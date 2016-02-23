@@ -1,0 +1,23 @@
+[
+  {
+    "uidLesson":"0325415",
+    "lessonLabel":"Maths Ch.1 Leçon 2",
+    "subjectName":"Maths",
+    "subjectLabel":"Maths",
+    "uidSchool":"Collège Pascal Praud",
+    "uidTeacher":"RTEGE-542187-GHEHG",
+    "fullNameTeacher":"Mlle Violette Chombier",
+    "classType":"",
+    "className":"1ère F",
+    "lessonDate":"2016/02/29",
+    "startTimeLesson":"10h00",
+    "endTimeLesson":"12h00",
+    "lessonDescription":"Cette leçon porte sur de l'algorythmique.",
+    "teacherNotes":"Devoir surprise à donner !",
+    "lessonRoom":"112",
+    "lessonColor":"000000",
+    "attachments":[
+      {"attachmentName":"devoir1", "fileName":"file.txt", "filePath":"c:/temp/file.txt"},
+      {"attachmentName":"devoir2", "fileName":"file2.txt", "filePath":"c:/temp/file2.txt"}
+    ]}
+]

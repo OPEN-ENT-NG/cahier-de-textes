@@ -1,0 +1,10 @@
+[
+  {
+    "uidTeacher":"RTEGE-542187-GHEHG",
+    "nameTeacher":"Chombier",
+    "firstNameTeacher":"Violette",
+    "subjects":[
+      {"subjectName":"Maths", "subjectLabel":"Maths"},
+      {"subjectName":"Physique", "subjectLabel":"Physique"}
+    ]}
+]

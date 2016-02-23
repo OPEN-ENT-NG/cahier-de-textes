@@ -1,0 +1,19 @@
+[
+  {
+    "uidHomework":"0325415",
+    "uidLesson":"0325415",
+    "homeworkLabel":"Maths Ch.1 Leçon 2",
+    "homeworkSubjectName":"Maths",
+    "homeworkType":"Exercice",
+    "uidTeacher":"RTEGE-542187-GHEHG",
+    "fullNameTeacher":"Mlle Violette Chombier",
+    "classType":"",
+    "className":"1ère F",
+    "homeworkDueDate":"2016/02/29",
+    "homeworkDescription":"Cette leçon porte sur de l'algorythmique.",
+    "teacherNotes":"Devoir surprise à donner !",
+    "attachments":[
+      {"attachmentName":"devoir1", "fileName":"file.txt", "filePath":"c:/temp/file.txt"},
+      {"attachmentName":"devoir2", "fileName":"file2.txt", "filePath":"c:/temp/file2.txt"}
+    ]}
+]
