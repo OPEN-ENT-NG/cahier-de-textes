@@ -39,7 +39,7 @@ public class DiaryController extends BaseController{
     public void showLessons(final HttpServerRequest request) {
         final String idTeacher = request.params().get("idTeacher");
         final String idSchool = request.params().get("idSchool");
-        lessonService.getAllLessons(idTeacher, idSchool, arrayResponseHandler(request));
+//        lessonService.getAllLessonsForTeacher(idTeacher, idSchool, arrayResponseHandler(request));
     }
 
 }

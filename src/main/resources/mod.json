@@ -6,6 +6,7 @@
 	"app-icon" : "Diary-large",
 	"app-displayName" : "Diary",
 	"mode": "dev",
+	"sql": true,
 	"entcore.port" : 8090,
 	"auto-redeploy": true
 }

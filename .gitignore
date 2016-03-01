@@ -8,4 +8,4 @@
 .jshintrc
 /.idea
 /node_modules
-
+*.iml
