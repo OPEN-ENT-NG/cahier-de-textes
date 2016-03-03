@@ -36,6 +36,7 @@ public class LessonController extends BaseController {
     public void getLesson(final HttpServerRequest request) {
 
         log.debug("getLesson");
+        ok(request);
     }
 
 
@@ -46,7 +47,7 @@ public class LessonController extends BaseController {
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
 
-        log.debug("listLessons" + idSchool);
+        log.debug("listLessons on school : " + idSchool);
 
         //TODO validate dates
 
@@ -56,9 +57,9 @@ public class LessonController extends BaseController {
 
                 if(user!=null){
                     if("Teacher".equals(user.getType())){
-                        lessonService.getAllLessonsForTeacher(user.getUserId(), idSchool, startDate, endDate, arrayResponseHandler(request));
+                        lessonService.getAllLessonsForTeacher(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else {
-                        lessonService.getAllLessonsForStudent(user.getUserId(), idSchool, startDate, endDate, arrayResponseHandler(request));
+                        lessonService.getAllLessonsForStudent(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     }
 
                 } else {

@@ -2,6 +2,7 @@ package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.utils.DateUtils;
+import fr.openent.diary.utils.JsonUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
@@ -25,6 +26,10 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
  */
 public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
+    private final static int INDEX_LESSON_ID = 0;
+    private final static int INDEX_HOMEWORK_ID = 16;
+    private final static int INDEX_LESSON_DATE = 11;
+
     private final static String DATABASE_TABLE ="lesson";
     private final static Logger log = LoggerFactory.getLogger("LessonServiceImpl");
 
@@ -36,7 +41,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     @Override
     public void getAllLessonsForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, l.teacher_id, t.teacher_display_name,")
+        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
                 .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
                 .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.homework_id ")
                 .append(" FROM diary.lesson AS l")
@@ -57,21 +62,28 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
                     JsonArray resultRefined = new JsonArray();
                     List<Object> homeworkIds = new ArrayList<Object>();
-                    JsonObject lastLesson = new JsonObject();
+                    //TODO check size >0
+                    JsonArray lastLesson = result.get(0);
 
-                    for (Object jsonObject : result) {
-                        JsonObject lesson = (JsonObject) jsonObject;
-                        String idLesson = lesson.getString("lesson_id");
-                        String idHomework = lesson.getString("homework_id");
+                    for (int i = 0; i < result.size(); i++) {
+                        JsonArray lesson = result.get(i);
 
-                        if(idLesson.compareTo(lastLesson.getString("lesson_id")) != 0){
+                        log.debug("lesson is : " + lesson.getClass());
+                        Long idLesson = lesson.get(INDEX_LESSON_ID);
+                        log.debug("id lesson is : " + idLesson.toString());
+                        Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
+                        log.debug("idHomework is : " + idHomework);
+
+                        if(idLesson.compareTo((Long) lastLesson.get(INDEX_LESSON_ID)) != 0){
                             addLesson(resultRefined, homeworkIds, lastLesson);
                             homeworkIds.clear();
-                        } else {
-                            if (idHomework != null && !idHomework.isEmpty()) {
-                                homeworkIds.add(idHomework);
-                            }
                         }
+
+                        if (idHomework != null) {
+                            log.debug("add idHomework : " + idHomework);
+                            homeworkIds.add(idHomework);
+                        }
+
                         lastLesson = lesson;
                     }
 
@@ -86,17 +98,17 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     }
 
-    private void addLesson(JsonArray resultRefined, List<Object> homeworkIds, JsonObject lastLesson) {
+    private void addLesson(JsonArray resultRefined, List<Object> homeworkIds, JsonArray lastLesson) {
         JsonArray homeworks = new JsonArray(homeworkIds);
-        lastLesson.removeField("homework_id");
-        lastLesson.putArray("homeworks", homeworks);
-        resultRefined.add(lastLesson);
+        JsonArray lessonWithHomeworks = JsonUtils.removeItemAt(lastLesson, INDEX_HOMEWORK_ID);
+        lessonWithHomeworks.addArray(homeworks);
+        resultRefined.add(lessonWithHomeworks);
     }
 
     @Override
     public void getAllLessonsForStudent(final String schoolId, final String groupId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, l.teacher_id, t.teacher_display_name,")
+        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
                 .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
                 .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.homework_id ")
                 .append(" FROM diary.lesson AS l")
@@ -117,29 +129,36 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
                     JsonArray resultRefined = new JsonArray();
                     List<Object> homeworkIds = new ArrayList<Object>();
-                    JsonObject lastLesson = new JsonObject();
+                    //TODO check size >0
+                    JsonArray lastLesson = result.get(0);
 
-                    for (Object jsonObject : result) {
-                        JsonObject lesson = (JsonObject) jsonObject;
-                        String idLesson = lesson.getString("lesson_id");
-                        String dateLesson = lesson.getString("lesson_date");
-                        String idHomework = lesson.getString("homework_id");
+                    for (int i = 0; i < result.size(); i++) {
+                        JsonArray lesson = result.get(i);
 
-                        if(idLesson.compareTo(lastLesson.getString("lesson_id")) != 0){
+                        log.debug("lesson is : " + lesson.getClass());
+                        Long idLesson = lesson.get(INDEX_LESSON_ID);
+                        log.debug("id lesson is : " + idLesson.toString());
+                        Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
+                        log.debug("idHomework is : " + idHomework);
+                        String dateLesson = lesson.get(INDEX_LESSON_DATE);
+                        log.debug("dateLesson is : " + dateLesson);
+
+                        if(idLesson.compareTo((Long)lastLesson.get(INDEX_LESSON_ID)) != 0){
                             addLesson(resultRefined, homeworkIds, lastLesson);
                             homeworkIds.clear();
-                        } else {
-                            if (idHomework != null && !idHomework.isEmpty()) {
-                                //don't display homeworks with lesson date > now
-                                try {
-                                    if (DateUtils.parseDate(dateLesson).before(new Date())) {
-                                        homeworkIds.add(idHomework);
-                                    }
-                                } catch (ParseException e) {
-                                    handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
+                        }
+
+                        if (idHomework != null) {
+                            //don't display homeworks with lesson date > now
+                            try {
+                                if (DateUtils.parseDate(dateLesson).before(new Date())) {
+                                    homeworkIds.add(idHomework);
                                 }
+                            } catch (ParseException e) {
+                                handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
                             }
                         }
+
                         lastLesson = lesson;
                     }
 
