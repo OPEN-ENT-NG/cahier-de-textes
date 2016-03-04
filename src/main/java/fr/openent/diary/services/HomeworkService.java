@@ -1,6 +1,8 @@
 package fr.openent.diary.services;
 
+import fr.wseduc.webutils.Either;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 /**
@@ -8,7 +10,12 @@ import org.vertx.java.core.json.JsonObject;
  */
 public interface HomeworkService {
 
-    void getAllHomeworksForALesson(final String teacherId, final String schoolId, final String lessonId, final Handler<JsonObject> handler);
+    void getAllHomeworksForALesson(final String schoolId, final String teacherId, final String lessonId, final Handler<JsonObject> handler);
+
+    void getAllHomeworksForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+
+    void getAllHomeworksForStudent(final String schoolId, final String groupId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+
 
     /**
      * Gets all the homeworks not related to a lesson.
