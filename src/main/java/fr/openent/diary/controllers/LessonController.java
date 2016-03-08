@@ -34,7 +34,7 @@ public class LessonController extends BaseController {
     @Get("/lesson")
     @ApiDoc("Get all lessons for etab")
     public void getLesson(final HttpServerRequest request) {
-
+        final String idLesson = request.params().get("etabId");
         log.debug("getLesson");
         ok(request);
     }
@@ -49,8 +49,6 @@ public class LessonController extends BaseController {
 
         log.debug("listLessons on school : " + idSchool);
 
-        //TODO validate dates
-
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
@@ -59,7 +57,7 @@ public class LessonController extends BaseController {
                     if("Teacher".equals(user.getType())){
                         lessonService.getAllLessonsForTeacher(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else {
-                        lessonService.getAllLessonsForStudent(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                        lessonService.getAllLessonsForStudent(idSchool, user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                     }
 
                 } else {

@@ -2,7 +2,7 @@
       "name": "fr.openent~diary~0.1-SNAPSHOT",
       "config": {
         "main" : "fr.openent.diary.Diary",
-        "port" : 8025,
+        "port" : 8054,
         "app-name" : "Diary",
     	"app-address" : "/diary",
     	"app-icon" : "Diary-large",

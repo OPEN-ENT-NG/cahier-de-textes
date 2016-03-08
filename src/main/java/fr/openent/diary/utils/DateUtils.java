@@ -11,7 +11,8 @@ import java.util.GregorianCalendar;
  */
 public final class DateUtils {
 
-    private final static String FORMAT ="yyyy-MM-dd";
+    public final static String DATE_FORMAT ="yyyy-MM-dd";
+    public final static String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
 
     private DateUtils()  {}
 
@@ -19,7 +20,7 @@ public final class DateUtils {
      * Parses a sql date formatted as yyyy-MM-dd into a Date Object.
      */
     public static Date parseDate(String dateToParse) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         return dateFormat.parse(dateToParse);
     }
 

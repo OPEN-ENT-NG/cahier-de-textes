@@ -15,6 +15,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,62 +41,151 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     @Override
     public void getAllLessonsForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
-                .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.homework_id ")
-                .append(" FROM diary.lesson AS l")
-                .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
-                .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
-                .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
-                .append(" GROUP BY l.lesson_id, t.teacher_display_name, h.homework_id")
-                .append(" ORDER BY l.lesson_date ASC");
 
-        JsonArray values = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId));
+        if (isDateValid(startDate) && isDateValid(endDate)) {
+            StringBuilder query = new StringBuilder();
+            query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
+                    .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
+                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.homework_id ")
+                    .append(" FROM diary.lesson AS l")
+                    .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
+                    .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
+                    .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
+                    .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
+                    .append(" GROUP BY l.lesson_id, l.lesson_date, t.teacher_display_name, h.homework_id")
+                    .append(" ORDER BY l.lesson_date ASC");
 
-        sql.prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
-            @Override
-            public void handle(Message<JsonObject> event) {
+            JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId))
+                    .add(startDate).add(endDate);
 
-                if ("ok".equals(event.body().getString("status"))) {
-                    JsonArray result = event.body().getArray("results");
+            sql.prepared(query.toString(), parameters, new Handler<Message<JsonObject>>() {
+                @Override
+                public void handle(Message<JsonObject> event) {
 
-                    JsonArray resultRefined = new JsonArray();
-                    List<Object> homeworkIds = new ArrayList<Object>();
-                    //TODO check size >0
-                    JsonArray lastLesson = result.get(0);
+                    if ("ok".equals(event.body().getString("status"))) {
+                        JsonArray result = event.body().getArray("results");
 
-                    for (int i = 0; i < result.size(); i++) {
-                        JsonArray lesson = result.get(i);
+                        JsonArray resultRefined = new JsonArray();
+                        List<Object> homeworkIds = new ArrayList<Object>();
+                        //TODO check size >0
+                        JsonArray lastLesson = result.get(0);
 
-                        log.debug("lesson is : " + lesson.getClass());
-                        Long idLesson = lesson.get(INDEX_LESSON_ID);
-                        log.debug("id lesson is : " + idLesson.toString());
-                        Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
-                        log.debug("idHomework is : " + idHomework);
+                        for (int i = 0; i < result.size(); i++) {
+                            JsonArray lesson = result.get(i);
 
-                        if(idLesson.compareTo((Long) lastLesson.get(INDEX_LESSON_ID)) != 0){
-                            addLesson(resultRefined, homeworkIds, lastLesson);
-                            homeworkIds.clear();
+                            log.debug("lesson is : " + lesson.getClass());
+                            Long idLesson = lesson.get(INDEX_LESSON_ID);
+                            log.debug("id lesson is : " + idLesson.toString());
+                            Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
+                            log.debug("idHomework is : " + idHomework);
+
+                            if(idLesson.compareTo((Long) lastLesson.get(INDEX_LESSON_ID)) != 0){
+                                addLesson(resultRefined, homeworkIds, lastLesson);
+                                homeworkIds.clear();
+                            }
+
+                            if (idHomework != null) {
+                                log.debug("add idHomework : " + idHomework);
+                                homeworkIds.add(idHomework);
+                            }
+
+                            lastLesson = lesson;
                         }
 
-                        if (idHomework != null) {
-                            log.debug("add idHomework : " + idHomework);
-                            homeworkIds.add(idHomework);
-                        }
+                        addLesson(resultRefined, homeworkIds, lastLesson);
 
-                        lastLesson = lesson;
+                        handler.handle(new Either.Right<String, JsonArray>(resultRefined));
+                    } else {
+                        handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
                     }
-
-                    addLesson(resultRefined, homeworkIds, lastLesson);
-
-                    handler.handle(new Either.Right<String, JsonArray>(resultRefined));
-                } else {
-                    handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
                 }
-            }
-        });
+            });
+        } else {
+            StringBuilder errorMessage = new StringBuilder("Start date and end date must follow the pattern: ");
+            errorMessage.append(DateUtils.DATE_FORMAT);
+            handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
+        }
+    }
 
+    @Override
+    public void getAllLessonsForStudent(final String schoolId, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+
+        if (isDateValid(startDate) && isDateValid(endDate)) {
+            StringBuilder query = new StringBuilder();
+            query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
+                    .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
+                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.homework_id ")
+                    .append(" FROM diary.lesson AS l")
+                    .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
+                    .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
+                    .append(" WHERE l.school_id = ? AND l.audience_code in ")
+                    .append(sql.listPrepared(groupIds.toArray()))
+                    .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
+                    .append(" GROUP BY l.lesson_id, l.lesson_date, t.teacher_display_name, h.homework_id")
+                    .append(" ORDER BY l.lesson_date ASC");
+
+            JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+            for (Object id: groupIds) {
+                parameters.add(id);
+            }
+
+            parameters.add(startDate).add(endDate);
+
+            sql.prepared(query.toString(), parameters, new Handler<Message<JsonObject>>() {
+                @Override
+                public void handle(Message<JsonObject> event) {
+
+                    if ("ok".equals(event.body().getString("status"))) {
+                        JsonArray result = event.body().getArray("results");
+
+                        JsonArray resultRefined = new JsonArray();
+                        List<Object> homeworkIds = new ArrayList<Object>();
+                        //TODO check size >0
+                        JsonArray lastLesson = result.get(0);
+
+                        for (int i = 0; i < result.size(); i++) {
+                            JsonArray lesson = result.get(i);
+
+                            log.debug("lesson is : " + lesson.getClass());
+                            Long idLesson = lesson.get(INDEX_LESSON_ID);
+                            log.debug("id lesson is : " + idLesson.toString());
+                            Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
+                            log.debug("idHomework is : " + idHomework);
+                            String dateLesson = lesson.get(INDEX_LESSON_DATE);
+                            log.debug("dateLesson is : " + dateLesson);
+
+                            if(idLesson.compareTo((Long)lastLesson.get(INDEX_LESSON_ID)) != 0){
+                                addLesson(resultRefined, homeworkIds, lastLesson);
+                                homeworkIds.clear();
+                            }
+
+                            if (idHomework != null) {
+                                //don't display homeworks with lesson date > now
+                                try {
+                                    if (DateUtils.parseDate(dateLesson).before(new Date())) {
+                                        homeworkIds.add(idHomework);
+                                    }
+                                } catch (ParseException e) {
+                                    handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
+                                }
+                            }
+
+                            lastLesson = lesson;
+                        }
+
+                        addLesson(resultRefined, homeworkIds, lastLesson);
+
+                        handler.handle(new Either.Right<String, JsonArray>(resultRefined));
+                    } else {
+                        handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
+                    }
+                }
+            });
+        }  else {
+            StringBuilder errorMessage = new StringBuilder("Start date and end date must follow the pattern: ");
+            errorMessage.append(DateUtils.DATE_FORMAT);
+            handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
+        }
     }
 
     private void addLesson(JsonArray resultRefined, List<Object> homeworkIds, JsonArray lastLesson) {
@@ -103,75 +193,6 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         JsonArray lessonWithHomeworks = JsonUtils.removeItemAt(lastLesson, INDEX_HOMEWORK_ID);
         lessonWithHomeworks.addArray(homeworks);
         resultRefined.add(lessonWithHomeworks);
-    }
-
-    @Override
-    public void getAllLessonsForStudent(final String schoolId, final String groupId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
-                .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.homework_id ")
-                .append(" FROM diary.lesson AS l")
-                .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
-                .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
-                .append(" WHERE l.audience_code = ? AND l.school_id = ?")
-                .append(" GROUP BY l.lesson_id, t.teacher_display_name, h.homework_id")
-                .append(" ORDER BY l.lesson_date ASC");
-
-        JsonArray values = new JsonArray().add(Sql.parseId(groupId)).add(Sql.parseId(schoolId));
-
-        sql.prepared(query.toString(), values, new Handler<Message<JsonObject>>() {
-            @Override
-            public void handle(Message<JsonObject> event) {
-
-                if ("ok".equals(event.body().getString("status"))) {
-                    JsonArray result = event.body().getArray("results");
-
-                    JsonArray resultRefined = new JsonArray();
-                    List<Object> homeworkIds = new ArrayList<Object>();
-                    //TODO check size >0
-                    JsonArray lastLesson = result.get(0);
-
-                    for (int i = 0; i < result.size(); i++) {
-                        JsonArray lesson = result.get(i);
-
-                        log.debug("lesson is : " + lesson.getClass());
-                        Long idLesson = lesson.get(INDEX_LESSON_ID);
-                        log.debug("id lesson is : " + idLesson.toString());
-                        Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
-                        log.debug("idHomework is : " + idHomework);
-                        String dateLesson = lesson.get(INDEX_LESSON_DATE);
-                        log.debug("dateLesson is : " + dateLesson);
-
-                        if(idLesson.compareTo((Long)lastLesson.get(INDEX_LESSON_ID)) != 0){
-                            addLesson(resultRefined, homeworkIds, lastLesson);
-                            homeworkIds.clear();
-                        }
-
-                        if (idHomework != null) {
-                            //don't display homeworks with lesson date > now
-                            try {
-                                if (DateUtils.parseDate(dateLesson).before(new Date())) {
-                                    homeworkIds.add(idHomework);
-                                }
-                            } catch (ParseException e) {
-                                handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
-                            }
-                        }
-
-                        lastLesson = lesson;
-                    }
-
-                    addLesson(resultRefined, homeworkIds, lastLesson);
-
-                    handler.handle(new Either.Right<String, JsonArray>(resultRefined));
-                } else {
-                    handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
-                }
-            }
-        });
-
-
     }
 
     @Override
@@ -213,5 +234,21 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     @Override
     public void deleteLesson(final String  lessonId, final Handler<Either<String, JsonObject>> handler) {
         super.delete(lessonId, handler);
+    }
+
+    /**
+     * Controls the date format. Must be yyyy-MM-dd.
+     */
+    private boolean isDateValid(String date) {
+        if (date == null || !date.matches(DateUtils.DATE_FORMAT_REGEX))
+            return false;
+        SimpleDateFormat df = new SimpleDateFormat(DateUtils.DATE_FORMAT);
+        df.setLenient(false);
+        try {
+            df.parse(date);
+            return true;
+        } catch (ParseException ex) {
+            return false;
+        }
     }
 }
