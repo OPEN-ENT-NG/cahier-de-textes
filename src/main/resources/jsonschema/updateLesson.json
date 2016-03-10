@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "lesson_title": {
+      "type": "string"
+    },
+    "subject_name": {
+      "type": "string"
+    },
+    "subject_label": {
+      "type": "string"
+    },
+    "school_id": {
+      "type": "string"
+    },
+    "audience_type": {
+      "type": "string"
+    },
+    "audience_code": {
+      "type": "string"
+    },
+    "audience_name": {
+      "type": "string"
+    },
+    "lesson_date": {
+      "type": "string"
+    },
+    "lesson_start_time": {
+      "type": "string"
+    },
+    "lesson_end_time": {
+      "type": "string"
+    },
+    "lesson_description": {
+      "type": "string"
+    },
+    "lesson_annotation": {
+      "type": "string"
+    },
+    "lesson_room": {
+      "type": "string"
+    },
+    "lesson_color": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "lesson_title",
+    "subject_name",
+    "subject_label",
+    "school_id",
+    "audience_type",
+    "audience_code",
+    "audience_name",
+    "lesson_date",
+    "lesson_start_time",
+    "lesson_end_time",
+    "lesson_description",
+    "lesson_room",
+    "lesson_color"
+  ]
+}

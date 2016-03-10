@@ -2,9 +2,12 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.services.LessonService;
 import fr.wseduc.rs.ApiDoc;
+import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.rs.Put;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.user.UserInfos;
@@ -31,12 +34,26 @@ public class LessonController extends BaseController {
         this.lessonService = lessonService;
     }
 
-    @Get("/lesson")
-    @ApiDoc("Get all lessons for etab")
+    @Get("/lesson/:id")
+    @ApiDoc("Get a lesson using its identifier")
     public void getLesson(final HttpServerRequest request) {
-        final String idLesson = request.params().get("etabId");
-        log.debug("getLesson");
-        ok(request);
+        final String lessonId = request.params().get("id");
+
+        if (isValidLessonId(lessonId)) {
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        lessonService.retrieveLesson(lessonId, notEmptyResponseHandler(request, 201));
+                    } else {
+                        log.debug("User not found in session.");
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+        } else {
+            badRequest(request,"Invalid lesson identifier.");
+        }
     }
 
 
@@ -53,15 +70,15 @@ public class LessonController extends BaseController {
             @Override
             public void handle(UserInfos user) {
 
-                if(user!=null){
+                if(user != null){
                     if("Teacher".equals(user.getType())){
                         lessonService.getAllLessonsForTeacher(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
-                    } else {
+                    } else { //if student
                         lessonService.getAllLessonsForStudent(idSchool, user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
-                    }
+                    } //TODO manage more type of users?
 
                 } else {
-                    unauthorized(request,"no user found in session");
+                    unauthorized(request,"No user found in session.");
                 }
             }
         });
@@ -69,32 +86,90 @@ public class LessonController extends BaseController {
 
     @Post("/lesson")
     @ApiDoc("Create a lesson")
-    @SecuredAction("diary.lesson.create")
+//    @SecuredAction("diary.lesson.create")
     public void createLesson(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
 
-                if(user!=null){
+                if(user != null){
                     RequestUtils.bodyToJson(request, pathPrefix + "createLesson", new Handler<JsonObject>() {
                         @Override
                         public void handle(JsonObject json) {
 
-                            if(user.getStructures().contains(json.getString("uidSchool",""))){
+                            if(user.getStructures().contains(json.getString("school_id",""))){
                                 lessonService.createLesson(json, notEmptyResponseHandler(request, 201));
                             } else {
-                                badRequest(request,"invalid school id");
+                                badRequest(request,"Invalid school identifier.");
                             }
                         }
                     });
 
                 } else {
-                    unauthorized(request,"no user found in session");
+                    unauthorized(request, "No user found in session.");
                 }
             }
         });
     }
 
+    @Put("/lesson/:id")
+    @ApiDoc("Modify a lesson")
+    public void modifyLesson(final HttpServerRequest request) {
+
+        final String lessonId = request.params().get("id");
+
+        if (isValidLessonId(lessonId)) {
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        RequestUtils.bodyToJson(request, pathPrefix + "updateLesson",  new Handler<JsonObject>() {
+                            @Override
+                            public void handle(JsonObject json) {
+                                lessonService.updateLesson(lessonId, json, notEmptyResponseHandler(request, 201));
+                            }
+                        });
+                    } else {
+                        log.debug("User not found in session.");
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+        }else {
+            badRequest(request,"Invalid lesson identifier.");
+        }
+    }
+
+
+    @Delete("/lesson/:id")
+    @ApiDoc("Delete a lesson")
+    public void deleteLesson(final HttpServerRequest request) {
+
+        final String lessonId = request.params().get("id");
+
+        if (isValidLessonId(lessonId)) {
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        lessonService.deleteLesson(lessonId, notEmptyResponseHandler(request, 201));
+                    } else {
+                        log.debug("User not found in session.");
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+        } else {
+            badRequest(request,"Invalid lesson identifier.");
+        }
+    }
+
+    /**
+     * Controls that the lessonId is a not null number entry.
+     */
+    private boolean isValidLessonId(String lessonId) {
+        return lessonId != null && lessonId.matches("\\d+");
+    }
 
 }

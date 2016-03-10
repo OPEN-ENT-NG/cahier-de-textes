@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "homework_title": {
+      "type": "string"
+    },
+    "subject_label": {
+      "type": "string"
+    },
+    "subject_code": {
+      "type": "string"
+    },
+    "homework_type_id": {
+      "type": "string"
+    },
+    "teacher_id": {
+      "type": "string"
+    },
+    "school_id": {
+      "type": "string"
+    },
+    "lesson_id": {
+      "type": "string"
+    },
+    "audience_type": {
+      "type": "string"
+    },
+    "audience_code": {
+      "type": "string"
+    },
+    "audience_label": {
+      "type": "string"
+    },
+    "homework_due_date": {
+      "type": "string"
+    },
+    "homework_description": {
+      "type": "string"
+    },
+    "homework_color": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "homework_title",
+    "subject_label",
+    "subject_code",
+    "homework_type_id",
+    "teacher_id",
+    "school_id",
+    "audience_type",
+    "audience_code",
+    "audience_label",
+    "homework_due_date",
+    "homework_description",
+    "homework_color"
+  ]
+}

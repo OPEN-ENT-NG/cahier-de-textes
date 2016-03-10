@@ -1,6 +1,7 @@
 package fr.openent.diary;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.controllers.HomeworkController;
 import fr.openent.diary.controllers.LessonController;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.DiaryServiceImpl;
@@ -23,6 +24,7 @@ public class Diary extends BaseServer {
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
         addController(new LessonController(lessonService));
+        addController(new HomeworkController(homeworkService, lessonService));
 	}
 
 }
