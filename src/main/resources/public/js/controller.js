@@ -3,5 +3,6 @@
 	------------------
 	Main controller.
 **/
-function DiaryController($scope, $rootScope, model, template, route, date){
+function DiaryController($scope, model, route, date) {
+    template.open('main', 'main');
 }

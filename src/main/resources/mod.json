@@ -8,5 +8,5 @@
 	"mode": "dev",
 	"sql": true,
 	"entcore.port" : 8090,
-	"auto-redeploy": true
+	"auto-redeploy": false
 }

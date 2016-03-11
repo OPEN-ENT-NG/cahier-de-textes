@@ -36,6 +36,12 @@ public class DiaryController extends BaseController{
         this.lessonService = lessonService;
     }
 
+	@Get("")
+	@SecuredAction("diary.view")
+	public void view(final HttpServerRequest request) {
+		renderView(request);
+	}
+
     /**
      * Creates a teacher if it does not exist.
      * @param teacherId
