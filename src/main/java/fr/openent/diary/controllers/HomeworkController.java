@@ -57,7 +57,7 @@ public class HomeworkController extends BaseController {
         }
     }
 
-    @Get("/homework/:lessonId")
+    @Get("/homework/list/:lessonId")
     @ApiDoc("Get all homeworks for a lesson")
     public void listHomeworkByLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
