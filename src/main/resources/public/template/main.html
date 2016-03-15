@@ -1,5 +1,32 @@
 ﻿<h1><i18n>diary.title</i18n></h1>
 
-<div class="row">
-    <calendar></calendar>
-</div>
+<lightbox show="lightboxes.createLesson" on-close="lightboxes.createLesson = false">
+    <container template="create-lesson"></container>
+</lightbox>
+<lightbox show="lightboxes.createHomework" on-close="lightboxes.createHomework = false">
+    <container template="create-homework"></container>
+</lightbox>
+    
+
+    <div class="row">
+        <button ng-click="lightboxes.createLesson = true">
+            <i18n>diary.lesson.create</i18n>
+        </button>
+        <button ng-click="lightboxes.createHomework = true">
+            <i18n>diary.homework.create</i18n>
+        </button>
+        <hr />
+    </div>
+
+    <div class="row">
+        <filters>
+            <li>
+                <button ng-click="previousWeek(); ">&#8592;</button>
+                <button ng-click="nextWeek(); ">&#8594;</button>
+            </li>
+        </filters>
+        <calendar class="twelve cell"
+                  display-template="display-calendar-item"
+                  create-template="create-lesson"
+                  items="lessons"></calendar>
+    </div>

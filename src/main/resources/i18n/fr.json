@@ -43,5 +43,20 @@
 	"share.more"										: "Voir la suite",
 	"share.search.title"								: "Rechercher des utilisateurs et des groupes",
 	"share.search.placeholder"							: "Ex : Sabine, Dupont, Enseignants de l'école...",
-	"seemore"											: "Voir la suite"
+  "seemore": "Voir la suite",
+  "start.time": "Début",
+  "end.time": "Fin",
+  "room": "Salle",
+  "lesson.details.title": "Détails d'une séance",
+  "homework.details.title": "Détails d'un devoir",
+  "subject": "Matière",
+  "diary.lesson.create": "Créer une séance",
+  "diary.homework.create": "Créer un devoir",
+  "annotations.title": "Annotations",
+  "create.lesson.tabs.lesson": "Séance",
+  "create.lesson.tabs.homeworks": "Devoirs ([[lesson.homeworks.length()]])",
+  "classroom": "Classe",
+  "group": "Groupe",
+  "homework.type.home": "Devoir maison",
+  "lesson.homeworks.add": "Ajouter un devoir"
 }
