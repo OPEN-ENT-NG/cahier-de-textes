@@ -25,6 +25,14 @@ function DiaryController($scope, model, route, date) {
     $scope.subjects = model.subjects;
     $scope.homeworkTypes = model.homeworkTypes;
 
+    $scope.openLessonView = function(){
+        $scope.lightboxes.createLesson = true;
+        $scope.newItem = {
+            beginning: moment(),
+            end: moment()
+        }
+    }
+
     $scope.createLesson = function (start, end) {
         $scope.lesson.startTime = start;
         $scope.lesson.endTime = end;

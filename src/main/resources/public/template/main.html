@@ -9,7 +9,7 @@
     
 
     <div class="row">
-        <button ng-click="lightboxes.createLesson = true">
+        <button ng-click="openLessonView()">
             <i18n>diary.lesson.create</i18n>
         </button>
         <button ng-click="lightboxes.createHomework = true">
@@ -25,8 +25,11 @@
                 <button ng-click="nextWeek(); ">&#8594;</button>
             </li>
         </filters>
-        <calendar class="twelve cell"
-                  display-template="display-calendar-item"
-                  create-template="create-lesson"
-                  items="lessons"></calendar>
+        <calendar-daily-events for="calendar"></calendar-daily-events>
+        <calendar 
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                items="lessons"></calendar>
     </div>

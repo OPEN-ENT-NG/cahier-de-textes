@@ -1,6 +1,18 @@
-﻿AngularExtensions = {
+﻿var AngularExtensions = {
     addDirectives: function(module){
-        module.directive('timePicker', function ($compile) {
+        module.directive('calendarDailyEvents', function(){
+            return {
+                scope: {
+                    ngModel: '='
+                },
+                template: '',
+                link: function(scope, element, attributes){
+                    console.log($(attributes.for));
+                }
+            }    
+        });
+        
+        module.directive('timePicker', function () {
             return {
                 scope: {
                     ngModel: '=',
@@ -39,11 +51,13 @@
 
                     element.on('change', function () {
                         var time = element.val().split(':');
-                        scope.ngModel.set('hour', time[0]);
-                        scope.ngModel.set('minute', time[1]);
-                        scope.$apply('ngModel');
-                        scope.$parent.$eval(scope.ngChange);
-                        scope.$parent.$apply();
+                        if(scope.ngModel && scope.ngModel.hour){
+                            scope.ngModel.set('hour', time[0]);
+                            scope.ngModel.set('minute', time[1]);
+                            scope.$apply('ngModel');
+                            scope.$parent.$eval(scope.ngChange);
+                            scope.$parent.$apply();
+                        }
                     });
 
                     element.on('show.timepicker', function () {
@@ -54,10 +68,6 @@
                                 timepicker.hideWidget();
                             }
                         });
-                    });
-
-                    element.on('$destroy', function () {
-                        element.timepicker('remove');
                     });
                 }
             }

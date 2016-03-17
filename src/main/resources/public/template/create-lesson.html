@@ -31,10 +31,13 @@
         <section ng-if="tabs.createLesson === 'lesson'">
             <div class="row">
                 <input type="text" i18n-placeholder="title" ng-model="lesson.title" required class="six cell" />
-                <div class="one cell right-magnet">
-                    <color-select ng-model="lesson.color"></color-select>
+                <div class="five cell right-magnet">
+                    <div class="one cell right-magnet [[lesson.color]] height-one">
+                        &nbsp;
+                        <color-select ng-model="lesson.color"></color-select>
+                    </div>
                 </div>
-                <div class="one cell right-magnet [[lesson.color]]">&nbsp;</div>
+                
             </div>
             <div class="row">
                 <div class="three cell">
