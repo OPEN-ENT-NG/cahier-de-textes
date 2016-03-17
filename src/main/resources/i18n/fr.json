@@ -58,5 +58,6 @@
   "classroom": "Classe",
   "group": "Groupe",
   "homework.type.home": "Devoir maison",
-  "lesson.homeworks.add": "Ajouter un devoir"
+  "lesson.homeworks.add": "Ajouter un devoir",
+  "daily.event": "Devoirs ([[day.dailyEvents.length]])"
 }

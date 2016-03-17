@@ -8,6 +8,23 @@ Homework.prototype.api = {
     post: '/diary/homework'
 };
 
+Homework.prototype.toJSON = function(){
+    return {
+        homework_title: this.title,
+        subject_label: this.subject.label,
+        subject_code: this.subject.code,
+        homework_type_id: this.type.id,
+        teacher_id: model.me.userId,
+        school_id: this.classroom.structureId,
+        audience_type: this.audienceType,
+        audience_code: this.classroom.id,
+        audience_label: this.classroom.name,
+        homework_due_date: this.dueDate.format('YYYY-MM-DD'),
+        homework_description: this.description,
+        homework_color: this.color
+    }
+};
+
 function Attachment(){}
 function Subject() { }
 function Classroom() { }
@@ -107,5 +124,31 @@ model.build = function () {
                 { id: 1, label: lang.translate('homework.type.home') }
             ]);
         }
-    })
+    });
+    
+    this.collection(Homework, {
+        sync: function(){
+            model.one('classrooms.sync', function(){
+                http().get('/diary/public/json/homeworks.json').done(function(homeworks){
+                this.load(
+                    _.map(homeworks, function(homework){
+                            return {
+                                id: homework.id,
+                                description: homework.homework_description,
+                                subject: model.subjects.findWhere({ code: homework.subject_code }),
+                                type: model.homeworkTypes.findWhere({ id: homework.type_id }),
+                                teacherId: homework.teacher_id,
+                                structureId: homework.structureId,
+                                classroom: model.classrooms.findWhere({ id: homework.audience_code }),
+                                dueDate: homework.homework_due_date,
+                                date: moment(homework.homework_due_date),
+                                title: homework.homework_title,
+                                color: homework.homework_color
+                            }  
+                    })
+                ) 
+                }.bind(this));
+            }.bind(this));
+        }
+    });
 }

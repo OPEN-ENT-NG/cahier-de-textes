@@ -8,6 +8,7 @@ function DiaryController($scope, model, route, date) {
     template.open('main', 'main');
     template.open('create-lesson', 'create-lesson');
     template.open('create-homework', 'create-homework');
+    template.open('daily-event-details', 'daily-event-details');
 
     $scope.lesson = new Lesson();
     $scope.homework = new Homework();
@@ -24,6 +25,7 @@ function DiaryController($scope, model, route, date) {
     $scope.classrooms = model.classrooms;
     $scope.subjects = model.subjects;
     $scope.homeworkTypes = model.homeworkTypes;
+    $scope.homeworks = model.homeworks;
 
     $scope.openLessonView = function(){
         $scope.lightboxes.createLesson = true;
@@ -39,14 +41,20 @@ function DiaryController($scope, model, route, date) {
         $scope.lesson.date = start;
         $scope.lesson.save();
     };
+    
+    $scope.createHomework = function () {
+        $scope.homework.save();
+    };
 
     $scope.nextWeek = function () {
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
+        model.trigger('calendar.date-change');
     };
 
     $scope.previousWeek = function () {
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
+        model.trigger('calendar.date-change');
     };
 }
