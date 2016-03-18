@@ -109,3 +109,5 @@ model.build = function () {
         }
     })
 }
+
+model.on('calendar.date-change', function(){ model.lessons.sync() })
