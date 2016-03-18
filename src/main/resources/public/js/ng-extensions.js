@@ -5,9 +5,68 @@
                 scope: {
                     ngModel: '='
                 },
-                template: '',
+                restrict: 'E',
+                template: '<div class="days">' +
+                    '<div class="day" ng-repeat="day in calendar.days.all">' +
+                        '<div class="opener" ng-if="day.dailyEvents.length" ng-click="day.openDailyEvents = !day.openDailyEvents"><i18n>daily.event</i18n></div>' +
+                        '<div class="daily-events" ng-class="{ show: day.openDailyEvents }">' +
+                            '<div class="item [[dailyEvent.color]]" ng-repeat="dailyEvent in day.dailyEvents">' + 
+                                '<container template="daily-event-details"></container>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>',
                 link: function(scope, element, attributes){
-                    console.log($(attributes.for));
+                    scope.calendar = model.calendar;
+                    
+                    function placeTimeslots(){
+                        setTimeout(function(){
+                            var timeslots = $('.timeslots');
+                            if(timeslots.length === 8 && timeslots.offset().top > 0){
+                                timeslots.offset({ top: timeslots.offset().top + 40 });
+                                $('.schedule .days').height(587);
+                            }
+                            else{
+                                placeTimeslots();
+                            }
+                        }, 10);
+                    }
+                    
+                    placeTimeslots();
+                    
+                    function setDaysContent(){
+                        scope.ngModel.forEach(function(item){
+                            var refDay = moment(model.calendar.dayForWeek).day(1);
+                            model.calendar.days.forEach(function(day){
+                                day.dailyEvents = [];
+                                if(item.date.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')){
+                                    day.dailyEvents.push(item);
+                                }
+                                
+                                refDay.add('day', 1);
+                            });
+                        });
+                        
+                        scope.calendar = model.calendar;
+                    }
+                    
+                    model.on('calendar.date-change', function(){
+                        setDaysContent();
+                        scope.$apply();
+                    });
+                    
+                    scope.$watchCollection('ngModel', function(newVal){
+                        setDaysContent()
+                    });
+                    
+                    $('body').on('click', function(e){
+                        if(e.target !== element[0] && element.find(e.target).length === 0){
+                            model.calendar.days.forEach(function(day){
+                                day.openDailyEvents = false;
+                            });
+                            scope.$apply();
+                        }
+                    });
                 }
             }    
         });

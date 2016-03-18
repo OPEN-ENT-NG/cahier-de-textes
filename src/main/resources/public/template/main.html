@@ -25,7 +25,7 @@
                 <button ng-click="nextWeek(); ">&#8594;</button>
             </li>
         </filters>
-        <calendar-daily-events for="calendar"></calendar-daily-events>
+        <calendar-daily-events for="calendar" ng-model="homeworks.all"></calendar-daily-events>
         <calendar 
                 id="calendar"
                 class="twelve cell"
