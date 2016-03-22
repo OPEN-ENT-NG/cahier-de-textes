@@ -24,7 +24,7 @@
       "type": "string"
     },
     "audience_code": {
-      "id": "http://jsonschema.net/audience_code",
+      "id": "http://jsonschema.net/audience_id",
       "type": "string"
     },
     "audience_label": {
@@ -70,7 +70,7 @@
     "subject_label",
     "school_id",
     "audience_type",
-    "audience_code",
+    "audience_id",
     "audience_label",
     "lesson_date",
     "lesson_start_time",

@@ -25,6 +25,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     private final static String DATABASE_TABLE ="homework";
     private final static Logger log = LoggerFactory.getLogger("HomeworkServiceImpl");
+    private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
 
     public HomeworkServiceImpl() {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
@@ -35,7 +36,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
-                .append(" h.audience_type, h.audience_code, h.audience_label, h.homework_title, h.homework_color,")
+                .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
@@ -53,7 +54,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
-                .append(" h.audience_type, h.audience_code, h.audience_label, h.homework_title, h.homework_color,")
+                .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
@@ -73,12 +74,13 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         //TODO handle dates + modify current_date ?
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
-                .append(" h.audience_type, h.audience_code, h.audience_label, h.homework_title, h.homework_color,")
+                .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
                 .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = t.lesson_id")
-                .append(" WHERE h.school_id = ? AND h.audience_code in ")
+                .append(" WHERE h.school_id = ? AND h.audience_id in ")
+                .append(sql.listPrepared(groupIds.toArray()))
                 .append(" AND h.homework_due_date < current_date")
                 .append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD') AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')")
                 .append(" ORDER BY h.homework_due_date ASC");
@@ -104,9 +106,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void createHomework(final JsonObject homeworkObject, final Handler<Either<String, JsonObject>> handler) {
+    public void createHomework(final JsonObject homeworkObject, final String teacherId, final Handler<Either<String, JsonObject>> handler) {
         if(homeworkObject != null) {
             final JsonArray attachments = homeworkObject.getArray("attachments");
+            homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
             if(attachments != null && attachments.size() > 0) {
                 //get next on the sequence to add the homework and value in FK on attachment
 

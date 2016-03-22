@@ -27,7 +27,7 @@
     "audience_type": {
       "type": "string"
     },
-    "audience_code": {
+    "audience_id": {
       "type": "string"
     },
     "audience_label": {
@@ -54,7 +54,7 @@
     "teacher_id",
     "school_id",
     "audience_type",
-    "audience_code",
+    "audience_id",
     "audience_label",
     "homework_due_date",
     "homework_description",

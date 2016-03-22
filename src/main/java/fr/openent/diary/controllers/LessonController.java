@@ -99,7 +99,7 @@ public class LessonController extends BaseController {
                         public void handle(JsonObject json) {
 
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                lessonService.createLesson(json, notEmptyResponseHandler(request, 201));
+                                lessonService.createLesson(json, user.getUserId(), notEmptyResponseHandler(request, 201));
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }

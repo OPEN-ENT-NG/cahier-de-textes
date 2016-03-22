@@ -116,7 +116,7 @@ public class HomeworkController extends BaseController {
                         public void handle(JsonObject json) {
 
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                homeworkService.createHomework(json, notEmptyResponseHandler(request, 201));
+                                homeworkService.createHomework(json, user.getUserId(), notEmptyResponseHandler(request, 201));
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
@@ -147,7 +147,7 @@ public class HomeworkController extends BaseController {
                                     @Override
                                     public void handle(JsonObject json) {
                                         if(user.getStructures().contains(json.getString("school_id",""))){
-                                            homeworkService.createHomework(json, notEmptyResponseHandler(request, 201));
+                                            homeworkService.createHomework(json, user.getUserId(), notEmptyResponseHandler(request, 201));
                                         } else {
                                             badRequest(request,"Invalid school identifier.");
                                         }
