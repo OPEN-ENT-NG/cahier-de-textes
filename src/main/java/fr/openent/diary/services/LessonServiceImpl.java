@@ -18,8 +18,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static org.entcore.common.sql.SqlResult.validResult;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 /**
@@ -27,12 +32,11 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
  */
 public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
-    private final static int INDEX_LESSON_ID = 0;
-    private final static int INDEX_HOMEWORK_ID = 16;
-    private final static int INDEX_LESSON_DATE = 11;
-
     private final static String DATABASE_TABLE ="lesson";
     private final static Logger log = LoggerFactory.getLogger("LessonServiceImpl");
+    private static final java.lang.String ID_LESSON_FIELD_NAME = "lesson_id";
+    private static final java.lang.String ID_HOMEWORK_FIELD_NAME = "homework_id";
+    private static final java.lang.String LESSON_DATE_FIELD_NAME = "lesson_date";
 
     public LessonServiceImpl() {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
@@ -48,7 +52,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append("l.audience_type, l.audience_code, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
                     .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.homework_id ")
                     .append(" FROM diary.lesson AS l")
-                    .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
+                    .append(" INNER JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
                     .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
                     .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
@@ -63,38 +67,47 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 public void handle(Message<JsonObject> event) {
 
                     if ("ok".equals(event.body().getString("status"))) {
-                        JsonArray result = event.body().getArray("results");
+                        final Either<String, JsonArray> ei = validResult(event);
+                        if (ei.isRight()) {
+                            JsonArray result = ei.right().getValue();
 
-                        JsonArray resultRefined = new JsonArray();
-                        List<Object> homeworkIds = new ArrayList<Object>();
-                        //TODO check size >0
-                        JsonArray lastLesson = result.get(0);
+                            if (result.size() > 0) {
+                                JsonArray resultRefined = new JsonArray();
+                                Set<Long> homeworkIds = new HashSet<Long>();
+                                JsonObject lastLesson = result.get(0);
 
-                        for (int i = 0; i < result.size(); i++) {
-                            JsonArray lesson = result.get(i);
+                                for (int i = 0; i < result.size(); i++) {
+                                    JsonObject lesson = result.get(i);
 
-                            log.debug("lesson is : " + lesson.getClass());
-                            Long idLesson = lesson.get(INDEX_LESSON_ID);
-                            log.debug("id lesson is : " + idLesson.toString());
-                            Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
-                            log.debug("idHomework is : " + idHomework);
+                                    log.debug("lesson is : " + lesson.getClass());
+                                    Long idLesson = lesson.getLong(ID_LESSON_FIELD_NAME);
+                                    log.debug("id lesson is : " + idLesson.toString());
+                                    Long idHomework = lesson.getLong(ID_HOMEWORK_FIELD_NAME);
+                                    log.debug("idHomework is : " + idHomework);
 
-                            if(idLesson.compareTo((Long) lastLesson.get(INDEX_LESSON_ID)) != 0){
+                                    if(!idLesson.equals(lastLesson.getLong(ID_LESSON_FIELD_NAME))){
+                                        addLesson(resultRefined, homeworkIds, lastLesson);
+                                        homeworkIds.clear();
+                                    }
+
+                                    if (idHomework != null) {
+                                        log.debug("add idHomework : " + idHomework);
+                                        homeworkIds.add(idHomework);
+                                    }
+
+                                    lastLesson = lesson;
+                                }
+
                                 addLesson(resultRefined, homeworkIds, lastLesson);
-                                homeworkIds.clear();
-                            }
 
-                            if (idHomework != null) {
-                                log.debug("add idHomework : " + idHomework);
-                                homeworkIds.add(idHomework);
+                                handler.handle(new Either.Right<String, JsonArray>(resultRefined));
+                            } else {
+                                StringBuilder errorMessage = new StringBuilder("No results.");
+                                handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
                             }
-
-                            lastLesson = lesson;
+                        } else {
+                            handler.handle(new Either.Left<String, JsonArray>(ei.left().getValue()));
                         }
-
-                        addLesson(resultRefined, homeworkIds, lastLesson);
-
-                        handler.handle(new Either.Right<String, JsonArray>(resultRefined));
                     } else {
                         handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
                     }
@@ -136,46 +149,60 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 public void handle(Message<JsonObject> event) {
 
                     if ("ok".equals(event.body().getString("status"))) {
-                        JsonArray result = event.body().getArray("results");
+                        final Either<String, JsonArray> ei = validResult(event);
+                        if (ei.isRight()) {
+                            JsonArray result = ei.right().getValue();
 
-                        JsonArray resultRefined = new JsonArray();
-                        List<Object> homeworkIds = new ArrayList<Object>();
-                        //TODO check size >0
-                        JsonArray lastLesson = result.get(0);
+                            if (result.size() > 0) {
+                                JsonArray resultRefined = new JsonArray();
+                                Set<Long> homeworkIds = new HashSet<Long>();
+                                JsonObject lastLesson = result.get(0);
 
-                        for (int i = 0; i < result.size(); i++) {
-                            JsonArray lesson = result.get(i);
+                                for (int i = 0; i < result.size(); i++) {
+                                    JsonObject lesson = result.get(i);
 
-                            log.debug("lesson is : " + lesson.getClass());
-                            Long idLesson = lesson.get(INDEX_LESSON_ID);
-                            log.debug("id lesson is : " + idLesson.toString());
-                            Long idHomework = lesson.get(INDEX_HOMEWORK_ID);
-                            log.debug("idHomework is : " + idHomework);
-                            String dateLesson = lesson.get(INDEX_LESSON_DATE);
-                            log.debug("dateLesson is : " + dateLesson);
+                                    log.debug("lesson is : " + lesson.getClass());
+                                    Long idLesson = lesson.getLong(ID_LESSON_FIELD_NAME);
+                                    log.debug("id lesson is : " + idLesson.toString());
+                                    Long idHomework = lesson.getLong(ID_HOMEWORK_FIELD_NAME);
+                                    log.debug("idHomework is : " + idHomework);
+                                    String dateLesson = lesson.getString(LESSON_DATE_FIELD_NAME);
+                                    log.debug("dateLesson is : " + dateLesson);
 
-                            if(idLesson.compareTo((Long)lastLesson.get(INDEX_LESSON_ID)) != 0){
-                                addLesson(resultRefined, homeworkIds, lastLesson);
-                                homeworkIds.clear();
-                            }
+                                    if(!idLesson.equals(lastLesson.getLong(ID_LESSON_FIELD_NAME))){
+                                        addLesson(resultRefined, homeworkIds, lastLesson);
+                                        homeworkIds.clear();
+                                    }
 
-                            if (idHomework != null) {
-                                //don't display homeworks with lesson date > now
-                                try {
-                                    if (DateUtils.parseDate(dateLesson).before(new Date())) {
+                                    if (idHomework != null) {
+                                        //don't display homeworks with lesson date > now
+                                        try {
+                                            if (DateUtils.parseDate(dateLesson).before(new Date())) {
+                                                homeworkIds.add(idHomework);
+                                            }
+                                        } catch (ParseException e) {
+                                            handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
+                                        }
+                                    }
+
+                                    if (idHomework != null) {
+                                        log.debug("add idHomework : " + idHomework);
                                         homeworkIds.add(idHomework);
                                     }
-                                } catch (ParseException e) {
-                                    handler.handle(new Either.Left<String, JsonArray>(e.getMessage()));
+
+                                    lastLesson = lesson;
                                 }
+
+                                addLesson(resultRefined, homeworkIds, lastLesson);
+
+                                handler.handle(new Either.Right<String, JsonArray>(resultRefined));
+                            } else {
+                                StringBuilder errorMessage = new StringBuilder("No results.");
+                                handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
                             }
-
-                            lastLesson = lesson;
+                        } else {
+                            handler.handle(new Either.Left<String, JsonArray>(ei.left().getValue()));
                         }
-
-                        addLesson(resultRefined, homeworkIds, lastLesson);
-
-                        handler.handle(new Either.Right<String, JsonArray>(resultRefined));
                     } else {
                         handler.handle(new Either.Left<String, JsonArray>(event.body().getString("message")));
                     }
@@ -188,11 +215,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         }
     }
 
-    private void addLesson(JsonArray resultRefined, List<Object> homeworkIds, JsonArray lastLesson) {
-        JsonArray homeworks = new JsonArray(homeworkIds);
-        JsonArray lessonWithHomeworks = JsonUtils.removeItemAt(lastLesson, INDEX_HOMEWORK_ID);
-        lessonWithHomeworks.addArray(homeworks);
-        resultRefined.add(lessonWithHomeworks);
+    private void addLesson(JsonArray resultRefined, Set<Long> homeworkIds, JsonObject lastLesson) {
+        JsonArray homeworks = new JsonArray(homeworkIds.toArray());
+        lastLesson.putArray(ID_HOMEWORK_FIELD_NAME, homeworks);
+        resultRefined.add(lastLesson);
     }
 
     @Override
