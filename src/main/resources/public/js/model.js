@@ -83,7 +83,7 @@ model.build = function () {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
                     lessons = lessons.concat(data);
                     that.load(
-                        _.map(lessons, function(lesson){
+                        _.map(lessons, function (lesson) {
                             return {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
@@ -97,7 +97,10 @@ model.build = function () {
                                 endTime: lesson.lesson_end_time,
                                 color: lesson.lesson_color,
                                 room: lesson.lesson_room,
-                                annotation: lesson.lesson_annotation
+                                annotation: lesson.lesson_annotation,
+                                startMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_start_time),
+                                endMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_end_time),
+                                is_periodic: false
                             }
                         })
                     );
@@ -169,6 +172,6 @@ model.build = function () {
             }.bind(this));
         }
     });
-}
 
-model.on('calendar.date-change', function(){ model.lessons.sync() })
+    model.on('calendar.date-change', function () { model.lessons.sync() })
+}
