@@ -77,14 +77,32 @@ model.build = function () {
         sync: function () {
             var lessons = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD')
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
+            var that = this;
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
                     lessons = lessons.concat(data);
+                    that.load(
+                        _.map(lessons, function(lesson){
+                            return {
+                                id: lesson.lesson_id,
+                                title: lesson.lesson_title,
+                                description: lesson.lesson_description,
+                                subject: model.subjects.findWhere({ code: lesson.subject_code }),
+                                teacherId: lesson.teacher_display_name,
+                                structureId: lesson.school_id,
+                                classroom: model.classrooms.findWhere({ id: lesson.audience_code }),
+                                date: lesson.lesson_date,
+                                startTime: lesson.lesson_start_time,
+                                endTime: lesson.lesson_end_time,
+                                color: lesson.lesson_color,
+                                room: lesson.lesson_room,
+                                annotation: lesson.lesson_annotation
+                            }
+                        })
+                    );
                 });
             });
-
-            this.load(lessons);
         }
     });
 
