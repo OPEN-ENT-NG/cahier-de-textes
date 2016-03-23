@@ -58,7 +58,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
-                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = t.lesson_id")
+                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = h .lesson_id")
                 .append(" WHERE h.teacher_id = ? AND h.school_id = ?")
                 .append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD') AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')")
                 .append(" ORDER BY h.homework_due_date ASC");
@@ -78,7 +78,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
-                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = t.lesson_id")
+                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = h.lesson_id")
                 .append(" WHERE h.school_id = ? AND h.audience_id in ")
                 .append(sql.listPrepared(groupIds.toArray()))
                 .append(" AND h.homework_due_date < current_date")

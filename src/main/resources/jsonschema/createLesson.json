@@ -23,7 +23,7 @@
       "id": "http://jsonschema.net/audience_type",
       "type": "string"
     },
-    "audience_code": {
+    "audience_id": {
       "id": "http://jsonschema.net/audience_id",
       "type": "string"
     },
