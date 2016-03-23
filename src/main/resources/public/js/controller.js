@@ -46,6 +46,15 @@ function DiaryController($scope, model, route, date) {
         $scope.homework.save();
     };
 
+    //fixme, Camille can we manage the load order with another way
+    $scope.initialization = function () {
+        $scope.subjects.sync();
+        $scope.classrooms.sync(function () {
+            model.lessons.sync();
+            $scope.$apply();
+        });
+    };
+
     $scope.nextWeek = function () {
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
