@@ -26,10 +26,16 @@
             </li>
         </filters>
         <calendar-daily-events for="calendar" ng-model="homeworks.all"></calendar-daily-events>
-        <calendar 
-                id="calendar"
-                class="twelve cell"
-                display-template="display-calendar-item"
-                create-template="create-lesson"
-                items="lessons.all"></calendar>
+        <calendar ng-if="showCal"
+                  id="calendar"
+                  class="twelve cell"
+                  display-template="display-calendar-item"
+                  create-template="create-lesson"
+                  items="lessons.all"></calendar>
+        <calendar ng-if="!showCal"
+                  id="calendar"
+                  class="twelve cell"
+                  display-template="display-calendar-item"
+                  create-template="create-lesson"
+                  items="lessons.all"></calendar>
     </div>

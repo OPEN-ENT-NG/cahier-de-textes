@@ -74,7 +74,7 @@ model.build = function () {
     model.makeModels([HomeworkType, Classroom, Subject, Lesson, Homework]);
 
     this.collection(Lesson, {
-        sync: function (cb) {
+        syncLessons: function (cb) {
             if(model.classrooms.all.length === 0 || model.subjects.all.length ===0){
                 return;
             }
@@ -85,11 +85,12 @@ model.build = function () {
             var that = this;
 
             var countStructure = model.me.structures.length;
+            model.lessons.all.splice(0, model.lessons.all.length);
 
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
                     lessons = lessons.concat(data);
-                    that.load(
+                    that.addRange(
                         _.map(lessons, function (lesson) {
                             return {
                                 id: lesson.lesson_id,
@@ -192,5 +193,5 @@ model.build = function () {
         }
     });
 
-    model.on('calendar.date-change', function () { model.lessons.sync() })
+    //model.on('calendar.date-change', function () { model.lessons.sync() })
 }

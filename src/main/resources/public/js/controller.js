@@ -7,6 +7,7 @@ function DiaryController($scope, model, route, date) {
 
     $scope.lesson = new Lesson();
     $scope.homework = new Homework();
+    $scope.showCal = false;
 
     model.on('classrooms.sync', function () {
         $scope.lesson.classroom = $scope.homework.classroom = model.classrooms.first();
@@ -36,7 +37,7 @@ function DiaryController($scope, model, route, date) {
         $scope.lesson.date = start;
         $scope.lesson.save();
     };
-    
+
     $scope.createHomework = function () {
         $scope.homework.save();
     };
@@ -45,27 +46,30 @@ function DiaryController($scope, model, route, date) {
     $scope.initialization = function () {
         model.subjects.sync(function () {
             model.classrooms.sync(function () {
-                model.lessons.sync(function () {
+                model.lessons.syncLessons(function () {
                     template.open('main', 'main');
                     template.open('create-lesson', 'create-lesson');
                     template.open('create-homework', 'create-homework');
                     template.open('daily-event-details', 'daily-event-details');
                     $scope.$apply();
-
                 });
             });
         });
     };
 
     $scope.nextWeek = function () {
+        $scope.showCal = !$scope.showCal;
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
-        model.trigger('calendar.date-change');
+        //model.trigger('calendar.date-change');
+        model.lessons.syncLessons();
     };
 
     $scope.previousWeek = function () {
+        $scope.showCal = !$scope.showCal;
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
-        model.trigger('calendar.date-change');
+        //model.trigger('calendar.date-change');
+        model.lessons.syncLessons();
     };
 }
