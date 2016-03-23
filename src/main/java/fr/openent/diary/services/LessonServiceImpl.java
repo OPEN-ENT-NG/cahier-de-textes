@@ -68,8 +68,9 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                         if (ei.isRight()) {
                             JsonArray result = ei.right().getValue();
 
+                            JsonArray resultRefined = new JsonArray();
                             if (result.size() > 0) {
-                                JsonArray resultRefined = new JsonArray();
+
                                 Set<Long> homeworkIds = new HashSet<Long>();
                                 JsonObject lastLesson = result.get(0);
 
@@ -82,7 +83,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                     Long idHomework = lesson.getLong(ID_HOMEWORK_FIELD_NAME);
                                     log.debug("idHomework is : " + idHomework);
 
-                                    if(!idLesson.equals(lastLesson.getLong(ID_LESSON_FIELD_NAME))){
+                                    if (!idLesson.equals(lastLesson.getLong(ID_LESSON_FIELD_NAME))) {
                                         addLesson(resultRefined, homeworkIds, lastLesson);
                                         homeworkIds.clear();
                                     }
@@ -96,12 +97,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                 }
 
                                 addLesson(resultRefined, homeworkIds, lastLesson);
-
-                                handler.handle(new Either.Right<String, JsonArray>(resultRefined));
-                            } else {
-                                StringBuilder errorMessage = new StringBuilder("No results.");
-                                handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
                             }
+
+                            handler.handle(new Either.Right<String, JsonArray>(resultRefined));
+
                         } else {
                             handler.handle(new Either.Left<String, JsonArray>(ei.left().getValue()));
                         }
