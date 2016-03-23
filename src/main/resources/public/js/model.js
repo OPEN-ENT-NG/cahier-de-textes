@@ -79,6 +79,11 @@ model.build = function () {
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
             var that = this;
+
+            if(model.classrooms.all.length === 0 || model.subjects.all.length ===0){
+                return;
+            }
+
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
                     lessons = lessons.concat(data);
@@ -88,10 +93,14 @@ model.build = function () {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
                                 description: lesson.lesson_description,
+                                /* fixme Object can't used in calendar item template, why empty */
                                 subject: model.subjects.findWhere({ code: lesson.subject_code }),
+                                subjectLabel: model.subjects.findWhere({ code: lesson.subject_code }).label,
                                 teacherId: lesson.teacher_display_name,
                                 structureId: lesson.school_id,
+                                /* fixme Object can't used in calendar item template, why empty */
                                 classroom: model.classrooms.findWhere({ id: lesson.audience_id }),
+                                classroomName: model.classrooms.findWhere({ id: lesson.audience_id }).name,
                                 date: lesson.lesson_date,
                                 startTime: lesson.lesson_start_time,
                                 endTime: lesson.lesson_end_time,
@@ -118,7 +127,7 @@ model.build = function () {
     });
 
     this.collection(Classroom, {
-        sync: function () {
+        sync: function (cb) {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
@@ -133,6 +142,9 @@ model.build = function () {
                     if (nbStructures === 0) {
                         this.trigger('sync');
                         this.trigger('change');
+                        if(typeof cb === 'function'){
+                            cb();
+                        }
                     }
                 }.bind(that));
             });
