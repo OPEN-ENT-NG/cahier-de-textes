@@ -168,11 +168,21 @@ model.build = function () {
     });
 
     this.collection(Homework, {
-        sync: function(){
-            model.one('classrooms.sync', function(){
-                http().get('/diary/public/json/homeworks.json').done(function(homeworks){
-                this.load(
-                    _.map(homeworks, function(homework){
+        syncHomeworks: function(cb){
+
+            var homeworks = [];
+            var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
+            var that = this;
+
+            var countStructure = model.me.structures.length;
+            model.homeworks.all.splice(0, model.homeworks.all.length);
+
+            model.me.structures.forEach(function (structureId) {
+                http().get('/diary/homework/' + structureId + '/' + start + '/' + end).done(function (data) {
+                    homeworks = homeworks.concat(data);
+                    that.addRange(
+                        _.map(homeworks, function(homework){
                             return {
                                 id: homework.id,
                                 description: homework.homework_description,
@@ -184,14 +194,22 @@ model.build = function () {
                                 dueDate: homework.homework_due_date,
                                 date: moment(homework.homework_due_date),
                                 title: homework.homework_title,
-                                color: homework.homework_color
+                                color: homework.homework_color,
+                                startMoment: moment(homework.homework_due_date),
+                                endMoment: moment(homework.homework_due_date),
+                                is_periodic: false
                             }
-                    })
-                )
-                }.bind(this));
-            }.bind(this));
+                        })
+                    );
+                    countStructure--;
+                    if (countStructure === 0) {
+                        if(typeof cb === 'function'){
+                            cb();
+                        }
+                    }
+                });
+            });
         }
     });
 
-    //model.on('calendar.date-change', function () { model.lessons.sync() })
 }

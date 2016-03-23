@@ -47,11 +47,13 @@ function DiaryController($scope, model, route, date) {
         model.subjects.sync(function () {
             model.classrooms.sync(function () {
                 model.lessons.syncLessons(function () {
+                    model.homeworks.syncHomeworks(function () {
                     template.open('main', 'main');
                     template.open('create-lesson', 'create-lesson');
                     template.open('create-homework', 'create-homework');
                     template.open('daily-event-details', 'daily-event-details');
                     $scope.$apply();
+                    });
                 });
             });
         });
@@ -63,6 +65,7 @@ function DiaryController($scope, model, route, date) {
         model.calendar.setDate(next);
         //model.trigger('calendar.date-change');
         model.lessons.syncLessons();
+        model.homeworks.syncHomeworks();
     };
 
     $scope.previousWeek = function () {
@@ -71,5 +74,6 @@ function DiaryController($scope, model, route, date) {
         model.calendar.setDate(prev);
         //model.trigger('calendar.date-change');
         model.lessons.syncLessons();
+        model.homeworks.syncHomeworks();
     };
 }
