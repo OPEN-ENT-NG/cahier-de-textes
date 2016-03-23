@@ -34,8 +34,8 @@ function HomeworkType(){}
 function Lesson(data) {
     this.collection(Attachment);
     this.collection(Homework);
-    this.subject = new Subject();
-    this.classroom = new Classroom();
+    this.subject = (data) ? data.subject : new Subject();
+    this.classroom = (data) ? data.classroom : new Classroom();
 }
 
 Lesson.prototype.api = {
@@ -74,15 +74,17 @@ model.build = function () {
     model.makeModels([HomeworkType, Classroom, Subject, Lesson, Homework]);
 
     this.collection(Lesson, {
-        sync: function () {
+        sync: function (cb) {
+            if(model.classrooms.all.length === 0 || model.subjects.all.length ===0){
+                return;
+            }
+
             var lessons = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
             var that = this;
 
-            if(model.classrooms.all.length === 0 || model.subjects.all.length ===0){
-                return;
-            }
+            var countStructure = model.me.structures.length;
 
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
@@ -93,14 +95,10 @@ model.build = function () {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
                                 description: lesson.lesson_description,
-                                /* fixme Object can't used in calendar item template, why empty */
                                 subject: model.subjects.findWhere({ code: lesson.subject_code }),
-                                subjectLabel: model.subjects.findWhere({ code: lesson.subject_code }).label,
                                 teacherId: lesson.teacher_display_name,
                                 structureId: lesson.school_id,
-                                /* fixme Object can't used in calendar item template, why empty */
                                 classroom: model.classrooms.findWhere({ id: lesson.audience_id }),
-                                classroomName: model.classrooms.findWhere({ id: lesson.audience_id }).name,
                                 date: lesson.lesson_date,
                                 startTime: lesson.lesson_start_time,
                                 endTime: lesson.lesson_end_time,
@@ -113,16 +111,25 @@ model.build = function () {
                             }
                         })
                     );
+                    countStructure--;
+                    if (countStructure === 0) {
+                        if(typeof cb === 'function'){
+                            cb();
+                        }
+                    }
                 });
             });
         }
     });
 
     this.collection(Subject, {
-        sync: function () {
+        sync: function (cb) {
             this.load([
                 { label: 'test', code: 'test' }
             ]);
+            if(typeof cb === 'function'){
+                cb();
+            }
         }
     });
 

@@ -5,11 +5,6 @@ function DiaryController($scope, model, route, date) {
         createLesson: 'lesson'
     };
 
-    template.open('main', 'main');
-    template.open('create-lesson', 'create-lesson');
-    template.open('create-homework', 'create-homework');
-    template.open('daily-event-details', 'daily-event-details');
-
     $scope.lesson = new Lesson();
     $scope.homework = new Homework();
 
@@ -48,10 +43,17 @@ function DiaryController($scope, model, route, date) {
 
     //fixme, Camille can we manage the load order with another way
     $scope.initialization = function () {
-        $scope.subjects.sync();
-        $scope.classrooms.sync(function () {
-            model.lessons.sync();
-            $scope.$apply();
+        model.subjects.sync(function () {
+            model.classrooms.sync(function () {
+                model.lessons.sync(function () {
+                    template.open('main', 'main');
+                    template.open('create-lesson', 'create-lesson');
+                    template.open('create-homework', 'create-homework');
+                    template.open('daily-event-details', 'daily-event-details');
+                    $scope.$apply();
+
+                });
+            });
         });
     };
 
