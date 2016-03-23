@@ -45,7 +45,7 @@ function DiaryController($scope, model, route, date) {
     //fixme, Camille can we manage the load order with another way
     $scope.initialization = function () {
         model.subjects.sync(function () {
-            model.classrooms.sync(function () {
+            model.classrooms.syncClassrooms(function () {
                 model.lessons.syncLessons(function () {
                     model.homeworks.syncHomeworks(function () {
                     template.open('main', 'main');

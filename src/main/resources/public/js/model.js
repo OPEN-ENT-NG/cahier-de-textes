@@ -135,7 +135,7 @@ model.build = function () {
     });
 
     this.collection(Classroom, {
-        sync: function (cb) {
+        syncClassrooms: function (cb) {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
