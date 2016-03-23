@@ -16,6 +16,15 @@
         </div>
     </div>
     <div class="row">
+        <input type="text" i18n-placeholder="title" ng-model="homework.title" required class="six cell" />
+        <div class="five cell right-magnet">
+            <div class="one cell right-magnet [[homework.color]] height-one">
+                &nbsp;
+                <color-select ng-model="homework.color"></color-select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="row">
             <label><i18n>date</i18n></label>
             <date-picker ng-model="homework.dueDate"></date-picker>

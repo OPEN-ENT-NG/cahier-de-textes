@@ -13,7 +13,7 @@
       "type": "string"
     },
     "homework_type_id": {
-      "type": "string"
+      "type": "integer"
     },
     "teacher_id": {
       "type": "string"

@@ -17,7 +17,7 @@
     },
     "homework_type_id": {
       "id": "http://jsonschema.net/homework_type_id",
-      "type": "string"
+      "type": "integer"
     },
     "teacher_id": {
       "id": "http://jsonschema.net/teacher_id",
