@@ -19,7 +19,7 @@
             ></select>
         </div>
     </div>
-    <section class=tabs row">
+    <section class="tabs row">
         <header ng-class="{ selected: tabs.createLesson === 'lesson' }"
                 ng-click="tabs.createLesson = 'lesson'">
             <i18n>create.lesson.tabs.lesson</i18n>
@@ -59,7 +59,7 @@
                 
             </div>
             <div class="row">
-                <editor ng-model="lesson.description"></editor>
+                <editor ng-model="lesson.description" required></editor>
             </div>
             <div class="row accordions">
                 <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
