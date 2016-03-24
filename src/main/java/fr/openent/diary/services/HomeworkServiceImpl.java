@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.validResultHandler;
+import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 /**
@@ -144,9 +145,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void updateHomework(String homeworkId, JsonObject homeworkObject, Handler<Either<String, JsonObject>> handler) {
-        if(homeworkObject != null) {
-            super.update(homeworkId, homeworkObject, handler);
+        StringBuilder sb = new StringBuilder();
+        JsonArray values = new JsonArray();
+        //TODO query without loops
+        for (String attr : homeworkObject.getFieldNames()) {
+            if (attr.equals("homework_due_date")) {
+                sb.append(attr).append(" = to_date(?, 'YYYY-MM-DD'), ");
+            } else {
+                sb.append(attr).append(" = ?, ");
+            }
+            values.add(homeworkObject.getValue(attr));
         }
+
+        sb.delete(sb.length() - 2, sb.length());
+        String query =
+                "UPDATE diary.homework " +
+                        " SET " + sb.toString() + //TODO Vincent you can manage create and update date + "modified = NOW() " +
+                        "WHERE id = ? ";
+        sql.prepared(query, values.add(Sql.parseId(homeworkId)), validRowsResultHandler(handler));
     }
 
     @Override
