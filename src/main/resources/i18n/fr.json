@@ -61,5 +61,7 @@
   "lesson.homeworks.add": "Ajouter un devoir",
   "daily.event": "Devoirs ([[day.dailyEvents.length]])",
   "diary.error.unknown": "Erreur technique imprévue.",
-	"update": "Mise à jour"
+	"update": "Mise à jour",
+  "calendar.weekfrom": "Semaine du",
+  "calendar.weekto": "au"
 }
