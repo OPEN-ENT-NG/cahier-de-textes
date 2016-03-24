@@ -39,9 +39,52 @@ function Lesson(data) {
 }
 
 Lesson.prototype.api = {
-    put: '/diary/lesson/:id',
-    delete: '/diary/lesson/:id',
-    post: '/diary/lesson'
+
+    delete: '/diary/lesson/:id'
+
+};
+//TODO
+Lesson.prototype.save = function(cb, cbe) {
+    if(this.id) {
+        this.update(cb, cbe);
+    }
+    else {
+        this.create(cb, cbe);
+    }
+};
+
+Lesson.prototype.update = function(cb, cbe) {
+    var url = '/diary/lesson/' + this.id;
+
+    var lesson = this;
+    http().putJson(url, this)
+        .done(function(){
+            if(typeof cb === 'function'){
+                cb();
+            }
+        }.bind(this))
+        .error(function(e){
+            if(typeof cbe === 'function'){
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+Lesson.prototype.create = function(cb, cbe) {
+    var lesson = this;
+   http().postJson('/diary/lesson', this)
+        .done(function(b){
+            lesson.updateData(b);
+            model.lessons.pushAll([lesson]);
+            if(typeof cb === 'function'){
+                cb();
+            }
+        })
+        .error(function(e){
+            if(typeof cbe === 'function'){
+                cbe(model.parseError(e));
+            }
+        });
 };
 
 Lesson.prototype.toJSON = function () {
@@ -53,9 +96,9 @@ Lesson.prototype.toJSON = function () {
         audience_type: this.audienceType,
         audience_id: this.classroom.id,
         audience_label: this.classroom.name,
-        lesson_date: this.date.format('YYYY-MM-DD'),
-        lesson_start_time: this.startTime.format('HH:mm'),
-        lesson_end_time: this.endTime.format('HH:mm'),
+        lesson_date: moment(this.date).format('YYYY-MM-DD'),
+        lesson_start_time: (typeof this.startTime.isValid === 'function') ? this.startTime.format('HH:mm') : this.startTime,
+        lesson_end_time: (typeof this.endTime.isValid === 'function') ? this.endTime.format('HH:mm'): this.endTime,
         lesson_description: this.description,
         lesson_annotation: this.annotations,
         lesson_room: this.room,
@@ -68,6 +111,19 @@ Lesson.prototype.addHomework = function () {
     homework.dueDate = this.date;
     homework.type = model.homeworkTypes.first();
     this.homeworks.push(homework);
+};
+
+model.parseError = function(e) {
+    var error = {};
+    try {
+        error = JSON.parse(e.responseText);
+    }
+    catch (err) {
+        error.error = "diary.error.unknown";
+    }
+    error.status = e.status;
+
+    return error;
 };
 
 model.build = function () {
@@ -95,6 +151,7 @@ model.build = function () {
                             return {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
+                                audienceType: lesson.audience_type,
                                 description: lesson.lesson_description,
                                 subject: model.subjects.findWhere({ code: lesson.subject_code }),
                                 teacherId: lesson.teacher_display_name,
@@ -120,6 +177,10 @@ model.build = function () {
                     }
                 });
             });
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
         }
     });
 

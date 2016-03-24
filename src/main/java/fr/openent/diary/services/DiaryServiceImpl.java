@@ -29,7 +29,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void retrieveTeacher(String teacherId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT * FROM diary.teacher as t WHERE t.teacher_id = ?");
+        query.append("SELECT * FROM diary.teacher as t WHERE t.id = ?");
 
         JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
 
@@ -40,7 +40,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void createTeacher(final JsonObject teacherObject, final Handler<Either<String, JsonObject>> handler) {
         if(teacherObject != null) {
             //insert teacher
-            sql.insert("diary.teacher", teacherObject, "teacher_id", validUniqueResultHandler(handler));
+            sql.insert("diary.teacher", teacherObject, "id", validUniqueResultHandler(handler));
         }
     }
 }

@@ -18,6 +18,10 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 

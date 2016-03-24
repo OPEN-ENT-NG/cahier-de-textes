@@ -6,7 +6,7 @@
     "lesson_title": {
       "type": "string"
     },
-    "subject_name": {
+    "subject_code": {
       "type": "string"
     },
     "subject_label": {
@@ -21,7 +21,7 @@
     "audience_id": {
       "type": "string"
     },
-    "audience_name": {
+    "audience_label": {
       "type": "string"
     },
     "lesson_date": {
@@ -51,12 +51,12 @@
   },
   "required": [
     "lesson_title",
-    "subject_name",
+    "subject_code",
     "subject_label",
     "school_id",
     "audience_type",
     "audience_id",
-    "audience_name",
+    "audience_label",
     "lesson_date",
     "lesson_start_time",
     "lesson_end_time",

@@ -1,6 +1,7 @@
 function DiaryController($scope, model, route, date) {
     $scope.lightboxes = {
     };
+    $scope.currentErrors = [];
     $scope.tabs = {
         createLesson: 'lesson'
     };
@@ -9,13 +10,13 @@ function DiaryController($scope, model, route, date) {
     $scope.homework = new Homework();
     $scope.showCal = false;
 
-    model.on('classrooms.sync', function () {
+   /* model.on('classrooms.sync', function () {
         $scope.lesson.classroom = $scope.homework.classroom = model.classrooms.first();
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
         $scope.homework.type = model.homeworkTypes.first();
-    });
+    });*/
 
     $scope.lessons = model.lessons;
     $scope.classrooms = model.classrooms;
@@ -23,19 +24,56 @@ function DiaryController($scope, model, route, date) {
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
 
-    $scope.openLessonView = function(){
-        $scope.lightboxes.createLesson = true;
-        $scope.newItem = {
-            beginning: moment(),
-            end: moment()
+    $scope.openLessonView = function(lesson){
+        if (lesson) {
+            $scope.lesson = new Lesson();
+            $scope.lesson.updateData(lesson);
+            $scope.newItem = {
+                beginning: moment($scope.lesson.beginning),
+                end: moment($scope.lesson.end)
+            }
+        } else {
+            $scope.lesson = new Lesson();
+            initLesson();
+            $scope.newItem = {
+                beginning: moment(),
+                end: moment()
+            }
         }
-    }
+        $scope.lightboxes.createLesson = true;
+    };
+
+    $scope.closeLesson = function() {
+
+    };
 
     $scope.createLesson = function (start, end) {
+        $scope.currentErrors = [];
         $scope.lesson.startTime = start;
         $scope.lesson.endTime = end;
         $scope.lesson.date = start;
-        $scope.lesson.save();
+        $scope.lesson.save(function () {
+            $scope.lightboxes.createLesson = false;
+            //TODO don't reload all calendar view
+            model.lessons.syncLessons();
+            $scope.showCal = !$scope.showCal;
+            $scope.$apply();
+        }, function (e) {
+            validationError(e);
+        });
+    };
+
+    $scope.updateLesson = function () {
+        $scope.currentErrors = [];
+        $scope.lesson.save(function () {
+            $scope.lightboxes.createLesson = false;
+            //TODO don't reload all calendar view
+            model.lessons.syncLessons();
+            $scope.showCal = !$scope.showCal;
+            $scope.$apply();
+        }, function (e) {
+            validationError(e);
+        });
     };
 
     $scope.createHomework = function () {
@@ -75,5 +113,19 @@ function DiaryController($scope, model, route, date) {
         //model.trigger('calendar.date-change');
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks();
+    };
+
+    var initLesson = function() {
+        $scope.lesson.classroom = $scope.homework.classroom = model.classrooms.first();
+        $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
+        $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
+        $scope.lesson.color = $scope.homework.color = 'pink';
+        $scope.homework.type = model.homeworkTypes.first();
+    }
+
+    var validationError = function(e){
+        notify.error(e.error);
+        $scope.currentErrors.push(e);
+        $scope.$apply();
     };
 }

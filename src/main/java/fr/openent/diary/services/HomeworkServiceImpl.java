@@ -35,12 +35,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getAllHomeworksForALesson(String lessonId, Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
                 .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
-                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
-                .append(" JOIN diary.lesson as l ON l.lesson_id = h.lesson_id")
+                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.id")
+                .append(" JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" WHERE h.lesson_id = ?")
                 .append(" ORDER BY h.homework_due_date ASC");
 
@@ -53,12 +53,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getAllHomeworksForTeacher(String schoolId, String teacherId, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
                 .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
-                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
-                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = h .lesson_id")
+                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.id")
+                .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" WHERE h.teacher_id = ? AND h.school_id = ?")
                 .append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD') AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')")
                 .append(" ORDER BY h.homework_due_date ASC");
@@ -73,12 +73,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         //TODO handle dates + modify current_date ?
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.homework_id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, h.subject_code, h.subject_label, h.school_id,")
                 .append(" h.audience_type, h.audience_id, h.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
-                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.homework_type_id")
-                .append(" LEFT OUTER JOIN diary.lesson as l ON l.lesson_id = h.lesson_id")
+                .append(" JOIN diary.homework_type as th ON h.homework_type_id = th.id")
+                .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" WHERE h.school_id = ? AND h.audience_id in ")
                 .append(sql.listPrepared(groupIds.toArray()))
                 .append(" AND h.homework_due_date < current_date")
@@ -98,7 +98,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void retrieveHomework(String homeworkId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT * FROM diary.homework as h WHERE h.homework_id = ?");
+        query.append("SELECT * FROM diary.homework as h WHERE h.id = ?");
 
         JsonArray parameters = new JsonArray().add(Sql.parseId(homeworkId));
 
@@ -113,13 +113,13 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             if(attachments != null && attachments.size() > 0) {
                 //get next on the sequence to add the homework and value in FK on attachment
 
-                sql.raw("select nextval('diary.homework_homework_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+                sql.raw("select nextval('diary.homework_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
                         if (event.isRight()) {
                             log.debug(event.right().getValue());
                             Long nextId = event.right().getValue().getLong("next_id");
-                            homeworkObject.putNumber("homework_id", nextId);
+                            homeworkObject.putNumber("id", nextId);
 
                             JsonArray parameters = new JsonArray().add(nextId);
                             for (Object id: attachments) {
@@ -127,7 +127,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                             }
 
                             SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                            sb.insert("diary.homework", homeworkObject, "homework_id");
+                            sb.insert("diary.homework", homeworkObject, "id");
                             sb.prepared("update diary.attachment set homework_id = ? where attachment_id in " +
                                     sql.listPrepared(attachments.toArray()), parameters);
 
@@ -137,7 +137,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 }));
             } else {
                 //insert lesson
-                sql.insert("diary.homework", homeworkObject, "homework_id", validUniqueResultHandler(handler));
+                sql.insert("diary.homework", homeworkObject, "id", validUniqueResultHandler(handler));
             }
         }
     }

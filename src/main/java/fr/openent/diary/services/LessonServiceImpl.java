@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.entcore.common.sql.SqlResult.validResult;
+import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 /**
@@ -45,15 +46,15 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
+            query.append("SELECT l.id as lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
                     .append("l.audience_type, l.audience_id, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.homework_id ")
+                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
-                    .append(" INNER JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
-                    .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
+                    .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
+                    .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
-                    .append(" GROUP BY l.lesson_id, l.lesson_date, t.teacher_display_name, h.homework_id")
+                    .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id")
                     .append(" ORDER BY l.lesson_date ASC");
 
             JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId))
@@ -121,16 +122,16 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
+            query.append("SELECT l.id as lesson_id, l.subject_code, l.subject_label, l.school_id, t.teacher_display_name,")
                     .append("l.audience_type, l.audience_id, l.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.homework_id ")
+                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
                     .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
-                    .append(" LEFT JOIN diary.homework as h ON l.lesson_id = h.lesson_id")
+                    .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" WHERE l.school_id = ? AND l.audience_id in ")
                     .append(sql.listPrepared(groupIds.toArray()))
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
-                    .append(" GROUP BY l.lesson_id, l.lesson_date, t.teacher_display_name, h.homework_id")
+                    .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id")
                     .append(" ORDER BY l.lesson_date ASC");
 
             JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
@@ -225,7 +226,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             if(attachments != null && attachments.size() > 0) {
                 //get next on the sequence to add the lesson and value in FK on attachment
 
-                sql.raw("select nextval('diary.lesson_lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+                sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
                         if (event.isRight()) {
@@ -239,7 +240,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                             }
 
                             SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                            sb.insert("diary.lesson", lessonObject, "lesson_id");
+                            sb.insert("diary.lesson", lessonObject, "id");
                             sb.prepared("update diary.attachment set lesson_id = ? where attachment_id in " +
                                     sql.listPrepared(attachments.toArray()), parameters);
 
@@ -249,7 +250,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 }));
             } else {
                 //insert lesson
-                sql.insert("diary.lesson", lessonObject, "lesson_id", validUniqueResultHandler(handler));
+                sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
             }
         }
     }
@@ -258,7 +259,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void retrieveLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT * FROM diary.lesson as l WHERE l.lesson_id = ?");
+        query.append("SELECT l.id as lesson_id, l.subject_code, l.subject_label, l.school_id, l.teacher_id, l.audience_type, ")
+                .append("l.audience_id, l.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date, ")
+                .append("l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation")
+                .append(" FROM diary.lesson as l WHERE l.id = ?");
 
         JsonArray parameters = new JsonArray().add(Sql.parseId(lessonId));
 
@@ -267,10 +271,28 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     @Override
     public void updateLesson(final String lessonId, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler) {
-        if(lessonObject != null) {
-            super.update(lessonId, lessonObject, handler);
+        StringBuilder sb = new StringBuilder();
+        JsonArray values = new JsonArray();
+        //TODO query without loops
+        for (String attr : lessonObject.getFieldNames()) {
+            if (attr.equals("lesson_date")) {
+                sb.append(attr).append(" = to_date(?, 'YYYY-MM-DD'), ");
+            } else if (attr.equals("lesson_start_time") || attr.equals("lesson_end_time")) {
+                sb.append(attr).append(" = to_timestamp(?, 'hh24:mi:ss'), ");
+            } else {
+                sb.append(attr).append(" = ?, ");
+            }
+            values.add(lessonObject.getValue(attr));
         }
+
+        sb.delete(sb.length() - 2, sb.length());
+        String query =
+                "UPDATE diary.lesson " +
+                        " SET " + sb.toString() + //TODO Vincent you can manage create and update date + "modified = NOW() " +
+                        "WHERE id = ? ";
+        sql.prepared(query, values.add(Sql.parseId(lessonId)), validRowsResultHandler(handler));
     }
+
 
     @Override
     public void deleteLesson(final String  lessonId, final Handler<Either<String, JsonObject>> handler) {
