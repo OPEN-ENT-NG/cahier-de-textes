@@ -241,7 +241,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
                             SqlStatementsBuilder sb = new SqlStatementsBuilder();
                             sb.insert("diary.lesson", lessonObject, "id");
-                            sb.prepared("update diary.attachment set lesson_id = ? where attachment_id in " +
+                            sb.prepared("update diary.attachment set lesson_id = ? where id in " +
                                     sql.listPrepared(attachments.toArray()), parameters);
 
                             sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
