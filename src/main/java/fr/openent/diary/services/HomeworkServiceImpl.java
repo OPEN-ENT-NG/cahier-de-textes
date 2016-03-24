@@ -128,7 +128,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
                             SqlStatementsBuilder sb = new SqlStatementsBuilder();
                             sb.insert("diary.homework", homeworkObject, "id");
-                            sb.prepared("update diary.attachment set homework_id = ? where attachment_id in " +
+                            sb.prepared("update diary.attachment set homework_id = ? where id in " +
                                     sql.listPrepared(attachments.toArray()), parameters);
 
                             sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
