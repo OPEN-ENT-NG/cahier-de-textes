@@ -3,9 +3,50 @@ function Homework() {
 }
 
 Homework.prototype.api = {
-    put: '/diary/homework/:id',
     delete: '/diary/homework/:id',
-    post: '/diary/homework'
+};
+
+Homework.prototype.save = function(cb, cbe) {
+    if(this.id) {
+        this.update(cb, cbe);
+    }
+    else {
+        this.create(cb, cbe);
+    }
+};
+
+Homework.prototype.update = function(cb, cbe) {
+    var url = '/diary/homework/' + this.id;
+
+    var homework = this;
+    http().putJson(url, this)
+        .done(function(){
+            if(typeof cb === 'function'){
+                cb();
+            }
+        }.bind(this))
+        .error(function(e){
+            if(typeof cbe === 'function'){
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+Homework.prototype.create = function(cb, cbe) {
+    var homework = this;
+    http().postJson('/diary/homework', this)
+        .done(function(b){
+            homework.updateData(b);
+            model.homeworks.pushAll([homework]);
+            if(typeof cb === 'function'){
+                cb();
+            }
+        })
+        .error(function(e){
+            if(typeof cbe === 'function'){
+                cbe(model.parseError(e));
+            }
+        });
 };
 
 Homework.prototype.toJSON = function(){
@@ -39,9 +80,7 @@ function Lesson(data) {
 }
 
 Lesson.prototype.api = {
-
     delete: '/diary/lesson/:id'
-
 };
 //TODO
 Lesson.prototype.save = function(cb, cbe) {
@@ -72,7 +111,7 @@ Lesson.prototype.update = function(cb, cbe) {
 
 Lesson.prototype.create = function(cb, cbe) {
     var lesson = this;
-   http().postJson('/diary/lesson', this)
+    http().postJson('/diary/lesson', this)
         .done(function(b){
             lesson.updateData(b);
             model.lessons.pushAll([lesson]);
@@ -185,13 +224,21 @@ model.build = function () {
     });
 
     this.collection(Subject, {
-        sync: function (cb) {
-            this.load([
-                { label: 'test', code: 'test' }
-            ]);
-            if(typeof cb === 'function'){
-                cb();
-            }
+        syncSubjects: function (cb) {
+            this.all = [];
+            var nbStructures = model.me.structures.length;
+            var that = this;
+            model.me.structures.forEach(function (structureId) {
+                http().get('/diary/subject/list/' + structureId).done(function (data) {
+                    model.subjects.addRange(data);
+                    nbStructures--;
+                    if (nbStructures === 0) {
+                        if(typeof cb === 'function'){
+                            cb();
+                        }
+                    }
+                }.bind(that));
+            });
         }
     });
 
@@ -270,6 +317,10 @@ model.build = function () {
                     }
                 });
             });
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
         }
     });
 

@@ -36,11 +36,22 @@ function DiaryController($scope, model, route, date) {
             $scope.lesson = new Lesson();
             initLesson();
             $scope.newItem = {
-                beginning: moment(),
-                end: moment()
+                beginning: moment().minute(0).second(0),
+                end: moment().minute(0).second(0)
             }
         }
         $scope.lightboxes.createLesson = true;
+    };
+
+    $scope.openHomeworkView = function(homework){
+        if (homework) {
+            $scope.homework = new Homework();
+            $scope.homework.updateData(homework);
+        } else {
+            $scope.homework = new Homework();
+            initHomework();
+        }
+        $scope.lightboxes.createHomework = true;
     };
 
     $scope.closeLesson = function() {
@@ -77,12 +88,20 @@ function DiaryController($scope, model, route, date) {
     };
 
     $scope.createHomework = function () {
-        $scope.homework.save();
+        $scope.currentErrors = [];
+        $scope.homework.save(function () {
+            $scope.lightboxes.createHomework = false;
+            //TODO don't reload all calendar view
+            model.homeworks.syncHomeworks();
+            $scope.$apply();
+        }, function (e) {
+            validationError(e);
+        });
     };
 
     //fixme, Camille can we manage the load order with another way
     $scope.initialization = function () {
-        model.subjects.sync(function () {
+        model.subjects.syncSubjects(function () {
             model.classrooms.syncClassrooms(function () {
                 model.lessons.syncLessons(function () {
                     model.homeworks.syncHomeworks(function () {
@@ -101,7 +120,6 @@ function DiaryController($scope, model, route, date) {
         $scope.showCal = !$scope.showCal;
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
-        //model.trigger('calendar.date-change');
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks();
     };
@@ -110,7 +128,6 @@ function DiaryController($scope, model, route, date) {
         $scope.showCal = !$scope.showCal;
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
-        //model.trigger('calendar.date-change');
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks();
     };
@@ -120,6 +137,14 @@ function DiaryController($scope, model, route, date) {
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
+        $scope.homework.type = model.homeworkTypes.first();
+    }
+
+    var initHomework = function() {
+        $scope.homework.classroom = $scope.homework.classroom = model.classrooms.first();
+        $scope.homework.subject = $scope.homework.subject = model.subjects.first();
+        $scope.homework.audienceType = $scope.homework.audienceType = 'class';
+        $scope.homework.color = $scope.homework.color = 'pink';
         $scope.homework.type = model.homeworkTypes.first();
     }
 

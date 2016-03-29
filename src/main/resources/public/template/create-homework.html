@@ -1,4 +1,4 @@
-﻿<form ng-submit="createHomework()">
+﻿<form ng-submit="(homework.id) ? updateHomework(): createHomework()">
     <h2><i18n>homework.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -27,7 +27,7 @@
     <div class="row">
         <div class="row">
             <label><i18n>date</i18n></label>
-            <date-picker ng-model="homework.dueDate"></date-picker>
+            <date-picker ng-model="homework.dueDate" class="cell six"></date-picker>
             <label><i18n>type</i18n></label>
             <select 
                 ng-options="type as type.label for type in homeworkTypes.all" 

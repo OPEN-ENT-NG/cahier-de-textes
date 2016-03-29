@@ -65,4 +65,18 @@ public class DiaryController extends BaseController{
 //        });
 //    }
 
+    @Get("/subject/list/:schoolId")
+    @ApiDoc("Get all subjects for a school")
+    public void listSubjects(final HttpServerRequest request) {
+        final String schoolId = request.params().get("schoolId");
+        diaryService.listSubjects(schoolId, arrayResponseHandler(request));
+    }
+
+    @Get("/audience/list/:schoolId")
+    @ApiDoc("Get all audiences for a school")
+    public void listAudiences(final HttpServerRequest request) {
+        final String schoolId = request.params().get("schoolId");
+        diaryService.listAudiences(schoolId, arrayResponseHandler(request));
+    }
+
 }

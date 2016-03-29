@@ -4,6 +4,7 @@ import fr.openent.diary.controllers.DiaryController;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
+import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -34,6 +35,38 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void createSubject(JsonObject subjectObject, Handler<Either<String, JsonObject>> handler) {
+
+    }
+
+    @Override
+    public void deleteSubject(String subjectId, Handler<Either<String, JsonObject>> handler) {
+
+    }
+
+    @Override
+    public void listSubjects(String schoolId, final Handler<Either<String, JsonArray>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT s.id, s.subject_label as label FROM diary.subject as s WHERE s.school_id = ?");
+
+        JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+
+        sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void listAudiences(String schoolId, final Handler<Either<String, JsonArray>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * FROM diary.audience as s WHERE s.school_id = ?");
+
+        JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+
+        sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
     }
 
     @Override

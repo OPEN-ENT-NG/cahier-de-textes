@@ -12,7 +12,7 @@
         <button ng-click="openLessonView()">
             <i18n>diary.lesson.create</i18n>
         </button>
-        <button ng-click="lightboxes.createHomework = true">
+        <button ng-click="openHomeworkView()">
             <i18n>diary.homework.create</i18n>
         </button>
         <hr />
@@ -25,7 +25,10 @@
                 <button ng-click="nextWeek(); ">&#8594;</button>
             </li>
         </filters>
-        <calendar-daily-events for="calendar" ng-model="homeworks.all"></calendar-daily-events>
+        <calendar-daily-events for="calendar"
+                               ng-model="homeworks.all"
+                               on-create-open="openHomeworkView()"
+                               on-create-close="lightboxes.createHomework = false"></calendar-daily-events>
         <div class="row" ng-if="! showCal">
             <calendar
                   id="calendar"

@@ -2,6 +2,7 @@ package fr.openent.diary.services;
 
 import fr.wseduc.webutils.Either;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 /**
@@ -12,4 +13,12 @@ public interface DiaryService {
     void createTeacher(final JsonObject teacherObject, final Handler<Either<String, JsonObject>> handler);
 
     void retrieveTeacher(final String teacherId, final Handler<Either<String, JsonObject>> handler);
+
+    void createSubject(final JsonObject subjectObject, final Handler<Either<String, JsonObject>> handler);
+
+    void deleteSubject(final String subjectId, final Handler<Either<String, JsonObject>> handler);
+
+    void listSubjects(final String schoolId, final Handler<Either<String, JsonArray>> handler);
+
+    void listAudiences(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 }
