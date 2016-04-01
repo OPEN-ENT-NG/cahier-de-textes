@@ -19,11 +19,11 @@ public class Diary extends BaseServer {
 		super.start();
 
         final DiaryService diaryService = new DiaryServiceImpl();
-        final LessonService lessonService = new LessonServiceImpl();
-        final HomeworkService homeworkService = new HomeworkServiceImpl();
+        final LessonService lessonService = new LessonServiceImpl(diaryService);
+        final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService);
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
-        addController(new LessonController(lessonService));
+        addController(new LessonController(lessonService, diaryService));
         addController(new HomeworkController(homeworkService, lessonService));
 	}
 

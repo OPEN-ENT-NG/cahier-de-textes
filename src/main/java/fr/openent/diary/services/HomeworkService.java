@@ -22,7 +22,7 @@ public interface HomeworkService {
 
     //TODO can create teacher if not exists + chains handler
     //return {idHomework=value} or error
-    void createHomework(final JsonObject homeworkObject, final String teacherId, final Handler<Either<String, JsonObject>> handler);
+    void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
 
     void updateHomework(final String homeworkId, final JsonObject homeworkObject, final Handler<Either<String, JsonObject>> handler);
 

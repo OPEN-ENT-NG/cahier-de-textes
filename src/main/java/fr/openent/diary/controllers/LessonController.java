@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
@@ -31,11 +32,13 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 public class LessonController extends BaseController {
 
     LessonService lessonService;
+    DiaryService diaryService;
 
     private final static Logger log = LoggerFactory.getLogger("LessonController");
 
-    public LessonController(LessonService lessonService) {
+    public LessonController(LessonService lessonService, DiaryService diaryService) {
         this.lessonService = lessonService;
+        this.diaryService = diaryService;
     }
 
     @Get("/lesson/:id")
@@ -96,20 +99,17 @@ public class LessonController extends BaseController {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-
                 if(user != null){
                     RequestUtils.bodyToJson(request, pathPrefix + "createLesson", new Handler<JsonObject>() {
                         @Override
-                        public void handle(JsonObject json) {
-
+                        public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                lessonService.createLesson(json, user.getUserId(), notEmptyResponseHandler(request, 201));
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
                         }
                     });
-
                 } else {
                     unauthorized(request, "No user found in session.");
                 }

@@ -109,20 +109,17 @@ public class HomeworkController extends BaseController {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-
                 if(user != null){
                     RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
                         @Override
                         public void handle(JsonObject json) {
-
-                            if(user.getStructures().contains(json.getString("school_id",""))){
-                                homeworkService.createHomework(json, user.getUserId(), notEmptyResponseHandler(request, 201));
-                            } else {
-                                badRequest(request,"Invalid school identifier.");
-                            }
+                        if(user.getStructures().contains(json.getString("school_id",""))){
+                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
+                        } else {
+                            badRequest(request,"Invalid school identifier.");
+                        }
                         }
                     });
-
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -142,20 +139,20 @@ public class HomeworkController extends BaseController {
                     lessonService.retrieveLesson(lessonId, new Handler<Either<String, JsonObject>> () {
                         @Override
                         public void handle(Either<String, JsonObject> event) {
-                            if (event.isRight()) {
-                                RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
-                                    @Override
-                                    public void handle(JsonObject json) {
-                                        if(user.getStructures().contains(json.getString("school_id",""))){
-                                            homeworkService.createHomework(json, user.getUserId(), notEmptyResponseHandler(request, 201));
-                                        } else {
-                                            badRequest(request,"Invalid school identifier.");
-                                        }
-                                    }
-                                });
-                            } else {
-                                badRequest(request, "Lesson identifier is unknown.");
-                            }
+                        if (event.isRight()) {
+                            RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
+                                @Override
+                                public void handle(JsonObject json) {
+                                if(user.getStructures().contains(json.getString("school_id",""))){
+                                    homeworkService.createHomework(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
+                                } else {
+                                    badRequest(request,"Invalid school identifier.");
+                                }
+                                }
+                            });
+                        } else {
+                            badRequest(request, "Lesson identifier is unknown.");
+                        }
                         }
                     });
                 } else {

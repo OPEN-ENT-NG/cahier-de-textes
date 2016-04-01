@@ -7,10 +7,6 @@
       "id": "http://jsonschema.net/homework_title",
       "type": "string"
     },
-    "subject_label": {
-      "id": "http://jsonschema.net/subject_label",
-      "type": "string"
-    },
     "subject_code": {
       "id": "http://jsonschema.net/subject_id",
       "type": "string"
@@ -31,16 +27,8 @@
       "id": "http://jsonschema.net/lesson_id",
       "type": "string"
     },
-    "audience_type": {
-      "id": "http://jsonschema.net/audience_type",
-      "type": "string"
-    },
     "audience_id": {
       "id": "http://jsonschema.net/audience_id",
-      "type": "string"
-    },
-    "audience_label": {
-      "id": "http://jsonschema.net/audience_label",
       "type": "string"
     },
     "homework_due_date": {
@@ -62,14 +50,11 @@
   },
   "required": [
     "homework_title",
-    "subject_label",
     "subject_id",
     "homework_type_id",
     "teacher_id",
     "school_id",
-    "audience_type",
     "audience_id",
-    "audience_label",
     "homework_due_date",
     "homework_description",
     "homework_color"

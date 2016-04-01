@@ -52,14 +52,11 @@ Homework.prototype.create = function(cb, cbe) {
 Homework.prototype.toJSON = function(){
     return {
         homework_title: this.title,
-        subject_label: this.subject.label,
-        subject_code: this.subject.code,
+        subject_id: this.subject.id,
         homework_type_id: this.type.id,
         teacher_id: model.me.userId,
         school_id: this.classroom.structureId,
-        audience_type: this.audienceType,
         audience_id: this.classroom.id,
-        audience_label: this.classroom.name,
         homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
         homework_description: this.description,
         homework_color: this.color
@@ -129,12 +126,9 @@ Lesson.prototype.create = function(cb, cbe) {
 Lesson.prototype.toJSON = function () {
     return {
         lesson_title: this.title,
-        subject_code: this.subject.code,
-        subject_label: this.subject.label,
+        subject_id: this.subject.id,
         school_id: this.classroom.structureId,
-        audience_type: this.audienceType,
         audience_id: this.classroom.id,
-        audience_label: this.classroom.name,
         lesson_date: moment(this.date).format('YYYY-MM-DD'),
         lesson_start_time: (typeof this.startTime.isValid === 'function') ? this.startTime.format('HH:mm') : this.startTime,
         lesson_end_time: (typeof this.endTime.isValid === 'function') ? this.endTime.format('HH:mm'): this.endTime,
@@ -192,7 +186,7 @@ model.build = function () {
                                 title: lesson.lesson_title,
                                 audienceType: lesson.audience_type,
                                 description: lesson.lesson_description,
-                                subject: model.subjects.findWhere({ code: lesson.subject_code }),
+                                subject: model.subjects.findWhere({ id: lesson.subject_id }),
                                 teacherId: lesson.teacher_display_name,
                                 structureId: lesson.school_id,
                                 classroom: model.classrooms.findWhere({ id: lesson.audience_id }),
@@ -294,7 +288,7 @@ model.build = function () {
                             return {
                                 id: homework.id,
                                 description: homework.homework_description,
-                                subject: model.subjects.findWhere({ code: homework.subject_code }),
+                                subject: model.subjects.findWhere({ id: homework.subject_id }),
                                 type: model.homeworkTypes.findWhere({ id: homework.type_id }),
                                 teacherId: homework.teacher_id,
                                 structureId: homework.structureId,

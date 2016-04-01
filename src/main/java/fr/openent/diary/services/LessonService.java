@@ -23,9 +23,8 @@ public interface LessonService extends CrudService {
 
     void retrieveLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 
-    //TODO can create teacher if not exists + chains handler
     //return {idLesson=value} or error
-    void createLesson(final JsonObject lessonObject, final String teacherId, final Handler<Either<String, JsonObject>> handler);
+    void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
 
     void updateLesson(final String lessonId, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler);
 

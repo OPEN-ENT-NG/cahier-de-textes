@@ -21,9 +21,46 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
     private final static String DATABASE_TABLE ="teacher"; //TODO handle attachments manually or the opposite?
     private final static Logger log = LoggerFactory.getLogger("DiaryServiceImpl");
+    private static final String TEACHER_ID_FIELD_NAME = "id";
+    private static final String TEACHER_DISPLAY_NAME_FIELD_NAME = "teacher_display_name";
+
+    private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 
     public DiaryServiceImpl() {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
+    }
+
+    @Override
+    public void getOrCreateTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
+
+            log.debug("getOrCreateTeacher: " + teacherId);
+            if (isValidIdentifier(teacherId)) {
+                retrieveTeacher(teacherId, new Handler<Either<String, JsonObject>>() {
+                    @Override
+                    public void handle(Either<String, JsonObject> event) {
+                    if (event.isRight()) {
+                        if (event.right().getValue().size() == 0) {
+                            log.debug("No teacher, create it");
+                            createTeacher(teacherId, teacherDisplayName, handler);
+                        } else {
+                            log.debug("Teacher found");
+                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue()));
+                        }
+                    } else {
+                        log.debug("error while retrieve teacher");
+                        handler.handle(new Either.Left<String, JsonObject>(event.left().getValue()));
+                    }
+                    }
+                });
+            } else {
+                String errorMessage = "Invalid teacher identifier.";
+                log.debug(errorMessage);
+                handler.handle(new Either.Left<String, JsonObject>(errorMessage));
+            }
+    }
+
+    private boolean isValidIdentifier(String teacherId) {
+        return teacherId != null && teacherId.matches(UUID_REGEX);
     }
 
     @Override
@@ -35,6 +72,20 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void createTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
+        if(isValidIdentifier(teacherId)) { //TODO change to StringUtils/UUID utils?
+            //insert teacher
+            JsonObject teacherParams = new JsonObject();
+            teacherParams.putString(TEACHER_ID_FIELD_NAME, teacherId);
+            teacherParams.putString(TEACHER_DISPLAY_NAME_FIELD_NAME, teacherDisplayName);
+            sql.insert("diary.teacher", teacherParams, "id", validUniqueResultHandler(handler));
+        } else {
+            String errorMessage = "Invalid teacher identifier.";
+            handler.handle(new Either.Left<String, JsonObject>(errorMessage));
+        }
     }
 
     @Override
@@ -51,7 +102,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void listSubjects(String schoolId, final Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT s.id, s.subject_label as label FROM diary.subject as s WHERE s.school_id = ?");
+        query.append("SELECT s.id as id, s.subject_label as label FROM diary.subject as s WHERE s.school_id = ?");
 
         JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
 
@@ -69,11 +120,4 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
     }
 
-    @Override
-    public void createTeacher(final JsonObject teacherObject, final Handler<Either<String, JsonObject>> handler) {
-        if(teacherObject != null) {
-            //insert teacher
-            sql.insert("diary.teacher", teacherObject, "id", validUniqueResultHandler(handler));
-        }
-    }
 }

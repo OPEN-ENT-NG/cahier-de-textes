@@ -29,6 +29,8 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
  */
 public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
+    private DiaryService diaryService;
+
     private final static String DATABASE_TABLE ="lesson";
     private final static Logger log = LoggerFactory.getLogger("LessonServiceImpl");
     private static final String ID_LESSON_FIELD_NAME = "lesson_id";
@@ -36,10 +38,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
 
-    public LessonServiceImpl() {
+    public LessonServiceImpl(final DiaryService diaryService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
+        this.diaryService = diaryService;
     }
-
 
     @Override
     public void getAllLessonsForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
@@ -47,8 +49,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, t.teacher_display_name,")
-                    .append("a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.id as homework_id ")
+                    .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
+                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
                     .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
@@ -125,8 +127,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, t.teacher_display_name,")
-                    .append("a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
-                    .append("l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.id as homework_id ")
+                    .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
+                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
                     .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
@@ -135,6 +137,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" WHERE l.school_id = ? AND l.audience_id in ")
                     .append(sql.listPrepared(groupIds.toArray()))
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
+                    .append(" AND l.lesson_state = 'published'")
                     .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_label, a.audience_type, a.audience_label")
                     .append(" ORDER BY l.lesson_date ASC");
 
@@ -223,39 +226,48 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
     @Override
-    public void createLesson(final JsonObject lessonObject, final String teacherId, final Handler<Either<String, JsonObject>> handler) {
+    public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
         if(lessonObject != null) {
-            final JsonArray attachments = lessonObject.getArray("attachments");
-            lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
-            if(attachments != null && attachments.size() > 0) {
-                //get next on the sequence to add the lesson and value in FK on attachment
+            diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
+                @Override
+                public void handle(Either<String, JsonObject> event) {
+                    if(event.isRight()){
+                        final JsonArray attachments = lessonObject.getArray("attachments");
+                        lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
+                        if(attachments != null && attachments.size() > 0) {
+                            //get next on the sequence to add the lesson and value in FK on attachment
+                            sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        log.debug(event.right().getValue());
+                                        Long nextId = event.right().getValue().getLong("next_id");
+                                        lessonObject.putNumber(ID_LESSON_FIELD_NAME, nextId);
 
-                sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-                    @Override
-                    public void handle(Either<String, JsonObject> event) {
-                        if (event.isRight()) {
-                            log.debug(event.right().getValue());
-                            Long nextId = event.right().getValue().getLong("next_id");
-                            lessonObject.putNumber(ID_LESSON_FIELD_NAME, nextId);
+                                        JsonArray parameters = new JsonArray().add(nextId);
+                                        for (Object id: attachments) {
+                                            parameters.add(id);
+                                        }
 
-                            JsonArray parameters = new JsonArray().add(nextId);
-                            for (Object id: attachments) {
-                                parameters.add(id);
-                            }
+                                        SqlStatementsBuilder sb = new SqlStatementsBuilder();
+                                        sb.insert("diary.lesson", lessonObject, "id");
+                                        sb.prepared("update diary.attachment set lesson_id = ? where id in " +
+                                                sql.listPrepared(attachments.toArray()), parameters);
 
-                            SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                            sb.insert("diary.lesson", lessonObject, "id");
-                            sb.prepared("update diary.attachment set lesson_id = ? where id in " +
-                                    sql.listPrepared(attachments.toArray()), parameters);
-
-                            sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                                    }
+                                }
+                            }));
+                        } else {
+                            //insert lesson
+                            sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
                         }
+                    } else {
+                        log.error("Teacher couldn't be retrieved or created.");
+                        handler.handle(event.left());
                     }
-                }));
-            } else {
-                //insert lesson
-                sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
-            }
+                }
+            });
         }
     }
 
@@ -265,7 +277,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, l.teacher_id, a.audience_type,")
                 .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
-                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation")
+                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state")
                 .append(" FROM diary.lesson as l")
                 .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
                 .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")

@@ -10,7 +10,7 @@ import org.vertx.java.core.json.JsonObject;
  */
 public interface DiaryService {
 
-    void createTeacher(final JsonObject teacherObject, final Handler<Either<String, JsonObject>> handler);
+    void createTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
 
     void retrieveTeacher(final String teacherId, final Handler<Either<String, JsonObject>> handler);
 
@@ -21,4 +21,6 @@ public interface DiaryService {
     void listSubjects(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 
     void listAudiences(final String schoolId, final Handler<Either<String, JsonArray>> handler);
+
+    void getOrCreateTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
 }

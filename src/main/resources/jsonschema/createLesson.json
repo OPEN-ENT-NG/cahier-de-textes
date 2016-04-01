@@ -7,28 +7,16 @@
       "id": "http://jsonschema.net/lesson_title",
       "type": "string"
     },
-    "subject_code": {
-      "id": "http://jsonschema.net/subject_name",
-      "type": "string"
-    },
-    "subject_label": {
-      "id": "http://jsonschema.net/subject_label",
+    "subject_id": {
+      "id": "http://jsonschema.net/subject_id",
       "type": "string"
     },
     "school_id": {
       "id": "http://jsonschema.net/school_id",
       "type": "string"
     },
-    "audience_type": {
-      "id": "http://jsonschema.net/audience_type",
-      "type": "string"
-    },
     "audience_id": {
       "id": "http://jsonschema.net/audience_id",
-      "type": "string"
-    },
-    "audience_label": {
-      "id": "http://jsonschema.net/audience_name",
       "type": "string"
     },
     "lesson_date": {
@@ -66,12 +54,9 @@
   },
   "required": [
     "lesson_title",
-    "subject_code",
-    "subject_label",
+    "subject_id",
     "school_id",
-    "audience_type",
     "audience_id",
-    "audience_label",
     "lesson_date",
     "lesson_start_time",
     "lesson_end_time",
