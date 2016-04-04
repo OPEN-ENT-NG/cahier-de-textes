@@ -34,7 +34,7 @@ public class LessonController extends BaseController {
     LessonService lessonService;
     DiaryService diaryService;
 
-    private final static Logger log = LoggerFactory.getLogger("LessonController");
+    private final static Logger log = LoggerFactory.getLogger(LessonController.class);
 
     public LessonController(LessonService lessonService, DiaryService diaryService) {
         this.lessonService = lessonService;

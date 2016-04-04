@@ -5,7 +5,6 @@ import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
-import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -20,7 +19,7 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
     private final static String DATABASE_TABLE ="teacher"; //TODO handle attachments manually or the opposite?
-    private final static Logger log = LoggerFactory.getLogger("DiaryServiceImpl");
+    private final static Logger log = LoggerFactory.getLogger(DiaryServiceImpl.class);
     private static final String TEACHER_ID_FIELD_NAME = "id";
     private static final String TEACHER_DISPLAY_NAME_FIELD_NAME = "teacher_display_name";
 

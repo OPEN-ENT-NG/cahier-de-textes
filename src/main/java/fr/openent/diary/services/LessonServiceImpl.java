@@ -32,7 +32,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private DiaryService diaryService;
 
     private final static String DATABASE_TABLE ="lesson";
-    private final static Logger log = LoggerFactory.getLogger("LessonServiceImpl");
+    private final static Logger log = LoggerFactory.getLogger(LessonServiceImpl.class);
     private static final String ID_LESSON_FIELD_NAME = "lesson_id";
     private static final String ID_HOMEWORK_FIELD_NAME = "homework_id";
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";

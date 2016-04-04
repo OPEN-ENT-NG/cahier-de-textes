@@ -27,7 +27,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private DiaryService diaryService;
 
     private final static String DATABASE_TABLE ="homework";
-    private final static Logger log = LoggerFactory.getLogger("HomeworkServiceImpl");
+    private final static Logger log = LoggerFactory.getLogger(HomeworkServiceImpl.class);
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
 
     public HomeworkServiceImpl(final DiaryService diaryService) {

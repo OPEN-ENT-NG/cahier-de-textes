@@ -28,7 +28,7 @@ public class DiaryController extends BaseController{
 
     //TODO is this the best place to declare that variable?
     public static final String DATABASE_SCHEMA = "diary";
-    private final static Logger log = LoggerFactory.getLogger("DiaryController");
+    private final static Logger log = LoggerFactory.getLogger(DiaryController.class);
 
     DiaryService diaryService;
     LessonService lessonService;
