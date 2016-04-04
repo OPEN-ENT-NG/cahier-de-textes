@@ -44,7 +44,7 @@ CREATE TABLE diary.lesson (
     lesson_end_time time,
     lesson_description text,
     lesson_annotation text,
-    lesson_state resource_state DEFAULT 'draft',
+    lesson_state diary.resource_state DEFAULT 'draft',
     PRIMARY KEY (id),
     CONSTRAINT teacher_id_FK FOREIGN KEY (teacher_id)
         REFERENCES diary.teacher(id) ON DELETE CASCADE,
@@ -74,7 +74,7 @@ CREATE TABLE diary.homework (
     homework_type_id integer,
     homework_due_date date,
     homework_color character varying(6),
-    homework_state resource_state DEFAULT 'draft',
+    homework_state diary.resource_state DEFAULT 'draft',
     PRIMARY KEY (id),
     CONSTRAINT lesson_id_fk FOREIGN KEY (lesson_id)
         REFERENCES diary.lesson(id) ON DELETE CASCADE,
