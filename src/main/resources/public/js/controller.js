@@ -101,15 +101,19 @@ function DiaryController($scope, model, route, date) {
 
     //fixme, Camille can we manage the load order with another way
     $scope.initialization = function () {
-        model.subjects.syncSubjects(function () {
-            model.classrooms.syncClassrooms(function () {
-                model.lessons.syncLessons(function () {
-                    model.homeworks.syncHomeworks(function () {
-                    template.open('main', 'main');
-                    template.open('create-lesson', 'create-lesson');
-                    template.open('create-homework', 'create-homework');
-                    template.open('daily-event-details', 'daily-event-details');
-                    $scope.$apply();
+
+        var teacher = new Teacher();
+        teacher.create(function() {
+            model.subjects.syncSubjects(function () {
+                model.classrooms.syncClassrooms(function () {
+                    model.lessons.syncLessons(function () {
+                        model.homeworks.syncHomeworks(function () {
+                        template.open('main', 'main');
+                        template.open('create-lesson', 'create-lesson');
+                        template.open('create-homework', 'create-homework');
+                        template.open('daily-event-details', 'daily-event-details');
+                        $scope.$apply();
+                        });
                     });
                 });
             });

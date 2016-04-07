@@ -5,6 +5,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.List;
+
 /**
  * Created by a457593 on 18/02/2016.
  */
@@ -15,6 +17,8 @@ public interface DiaryService {
     void retrieveTeacher(final String teacherId, final Handler<Either<String, JsonObject>> handler);
 
     void createSubject(final JsonObject subjectObject, final Handler<Either<String, JsonObject>> handler);
+
+    void createSubjects(final List<JsonObject> subjectObjectList, final Handler<Either<String, JsonObject>> handler);
 
     void deleteSubject(final String subjectId, final Handler<Either<String, JsonObject>> handler);
 

@@ -2,14 +2,18 @@ package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
 import fr.wseduc.webutils.Either;
+import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
+import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
+
+import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
@@ -18,6 +22,7 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
  */
 public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
+    private final Neo4j neo = Neo4j.getInstance();
     private final static String DATABASE_TABLE ="teacher"; //TODO handle attachments manually or the opposite?
     private final static Logger log = LoggerFactory.getLogger(DiaryServiceImpl.class);
     private static final String TEACHER_ID_FIELD_NAME = "id";
@@ -43,7 +48,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                             createTeacher(teacherId, teacherDisplayName, handler);
                         } else {
                             log.debug("Teacher found");
-                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue()));
+                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().putBoolean("teacherFound", true)));
                         }
                     } else {
                         log.debug("error while retrieve teacher");
@@ -117,6 +122,27 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
 
         sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void createSubjects(List<JsonObject> subjectObjectList, Handler<Either<String, JsonObject>> handler) {
+
+        SqlStatementsBuilder sb = new SqlStatementsBuilder();
+
+        for (JsonObject subject : subjectObjectList) {
+            sb.insert("diary.subject", subject, "id");
+        }
+
+        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+    }
+
+    public void getSubjects(final String schoolId, final String teacherId, final Handler<Either<String, JsonArray>> handler) {
+
+        StringBuilder query = new StringBuilder("MATCH (m:FieldOfStudy)");
+        query.append(" WHERE ");
+        query.append(" return m limit 10;");
+
+
     }
 
 }

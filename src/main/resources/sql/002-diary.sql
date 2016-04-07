@@ -27,7 +27,10 @@ CREATE TABLE diary.subject (
     id character varying(37),
     school_id character varying(37),
     subject_label character varying(20),
-    PRIMARY KEY (id)
+    teacher_id character varying(37),
+    PRIMARY KEY (id),
+    CONSTRAINT teacher_id_FK FOREIGN KEY (teacher_id)
+        REFERENCES diary.teacher(id) ON DELETE CASCADE
 );
 
 CREATE TABLE diary.lesson (

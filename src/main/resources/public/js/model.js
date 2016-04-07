@@ -66,7 +66,6 @@ Homework.prototype.toJSON = function(){
 function Attachment(){}
 function Subject() { }
 function Classroom() { }
-function StudentGroup() { }
 function HomeworkType(){}
 
 function Lesson(data) {
@@ -146,6 +145,25 @@ Lesson.prototype.addHomework = function () {
     this.homeworks.push(homework);
 };
 
+function Teacher() {}
+
+Teacher.prototype.create = function(cb) {
+
+    model.me.structures.forEach(function (structureId) {
+        http().postJson('/diary/teacher/' + structureId).done(function (e) {
+            console.log('httpsattus : ' + e);
+            if (e.status == '201') {
+                console.log('init subjects : ');
+            }
+
+            if(typeof cb === 'function'){
+                cb();
+            }
+        });
+    });
+};
+
+
 model.parseError = function(e) {
     var error = {};
     try {
@@ -161,6 +179,16 @@ model.parseError = function(e) {
 
 model.build = function () {
     model.makeModels([HomeworkType, Classroom, Subject, Lesson, Homework]);
+
+    model.me.structures.forEach(function (structureId) {
+        http().postJson('/diary/teacher/' + structureId).done(function (e) {
+            console.log('httpsattus : ' + e);
+            if (e.status == '201') {
+                console.log('init subjects : ');
+
+            }
+        });
+    });
 
     this.collection(Lesson, {
         syncLessons: function (cb) {
