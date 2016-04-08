@@ -48,7 +48,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, t.teacher_display_name,")
+            query.append("SELECT l.id as lesson_id, s.subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
@@ -58,7 +58,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
                     .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
-                    .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_label, a.audience_type, a.audience_label")
+                    .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_id, s.subject_label, a.audience_type, a.audience_label")
                     .append(" ORDER BY l.lesson_date ASC");
 
             JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId))
