@@ -10,8 +10,8 @@ function DiaryController($scope, model, route, date) {
     $scope.homework = new Homework();
     $scope.showCal = false;
 
-   /* model.on('classrooms.sync', function () {
-        $scope.lesson.classroom = $scope.homework.classroom = model.classrooms.first();
+   /* model.on('audiences.sync', function () {
+        $scope.lesson.audience = $scope.homework.audience = model.audiences.first();
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
@@ -19,7 +19,7 @@ function DiaryController($scope, model, route, date) {
     });*/
 
     $scope.lessons = model.lessons;
-    $scope.classrooms = model.classrooms;
+    $scope.audiences = model.audiences;
     $scope.subjects = model.subjects;
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
@@ -99,25 +99,29 @@ function DiaryController($scope, model, route, date) {
         });
     };
 
-    //fixme, Camille can we manage the load order with another way
     $scope.initialization = function () {
-
+        $scope.countdown = 5;
         var teacher = new Teacher();
-        teacher.create(function() {
-            model.subjects.syncSubjects(function () {
-                model.classrooms.syncClassrooms(function () {
-                    model.lessons.syncLessons(function () {
-                        model.homeworks.syncHomeworks(function () {
-                        template.open('main', 'main');
-                        template.open('create-lesson', 'create-lesson');
-                        template.open('create-homework', 'create-homework');
-                        template.open('daily-event-details', 'daily-event-details');
-                        $scope.$apply();
-                        });
-                    });
-                });
-            });
-        });
+        teacher.create($scope.decrementCountdown);
+        model.subjects.syncSubjects($scope.decrementCountdown);
+        model.audiences.syncAudiences($scope.decrementCountdown);
+        model.lessons.syncLessons($scope.decrementCountdown);
+        model.homeworks.syncHomeworks($scope.decrementCountdown);
+    };
+
+    $scope.decrementCountdown = function () {
+        $scope.countdown--;
+        if (countdown == 0) {
+            initTemplates();
+        }
+    };
+
+    $scope.initTemplates = function () {
+        template.open('main', 'main');
+        template.open('create-lesson', 'create-lesson');
+        template.open('create-homework', 'create-homework');
+        template.open('daily-event-details', 'daily-event-details');
+        $scope.$apply();
     };
 
     $scope.nextWeek = function () {
@@ -137,7 +141,7 @@ function DiaryController($scope, model, route, date) {
     };
 
     var initLesson = function() {
-        $scope.lesson.classroom = $scope.homework.classroom = model.classrooms.first();
+        $scope.lesson.audience = $scope.homework.audienc = model.audiences.first();
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
@@ -145,7 +149,7 @@ function DiaryController($scope, model, route, date) {
     }
 
     var initHomework = function() {
-        $scope.homework.classroom = $scope.homework.classroom = model.classrooms.first();
+        $scope.homework.audience = $scope.homework.audience = model.audiences.first();
         $scope.homework.subject = $scope.homework.subject = model.subjects.first();
         $scope.homework.audienceType = $scope.homework.audienceType = 'class';
         $scope.homework.color = $scope.homework.color = 'pink';

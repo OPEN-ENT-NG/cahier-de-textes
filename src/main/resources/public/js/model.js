@@ -55,8 +55,8 @@ Homework.prototype.toJSON = function(){
         subject_id: this.subject.id,
         homework_type_id: this.type.id,
         teacher_id: model.me.userId,
-        school_id: this.classroom.structureId,
-        audience_id: this.classroom.id,
+        school_id: this.audience.structureId,
+        audience_id: this.audience.id,
         homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
         homework_description: this.description,
         homework_color: this.color
@@ -65,14 +65,14 @@ Homework.prototype.toJSON = function(){
 
 function Attachment(){}
 function Subject() { }
-function Classroom() { }
+function Audience() { }
 function HomeworkType(){}
 
 function Lesson(data) {
     this.collection(Attachment);
     this.collection(Homework);
     this.subject = (data) ? data.subject : new Subject();
-    this.classroom = (data) ? data.classroom : new Classroom();
+    this.audience = (data) ? data.audience : new Audience();
 }
 
 Lesson.prototype.api = {
@@ -126,8 +126,8 @@ Lesson.prototype.toJSON = function () {
     return {
         lesson_title: this.title,
         subject_id: this.subject.id,
-        school_id: this.classroom.structureId,
-        audience_id: this.classroom.id,
+        school_id: this.audience.structureId,
+        audience_id: this.audience.id,
         lesson_date: moment(this.date).format('YYYY-MM-DD'),
         lesson_start_time: (typeof this.startTime.isValid === 'function') ? this.startTime.format('HH:mm') : this.startTime,
         lesson_end_time: (typeof this.endTime.isValid === 'function') ? this.endTime.format('HH:mm'): this.endTime,
@@ -178,7 +178,7 @@ model.parseError = function(e) {
 };
 
 model.build = function () {
-    model.makeModels([HomeworkType, Classroom, Subject, Lesson, Homework]);
+    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
 
     model.me.structures.forEach(function (structureId) {
         http().postJson('/diary/teacher/' + structureId).done(function (e) {
@@ -192,9 +192,6 @@ model.build = function () {
 
     this.collection(Lesson, {
         syncLessons: function (cb) {
-            if(model.classrooms.all.length === 0 || model.subjects.all.length ===0){
-                return;
-            }
 
             var lessons = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
@@ -214,10 +211,12 @@ model.build = function () {
                                 title: lesson.lesson_title,
                                 audienceType: lesson.audience_type,
                                 description: lesson.lesson_description,
-                                subject: model.subjects.findWhere({ id: lesson.subject_id }),
+                                subjectId: lesson.subject_id,
+                                subjectLabel: lesson.subject_label,
                                 teacherId: lesson.teacher_display_name,
                                 structureId: lesson.school_id,
-                                classroom: model.classrooms.findWhere({ id: lesson.audience_id }),
+                                audienceId: lesson.audience_id,
+                                audienceLabel: lesson.audience_label,
                                 date: lesson.lesson_date,
                                 startTime: lesson.lesson_start_time,
                                 endTime: lesson.lesson_end_time,
@@ -264,16 +263,16 @@ model.build = function () {
         }
     });
 
-    this.collection(Classroom, {
-        syncClassrooms: function (cb) {
+    this.collection(Audience, {
+        syncAudiences: function (cb) {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
             model.me.structures.forEach(function (structureId) {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {
-                    structureData.classes = _.map(structureData.classes, function (classroom) {
-                        classroom.structureId = structureId;
-                        return classroom;
+                    structureData.classes = _.map(structureData.classes, function (audience) {
+                        audience.structureId = structureId;
+                        return audience;
                     });
                     this.addRange(structureData.classes);
                     nbStructures--;
@@ -316,11 +315,14 @@ model.build = function () {
                             return {
                                 id: homework.id,
                                 description: homework.homework_description,
-                                subject: model.subjects.findWhere({ id: homework.subject_id }),
-                                type: model.homeworkTypes.findWhere({ id: homework.type_id }),
+                                subjectId: homework.subject_id,
+                                subjectLabel: homework.subject_label,
+                                typeId: homework.type_id,
+                                typeLabel: homework.type_label,
                                 teacherId: homework.teacher_id,
                                 structureId: homework.structureId,
-                                classroom: model.classrooms.findWhere({ id: homework.audience_id }),
+                                audienceId: homework.audience_id,
+                                audienceLabel: homework.audience_label,
                                 dueDate: homework.homework_due_date,
                                 date: moment(homework.homework_due_date),
                                 title: homework.homework_title,

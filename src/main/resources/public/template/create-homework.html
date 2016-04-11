@@ -8,11 +8,11 @@
         </div>
         <div class="right-magnet cell">
             <input type="radio" name="audience" value="class" ng-model="homework.audienceType" />
-            <i18n>classroom</i18n>
+            <i18n>audience.type.class</i18n>
             <input type="radio" name="audience" value="group" ng-model="homework.audienceType" />
-            <i18n>group</i18n>
-            <select ng-model="homework.classroom"
-                    ng-options="classroom as classroom.name for classroom in classrooms.all"></select>
+            <i18n>audience.type.group</i18n>
+            <select ng-model="homework.audience"
+                    ng-options="audience as audience.name for audience in audiences.all"></select>
         </div>
     </div>
     <div class="row">

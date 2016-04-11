@@ -10,12 +10,12 @@
         </div>
         <div class="right-magnet cell">
             <input type="radio" name="audience" value="class" ng-model="lesson.audienceType" />
-            <i18n>classroom</i18n>
+            <i18n>audience.type.class</i18n>
             <input type="radio" name="audience" value="group" ng-model="lesson.audienceType" />
-            <i18n>group</i18n>
+            <i18n>audience.type.group</i18n>
             <select 
-                ng-model="lesson.classroom"
-                ng-options="classroom as classroom.name for classroom in classrooms.all"
+                ng-model="lesson.audience"
+                ng-options="audience as audience.name for audience in audiences.all"
             ></select>
         </div>
     </div>
