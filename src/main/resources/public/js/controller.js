@@ -111,8 +111,8 @@ function DiaryController($scope, model, route, date) {
 
     $scope.decrementCountdown = function () {
         $scope.countdown--;
-        if (countdown == 0) {
-            initTemplates();
+        if ($scope.countdown == 0) {
+            $scope.initTemplates();
         }
     };
 
