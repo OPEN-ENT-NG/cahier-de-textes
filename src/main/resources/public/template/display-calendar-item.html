@@ -1,8 +1,16 @@
 <div class="schedule-item-content [[item.color]]">
-    <div class="cell twelve" ng-click="openLessonView(item)">
-        [[item.subject.label]]
+    <div class="cell twelve">
+        [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
+        -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
+
+        <div style="float: right; margin-right: 5%">[[item.room]]</div>
     </div>
+
     <div class="cell twelve" ng-click="openLessonView(item)">
-        [[item.audience.name]]
+        [[item.subjectLabel]]
+    </div>
+
+    <div class="cell twelve" ng-click="openLessonView(item)">
+        [[item.audienceLabel]]
     </div>
 </div>
