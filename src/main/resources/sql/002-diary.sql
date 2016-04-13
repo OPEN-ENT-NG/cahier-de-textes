@@ -14,14 +14,19 @@ CREATE TABLE diary.teacher (
     PRIMARY KEY (id)
 );
 
+CREATE TYPE diary.audience_type AS ENUM ('class', 'group');
+
+COMMENT ON TYPE diary.audience_type IS 'Type of audience (class or group)';
 
 CREATE TABLE diary.audience (
     id character varying(37),
     school_id character varying(37),
-    audience_type character varying(8),
+    audience_type audience_type DEFAULT 'class',
     audience_label character varying(20),
     PRIMARY KEY (id)
 );
+
+COMMENT ON COLUMN diary."audience".audience_type IS 'Type of audience (class or group)';
 
 CREATE TABLE diary.subject (
     id character varying(37),
