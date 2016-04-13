@@ -6,12 +6,9 @@ import fr.openent.diary.services.LessonService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
-import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
-import fr.wseduc.webutils.request.RequestUtils;
-import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
@@ -28,12 +25,11 @@ import org.vertx.java.platform.Container;
 import java.util.Map;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
-import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
 /**
  * Created by a457593 on 18/02/2016.
  */
-public class DiaryController extends BaseController{
+public class DiaryController extends BaseController {
 
     //TODO is this the best place to declare that variable?
     public static final String DATABASE_SCHEMA = "diary";
@@ -58,11 +54,11 @@ public class DiaryController extends BaseController{
         this.neo = new Neo(vertx, eb, log);
     }
 
-	@Get("")
-	@SecuredAction("diary.view")
-	public void view(final HttpServerRequest request) {
-		renderView(request);
-	}
+    @Get("")
+    @SecuredAction("diary.view")
+    public void view(final HttpServerRequest request) {
+        renderView(request);
+    }
 
     @Get("/subject/list/:schoolId")
     @ApiDoc("Get all subjects for a school")
@@ -85,8 +81,8 @@ public class DiaryController extends BaseController{
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-                if(user != null){
-                    if(user.getStructures().contains(schoolId)){
+                if (user != null) {
+                    if (user.getStructures().contains(schoolId)) {
                         diaryService.getOrCreateTeacher(user.getUserId(), user.getUsername(), new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
@@ -103,7 +99,7 @@ public class DiaryController extends BaseController{
                             }
                         });
                     } else {
-                        badRequest(request,"Invalid school identifier.");
+                        badRequest(request, "Invalid school identifier.");
                     }
                 } else {
                     unauthorized(request, "No user found in session.");
