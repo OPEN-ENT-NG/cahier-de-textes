@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.AudienceType;
 import fr.openent.diary.utils.DateUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -13,6 +14,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,9 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.entcore.common.sql.SqlResult.validResult;
-import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
-import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
+import static org.entcore.common.sql.SqlResult.*;
 
 /**
  * Created by a457593 on 18/02/2016.
@@ -30,6 +30,8 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     private DiaryService diaryService;
+
+    private AudienceService audienceService;
 
     private final static String DATABASE_TABLE ="lesson";
     private final static Logger log = LoggerFactory.getLogger(LessonServiceImpl.class);
@@ -225,43 +227,31 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         resultRefined.add(lastLesson);
     }
 
+    /**
+     * Creates a lesson.
+     * To do so teacher and audience must exist in database thus they are auto-created if needed
+     *
+     * @param lessonObject       Lesson
+     * @param teacherId          Teacher id
+     * @param teacherDisplayName Displayed name of teacher
+     * @param audienceId         Audience
+     * @param schoolId           School id
+     * @param audienceType       Type of audience
+     * @param audienceLabel      Label of audience
+     * @param handler
+     */
     @Override
-    public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
-        if(lessonObject != null) {
+    public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
+
+        if (lessonObject != null) {
+            // auto-creates teacher if it does not exists
             diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
+
                 @Override
                 public void handle(Either<String, JsonObject> event) {
-                    if(event.isRight()){
-                        final JsonArray attachments = lessonObject.getArray("attachments");
-                        lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
-                        if(attachments != null && attachments.size() > 0) {
-                            //get next on the sequence to add the lesson and value in FK on attachment
-                            sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        log.debug(event.right().getValue());
-                                        Long nextId = event.right().getValue().getLong("next_id");
-                                        lessonObject.putNumber(ID_LESSON_FIELD_NAME, nextId);
 
-                                        JsonArray parameters = new JsonArray().add(nextId);
-                                        for (Object id: attachments) {
-                                            parameters.add(id);
-                                        }
-
-                                        SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                                        sb.insert("diary.lesson", lessonObject, "id");
-                                        sb.prepared("update diary.attachment set lesson_id = ? where id in " +
-                                                sql.listPrepared(attachments.toArray()), parameters);
-
-                                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
-                                    }
-                                }
-                            }));
-                        } else {
-                            //insert lesson
-                            sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
-                        }
+                    if (event.isRight()) {
+                        getOrCreateAudienceAndCreateLesson(lessonObject, teacherId, audienceId, schoolId, audienceType, audienceLabel, handler);
                     } else {
                         log.error("Teacher couldn't be retrieved or created.");
                         handler.handle(event.left());
@@ -269,6 +259,78 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 }
             });
         }
+    }
+
+    /**
+     * Check audience exists and auto-creates it if needed then creates the lesson
+     *
+     * @param lessonObject  Lesson
+     * @param teacherId     Teacher id
+     * @param audienceId    Audience
+     * @param schoolId      School id
+     * @param audienceType  Audience type
+     * @param audienceLabel Audience label
+     * @param handler
+     */
+    private void getOrCreateAudienceAndCreateLesson(final JsonObject lessonObject, final String teacherId, final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
+
+        final AudienceServiceImpl audienceService = new AudienceServiceImpl();
+
+        // check audiences exists and create it if needed
+        audienceService.getOrCreateAudience(audienceId, schoolId, audienceType, audienceLabel, new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+
+                // audience exists or created we can then create lesson
+                if (event.isRight()) {
+                    final JsonArray attachments = lessonObject.getArray("attachments");
+                    lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
+
+                    if (attachments != null && attachments.size() > 0) {
+                        createLessonWithAttachments(attachments, lessonObject, handler);
+                    } else {
+                        //insert lesson
+                        sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
+                    }
+                } else {
+                    log.error(MessageFormat.format("Error while getting or creating audience with id ?", audienceId));
+                    handler.handle(event.left());
+                }
+            }
+        });
+    }
+
+    /**
+     * Adds attachments to lesson
+     *
+     * @param attachments  Attachments
+     * @param lessonObject Lesson
+     * @param handler
+     */
+    private void createLessonWithAttachments(final JsonArray attachments, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler) {
+
+        sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    log.debug(event.right().getValue());
+                    Long nextId = event.right().getValue().getLong("next_id");
+                    lessonObject.putNumber(ID_LESSON_FIELD_NAME, nextId);
+
+                    JsonArray parameters = new JsonArray().add(nextId);
+                    for (Object id : attachments) {
+                        parameters.add(id);
+                    }
+
+                    SqlStatementsBuilder sb = new SqlStatementsBuilder();
+                    sb.insert("diary.lesson", lessonObject, "id");
+                    sb.prepared("update diary.attachment set lesson_id = ? where id in " +
+                            sql.listPrepared(attachments.toArray()), parameters);
+
+                    sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                }
+            }
+        }));
     }
 
     @Override

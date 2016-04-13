@@ -128,6 +128,8 @@ Lesson.prototype.toJSON = function () {
         subject_id: this.subject.id,
         school_id: this.audience.structureId,
         audience_id: this.audience.id,
+        audience_type: this.audienceType,
+        audience_name: this.audience.name,
         lesson_date: moment(this.date).format('YYYY-MM-DD'),
         lesson_start_time: (typeof this.startTime.isValid === 'function') ? this.startTime.format('HH:mm') : this.startTime,
         lesson_end_time: (typeof this.endTime.isValid === 'function') ? this.endTime.format('HH:mm'): this.endTime,

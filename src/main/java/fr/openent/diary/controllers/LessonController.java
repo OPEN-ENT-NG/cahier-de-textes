@@ -2,13 +2,8 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
-import fr.wseduc.rs.ApiDoc;
-import fr.wseduc.rs.Delete;
-import fr.wseduc.rs.Get;
-import fr.wseduc.rs.Post;
-import fr.wseduc.rs.Put;
-import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.Either;
+import fr.openent.diary.utils.AudienceType;
+import fr.wseduc.rs.*;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.user.UserInfos;
@@ -18,10 +13,6 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
@@ -104,7 +95,19 @@ public class LessonController extends BaseController {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
+
+                                // get audience data from json object (see model.js Lesson.prototype.toJSON)
+                                final String audienceId = json.getString("audience_id");
+                                final String schoolId = json.getString("school_id");
+                                final AudienceType audienceType = AudienceType.valueOf(json.getString("audience_type").toUpperCase());
+                                final String audienceLabel = json.getString("audience_name");
+
+                                // fields not as column in table diary.lesson so need to delete
+                                // else would crash on sql.savejson
+                                json.removeField("audience_type");
+                                json.removeField("audience_name");
+
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), audienceId, schoolId, audienceType, audienceLabel, notEmptyResponseHandler(request, 201));
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
