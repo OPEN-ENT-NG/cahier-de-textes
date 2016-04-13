@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -28,8 +29,6 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     private static final String TEACHER_ID_FIELD_NAME = "id";
     private static final String TEACHER_DISPLAY_NAME_FIELD_NAME = "teacher_display_name";
 
-    private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
-
     public DiaryServiceImpl() {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
     }
@@ -38,7 +37,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void getOrCreateTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
 
             log.debug("getOrCreateTeacher: " + teacherId);
-            if (isValidIdentifier(teacherId)) {
+            if (StringUtils.isValidIdentifier(teacherId)) {
                 retrieveTeacher(teacherId, new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
@@ -63,10 +62,6 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
             }
     }
 
-    private boolean isValidIdentifier(String teacherId) {
-        return teacherId != null && teacherId.matches(UUID_REGEX);
-    }
-
     @Override
     public void retrieveTeacher(String teacherId, Handler<Either<String, JsonObject>> handler) {
 
@@ -80,7 +75,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
     @Override
     public void createTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
-        if(isValidIdentifier(teacherId)) { //TODO change to StringUtils/UUID utils?
+        if(StringUtils.isValidIdentifier(teacherId)) { //TODO change to StringUtils/UUID utils?
             //insert teacher
             JsonObject teacherParams = new JsonObject();
             teacherParams.putString(TEACHER_ID_FIELD_NAME, teacherId);
