@@ -9,6 +9,7 @@ import fr.wseduc.rs.Post;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
+import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
@@ -88,10 +89,10 @@ public class DiaryController extends BaseController {
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     //return 201 if teacher is created, 200 if it was retrieved
-                                    if (Boolean.TRUE.equals(event.right().getValue().getBoolean("teacherFound"))) {
-                                        DefaultResponseHandler.defaultResponseHandler(request);
+                                    if (!Boolean.TRUE.equals(event.right().getValue().getBoolean("teacherFound"))) {
+                                        request.response().setStatusCode(200).end();
                                     } else {
-                                        DefaultResponseHandler.defaultResponseHandler(request, 201);
+                                        created(request);
                                     }
                                 } else {
                                     DefaultResponseHandler.leftToResponse(request, event.left());
