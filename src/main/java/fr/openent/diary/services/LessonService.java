@@ -43,4 +43,11 @@ public interface LessonService extends CrudService {
     //use crud sql helper
     void deleteLesson(final String  lessonId, final Handler<Either<String, JsonObject>> handler);
 
+    /**
+     * Publishes a Lesson, by setting the lesson_state to 'published'.
+     * Also publishes all linked homeworks.
+     * @param lessonId
+     * @param handler
+     */
+    void publishLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 }
