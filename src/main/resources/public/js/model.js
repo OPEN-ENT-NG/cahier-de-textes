@@ -182,16 +182,6 @@ model.parseError = function(e) {
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
 
-    model.me.structures.forEach(function (structureId) {
-        http().postJson('/diary/teacher/' + structureId).done(function (e) {
-            console.log('httpsattus : ' + e);
-            if (e.status == '201') {
-                console.log('init subjects : ');
-
-            }
-        });
-    });
-
     this.collection(Lesson, {
         syncLessons: function (cb) {
 
