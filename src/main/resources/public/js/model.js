@@ -153,7 +153,7 @@ Teacher.prototype.create = function(cb) {
 
     model.me.structures.forEach(function (structureId) {
         http().postJson('/diary/teacher/' + structureId).done(function (e) {
-            console.log('httpsattus : ' + e);
+
             if (e.status == '201') {
                 console.log('init subjects : ');
             }
