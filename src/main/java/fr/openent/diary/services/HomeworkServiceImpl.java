@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
@@ -196,6 +197,29 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void deleteHomework(final String  homeworkId, final Handler<Either<String, JsonObject>> handler) {
         super.delete(homeworkId, handler);
+    }
+
+    @Override
+    public void publishHomework(String homeworkId, Handler<Either<String, JsonObject>> handler) {
+        List<String> ids = new ArrayList<String>();
+        ids.add(homeworkId);
+        publishHomeworks(ids, handler);
+    }
+
+    @Override
+    public void publishHomeworks(List<String> homeworkIds, Handler<Either<String, JsonObject>> handler) {
+        StringBuilder sb = new StringBuilder();
+        JsonArray parameters = new JsonArray();
+        for (String id: homeworkIds) {
+            parameters.add(id);
+        }
+
+        sb.append("UPDATE diary.homework SET homework_state = '");
+        sb.append(ResourceState.PUBLISHED.toString()).append("' ");
+        sb.append("WHERE id in ");
+        sb.append(sql.listPrepared(homeworkIds.toArray()));
+
+        sql.prepared(sb.toString(), parameters, validRowsResultHandler(handler));
     }
 }
 

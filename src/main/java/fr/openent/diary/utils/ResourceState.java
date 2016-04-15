@@ -5,5 +5,16 @@ package fr.openent.diary.utils;
  */
 public enum ResourceState {
 
-    DRAFT, PUBLISHED
+    DRAFT("draft"), PUBLISHED("published");
+
+    private final String stateLabel;
+
+    ResourceState(String label) {
+        this.stateLabel = label;
+    }
+
+    @Override
+    public String toString() {
+        return this.stateLabel;
+    }
 }

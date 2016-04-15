@@ -3,6 +3,7 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.utils.AudienceType;
 import fr.openent.diary.utils.DateUtils;
+import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
@@ -378,6 +379,27 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     @Override
     public void deleteLesson(final String  lessonId, final Handler<Either<String, JsonObject>> handler) {
         super.delete(lessonId, handler);
+    }
+
+    @Override
+    public void publishLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
+        StringBuilder lessonSb = new StringBuilder();
+        JsonArray parameters = new JsonArray();
+        parameters.add(Sql.parseId(lessonId));
+
+        lessonSb.append("UPDATE diary.lesson SET lesson_state = '");
+        lessonSb.append(ResourceState.PUBLISHED.toString()).append("' ");
+        lessonSb.append("WHERE id = ? ");
+
+        StringBuilder homeworkSb = new StringBuilder();
+        homeworkSb.append("UPDATE diary.homework SET homework_state = '");
+        homeworkSb.append(ResourceState.PUBLISHED.toString()).append("' ");
+        homeworkSb.append("WHERE lesson_id = ? ");
+
+        SqlStatementsBuilder transactionBuilder = new SqlStatementsBuilder();
+        transactionBuilder.prepared(lessonSb.toString(), parameters);
+        transactionBuilder.prepared(homeworkSb.toString(), parameters);
+        sql.transaction(transactionBuilder.build(), validUniqueResultHandler(0, handler));
     }
 
     /**

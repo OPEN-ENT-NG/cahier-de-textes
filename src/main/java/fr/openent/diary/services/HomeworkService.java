@@ -27,4 +27,13 @@ public interface HomeworkService {
     void updateHomework(final String homeworkId, final JsonObject homeworkObject, final Handler<Either<String, JsonObject>> handler);
 
     void deleteHomework(final String  homeworkId, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Publishes a Homework, by setting the lesson_state to 'published'
+     * @param homeworkId
+     * @param handler
+     */
+    void publishHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
+
+    void publishHomeworks(final List<String> homeworkIds, final Handler<Either<String, JsonObject>> handler);
 }
