@@ -4,7 +4,7 @@
         <div class="six cell">
             <label><i18n>subject</i18n></label>
             <select ng-model="homework.subject"
-                    ng-options="subject as subject.label for subject in subjects.all"></select>
+                    ng-options="subject as subject.label for subject in subjects.all" required></select>
         </div>
         <div class="right-magnet cell">
             <input type="radio" name="audience" value="class" ng-model="homework.audienceType" />
@@ -40,6 +40,6 @@
     </div>
     <div class="row">
         <button class="right-magnet"><i18n>create</i18n></button>
-        <button type="button" class="right-magnet cancel" ng-click="lightboxes.createLesson = false"><i18n>cancel</i18n></button>
+        <button type="button" class="right-magnet cancel" ng-click="redirect('/calendarView')"><i18n>cancel</i18n></button>
     </div>
 </form>

@@ -1,18 +1,10 @@
 ﻿<h1><i18n>diary.title</i18n></h1>
 
-<lightbox show="lightboxes.createLesson" on-close="lightboxes.createLesson = false">
-    <container template="create-lesson"></container>
-</lightbox>
-<lightbox show="lightboxes.createHomework" on-close="lightboxes.createHomework = false">
-    <container template="create-homework"></container>
-</lightbox>
-    
-
     <div class="row">
-        <button ng-click="openLessonView()">
+        <button ng-click="redirect('/createLessonView/nocalendar')">
             <i18n>diary.lesson.create</i18n>
         </button>
-        <button ng-click="openHomeworkView()">
+        <button ng-click="redirect('/createHomeworkView')">
             <i18n>diary.homework.create</i18n>
         </button>
         <hr />
@@ -27,16 +19,15 @@
         </filters>
         <calendar-daily-events for="calendar"
                                ng-model="homeworks.all"
-                               on-create-open="openHomeworkView()"
-                               on-create-close="lightboxes.createHomework = false"></calendar-daily-events>
+                               on-create-open="redirect('/createHomeworkView')"
+                               ></calendar-daily-events>
         <div class="row" ng-if="! showCal">
             <calendar
                   id="calendar"
                   class="twelve cell"
                   display-template="display-calendar-item"
                   create-template="create-lesson"
-                  on-create-open="openLessonView()"
-                  on-create-close="lightboxes.createLesson = false"
+                  on-create-open="redirect('/createLessonView/calendar')"
                   items="lessons.all"></calendar>
         </div>
         <div class="row" ng-if="showCal">
@@ -45,8 +36,7 @@
                   class="twelve cell"
                   display-template="display-calendar-item"
                   create-template="create-lesson"
-                  on-create-open="openLessonView()"
-                  on-create-close="lightboxes.createLesson = false"
+                  on-create-open="redirect('/createLessonView/calendar')"
                   items="lessons.all"></calendar>
         </div>
     </div>

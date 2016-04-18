@@ -1,4 +1,4 @@
-﻿<form ng-submit="(lesson.id) ? updateLesson(): createLesson(newItem.beginning, newItem.end)">
+﻿<form ng-submit="(lesson.id) ? updateLesson(): createLesson()">
     <h2><i18n>lesson.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -6,7 +6,7 @@
             <select
                 ng-model="lesson.subject"
                 ng-options="subject as subject.label for subject in subjects.all"
-            ></select>
+            required></select>
         </div>
         <div class="right-magnet cell">
             <input type="radio" name="audience" value="class" ng-model="lesson.audienceType" />
@@ -40,14 +40,19 @@
                 
             </div>
             <div class="row">
+                <!-- Beginning (Date: DD/MM/YYYY) -->
                 <div class="three cell">
                     <label class="cell three"><i18n>date</i18n></label>
-                    <date-picker ng-model="newItem.beginning" class="cell six"></date-picker>
+                    <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
                 </div>
+
+                <!-- Beginning (Time: HH:mm) -->
                 <div class="three cell">
                     <label class="cell four"><i18n>start.time</i18n></label>
                     <time-picker ng-model="newItem.beginning" class="cell four"></time-picker>
                 </div>
+
+                <!-- End (Time: HH:mm) -->
                 <div class="three cell">
                     <label class="cell four"><i18n>end.time</i18n></label>
                     <time-picker ng-model="newItem.end" class="cell four"></time-picker>
@@ -100,7 +105,7 @@
         <div class="row">
             <button ng-if="! lesson.id" class="right-magnet"><i18n>create</i18n></button>
             <button ng-if="lesson.id" class="right-magnet"><i18n>update</i18n></button>
-            <button type="button" class="right-magnet cancel" ng-click="lightboxes.createLesson = false"><i18n>cancel</i18n></button>
+            <button type="button" class="right-magnet cancel" ng-click="redirect('/calendarView')"><i18n>cancel</i18n></button>
         </div>
     </section>
 </form>
