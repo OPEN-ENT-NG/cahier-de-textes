@@ -8,9 +8,23 @@ public enum AudienceType {
     /**
      * Class type
      */
-    CLASS,
+    CLASS("class"),
     /**
      * Group type
      */
-    GROUP
+    GROUP("group");
+
+    private final String stateLabel;
+
+    /**
+     * @param label
+     */
+    AudienceType(String label) {
+        this.stateLabel = label;
+    }
+
+    @Override
+    public String toString() {
+        return this.stateLabel;
+    }
 }
