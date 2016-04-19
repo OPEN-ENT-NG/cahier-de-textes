@@ -1,4 +1,4 @@
-﻿<form ng-submit="(lesson.id) ? updateLesson(): createLesson()">
+﻿<form>
     <h2><i18n>lesson.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -103,9 +103,20 @@
             </div>
         </section>
         <div class="row">
-            <button ng-if="! lesson.id" class="right-magnet"><i18n>create</i18n></button>
-            <button ng-if="lesson.id" class="right-magnet"><i18n>update</i18n></button>
-            <button type="button" class="right-magnet cancel" ng-click="redirect('/calendarView')"><i18n>cancel</i18n></button>
+            <nav>
+                <!-- save lesson in draft mode and go back to calendar view -->
+                <button class="right-magnet" ng-click="createOrUpdateLesson(true)">
+                    <i18n>back</i18n>
+                </button>
+                <!-- save lesson in draft mode -->
+                <button class="right-magnet" ng-click="createOrUpdateLesson(false)">
+                    <i18n>save</i18n>
+                </button>
+                <!-- go back to calendar view without saving -->
+                <button class="right-magnet cancel" type="button" ng-click="redirect('/calendarView')">
+                    <i18n>cancel</i18n>
+                </button>
+            </nav>
         </div>
     </section>
 </form>

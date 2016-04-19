@@ -45,7 +45,7 @@
   },
   "required": [
     "lesson_title",
-    "subject_code",
+    "subject_id",
     "school_id",
     "audience_id",
     "lesson_date",

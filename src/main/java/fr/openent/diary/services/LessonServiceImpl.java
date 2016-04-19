@@ -245,6 +245,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
 
         if (lessonObject != null) {
+            stripNonLessonFields(lessonObject);
+
             // auto-creates teacher if it does not exists
             diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
 
@@ -260,6 +262,21 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 }
             });
         }
+    }
+
+
+    /**
+     * fields not as column in table diary.lesson so need to delete
+     * else will crash on createLesson or updateLesson
+     * TODO remove that try getting audience data from other object than lesson JSON one
+     * (see {@link fr.openent.diary.controllers.LessonController}
+     *
+     * @param lessonObject
+     */
+    private void stripNonLessonFields(final JsonObject lessonObject) {
+
+        lessonObject.removeField("audience_type");
+        lessonObject.removeField("audience_name");
     }
 
     /**
@@ -353,6 +370,9 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     @Override
     public void updateLesson(final String lessonId, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler) {
+
+        stripNonLessonFields(lessonObject);
+
         StringBuilder sb = new StringBuilder();
         JsonArray values = new JsonArray();
         //TODO query without loops

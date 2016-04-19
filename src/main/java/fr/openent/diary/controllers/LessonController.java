@@ -102,10 +102,6 @@ public class LessonController extends BaseController {
                                 final AudienceType audienceType = AudienceType.valueOf(json.getString("audience_type").toUpperCase());
                                 final String audienceLabel = json.getString("audience_name");
 
-                                // fields not as column in table diary.lesson so need to delete
-                                // else would crash on sql.savejson
-                                json.removeField("audience_type");
-                                json.removeField("audience_name");
 
                                 lessonService.createLesson(json, user.getUserId(), user.getUsername(), audienceId, schoolId, audienceType, audienceLabel, notEmptyResponseHandler(request, 201));
                             } else {
