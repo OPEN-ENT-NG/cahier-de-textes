@@ -99,7 +99,7 @@ public class LessonController extends BaseController {
                                 // get audience data from json object (see model.js Lesson.prototype.toJSON)
                                 final String audienceId = json.getString("audience_id");
                                 final String schoolId = json.getString("school_id");
-                                final AudienceType audienceType = AudienceType.valueOf(json.getString("audience_type"));
+                                final AudienceType audienceType = AudienceType.valueOf(json.getString("audience_type").toUpperCase());
                                 final String audienceLabel = json.getString("audience_name");
 
                                 // fields not as column in table diary.lesson so need to delete
