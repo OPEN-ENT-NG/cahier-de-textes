@@ -1,7 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.AudienceType;
+import fr.openent.diary.utils.Audience;
 import fr.openent.diary.utils.DateUtils;
 import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
@@ -41,9 +41,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
 
-    public LessonServiceImpl(final DiaryService diaryService) {
+    public LessonServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
         this.diaryService = diaryService;
+        this.audienceService = audienceService;
     }
 
     @Override
@@ -235,14 +236,11 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param lessonObject       Lesson
      * @param teacherId          Teacher id
      * @param teacherDisplayName Displayed name of teacher
-     * @param audienceId         Audience
-     * @param schoolId           School id
-     * @param audienceType       Type of audience
-     * @param audienceLabel      Label of audience
+     * @param audience           Audience
      * @param handler
      */
     @Override
-    public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
+    public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final Audience audience, final Handler<Either<String, JsonObject>> handler) {
 
         if (lessonObject != null) {
             stripNonLessonFields(lessonObject);
@@ -254,7 +252,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 public void handle(Either<String, JsonObject> event) {
 
                     if (event.isRight()) {
-                        getOrCreateAudienceAndCreateLesson(lessonObject, teacherId, audienceId, schoolId, audienceType, audienceLabel, handler);
+                        getOrCreateAudienceAndCreateLesson(lessonObject, teacherId, audience, handler);
                     } else {
                         log.error("Teacher couldn't be retrieved or created.");
                         handler.handle(event.left());
@@ -284,18 +282,13 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      *
      * @param lessonObject  Lesson
      * @param teacherId     Teacher id
-     * @param audienceId    Audience
-     * @param schoolId      School id
-     * @param audienceType  Audience type
-     * @param audienceLabel Audience label
+     * @param audience    Audience
      * @param handler
      */
-    private void getOrCreateAudienceAndCreateLesson(final JsonObject lessonObject, final String teacherId, final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
-
-        final AudienceServiceImpl audienceService = new AudienceServiceImpl();
+    private void getOrCreateAudienceAndCreateLesson(final JsonObject lessonObject, final String teacherId, final Audience audience, final Handler<Either<String, JsonObject>> handler) {
 
         // check audiences exists and create it if needed
-        audienceService.getOrCreateAudience(audienceId, schoolId, audienceType, audienceLabel, new Handler<Either<String, JsonObject>>() {
+        audienceService.getOrCreateAudience(audience, new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
 
@@ -311,7 +304,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                         sql.insert("diary.lesson", lessonObject, "id", validUniqueResultHandler(handler));
                     }
                 } else {
-                    log.error(MessageFormat.format("Error while getting or creating audience with id ?", audienceId));
+                    log.error(MessageFormat.format("Error while getting or creating audience with id ?", audience.getId()));
                     handler.handle(event.left());
                 }
             }
@@ -368,6 +361,13 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
 
+    /**
+     * Update lesson in db from JSON lesson object
+     *
+     * @param lessonId     Lesson id
+     * @param lessonObject Lesson object
+     * @param handler
+     */
     @Override
     public void updateLesson(final String lessonId, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler) {
 

@@ -1,7 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.AudienceType;
+import fr.openent.diary.utils.Audience;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -79,21 +79,18 @@ public class AudienceServiceImpl extends SqlCrudService implements AudienceServi
     /**
      * Creates an audience
      *
-     * @param audienceId    Id audience (must be in UUID format)
-     * @param schoolId      School Id/Structure Id (must be in UUID format)
-     * @param audienceType  Type of audience (class or group)
-     * @param audienceLabel Label of audience
+     * @param audience  Audience
      * @param handler
      */
     @Override
-    public void createAudience(final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
-        if (StringUtils.isValidIdentifier(audienceId)) {
+    public void createAudience(final Audience audience,  final Handler<Either<String, JsonObject>> handler) {
+        if (StringUtils.isValidIdentifier(audience.getId())) {
 
             JsonObject audienceParams = new JsonObject();
-            audienceParams.putString(AUDIENCE_ID_FIELD_NAME, audienceId);
-            audienceParams.putString(AUDIENCE_SCHOOL_ID_FIELD_NAME, schoolId);
-            audienceParams.putString(AUDIENCE_LABEL_FIELD_NAME, audienceLabel);
-            audienceParams.putString(AUDIENCE_TYPE_FIELD_NAME, audienceType.name().toLowerCase());
+            audienceParams.putString(AUDIENCE_ID_FIELD_NAME, audience.getId());
+            audienceParams.putString(AUDIENCE_SCHOOL_ID_FIELD_NAME, audience.getSchoolId());
+            audienceParams.putString(AUDIENCE_LABEL_FIELD_NAME, audience.getAudienceLabel());
+            audienceParams.putString(AUDIENCE_TYPE_FIELD_NAME, audience.getAudienceType().name().toLowerCase());
 
             sql.insert(DiaryController.DATABASE_SCHEMA + "." + AUDIENCE_TABLE, audienceParams, AUDIENCE_ID_FIELD_NAME, validUniqueResultHandler(handler));
         } else {
@@ -105,24 +102,21 @@ public class AudienceServiceImpl extends SqlCrudService implements AudienceServi
     /**
      * Create an audience if it does not exist in database (diary.audience)
      *
-     * @param audienceId    Audience Id
-     * @param schoolId      School Id (same as structure_id)
-     * @param audienceType  Type of audience (generally 'class' or 'group')
-     * @param audienceLabel Label of audience
+     * @param audience    Audience
      * @param handler
      */
-    public void getOrCreateAudience(final String audienceId, final String schoolId, final AudienceType audienceType, final String audienceLabel, final Handler<Either<String, JsonObject>> handler) {
+    public void getOrCreateAudience(final Audience audience, final Handler<Either<String, JsonObject>> handler) {
 
-        log.debug("getOrCreateAudience: " + audienceId);
+        log.debug("getOrCreateAudience: " + audience.getId());
 
-        if (StringUtils.isValidIdentifier(audienceId)) {
-            retrieveAudience(audienceId, new Handler<Either<String, JsonObject>>() {
+        if (StringUtils.isValidIdentifier(audience.getId())) {
+            retrieveAudience(audience.getId(), new Handler<Either<String, JsonObject>>() {
                 @Override
                 public void handle(Either<String, JsonObject> event) {
                     if (event.isRight()) {
                         if (event.right().getValue().size() == 0) {
                             log.debug("No audience, create it");
-                            createAudience(audienceId, schoolId, audienceType, audienceLabel, handler);
+                            createAudience(audience, handler);
                         } else {
                             log.debug("Audience found");
                             handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().putBoolean("teacherFound", true)));

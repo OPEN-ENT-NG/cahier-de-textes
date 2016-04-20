@@ -1,9 +1,11 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.services.AudienceService;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
-import fr.openent.diary.utils.AudienceType;
+import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.user.UserInfos;
@@ -15,6 +17,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
+import static org.entcore.common.http.response.DefaultResponseHandler.leftToResponse;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
 /**
@@ -24,12 +27,17 @@ public class LessonController extends BaseController {
 
     LessonService lessonService;
     DiaryService diaryService;
+    /**
+     * Might be used to auto-create audiences on lesson create/update
+     */
+    AudienceService audienceService;
 
     private final static Logger log = LoggerFactory.getLogger(LessonController.class);
 
-    public LessonController(LessonService lessonService, DiaryService diaryService) {
+    public LessonController(LessonService lessonService, DiaryService diaryService, AudienceService audienceSercice) {
         this.lessonService = lessonService;
         this.diaryService = diaryService;
+        this.audienceService = audienceSercice;
     }
 
     @Get("/lesson/:id")
@@ -95,15 +103,7 @@ public class LessonController extends BaseController {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-
-                                // get audience data from json object (see model.js Lesson.prototype.toJSON)
-                                final String audienceId = json.getString("audience_id");
-                                final String schoolId = json.getString("school_id");
-                                final AudienceType audienceType = AudienceType.valueOf(json.getString("audience_type").toUpperCase());
-                                final String audienceLabel = json.getString("audience_name");
-
-
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), audienceId, schoolId, audienceType, audienceLabel, notEmptyResponseHandler(request, 201));
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
@@ -129,8 +129,18 @@ public class LessonController extends BaseController {
                     if (user != null) {
                         RequestUtils.bodyToJson(request, pathPrefix + "updateLesson",  new Handler<JsonObject>() {
                             @Override
-                            public void handle(JsonObject json) {
-                                lessonService.updateLesson(lessonId, json, notEmptyResponseHandler(request, 201));
+                            public void handle(final JsonObject json) {
+                                // auto-create missing audiences if needeed
+                                audienceService.getOrCreateAudience(new Audience(json), new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            lessonService.updateLesson(lessonId, json, notEmptyResponseHandler(request, 201));
+                                        } else {
+                                            leftToResponse(request, event.left());
+                                        }
+                                    }
+                                });
                             }
                         });
                     } else {
