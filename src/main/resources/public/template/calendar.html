@@ -1,0 +1,40 @@
+<div class="row">
+    <button ng-click="redirect('/createLessonView/default')">
+        <i18n>diary.lesson.create</i18n>
+    </button>
+    <button ng-click="redirect('/createHomeworkView')">
+        <i18n>diary.homework.create</i18n>
+    </button>
+    <hr />
+</div>
+
+<div class="row">
+    <filters>
+        <li>
+            <button ng-click="previousWeek(); ">&#8592;</button>
+            <button ng-click="nextWeek(); ">&#8594;</button>
+        </li>
+    </filters>
+    <calendar-daily-events for="calendar"
+                           ng-model="homeworks.all"
+                           on-create-open="redirect('/createHomeworkView')"
+    ></calendar-daily-events>
+    <div class="row" ng-if="! showCal">
+        <calendar
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"></calendar>
+    </div>
+    <div class="row" ng-if="showCal">
+        <calendar
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"></calendar>
+    </div>
+</div>
