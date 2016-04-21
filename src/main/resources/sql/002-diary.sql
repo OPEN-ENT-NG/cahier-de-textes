@@ -21,7 +21,7 @@ COMMENT ON TYPE diary.audience_type IS 'Type of audience (class or group)';
 CREATE TABLE diary.audience (
     id character varying(37),
     school_id character varying(37),
-    audience_type audience_type DEFAULT 'class',
+    audience_type diary.audience_type DEFAULT 'class',
     audience_label character varying(20),
     PRIMARY KEY (id)
 );
