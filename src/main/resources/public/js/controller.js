@@ -8,13 +8,21 @@ routes.define(function ($routeProvider) {
         .when('/createHomeworkView', {
             action: 'createHomeworkView'
         })
-        // calendar view (normally default one for first time access)
-        .when('/calendarView', {
-            action: 'calendar'
+        .when('/editLessonView/:idLesson', {
+            action: 'editLessonView'
+        })
+        .when('/editHomeworkView/:idHomework', {
+            action: 'editHomeworkView'
+        })
+        .when('/editHomeworkView/:idHomework/:idLesson', {
+            action: 'editHomeworkView'
+        })
+        .when('/calendarView/:startDate', {
+            action: 'calendarView'
         })
         // default view
         .otherwise({
-            action: 'default'
+            action: 'calendarView'
         })
 })
 
@@ -43,18 +51,74 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
 
+    route({
+        createLessonView: function(params){
+            $scope.lesson = null;
+            var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
+            $scope.openLessonView($scope.lesson, params, lessonTimeFromCalendar);
+            template.open('main', 'main');
+            template.close('calendar');
+            template.close('create-homework');
+            template.open('create-lesson', 'create-lesson');
+
+        },
+        createHomeworkView: function(params){
+            $scope.homework = null;
+            $scope.openHomeworkView($scope.lesson, params);
+            template.open('main', 'main');
+            template.close('calendar');
+            template.close('create-lesson');
+            template.open('create-homework', 'create-homework');
+        },
+        editLessonView: function(params) {
+            loadLessonFromRoute(params.id);
+            template.open('main', 'main');
+            template.close('calendar');
+            template.close('create-homework');
+            template.open('create-lesson', 'create-lesson');
+        },
+        editHomeworkView: function(params) {
+            loadHomeworkFromRoute(params.id);
+            template.open('main', 'main');
+            template.close('calendar');
+            template.close('create-lesson');
+            template.open('create-homework', 'create-homework');
+        },
+        calendarView: function(params){
+            if (params.startDate != null) {
+                //put the start date in the scope?
+            }
+            template.open('main', 'main');
+            template.close('create-lesson');
+            template.close('create-homework');
+            template.open('calendar', 'calendar');
+            template.open('daily-event-details', 'daily-event-details');
+        }
+    });
+
+    var loadLessonFromRoute = function(id) {
+        var lesson = model.lessons.findWhere({ id:  id });
+        if (lesson != null) {
+            $scope.openLessonView(lesson);
+        }
+    };
+
+    var loadHomeworkFromRoute = function(id) {
+        var homework = model.homeworks.findWhere({ id:  id });
+        if (homework != null) {
+            $scope.openHomeworkView(homework);
+        }
+    };
 
     /**
-     *
-     * @param lesson
-     * @param params
      * @param initFromCalendar If true start and end time will be initialized to user choice in calendar
      * else will be initialized to today for start time and start time + 1 hour for end time
      */
-    $scope.initLessonViewData = function(lesson, params, timeFromCalendar){
+    $scope.openLessonView = function(lesson, params, timeFromCalendar){
 
         // open existing lesson for edit
         if (lesson) {
+            $scope.lesson = new Lesson();
             $scope.lesson.updateData(lesson);
             $scope.newItem = {
                 date: moment($scope.lesson.date),
@@ -69,36 +133,15 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     };
 
-    $scope.initHomeworkViewData = function(homework, params){
+    $scope.openHomeworkView = function(homework, params){
 
         if (homework) {
+            $scope.homework = new Homework();
             $scope.homework.updateData(homework);
         } else {
             initHomework();
         }
     };
-
-    route({
-        // TODO default view calendar
-        default: function(){
-            window.location.hash = '';
-        },
-        createLessonView: function(params){
-            $scope.lesson = null;
-            var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
-            $scope.initLessonViewData($scope.lesson, params, lessonTimeFromCalendar);
-            template.open('main', 'create-lesson');
-        },
-        createHomeworkView: function(params){
-            $scope.homework = null;
-            $scope.initHomeworkViewData($scope.lesson, params);
-            template.open('main', 'create-homework');
-        },
-        calendar: function(params){
-            template.close('main');
-            template.open('main', 'main');
-        }
-    });
 
     $scope.closeLesson = function() {
 
@@ -205,7 +248,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks();
     };
-	
+
 	$scope.redirect = function(path){
         $location.path(path);
     };
