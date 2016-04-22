@@ -1,4 +1,4 @@
-﻿<form>
+﻿<form name="lessonform">
     <h2><i18n>lesson.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -105,11 +105,11 @@
         <div class="row">
             <nav>
                 <!-- save lesson in draft mode and go back to calendar view -->
-                <button class="right-magnet" ng-click="createOrUpdateLesson(true)">
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
                     <i18n>back</i18n>
                 </button>
                 <!-- save lesson in draft mode -->
-                <button class="right-magnet" ng-click="createOrUpdateLesson(false)">
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(false)">
                     <i18n>save</i18n>
                 </button>
                 <!-- go back to calendar view without saving -->
