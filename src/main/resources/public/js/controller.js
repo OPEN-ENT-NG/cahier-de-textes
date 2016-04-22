@@ -55,16 +55,16 @@ function DiaryController($scope, template, model, route, date, $location) {
         createLessonView: function(params){
             $scope.lesson = null;
             var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
-            $scope.openLessonView($scope.lesson, params, lessonTimeFromCalendar);
+            $scope.openLessonView(null, params, lessonTimeFromCalendar);
             template.open('main', 'main');
             template.close('calendar');
             template.close('create-homework');
             template.open('create-lesson', 'create-lesson');
-
+            logging.properties
         },
         createHomeworkView: function(params){
             $scope.homework = null;
-            $scope.openHomeworkView($scope.lesson, params);
+            $scope.openHomeworkView(null, params);
             template.open('main', 'main');
             template.close('calendar');
             template.close('create-lesson');
