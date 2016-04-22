@@ -57,40 +57,30 @@ function DiaryController($scope, template, model, route, date, $location) {
             var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
             $scope.openLessonView(null, params, lessonTimeFromCalendar);
             template.open('main', 'main');
-            template.close('calendar');
-            template.close('create-homework');
-            template.open('create-lesson', 'create-lesson');
+            template.open('main-view', 'create-lesson');
         },
         createHomeworkView: function(params){
             $scope.homework = null;
             $scope.openHomeworkView(null, params);
             template.open('main', 'main');
-            template.close('calendar');
-            template.close('create-lesson');
-            template.open('create-homework', 'create-homework');
+            template.open('main-view', 'create-homework');
         },
         editLessonView: function(params) {
             loadLessonFromRoute(params.idLesson);
             template.open('main', 'main');
-            template.close('calendar');
-            template.close('create-homework');
-            template.open('create-lesson', 'create-lesson');
+            template.open('main-view', 'create-lesson');
         },
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params.id);
             template.open('main', 'main');
-            template.close('calendar');
-            template.close('create-lesson');
-            template.open('create-homework', 'create-homework');
+            template.open('main-view', 'create-homework');
         },
         calendarView: function(params){
             if (params.startDate != null) {
                 //put the start date in the scope?
             }
             template.open('main', 'main');
-            template.close('create-lesson');
-            template.close('create-homework');
-            template.open('calendar', 'calendar');
+            template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');
         }
     });
