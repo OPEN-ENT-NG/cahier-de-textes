@@ -71,7 +71,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('create-homework', 'create-homework');
         },
         editLessonView: function(params) {
-            loadLessonFromRoute(params.id);
+            loadLessonFromRoute(params.idLesson);
             template.open('main', 'main');
             template.close('calendar');
             template.close('create-homework');
@@ -96,15 +96,17 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
     });
 
-    var loadLessonFromRoute = function(id) {
-        var lesson = model.lessons.findWhere({ id:  id });
+    var loadLessonFromRoute = function (idLesson) {
+
+        var lesson = model.lessons.findWhere({id: parseInt(idLesson)});
+
         if (lesson != null) {
             $scope.openLessonView(lesson);
         }
     };
 
-    var loadHomeworkFromRoute = function(id) {
-        var homework = model.homeworks.findWhere({ id:  id });
+    var loadHomeworkFromRoute = function(idHomework) {
+        var homework = model.homeworks.findWhere({ id:  idHomework });
         if (homework != null) {
             $scope.openHomeworkView(homework);
         }
@@ -295,9 +297,15 @@ function DiaryController($scope, template, model, route, date, $location) {
         var teacher = new Teacher();
         teacher.create($scope.decrementCountdown);
         model.subjects.syncSubjects($scope.decrementCountdown);
-        model.audiences.syncAudiences($scope.decrementCountdown);
-        model.lessons.syncLessons($scope.decrementCountdown);
-        model.homeworks.syncHomeworks($scope.decrementCountdown);
+        model.audiences.syncAudiences(function(){
+            $scope.decrementCountdown();
+
+            // call lessons/homework sync after audiences sync since
+            // lesson and homework objects needs audience data to be built
+            model.lessons.syncLessons($scope.decrementCountdown);
+            model.homeworks.syncHomeworks($scope.decrementCountdown);
+        });
+
     };
 
     $scope.decrementDeleteCountdown = function () {
@@ -323,6 +331,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         template.open('create-lesson', 'create-lesson');
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
+        $scope.showCal = !$scope.showCal;
         $scope.$apply();
     };
 
