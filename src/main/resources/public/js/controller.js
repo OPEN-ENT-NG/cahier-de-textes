@@ -71,6 +71,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('create-homework', 'create-homework');
         },
         editLessonView: function(params) {
+            $scope.tabs.createLesson = 'lesson';
             loadLessonFromRoute(params.idLesson);
             template.open('main', 'main');
             template.close('calendar');
