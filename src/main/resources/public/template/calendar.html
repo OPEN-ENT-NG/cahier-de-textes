@@ -1,3 +1,9 @@
+<div ng-if="showConfirmPanel">
+    <lightbox show="showConfirmPanel" on-close="closeConfirmPanel()">
+        <container template="lightbox"></container>
+    </lightbox>
+</div>
+
 <div class="row">
     <button ng-click="redirect('/createLessonView/default')">
         <i18n>diary.lesson.create</i18n>
@@ -38,3 +44,23 @@
                 items="lessons.all"></calendar>
     </div>
 </div>
+
+<section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0  }">
+    <div class="toggle">
+        <div class="row">
+            <button ng-click="showConfirmDeleteLessonPanel()">
+                <i18n>remove</i18n>
+            </button>
+            <button ng-click="editSelectedLesson()" ng-class="{ disabled: lessons.selection().length > 1  }"  >
+                <i18n>edit</i18n>
+            </button>
+            <!-- not implemented yet so always disabled -->
+            <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0  }">
+                <i18n>share</i18n>
+            </button>
+            <button ng-click="publishSelectedLessons()">
+                <i18n>publish</i18n>
+            </button>
+        </div>
+    </div>
+</section>

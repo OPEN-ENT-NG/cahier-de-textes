@@ -6,6 +6,8 @@
         <div style="float: right; margin-right: 5%">[[item.room]]</div>
     </div>
 
+    <input type="checkbox" ng-model="item.selected" />
+
     <div class="cell twelve" ng-click="redirect('/editLessonView/'+ item.id)">
         [[item.subjectLabel]]
     </div>

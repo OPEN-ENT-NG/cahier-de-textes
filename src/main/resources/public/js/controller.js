@@ -159,6 +159,21 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
     }
 
+    /**
+     * 
+     */
+    $scope.editSelectedLesson = function(){
+        var selectedLessons = model.lessons.filter(function (someLesson) {
+            return someLesson && someLesson.selected;
+        });
+        
+        var selectedLesson = selectedLessons.length > 0 ? selectedLessons[0] : null;
+        
+        if(selectedLesson){
+            $scope.redirect('/editLessonView/' + selectedLesson.id);
+        }
+    }
+
 
     /**
      * Create or update lesson to database from page fields
@@ -191,6 +206,73 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
     };
 
+    /**
+     * Delete selected lessons
+     * @param item Lesson
+     */
+    $scope.publishSelectedLessons = function () {
+        $scope.currentErrors = [];
+
+        var selectedLessons = model.lessons.filter(function (someLesson) {
+            return someLesson && someLesson.selected;
+        });
+
+        $scope.countdownPublish = selectedLessons.length;
+
+        selectedLessons.forEach(function (lessonToDelete) {
+            lessonToDelete.publish(function () {
+                $scope.decrementDeleteCountdown();
+            }, function (e) {
+                validationError(e);
+            });
+        });
+    };
+
+    /**
+     * Display confirmation panel for lesson deletion
+     */
+    $scope.showConfirmDeleteLessonPanel = function () {
+        template.open('lightbox', 'confirm-delete-lesson');
+        $scope.showConfirmPanel = true;
+    };
+
+
+    /**
+     * Close confirmation panel
+     */
+    $scope.closeConfirmPanel = function () {
+
+        $scope.showConfirmPanel = false;
+        template.close('lightbox');
+    };
+
+    /**
+     * Delete selected lessons
+     * @param item Lesson
+     */
+    $scope.deleteSelectedLessons = function () {
+        $scope.currentErrors = [];
+
+        var selectedLessons = model.lessons.filter(function (someLesson) {
+            return someLesson && someLesson.selected;
+        });
+
+        if (selectedLessons.length == 0) {
+            return;
+        }
+
+        $scope.processingData = true;
+        $scope.countdownDelete = selectedLessons.length;
+
+        selectedLessons.forEach(function (lessonToDelete) {
+            lessonToDelete.delete(function () {
+                $scope.decrementDeleteCountdown();
+            }, function (e) {
+                validationError(e);
+            });
+        });
+    };
+
 
     $scope.createHomework = function () {
         $scope.currentErrors = [];
@@ -217,6 +299,17 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.lessons.syncLessons($scope.decrementCountdown);
         model.homeworks.syncHomeworks($scope.decrementCountdown);
     };
+
+    $scope.decrementDeleteCountdown = function () {
+        $scope.countdownDelete--;
+
+        if ($scope.countdownDelete == 0) {
+            $scope.showCal = !$scope.showCal;
+            $scope.processingData = false;
+            $scope.closeConfirmPanel();
+            notify.info('lesson.deleted');
+        }
+    }
 
     $scope.decrementCountdown = function () {
         $scope.countdown--;

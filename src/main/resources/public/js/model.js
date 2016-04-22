@@ -69,6 +69,7 @@ function Audience() { }
 function HomeworkType(){}
 
 function Lesson(data) {
+    this.selected = false;
     this.collection(Attachment);
     this.collection(Homework);
     this.subject = (data) ? data.subject : new Subject();
@@ -117,6 +118,58 @@ Lesson.prototype.create = function(cb, cbe) {
         })
         .error(function(e){
             if(typeof cbe === 'function'){
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+
+/**
+ * Deletes the lesson
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Lesson.prototype.delete = function (cb, cbe) {
+
+    var lesson = this;
+
+    http().delete('/diary/lesson/' + this.id, this)
+        .done(function (b) {
+
+            var idxLessonToDelete = model.lessons.indexOf(lesson);
+
+            // update calendar lessons cache
+            if (idxLessonToDelete >= 0) {
+                model.lessons.splice(model.lessons.indexOf(lesson), 1);
+            }
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+/**
+ * Publishes the lesson
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Lesson.prototype.publish = function (cb, cbe) {
+
+    http().put('/diary/lesson/publish/' + this.id, this)
+        .done(function (b) {
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
                 cbe(model.parseError(e));
             }
         });
@@ -190,6 +243,7 @@ model.parseError = function(e) {
 
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
+    Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.collection(Lesson, {
         syncLessons: function (cb) {
