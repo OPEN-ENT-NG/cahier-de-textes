@@ -26,11 +26,14 @@
     </div>
     <div class="row">
         <div class="row">
-            <label><i18n>date</i18n></label>
-            <date-picker ng-model="homework.dueDate" class="cell six"></date-picker>
-            <label><i18n>type</i18n></label>
-            <select 
-                ng-options="type as type.label for type in homeworkTypes.all" 
+            <div class="three cell">
+                <label class="cell three"><i18n>date</i18n></label>
+                <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
+            </div>
+
+            <label><i18n>homework.types</i18n></label>
+            <select
+                ng-options="type as type.label for type in homeworkTypes.all"
                 ng-model="homework.type">
             </select>
         </div>

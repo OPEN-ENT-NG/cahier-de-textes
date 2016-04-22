@@ -62,5 +62,6 @@
   "lesson.deleted": "La suppression s'est correctement effectuée",
   "lesson.deleting": "Suppression en cours",
   "daily.lesson.delete.confirm.one": "Êtes-vous sûr(e) de vouloir supprimer cette leçon?",
-  "daily.lesson.delete.confirm.multi": "Êtes-vous sûr(e) de vouloir supprimer ces leçons?"
+  "daily.lesson.delete.confirm.multi": "Êtes-vous sûr(e) de vouloir supprimer ces leçons?",
+  "homework.types": "Type de travail"
 }
