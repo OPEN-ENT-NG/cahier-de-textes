@@ -54,6 +54,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     route({
         createLessonView: function(params){
             $scope.lesson = null;
+            $scope.tabs.createLesson = 'lesson';
             var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
             $scope.openLessonView(null, params, lessonTimeFromCalendar);
             template.open('main', 'main');
