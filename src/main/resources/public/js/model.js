@@ -59,7 +59,8 @@ Homework.prototype.toJSON = function(){
         audience_id: this.audience.id,
         homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
         homework_description: this.description,
-        homework_color: this.color
+        homework_color: this.color,
+        homework_state: this.state,
     }
 };
 
@@ -161,9 +162,12 @@ Lesson.prototype.delete = function (cb, cbe) {
  */
 Lesson.prototype.publish = function (cb, cbe) {
 
-    http().put('/diary/lesson/publish/' + this.id, this)
-        .done(function (b) {
+    var jsonLesson = new Lesson();
+    jsonLesson.id = this.id;
+    jsonLesson.audience.structureId = this.structureId;
 
+    http().postJson('/diary/lesson/publish', jsonLesson)
+        .done(function () {
             if (typeof cb === 'function') {
                 cb();
             }
@@ -182,6 +186,7 @@ Lesson.prototype.publish = function (cb, cbe) {
  */
 Lesson.prototype.toJSON = function () {
     return {
+        lesson_id: this.id,
         subject_id: this.subject.id,
         school_id: this.audience.structureId,
         // TODO missing teacher_id
@@ -194,7 +199,7 @@ Lesson.prototype.toJSON = function () {
         lesson_end_time: moment(this.endTime).format('HH:mm'),
         lesson_description: this.description,
         lesson_annotation: this.annotations,
-        // TODO missing lesson_state
+        lesson_state: this.state,
         // start columns not in lesson table TODO move
         audience_type: this.audienceType,
         audience_name: this.audience.name
@@ -280,6 +285,7 @@ model.build = function () {
                                 annotation: lesson.lesson_annotation,
                                 startMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_start_time),
                                 endMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_end_time),
+                                state: lesson.lesson_state,
                                 is_periodic: false
                             }
                         })
@@ -384,6 +390,7 @@ model.build = function () {
                                 color: homework.homework_color,
                                 startMoment: moment(homework.homework_due_date),
                                 endMoment: moment(homework.homework_due_date),
+                                state: homework.homework_state,
                                 is_periodic: false
                             }
                         })

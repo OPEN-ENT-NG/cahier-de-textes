@@ -120,36 +120,44 @@ public class LessonController extends BaseController {
      * Publishes a lesson
      * @param request
      */
-    @Put("/lesson/publish/:id")
+    @Post("/lesson/publish")
     @ApiDoc("Publishes a lesson")
     public void publishLesson(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "lesson", new Handler<JsonObject>() {
+                        @Override
+                        public void handle(final JsonObject json) {
+                            if(user.getStructures().contains(json.getString("school_id",""))){
+                                String lessonId = String.valueOf(json.getInteger("lesson_id"));
+                                if (isValidLessonId(lessonId)) {
+                                    lessonService.publishLesson(lessonId, new Handler<Either<String, JsonObject>>() {
+                                        @Override
+                                        public void handle(Either<String, JsonObject> event) {
+                                            if (event.isRight()) {
 
-        final String lessonId = request.params().get("id");
-
-        if (isValidLessonId(lessonId)) {
-            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                @Override
-                public void handle(final UserInfos user) {
-                    if (user != null) {
-                        lessonService.publishLesson(lessonId, new Handler<Either<String, JsonObject>>() {
-                            @Override
-                            public void handle(Either<String, JsonObject> event) {
-                                if (event.isRight()) {
-
+                                            } else {
+                                                leftToResponse(request, event.left());
+                                            }
+                                        }
+                                    });
                                 } else {
-                                    leftToResponse(request, event.left());
+                                    badRequest(request, "Invalid lesson identifier.");
                                 }
+                            } else {
+                                badRequest(request,"Invalid school identifier.");
                             }
-                        });
-                    } else {
-                        log.debug("User not found in session.");
-                        unauthorized(request, "No user found in session.");
-                    }
+                        }
+                    });
+                } else {
+                    log.debug("User not found in session.");
+                    unauthorized(request, "No user found in session.");
                 }
-            });
-        } else {
-            badRequest(request, "Invalid lesson identifier.");
-        }
+            }
+        });
+
     }
 
     @Put("/lesson/:id")
