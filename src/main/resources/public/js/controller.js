@@ -354,10 +354,8 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     var initLesson = function (timeFromCalendar) {
 
-        if (!$scope.lesson) {
-            $scope.lesson = new Lesson();
-            $scope.homework = new Homework();
-        }
+        $scope.lesson = new Lesson();
+        $scope.homework = new Homework();
 
         $scope.lesson.audience = $scope.homework.audienc = model.audiences.first();
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
