@@ -1,12 +1,12 @@
 <div class="schedule-item-content [[item.color]]" tooltip="[[item.audienceLabel]] - [[item.title]]">
-    <div class="cell twelve">
+    <div class="cell twelve" ng-click="redirect('/editLessonView/'+ item.id)">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
 
         <div style="float: right; margin-right: 5%">[[item.room]]</div>
     </div>
 
-    <input type="checkbox" ng-model="item.selected" />
+    <input type="checkbox" ng-model="item.selected" style="float: right; margin-right: 5%;" />
 
     <div class="cell twelve" ng-click="redirect('/editLessonView/'+ item.id)">
         [[item.subjectLabel]]

@@ -261,23 +261,28 @@ model.build = function () {
                     lessons = lessons.concat(data);
                     that.addRange(
                         _.map(lessons, function (lesson) {
+
+                            var x = 3;
+
                             return {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
+                                audience: model.audiences.findWhere({ id: lesson.audience_id }),
+                                audienceId: lesson.audience_id,
+                                audienceLabel: lesson.audience_label,
                                 audienceType: lesson.audience_type,
                                 description: lesson.lesson_description,
+                                subject: model.subjects.findWhere({ code: lesson.subject_code }),
                                 subjectId: lesson.subject_id,
                                 subjectLabel: lesson.subject_label,
                                 teacherId: lesson.teacher_display_name,
                                 structureId: lesson.school_id,
-                                audienceId: lesson.audience_id,
-                                audienceLabel: lesson.audience_label,
                                 date: lesson.lesson_date,
                                 startTime: lesson.lesson_start_time,
                                 endTime: lesson.lesson_end_time,
                                 color: lesson.lesson_color,
                                 room: lesson.lesson_room,
-                                annotation: lesson.lesson_annotation,
+                                annotations: lesson.lesson_annotation,
                                 startMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_start_time),
                                 endMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_end_time),
                                 is_periodic: false
