@@ -267,8 +267,6 @@ model.build = function () {
                     that.addRange(
                         _.map(lessons, function (lesson) {
 
-                            var x = 3;
-
                             return {
                                 id: lesson.lesson_id,
                                 title: lesson.lesson_title,
