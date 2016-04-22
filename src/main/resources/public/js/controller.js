@@ -60,7 +60,6 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.close('calendar');
             template.close('create-homework');
             template.open('create-lesson', 'create-lesson');
-            logging.properties
         },
         createHomeworkView: function(params){
             $scope.homework = null;
