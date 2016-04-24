@@ -269,6 +269,8 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.createHomework = function () {
         $scope.currentErrors = [];
+        $scope.homework.dueDate = $scope.newItem.date;
+
         $scope.homework.save(function () {
             //TODO don't reload all calendar view
             model.homeworks.syncHomeworks();
@@ -395,6 +397,9 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.homework.audienceType = 'class';
         $scope.homework.color = 'pink';
         $scope.homework.type = model.homeworkTypes.first();
+        $scope.newItem = {
+            date: moment().minute(0).second(0)
+        };
     }
 
     var validationError = function(e){
