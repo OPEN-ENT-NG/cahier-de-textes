@@ -92,6 +92,12 @@ function DiaryController($scope, template, model, route, date, $location) {
         var lesson = model.lessons.findWhere({id: parseInt(idLesson)});
 
         if (lesson != null) {
+
+            var homeworks = model.homeworks.filter(function (someHomework) {
+                return someHomework && (someHomework.lesson_id == parseInt(idLesson));
+            });
+
+            lesson.homeworks = homeworks;
             $scope.openLessonView(lesson);
         }
     };
