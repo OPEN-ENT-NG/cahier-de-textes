@@ -199,14 +199,14 @@ function DiaryController($scope, template, model, route, date, $location) {
                         });
                     });
                 } else {
-                    $scope.postLessonSave();
+                    $scope.postLessonSave(goToCalendarView);
                 }
         }, function (e) {
             validationError(e);
         });
     };
 
-    $scope.postLessonSave = function(){
+    $scope.postLessonSave = function(goToCalendarView){
         //TODO don't reload all calendar view
         model.lessons.syncLessons();
         $scope.showCal = !$scope.showCal;
