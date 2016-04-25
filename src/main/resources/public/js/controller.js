@@ -187,6 +187,8 @@ function DiaryController($scope, template, model, route, date, $location) {
                 // homeworks associated with lesson
                 if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
 
+                    var homeworkProcessed = 0;
+
                     $scope.lesson.homeworks.forEach(function (homeToCreate) {
                         homeToCreate.lesson_id = $scope.lesson.id;
                         // needed fields as in model.js Homework.prototype.toJSON
@@ -194,9 +196,17 @@ function DiaryController($scope, template, model, route, date, $location) {
                         homeToCreate.subject = $scope.lesson.subject;
                         homeToCreate.color = $scope.lesson.color;
 
-                        homeToCreate.save(function(x){}, function (e) {
-                            validationError(e);
-                        });
+                        homeToCreate.save(
+                            // go back to calendar view once all homeworks saved ('back' button)
+                            function (x) {
+                                homeworkProcessed++;
+                                if (homeworkProcessed == $scope.lesson.homeworks.all.length) {
+                                    $scope.postLessonSave(goToCalendarView);
+                                }
+                            },
+                            function (e) {
+                                validationError(e);
+                            });
                     });
                 } else {
                     $scope.postLessonSave(goToCalendarView);
@@ -209,6 +219,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.postLessonSave = function(goToCalendarView){
         //TODO don't reload all calendar view
         model.lessons.syncLessons();
+        model.homeworks.syncHomeworks();
         $scope.showCal = !$scope.showCal;
         notify.info('lesson.saved.draft');
         $scope.$apply();
