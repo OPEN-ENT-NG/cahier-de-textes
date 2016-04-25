@@ -305,15 +305,23 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
 
-    $scope.createHomework = function () {
+    $scope.createOrUpdateHomework = function (goToCalendarView) {
         $scope.currentErrors = [];
         $scope.homework.dueDate = $scope.newItem.date;
 
         $scope.homework.save(function () {
             //TODO don't reload all calendar view
             model.homeworks.syncHomeworks();
-            $scope.goToCalendarView();
+            $scope.showCal = !$scope.showCal;
+            notify.info('homework.saved.draft');
             $scope.$apply();
+
+            if (goToCalendarView) {
+                $scope.goToCalendarView();
+                $scope.lesson = null;
+                $scope.homework = null;
+            }
+
         }, function (e) {
             validationError(e);
         });

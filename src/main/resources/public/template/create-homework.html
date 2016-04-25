@@ -1,4 +1,4 @@
-﻿<form ng-submit="(homework.id) ? updateHomework(): createHomework()">
+﻿<form name="homeworkform">
     <h2><i18n>homework.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -42,7 +42,15 @@
         <editor ng-model="homework.description" required></editor>
     </div>
     <div class="row">
-        <button class="right-magnet"><i18n>create</i18n></button>
+        <!-- save homework in draft mode and go back to calendar view -->
+        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
+            <i18n>back</i18n>
+        </button>
+        <!-- save homework in draft mode -->
+        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(false)">
+            <i18n>save</i18n>
+        </button>
+        <!-- go back to calendar view without saving -->
         <button type="button" class="right-magnet cancel" ng-click="redirect('/calendarView')"><i18n>cancel</i18n></button>
     </div>
 </form>
