@@ -182,21 +182,42 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.date = $scope.newItem.date;
 
 
-        $scope.lesson.save(function () {
-            //TODO don't reload all calendar view
-            model.lessons.syncLessons();
-            $scope.showCal = !$scope.showCal;
-            notify.info('lesson.saved.draft');
-            $scope.$apply();
+        $scope.lesson.save(
+            function () {
+                // homeworks associated with lesson
+                if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
 
-            if (goToCalendarView) {
-                $scope.goToCalendarView();
-                $scope.lesson = null;
-                $scope.homework = null;
-            }
+                    $scope.lesson.homeworks.forEach(function (homeToCreate) {
+                        homeToCreate.lesson_id = $scope.lesson.id;
+                        // needed fields as in model.js Homework.prototype.toJSON
+                        homeToCreate.audience = $scope.lesson.audience;
+                        homeToCreate.subject = $scope.lesson.subject;
+                        homeToCreate.color = $scope.lesson.color;
+
+                        homeToCreate.save(function(x){}, function (e) {
+                            validationError(e);
+                        });
+                    });
+                } else {
+                    $scope.postLessonSave();
+                }
         }, function (e) {
             validationError(e);
         });
+    };
+
+    $scope.postLessonSave = function(){
+        //TODO don't reload all calendar view
+        model.lessons.syncLessons();
+        $scope.showCal = !$scope.showCal;
+        notify.info('lesson.saved.draft');
+        $scope.$apply();
+
+        if (goToCalendarView) {
+            $scope.goToCalendarView();
+            $scope.lesson = null;
+            $scope.homework = null;
+        }
     };
 
     /**

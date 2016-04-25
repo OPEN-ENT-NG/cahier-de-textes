@@ -25,7 +25,7 @@
     },
     "lesson_id": {
       "id": "http://jsonschema.net/lesson_id",
-      "type": "string"
+      "type": "integer"
     },
     "audience_id": {
       "id": "http://jsonschema.net/audience_id",

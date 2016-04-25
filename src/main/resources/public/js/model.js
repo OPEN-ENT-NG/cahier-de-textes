@@ -61,6 +61,7 @@ Homework.prototype.toJSON = function(){
         homework_description: this.description,
         homework_color: this.color,
         homework_state: this.state,
+        lesson_id: this.lesson_id
     }
 };
 
@@ -379,6 +380,7 @@ model.build = function () {
                             return {
                                 id: homework.id,
                                 description: homework.homework_description,
+                                audience: model.audiences.findWhere({ id: homework.audience_id }),
                                 subjectId: homework.subject_id,
                                 subjectLabel: homework.subject_label,
                                 typeId: homework.type_id,
@@ -394,7 +396,8 @@ model.build = function () {
                                 startMoment: moment(homework.homework_due_date),
                                 endMoment: moment(homework.homework_due_date),
                                 state: homework.homework_state,
-                                is_periodic: false
+                                is_periodic: false,
+                                lesson_id: homework.lesson_id
                             }
                         })
                     );
