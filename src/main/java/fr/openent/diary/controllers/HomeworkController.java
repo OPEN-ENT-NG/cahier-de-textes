@@ -2,17 +2,10 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
-import fr.wseduc.rs.ApiDoc;
-import fr.wseduc.rs.Delete;
-import fr.wseduc.rs.Get;
-import fr.wseduc.rs.Post;
-import fr.wseduc.rs.Put;
-import fr.wseduc.security.ActionType;
-import fr.wseduc.security.SecuredAction;
+import fr.wseduc.rs.*;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
-import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -162,7 +155,7 @@ public class HomeworkController extends BaseController {
         });
     }
 
-    @Put("/homework/:id")
+    @Put("/homework/:homeworkId")
     @ApiDoc("Modify a homework")
     public void modifyHomework(final HttpServerRequest request) {
 

@@ -7,7 +7,6 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -16,9 +15,7 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.entcore.common.sql.SqlResult.validResultHandler;
-import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
-import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
+import static org.entcore.common.sql.SqlResult.*;
 
 /**
  * Created by a457593 on 18/02/2016.
@@ -174,6 +171,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void updateHomework(String homeworkId, JsonObject homeworkObject, Handler<Either<String, JsonObject>> handler) {
+
+        // FIXME json sql do not work if SQL enum column
+        homeworkObject.removeField("homework_state");
+
         StringBuilder sb = new StringBuilder();
         JsonArray values = new JsonArray();
         //TODO query without loops

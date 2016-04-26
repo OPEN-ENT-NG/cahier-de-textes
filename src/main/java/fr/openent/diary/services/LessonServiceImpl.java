@@ -373,6 +373,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void updateLesson(final String lessonId, final JsonObject lessonObject, final Handler<Either<String, JsonObject>> handler) {
 
         stripNonLessonFields(lessonObject);
+        // FIXME have to remove lesson_state field since SQL error on update enum/character varying
+        lessonObject.removeField("lesson_state");
 
         StringBuilder sb = new StringBuilder();
         JsonArray values = new JsonArray();

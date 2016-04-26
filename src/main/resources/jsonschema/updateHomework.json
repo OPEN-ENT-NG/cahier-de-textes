@@ -19,7 +19,7 @@
       "type": "string"
     },
     "lesson_id": {
-      "type": "string"
+      "type": "integer"
     },
     "audience_id": {
       "type": "string"
