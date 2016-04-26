@@ -5,16 +5,23 @@ import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.leftToResponse;
@@ -212,7 +219,9 @@ public class LessonController extends BaseController {
                     if (user != null) {
                         lessonService.deleteLesson(lessonId, notEmptyResponseHandler(request, 201));
                     } else {
-                        log.debug("User not found in session.");
+                        if (log.isDebugEnabled()) {
+                            log.debug("User not found in session.");
+                        }
                         unauthorized(request, "No user found in session.");
                     }
                 }
@@ -220,6 +229,29 @@ public class LessonController extends BaseController {
         } else {
             badRequest(request,"Invalid lesson identifier.");
         }
+    }
+
+    @Delete("/deleteLessons")
+    public void deletes(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "deleteLessons", new Handler<JsonObject>() {
+                        public void handle(JsonObject data) {
+                            final List<String> ids = data.getArray("ids").toList();
+
+                            lessonService.deleteLessons(ids, notEmptyResponseHandler(request, 201));
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User not found in session.");
+                    }
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
     }
 
     /**

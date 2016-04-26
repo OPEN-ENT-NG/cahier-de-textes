@@ -405,6 +405,21 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
     @Override
+    public void deleteLessons(final List<String>  lessonIds, final Handler<Either<String, JsonObject>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE FROM diary.lesson as l where l.lesson_id in ");
+        query.append(sql.listPrepared(lessonIds.toArray()));
+
+        JsonArray parameters = new JsonArray();
+        for (Object id: lessonIds) {
+            parameters.add(id);
+        }
+
+        sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
+    }
+
+    @Override
     public void publishLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder lessonSb = new StringBuilder();
         JsonArray parameters = new JsonArray();
