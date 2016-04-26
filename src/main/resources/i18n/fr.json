@@ -61,7 +61,9 @@
   "homework.saved.draft": "Le travail a été enregistré en mode brouillon",
   "lesson.deleted": "La suppression s'est correctement effectuée",
   "lesson.deleting": "Suppression en cours",
-  "daily.lesson.delete.confirm.one": "Êtes-vous sûr(e) de vouloir supprimer cette leçon?",
-  "daily.lesson.delete.confirm.multi": "Êtes-vous sûr(e) de vouloir supprimer ces leçons?",
+  "daily.lesson.delete.confirm.one": "Êtes-vous sûr(e) de vouloir supprimer cette séance ?",
+  "daily.lesson.delete.confirm.multi": "Êtes-vous sûr(e) de vouloir supprimer ces séances ?",
+  "daily.lesson.publish.confirm.one": "Êtes-vous sûr(e) de vouloir publier cette séance ?",
+  "daily.lesson.publish.confirm.multi": "Êtes-vous sûr(e) de vouloir publier ces séances ?",
   "homework.types": "Type de travail"
 }
