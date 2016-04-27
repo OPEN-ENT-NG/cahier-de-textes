@@ -73,7 +73,10 @@ function HomeworkType(){}
 function Lesson(data) {
     this.selected = false;
     this.collection(Attachment);
-    this.collection(Homework);
+    // initialize homeworks collection (see lib.js)
+    if(!this.homeworks) {
+        this.collection(Homework);
+    }
     this.subject = (data) ? data.subject : new Subject();
     this.audience = (data) ? data.audience : new Audience();
 }
@@ -247,6 +250,35 @@ model.parseError = function(e) {
     return error;
 };
 
+/**
+ * Get homeworks linked to a lesson
+ *
+ * @param lesson
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+model.loadHomeworksForLesson = function (lesson, cb, cbe) {
+
+
+    http().get('/diary/homework/list/' + lesson.id).done(function (sqlHomeworks) {
+
+        lesson.homeworks = new Collection(Homework);
+
+        sqlHomeworks.forEach(function (sqlHomework) {
+            lesson.homeworks.push(convertSqlToJsHomework(sqlHomework));
+        });
+
+        if (typeof cb == 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
+
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
@@ -267,6 +299,17 @@ model.build = function () {
                     lessons = lessons.concat(data);
                     that.addRange(
                         _.map(lessons, function (lesson) {
+
+                            var lessonHomeworks = new Array();
+
+                            // only initialize homeworks attached to lesson
+                            // with only id
+                            for (var i = 0; i < lesson.homework_id.length; i++) {
+                                var homework = new Homework();
+                                homework.lesson_id = parseInt(lesson.lesson_id);
+                                homework.needsload = true;
+                                lessonHomeworks.push(homework);
+                            }
 
                             return {
                                 id: lesson.lesson_id,
@@ -290,7 +333,8 @@ model.build = function () {
                                 startMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_start_time),
                                 endMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_end_time),
                                 state: lesson.lesson_state,
-                                is_periodic: false
+                                is_periodic: false,
+                                homeworks: lessonHomeworks
                             }
                         })
                     );
@@ -376,31 +420,7 @@ model.build = function () {
                 http().get('/diary/homework/' + structureId + '/' + start + '/' + end).done(function (data) {
                     homeworks = homeworks.concat(data);
                     that.addRange(
-                        _.map(homeworks, function(homework){
-                            return {
-                                id: homework.id,
-                                description: homework.homework_description,
-                                audience: model.audiences.findWhere({ id: homework.audience_id }),
-                                subjectId: homework.subject_id,
-                                subjectLabel: homework.subject_label,
-                                type: model.homeworkTypes.findWhere({ id: homework.homework_type_id }),
-                                typeId: homework.homework_type_id,
-                                typeLabel: homework.homework_type_label,
-                                teacherId: homework.teacher_id,
-                                structureId: homework.structureId,
-                                audienceId: homework.audience_id,
-                                audienceLabel: homework.audience_label,
-                                dueDate: homework.homework_due_date,
-                                date: moment(homework.homework_due_date),
-                                title: homework.homework_title,
-                                color: homework.homework_color,
-                                startMoment: moment(homework.homework_due_date),
-                                endMoment: moment(homework.homework_due_date),
-                                state: homework.homework_state,
-                                is_periodic: false,
-                                lesson_id: homework.lesson_id
-                            }
-                        })
+                        _.map(homeworks, convertSqlToJsHomework)
                     );
                     countStructure--;
                     if (countStructure === 0) {
@@ -417,4 +437,39 @@ model.build = function () {
         }
     });
 
+    /**
+     * Transform sql homework data (table diary.homework)
+     * to json
+     * @param sqlHomework
+     * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
+     */
+    convertSqlToJsHomework = function(sqlHomework){
+        var jsHomework =  {
+            id: sqlHomework.id,
+            description: sqlHomework.homework_description,
+            audience: model.audiences.findWhere({ id: sqlHomework.audience_id }),
+            subjectId: sqlHomework.subject_id,
+            subjectLabel: sqlHomework.subject_label,
+            type: model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
+            typeId: sqlHomework.homework_type_id,
+            typeLabel: sqlHomework.homework_type_label,
+            teacherId: sqlHomework.teacher_id,
+            structureId: sqlHomework.structureId,
+            audienceId: sqlHomework.audience_id,
+            audienceLabel: sqlHomework.audience_label,
+            dueDate: sqlHomework.homework_due_date,
+            date: moment(sqlHomework.homework_due_date),
+            title: sqlHomework.homework_title,
+            color: sqlHomework.homework_color,
+            startMoment: moment(sqlHomework.homework_due_date),
+            endMoment: moment(sqlHomework.homework_due_date),
+            state: sqlHomework.homework_state,
+            is_periodic: false,
+            lesson_id: sqlHomework.lesson_id
+        };
+
+        var xxx;
+
+        return jsHomework;
+    };
 }

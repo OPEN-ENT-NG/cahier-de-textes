@@ -25,7 +25,7 @@
             <i18n>create.lesson.tabs.lesson</i18n>
         </header>
         <header ng-class="{ selected: tabs.createLesson === 'homeworks' }"
-                ng-click="tabs.createLesson = 'homeworks'">
+                ng-click="tabs.createLesson = 'homeworks'; loadHomeworksForCurrentLesson()">
             <i18n>create.lesson.tabs.homeworks</i18n>
         </header>
         <section ng-if="tabs.createLesson === 'lesson'">
@@ -77,6 +77,8 @@
                 </article>
             </div>
         </section>
+
+        <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <section ng-if="tabs.createLesson === 'homeworks'">
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
                 <div class="row">
