@@ -94,11 +94,6 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         if (lesson != null) {
 
-            var homeworks = model.homeworks.filter(function (someHomework) {
-                return someHomework && (someHomework.lesson_id == parseInt(idLesson));
-            });
-
-            lesson.homeworks = homeworks;
             $scope.openLessonView(lesson);
         }
     };
@@ -160,15 +155,15 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
     /**
-     * 
+     *
      */
     $scope.editSelectedLesson = function(){
         var selectedLessons = model.lessons.filter(function (someLesson) {
             return someLesson && someLesson.selected;
         });
-        
+
         var selectedLesson = selectedLessons.length > 0 ? selectedLessons[0] : null;
-        
+
         if(selectedLesson){
             $scope.redirect('/editLessonView/' + selectedLesson.id);
         }
@@ -266,6 +261,32 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.showConfirmDeleteLessonPanel = function () {
         template.open('lightbox', 'confirm-delete-lesson');
         $scope.showConfirmPanel = true;
+    };
+
+    /**
+     * Load homeworks for current lesson being edited
+     */
+    $scope.loadHomeworksForCurrentLesson = function () {
+
+        var needSqlSync = false;
+
+        // if homeworks ever retrieved from db don't do it again!
+        !$scope.lesson.homeworks.forEach(function (homework) {
+            if (homework.needsload) {
+                needSqlSync = true;
+            }
+        });
+
+        // only reload homeworks if necessary
+        if (needSqlSync) {
+            model.loadHomeworksForLesson($scope.lesson,
+
+            function () {
+                $scope.$apply();
+            }, function (e) {
+                validationError(e);
+            });
+        }
     };
 
 

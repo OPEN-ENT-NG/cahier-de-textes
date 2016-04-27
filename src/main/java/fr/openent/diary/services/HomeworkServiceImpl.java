@@ -37,9 +37,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getAllHomeworksForALesson(String lessonId, Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id,")
-                .append(" a.audience_type, h.audience_id, a.audience_label, h.homework_title, h.homework_color,")
-                .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
+        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id,")
+                .append(" a.audience_type, h.audience_id, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
+                .append(" h.homework_due_date, h.homework_description, th.homework_type_label, h.homework_type_id")
                 .append(" FROM diary.homework AS h")
                 .append(" LEFT JOIN diary.homework_type as th ON h.homework_type_id = th.id")
                 .append(" LEFT JOIN diary.lesson as l ON l.id = h.lesson_id")
