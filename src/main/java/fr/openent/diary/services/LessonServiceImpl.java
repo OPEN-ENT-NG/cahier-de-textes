@@ -408,7 +408,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void deleteLessons(final List<String>  lessonIds, final Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("DELETE FROM diary.lesson as l where l.lesson_id in ");
+        query.append("DELETE FROM diary.lesson as l where l.id in ");
         query.append(sql.listPrepared(lessonIds.toArray()));
 
         JsonArray parameters = new JsonArray();
@@ -416,7 +416,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             parameters.add(id);
         }
 
-        sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
+        sql.prepared(query.toString(), parameters, validRowsResultHandler(handler));
     }
 
     @Override

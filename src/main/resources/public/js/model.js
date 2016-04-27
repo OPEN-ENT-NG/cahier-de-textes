@@ -157,6 +157,23 @@ Lesson.prototype.delete = function (cb, cbe) {
 };
 
 /**
+ * Deletes a list of lessons
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Lesson.prototype.deleteLessons = function (itemArray, cb, cbe) {
+    return http().deleteJson("/diary/deleteLessons", itemArray).done(function(r){
+        if(typeof cb === 'function'){
+            cb();
+        }
+    }).error(function(e){
+        if(typeof cbe === 'function'){
+            cbe(model.parseError(e));
+        }
+    });
+};
+
+/**
  * Publishes the lesson
  * @param cb Callback
  * @param cbe Callback on error

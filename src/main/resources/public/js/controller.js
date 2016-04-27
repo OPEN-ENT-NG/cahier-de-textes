@@ -44,6 +44,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.showCal = false;
+    $scope.newLesson = new Lesson();
 
     $scope.lessons = model.lessons;
     $scope.audiences = model.audiences;
@@ -284,26 +285,21 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.deleteSelectedLessons = function () {
         $scope.currentErrors = [];
 
-        var selectedLessons = model.lessons.filter(function (someLesson) {
-            return someLesson && someLesson.selected;
+        var itemArray = [];
+        model.lessons.selection().forEach(function (lesson) {
+            itemArray.push(lesson.id);
         });
-
-        if (selectedLessons.length == 0) {
-            return;
-        }
-
-        $scope.processingData = true;
-        $scope.countdownDelete = selectedLessons.length;
-
-        selectedLessons.forEach(function (lessonToDelete) {
-            lessonToDelete.delete(function () {
-                $scope.decrementDeleteCountdown();
-            }, function (e) {
-                validationError(e);
-            });
-        });
+        $scope.deleteLessons({ids:itemArray});
     };
 
+    $scope.deleteLessons = function(itemArray){
+        $scope.currentErrors = [];
+        $scope.newLesson.deleteLessons(itemArray, function () {
+            model.lessons.sync();
+        },function (e) {
+            validationError(e);
+        });
+    };
 
     $scope.createOrUpdateHomework = function (goToCalendarView) {
         $scope.currentErrors = [];
