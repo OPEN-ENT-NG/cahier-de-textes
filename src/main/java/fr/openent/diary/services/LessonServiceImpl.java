@@ -134,7 +134,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
-                    .append(" JOIN diary.teacher as t ON t.teacher_id = l.teacher_id")
+                    .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
                     .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
