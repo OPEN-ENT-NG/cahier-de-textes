@@ -5,27 +5,20 @@ import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
-import fr.wseduc.security.ActionType;
-import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
-import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
-import static org.entcore.common.http.response.DefaultResponseHandler.leftToResponse;
-import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
+import static org.entcore.common.http.response.DefaultResponseHandler.*;
 
 /**
  * Created by a457593 on 23/02/2016.
@@ -144,7 +137,7 @@ public class LessonController extends BaseController {
                                         @Override
                                         public void handle(Either<String, JsonObject> event) {
                                             if (event.isRight()) {
-
+                                                request.response().setStatusCode(200).end();
                                             } else {
                                                 leftToResponse(request, event.left());
                                             }

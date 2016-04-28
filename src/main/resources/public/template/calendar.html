@@ -1,5 +1,5 @@
-<div ng-if="showConfirmPanel">
-    <lightbox show="showConfirmPanel" on-close="closeConfirmPanel()">
+<div ng-if="display.showPanel">
+    <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
         <container template="lightbox"></container>
     </lightbox>
 </div>
@@ -48,7 +48,7 @@
 <section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0  }">
     <div class="toggle">
         <div class="row">
-            <button ng-click="showConfirmDeleteLessonPanel()">
+            <button ng-click="showConfirmPanel('confirm-delete-lesson')">
                 <i18n>remove</i18n>
             </button>
             <button ng-click="editSelectedLesson()" ng-class="{ disabled: lessons.selection().length > 1  }"  >
@@ -58,7 +58,7 @@
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0  }">
                 <i18n>share</i18n>
             </button>
-            <button ng-click="publishSelectedLessons()">
+            <button ng-click="showConfirmPanel('confirm-publish-lesson')">
                 <i18n>publish</i18n>
             </button>
         </div>

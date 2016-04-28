@@ -46,6 +46,10 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.showCal = false;
     $scope.newLesson = new Lesson();
 
+    $scope.display = {
+        showPanel: false
+    };
+
     $scope.lessons = model.lessons;
     $scope.audiences = model.audiences;
     $scope.subjects = model.subjects;
@@ -244,23 +248,23 @@ function DiaryController($scope, template, model, route, date, $location) {
             return someLesson && someLesson.selected;
         });
 
+        $scope.processingData = true;
         $scope.countdownPublish = selectedLessons.length;
 
-        selectedLessons.forEach(function (lessonToDelete) {
-            lessonToDelete.publish(function () {
-                $scope.decrementDeleteCountdown();
+        postPublishAction = function(){
+            $scope.closeConfirmPanel();
+            notify.info('lesson.published');
+        };
+
+        selectedLessons.forEach(function (lessonToPublish) {
+            lessonToPublish.publish(function () {
+
+                $scope.decrementSyncCountdown($scope.countdownPublish, postPublishAction);
             }, function (e) {
+                $scope.closeConfirmPanel();
                 validationError(e);
             });
         });
-    };
-
-    /**
-     * Display confirmation panel for lesson deletion
-     */
-    $scope.showConfirmDeleteLessonPanel = function () {
-        template.open('lightbox', 'confirm-delete-lesson');
-        $scope.showConfirmPanel = true;
     };
 
     /**
@@ -295,8 +299,18 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.closeConfirmPanel = function () {
 
-        $scope.showConfirmPanel = false;
+        $scope.processingData = false;
+        $scope.display.showPanel = false;
         template.close('lightbox');
+        $scope.$apply();
+    };
+
+    /**
+     * Display confirmation panel
+     */
+    $scope.showConfirmPanel = function (panelContent) {
+        template.open('lightbox', panelContent);
+        $scope.display.showPanel = true;
     };
 
     /**
@@ -313,14 +327,31 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.deleteLessons({ids:itemArray});
     };
 
-    $scope.deleteLessons = function(itemArray){
+    /**
+     * Delete lessons
+     * @param itemArray Array which values contain a property 'id'
+     * which is lesson id to delete
+     */
+    $scope.deleteLessons = function (itemArray) {
         $scope.currentErrors = [];
         $scope.newLesson.deleteLessons(itemArray, function () {
-            model.lessons.sync();
+
+            // refresh current lessons cache to sync with lessons deleted
+            model.lessons.forEach(function(lesson){
+                if(lesson && itemArray.ids.indexOf(lesson.id) != -1 ){
+                    model.lessons.remove(lesson);
+                }
+            });
+
+            $scope.lessons = model.lessons;
+
+            $scope.closeConfirmPanel();
+            notify.info('lesson.deleted');
         },function (e) {
             validationError(e);
         });
     };
+
 
     $scope.createOrUpdateHomework = function (goToCalendarView) {
         $scope.currentErrors = [];
@@ -364,17 +395,25 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     };
 
-    $scope.decrementDeleteCountdown = function () {
-        $scope.countdownDelete--;
+    /**
+     * Used when using consecutive callbacks
+     * and execute function once X callbacks have processed
+     * (for example init templates once all sync functions (homeworks, lessons, ...) have been processed)
+     * @param countDownVar Variable number to decrement at each call of this function
+     * @param cb Function to execute once the number of occurences have been reached
+     */
+    $scope.decrementSyncCountdown = function (countDownVar, cb) {
+        countDownVar--;
 
-        if ($scope.countdownDelete == 0) {
-            $scope.showCal = !$scope.showCal;
-            $scope.processingData = false;
-            $scope.closeConfirmPanel();
-            notify.info('lesson.deleted');
+        if (countDownVar == 0) {
+
+            if (typeof cb == 'function') {
+                cb();
+            }
         }
     }
 
+    // TODO merge/use with decrementSyncCountDown
     $scope.decrementCountdown = function () {
         $scope.countdown--;
         if ($scope.countdown == 0) {
