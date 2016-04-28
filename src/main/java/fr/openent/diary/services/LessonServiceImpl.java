@@ -204,9 +204,6 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                 addLesson(resultRefined, homeworkIds, lastLesson);
 
                                 handler.handle(new Either.Right<String, JsonArray>(resultRefined));
-                            } else {
-                                StringBuilder errorMessage = new StringBuilder("No results.");
-                                handler.handle(new Either.Left<String, JsonArray>(errorMessage.toString()));
                             }
                         } else {
                             handler.handle(new Either.Left<String, JsonArray>(ei.left().getValue()));
