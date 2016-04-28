@@ -18,10 +18,7 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.entcore.common.sql.SqlResult.*;
 
@@ -450,6 +447,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         lessonSb.append(ResourceState.PUBLISHED.toString()).append("' ");
         lessonSb.append("WHERE id in ");
         lessonSb.append(sql.listPrepared(lessonIds.toArray()));
+        lessonSb.append(" AND lesson_state = '").append(ResourceState.DRAFT.toString()).append("' ");
 
         // publish associated homeworks
         StringBuilder homeworkSb = new StringBuilder();
@@ -457,6 +455,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         homeworkSb.append(ResourceState.PUBLISHED.toString()).append("' ");
         homeworkSb.append("WHERE lesson_id in ");
         homeworkSb.append(sql.listPrepared(lessonIds.toArray()));
+        homeworkSb.append(" AND homework_state = '").append(ResourceState.DRAFT.toString()).append("' ");
 
         SqlStatementsBuilder transactionBuilder = new SqlStatementsBuilder();
         transactionBuilder.prepared(lessonSb.toString(), parameters);
