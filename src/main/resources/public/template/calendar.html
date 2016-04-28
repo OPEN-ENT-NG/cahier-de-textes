@@ -51,14 +51,14 @@
             <button ng-click="showConfirmPanel('confirm-delete-lesson')">
                 <i18n>remove</i18n>
             </button>
-            <button ng-click="editSelectedLesson()" ng-class="{ disabled: lessons.selection().length > 1  }"  >
+            <button ng-click="editSelectedLesson()" ng-class="{ disabled: lessons.selection().length != 1}"  >
                 <i18n>edit</i18n>
             </button>
             <!-- not implemented yet so always disabled -->
-            <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0  }">
+            <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
             </button>
-            <button ng-click="showConfirmPanel('confirm-publish-lesson')">
+            <button ng-click="showConfirmPanel('confirm-publish-lesson')" ng-class="{ disabled: !isOneDraftInSelected()}">
                 <i18n>publish</i18n>
             </button>
         </div>

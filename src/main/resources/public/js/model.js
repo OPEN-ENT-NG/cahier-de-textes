@@ -252,6 +252,14 @@ Lesson.prototype.addHomework = function () {
     this.homeworks.push(homework);
 };
 
+Lesson.prototype.isDraft = function () {
+    return this.state === "draft";
+};
+
+Lesson.prototype.isPublished = function () {
+    return this.state === "published";
+};
+
 function Teacher() {}
 
 Teacher.prototype.create = function(cb) {
@@ -283,6 +291,21 @@ model.parseError = function(e) {
 
     return error;
 };
+
+/**
+ *
+ * @param lessons Collection of lessons
+ * @returns {Array} Array of id of the lessons
+ */
+model.getLessonIds = function(lessons){
+
+    var itemArray = [];
+    lessons.forEach(function (lesson) {
+        itemArray.push(lesson.id);
+    });
+
+    return itemArray;
+}
 
 /**
  * Get homeworks linked to a lesson

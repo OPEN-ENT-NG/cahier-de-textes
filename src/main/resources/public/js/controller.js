@@ -254,9 +254,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        $scope.newLesson.publishLessons({ids:$scope.getLessonIds(lessons)}, function () {
-
-            var scopeLessonsSync = false;
+        $scope.newLesson.publishLessons({ids:model.getLessonIds(lessons)}, function () {
 
             // refresh state of lessons published
             lessons.forEach(function (lesson) {
@@ -269,11 +267,6 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.processingData = false;
             validationError(e);
         });
-
-        var selectedLessons = model.lessons.filter(function (someLesson) {
-            return someLesson && someLesson.selected;
-        });
-
     };
 
     /**
@@ -322,6 +315,19 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.display.showPanel = true;
     };
 
+    /**
+     * Tells if ont draft lesson is selected
+     * @returns {boolean} true if one draft lesson selected else false
+     */
+    $scope.isOneDraftInSelected = function () {
+        var oneDraft = false;
+        model.lessons.selection().forEach(function (lesson) {
+            if (lesson.isDraft()) {
+                oneDraft = true;
+            }
+        });
+        return oneDraft;
+    }
 
     $scope.getSelectedLessons = function(){
         var itemArray = [];
@@ -333,20 +339,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         return itemArray;
     }
 
-    /**
-     *
-     * @param lessons Collection of lessons
-     * @returns {Array} Array of id of the lessons
-     */
-    $scope.getLessonIds = function(lessons){
-
-        var itemArray = [];
-        lessons.forEach(function (lesson) {
-            itemArray.push(lesson.id);
-        });
-
-        return itemArray;
-    }
+    
 
     /**
      * Delete selected lessons
@@ -365,7 +358,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.deleteLessons = function (lessons) {
         $scope.currentErrors = [];
 
-        $scope.newLesson.deleteLessons({ids:$scope.getLessonIds(lessons)}, function () {
+        $scope.newLesson.deleteLessons({ids:model.getLessonIds(lessons)}, function () {
 
             // refresh current lessons cache to sync with lessons deleted
             lessons.forEach(function(deletedLesson){
