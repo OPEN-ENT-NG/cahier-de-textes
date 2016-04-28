@@ -416,20 +416,47 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         sql.prepared(query.toString(), parameters, validRowsResultHandler(handler));
     }
 
-    @Override
+
+    /**
+     * Publishes a lesson (changing status from draft to published)
+     * Linked homeworks are also published
+     *
+     * @param lessonId Id of lesson to be deleted
+     * @param handler
+     */
     public void publishLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
+        List<String> idLessonsToDelete = new ArrayList<String>();
+        idLessonsToDelete.add(lessonId);
+        publishLessons(idLessonsToDelete, handler);
+    }
+
+    /**
+     * Publishes lessons (changing status from draft to published)
+     * Linked homeworks are also published
+     *
+     * @param lessonIds Ids of lessons to be deleted
+     * @param handler
+     */
+    @Override
+    public void publishLessons(List<String> lessonIds, Handler<Either<String, JsonObject>> handler) {
         StringBuilder lessonSb = new StringBuilder();
         JsonArray parameters = new JsonArray();
-        parameters.add(Sql.parseId(lessonId));
+        for (Object id : lessonIds) {
+            parameters.add(id);
+        }
 
+        // publish lessons
         lessonSb.append("UPDATE diary.lesson SET lesson_state = '");
         lessonSb.append(ResourceState.PUBLISHED.toString()).append("' ");
-        lessonSb.append("WHERE id = ? ");
+        lessonSb.append("WHERE id in ");
+        lessonSb.append(sql.listPrepared(lessonIds.toArray()));
 
+        // publish associated homeworks
         StringBuilder homeworkSb = new StringBuilder();
         homeworkSb.append("UPDATE diary.homework SET homework_state = '");
         homeworkSb.append(ResourceState.PUBLISHED.toString()).append("' ");
-        homeworkSb.append("WHERE lesson_id = ? ");
+        homeworkSb.append("WHERE lesson_id in ");
+        homeworkSb.append(sql.listPrepared(lessonIds.toArray()));
 
         SqlStatementsBuilder transactionBuilder = new SqlStatementsBuilder();
         transactionBuilder.prepared(lessonSb.toString(), parameters);

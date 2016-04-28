@@ -238,33 +238,42 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     /**
-     * Delete selected lessons
-     * @param item Lesson
+     * Publish selected lessons
      */
     $scope.publishSelectedLessons = function () {
         $scope.currentErrors = [];
+        $scope.publishLessons($scope.getSelectedLessons());
+    };
+
+    /**
+     * Publish lessons
+     * @param lessonIdArray Array which values contain a property 'id'
+     * which is lesson id to delete
+     */
+    $scope.publishLessons = function (lessons) {
+        $scope.currentErrors = [];
+        $scope.processingData = true;
+
+        $scope.newLesson.publishLessons({ids:$scope.getLessonIds(lessons)}, function () {
+
+            var scopeLessonsSync = false;
+
+            // refresh state of lessons published
+            lessons.forEach(function (lesson) {
+                lesson.state = 'published';
+            });
+
+            $scope.closeConfirmPanel();
+            notify.info('lesson.published');
+        }, function (e) {
+            $scope.processingData = false;
+            validationError(e);
+        });
 
         var selectedLessons = model.lessons.filter(function (someLesson) {
             return someLesson && someLesson.selected;
         });
 
-        $scope.processingData = true;
-        $scope.countdownPublish = selectedLessons.length;
-
-        postPublishAction = function(){
-            $scope.closeConfirmPanel();
-            notify.info('lesson.published');
-        };
-
-        selectedLessons.forEach(function (lessonToPublish) {
-            lessonToPublish.publish(function () {
-
-                $scope.decrementSyncCountdown($scope.countdownPublish, postPublishAction);
-            }, function (e) {
-                $scope.closeConfirmPanel();
-                validationError(e);
-            });
-        });
     };
 
     /**
@@ -313,37 +322,55 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.display.showPanel = true;
     };
 
+
+    $scope.getSelectedLessons = function(){
+        var itemArray = [];
+
+        model.lessons.selection().forEach(function (lesson) {
+            itemArray.push(lesson);
+        });
+
+        return itemArray;
+    }
+
+    /**
+     *
+     * @param lessons Collection of lessons
+     * @returns {Array} Array of id of the lessons
+     */
+    $scope.getLessonIds = function(lessons){
+
+        var itemArray = [];
+        lessons.forEach(function (lesson) {
+            itemArray.push(lesson.id);
+        });
+
+        return itemArray;
+    }
+
     /**
      * Delete selected lessons
      * @param item Lesson
      */
     $scope.deleteSelectedLessons = function () {
         $scope.currentErrors = [];
-
-        var itemArray = [];
-        model.lessons.selection().forEach(function (lesson) {
-            itemArray.push(lesson.id);
-        });
-        $scope.deleteLessons({ids:itemArray});
+        $scope.deleteLessons($scope.getSelectedLessons());
     };
 
     /**
      * Delete lessons
-     * @param itemArray Array which values contain a property 'id'
+     * @param Lessons Lessons to be deleted
      * which is lesson id to delete
      */
-    $scope.deleteLessons = function (itemArray) {
+    $scope.deleteLessons = function (lessons) {
         $scope.currentErrors = [];
-        $scope.newLesson.deleteLessons(itemArray, function () {
+
+        $scope.newLesson.deleteLessons({ids:$scope.getLessonIds(lessons)}, function () {
 
             // refresh current lessons cache to sync with lessons deleted
-            model.lessons.forEach(function(lesson){
-                if(lesson && itemArray.ids.indexOf(lesson.id) != -1 ){
-                    model.lessons.remove(lesson);
-                }
+            lessons.forEach(function(deletedLesson){
+                model.lessons.remove(deletedLesson);
             });
-
-            $scope.lessons = model.lessons;
 
             $scope.closeConfirmPanel();
             notify.info('lesson.deleted');

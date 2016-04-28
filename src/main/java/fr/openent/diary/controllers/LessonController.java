@@ -160,6 +160,39 @@ public class LessonController extends BaseController {
 
     }
 
+    @Post("/publishLessons")
+    @ApiDoc("Publishes lessons")
+    public void publishLessons(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "publishLessons", new Handler<JsonObject>() {
+                        public void handle(JsonObject data) {
+                            final List<String> ids = data.getArray("ids").toList();
+
+                            lessonService.publishLessons(ids, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        request.response().setStatusCode(200).end();
+                                    } else {
+                                        leftToResponse(request, event.left());
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User not found in session.");
+                    }
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
     @Put("/lesson/:id")
     @ApiDoc("Modify a lesson")
     public void modifyLesson(final HttpServerRequest request) {

@@ -200,6 +200,23 @@ Lesson.prototype.publish = function (cb, cbe) {
         });
 };
 
+/**
+ * Publishes a list of lessons
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Lesson.prototype.publishLessons = function (itemArray, cb, cbe) {
+    return http().postJson("/diary/publishLessons", itemArray).done(function(r){
+        if(typeof cb === 'function'){
+            cb();
+        }
+    }).error(function(e){
+        if(typeof cbe === 'function'){
+            cbe(model.parseError(e));
+        }
+    });
+};
+
 
 /**
  * 
