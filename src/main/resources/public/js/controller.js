@@ -339,7 +339,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.closeConfirmPanel();
 
             notify.info(isUnpublish ? 'homework.unpublished' : 'homework.published');
-
+            
             if (typeof cb === 'function') {
                 cb();
             }
@@ -589,6 +589,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
+        $scope.lesson.state = 'draft';
         $scope.homework.type = model.homeworkTypes.first();
 
         // init start/end time to calendar user's choice (HH:00) -> now (HH:00) + 1 hour
@@ -623,6 +624,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.homework.audienceType = 'class';
         $scope.homework.color = 'pink';
         $scope.homework.type = model.homeworkTypes.first();
+        $scope.homework.state = 'draft';
         $scope.newItem = {
             date: moment().minute(0).second(0)
         };

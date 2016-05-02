@@ -107,12 +107,12 @@
         <div class="row">
             <nav>
                 <!-- publishes the current lesson ang go back to calendar view -->
-                <button class="right-magnet" type="submit" ng-if="lesson.state == 'draft'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
+                <button class="right-magnet" type="submit" ng-if="lesson.id && lesson.state == 'draft'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
                     <i18n>publish</i18n>
                 </button>
 
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-                <button class="right-magnet" type="submit" ng-if="lesson.state == 'published'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-unpublish-lesson')">
+                <button class="right-magnet" type="submit" ng-if="lesson.id && lesson.state == 'published'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-unpublish-lesson')">
                     <i18n>lesson.unpublish</i18n>
                 </button>
 
