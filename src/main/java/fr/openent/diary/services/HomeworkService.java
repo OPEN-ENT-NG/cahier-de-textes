@@ -36,4 +36,11 @@ public interface HomeworkService {
     void publishHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
 
     void publishHomeworks(final List<String> homeworkIds, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Un-publishes homeworks
+     * @param homeworkIds Array of id homeworks
+     * @param handler
+     */
+    void unPublishHomeworks(final List<String> homeworkIds, final Handler<Either<String, JsonObject>> handler);
 }

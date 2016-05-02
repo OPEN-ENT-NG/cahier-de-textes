@@ -1,0 +1,16 @@
+<div class="row">
+    <article class="twelve cell">
+        <h2 ng-if="homework"><i18n>daily.lesson.unpublish.confirm.one</i18n></h2>
+
+        <div class="row">
+            <button class="right-magnet"
+                    ng-click="publishHomework(homework, true)"
+                    ng-if="true !== processingData && !homework">
+                <i18n>homework.unpublish</i18n>
+            </button>
+            <input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="closeConfirmPanel()" ng-if="processingData !== true" />
+
+            <button class="right-magnet cancel disabled" disabled ng-if="processingData === true"><i18n>homework.publishing</i18n></button>
+        </div>
+    </article>
+</div>

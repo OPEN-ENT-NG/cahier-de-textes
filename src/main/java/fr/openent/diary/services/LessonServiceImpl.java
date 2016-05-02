@@ -436,26 +436,40 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      */
     @Override
     public void publishLessons(List<String> lessonIds, Handler<Either<String, JsonObject>> handler) {
+        changeLessonsState(lessonIds, ResourceState.DRAFT, ResourceState.PUBLISHED, handler);
+    }
+
+    @Override
+    public void unPublishLessons(List<String> lessonIds, Handler<Either<String, JsonObject>> handler) {
+        changeLessonsState(lessonIds, ResourceState.PUBLISHED, ResourceState.DRAFT, handler);
+    }
+
+    /**
+     * @param lessonIds    Lesson ids to change state
+     * @param initialState Initial state of lessons
+     * @param finalState   Final state of lessons
+     * @param handler
+     */
+    private void changeLessonsState(List<String> lessonIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
         StringBuilder lessonSb = new StringBuilder();
         JsonArray parameters = new JsonArray();
+
         for (Object id : lessonIds) {
             parameters.add(id);
         }
 
-        // publish lessons
-        lessonSb.append("UPDATE diary.lesson SET lesson_state = '");
-        lessonSb.append(ResourceState.PUBLISHED.toString()).append("' ");
+        // un/publish lessons
+        lessonSb.append("UPDATE diary.lesson SET lesson_state = '").append(finalState.toString()).append("' ");
         lessonSb.append("WHERE id in ");
         lessonSb.append(sql.listPrepared(lessonIds.toArray()));
-        lessonSb.append(" AND lesson_state = '").append(ResourceState.DRAFT.toString()).append("' ");
+        lessonSb.append(" AND lesson_state = '").append(initialState.toString()).append("' ");
 
-        // publish associated homeworks
+        // un/publish associated homeworks
         StringBuilder homeworkSb = new StringBuilder();
-        homeworkSb.append("UPDATE diary.homework SET homework_state = '");
-        homeworkSb.append(ResourceState.PUBLISHED.toString()).append("' ");
+        homeworkSb.append("UPDATE diary.homework SET homework_state = '").append(finalState.toString()).append("' ");
         homeworkSb.append("WHERE lesson_id in ");
         homeworkSb.append(sql.listPrepared(lessonIds.toArray()));
-        homeworkSb.append(" AND homework_state = '").append(ResourceState.DRAFT.toString()).append("' ");
+        homeworkSb.append(" AND homework_state = '").append(initialState.toString()).append("' ");
 
         SqlStatementsBuilder transactionBuilder = new SqlStatementsBuilder();
         transactionBuilder.prepared(lessonSb.toString(), parameters);

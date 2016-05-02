@@ -106,6 +106,16 @@
         </section>
         <div class="row">
             <nav>
+                <!-- publishes the current lesson ang go back to calendar view -->
+                <button class="right-magnet" type="submit" ng-if="lesson.state == 'draft'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
+                    <i18n>publish</i18n>
+                </button>
+
+                <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
+                <button class="right-magnet" type="submit" ng-if="lesson.state == 'published'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-unpublish-lesson')">
+                    <i18n>lesson.unpublish</i18n>
+                </button>
+
                 <!-- save lesson in draft mode and go back to calendar view -->
                 <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
                     <i18n>back</i18n>
