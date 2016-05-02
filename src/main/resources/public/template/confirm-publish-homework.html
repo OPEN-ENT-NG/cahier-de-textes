@@ -5,7 +5,7 @@
         <div class="row">
             <button class="right-magnet"
                     ng-click="publishHomework(homework, false)"
-                    ng-if="true !== processingData && homework">
+                    ng-if="true !== processingData && homework && homework.id && homework.state === 'draft'">
                 <i18n>publish</i18n>
             </button>
             <input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="closeConfirmPanel()" ng-if="processingData !== true" />

@@ -218,7 +218,7 @@ public class HomeworkController extends BaseController {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "unPublishHomeworks", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<Integer> ids = data.getArray("ids").toList();
 
                             homeworkService.unPublishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
@@ -251,7 +251,7 @@ public class HomeworkController extends BaseController {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "publishHomeworks", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<Integer> ids = data.getArray("ids").toList();
 
                             homeworkService.publishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override

@@ -201,14 +201,14 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void publishHomework(String homeworkId, Handler<Either<String, JsonObject>> handler) {
-        List<String> ids = new ArrayList<String>();
+    public void publishHomework(Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
+        List<Integer> ids = new ArrayList<>();
         ids.add(homeworkId);
         publishHomeworks(ids, handler);
     }
 
     @Override
-    public void publishHomeworks(List<String> homeworkIds, Handler<Either<String, JsonObject>> handler) {
+    public void publishHomeworks(List<Integer> homeworkIds, Handler<Either<String, JsonObject>> handler) {
         changeHomeworksState(homeworkIds, ResourceState.DRAFT, ResourceState.PUBLISHED, handler);
     }
 
@@ -218,7 +218,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param handler
      */
     @Override
-    public void unPublishHomeworks(List<String> homeworkIds, Handler<Either<String, JsonObject>> handler) {
+    public void unPublishHomeworks(List<Integer> homeworkIds, Handler<Either<String, JsonObject>> handler) {
         changeHomeworksState(homeworkIds, ResourceState.PUBLISHED, ResourceState.DRAFT, handler);
     }
 
@@ -229,17 +229,17 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param finalState Final homework state
      * @param handler
      */
-    private void changeHomeworksState(List<String> homeworkIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
+    private void changeHomeworksState(List<Integer> homeworkIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
         StringBuilder sb = new StringBuilder();
         JsonArray parameters = new JsonArray();
-        for (String id : homeworkIds) {
+        for (Integer id : homeworkIds) {
             parameters.add(id);
         }
 
-        sb.append("UPDATE diary.homework SET homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
+        sb.append("UPDATE diary.homework SET homework_state = '").append(finalState).append("' ");
         sb.append("WHERE id in ");
         sb.append(sql.listPrepared(homeworkIds.toArray()));
-        sb.append(" and homework_state = '").append(ResourceState.DRAFT.toString()).append("'");
+        sb.append(" and homework_state = '").append(initialState).append("'");
 
         sql.prepared(sb.toString(), parameters, validRowsResultHandler(handler));
     }

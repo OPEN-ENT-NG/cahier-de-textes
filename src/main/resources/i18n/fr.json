@@ -61,6 +61,8 @@
   "homework.saved": "Le travail à faire a été sauvegardé.",
   "homework.deleted": "La suppression s'est correctement effectuée",
   "homework.published": "La publication s'est correctement effectuée",
+  "homework.unpublished": "Le passage en mode brouillon s'est correctement effectué.",
+  "homework.unpublish": "Marquer comme brouillon",
   "homework.publishing": "Publication en cours",
   "lesson.deleted": "La suppression s'est correctement effectuée",
   "lesson.published": "La publication s'est correctement effectuée",
