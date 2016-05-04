@@ -9,9 +9,11 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.share.ShareService;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -20,6 +22,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
@@ -27,7 +30,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.*;
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class LessonController extends ControllerHelper {
+public class LessonController extends SharedResourceController {
 
     LessonService lessonService;
     DiaryService diaryService;
@@ -107,7 +110,33 @@ public class LessonController extends ControllerHelper {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+
+                                        if (event.isRight()) {
+                                            //create automatic sharing
+                                            String resourceId = String.valueOf(event.right().getValue().getLong("id"));
+                                            //TODO get actions
+                                            final List<String> actions = new ArrayList<String>();
+                                            actions.add("read");
+                                            actions.add("contrib");
+                                            //TODO get group ids from graph(?) neo4j
+                                            final List<String> groupIds = new ArrayList<String>();
+                                            groupIds.add("601-1461514789206");
+                                            groupIds.add("851-1461514790215");
+
+                                            if(groupIds != null && groupIds.size() != 0) {
+                                                LessonController.this.shareResource(user.getUserId(), groupIds, resourceId, actions, notEmptyResponseHandler(request, 201));
+                                            } else {
+                                                badRequest(request, "Sharing Lesson has encountered a problem.");
+                                            }
+                                            
+                                        } else {
+                                            badRequest(request,"Lesson could not be created.");
+                                        }
+                                    }
+                                });
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
@@ -341,6 +370,5 @@ public class LessonController extends ControllerHelper {
     private boolean isValidLessonId(String lessonId) {
         return lessonId != null && lessonId.matches("\\d+");
     }
-
 
 }

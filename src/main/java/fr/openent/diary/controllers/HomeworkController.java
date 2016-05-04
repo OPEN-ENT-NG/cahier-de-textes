@@ -12,6 +12,8 @@ import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.List;
 
@@ -22,10 +24,12 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class HomeworkController extends ControllerHelper {
+public class HomeworkController extends SharedResourceController {
 
     HomeworkService homeworkService;
     LessonService lessonService;
+
+    private final static Logger log = LoggerFactory.getLogger(HomeworkController.class);
 
     public HomeworkController(HomeworkService homeworkService, LessonService lessonService) {
         this.homeworkService = homeworkService;
@@ -210,24 +214,6 @@ public class HomeworkController extends ControllerHelper {
         }
     }
 
-    @Get("/homework/share/json/:id")
-    @ApiDoc("List rights for a given resource")
-    public void share(final HttpServerRequest request) {
-        super.shareJson(request, false);
-    }
-
-    @Put("/homework/share/json/:id")
-    @ApiDoc("Add rights for a given resource")
-    public void shareSubmit(final HttpServerRequest request) {
-        super.shareJsonSubmit(request, null, false);
-    }
-
-    @Put("/homework/share/remove/:id")
-    @ApiDoc("Remove rights for a given resource")
-    public void shareRemove(final HttpServerRequest request) {
-        super.removeShare(request, false);
-    }
-
     @Post("/unPublishHomeworks")
     @ApiDoc("Unpublishes homeworks")
     public void unPublishHomeworks(final HttpServerRequest request) {
@@ -292,6 +278,24 @@ public class HomeworkController extends ControllerHelper {
                 }
             }
         });
+    }
+
+    @Get("/homework/share/json/:id")
+    @ApiDoc("List rights for a given resource")
+    public void share(final HttpServerRequest request) {
+        super.shareJson(request, false);
+    }
+
+    @Put("/homework/share/json/:id")
+    @ApiDoc("Add rights for a given resource")
+    public void shareSubmit(final HttpServerRequest request) {
+        super.shareJsonSubmit(request, null, false);
+    }
+
+    @Put("/homework/share/remove/:id")
+    @ApiDoc("Remove rights for a given resource")
+    public void shareRemove(final HttpServerRequest request) {
+        super.removeShare(request, false);
     }
 
     /**
