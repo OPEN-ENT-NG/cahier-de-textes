@@ -467,6 +467,14 @@ function DiaryController($scope, template, model, route, date, $location) {
             // refresh current lessons cache to sync with lessons deleted
             lessons.forEach(function(deletedLesson){
                 model.lessons.remove(deletedLesson);
+
+                var lessonHomeworks = model.homeworks.filter(function (homework) {
+                    return homework && homework.lesson_id == deletedLesson.id;
+                });
+
+                lessonHomeworks.forEach(function (homework) {
+                    model.homeworks.remove(homework);
+                });
             });
 
             $scope.closeConfirmPanel();
