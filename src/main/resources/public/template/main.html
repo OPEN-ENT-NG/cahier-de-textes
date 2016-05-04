@@ -1,3 +1,7 @@
 ﻿<h1><i18n>diary.title</i18n></h1>
-
+<div ng-if="display.showPanel">
+    <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
+        <container template="lightbox"></container>
+    </lightbox>
+</div>
 <container template="main-view"></container>

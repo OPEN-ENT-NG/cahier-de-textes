@@ -13,7 +13,10 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.List;
+
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
+import static org.entcore.common.http.response.DefaultResponseHandler.leftToResponse;
 import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyResponseHandler;
 
 /**
@@ -223,6 +226,72 @@ public class HomeworkController extends ControllerHelper {
     @ApiDoc("Remove rights for a given resource")
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
+    }
+
+    @Post("/unPublishHomeworks")
+    @ApiDoc("Unpublishes homeworks")
+    public void unPublishHomeworks(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "unPublishHomeworks", new Handler<JsonObject>() {
+                        public void handle(JsonObject data) {
+                            final List<Integer> ids = data.getArray("ids").toList();
+
+                            homeworkService.unPublishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        request.response().setStatusCode(200).end();
+                                    } else {
+                                        leftToResponse(request, event.left());
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User not found in session.");
+                    }
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
+    @Post("/publishHomeworks")
+    @ApiDoc("Publishes homeworks")
+    public void publishHomeworks(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "publishHomeworks", new Handler<JsonObject>() {
+                        public void handle(JsonObject data) {
+                            final List<Integer> ids = data.getArray("ids").toList();
+
+                            homeworkService.publishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        request.response().setStatusCode(200).end();
+                                    } else {
+                                        leftToResponse(request, event.left());
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User not found in session.");
+                    }
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
     }
 
     /**

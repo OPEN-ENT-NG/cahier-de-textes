@@ -66,4 +66,11 @@ public interface LessonService extends CrudService {
      * @param handler
      */
     void publishLessons(final List<String> lessonIds, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Un-publishes lessons
+     * @param lessonIds
+     * @param handler
+     */
+    void unPublishLessons(final List<String> lessonIds, final Handler<Either<String, JsonObject>> handler);
 }

@@ -89,6 +89,8 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('main', 'main');
             template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');
+            $scope.lesson = null;
+            $scope.homework = null;
         }
     });
 
@@ -97,7 +99,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         var lesson = model.lessons.findWhere({id: parseInt(idLesson)});
 
         if (lesson != null) {
-
             $scope.openLessonView(lesson);
         }
     };
@@ -117,7 +118,9 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         // open existing lesson for edit
         if (lesson) {
-            $scope.lesson = new Lesson();
+            if (!$scope.lesson) {
+                $scope.lesson = new Lesson();
+            }
             $scope.lesson.updateData(lesson);
             $scope.newItem = {
                 date: moment($scope.lesson.date),
@@ -227,7 +230,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks();
         $scope.showCal = !$scope.showCal;
-        notify.info('lesson.saved.draft');
+        notify.info('lesson.saved');
         $scope.$apply();
 
         if (goToCalendarView) {
@@ -238,31 +241,108 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     /**
-     * Publish selected lessons
+     * un/Publish selected lessons
      */
-    $scope.publishSelectedLessons = function () {
+    $scope.publishSelectedLessons = function (isUnpublish) {
         $scope.currentErrors = [];
-        $scope.publishLessons($scope.getSelectedLessons());
+        $scope.publishLessons($scope.getSelectedLessons(), isUnpublish);
     };
 
+
     /**
+     * Publishes or unpublishes homework and go back to calendar view
+     * @param homework Homework
+     * @param isUnpublish if true publishes homework else un-publishes it
+     */
+    $scope.publishHomeworkAndGoCalendarView = function (homework, isUnpublish) {
+        $scope.publishHomework(homework, isUnpublish, $scope.goToCalendarView());
+    }
+
+    /**
+     * Publishes or unpublishes lesson and go back to calendar view
+     * @param lesson Lesson
+     * @param isUnpublish if true publishes lesson else un-publishes it
+     */
+    $scope.publishLessonAndGoCalendarView = function (lesson, isUnpublish) {
+        $scope.publishLesson(lesson, isUnpublish, $scope.goToCalendarView());
+    }
+
+    /**
+     * Publish lesson
+     * @param isUnpublish If true unpublishes the lesson (back to draft mode) else publishes it
+     * @param cb Callback function
+     */
+    $scope.publishLesson = function (lesson, isUnpublish, cb) {
+        var lessons = new Array();
+        lessons.push(lesson);
+        $scope.publishLessons(lessons, isUnpublish, cb);
+    }
+
+     /**
      * Publish lessons
-     * @param lessonIdArray Array which values contain a property 'id'
+     * @param lessons Array of lessons to publish or unpublish
+      * @param isUnpublish if true unpublishes the lessons else publishes them
      * which is lesson id to delete
      */
-    $scope.publishLessons = function (lessons) {
+    $scope.publishLessons = function (lessons, isUnpublish, cb) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        $scope.newLesson.publishLessons({ids:model.getLessonIds(lessons)}, function () {
+        $scope.newLesson.publishLessons({ids:model.getLessonIds(lessons)}, isUnpublish, function () {
 
-            // refresh state of lessons published
+            // refresh state of lessons un/published
             lessons.forEach(function (lesson) {
-                lesson.state = 'published';
+                lesson.state = isUnpublish ? 'draft' : 'published';
             });
 
             $scope.closeConfirmPanel();
-            notify.info('lesson.published');
+
+            notify.info(isUnpublish ? 'lesson.unpublished' : 'lesson.published');
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        }, function (e) {
+            $scope.processingData = false;
+            validationError(e);
+        });
+    };
+
+    /**
+     * Publish lesson
+     * @param isUnpublish If true unpublishes the lesson (back to draft mode) else publishes it
+     * @param cb Callback function
+     */
+    $scope.publishHomework = function (homework, isUnpublish, cb) {
+        var homeworks = new Array();
+        homeworks.push(homework);
+        $scope.publishHomeworks(homeworks, isUnpublish, cb);
+    }
+
+    /**
+     * Publish or un-publishes lessons
+     * @param lessons Array of lessons to publish or unpublish
+     * @param isUnpublish If true unpublishes lesson else publishes it
+     * which is lesson id to delete
+     */
+    $scope.publishHomeworks = function (homeworks, isUnpublish, cb) {
+        $scope.currentErrors = [];
+        $scope.processingData = true;
+
+        model.publishHomeworks({ids:model.getHomeworkIds(homeworks)}, isUnpublish, function () {
+
+            // refresh state of homeworks to published or unpublished
+            homeworks.forEach(function (homework) {
+                homework.state = isUnpublish ? 'draft' : 'published';
+            });
+
+            $scope.closeConfirmPanel();
+
+            notify.info(isUnpublish ? 'homework.unpublished' : 'homework.published');
+            
+            if (typeof cb === 'function') {
+                cb();
+            }
         }, function (e) {
             $scope.processingData = false;
             validationError(e);
@@ -316,17 +396,41 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     /**
-     * Tells if ont draft lesson is selected
+     * Tells if at least one draft is selected and only drafts
      * @returns {boolean} true if one draft lesson selected else false
      */
-    $scope.isOneDraftInSelected = function () {
-        var oneDraft = false;
+    $scope.isOneDraftOnlyInSelected = function () {
+
+        var selected = false;
+
         model.lessons.selection().forEach(function (lesson) {
             if (lesson.isDraft()) {
-                oneDraft = true;
+                selected = true;
+            } else {
+                return false;
             }
         });
-        return oneDraft;
+
+        return selected;
+    }
+
+    /**
+     * Tells if at least one published lesson is selected and only published ones
+     * @returns {boolean} true if one draft lesson published else false
+     */
+    $scope.isOnePublishedOnlyInSelected = function () {
+
+        var selected = false;
+
+        model.lessons.selection().forEach(function (lesson) {
+            if (lesson.isPublished()) {
+                selected = true;
+            } else {
+                return false;
+            }
+        });
+
+        return selected;
     }
 
     $scope.getSelectedLessons = function(){
@@ -381,7 +485,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             //TODO don't reload all calendar view
             model.homeworks.syncHomeworks();
             $scope.showCal = !$scope.showCal;
-            notify.info('homework.saved.draft');
+            notify.info('homework.saved');
             $scope.$apply();
 
             if (goToCalendarView) {
@@ -427,7 +531,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         if (countDownVar == 0) {
 
-            if (typeof cb == 'function') {
+            if (typeof cb === 'function') {
                 cb();
             }
         }
@@ -485,6 +589,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = 'pink';
+        $scope.lesson.state = 'draft';
         $scope.homework.type = model.homeworkTypes.first();
 
         // init start/end time to calendar user's choice (HH:00) -> now (HH:00) + 1 hour
@@ -519,6 +624,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.homework.audienceType = 'class';
         $scope.homework.color = 'pink';
         $scope.homework.type = model.homeworkTypes.first();
+        $scope.homework.state = 'draft';
         $scope.newItem = {
             date: moment().minute(0).second(0)
         };

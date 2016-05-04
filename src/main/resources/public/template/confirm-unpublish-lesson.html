@@ -1,18 +1,18 @@
 <div class="row">
     <article class="twelve cell">
-        <h2 ng-if="lessons.selection().length === 1 || lesson"><i18n>daily.lesson.publish.confirm.one</i18n></h2>
-        <h2 ng-if="lessons.selection().length > 1"><i18n>daily.lesson.publish.confirm.multi</i18n></h2>
+        <h2 ng-if="lessons.selection().length === 1 || lesson"><i18n>daily.lesson.unpublish.confirm.one</i18n></h2>
+        <h2 ng-if="lessons.selection().length > 1"><i18n>daily.lesson.unpublish.confirm.multi</i18n></h2>
 
         <div class="row">
             <button class="right-magnet"
-                    ng-click="publishSelectedLessons()"
+                    ng-click="publishSelectedLessons(true)"
                     ng-if="true !== processingData && lessons.selection().length > 0 && !lesson">
-                <i18n>publish</i18n>
+                <i18n>lesson.unpublish</i18n>
             </button>
             <button class="right-magnet"
-                    ng-click="publishLessonAndGoCalendarView(lesson, false)"
+                    ng-click="publishLessonAndGoCalendarView(lesson, true)"
                     ng-if="true !== processingData && lesson">
-                <i18n>publish</i18n>
+                <i18n>lesson.unpublish</i18n>
             </button>
             <input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="closeConfirmPanel()" ng-if="processingData !== true" />
 

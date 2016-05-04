@@ -1,8 +1,3 @@
-<div ng-if="display.showPanel">
-    <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
-        <container template="lightbox"></container>
-    </lightbox>
-</div>
 
 <div class="row">
     <button ng-click="redirect('/createLessonView/default')">
@@ -58,8 +53,11 @@
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
             </button>
-            <button ng-click="showConfirmPanel('confirm-publish-lesson')" ng-class="{ disabled: !isOneDraftInSelected()}">
+            <button ng-click="showConfirmPanel('confirm-publish-lesson')" ng-if="isOneDraftOnlyInSelected()">
                 <i18n>publish</i18n>
+            </button>
+            <button ng-click="showConfirmPanel('confirm-unpublish-lesson')" ng-if="isOnePublishedOnlyInSelected()">
+                <i18n>lesson.unpublish</i18n>
             </button>
         </div>
     </div>

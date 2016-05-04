@@ -1,4 +1,9 @@
-﻿<form name="homeworkform">
+﻿<div ng-if="display.showPanel">
+    <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
+        <container template="lightbox"></container>
+    </lightbox>
+</div>
+<form name="homeworkform">
     <h2><i18n>homework.details.title</i18n></h2>
     <div class="row">
         <div class="six cell">
@@ -42,6 +47,15 @@
         <editor ng-model="homework.description" required></editor>
     </div>
     <div class="row">
+        <!-- publishes the current lesson ang go back to calendar view -->
+        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-publish-homework')">
+            <i18n>publish</i18n>
+        </button>
+
+        <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
+        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-unpublish-homework')">
+            <i18n>lesson.unpublish</i18n>
+        </button>
         <!-- save homework in draft mode and go back to calendar view -->
         <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
             <i18n>back</i18n>

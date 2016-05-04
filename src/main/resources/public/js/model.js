@@ -49,6 +49,27 @@ Homework.prototype.create = function(cb, cbe) {
         });
 };
 
+/**
+ * Publishes or un publishes a list of lessons
+ * @param itemArray Array of homeworks to publish or unpublish
+ * @param cb Callback function
+ * @param cbe Callback function on error
+ */
+model.publishHomeworks = function (itemArray, isUnpublish, cb, cbe) {
+
+    var url = isUnpublish ? "/diary/unPublishHomeworks" : "/diary/publishHomeworks";
+
+    return http().postJson(url, itemArray).done(function (r) {
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
 Homework.prototype.toJSON = function(){
     return {
         homework_title: this.title,
@@ -201,17 +222,20 @@ Lesson.prototype.publish = function (cb, cbe) {
 };
 
 /**
- * Publishes a list of lessons
+ * Publishes or un publishes a list of lessons
  * @param cb Callback
  * @param cbe Callback on error
  */
-Lesson.prototype.publishLessons = function (itemArray, cb, cbe) {
-    return http().postJson("/diary/publishLessons", itemArray).done(function(r){
-        if(typeof cb === 'function'){
+Lesson.prototype.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
+
+    var url = isUnpublish ? "/diary/unPublishLessons" : "/diary/publishLessons";
+
+    return http().postJson(url, itemArray).done(function (r) {
+        if (typeof cb === 'function') {
             cb();
         }
-    }).error(function(e){
-        if(typeof cbe === 'function'){
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
             cbe(model.parseError(e));
         }
     });
@@ -257,7 +281,7 @@ Lesson.prototype.isDraft = function () {
 };
 
 Lesson.prototype.isPublished = function () {
-    return this.state === "published";
+    return !this.isDraft();
 };
 
 function Teacher() {}
@@ -294,6 +318,21 @@ model.parseError = function(e) {
 
 /**
  *
+ * @param lessons Collection of homeworks
+ * @returns {Array} Array of id of the homeworks
+ */
+model.getHomeworkIds = function(homeworks){
+
+    var itemArray = [];
+    homeworks.forEach(function (homework) {
+        itemArray.push(homework.id);
+    });
+
+    return itemArray;
+}
+
+/**
+ *
  * @param lessons Collection of lessons
  * @returns {Array} Array of id of the lessons
  */
@@ -325,7 +364,7 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
             lesson.homeworks.push(convertSqlToJsHomework(sqlHomework));
         });
 
-        if (typeof cb == 'function') {
+        if (typeof cb === 'function') {
             cb();
         }
     }).error(function (e) {
