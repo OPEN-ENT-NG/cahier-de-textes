@@ -32,7 +32,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.arrayRespo
  */
 public class DiaryController extends BaseController {
 
-    //TODO is this the best place to declare that variable?
+    //TODO is this the best place to declare that variable? NO if services can act as standalone...
     public static final String DATABASE_SCHEMA = "diary";
     private final static Logger log = LoggerFactory.getLogger(DiaryController.class);
 

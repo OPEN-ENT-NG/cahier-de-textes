@@ -5,9 +5,13 @@ import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -23,7 +27,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.*;
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class LessonController extends BaseController {
+public class LessonController extends ControllerHelper {
 
     LessonService lessonService;
     DiaryService diaryService;
@@ -280,11 +284,30 @@ public class LessonController extends BaseController {
         });
     }
 
+    @Get("/lesson/share/json/:id")
+    @ApiDoc("List rights for a given resource")
+    public void share(final HttpServerRequest request) {
+        super.shareJson(request, false);
+    }
+
+    @Put("/lesson/share/json/:id")
+    @ApiDoc("Add rights for a given resource")
+    public void shareSubmit(final HttpServerRequest request) {
+        super.shareJsonSubmit(request, null, false);
+    }
+
+    @Put("/lesson/share/remove/:id")
+    @ApiDoc("Remove rights for a given resource")
+    public void shareRemove(final HttpServerRequest request) {
+        super.removeShare(request, false);
+    }
+
     /**
      * Controls that the lessonId is a not null number entry.
      */
     private boolean isValidLessonId(String lessonId) {
         return lessonId != null && lessonId.matches("\\d+");
     }
+
 
 }

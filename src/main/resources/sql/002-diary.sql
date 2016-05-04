@@ -110,3 +110,60 @@ CREATE TABLE diary.attachment (
 	  CONSTRAINT homework_id_fk FOREIGN KEY (homework_id)
         REFERENCES diary.homework(id)
 );
+
+CREATE TABLE diary.users
+(
+  id character varying(36) NOT NULL,
+  username character varying(255),
+  deleted boolean DEFAULT false,
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE diary.groups
+(
+  id character varying(36) NOT NULL,
+  name character varying(255),
+  CONSTRAINT groups_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE diary.members
+(
+  id character varying(36) NOT NULL,
+  user_id character varying(36),
+  group_id character varying(36),
+  CONSTRAINT members_pkey PRIMARY KEY (id),
+  CONSTRAINT group_fk FOREIGN KEY (group_id)
+      REFERENCES diary.groups (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT user_fk FOREIGN KEY (user_id)
+      REFERENCES diary.users (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE diary.lesson_shares
+(
+  member_id character varying(36) NOT NULL,
+  resource_id bigint NOT NULL,
+  action character varying(255) NOT NULL,
+  CONSTRAINT lesson_share PRIMARY KEY (member_id, resource_id, action),
+  CONSTRAINT lesson_fk FOREIGN KEY (resource_id)
+      REFERENCES diary.lesson (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT lesson_share_member_fk FOREIGN KEY (member_id)
+      REFERENCES diary.members (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE diary.homework_shares
+(
+  member_id character varying(36) NOT NULL,
+  resource_id bigint NOT NULL,
+  action character varying(255) NOT NULL,
+  CONSTRAINT homework_share PRIMARY KEY (member_id, resource_id, action),
+  CONSTRAINT homework_fk FOREIGN KEY (resource_id)
+      REFERENCES diary.homework (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT homework_share_member_fk FOREIGN KEY (member_id)
+      REFERENCES diary.members (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);

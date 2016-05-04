@@ -6,6 +6,7 @@ import fr.wseduc.rs.*;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
+import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -18,7 +19,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class HomeworkController extends BaseController {
+public class HomeworkController extends ControllerHelper {
 
     HomeworkService homeworkService;
     LessonService lessonService;
@@ -204,6 +205,24 @@ public class HomeworkController extends BaseController {
         } else {
             badRequest(request,"Invalid homework identifier.");
         }
+    }
+
+    @Get("/homework/share/json/:id")
+    @ApiDoc("List rights for a given resource")
+    public void share(final HttpServerRequest request) {
+        super.shareJson(request, false);
+    }
+
+    @Put("/homework/share/json/:id")
+    @ApiDoc("Add rights for a given resource")
+    public void shareSubmit(final HttpServerRequest request) {
+        super.shareJsonSubmit(request, null, false);
+    }
+
+    @Put("/homework/share/remove/:id")
+    @ApiDoc("Remove rights for a given resource")
+    public void shareRemove(final HttpServerRequest request) {
+        super.removeShare(request, false);
     }
 
     /**
