@@ -115,6 +115,9 @@ public class LessonController extends SharedResourceController {
                                     public void handle(Either<String, JsonObject> event) {
 
                                         if (event.isRight()) {
+                                            request.response().setStatusCode(201).end();
+                                            // disabled until working
+                                            /*
                                             //create automatic sharing
                                             String resourceId = String.valueOf(event.right().getValue().getLong("id"));
                                             //TODO get actions
@@ -131,7 +134,7 @@ public class LessonController extends SharedResourceController {
                                             } else {
                                                 badRequest(request, "Sharing Lesson has encountered a problem.");
                                             }
-                                            
+                                            */
                                         } else {
                                             badRequest(request,"Lesson could not be created.");
                                         }
