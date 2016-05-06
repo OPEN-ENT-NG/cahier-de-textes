@@ -540,9 +540,10 @@ model.build = function () {
      * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
      */
     convertSqlToJsHomework = function(sqlHomework){
-        return  {
+        return   {
             id: sqlHomework.id,
             description: sqlHomework.homework_description,
+            audienceId: sqlHomework.audience_id,
             audience: model.audiences.findWhere({ id: sqlHomework.audience_id }),
             subjectId: sqlHomework.subject_id,
             subjectLabel: sqlHomework.subject_label,

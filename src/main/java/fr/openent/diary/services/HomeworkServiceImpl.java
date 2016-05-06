@@ -58,7 +58,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getAllHomeworksForTeacher(String schoolId, String teacherId, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
@@ -80,7 +80,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         //TODO handle dates + modify current_date ?
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id, h.audience_id,")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
@@ -108,7 +108,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void retrieveHomework(String homeworkId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id,")
+        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id, h.audience_id")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color,")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, th.homework_type_label")
                 .append(" FROM diary.homework AS h")
@@ -202,7 +202,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void publishHomework(Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
-        List<Integer> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<Integer>();
         ids.add(homeworkId);
         publishHomeworks(ids, handler);
     }

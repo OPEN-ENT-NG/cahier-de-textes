@@ -78,7 +78,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('main-view', 'create-lesson');
         },
         editHomeworkView: function(params) {
-            loadHomeworkFromRoute(params.id);
+            loadHomeworkFromRoute(params.idHomework);
             template.open('main', 'main');
             template.open('main-view', 'create-homework');
         },
@@ -104,7 +104,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     var loadHomeworkFromRoute = function(idHomework) {
-        var homework = model.homeworks.findWhere({ id:  idHomework });
+        var homework = model.homeworks.findWhere({ id: parseInt(idHomework)});
         if (homework != null) {
             $scope.openHomeworkView(homework);
         }
@@ -138,8 +138,19 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.openHomeworkView = function(homework, params){
 
         if (homework) {
-            $scope.homework = new Homework();
+            if (!$scope.homework) {
+                $scope.homework = new Homework();
+            }
+
             $scope.homework.updateData(homework);
+
+            if (!$scope.homework.audience) {
+                $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audienceId});
+            }
+
+            if (!$scope.homework.type) {
+                $scope.homework.type = model.homeworkTypes.findWhere({ id: $scope.homework.typeId });
+            }
         } else {
             initHomework();
         }
@@ -357,7 +368,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         var needSqlSync = false;
 
         // if homeworks ever retrieved from db don't do it again!
-        !$scope.lesson.homeworks.forEach(function (homework) {
+        $scope.lesson.homeworks.forEach(function (homework) {
             if (homework.needsload) {
                 needSqlSync = true;
             }
