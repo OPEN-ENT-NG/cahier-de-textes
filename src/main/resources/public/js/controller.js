@@ -207,27 +207,35 @@ function DiaryController($scope, template, model, route, date, $location) {
                 // homeworks associated with lesson
                 if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
 
-                    var homeworkProcessed = 0;
+                    var homeworkSavedCount = 0;
 
-                    $scope.lesson.homeworks.forEach(function (homeToCreate) {
-                        homeToCreate.lesson_id = $scope.lesson.id;
+                    $scope.lesson.homeworks.forEach(function (homework) {
+
+                        homework.lesson_id = $scope.lesson.id;
                         // needed fields as in model.js Homework.prototype.toJSON
-                        homeToCreate.audience = $scope.lesson.audience;
-                        homeToCreate.subject = $scope.lesson.subject;
-                        homeToCreate.color = $scope.lesson.color;
+                        homework.audience = $scope.lesson.audience;
+                        homework.subject = $scope.lesson.subject;
+                        homework.color = $scope.lesson.color;
 
-                        homeToCreate.save(
-                            // go back to calendar view once all homeworks saved ('back' button)
-                            function (x) {
-                                homeworkProcessed++;
-                                if (homeworkProcessed == $scope.lesson.homeworks.all.length) {
-                                    $scope.postLessonSave(goToCalendarView);
-                                }
-                            },
-                            function (e) {
-                                validationError(e);
-                            });
+                        // homework might not have been sql loaded if user stayed on lesson tab
+                        if(homework.loaded) {
+                            homework.save(
+                                // go back to calendar view once all homeworks saved ('back' button)
+                                function (x) {
+                                    homeworkSavedCount ++;
+                                    if (homeworkSavedCount == $scope.lesson.homeworks.all.length) {
+                                        $scope.postLessonSave(goToCalendarView);
+                                    }
+                                },
+                                function (e) {
+                                    validationError(e);
+                                });
+                        }
                     });
+
+                    if(homeworkSavedCount === 0){
+                        $scope.postLessonSave(goToCalendarView);
+                    }
                 } else {
                     $scope.postLessonSave(goToCalendarView);
                 }
@@ -369,7 +377,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         // if homeworks ever retrieved from db don't do it again!
         $scope.lesson.homeworks.forEach(function (homework) {
-            if (homework.needsload) {
+            if (!homework.loaded) {
                 needSqlSync = true;
             }
         });

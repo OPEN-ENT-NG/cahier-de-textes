@@ -403,7 +403,7 @@ model.build = function () {
                             for (var i = 0; i < lesson.homework_id.length; i++) {
                                 var homework = new Homework();
                                 homework.lesson_id = parseInt(lesson.lesson_id);
-                                homework.needsload = true;
+                                homework.loaded = false; // means full data from sql not loaded
                                 lessonHomeworks.push(homework);
                             }
 
