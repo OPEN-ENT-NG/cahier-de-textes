@@ -131,10 +131,33 @@ Lesson.prototype.save = function(cb, cbe) {
     }
 };
 
+/**
+ * Given a moment which contain reliable time data,
+ * return a moment time with this time and the date specified.
+ * @param date Date
+ * @param momentTime Moment date
+ * @returns {*}
+ */
+var getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
+    var dateMoment = moment(date);
+
+    momentTime.set('year', dateMoment.get('year'));
+    momentTime.set('month', dateMoment.get('month'));
+    momentTime.set('date', dateMoment.get('date'));
+
+    return momentTime;
+}
+
 Lesson.prototype.update = function(cb, cbe) {
     var url = '/diary/lesson/' + this.id;
 
     var lesson = this;
+
+    // startTime used for db save but startMoment in calendar view
+    // startMoment day is given by lesson.date
+    lesson.startMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, lesson.startMoment);
+    lesson.endMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, lesson.endMoment);
+
     http().putJson(url, this)
         .done(function(){
 
