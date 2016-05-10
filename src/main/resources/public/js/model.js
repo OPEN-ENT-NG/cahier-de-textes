@@ -287,6 +287,22 @@ Lesson.prototype.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
     var url = isUnpublish ? "/diary/unPublishLessons" : "/diary/publishLessons";
 
     return http().postJson(url, itemArray).done(function (r) {
+
+        var updateLessons = new Array();
+
+        // update lesson cache
+        // bad code but collection does not seem to update on state change
+        // so have to delete and add modified lessons ...
+        model.lessons.forEach(function(lessonModel){
+            if(itemArray.ids.indexOf(lessonModel.id) != -1){
+                model.lessons.remove(lessonModel);
+                lessonModel.state = isUnpublish ? 'draft' : 'published';
+                updateLessons.push(lessonModel);
+            }
+        });
+
+        model.lessons.addRange(updateLessons);
+
         if (typeof cb === 'function') {
             cb();
         }
