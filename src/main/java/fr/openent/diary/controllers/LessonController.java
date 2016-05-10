@@ -110,14 +110,18 @@ public class LessonController extends SharedResourceController {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
+                                // TODO uncomment when operational
+                                /*
                                 lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), new Handler<Either<String, JsonObject>>() {
                                     @Override
                                     public void handle(Either<String, JsonObject> event) {
 
                                         if (event.isRight()) {
+                                            notEmptyResponseHandler(request, 201);
                                             request.response().setStatusCode(201).end();
                                             // disabled until working
-                                            /*
+
                                             //create automatic sharing
                                             String resourceId = String.valueOf(event.right().getValue().getLong("id"));
                                             //TODO get actions
@@ -134,12 +138,12 @@ public class LessonController extends SharedResourceController {
                                             } else {
                                                 badRequest(request, "Sharing Lesson has encountered a problem.");
                                             }
-                                            */
+
                                         } else {
                                             badRequest(request,"Lesson could not be created.");
                                         }
                                     }
-                                });
+                                });*/
                             } else {
                                 badRequest(request,"Invalid school identifier.");
                             }
