@@ -21,6 +21,22 @@ Homework.prototype.update = function(cb, cbe) {
     var homework = this;
     http().putJson(url, this)
         .done(function(){
+            // sync homeworks cache with updated lesson
+            var found = false;
+
+            // tricky way but updating object in collection do not work
+            // have to remove and insert it in collection
+            model.homeworks.forEach(function(homeworkModel){
+                if(!found && homework.id === homeworkModel.id){
+                    model.homeworks.remove(homeworkModel);
+                    found = true;
+                }
+            });
+
+            if(found){
+                model.homeworks.push(homework);
+            }
+
             if(typeof cb === 'function'){
                 cb();
             }
@@ -121,6 +137,23 @@ Lesson.prototype.update = function(cb, cbe) {
     var lesson = this;
     http().putJson(url, this)
         .done(function(){
+
+            // sync lessons cache with updated lesson
+            var found = false;
+
+            // tricky way but updating object in collection do not work
+            // have to remove and insert it in collection
+            model.lessons.forEach(function(lessonModel){
+                if(!found && lesson.id === lessonModel.id){
+                    model.lessons.remove(lessonModel);
+                    found = true;
+                }
+            });
+
+            if(found){
+                model.lessons.push(lesson);
+            }
+
             if(typeof cb === 'function'){
                 cb();
             }
