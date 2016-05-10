@@ -299,8 +299,9 @@ Lesson.prototype.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
                 lessonModel.state = isUnpublish ? 'draft' : 'published';
 
                 model.homeworks.forEach(function(homework){
-                    homework.state = isUnpublish ? 'draft' : 'published';
-                    homework.trigger('change');
+                    if(homework.lesson_id === lessonModel.id) {
+                        homework.state = isUnpublish ? 'draft' : 'published';
+                    }
                 });
 
                 updateLessons.push(lessonModel);
