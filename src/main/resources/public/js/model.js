@@ -297,6 +297,12 @@ Lesson.prototype.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
             if(itemArray.ids.indexOf(lessonModel.id) != -1){
                 model.lessons.remove(lessonModel);
                 lessonModel.state = isUnpublish ? 'draft' : 'published';
+
+                model.homeworks.forEach(function(homework){
+                    homework.state = isUnpublish ? 'draft' : 'published';
+                    homework.trigger('change');
+                });
+
                 updateLessons.push(lessonModel);
             }
         });
