@@ -208,6 +208,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
 
                     var homeworkSavedCount = 0;
+                    var homeworkCount = $scope.lesson.homeworks.all.length;
 
                     $scope.lesson.homeworks.forEach(function (homework) {
 
@@ -218,12 +219,12 @@ function DiaryController($scope, template, model, route, date, $location) {
                         homework.color = $scope.lesson.color;
 
                         // homework might not have been sql loaded if user stayed on lesson tab
-                        if(homework.loaded) {
+                        if(typeof homework.loaded === 'undefined' || !homework.loaded) {
                             homework.save(
                                 // go back to calendar view once all homeworks saved ('back' button)
                                 function (x) {
                                     homeworkSavedCount ++;
-                                    if (homeworkSavedCount == $scope.lesson.homeworks.all.length) {
+                                    if (homeworkSavedCount == homeworkCount) {
                                         $scope.postLessonSave(goToCalendarView);
                                     }
                                 },
