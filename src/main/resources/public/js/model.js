@@ -155,8 +155,8 @@ Lesson.prototype.update = function(cb, cbe) {
 
     // startTime used for db save but startMoment in calendar view
     // startMoment day is given by lesson.date
-    lesson.startMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, lesson.startMoment ? lesson.startMoment : moment(lesson.startTime));
-    lesson.endMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, lesson.endMoment ? lesson.endMoment : moment(lesson.endTime));
+    lesson.startMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, moment(lesson.startTime));
+    lesson.endMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, moment(lesson.endTime));
 
     http().putJson(url, this)
         .done(function(){
