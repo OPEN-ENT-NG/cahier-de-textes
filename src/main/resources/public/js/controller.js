@@ -219,7 +219,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                         homework.color = $scope.lesson.color;
 
                         // homework might not have been sql loaded if user stayed on lesson tab
-                        if(typeof homework.loaded === 'undefined' || !homework.loaded) {
+                        if(typeof homework.loaded === 'undefined' || homework.loaded) {
                             homework.save(
                                 // go back to calendar view once all homeworks saved ('back' button)
                                 function (x) {
