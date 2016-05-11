@@ -205,10 +205,12 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.save(
             function () {
                 // homeworks associated with lesson
+                // TODO move to model and refactor
                 if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
 
                     var homeworkSavedCount = 0;
                     var homeworkCount = $scope.lesson.homeworks.all.length;
+                    var execASyncPostLessonSave = true;
 
                     $scope.lesson.homeworks.forEach(function (homework) {
 
@@ -220,6 +222,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
                         // homework might not have been sql loaded if user stayed on lesson tab
                         if(typeof homework.loaded === 'undefined' || homework.loaded) {
+                            execASyncPostLessonSave = false;
                             homework.save(
                                 // go back to calendar view once all homeworks saved ('back' button)
                                 function (x) {
@@ -234,7 +237,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                         }
                     });
 
-                    if(homeworkSavedCount === 0){
+                    if(execASyncPostLessonSave){
                         $scope.postLessonSave(goToCalendarView);
                     }
                 } else {
