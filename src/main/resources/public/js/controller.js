@@ -376,6 +376,11 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.loadHomeworksForCurrentLesson = function () {
 
+        // lesson not yet created do not retrieve homeworks
+        if(!$scope.lesson.id){
+            return;
+        }
+
         var needSqlSync = false;
 
         // if homeworks ever retrieved from db don't do it again!

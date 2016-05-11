@@ -434,6 +434,9 @@ model.getLessonIds = function(lessons){
  */
 model.loadHomeworksForLesson = function (lesson, cb, cbe) {
 
+    if (!lesson.id) {
+        return;
+    }
 
     http().get('/diary/homework/list/' + lesson.id).done(function (sqlHomeworks) {
 
