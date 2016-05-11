@@ -41,7 +41,7 @@
                         scope.ngModel.forEach(function(item){
                             var refDay = moment(model.calendar.dayForWeek).day(1);
                             model.calendar.days.forEach(function(day){
-                                if(item.date.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')){
+                                if(item.dueDate && item.dueDate.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')){
                                     day.dailyEvents.push(item);
                                 }
                                 

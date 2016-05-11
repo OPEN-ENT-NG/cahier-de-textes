@@ -123,6 +123,12 @@ Lesson.prototype.api = {
 };
 //TODO
 Lesson.prototype.save = function(cb, cbe) {
+
+    // startTime used for db save but startMoment in calendar view
+    // startMoment day is given by lesson.date
+    this.startMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.startTime));
+    this.endMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.endTime));
+
     if(this.id) {
         this.update(cb, cbe);
     }
@@ -152,11 +158,6 @@ Lesson.prototype.update = function(cb, cbe) {
     var url = '/diary/lesson/' + this.id;
 
     var lesson = this;
-
-    // startTime used for db save but startMoment in calendar view
-    // startMoment day is given by lesson.date
-    lesson.startMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, moment(lesson.startTime));
-    lesson.endMoment = getMomentDateTimeFromDateAndMomentTime(lesson.date, moment(lesson.endTime));
 
     http().putJson(url, this)
         .done(function(){
@@ -636,7 +637,8 @@ model.build = function () {
             structureId: sqlHomework.structureId,
             audienceId: sqlHomework.audience_id,
             audienceLabel: sqlHomework.audience_label,
-            dueDate: sqlHomework.homework_due_date,
+            // TODO delete dueDate? (seems redondant info vs date field)
+            dueDate: moment(sqlHomework.homework_due_date),
             date: moment(sqlHomework.homework_due_date),
             title: sqlHomework.homework_title,
             color: sqlHomework.homework_color,

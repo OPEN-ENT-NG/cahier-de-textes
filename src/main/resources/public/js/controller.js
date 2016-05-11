@@ -644,6 +644,8 @@ function DiaryController($scope, template, model, route, date, $location) {
                 end: moment().minute(0).second(0).add(1, 'hours')
             }
         }
+
+        $scope.lesson.date = $scope.newItem.date;
     }
 
     var initHomework = function() {
