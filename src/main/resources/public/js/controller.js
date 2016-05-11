@@ -59,7 +59,6 @@ function DiaryController($scope, template, model, route, date, $location) {
     route({
         createLessonView: function(params){
             $scope.lesson = null;
-            $scope.tabs.createLesson = 'lesson';
             var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
             $scope.openLessonView(null, params, lessonTimeFromCalendar);
             template.open('main', 'main');
@@ -72,7 +71,6 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('main-view', 'create-homework');
         },
         editLessonView: function(params) {
-            $scope.tabs.createLesson = 'lesson';
             loadLessonFromRoute(params.idLesson);
             template.open('main', 'main');
             template.open('main-view', 'create-lesson');
@@ -115,6 +113,9 @@ function DiaryController($scope, template, model, route, date, $location) {
      * else will be initialized to today for start time and start time + 1 hour for end time
      */
     $scope.openLessonView = function(lesson, params, timeFromCalendar){
+
+        $scope.tabs.createLesson = 'lesson';
+        $scope.tabs.showAnnotations = false;
 
         // open existing lesson for edit
         if (lesson) {
