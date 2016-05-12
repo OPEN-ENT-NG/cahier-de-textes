@@ -83,6 +83,9 @@
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
                 <div class="row">
                     <input type="text" ng-model="homework.title" i18n-placeholder="title" class="six cell" required />
+
+                    <!-- deletes homework -->
+                    <a ng-click="deleteHomework(homework, lesson)" style="float: right;">X</a>
                 </div>
                 <div class="row">
                     <div class="four cell">

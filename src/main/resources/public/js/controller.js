@@ -511,6 +511,22 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
     };
 
+    /**
+     * Deletes an homework
+     * @param homework Homework to be deleted
+     * @param lesson Lesson attached to homework (optional)
+     */
+    $scope.deleteHomework = function (homework, lesson) {
+
+        // TODO user confirm panel?
+        homework.delete(lesson, function () {
+            notify.info('homework.deleted');
+            $scope.$apply();
+        }, function (e) {
+            validationError(e);
+        });
+    };
+
 
     $scope.createOrUpdateHomework = function (goToCalendarView) {
         $scope.currentErrors = [];

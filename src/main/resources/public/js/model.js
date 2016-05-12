@@ -63,6 +63,50 @@ Homework.prototype.create = function(cb, cbe) {
                 cbe(model.parseError(e));
             }
         });
+}
+
+
+/**
+ * Deletes the homework
+ * @param cb Callback after delete
+ * @param cbe Callback on error
+ */
+Homework.prototype.delete = function (lesson, cb, cbe) {
+
+    var homework = this;
+
+    var deleteHomeworkReferences = function () {
+
+        // delete homework from calendar cache
+        model.homeworks.forEach(function (modelHomework) {
+            if (modelHomework.id === homework.id) {
+                model.homeworks.remove(modelHomework);
+            }
+        });
+
+        if (lesson && lesson.homeworks) {
+            lesson.homeworks.remove(homework);
+        }
+    };
+
+    if (this.id) {
+        http().delete('/diary/homework/' + this.id, this)
+            .done(function (b) {
+
+                deleteHomeworkReferences();
+
+                if (typeof cb === 'function') {
+                    cb();
+                }
+            })
+            .error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+            });
+    } else {
+        deleteHomeworkReferences();
+    }
 };
 
 /**
@@ -350,6 +394,20 @@ Lesson.prototype.toJSON = function () {
 };
 
 Lesson.prototype.addHomework = function () {
+    var homework = new Homework();
+    homework.dueDate = this.date;
+    homework.type = model.homeworkTypes.first();
+    this.homeworks.push(homework);
+};
+
+Lesson.prototype.deleteHomework = function (homework) {
+
+    homework.delete(function(cb){
+
+    }, function(cbe){
+
+    });
+
     var homework = new Homework();
     homework.dueDate = this.date;
     homework.type = model.homeworkTypes.first();
