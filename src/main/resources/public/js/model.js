@@ -397,6 +397,7 @@ Lesson.prototype.addHomework = function () {
     var homework = new Homework();
     homework.dueDate = this.date;
     homework.type = model.homeworkTypes.first();
+    homework.state = this.state;
     this.homeworks.push(homework);
 };
 
