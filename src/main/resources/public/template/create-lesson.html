@@ -85,7 +85,9 @@
                     <input type="text" ng-model="homework.title" i18n-placeholder="title" class="six cell" required />
 
                     <!-- deletes homework -->
-                    <a ng-click="deleteHomework(homework, lesson)" style="float: right;">X</a>
+                    <div class="controls">
+                        <i ng-click="deleteHomework(homework, lesson)" style="float: right;" class="remove">X</i>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="four cell">
