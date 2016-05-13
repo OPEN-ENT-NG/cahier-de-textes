@@ -6,12 +6,22 @@
                     ngModel: '='
                 },
                 restrict: 'E',
-                template: '<div class="days">' +
-                    '<div class="day" ng-repeat="day in calendar.days.all">' +
-                        '<div class="opener" ng-if="day.dailyEvents.length" ng-click="day.openDailyEvents = !day.openDailyEvents"><i18n>daily.event</i18n></div>' +
+                // ng-controller="DiaryController"
+                template: '<div class="days" >' +
+                    '<div class="day" ng-repeat="day in calendar.days.all" style="height: 120px;">' +
+                        // <= 3 homeworks for current day
+                        '<div ng-if="day.dailyEvents.length && day.dailyEvents.length <= 3">' +
+                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                            '<container template="daily-event-item"></container>' +
+                            '</div>' +
+                        '</div>' +
+                        // > 3 homeworks for current day
+                        '<div class="opener" ng-if="day.dailyEvents.length && day.dailyEvents.length > 3" ' +
+                        'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
+                        '<i18n>daily.event</i18n>' +
                         '<div class="daily-events" ng-class="{ show: day.openDailyEvents }">' +
-                            '<div class="item [[dailyEvent.color]]" ng-repeat="dailyEvent in day.dailyEvents">' + 
-                                '<container template="daily-event-details"></container>' +
+                            '<div class="item [[dailyEvent.color]]" ng-repeat="dailyEvent in day.dailyEvents">' +
+                            '<container template="daily-event-details"></container>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
@@ -20,19 +30,29 @@
                     scope.calendar = model.calendar;
                     
                     function placeTimeslots(){
-                        setTimeout(function(){
-                            var timeslots = $('.timeslots');
-                            if(timeslots.length === 8 && timeslots.offset().top > 0){
-                                timeslots.offset({ top: timeslots.offset().top + 40 });
-                                $('.schedule .days').height(587);
-                            }
-                            else{
-                                placeTimeslots();
-                            }
-                        }, 10);
+
+
+                        if(typeof scope.processingPlaceTimeslots !== 'undefined' && scope.processingPlaceTimeslots === true){
+                            return;
+                        }
+
+                        var timeslots = $('.timeslots');
+
+                        if(timeslots.length === 8 && typeof scope.initialTimeSlotsOffset === 'undefined'){
+                            scope.initialTimeSlotsOffset = timeslots.offset().top;
+                        }
+
+                        // used to display homeworks in calendar view
+                        var extraTimeSlotsOffset = 120;
+                        var currentTimeSlotsOffset = (typeof timeslots.offset() === 'undefined') ? 0 : timeslots.offset().top;
+
+                        // tricky way to not apply extra offset twice
+                        if((currentTimeSlotsOffset < scope.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.length === 8 && timeslots.offset().top > 0){
+                            timeslots.offset({ top: timeslots.offset().top + extraTimeSlotsOffset });
+                            $('.schedule .days').height(587);
+                        }
                     }
-                    
-                    placeTimeslots();
+
                     
                     function setDaysContent() {
                         model.calendar.days.forEach(function (day) {
@@ -50,6 +70,7 @@
                         });
                         
                         scope.calendar = model.calendar;
+                        placeTimeslots();
                     }
                     
                     model.on('calendar.date-change', function(){
@@ -72,7 +93,7 @@
                 }
             }    
         });
-        
+
         module.directive('timePicker', function () {
             return {
                 scope: {
@@ -102,7 +123,7 @@
                             });
                         });
                     }
-                    
+
                     scope.$watch('ngModel', function (newVal) {
                         if (!newVal) {
                             return;

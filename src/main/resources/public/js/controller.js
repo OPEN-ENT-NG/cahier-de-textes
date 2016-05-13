@@ -563,7 +563,14 @@ function DiaryController($scope, template, model, route, date, $location) {
             // call lessons/homework sync after audiences sync since
             // lesson and homework objects needs audience data to be built
             model.lessons.syncLessons($scope.decrementCountdown);
-            model.homeworks.syncHomeworks($scope.decrementCountdown);
+            model.homeworks.syncHomeworks(
+                function(){
+                    $scope.decrementCountdown();
+
+                    // tricky way to trigger displaying the homework panel in calendar
+                    model.calendar.setDate(moment(model.calendar.firstDay));
+                }
+            );
         });
 
     };
@@ -599,6 +606,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         template.open('create-lesson', 'create-lesson');
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
+        template.open('daily-event-item', 'daily-event-item');
         $scope.showCal = !$scope.showCal;
         $scope.$apply();
     };
@@ -608,7 +616,11 @@ function DiaryController($scope, template, model, route, date, $location) {
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
         model.lessons.syncLessons();
-        model.homeworks.syncHomeworks();
+        model.homeworks.syncHomeworks(function(){
+            // tricky way to trigger displaying the homework panel in calendar
+            // once data loaded
+            model.calendar.setDate(moment(model.calendar.firstDay));
+        });
     };
 
     $scope.previousWeek = function () {
@@ -616,10 +628,14 @@ function DiaryController($scope, template, model, route, date, $location) {
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
         model.lessons.syncLessons();
-        model.homeworks.syncHomeworks();
+        model.homeworks.syncHomeworks(function(){
+            // tricky way to trigger displaying the homework panel in calendar
+            // once data loaded
+            model.calendar.setDate(moment(model.calendar.firstDay));
+        });
     };
 
-	$scope.redirect = function(path){
+    $scope.redirect = function(path){
         $location.path(path);
     };
 

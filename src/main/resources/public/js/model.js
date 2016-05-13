@@ -15,6 +15,14 @@ Homework.prototype.save = function(cb, cbe) {
     }
 };
 
+/**
+ * Returns true if current homework is attached to a lesson
+ * @returns {boolean}
+ */
+Homework.prototype.isAttachedToLesson = function() {
+    return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
+}
+
 Homework.prototype.update = function(cb, cbe) {
     var url = '/diary/homework/' + this.id;
 
