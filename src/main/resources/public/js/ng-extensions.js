@@ -28,14 +28,9 @@
                 '</div>',
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
-                    
+
                     function placeTimeslots(){
-
-
-                        if(typeof scope.processingPlaceTimeslots !== 'undefined' && scope.processingPlaceTimeslots === true){
-                            return;
-                        }
-
+                        
                         var timeslots = $('.timeslots');
 
                         if(timeslots.length === 8 && typeof scope.initialTimeSlotsOffset === 'undefined'){
