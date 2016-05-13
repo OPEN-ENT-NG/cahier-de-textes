@@ -201,6 +201,21 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
+    public void deleteHomeworks(final List<String> homeworkIds, final Handler<Either<String, JsonObject>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE FROM diary.homework as h where h.id in ");
+        query.append(sql.listPrepared(homeworkIds.toArray()));
+
+        JsonArray parameters = new JsonArray();
+        for (Object id : homeworkIds) {
+            parameters.add(id);
+        }
+
+        sql.prepared(query.toString(), parameters, validRowsResultHandler(handler));
+    }
+
+    @Override
     public void publishHomework(Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(homeworkId);

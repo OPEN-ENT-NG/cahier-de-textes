@@ -46,19 +46,21 @@
     </div>
 </div>
 
-<section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0  }">
+<!-- action panel displayed if at least one or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0 && homeworks.selection().length === 0  }">
     <div class="toggle">
         <div class="row">
-            <button ng-click="showConfirmPanel('confirm-delete-lesson')">
+            <button ng-click="showConfirmPanel('confirm-delete')">
                 <i18n>remove</i18n>
             </button>
-            <button ng-click="editSelectedLesson()" ng-class="{ disabled: lessons.selection().length != 1}"  >
+            <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
                 <i18n>edit</i18n>
             </button>
             <!-- not implemented yet so always disabled -->
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
             </button>
+            <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
             <button ng-click="showConfirmPanel('confirm-publish-lesson')" ng-if="isOneDraftOnlyInSelected()">
                 <i18n>publish</i18n>
             </button>

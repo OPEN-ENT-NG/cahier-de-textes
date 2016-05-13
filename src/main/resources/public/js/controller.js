@@ -11,6 +11,10 @@ routes.define(function ($routeProvider) {
         .when('/editLessonView/:idLesson', {
             action: 'editLessonView'
         })
+        // opens lesson and set default tab view to homeworks one
+        .when('/editLessonView/:idLesson/:idHomework', {
+            action: 'editLessonView'
+        })
         .when('/editHomeworkView/:idHomework', {
             action: 'editHomeworkView'
         })
@@ -45,6 +49,8 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.showCal = false;
     $scope.newLesson = new Lesson();
+    // for static access to some global function
+    $scope.newHomework = new Homework();
 
     $scope.display = {
         showPanel: false
@@ -59,10 +65,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     route({
         createLessonView: function(params){
             $scope.lesson = null;
-            var lessonTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
-            $scope.openLessonView(null, params, lessonTimeFromCalendar);
-            template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
+            $scope.openLessonView(null, params);
         },
         createHomeworkView: function(params){
             $scope.homework = null;
@@ -71,9 +74,19 @@ function DiaryController($scope, template, model, route, date, $location) {
             template.open('main-view', 'create-homework');
         },
         editLessonView: function(params) {
-            loadLessonFromRoute(params.idLesson);
-            template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
+
+            if(!params.idLesson){
+                $scope.goToCalendarView(notify.error('daily.lesson.id.notspecified'));
+                return;
+            }
+
+            var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
+
+            if (lesson != null) {
+                $scope.openLessonView(lesson, params);
+            } else {
+                $scope.goToCalendarView(notify.error('daily.lesson.idnotfound'));
+            }
         },
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params.idHomework);
@@ -92,14 +105,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
     });
 
-    var loadLessonFromRoute = function (idLesson) {
-
-        var lesson = model.lessons.findWhere({id: parseInt(idLesson)});
-
-        if (lesson != null) {
-            $scope.openLessonView(lesson);
-        }
-    };
 
     var loadHomeworkFromRoute = function(idHomework) {
         var homework = model.homeworks.findWhere({ id: parseInt(idHomework)});
@@ -109,12 +114,13 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     /**
-     * @param initFromCalendar If true start and end time will be initialized to user choice in calendar
-     * else will be initialized to today for start time and start time + 1 hour for end time
+     *
+     * @param lesson Lesson to view
+     * @param params Parameters from url
      */
-    $scope.openLessonView = function(lesson, params, timeFromCalendar){
+    $scope.openLessonView = function(lesson, params){
 
-        $scope.tabs.createLesson = 'lesson';
+        $scope.tabs.createLesson = params.idHomework ? 'homeworks' : 'lesson';
         $scope.tabs.showAnnotations = false;
 
         // open existing lesson for edit
@@ -131,9 +137,24 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
         // create new lesson
         else {
-            initLesson(timeFromCalendar);
+            var isTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
+            initLesson(isTimeFromCalendar);
         }
 
+        var openLessonTemplates = function(){
+            template.open('main', 'main');
+            template.open('main-view', 'create-lesson');
+        }
+
+        // open homeworks tab view so we need load homework data
+        // first (which is not loaded by default on lesson tab view)
+        if (params.idHomework) {
+            $scope.loadHomeworksForCurrentLesson(function () {
+                openLessonTemplates();
+            });
+        } else {
+            openLessonTemplates();
+        }
     };
 
     $scope.openHomeworkView = function(homework, params){
@@ -174,17 +195,89 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
     /**
-     *
+     * Deletes selected items (lessons or homeworks)
+     * in calendar view from database
      */
-    $scope.editSelectedLesson = function(){
-        var selectedLessons = model.lessons.filter(function (someLesson) {
-            return someLesson && someLesson.selected;
+    $scope.deleteSelectedItems = function () {
+        var selectedLessons = getSelectedLessons();
+        var selectedHomeworks = getSelectedHomeworks();
+
+        if ((selectedLessons.length + selectedHomeworks.length) === 0) {
+            notify.error('daily.nohomeworkorlesson.selected');
+            return;
+        }
+
+        // remove pending delete homeworks
+        // ever embedded in selected pending delete lessons
+        var homeworksToDelete = selectedHomeworks.filter(function (homework) {
+
+            var homeworkInSelectedLesson = false;
+
+            selectedLessons.forEach(function(lesson){
+                if(!homeworkInSelectedLesson && lesson.hasHomeworkWithId(homework.id)){
+                    homeworkInSelectedLesson = true;
+                }
+            });
+
+            return !homeworkInSelectedLesson;
         });
 
+        var postDeleteNotify = function(){
+            notify.info('deleted');
+        }
+
+        var deleteHomeworks = function(){
+            $scope.newHomework.deleteHomeworks(homeworksToDelete,
+                function (cb) {
+                    postDeleteNotify();
+                },
+                // calback error function
+                function (cbe) {notify.error(cbe.message)}
+            );
+        }
+
+        // note: associated homeworks are automatically deleted
+        // sql delete cascade
+        if (selectedLessons.length() > 0) {
+            $scope.newLesson.deleteLessons(selectedLessons,
+                function (cb) {
+                    postDeleteNotify();
+                },
+                // calback error function
+                function (cbe) {notify.error(cbe.message)}
+            );
+        } else {
+            deleteHomeworks();
+        }
+    }
+
+    /**
+     * Open selected lesson or homework
+     */
+    $scope.editSelectedItem = function () {
+
+        var selectedLessons = getSelectedLessons();
         var selectedLesson = selectedLessons.length > 0 ? selectedLessons[0] : null;
 
-        if(selectedLesson){
-            $scope.redirect('/editLessonView/' + selectedLesson.id);
+        var selectedHomeworks = getSelectedHomeworks();
+        var selectedHomework = selectedHomeworks.length > 0 ? selectedHomeworks[0] : null;
+
+        if (selectedHomework && selectedLesson) {
+            notify.error('Only one homework or lesson must be selected');
+            return;
+        }
+
+        if (selectedLesson) {
+            $scope.redirect('/editLessonView/' + selectedLesson.id + '/');
+        } else if (selectedHomework) {
+            // open lesson view if homework is attached to a lesson
+            if (selectedHomework.lesson_id) {
+                // set default tab to homework tab
+                $scope.tabs.createLesson = 'homeworks';
+                $scope.redirect('/editLessonView/' + selectedHomework.lesson_id + '/' + selectedHomework.id);
+            } else {
+                $scope.redirect('/editHomeworkView/' + selectedHomework.id);
+            }
         }
     }
 
@@ -361,7 +454,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.closeConfirmPanel();
 
             notify.info(isUnpublish ? 'homework.unpublished' : 'homework.published');
-            
+
             if (typeof cb === 'function') {
                 cb();
             }
@@ -373,8 +466,9 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Load homeworks for current lesson being edited
+     * @param cb Callback function
      */
-    $scope.loadHomeworksForCurrentLesson = function () {
+    $scope.loadHomeworksForCurrentLesson = function (cb) {
 
         // lesson not yet created do not retrieve homeworks
         if(!$scope.lesson.id){
@@ -395,10 +489,17 @@ function DiaryController($scope, template, model, route, date, $location) {
             model.loadHomeworksForLesson($scope.lesson,
 
             function () {
+                if (typeof cb !== 'undefined') {
+                    cb();
+                }
                 $scope.$apply();
             }, function (e) {
                 validationError(e);
             });
+        } else {
+            if (typeof cb !== 'undefined') {
+                cb();
+            }
         }
     };
 
@@ -421,6 +522,19 @@ function DiaryController($scope, template, model, route, date, $location) {
         template.open('lightbox', panelContent);
         $scope.display.showPanel = true;
     };
+
+
+    /**
+     * Test in calendar view if there are one lesson
+     * or one homework only selected (not both lessons and homeworks)
+     * @returns {boolean}
+     */
+    $scope.isOneHomeworkOrLessonStriclySelected = function () {
+        var hasLessonOnlySelected = $scope.lessons.selection().length == 1 && $scope.homeworks.selection().length == 0;
+        var hasHomeworkOnlySelected = $scope.homeworks.selection().length == 1 && $scope.lessons.selection().length == 0;
+
+        return hasLessonOnlySelected || hasHomeworkOnlySelected;
+    }
 
     /**
      * Tells if at least one draft is selected and only drafts
@@ -470,7 +584,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         return itemArray;
     }
 
-    
+
 
     /**
      * Delete selected lessons
@@ -489,23 +603,15 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.deleteLessons = function (lessons) {
         $scope.currentErrors = [];
 
-        $scope.newLesson.deleteLessons({ids:model.getLessonIds(lessons)}, function () {
+        $scope.newLesson.deleteLessons(lessons, function () {
 
             // refresh current lessons cache to sync with lessons deleted
-            lessons.forEach(function(deletedLesson){
-                model.lessons.remove(deletedLesson);
-
-                var lessonHomeworks = model.homeworks.filter(function (homework) {
-                    return homework && homework.lesson_id == deletedLesson.id;
-                });
-
-                lessonHomeworks.forEach(function (homework) {
-                    model.homeworks.remove(homework);
-                });
+            lessons.forEach(function (deletedLesson) {
+                deletedLesson.deleteModelReferences();
             });
 
             $scope.closeConfirmPanel();
-            notify.info('lesson.deleted');
+            notify.info('item.deleted');
         },function (e) {
             validationError(e);
         });
@@ -639,6 +745,36 @@ function DiaryController($scope, template, model, route, date, $location) {
         $location.path(path);
     };
 
+
+
+    /**
+     *
+     * @returns {*}
+     */
+    var getSelectedHomeworks = function(){
+        var selectedHomeworks = model.homeworks.filter(function (homework) {
+            return homework && homework.selected;
+        });
+
+        return selectedHomeworks;
+    }
+
+
+    $scope.getLessonsOrHomeworksSelectedCount = function () {
+        return getSelectedLessons().length + getSelectedHomeworks().length;
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    var getSelectedLessons = function(){
+        var selectedLessons = model.lessons.filter(function (lesson) {
+            return lesson && lesson.selected;
+        });
+
+        return selectedLessons;
+    }
 
     /**
      * Init lesson object

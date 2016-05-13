@@ -8,7 +8,7 @@
 
     <div class="cell twelve">
         <span ng-click="redirect('/editHomeworkView/'+ dailyEvent.id)">[[dailyEvent.audienceLabel]]</span>
-        <input type="checkbox" ng-model="item.selected"  style="float: right; margin-right: 5%;"/>
+        <input type="checkbox" ng-model="dailyEvent.selected"  style="float: right; margin-right: 5%;"/>
 
         <!-- DRAFT STATE ICON -->
         <span ng-if="[[dailyEvent.state]]=='draft'" ng-click="redirect('/editLessonView/'+ item.id)">

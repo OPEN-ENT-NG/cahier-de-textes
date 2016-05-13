@@ -304,4 +304,27 @@ public class HomeworkController extends SharedResourceController {
     private boolean isValidHomeworkId(String homeworkId) {
         return homeworkId != null && homeworkId.matches("\\d+");
     }
+
+    @Delete("/deleteHomeworks")
+    public void deletes(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "deleteHomeworks", new Handler<JsonObject>() {
+                        public void handle(JsonObject data) {
+                            final List<String> ids = data.getArray("ids").toList();
+
+                            homeworkService.deleteHomeworks(ids, notEmptyResponseHandler(request, 201));
+                        }
+                    });
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User not found in session.");
+                    }
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
 }

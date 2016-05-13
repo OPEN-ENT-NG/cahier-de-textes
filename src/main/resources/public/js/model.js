@@ -23,6 +23,14 @@ Homework.prototype.isAttachedToLesson = function() {
     return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
 }
 
+Homework.prototype.isDraft = function () {
+    return this.state === "draft";
+};
+
+Homework.prototype.isPublished = function () {
+    return !this.isDraft();
+};
+
 Homework.prototype.update = function(cb, cbe) {
     var url = '/diary/homework/' + this.id;
 
@@ -168,6 +176,27 @@ function Lesson(data) {
     }
     this.subject = (data) ? data.subject : new Subject();
     this.audience = (data) ? data.audience : new Audience();
+
+    /**
+     * Delete calendar references of current lesson
+     */
+    this.deleteModelReferences = function () {
+        var idxLessonToDelete = model.lessons.indexOf(lesson);
+
+        // delete lesson in calendar cache
+        if (idxLessonToDelete >= 0) {
+            model.lessons.splice(model.lessons.indexOf(lesson), 1);
+        }
+
+        // delete associated homeworks references
+        var lessonHomeworks = model.homeworks.filter(function (homework) {
+            return homework && homework.lesson_id === this.id;
+        });
+
+        lessonHomeworks.forEach(function (homework) {
+            model.homeworks.remove(homework);
+        });
+    };
 }
 
 Lesson.prototype.api = {
@@ -187,6 +216,29 @@ Lesson.prototype.save = function(cb, cbe) {
     else {
         this.create(cb, cbe);
     }
+};
+
+/**
+ *
+ * @param idHomework
+ * @returns {boolean}
+ */
+Lesson.prototype.hasHomeworkWithId = function (idHomework) {
+
+    var found = false;
+
+    if (!idHomework || !this.homeworks) {
+        found = false;
+    }
+
+
+    this.homeworks.forEach(function (homework) {
+        if (homework.id === idHomework) {
+            found = true;
+        }
+    });
+
+    return found;
 };
 
 /**
@@ -271,12 +323,7 @@ Lesson.prototype.delete = function (cb, cbe) {
     http().delete('/diary/lesson/' + this.id, this)
         .done(function (b) {
 
-            var idxLessonToDelete = model.lessons.indexOf(lesson);
-
-            // update calendar lessons cache
-            if (idxLessonToDelete >= 0) {
-                model.lessons.splice(model.lessons.indexOf(lesson), 1);
-            }
+            lesson.deleteModelReferences();
 
             if (typeof cb === 'function') {
                 cb();
@@ -291,11 +338,21 @@ Lesson.prototype.delete = function (cb, cbe) {
 
 /**
  * Deletes a list of lessons
+ * @param lessons Lessons to be deleted
  * @param cb Callback
  * @param cbe Callback on error
  */
-Lesson.prototype.deleteLessons = function (itemArray, cb, cbe) {
+Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
+
+
+    var itemArray = {ids:model.getLessonIds(lessons)};
+
     return http().deleteJson("/diary/deleteLessons", itemArray).done(function(r){
+
+        lessons.forEach(function (lesson) {
+            lesson.deleteModelReferences();
+        });
+
         if(typeof cb === 'function'){
             cb();
         }

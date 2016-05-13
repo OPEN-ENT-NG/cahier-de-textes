@@ -28,6 +28,8 @@ public interface HomeworkService {
 
     void deleteHomework(final String  homeworkId, final Handler<Either<String, JsonObject>> handler);
 
+    void deleteHomeworks(final List<String> homeworkIds, final Handler<Either<String, JsonObject>> handler);
+
     /**
      * Publishes a Homework, by setting the lesson_state to 'published'
      * @param homeworkId
