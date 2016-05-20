@@ -537,6 +537,24 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
     /**
+     * Tells if there are selected items (lesson or homework)
+     * that can be published.
+     * @param isUnpublish if true test if can be unpublished else published
+     */
+    $scope.isItemsPublishableSelected = function (isUnpublish) {
+
+        var lessonsDraftsSelected = $scope.lessons.filter(function (lesson) {
+            return lesson.selected && lesson.state == (isUnpublish? 'published' : 'draft');
+        });
+
+        var freeHomeworksDraftsSelected = $scope.homeworks.filter(function (homework) {
+            return homework.selected && (homework.state == (isUnpublish ? 'published' : 'draft')) && (homework.lesson_id == null);
+        });
+
+        return (lessonsDraftsSelected.length + freeHomeworksDraftsSelected.length) > 0;
+    }
+
+    /**
      * Tells if at least one draft is selected and only drafts
      * @returns {boolean} true if one draft lesson selected else false
      */
