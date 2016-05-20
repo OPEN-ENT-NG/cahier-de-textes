@@ -170,6 +170,10 @@ function DiaryController($scope, template, model, route, date, $location) {
                 $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audienceId});
             }
 
+            if (!$scope.homework.subject) {
+                $scope.homework.subject = model.subjects.findWhere({id: $scope.homework.subjectId});
+            }
+
             if (!$scope.homework.type) {
                 $scope.homework.type = model.homeworkTypes.findWhere({ id: $scope.homework.typeId });
             }
