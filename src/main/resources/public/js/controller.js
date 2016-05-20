@@ -223,7 +223,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
 
         var postDeleteNotify = function(){
-            notify.info('deleted');
+            notify.info('item.deleted');
         }
 
         var deleteHomeworks = function(){
@@ -238,7 +238,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         // note: associated homeworks are automatically deleted
         // sql delete cascade
-        if (selectedLessons.length() > 0) {
+        if (selectedLessons.length > 0) {
             $scope.newLesson.deleteLessons(selectedLessons,
                 function (cb) {
                     postDeleteNotify();

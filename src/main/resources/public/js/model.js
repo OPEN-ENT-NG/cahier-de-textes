@@ -1,5 +1,16 @@
 function Homework() {
 
+    /**
+     * Delete calendar references of current homework
+     */
+    this.deleteModelReferences = function () {
+        var idxHomeworkToDelete = model.homeworks.indexOf(this);
+
+        // delete homework in calendar cache
+        if (idxHomeworkToDelete >= 0) {
+            model.homeworks.splice(idxHomeworkToDelete, 1);
+        }
+    };
 }
 
 Homework.prototype.api = {
@@ -81,9 +92,37 @@ Homework.prototype.create = function(cb, cbe) {
         });
 }
 
+/**
+ * Deletes a list of lessons
+ * @param lessons Lessons to be deleted
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Homework.prototype.deleteHomeworks = function (homeworks, cb, cbe) {
+
+
+    var itemArray = {ids:model.getLessonIds(homeworks)};
+
+    return http().deleteJson("/diary/deleteHomeworks", itemArray).done(function(r){
+
+        homeworks.forEach(function (homework) {
+            homework.deleteModelReferences();
+        });
+
+        if(typeof cb === 'function'){
+            cb();
+        }
+    }).error(function(e){
+        if(typeof cbe === 'function'){
+            cbe(model.parseError(e));
+        }
+    });
+};
+
 
 /**
  * Deletes the homework
+ * @param Optional lesson attached to homework
  * @param cb Callback after delete
  * @param cbe Callback on error
  */
@@ -181,11 +220,11 @@ function Lesson(data) {
      * Delete calendar references of current lesson
      */
     this.deleteModelReferences = function () {
-        var idxLessonToDelete = model.lessons.indexOf(lesson);
+        var idxLessonToDelete = model.lessons.indexOf(this);
 
         // delete lesson in calendar cache
         if (idxLessonToDelete >= 0) {
-            model.lessons.splice(model.lessons.indexOf(lesson), 1);
+            model.lessons.splice(idxLessonToDelete, 1);
         }
 
         // delete associated homeworks references
