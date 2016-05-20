@@ -658,7 +658,9 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.createOrUpdateHomework = function (goToCalendarView) {
         $scope.currentErrors = [];
-        $scope.homework.dueDate = $scope.newItem.date;
+        if ($scope.newItem) {
+            $scope.homework.dueDate = $scope.newItem.date;
+        }
 
         $scope.homework.save(function () {
             $scope.showCal = !$scope.showCal;
