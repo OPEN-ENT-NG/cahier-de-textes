@@ -1,13 +1,16 @@
 <div class="row">
     <article class="twelve cell">
         <h2 ng-if="getLessonsOrHomeworksSelectedCount() === 1"><i18n>daily.item.delete.confirm.one</i18n></h2>
-        <h2 ng-if="getLessonsOrHomeworksSelectedCount() > 1"><i18n>daily.item.delete.confirm.multi</i18n></h2>
+        <h2 ng-if="getLessonsOrHomeworksSelectedCount() > 1">
+            <i18n>daily.item.delete.confirm.multi</i18n>
+            &nbsp;([[getLessonsOrHomeworksSelectedCount()]]&nbsp;<i18n>daily.items</i18n>)
+        </h2>
 
         <div class="row">
             <button class="right-magnet" ng-click="deleteSelectedItems()" ng-if="true !== processingData && getLessonsOrHomeworksSelectedCount() > 0"><i18n>remove</i18n></button>
             <input type="button" class="cancel right-magnet" i18n-value="cancel" ng-click="closeConfirmPanel()" ng-if="processingData !== true" />
 
-            <button class="right-magnet cancel disabled" disabled ng-if="processingData === true"><i18n>daily.lesson.deleting</i18n></button>
+            <button class="right-magnet cancel disabled" disabled ng-if="processingData === true"><i18n>daily.item.deleting</i18n></button>
         </div>
     </article>
 </div>
