@@ -407,7 +407,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        $scope.newLesson.publishLessons({ids:model.getLessonIds(lessons)}, isUnpublish, function () {
+        $scope.newLesson.publishLessons({ids:model.getItemsIds(lessons)}, isUnpublish, function () {
 
             // refresh state of lessons un/published
             lessons.forEach(function (lesson) {
@@ -448,7 +448,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishHomeworks({ids:model.getHomeworkIds(homeworks)}, isUnpublish, function () {
+        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isUnpublish, function () {
 
             // refresh state of homeworks to published or unpublished
             homeworks.forEach(function (homework) {
@@ -457,7 +457,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
             $scope.closeConfirmPanel();
 
-            notify.info(isUnpublish ? 'homework.unpublished' : 'homework.published');
+            notify.info(isUnpublish ? 'item.unpublished' : 'item.published');
 
             if (typeof cb === 'function') {
                 cb();
@@ -540,22 +540,74 @@ function DiaryController($scope, template, model, route, date, $location) {
         return hasLessonOnlySelected || hasHomeworkOnlySelected;
     }
 
+
+    var getPublishableItemSelected = function (isUnpublish) {
+
+        var lessonsSelected = $scope.lessons.filter(function (lesson) {
+            return lesson.selected && lesson.id && lesson.state == (isUnpublish ? 'published' : 'draft');
+        });
+
+        // only free homeworks can be published/unpublished
+        var homeworksSelected = $scope.homeworks.filter(function (homework) {
+            return homework.selected && homework.id && (homework.state == (isUnpublish ? 'published' : 'draft')) && (homework.lesson_id == null);
+        });
+
+        return {
+            lessons: lessonsSelected,
+            homeworks: homeworksSelected
+        };
+    };
+
+    $scope.publishSelectedItems = function (isUnpublish) {
+
+        var itemsToBePublished = getPublishableItemSelected(isUnpublish);
+        var homeworks = itemsToBePublished.homeworks;
+        var lessons = itemsToBePublished.lessons;
+
+        var postPublishFunction = function () {
+            $scope.processingData = false;
+            notify.info('item.published');
+            $scope.closeConfirmPanel();
+            $scope.$apply();
+        }
+
+        if (lessons.length > 0) {
+
+            model.publishLessons({ids: model.getItemsIds(lessons)}, isUnpublish,
+                function (cb) {
+                    itemsToBePublished.lessons.forEach(function (lesson) {
+                        lesson.state = isUnpublish ? 'draft' : 'published';
+                    });
+                    postPublishFunction();
+                }, function (cbe) {
+                    notify.error(cbe.message);
+                })
+        }
+
+        if (homeworks.length > 0) {
+
+            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, isUnpublish,
+                function (cb) {
+                    itemsToBePublished.homeworks.forEach(function (homework) {
+                        homework.state = isUnpublish ? 'draft' : 'published';
+                    });
+                    postPublishFunction();
+                }, function (cbe) {
+                    notify.error(cbe.message);
+                })
+        }
+    }
+
     /**
      * Tells if there are selected items (lesson or homework)
      * that can be published.
      * @param isUnpublish if true test if can be unpublished else published
      */
-    $scope.isItemsPublishableSelected = function (isUnpublish) {
+    $scope.getItemsPublishableSelectedCount = function (isUnpublish) {
 
-        var lessonsDraftsSelected = $scope.lessons.filter(function (lesson) {
-            return lesson.selected && lesson.state == (isUnpublish? 'published' : 'draft');
-        });
+        var items = getPublishableItemSelected(isUnpublish);
 
-        var freeHomeworksDraftsSelected = $scope.homeworks.filter(function (homework) {
-            return homework.selected && (homework.state == (isUnpublish ? 'published' : 'draft')) && (homework.lesson_id == null);
-        });
-
-        return (lessonsDraftsSelected.length + freeHomeworksDraftsSelected.length) > 0;
+        return items.lessons.length + items.homeworks.length;
     }
 
     /**

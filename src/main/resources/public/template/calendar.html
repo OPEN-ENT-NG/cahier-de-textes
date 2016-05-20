@@ -61,11 +61,11 @@
                 <i18n>share</i18n>
             </button>
             <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
-            <button ng-click="showConfirmPanel('confirm-publish-lesson')" ng-if="isItemsPublishableSelected(false)">
+            <button ng-click="showConfirmPanel('confirm-publish')" ng-if="getItemsPublishableSelectedCount(false) > 0 ">
                 <i18n>publish</i18n>
             </button>
             <!-- unpublish - lessons in published state and homeworks in published state not attached to lesson -->
-            <button ng-click="showConfirmPanel('confirm-unpublish-lesson')" ng-if="isItemsPublishableSelected(true)">
+            <button ng-click="showConfirmPanel('confirm-unpublish')" ng-if="getItemsPublishableSelectedCount(true) > 0 ">
                 <i18n>lesson.unpublish</i18n>
             </button>
         </div>

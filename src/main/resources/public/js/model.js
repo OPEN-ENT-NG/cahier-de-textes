@@ -1,5 +1,7 @@
 function Homework() {
 
+    this.lesson_id = null;
+
     /**
      * Delete calendar references of current homework
      */
@@ -101,7 +103,7 @@ Homework.prototype.create = function(cb, cbe) {
 Homework.prototype.deleteHomeworks = function (homeworks, cb, cbe) {
 
 
-    var itemArray = {ids:model.getLessonIds(homeworks)};
+    var itemArray = {ids:model.getItemsIds(homeworks)};
 
     return http().deleteJson("/diary/deleteHomeworks", itemArray).done(function(r){
 
@@ -384,7 +386,7 @@ Lesson.prototype.delete = function (cb, cbe) {
 Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
 
 
-    var itemArray = {ids:model.getLessonIds(lessons)};
+    var itemArray = {ids:model.getItemsIds(lessons)};
 
     return http().deleteJson("/diary/deleteLessons", itemArray).done(function(r){
 
@@ -561,29 +563,14 @@ model.parseError = function(e) {
 
 /**
  *
- * @param lessons Collection of homeworks
- * @returns {Array} Array of id of the homeworks
+ * @param items Collection of items (lessons or homeworks)
+ * @returns {Array} Array of id of the items
  */
-model.getHomeworkIds = function(homeworks){
+model.getItemsIds = function (items) {
 
     var itemArray = [];
-    homeworks.forEach(function (homework) {
-        itemArray.push(homework.id);
-    });
-
-    return itemArray;
-}
-
-/**
- *
- * @param lessons Collection of lessons
- * @returns {Array} Array of id of the lessons
- */
-model.getLessonIds = function(lessons){
-
-    var itemArray = [];
-    lessons.forEach(function (lesson) {
-        itemArray.push(lesson.id);
+    items.forEach(function (item) {
+        itemArray.push(item.id);
     });
 
     return itemArray;
