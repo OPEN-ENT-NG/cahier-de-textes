@@ -433,7 +433,7 @@ Lesson.prototype.publish = function (cb, cbe) {
  * @param cb Callback
  * @param cbe Callback on error
  */
-Lesson.prototype.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
+model.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
 
     var url = isUnpublish ? "/diary/unPublishLessons" : "/diary/publishLessons";
 

@@ -407,7 +407,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        $scope.newLesson.publishLessons({ids:model.getItemsIds(lessons)}, isUnpublish, function () {
+        model.publishLessons({ids:model.getItemsIds(lessons)}, isUnpublish, function () {
 
             // refresh state of lessons un/published
             lessons.forEach(function (lesson) {
