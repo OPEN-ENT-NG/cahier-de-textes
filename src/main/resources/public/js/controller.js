@@ -411,7 +411,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
             // refresh state of lessons un/published
             lessons.forEach(function (lesson) {
-                lesson.state = isUnpublish ? 'draft' : 'published';
+                lesson.changeState(!isUnpublish);
             });
 
             $scope.closeConfirmPanel();
@@ -576,7 +576,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             model.publishLessons({ids: model.getItemsIds(lessons)}, isUnpublish,
                 function (cb) {
                     itemsToBePublished.lessons.forEach(function (lesson) {
-                        lesson.state = isUnpublish ? 'draft' : 'published';
+                        lesson.changeState(!isUnpublish);
                     });
                     postPublishFunction();
                 }, function (cbe) {

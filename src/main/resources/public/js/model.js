@@ -447,14 +447,8 @@ model.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
         model.lessons.forEach(function(lessonModel){
             if(itemArray.ids.indexOf(lessonModel.id) != -1){
                 model.lessons.remove(lessonModel);
-                lessonModel.state = isUnpublish ? 'draft' : 'published';
 
-                model.homeworks.forEach(function(homework){
-                    if(homework.lesson_id === lessonModel.id) {
-                        homework.state = isUnpublish ? 'draft' : 'published';
-                    }
-                });
-
+                lessonModel.changeState(!isUnpublish);
                 updateLessons.push(lessonModel);
             }
         });
@@ -528,6 +522,30 @@ Lesson.prototype.isDraft = function () {
 Lesson.prototype.isPublished = function () {
     return !this.isDraft();
 };
+
+/**
+ * Change state of current and associated homeworks
+ * @param isPublished
+ */
+Lesson.prototype.changeState = function (isPublished) {
+    this.state = isPublished ? 'published' : 'draft';
+
+    // change state of associated homeworks
+    this.homeworks.forEach(function (homework) {
+        var lessonHomework = homework;
+        homework.state = isPublished ? 'published' : 'draft';
+
+        var found = false;
+
+        // change state of homeworks cache in calendar for current week
+        model.homeworks.forEach(function (homeworkCache) {
+            if (!found && homeworkCache.id == lessonHomework.id) {
+                homeworkCache.state = isPublished ? 'published' : 'draft';
+                found = true;
+            }
+        });
+    });
+}
 
 function Teacher() {}
 
@@ -635,6 +653,7 @@ model.build = function () {
                             // with only id
                             for (var i = 0; i < lesson.homework_id.length; i++) {
                                 var homework = new Homework();
+                                homework.id = lesson.homework_id[i];
                                 homework.lesson_id = parseInt(lesson.lesson_id);
                                 homework.loaded = false; // means full data from sql not loaded
                                 lessonHomeworks.push(homework);
