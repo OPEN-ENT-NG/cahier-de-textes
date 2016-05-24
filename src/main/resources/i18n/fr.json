@@ -85,6 +85,7 @@
   "daily.lesson.unpublish.confirm.multi": "Êtes-vous sûr(e) de vouloir marquer ces séances en tant que brouillon ?",
   "daily.lesson.publish.confirm.one": "Êtes-vous sûr(e) de vouloir publier cette séance ?",
   "daily.lesson.publish.confirm.multi": "Êtes-vous sûr(e) de vouloir publier ces séances ?",
+  "daily.homework.delete": "Supprimer le travail à faire",
   "daily.homework.delete.confirm.one": "Êtes-vous sûr(e) de vouloir supprimer ce travail à faire ?",
   "daily.homework.publish.confirm.one": "Êtes-vous sûr(e) de vouloir publier ce travail à faire ?",
   "daily.homework.publish.confirm.multi": "Êtes-vous sûr(e) de vouloir publier ce travail à faire ?",

@@ -86,7 +86,7 @@
 
                     <!-- deletes homework -->
                     <div class="controls">
-                        <i ng-click="deleteHomework(homework, lesson)" style="float: right;" class="remove"></i>
+                        <i ng-click="deleteHomework(homework, lesson)" style="float: right;" class="remove" tooltip="daily.homework.delete"></i>
                     </div>
                 </div>
                 <div class="row">
@@ -113,12 +113,12 @@
             <nav>
                 <!-- publishes the current lesson ang go back to calendar view -->
                 <button class="right-magnet" type="submit" ng-if="lesson.id && lesson.state == 'draft'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
-                    <i18n>publish</i18n>
+                    <i18n>daily.item.publish</i18n>
                 </button>
 
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
                 <button class="right-magnet" type="submit" ng-if="lesson.id && lesson.state == 'published'" data-ng-click="lessonform.$valid && showConfirmPanel('confirm-unpublish-lesson')">
-                    <i18n>lesson.unpublish</i18n>
+                    <i18n>daily.item.unpublish</i18n>
                 </button>
 
                 <!-- save lesson in draft mode and go back to calendar view -->
