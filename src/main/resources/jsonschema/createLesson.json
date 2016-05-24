@@ -61,7 +61,6 @@
     "lesson_start_time",
     "lesson_end_time",
     "lesson_description",
-    "lesson_room",
     "lesson_color"
   ]
 }
