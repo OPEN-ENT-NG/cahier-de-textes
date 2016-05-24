@@ -195,19 +195,35 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
     });
 };
 
-Homework.prototype.toJSON = function(){
-    return {
-        homework_title: this.title,
-        subject_id: this.subject.id,
-        homework_type_id: this.type.id,
-        teacher_id: model.me.userId,
-        school_id: this.audience.structureId,
-        audience_id: this.audience.id,
-        homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
-        homework_description: this.description,
-        homework_color: this.color,
-        homework_state: this.state,
-        lesson_id: this.lesson_id
+Homework.prototype.toJSON = function () {
+
+    if (this.lesson_id) {
+        return {
+            homework_title: this.title,
+            subject_id: this.subject.id,
+            homework_type_id: this.type.id,
+            teacher_id: model.me.userId,
+            school_id: this.audience.structureId,
+            audience_id: this.audience.id,
+            homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
+            homework_description: this.description,
+            homework_color: this.color,
+            homework_state: this.state,
+            lesson_id: this.lesson_id
+        }
+    } else {
+        return {
+            homework_title: this.title,
+            subject_id: this.subject.id,
+            homework_type_id: this.type.id,
+            teacher_id: model.me.userId,
+            school_id: this.audience.structureId,
+            audience_id: this.audience.id,
+            homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
+            homework_description: this.description,
+            homework_color: this.color,
+            homework_state: this.state
+        }
     }
 };
 
