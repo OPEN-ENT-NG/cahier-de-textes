@@ -494,25 +494,46 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
  * JSON object corresponding to sql diary.lesson table columns
  */
 Lesson.prototype.toJSON = function () {
-    return {
-        lesson_id: this.id,
-        subject_id: this.subject.id,
-        school_id: this.audience.structureId,
-        // TODO missing teacher_id
-        audience_id: this.audience.id,
-        lesson_title: this.title,
-        lesson_room: this.room,
-        lesson_color: this.color,
-        lesson_date: moment(this.date).format('YYYY-MM-DD'),
-        lesson_start_time: moment(this.startTime).format('HH:mm'),
-        lesson_end_time: moment(this.endTime).format('HH:mm'),
-        lesson_description: this.description,
-        lesson_annotation: this.annotations,
-        lesson_state: this.state,
-        // start columns not in lesson table TODO move
-        audience_type: this.audienceType,
-        audience_name: this.audience.name
-        // end columns not in lesson table
+
+    if(this.lesson_room){
+        return {
+            lesson_id: this.id,
+            subject_id: this.subject.id,
+            school_id: this.audience.structureId,
+            // TODO missing teacher_id
+            audience_id: this.audience.id,
+            lesson_title: this.title,
+            lesson_room: this.room,
+            lesson_color: this.color,
+            lesson_date: moment(this.date).format('YYYY-MM-DD'),
+            lesson_start_time: moment(this.startTime).format('HH:mm'),
+            lesson_end_time: moment(this.endTime).format('HH:mm'),
+            lesson_description: this.description,
+            lesson_annotation: this.annotations,
+            lesson_state: this.state,
+            // start columns not in lesson table TODO move
+            audience_type: this.audienceType,
+            audience_name: this.audience.name
+        }
+    } else {
+        return {
+            lesson_id: this.id,
+            subject_id: this.subject.id,
+            school_id: this.audience.structureId,
+            // TODO missing teacher_id
+            audience_id: this.audience.id,
+            lesson_title: this.title,
+            lesson_color: this.color,
+            lesson_date: moment(this.date).format('YYYY-MM-DD'),
+            lesson_start_time: moment(this.startTime).format('HH:mm'),
+            lesson_end_time: moment(this.endTime).format('HH:mm'),
+            lesson_description: this.description,
+            lesson_annotation: this.annotations,
+            lesson_state: this.state,
+            // start columns not in lesson table TODO move
+            audience_type: this.audienceType,
+            audience_name: this.audience.name
+        }
     }
 };
 
