@@ -495,7 +495,7 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
  */
 Lesson.prototype.toJSON = function () {
 
-    if(this.lesson_room){
+    if(this.room){
         return {
             lesson_id: this.id,
             subject_id: this.subject.id,
