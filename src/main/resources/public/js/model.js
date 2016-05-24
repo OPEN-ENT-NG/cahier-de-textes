@@ -1,5 +1,5 @@
 function Homework() {
-    
+
 
     /**
      * Delete calendar references of current homework
@@ -225,21 +225,20 @@ function Lesson(data) {
     }
     this.subject = (data) ? data.subject : new Subject();
     this.audience = (data) ? data.audience : new Audience();
+    var that = this;
 
     /**
      * Delete calendar references of current lesson
      */
     this.deleteModelReferences = function () {
-        var idxLessonToDelete = model.lessons.indexOf(this);
-
-        // delete lesson in calendar cache
-        if (idxLessonToDelete >= 0) {
-            model.lessons.splice(idxLessonToDelete, 1);
-        }
-
+        model.lessons.forEach(function (lesson) {
+            if (lesson.id === that.id) {
+                model.lessons.remove(lesson);
+            }
+        });
         // delete associated homeworks references
         var lessonHomeworks = model.homeworks.filter(function (homework) {
-            return homework && homework.lesson_id === this.id;
+            return homework && homework.lesson_id === that.id;
         });
 
         lessonHomeworks.forEach(function (homework) {

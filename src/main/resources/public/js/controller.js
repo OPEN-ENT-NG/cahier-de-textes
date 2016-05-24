@@ -226,14 +226,15 @@ function DiaryController($scope, template, model, route, date, $location) {
             return !homeworkInSelectedLesson;
         });
 
-        var postDeleteNotify = function(){
+        var postDelete = function(){
             notify.info('item.deleted');
+            $scope.closeConfirmPanel();
         }
 
         var deleteHomeworks = function(){
             $scope.newHomework.deleteHomeworks(homeworksToDelete,
                 function (cb) {
-                    postDeleteNotify();
+                    postDelete();
                 },
                 // calback error function
                 function (cbe) {notify.error(cbe.message)}
@@ -245,7 +246,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         if (selectedLessons.length > 0) {
             $scope.newLesson.deleteLessons(selectedLessons,
                 function (cb) {
-                    postDeleteNotify();
+                    postDelete();
                 },
                 // calback error function
                 function (cbe) {notify.error(cbe.message)}
