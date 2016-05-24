@@ -1,6 +1,5 @@
 function Homework() {
-
-    this.lesson_id = null;
+    
 
     /**
      * Delete calendar references of current homework
@@ -42,6 +41,15 @@ Homework.prototype.isDraft = function () {
 
 Homework.prototype.isPublished = function () {
     return !this.isDraft();
+};
+
+/**
+ * A directly publishable homework must exist in database and not linked to a lesson
+ * @param toPublish
+ * @returns {*|boolean} true if homework can be published directly
+ */
+Homework.prototype.isPublishable = function (toPublish) {
+    return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
 };
 
 Homework.prototype.update = function(cb, cbe) {
@@ -172,9 +180,9 @@ Homework.prototype.delete = function (lesson, cb, cbe) {
  * @param cb Callback function
  * @param cbe Callback function on error
  */
-model.publishHomeworks = function (itemArray, isUnpublish, cb, cbe) {
+model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
 
-    var url = isUnpublish ? "/diary/unPublishHomeworks" : "/diary/publishHomeworks";
+    var url = isPublish ? "/diary/publishHomeworks" : "/diary/unPublishHomeworks";
 
     return http().postJson(url, itemArray).done(function (r) {
         if (typeof cb === 'function') {
@@ -433,9 +441,9 @@ Lesson.prototype.publish = function (cb, cbe) {
  * @param cb Callback
  * @param cbe Callback on error
  */
-model.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
+model.publishLessons = function (itemArray, isPublish, cb, cbe) {
 
-    var url = isUnpublish ? "/diary/unPublishLessons" : "/diary/publishLessons";
+    var url = isPublish ? "/diary/publishLessons" : "/diary/unPublishLessons";
 
     return http().postJson(url, itemArray).done(function (r) {
 
@@ -448,7 +456,7 @@ model.publishLessons = function (itemArray, isUnpublish, cb, cbe) {
             if(itemArray.ids.indexOf(lessonModel.id) != -1){
                 model.lessons.remove(lessonModel);
 
-                lessonModel.changeState(!isUnpublish);
+                lessonModel.changeState(isPublish);
                 updateLessons.push(lessonModel);
             }
         });
@@ -523,6 +531,10 @@ Lesson.prototype.isPublished = function () {
     return !this.isDraft();
 };
 
+Lesson.prototype.isPublishable = function(toPublish){
+    return this.id && this.state == (toPublish ? 'draft' : 'published')
+};
+
 /**
  * Change state of current and associated homeworks
  * @param isPublished
@@ -545,7 +557,7 @@ Lesson.prototype.changeState = function (isPublished) {
             }
         });
     });
-}
+};
 
 function Teacher() {}
 

@@ -541,42 +541,79 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
 
-    var getPublishableItemSelected = function (isUnpublish) {
+    /**
+     * Get selected items from calendar (lessons and homeworks)
+     * and tidy them within un/publishable state
+     */
+    var getPublishableItemsSelected = function () {
 
-        var lessonsSelected = $scope.lessons.filter(function (lesson) {
-            return lesson.selected && lesson.id && lesson.state == (isUnpublish ? 'published' : 'draft');
+        var publishableSelectedLessons = [];
+        var unPublishableSelectedLessons = [];
+        var noStateChangeLessons = [];
+
+        var publishableSelectedHomeworks = [];
+        var unPublishableSelectedHomeworks = [];
+        var noStateChangeHomeworks = []; // eg.: homework attached to a lesson
+
+        $scope.lessons.forEach(function (lesson) {
+            if (lesson.selected) {
+                if (lesson.isPublishable(true)) {
+                    publishableSelectedLessons.push(lesson);
+                } else if (lesson.isPublishable(false)) {
+                    unPublishableSelectedLessons.push(lesson);
+                } else {
+                    noStateChangeLessons.push(lesson);
+                }
+            }
         });
 
         // only free homeworks can be published/unpublished
-        var homeworksSelected = $scope.homeworks.filter(function (homework) {
-            return homework.selected && homework.id && (homework.state == (isUnpublish ? 'published' : 'draft')) && (homework.lesson_id == null);
+        $scope.homeworks.forEach(function (homework) {
+            if (homework.selected) {
+                if (homework.isPublishable(true)) {
+                    publishableSelectedHomeworks.push(homework);
+                } else if (homework.isPublishable(false)) {
+                    unPublishableSelectedHomeworks.push(homework);
+                } else {
+                    noStateChangeHomeworks.push(homework);
+                }
+            }
         });
 
         return {
-            lessons: lessonsSelected,
-            homeworks: homeworksSelected
+            publishableSelectedLessons: publishableSelectedLessons,
+            unPublishableSelectedLessons: unPublishableSelectedLessons,
+            noStateChangeLessons: noStateChangeLessons,
+            publishableSelectedHomeworks: publishableSelectedHomeworks,
+            unPublishableSelectedHomeworks: unPublishableSelectedHomeworks,
+            noStateChangeHomeworks: noStateChangeHomeworks
         };
     };
 
-    $scope.publishSelectedItems = function (isUnpublish) {
+    $scope.publishSelectedItems = function (toPublish) {
 
-        var itemsToBePublished = getPublishableItemSelected(isUnpublish);
-        var homeworks = itemsToBePublished.homeworks;
-        var lessons = itemsToBePublished.lessons;
+        var itemsToBePublished = getPublishableItemsSelected();
+        var homeworks = toPublish ? itemsToBePublished.publishableSelectedHomeworks : itemsToBePublished.unPublishableSelectedHomeworks;
+        var lessons = toPublish ? itemsToBePublished.publishableSelectedLessons : itemsToBePublished.unPublishableSelectedLessons;
 
         var postPublishFunction = function () {
             $scope.processingData = false;
-            notify.info('item.published');
+
+            if(toPublish) {
+                notify.info('item.published');
+            } else {
+                notify.info('item.unpublished')
+            }
             $scope.closeConfirmPanel();
             $scope.$apply();
         }
 
         if (lessons.length > 0) {
 
-            model.publishLessons({ids: model.getItemsIds(lessons)}, isUnpublish,
+            model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish,
                 function (cb) {
-                    itemsToBePublished.lessons.forEach(function (lesson) {
-                        lesson.changeState(!isUnpublish);
+                    lessons.forEach(function (lesson) {
+                        lesson.changeState(toPublish);
                     });
                     postPublishFunction();
                 }, function (cbe) {
@@ -586,10 +623,10 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         if (homeworks.length > 0) {
 
-            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, isUnpublish,
+            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish,
                 function (cb) {
-                    itemsToBePublished.homeworks.forEach(function (homework) {
-                        homework.state = isUnpublish ? 'draft' : 'published';
+                    homeworks.forEach(function (homework) {
+                        homework.state = toPublish ? 'published' : 'draft';
                     });
                     postPublishFunction();
                 }, function (cbe) {
@@ -598,16 +635,55 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
     }
 
+    $scope.getItemsPublishableSelectedCount = function (toPublish) {
+
+        var itemsSelected = getPublishableItemsSelected();
+
+        if (toPublish) {
+            return itemsSelected.publishableSelectedLessons.length + itemsSelected.publishableSelectedHomeworks.length;
+        } else {
+            return itemsSelected.unPublishableSelectedLessons.length + itemsSelected.unPublishableSelectedHomeworks.length;
+        }
+    }
+
     /**
-     * Tells if there are selected items (lesson or homework)
-     * that can be published.
-     * @param isUnpublish if true test if can be unpublished else published
+     * Telles whether it is possible to publish or not selected items.
+     * It depends of type of items selected and current state
+     * @param toPublish
+     * @returns {boolean} true if selected items can be published
+     * and are not ever in publish state otherwise false
      */
-    $scope.getItemsPublishableSelectedCount = function (isUnpublish) {
+    $scope.hasPublishableOnlyItemsSelected = function (toPublish) {
+        var itemsSelected = getPublishableItemsSelected();
 
-        var items = getPublishableItemSelected(isUnpublish);
+        var publishableLessons = itemsSelected.publishableSelectedLessons;
+        var unpublishableLessons = itemsSelected.unPublishableSelectedLessons;
+        var noStateChangeLessons = itemsSelected.noStateChangeLessons;
 
-        return items.lessons.length + items.homeworks.length;
+        var publishableHomeworks = itemsSelected.publishableSelectedHomeworks;
+        var unpublishableHomeworks = itemsSelected.unPublishableSelectedHomeworks;
+        var noStateChangeHomeworks = itemsSelected.noStateChangeHomeworks;
+
+
+        if (toPublish) {
+            // nothing selected
+            if (publishableLessons.length + publishableHomeworks.length == 0) {
+                return false;
+            } else {
+                var noUnpublishableItems = unpublishableHomeworks.length == 0 && unpublishableLessons.length == 0;
+                return (publishableLessons.length > 0 && noUnpublishableItems  && noStateChangeLessons.length == 0)
+                    || (publishableHomeworks.length > 0 && noUnpublishableItems && noStateChangeHomeworks.length == 0);
+            }
+        } else {
+            // nothing selected
+            if (unpublishableLessons.length + unpublishableHomeworks.length == 0) {
+                return false;
+            } else {
+                var noPublishableItems = publishableLessons.length == 0 && publishableHomeworks.length == 0;
+                return (unpublishableLessons.length > 0 && noPublishableItems && noStateChangeLessons.length == 0)
+                    || (unpublishableHomeworks.length > 0 && noPublishableItems && noStateChangeHomeworks.length == 0);
+            }
+        }
     }
 
     /**
