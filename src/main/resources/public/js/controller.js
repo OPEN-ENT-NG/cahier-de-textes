@@ -829,6 +829,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             model.lessons.syncLessons($scope.decrementCountdown);
             model.homeworks.syncHomeworks(
                 function(){
+                    model.homeworksLoaded = true;
                     $scope.decrementCountdown();
 
                     // tricky way to trigger displaying the homework panel in calendar
@@ -876,6 +877,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.nextWeek = function () {
+        model.homeworksLoaded = undefined;
         $scope.showCal = !$scope.showCal;
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
@@ -883,11 +885,13 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.homeworks.syncHomeworks(function(){
             // tricky way to trigger displaying the homework panel in calendar
             // once data loaded
+            model.homeworksLoaded = true;
             model.calendar.setDate(moment(model.calendar.firstDay));
         });
     };
 
     $scope.previousWeek = function () {
+        model.homeworksLoaded = undefined;
         $scope.showCal = !$scope.showCal;
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
@@ -895,6 +899,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.homeworks.syncHomeworks(function(){
             // tricky way to trigger displaying the homework panel in calendar
             // once data loaded
+            model.homeworksLoaded = true;
             model.calendar.setDate(moment(model.calendar.firstDay));
         });
     };

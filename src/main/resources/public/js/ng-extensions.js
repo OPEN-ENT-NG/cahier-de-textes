@@ -30,7 +30,6 @@
                     scope.calendar = model.calendar;
 
                     function placeTimeslots(){
-                        
                         var timeslots = $('.timeslots');
 
                         if(timeslots.length === 8 && typeof scope.initialTimeSlotsOffset === 'undefined'){
@@ -50,6 +49,11 @@
 
                     
                     function setDaysContent() {
+
+                        if(!model.homeworksLoaded){
+                            return;
+                        }
+
                         model.calendar.days.forEach(function (day) {
                             day.dailyEvents = [];
                         });
