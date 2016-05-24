@@ -4,7 +4,7 @@
 
         <div class="row">
             <button class="right-magnet"
-                    ng-click="publishHomework(homework, true)"
+                    ng-click="publishHomework(homework, false)"
                     ng-if="true !== processingData && homework && homework.id && homework.state === 'published'">
                 <i18n>daily.item.unpublish</i18n>
             </button>

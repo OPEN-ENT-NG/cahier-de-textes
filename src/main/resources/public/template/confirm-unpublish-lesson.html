@@ -5,12 +5,12 @@
 
         <div class="row">
             <button class="right-magnet"
-                    ng-click="publishSelectedLessons(true)"
+                    ng-click="publishSelectedLessons(false)"
                     ng-if="true !== processingData && lessons.selection().length > 0 && !lesson">
                 <i18n>daily.item.unpublish</i18n>
             </button>
             <button class="right-magnet"
-                    ng-click="publishLessonAndGoCalendarView(lesson, true)"
+                    ng-click="publishLessonAndGoCalendarView(lesson, false)"
                     ng-if="true !== processingData && lesson">
                 <i18n>daily.item.unpublish</i18n>
             </button>

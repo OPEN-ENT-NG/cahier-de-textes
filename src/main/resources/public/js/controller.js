@@ -363,61 +363,61 @@ function DiaryController($scope, template, model, route, date, $location) {
     /**
      * un/Publish selected lessons
      */
-    $scope.publishSelectedLessons = function (isUnpublish) {
+    $scope.publishSelectedLessons = function (isPublish) {
         $scope.currentErrors = [];
-        $scope.publishLessons($scope.getSelectedLessons(), isUnpublish);
+        $scope.publishLessons($scope.getSelectedLessons(), isPublish);
     };
 
 
     /**
      * Publishes or unpublishes homework and go back to calendar view
      * @param homework Homework
-     * @param isUnpublish if true publishes homework else un-publishes it
+     * @param isPublish if true publishes homework else un-publishes it
      */
-    $scope.publishHomeworkAndGoCalendarView = function (homework, isUnpublish) {
-        $scope.publishHomework(homework, isUnpublish, $scope.goToCalendarView());
+    $scope.publishHomeworkAndGoCalendarView = function (homework, isPublish) {
+        $scope.publishHomework(homework, isPublish, $scope.goToCalendarView());
     }
 
     /**
      * Publishes or unpublishes lesson and go back to calendar view
      * @param lesson Lesson
-     * @param isUnpublish if true publishes lesson else un-publishes it
+     * @param isPublish if true publishes lesson else un-publishes it
      */
-    $scope.publishLessonAndGoCalendarView = function (lesson, isUnpublish) {
-        $scope.publishLesson(lesson, isUnpublish, $scope.goToCalendarView());
+    $scope.publishLessonAndGoCalendarView = function (lesson, isPublish) {
+        $scope.publishLesson(lesson, isPublish, $scope.goToCalendarView());
     }
 
     /**
      * Publish lesson
-     * @param isUnpublish If true unpublishes the lesson (back to draft mode) else publishes it
+     * @param isPublish If true publishes the lesson (back to draft mode) else unpublishes it
      * @param cb Callback function
      */
-    $scope.publishLesson = function (lesson, isUnpublish, cb) {
+    $scope.publishLesson = function (lesson, isPublish, cb) {
         var lessons = new Array();
         lessons.push(lesson);
-        $scope.publishLessons(lessons, isUnpublish, cb);
+        $scope.publishLessons(lessons, isPublish, cb);
     }
 
      /**
      * Publish lessons
      * @param lessons Array of lessons to publish or unpublish
-      * @param isUnpublish if true unpublishes the lessons else publishes them
+     * @param isPublish if true publishes the lessons else unpublishes them
      * which is lesson id to delete
      */
-    $scope.publishLessons = function (lessons, isUnpublish, cb) {
+    $scope.publishLessons = function (lessons, isPublish, cb) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishLessons({ids:model.getItemsIds(lessons)}, isUnpublish, function () {
+        model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, function () {
 
             // refresh state of lessons un/published
             lessons.forEach(function (lesson) {
-                lesson.changeState(!isUnpublish);
+                lesson.changeState(isPublish);
             });
 
             $scope.closeConfirmPanel();
 
-            notify.info(isUnpublish ? 'lesson.unpublished' : 'lesson.published');
+            notify.info(isPublish ? 'lesson.published' : 'lesson.unpublished');
 
             if (typeof cb === 'function') {
                 cb();
@@ -430,35 +430,35 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Publish lesson
-     * @param isUnpublish If true unpublishes the lesson (back to draft mode) else publishes it
+     * @param isUPublish If true publishes the lesson (back to draft mode) else unpublishes it
      * @param cb Callback function
      */
-    $scope.publishHomework = function (homework, isUnpublish, cb) {
+    $scope.publishHomework = function (homework, isPublish, cb) {
         var homeworks = new Array();
         homeworks.push(homework);
-        $scope.publishHomeworks(homeworks, isUnpublish, cb);
+        $scope.publishHomeworks(homeworks, isPublish, cb);
     }
 
     /**
      * Publish or un-publishes lessons
      * @param lessons Array of lessons to publish or unpublish
-     * @param isUnpublish If true unpublishes lesson else publishes it
+     * @param isPublish If true publishes lesson else unpublishes it
      * which is lesson id to delete
      */
-    $scope.publishHomeworks = function (homeworks, isUnpublish, cb) {
+    $scope.publishHomeworks = function (homeworks, isPublish, cb) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isUnpublish, function () {
+        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, function () {
 
             // refresh state of homeworks to published or unpublished
             homeworks.forEach(function (homework) {
-                homework.state = isUnpublish ? 'draft' : 'published';
+                homework.state = isPublish ? 'published' : 'draft';
             });
 
             $scope.closeConfirmPanel();
 
-            notify.info(isUnpublish ? 'item.unpublished' : 'item.published');
+            notify.info(isPublish ? 'item.published' : 'item.unpublished');
 
             if (typeof cb === 'function') {
                 cb();
