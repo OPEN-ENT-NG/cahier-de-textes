@@ -197,33 +197,21 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
 
 Homework.prototype.toJSON = function () {
 
+    var json = {
+        homework_title: this.title,
+        subject_id: this.subject.id,
+        homework_type_id: this.type.id,
+        teacher_id: model.me.userId,
+        school_id: this.audience.structureId,
+        audience_id: this.audience.id,
+        homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
+        homework_description: this.description,
+        homework_color: this.color,
+        homework_state: this.state
+    };
+
     if (this.lesson_id) {
-        return {
-            homework_title: this.title,
-            subject_id: this.subject.id,
-            homework_type_id: this.type.id,
-            teacher_id: model.me.userId,
-            school_id: this.audience.structureId,
-            audience_id: this.audience.id,
-            homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
-            homework_description: this.description,
-            homework_color: this.color,
-            homework_state: this.state,
-            lesson_id: this.lesson_id
-        }
-    } else {
-        return {
-            homework_title: this.title,
-            subject_id: this.subject.id,
-            homework_type_id: this.type.id,
-            teacher_id: model.me.userId,
-            school_id: this.audience.structureId,
-            audience_id: this.audience.id,
-            homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
-            homework_description: this.description,
-            homework_color: this.color,
-            homework_state: this.state
-        }
+        json.lesson_id = this.lesson_id
     }
 };
 
@@ -495,45 +483,27 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
  */
 Lesson.prototype.toJSON = function () {
 
-    if(this.room){
-        return {
-            lesson_id: this.id,
-            subject_id: this.subject.id,
-            school_id: this.audience.structureId,
-            // TODO missing teacher_id
-            audience_id: this.audience.id,
-            lesson_title: this.title,
-            lesson_room: this.room,
-            lesson_color: this.color,
-            lesson_date: moment(this.date).format('YYYY-MM-DD'),
-            lesson_start_time: moment(this.startTime).format('HH:mm'),
-            lesson_end_time: moment(this.endTime).format('HH:mm'),
-            lesson_description: this.description,
-            lesson_annotation: this.annotations,
-            lesson_state: this.state,
-            // start columns not in lesson table TODO move
-            audience_type: this.audienceType,
-            audience_name: this.audience.name
-        }
-    } else {
-        return {
-            lesson_id: this.id,
-            subject_id: this.subject.id,
-            school_id: this.audience.structureId,
-            // TODO missing teacher_id
-            audience_id: this.audience.id,
-            lesson_title: this.title,
-            lesson_color: this.color,
-            lesson_date: moment(this.date).format('YYYY-MM-DD'),
-            lesson_start_time: moment(this.startTime).format('HH:mm'),
-            lesson_end_time: moment(this.endTime).format('HH:mm'),
-            lesson_description: this.description,
-            lesson_annotation: this.annotations,
-            lesson_state: this.state,
-            // start columns not in lesson table TODO move
-            audience_type: this.audienceType,
-            audience_name: this.audience.name
-        }
+    var json = {
+        lesson_id: this.id,
+        subject_id: this.subject.id,
+        school_id: this.audience.structureId,
+        // TODO missing teacher_id
+        audience_id: this.audience.id,
+        lesson_title: this.title,
+        lesson_color: this.color,
+        lesson_date: moment(this.date).format('YYYY-MM-DD'),
+        lesson_start_time: moment(this.startTime).format('HH:mm'),
+        lesson_end_time: moment(this.endTime).format('HH:mm'),
+        lesson_description: this.description,
+        lesson_annotation: this.annotations,
+        lesson_state: this.state,
+        // start columns not in lesson table TODO move
+        audience_type: this.audienceType,
+        audience_name: this.audience.name
+    };
+
+    if (this.room) {
+        json.lesson_room = this.room;
     }
 };
 
