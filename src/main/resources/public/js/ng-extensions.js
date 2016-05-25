@@ -32,8 +32,8 @@
                     function placeTimeslots(){
                         var timeslots = $('.timeslots');
 
-                        if(timeslots.length === 8 && typeof scope.initialTimeSlotsOffset === 'undefined'){
-                            scope.initialTimeSlotsOffset = timeslots.offset().top;
+                        if(timeslots.length > 0 && typeof model.initialTimeSlotsOffset === 'undefined'){
+                            model.initialTimeSlotsOffset = timeslots.offset().top;
                         }
 
                         // used to display homeworks in calendar view
@@ -41,8 +41,8 @@
                         var currentTimeSlotsOffset = (typeof timeslots.offset() === 'undefined') ? 0 : timeslots.offset().top;
 
                         // tricky way to not apply extra offset twice
-                        if((currentTimeSlotsOffset < scope.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.length === 8 && timeslots.offset().top > 0){
-                            timeslots.offset({ top: timeslots.offset().top + extraTimeSlotsOffset });
+                        if ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.length > 0 && timeslots.offset().top > 0) {
+                            timeslots.offset({top: timeslots.offset().top + extraTimeSlotsOffset});
                             $('.schedule .days').height(587);
                         }
                     }
