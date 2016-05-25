@@ -353,6 +353,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         // created from Lesson.prototype.create
         // and the one retreived from db specially date fields
         model.lessons.syncLessons();
+        model.homeworks.syncHomeworks();
         $scope.showCal = !$scope.showCal;
         notify.info('lesson.saved');
         $scope.$apply();
