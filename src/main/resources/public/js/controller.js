@@ -885,28 +885,32 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.nextWeek = function () {
         model.homeworksLoaded = undefined;
-        $scope.showCal = !$scope.showCal;
         var next = moment(model.calendar.firstDay).add(7, 'day');
         model.calendar.setDate(next);
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks(function(){
+            model.homeworksLoaded = true;
+            $scope.showCal = !$scope.showCal;
+            $scope.$apply();
+
             // tricky way to trigger displaying the homework panel in calendar
             // once data loaded
-            model.homeworksLoaded = true;
             model.calendar.setDate(moment(model.calendar.firstDay));
         });
     };
 
     $scope.previousWeek = function () {
         model.homeworksLoaded = undefined;
-        $scope.showCal = !$scope.showCal;
         var prev = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.setDate(prev);
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks(function(){
+            model.homeworksLoaded = true;
+            $scope.showCal = !$scope.showCal;
+            $scope.$apply();
+
             // tricky way to trigger displaying the homework panel in calendar
             // once data loaded
-            model.homeworksLoaded = true;
             model.calendar.setDate(moment(model.calendar.firstDay));
         });
     };
