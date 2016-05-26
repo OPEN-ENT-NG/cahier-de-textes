@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.filters.LessonAccessFilter;
 import fr.openent.diary.services.AudienceService;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.LessonService;
@@ -8,12 +9,8 @@ import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.http.BaseController;
-import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
-import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
-import org.entcore.common.share.ShareService;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -39,16 +36,34 @@ public class LessonController extends SharedResourceController {
      */
     AudienceService audienceService;
 
+    List<String> actionsForAutomaticSharing;
+
+    //Permissions
+    private static final String view_resource = "diary.read";
+    private static final String manage_resource = "diary.manager";
+    private static final String publish_resource = "diary.publish";
+    private static final String list_lessons = "diary.list.lessons";
+
+    private static final String sharing_action_read = "fr-openent-diary-controllers-LessonController|getLesson";
+    private static final String sharing_action_list = "fr-openent-diary-controllers-LessonController|listLessons";
+
     private final static Logger log = LoggerFactory.getLogger(LessonController.class);
 
     public LessonController(LessonService lessonService, DiaryService diaryService, AudienceService audienceSercice) {
         this.lessonService = lessonService;
         this.diaryService = diaryService;
         this.audienceService = audienceSercice;
+
+        //init automatic sharing actionsForAutomaticSharing
+        actionsForAutomaticSharing = new ArrayList<String>();
+        actionsForAutomaticSharing.add(sharing_action_read);
+        actionsForAutomaticSharing.add(sharing_action_list);
     }
 
     @Get("/lesson/:id")
     @ApiDoc("Get a lesson using its identifier")
+    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void getLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
 
@@ -72,6 +87,7 @@ public class LessonController extends SharedResourceController {
 
     @Get("/lesson/:etabId/:startDate/:endDate")
     @ApiDoc("Get all lessons for etab")
+    @SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
     public void listLessons(final HttpServerRequest request) {
         final String idSchool = request.params().get("etabId");
         final String startDate = request.params().get("startDate");
@@ -99,7 +115,7 @@ public class LessonController extends SharedResourceController {
 
     @Post("/lesson")
     @ApiDoc("Create a lesson")
-//    @SecuredAction("diary.lesson.create")
+    @SecuredAction(manage_resource)
     public void createLesson(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -124,32 +140,36 @@ public class LessonController extends SharedResourceController {
 
                                             //create automatic sharing
                                             String resourceId = String.valueOf(event.right().getValue().getLong("id"));
-                                            //TODO get actions
-                                            final List<String> actions = new ArrayList<String>();
-                                            actions.add("read");
-                                            actions.add("contrib");
-                                            //TODO get group ids from graph(?) neo4j
-                                            final List<String> groupIds = new ArrayList<String>();
-                                            groupIds.add("601-1461514789206");
-                                            groupIds.add("851-1461514790215");
 
-                                            if(groupIds != null && groupIds.size() != 0) {
-                                                LessonController.this.shareResource(user.getUserId(), groupIds, resourceId, actions, notEmptyResponseHandler(request, 201));
+                                            // Groups and users
+                                            final List<String> groupsAndUserIds = new ArrayList<>();
+                                            //875-1464101573455 TPS teachers
+                                            groupsAndUserIds.add("875-1464101573455");
+//                                            if (user.getGroupsIds() != null) {
+//                                                groupsAndUserIds.addAll(user.getGroupsIds());
+//                                            }
+
+                                            if(groupsAndUserIds != null && groupsAndUserIds.size() != 0) {
+                                                LessonController.this.shareResource(user.getUserId(), groupsAndUserIds, resourceId, getActionsForAutomaticSharing() , notEmptyResponseHandler(request, 201));
                                             } else {
+                                                log.warn("Sharing Lesson has encountered a problem.");
                                                 badRequest(request, "Sharing Lesson has encountered a problem.");
                                             }
 
                                         } else {
+                                            log.warn("Lesson could not be created.");
                                             badRequest(request,"Lesson could not be created.");
                                         }
                                     }
                                 });*/
                             } else {
+                                log.warn("Invalid school identifier.");
                                 badRequest(request,"Invalid school identifier.");
                             }
                         }
                     });
                 } else {
+                    log.warn("No user found in session.");
                     unauthorized(request, "No user found in session.");
                 }
             }
@@ -162,6 +182,8 @@ public class LessonController extends SharedResourceController {
      */
     @Post("/lesson/publish")
     @ApiDoc("Publishes a lesson")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void publishLesson(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -202,6 +224,7 @@ public class LessonController extends SharedResourceController {
 
     @Post("/publishLessons")
     @ApiDoc("Publishes lessons")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
     public void publishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -235,6 +258,7 @@ public class LessonController extends SharedResourceController {
 
     @Post("/unPublishLessons")
     @ApiDoc("Unpublishes lessons")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
     public void unPublishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -268,6 +292,8 @@ public class LessonController extends SharedResourceController {
 
     @Put("/lesson/:id")
     @ApiDoc("Modify a lesson")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void modifyLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -307,6 +333,8 @@ public class LessonController extends SharedResourceController {
 
     @Delete("/lesson/:id")
     @ApiDoc("Delete a lesson")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void deleteLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -331,6 +359,7 @@ public class LessonController extends SharedResourceController {
     }
 
     @Delete("/deleteLessons")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -355,18 +384,24 @@ public class LessonController extends SharedResourceController {
 
     @Get("/lesson/share/json/:id")
     @ApiDoc("List rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
     }
 
     @Put("/lesson/share/json/:id")
     @ApiDoc("Add rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
     }
 
     @Put("/lesson/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(LessonAccessFilter.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
     }
@@ -378,4 +413,7 @@ public class LessonController extends SharedResourceController {
         return lessonId != null && lessonId.matches("\\d+");
     }
 
+    protected List<String> getActionsForAutomaticSharing() {
+        return this.actionsForAutomaticSharing;
+    }
 }

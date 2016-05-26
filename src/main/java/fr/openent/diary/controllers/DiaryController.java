@@ -6,6 +6,7 @@ import fr.openent.diary.services.LessonService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
@@ -42,6 +43,12 @@ public class DiaryController extends BaseController {
     LessonService lessonService;
     HomeworkService homeworkService;
 
+    private static final String view = "diary.view";
+    private static final String list_subjects = "diary.list.subjects";
+    private static final String list_audiences = "diary.list.audiences";
+    private static final String teacher_create = "diary.teacher.create";
+    private static final String teacher_subjects = "diary.teacher.subjects";
+
     public DiaryController(DiaryService diaryService, LessonService lessonService, HomeworkService homeworkService) {
         this.diaryService = diaryService;
         this.homeworkService = homeworkService;
@@ -56,13 +63,14 @@ public class DiaryController extends BaseController {
     }
 
     @Get("")
-    @SecuredAction("diary.view")
+    @SecuredAction(value = view, type = ActionType.WORKFLOW)
     public void view(final HttpServerRequest request) {
         renderView(request);
     }
 
     @Get("/subject/list/:schoolId")
     @ApiDoc("Get all subjects for a school")
+    @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
     public void listSubjects(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         diaryService.listSubjects(schoolId, arrayResponseHandler(request));
@@ -70,6 +78,7 @@ public class DiaryController extends BaseController {
 
     @Get("/audience/list/:schoolId")
     @ApiDoc("Get all audiences for a school")
+    @SecuredAction(value = list_audiences, type = ActionType.AUTHENTICATED)
     public void listAudiences(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         diaryService.listAudiences(schoolId, arrayResponseHandler(request));
@@ -77,6 +86,7 @@ public class DiaryController extends BaseController {
 
     @Post("/teacher/:schoolId")
     @ApiDoc("Get or create a teacher for a school")
+    @SecuredAction(value = teacher_create, type = ActionType.AUTHENTICATED)
     public void getOrCreateTeacher(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -110,6 +120,7 @@ public class DiaryController extends BaseController {
     }
 
     @Post("/subjects/:schoolId/:teacherId")
+    @SecuredAction(value = teacher_subjects, type = ActionType.AUTHENTICATED)
     public void initTeacherSubjects(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         final String teacherId = request.params().get("teacherId");

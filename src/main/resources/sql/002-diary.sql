@@ -167,3 +167,35 @@ CREATE TABLE diary.homework_shares
       REFERENCES diary.members (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION diary.insert_groups_members() RETURNS trigger AS $$
+     BEGIN
+     IF (TG_OP = 'INSERT') THEN
+              INSERT INTO diary.members (id, group_id) VALUES (NEW.id, NEW.id);
+              RETURN NEW;
+      END IF;
+      RETURN NULL;
+    END;
+$$ LANGUAGE plpgsql VOLATILE
+
+CREATE OR REPLACE FUNCTION diary.insert_users_members() RETURNS trigger AS $$
+     BEGIN
+     IF (TG_OP = 'INSERT') THEN
+              INSERT INTO diary.members (id, user_id) VALUES (NEW.id, NEW.id);
+              RETURN NEW;
+      END IF;
+      RETURN NULL;
+    END;
+$$ LANGUAGE plpgsql VOLATILE
+
+CREATE TRIGGER groups_trigger
+  AFTER INSERT
+  ON diary.groups
+  FOR EACH ROW
+  EXECUTE PROCEDURE diary.insert_groups_members();
+
+CREATE TRIGGER users_trigger
+  AFTER INSERT
+  ON diary.users
+  FOR EACH ROW
+  EXECUTE PROCEDURE diary.insert_users_members();

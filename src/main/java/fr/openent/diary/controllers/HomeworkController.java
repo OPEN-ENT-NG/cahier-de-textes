@@ -1,12 +1,14 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.filters.HomeworkAccessFilter;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.request.RequestUtils;
-import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
@@ -15,6 +17,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -29,15 +32,37 @@ public class HomeworkController extends SharedResourceController {
     HomeworkService homeworkService;
     LessonService lessonService;
 
+    List<String> actionsForAutomaticSharing;
+
+    //Permissions
+    private static final String view_resource = "diary.read";
+    private static final String manage_resource = "diary.manager";
+    private static final String publish_resource = "diary.publish";
+    private static final String list_homeworks = "diary.list.homeworks";
+    private static final String list_homeworks_by_lesson = "diary.list.homeworks.lesson";
+
+
+    private static final String sharing_action_read = "fr.openent.diary.controllers.HomeworkController|getHomework";
+    private static final String sharing_action_list = "fr.openent.diary.controllers.HomeworkController|listHomeworks";
+    private static final String sharing_action_list_by_lesson = "fr.openent.diary.controllers.HomeworkController|listHomeworkByLesson";
+
     private final static Logger log = LoggerFactory.getLogger(HomeworkController.class);
 
     public HomeworkController(HomeworkService homeworkService, LessonService lessonService) {
         this.homeworkService = homeworkService;
         this.lessonService = lessonService;
+
+        //init automatic sharing actionsForAutomaticSharing
+        actionsForAutomaticSharing = new ArrayList<String>();
+        actionsForAutomaticSharing.add(sharing_action_read);
+        actionsForAutomaticSharing.add(sharing_action_list);
+        actionsForAutomaticSharing.add(sharing_action_list_by_lesson);
     }
 
     @Get("/homework/:id")
     @ApiDoc("Get a homework using its identifier")
+    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void getHomework(final HttpServerRequest request) {
         final String homeworkId = request.params().get("id");
 
@@ -60,6 +85,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/list/:lessonId")
     @ApiDoc("Get all homeworks for a lesson")
+    @SecuredAction(value = list_homeworks_by_lesson, type = ActionType.AUTHENTICATED)
     public void listHomeworkByLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -78,6 +104,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/:etabId/:startDate/:endDate")
     @ApiDoc("Get all homeworks for a school")
+    @SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
     public void listHomeworks(final HttpServerRequest request) {
         final String idSchool = request.params().get("etabId");
         final String startDate = request.params().get("startDate");
@@ -105,6 +132,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework")
     @ApiDoc("Create a homework")
+    @SecuredAction(manage_resource)
     public void createFreeHomework(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -130,6 +158,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework/:lessonId")
     @ApiDoc("Create a homework for a lesson")
+    @SecuredAction(manage_resource)
     public void createHomeworkForLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -165,6 +194,8 @@ public class HomeworkController extends SharedResourceController {
 
     @Put("/homework/:homeworkId")
     @ApiDoc("Modify a homework")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void modifyHomework(final HttpServerRequest request) {
 
         final String homeworkId = request.params().get("homeworkId");
@@ -193,6 +224,8 @@ public class HomeworkController extends SharedResourceController {
 
     @Delete("/homework/:id")
     @ApiDoc("Delete a homework")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void deleteHomework(final HttpServerRequest request) {
 
         final String homeworkId = request.params().get("id");
@@ -216,6 +249,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/unPublishHomeworks")
     @ApiDoc("Unpublishes homeworks")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
     public void unPublishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -249,6 +283,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/publishHomeworks")
     @ApiDoc("Publishes homeworks")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
     public void publishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -282,18 +317,24 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/share/json/:id")
     @ApiDoc("List rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
     }
 
     @Put("/homework/share/json/:id")
     @ApiDoc("Add rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
     }
 
     @Put("/homework/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
     }
@@ -306,6 +347,7 @@ public class HomeworkController extends SharedResourceController {
     }
 
     @Delete("/deleteHomeworks")
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -326,5 +368,9 @@ public class HomeworkController extends SharedResourceController {
                 }
             }
         });
+    }
+
+    protected List<String> getActionsForAutomaticSharing() {
+        return this.actionsForAutomaticSharing;
     }
 }
