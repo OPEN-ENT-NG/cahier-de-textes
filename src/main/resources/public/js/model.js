@@ -213,6 +213,8 @@ Homework.prototype.toJSON = function () {
     if (this.lesson_id) {
         json.lesson_id = this.lesson_id
     }
+
+    return json;
 };
 
 function Attachment(){}
@@ -505,6 +507,8 @@ Lesson.prototype.toJSON = function () {
     if (this.room) {
         json.lesson_room = this.room;
     }
+
+    return json;
 };
 
 Lesson.prototype.addHomework = function () {
