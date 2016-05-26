@@ -354,21 +354,22 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.postLessonSave = function(goToCalendarView){
+        notify.info('lesson.saved');
+
         // TODO remove sync and investigate more
         // actually there are some differences between the lesson object
         // created from Lesson.prototype.create
-        // and the one retreived from db specially date fields
-        model.lessons.syncLessons();
-        model.homeworks.syncHomeworks();
-        $scope.showCal = !$scope.showCal;
-        notify.info('lesson.saved');
-        $scope.$apply();
-
-        if (goToCalendarView) {
-            $scope.goToCalendarView();
-            $scope.lesson = null;
-            $scope.homework = null;
-        }
+        // and the one retreived from db specially date fields as string or date or moment
+        model.lessons.syncLessons(function(){
+            model.homeworks.syncHomeworks(function(){
+                $scope.$apply();
+                if (goToCalendarView) {
+                    $scope.goToCalendarView();
+                    $scope.lesson = null;
+                    $scope.homework = null;
+                }
+            });
+        });
     };
 
     /**
