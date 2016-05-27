@@ -52,6 +52,10 @@ function DiaryController($scope, template, model, route, date, $location) {
     // for static access to some global function
     $scope.newHomework = new Homework();
 
+    $scope.confirmPanel = {
+        item: undefined
+    }
+
     $scope.display = {
         showPanel: false
     };
@@ -544,10 +548,13 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Display confirmation panel
+     * @param panelContent Html confirm panel file
+     * @param item Optional item
      */
-    $scope.showConfirmPanel = function (panelContent) {
+    $scope.showConfirmPanel = function (panelContent, item) {
         template.open('lightbox', panelContent);
         $scope.display.showPanel = true;
+        $scope.confirmPanel.item = item;
     };
 
 
@@ -790,17 +797,27 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
     };
 
+
+    $scope.deleteHomeworkAndCloseConfirmPanel = function (homework, lesson) {
+        $scope.deleteHomework(homework, lesson, function(){
+            $scope.closeConfirmPanel();
+        });
+    }
+
     /**
      * Deletes an homework
      * @param homework Homework to be deleted
      * @param lesson Lesson attached to homework (optional)
      */
-    $scope.deleteHomework = function (homework, lesson) {
+    $scope.deleteHomework = function (homework, lesson, cb) {
 
-        // TODO user confirm panel?
         homework.delete(lesson, function () {
             notify.info('homework.deleted');
             $scope.$apply();
+
+            if (typeof cb === 'function') {
+                cb();
+            }
         }, function (e) {
             validationError(e);
         });

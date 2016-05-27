@@ -171,6 +171,10 @@ Homework.prototype.delete = function (lesson, cb, cbe) {
             });
     } else {
         deleteHomeworkReferences();
+
+        if (typeof cb === 'function') {
+            cb();
+        }
     }
 };
 
