@@ -42,16 +42,17 @@ public class LessonAccessFilter implements ResourcesProvider {
                 groupsAndUserIds.addAll(user.getGroupsIds());
             }
 
+            //TODO change owner control to field owner ! + left join to INNER join when sharing will be active
             StringBuilder from = new StringBuilder(conf.getSchema());
-            from.append(".").append(conf.getTable()).append(" AS t");
-            from.append(" INNER JOIN ").append(conf.getSchema()).append(".").append(conf.getShareTable()).append(" AS st");
+            from.append(conf.getTable()).append(" AS t");
+            from.append(" LEFT JOIN ").append(conf.getSchema()).append(conf.getShareTable()).append(" AS st");
             from.append(" ON t.id = st.resource_id");
 
             StringBuilder query = new StringBuilder();
             JsonArray values = new JsonArray();
             query.append("SELECT count(*)")
                     .append(" FROM ").append(from.toString())
-                    .append(" WHERE t.id = ? t.teacher_id = ? OR (st.resource_id = ? AND st.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
+                    .append(" WHERE t.id = ? AND t.teacher_id = ? OR (st.resource_id = ? AND st.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
                     .append(" AND st.action = ?) ");
 
             values.add(Sql.parseId(resourceId));

@@ -222,9 +222,10 @@ public class LessonController extends SharedResourceController {
 
     }
 
+    //TODO : change action.type to resource + add filter
     @Post("/publishLessons")
     @ApiDoc("Publishes lessons")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void publishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -256,9 +257,10 @@ public class LessonController extends SharedResourceController {
         });
     }
 
+    //TODO : change action.type to resource + add filter
     @Post("/unPublishLessons")
     @ApiDoc("Unpublishes lessons")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void unPublishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -358,8 +360,9 @@ public class LessonController extends SharedResourceController {
         }
     }
 
+    //TODO : change action.type to resource + add filter
     @Delete("/deleteLessons")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override

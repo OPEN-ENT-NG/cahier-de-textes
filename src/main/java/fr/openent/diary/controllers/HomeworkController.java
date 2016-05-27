@@ -247,9 +247,10 @@ public class HomeworkController extends SharedResourceController {
         }
     }
 
+    //TODO : change action.type to resource + add filter
     @Post("/unPublishHomeworks")
     @ApiDoc("Unpublishes homeworks")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void unPublishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -281,9 +282,10 @@ public class HomeworkController extends SharedResourceController {
         });
     }
 
+    //TODO : change action.type to resource + add filter
     @Post("/publishHomeworks")
     @ApiDoc("Publishes homeworks")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void publishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -346,8 +348,9 @@ public class HomeworkController extends SharedResourceController {
         return homeworkId != null && homeworkId.matches("\\d+");
     }
 
+    //TODO : change action.type to resource + add filter
     @Delete("/deleteHomeworks")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
