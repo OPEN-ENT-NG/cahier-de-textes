@@ -62,8 +62,8 @@ public class LessonController extends SharedResourceController {
 
     @Get("/lesson/:id")
     @ApiDoc("Get a lesson using its identifier")
-    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = view_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void getLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
 
@@ -87,7 +87,7 @@ public class LessonController extends SharedResourceController {
 
     @Get("/lesson/:etabId/:startDate/:endDate")
     @ApiDoc("Get all lessons for etab")
-    @SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
+    //@SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
     public void listLessons(final HttpServerRequest request) {
         final String idSchool = request.params().get("etabId");
         final String startDate = request.params().get("startDate");
@@ -115,7 +115,7 @@ public class LessonController extends SharedResourceController {
 
     @Post("/lesson")
     @ApiDoc("Create a lesson")
-    @SecuredAction(manage_resource)
+    //@SecuredAction(manage_resource)
     public void createLesson(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -182,8 +182,8 @@ public class LessonController extends SharedResourceController {
      */
     @Post("/lesson/publish")
     @ApiDoc("Publishes a lesson")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void publishLesson(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -225,7 +225,7 @@ public class LessonController extends SharedResourceController {
     //TODO : change action.type to resource + add filter
     @Post("/publishLessons")
     @ApiDoc("Publishes lessons")
-    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
+    //@SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void publishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -260,7 +260,7 @@ public class LessonController extends SharedResourceController {
     //TODO : change action.type to resource + add filter
     @Post("/unPublishLessons")
     @ApiDoc("Unpublishes lessons")
-    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
+    //@SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void unPublishLessons(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -294,8 +294,8 @@ public class LessonController extends SharedResourceController {
 
     @Put("/lesson/:id")
     @ApiDoc("Modify a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void modifyLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -335,8 +335,8 @@ public class LessonController extends SharedResourceController {
 
     @Delete("/lesson/:id")
     @ApiDoc("Delete a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void deleteLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -362,7 +362,7 @@ public class LessonController extends SharedResourceController {
 
     //TODO : change action.type to resource + add filter
     @Delete("/deleteLessons")
-    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
+    //@SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -387,24 +387,24 @@ public class LessonController extends SharedResourceController {
 
     @Get("/lesson/share/json/:id")
     @ApiDoc("List rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
     }
 
     @Put("/lesson/share/json/:id")
     @ApiDoc("Add rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
     }
 
     @Put("/lesson/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
     }
