@@ -256,6 +256,34 @@ function Lesson(data) {
 Lesson.prototype.api = {
     delete: '/diary/lesson/:id'
 };
+
+/**
+ * Triggered when lesson item has stopped being dragged in calendar view
+ * see angular-app.js scheduleItemEl.on('stopDrag').
+ * Will auto-save lesson in db on item move/resize
+ * @param cb
+ * @param cbe
+ */
+Lesson.prototype.calendarUpdate = function (cb, cbe) {
+
+    // TODO date fields types are kinda messy
+    // toJson method needs date fields to be in some specific format
+    if (this.beginning) {
+        this.date = this.beginning;
+        this.startMoment = this.beginning;
+        this.endMoment = this.end;
+        this.startTime = this.startMoment;
+        this.endTime = this.endMoment;
+    }
+    if (this.id) {
+        this.update(function () {
+            //model.refresh();
+        }, function (error) {
+            model.parseError(error);
+        });
+    }
+};
+
 //TODO
 Lesson.prototype.save = function(cb, cbe) {
 

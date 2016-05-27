@@ -56,6 +56,16 @@ function DiaryController($scope, template, model, route, date, $location) {
         showPanel: false
     };
 
+    /**
+     * Used to know if user clicked on calendar event
+     * or is dragging  to prevent ng-click
+     */
+    $scope.itemMouseEvent = {
+        lastMouseDownTime: undefined,
+        lastMouseClientX: undefined,
+        lastMouseClientY: undefined,
+    }
+
     $scope.lessons = model.lessons;
     $scope.audiences = model.audiences;
     $scope.subjects = model.subjects;
@@ -916,7 +926,37 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
     };
 
-    $scope.redirect = function(path){
+
+    $scope.setMouseDownTime = function ($event) {
+        $scope.itemMouseEvent.lastMouseDownTime = new Date().getTime();
+        $scope.itemMouseEvent.lastMouseClientX = $event.clientX;
+        $scope.itemMouseEvent.lastMouseClientY = $event.clientY;
+    }
+
+    /**
+     * Redirect to path only when user is doind a real click.
+     * If user is draging item redirect will not be called
+     * @param path
+     */
+    $scope.openOnClickSaveOnDrag = function (item, $event) {
+
+        var path = '/editLessonView/'+ item.id;
+        var maxDeltaMove = 5;
+        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > maxDeltaMove;
+        var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > maxDeltaMove;
+
+        // fast click = no drag = real click
+        if ((new Date().getTime() - $scope.itemMouseEvent.lastMouseDownTime) < 300) {
+            $scope.redirect(path);
+        } else {
+            // long click: considered as real click if cursor did not move that much
+            if (!xMouseMoved && !yMouseMoved) {
+                $scope.redirect(path);
+            }
+        }
+    }
+
+    $scope.redirect = function (path) {
         $location.path(path);
     };
 
