@@ -42,9 +42,10 @@ public class LessonAccessFilter implements ResourcesProvider {
                 groupsAndUserIds.addAll(user.getGroupsIds());
             }
 
+            //TODO change owner control to field owner !
             StringBuilder from = new StringBuilder(conf.getSchema());
-            from.append(".").append(conf.getTable()).append(" AS t");
-            from.append(" INNER JOIN ").append(conf.getSchema()).append(".").append(conf.getShareTable()).append(" AS st");
+            from.append(conf.getTable()).append(" AS t");
+            from.append(" INNER JOIN ").append(conf.getSchema()).append(conf.getShareTable()).append(" AS st");
             from.append(" ON t.id = st.resource_id");
 
             StringBuilder query = new StringBuilder();
