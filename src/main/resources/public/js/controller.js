@@ -940,18 +940,18 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.openOnClickSaveOnDrag = function (item, $event) {
 
-        var path = '/editLessonView/'+ item.id;
+        var path = '/editLessonView/' + item.id;
         var maxDeltaMove = 5;
         var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > maxDeltaMove;
         var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > maxDeltaMove;
 
         // fast click = no drag = real click
-        if ((new Date().getTime() - $scope.itemMouseEvent.lastMouseDownTime) < 300) {
-            $scope.redirect(path);
-        } else {
-            // long click: considered as real click if cursor did not move that much
-            if (!xMouseMoved && !yMouseMoved) {
-                $scope.redirect(path);
+        // or cursor did not move
+        if ((!xMouseMoved && !yMouseMoved) || (new Date().getTime() - $scope.itemMouseEvent.lastMouseDownTime) < 300) {
+
+            // do not redirect to lesson view if user clicked on checkbox
+            if (!($event.toElement && $event.toElement.type === "checkbox")) {
+                $scope.redirect(path)
             }
         }
     }

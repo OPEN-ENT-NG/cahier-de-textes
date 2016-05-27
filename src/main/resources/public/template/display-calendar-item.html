@@ -1,5 +1,5 @@
-<div class="schedule-item-content [[item.color]]" tooltip="[[item.audienceLabel]] - [[item.title]]">
-    <div class="cell twelve" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+<div class="schedule-item-content [[item.color]]" tooltip="[[item.audienceLabel]] - [[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+    <div class="cell twelve">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
 
@@ -7,11 +7,11 @@
     </div>
 
     <div class="cell twelve">
-        <span ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">[[item.subjectLabel]]&nbsp; [[item.audienceLabel]]</span>
+        <span>[[item.subjectLabel]]&nbsp; [[item.audienceLabel]]</span>
 
-        <input type="checkbox" ng-model="item.selected"  style="float: right; margin-right: 5%;"/>
+        <input type="checkbox" ng-model="item.selected"   style="float: right; margin-right: 5%;"/>
 
-		<span ng-if="[[item.state]]=='draft'" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+		<span ng-if="[[item.state]]=='draft'">
             <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 width="16px" height="16px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve" style="float: right;">
             <g>
