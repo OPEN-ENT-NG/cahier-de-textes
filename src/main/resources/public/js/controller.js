@@ -941,9 +941,12 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.openOnClickSaveOnDrag = function (item, $event) {
 
         var path = '/editLessonView/' + item.id;
-        var maxDeltaMove = 5;
-        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > maxDeltaMove;
-        var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > maxDeltaMove;
+
+        // gap between days is quite important
+        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > 10;
+        // gap between minutes is tiny so y mouse move detection must be accurate
+        // so user can change lesson time slightly
+        var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > 0;
 
         // fast click = no drag = real click
         // or cursor did not move
