@@ -835,7 +835,7 @@ function DiaryController($scope, template, model, route, date, $location) {
      * Load related data to lessons and homeworks from database
      */
     $scope.initialization = function () {
-        $scope.countdown = 5;
+        $scope.countdown = 4;
         var teacher = new Teacher();
         teacher.create($scope.decrementCountdown);
         model.subjects.syncSubjects($scope.decrementCountdown);
@@ -844,16 +844,17 @@ function DiaryController($scope, template, model, route, date, $location) {
 
             // call lessons/homework sync after audiences sync since
             // lesson and homework objects needs audience data to be built
-            model.lessons.syncLessons($scope.decrementCountdown);
-            model.homeworks.syncHomeworks(
-                function(){
-                    model.homeworksLoaded = true;
-                    $scope.decrementCountdown();
+            model.lessons.syncLessons(function() {
+                model.homeworks.syncHomeworks(
+                    function () {
+                        model.homeworksLoaded = true;
+                        $scope.decrementCountdown();
 
-                    // tricky way to trigger displaying the homework panel in calendar
-                    model.calendar.setDate(moment(model.calendar.firstDay));
-                }
-            );
+                        // tricky way to trigger displaying the homework panel in calendar
+                        model.calendar.setDate(moment(model.calendar.firstDay));
+                    }
+                );
+            });
         });
 
     };
