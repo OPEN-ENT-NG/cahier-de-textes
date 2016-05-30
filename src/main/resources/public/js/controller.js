@@ -971,7 +971,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         if ((!xMouseMoved && !yMouseMoved) || (new Date().getTime() - $scope.itemMouseEvent.lastMouseDownTime) < 300) {
 
             // do not redirect to lesson view if user clicked on checkbox
-            if (!($event.toElement && $event.toElement.type === "checkbox")) {
+            if (!($event.target && $event.target.type === "checkbox")) {
                 $scope.redirect(path)
             }
         }
