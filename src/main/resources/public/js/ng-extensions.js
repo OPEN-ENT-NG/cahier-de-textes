@@ -81,12 +81,18 @@
                         // if days timeslots are not yet positioned
                         // wait until they are to create the homework panel
                         else {
+                            var timerOccurences = 0;
                             var timer = setTimeout(
                                 function () {
                                     timeslots = $('.timeslots');
                                     if (timeslots.length === 8) {
                                         clearTimeout(timer);
                                         placeTimeslots(timeslots);
+                                    }
+                                    timerOccurences++;
+                                    // 30 * 0.3 = 10s should be far than enough to have all timeslots loaded
+                                    if (timerOccurences > 30) {
+                                        clearTimeout(timer);
                                     }
                                 }, 300);
                         }
