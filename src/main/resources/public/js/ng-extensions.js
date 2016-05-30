@@ -46,7 +46,12 @@
                         // tricky way to not apply extra offset twice
                         if ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.offset().top > 0) {
                             timeslots.offset({top: timeslots.offset().top + extraTimeSlotsOffset});
-                            $('.schedule .days').height(587);
+
+                            // apply same offset to the next hours bar in calendar view
+                            var nextTimeSlots = $('.next-timeslots');
+                            nextTimeSlots.offset({top: nextTimeSlots.offset().top + extraTimeSlotsOffset});
+
+                            $('.schedule .days').height(587 + extraTimeSlotsOffset);
                         }
                     }
 
