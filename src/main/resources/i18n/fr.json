@@ -71,7 +71,7 @@
   "daily.item.deleting": "Suppression en cours",
   "daily.nohomeworkorlesson.selected": "Aucune(s) séance(s) ou travail/aux à faire sélectionné/e(s).",
   "daily.lesson.id.notspecified": "L'id de la séance n'est pas spécifié.",
-  "daily.lesson.id.notfound": "La séance avec l'id {0} n'a pas été trouvée.",
+  "daily.lesson.id.notfound": "La séance n'a pas été trouvée.",
   "daily.item.publish": "Publier",
   "daily.item.unpublish": "Marquer comme brouillon",
   "daily.items": "éléments",

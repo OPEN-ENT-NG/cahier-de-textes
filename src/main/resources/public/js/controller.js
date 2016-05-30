@@ -99,7 +99,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             if (lesson != null) {
                 $scope.openLessonView(lesson, params);
             } else {
-                $scope.goToCalendarView(notify.error('daily.lesson.idnotfound'));
+                $scope.goToCalendarView(notify.error('daily.lesson.id.notfound'));
             }
         },
         editHomeworkView: function(params) {
