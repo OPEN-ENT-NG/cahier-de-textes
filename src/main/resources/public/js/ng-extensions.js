@@ -29,10 +29,13 @@
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
 
-                    function placeTimeslots(){
-                        var timeslots = $('.timeslots');
+                    /**
+                     * Create the homeworks area in calendar view
+                     * @param timeslots Elements with 'timeslot' css class (hour legend tag + 7 day slots)
+                     */
+                    function placeTimeslots(timeslots) {
 
-                        if(timeslots.length > 0 && typeof model.initialTimeSlotsOffset === 'undefined'){
+                        if (typeof model.initialTimeSlotsOffset === 'undefined') {
                             model.initialTimeSlotsOffset = timeslots.offset().top;
                         }
 
@@ -41,7 +44,7 @@
                         var currentTimeSlotsOffset = (typeof timeslots.offset() === 'undefined') ? 0 : timeslots.offset().top;
 
                         // tricky way to not apply extra offset twice
-                        if ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.length > 0 && timeslots.offset().top > 0) {
+                        if ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.offset().top > 0) {
                             timeslots.offset({top: timeslots.offset().top + extraTimeSlotsOffset});
                             $('.schedule .days').height(587);
                         }
@@ -69,7 +72,24 @@
                         });
                         
                         scope.calendar = model.calendar;
-                        placeTimeslots();
+
+                        var timeslots = $('.timeslots');
+
+                        if (timeslots.length === 8) {
+                            placeTimeslots(timeslots);
+                        }
+                        // if days timeslots are not yet positioned
+                        // wait until they are to create the homework panel
+                        else {
+                            var timer = setTimeout(
+                                function () {
+                                    timeslots = $('.timeslots');
+                                    if (timeslots.length === 8) {
+                                        clearTimeout(timer);
+                                        placeTimeslots(timeslots);
+                                    }
+                                }, 300);
+                        }
                     }
                     
                     model.on('calendar.date-change', function(){
