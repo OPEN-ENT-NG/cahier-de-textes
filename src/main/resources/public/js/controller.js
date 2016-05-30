@@ -98,8 +98,18 @@ function DiaryController($scope, template, model, route, date, $location) {
 
             if (lesson != null) {
                 $scope.openLessonView(lesson, params);
-            } else {
-                $scope.goToCalendarView(notify.error('daily.lesson.id.notfound'));
+            }
+            // case when viewing homework and lesson not in current week
+            else {
+                lesson = new Lesson();
+                lesson.id = parseInt(params.idLesson);
+
+                // TODO cache loaded lesson to avoid db re-sync it each time
+                lesson.load(true, function(){
+                    $scope.openLessonView(lesson, params);
+                }, function(cbe){
+                    notify.error(cbe.message);
+                });
             }
         },
         editHomeworkView: function(params) {
@@ -145,8 +155,8 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.lesson.updateData(lesson);
             $scope.newItem = {
                 date: moment($scope.lesson.date),
-                beginning: moment($scope.lesson.beginning),
-                end: moment($scope.lesson.end)
+                beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
+                end: $scope.lesson.endMoment //moment($scope.lesson.end)
             }
         }
         // create new lesson

@@ -450,6 +450,34 @@ Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
 };
 
 /**
+ * Load lesson object from id
+ * @param cb Callback function
+ * @param cbe Callback on error function
+ */
+Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
+
+    var lesson = this;
+
+    http().get('/diary/lesson/' + this.id)
+        .done(function (data) {
+            lesson.updateData(sqlToJsLesson(data));
+
+            if(loadHomeworks){
+                model.loadHomeworksForLesson(lesson, cb, cbe);
+            }
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });
+}
+
+/**
  * Publishes the lesson
  * @param cb Callback
  * @param cbe Callback on error
@@ -700,44 +728,7 @@ model.build = function () {
                     lessons = lessons.concat(data);
                     that.addRange(
                         _.map(lessons, function (lesson) {
-
-                            var lessonHomeworks = new Array();
-
-                            // only initialize homeworks attached to lesson
-                            // with only id
-                            for (var i = 0; i < lesson.homework_id.length; i++) {
-                                var homework = new Homework();
-                                homework.id = lesson.homework_id[i];
-                                homework.lesson_id = parseInt(lesson.lesson_id);
-                                homework.loaded = false; // means full data from sql not loaded
-                                lessonHomeworks.push(homework);
-                            }
-
-                            return {
-                                id: lesson.lesson_id,
-                                title: lesson.lesson_title,
-                                audience: model.audiences.findWhere({ id: lesson.audience_id }),
-                                audienceId: lesson.audience_id,
-                                audienceLabel: lesson.audience_label,
-                                audienceType: lesson.audience_type,
-                                description: lesson.lesson_description,
-                                subject: model.subjects.findWhere({ code: lesson.subject_code }),
-                                subjectId: lesson.subject_id,
-                                subjectLabel: lesson.subject_label,
-                                teacherId: lesson.teacher_display_name,
-                                structureId: lesson.school_id,
-                                date: lesson.lesson_date,
-                                startTime: lesson.lesson_start_time,
-                                endTime: lesson.lesson_end_time,
-                                color: lesson.lesson_color,
-                                room: lesson.lesson_room,
-                                annotations: lesson.lesson_annotation,
-                                startMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_start_time),
-                                endMoment: moment(lesson.lesson_date.split(' ')[0] + ' ' + lesson.lesson_end_time),
-                                state: lesson.lesson_state,
-                                is_periodic: false,
-                                homeworks: lessonHomeworks
-                            }
+                            return sqlToJsLesson(lesson);
                         })
                     );
                     countStructure--;
@@ -838,6 +829,54 @@ model.build = function () {
             }
         }
     });
+
+    /**
+     * Convert sql diary.lesson row to js row used in angular model
+     * @param lesson Sql diary.lesson row
+     */
+    sqlToJsLesson = function (data) {
+
+        var lessonHomeworks = new Array();
+
+        // only initialize homeworks attached to lesson
+        // with only id
+        if (data.homework_id) {
+            for (var i = 0; i < data.homework_id.length; i++) {
+                var homework = new Homework();
+                homework.id = data.homework_id[i];
+                homework.lesson_id = parseInt(data.lesson_id);
+                homework.loaded = false; // means full data from sql not loaded
+                lessonHomeworks.push(homework);
+            }
+        }
+
+        return {
+            id: data.lesson_id,
+            title: data.lesson_title,
+            audience: model.audiences.findWhere({id: data.audience_id}),
+            audienceId: data.audience_id,
+            audienceLabel: data.audience_label,
+            audienceType: data.audience_type,
+            description: data.lesson_description,
+            subject: model.subjects.findWhere({code: data.subject_code}),
+            subjectId: data.subject_id,
+            subjectLabel: data.subject_label,
+            teacherId: data.teacher_display_name,
+            structureId: data.school_id,
+            date: data.lesson_date,
+            startTime: data.lesson_start_time,
+            endTime: data.lesson_end_time,
+            color: data.lesson_color,
+            room: data.lesson_room,
+            annotations: data.lesson_annotation,
+            startMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_start_time),
+            endMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_end_time),
+            state: data.lesson_state,
+            is_periodic: false,
+            homeworks: lessonHomeworks
+        }
+    };
+
 
     /**
      * Transform sql homework data (table diary.homework)

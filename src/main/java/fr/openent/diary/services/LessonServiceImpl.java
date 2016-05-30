@@ -343,7 +343,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void retrieveLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, l.teacher_id, a.audience_type,")
+        query.append("SELECT l.id as lesson_id, s.subject_label, l.subject_id, l.school_id, l.teacher_id, a.audience_type,")
                 .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
                 .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state")
                 .append(" FROM diary.lesson as l")
