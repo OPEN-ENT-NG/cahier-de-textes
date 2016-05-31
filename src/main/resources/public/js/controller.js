@@ -876,9 +876,6 @@ function DiaryController($scope, template, model, route, date, $location) {
                     function () {
                         model.homeworksLoaded = true;
                         $scope.decrementCountdown();
-
-                        // tricky way to trigger displaying the homework panel in calendar
-                        model.calendar.setDate(moment(model.calendar.firstDay));
                     }
                 );
             });
