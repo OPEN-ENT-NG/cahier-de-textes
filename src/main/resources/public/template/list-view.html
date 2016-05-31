@@ -12,31 +12,33 @@
     <hr />
 </div>
 
-<section class="cell twelve">
+<section>
     <ul class="colored">
         <li ng-repeat="day in pedagogicItems.days">
-            <div class="twelve height-one">
+            <div>
                 <p>
                     <a ng-if="day.expanded !== true" ng-click="expandDay(day)">
                         <i class="caret"></i>[[day.dayName]]</a>
                     <a ng-if="day.expanded === true" ng-click="collapseDay(day)">
-                        <i class="caret expanded"></i>[[day.dayName]]</a> Travail à faire ([[day.nbHomeworks]]) &nbsp; Séance ([[day.nbLessons]])
+                        <i class="caret expanded"></i>[[day.dayName]]</a> <strong><i18n>diary.homework.label</i18n> ([[day.nbHomeworks]])&nbsp; <i18n>diary.lesson.label</i18n> ([[day.nbLessons]])</strong>
                 </p>
             </div>
             <ul ng-if="day.expanded === true">
                 <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay">
-                    <div class="one cell height-two" ng-if="pedagogicItem.typeItem === 'homework'">
-                        <i class="icon rack2" ng-style="{'color':pedagogicItem.color}"></i>
+                    <div class="cell-no-float notification">
+                        <i ng-class="pedagogicItem.typeItem === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
+                        <div class="table-cell">
+                            <div>
+                                <i ng-if="pedagogicItem.published === false"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
+                                <em class="medium-importance">
+                                    <p style="display:inline" ng-if="pedagogicItem.typeItem === 'lesson'">[[pedagogicItem.startHour]] - [[pedagogicItem.endHour]]&nbsp;</p>
+                                    [[pedagogicItem.title]]
+                                </em>
+                            </div>
+                            <div>[[pedagogicItem.description]]</div>
+                        </div>
                     </div>
-                    <div class="one cell height-two" ng-if="pedagogicItem.typeItem === 'lesson'">
-                        <i class="icon cahier-textes2" ng-style="{'color':pedagogicItem.color}"></i>
-                    </div>
-                    <div class="eleven cell height-one">
-                        <i ng-if="pedagogicItem.published === false"><i18n>diary.not.published</i18n></i>
-                        [[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]<br/>
-                        [[pedagogicItem.title]]
-                    </div>
-                    <div class="eleven cell height-one">[[pedagogicItem.description]]</div>
                 </li>
             </ul>
         </li>

@@ -58,3 +58,20 @@ i.cahier-textes2::before {
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
 }
+
+.table-cell, .table-cell-left{
+    display: table-cell;
+    vertical-align: top;
+}
+
+.table-cell-left {
+    padding-right: 10px;
+}
+
+.cell-no-float {
+    box-sizing: border-box;
+    float: none;
+    display: block;
+    position: relative;
+}
+
