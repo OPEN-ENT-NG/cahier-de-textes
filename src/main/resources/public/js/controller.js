@@ -1095,33 +1095,28 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.nextWeek = function () {
         model.homeworksLoaded = undefined;
-        var next = moment(model.calendar.firstDay).add(7, 'day');
-        model.calendar.setDate(next);
-        model.lessons.syncLessons();
-        model.homeworks.syncHomeworks(function(){
-            model.homeworksLoaded = true;
-            $scope.showCal = !$scope.showCal;
-            $scope.$apply();
-
-            // tricky way to trigger displaying the homework panel in calendar
-            // once data loaded
-            model.calendar.setDate(moment(model.calendar.firstDay));
-        });
+        var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
+        refreshCalendar(nextMonday);
     };
 
     $scope.previousWeek = function () {
         model.homeworksLoaded = undefined;
-        var prev = moment(model.calendar.firstDay).subtract(7, 'day');
-        model.calendar.setDate(prev);
+        var prevMonday = moment(model.calendar.firstDay).subtract(7, 'day');
+        refreshCalendar(prevMonday);
+    };
+
+    /**
+     * Refresh calendar from given date.
+     * Will refresh ui and lessons and homeworks week data cache
+     * @param momentDate Start date (monday only)
+     */
+    var refreshCalendar = function (momentDate) {
+        model.calendar.setDate(momentDate);
         model.lessons.syncLessons();
-        model.homeworks.syncHomeworks(function(){
+        model.homeworks.syncHomeworks(function () {
             model.homeworksLoaded = true;
             $scope.showCal = !$scope.showCal;
             $scope.$apply();
-
-            // tricky way to trigger displaying the homework panel in calendar
-            // once data loaded
-            model.calendar.setDate(moment(model.calendar.firstDay));
         });
     };
 

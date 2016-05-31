@@ -95,11 +95,11 @@
                                         placeTimeslots(timeslots);
                                     }
                                     timerOccurences++;
-                                    // 30 * 0.3 = 10s should be far than enough to have all timeslots loaded
-                                    if (timerOccurences > 30) {
+                                    // 10s should be far than enough to have all timeslots loaded
+                                    if (timerOccurences > 100) {
                                         clearTimeout(timer);
                                     }
-                                }, 300);
+                                }, 100);
                         }
                     }
                     
