@@ -4,5 +4,7 @@
 	"lesson.deleted": "Lesson was succesfully deleted",
 	"lesson.deleting": "Deletion in progress ...",
 	"daily.lesson.delete.confirm.one": "Are you sure you want to delete this lesson?",
-	"daily.lesson.delete.confirm.multi": "Are you sure you want to delete these lessons?"
+	"daily.lesson.delete.confirm.multi": "Are you sure you want to delete these lessons?",
+	"diary.icon.show.calendar": "Lessons calendar",
+	"diary.icon.show.list": "Lessons list"
 }

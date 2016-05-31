@@ -57,7 +57,8 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
     $scope.display = {
-        showPanel: false
+        showPanel: false,
+        showList: false
     };
 
     /**
@@ -68,6 +69,149 @@ function DiaryController($scope, template, model, route, date, $location) {
         lastMouseDownTime: undefined,
         lastMouseClientX: undefined,
         lastMouseClientY: undefined,
+    }
+
+    $scope.pedagogicItems = {
+        days : [
+            {   dayName :"Vendredi 29 janvier 2016",
+                nbLessons : 2,
+                nbHomeworks : 2,
+                expanded : true,
+                pedagogicItemsOfTheDay : [
+                    {
+                        typeItem : "homework",
+                        title : "Exercices de trigonométrie",
+                        subject : "Mathématiques",
+                        audience : "TS1",
+                        startHour : "",
+                        endHour : "",
+                        typeHomework : "Devoir maison",
+                        teacher : "Alain Bono",
+                        description : "Faire les exercices 5, 6 et 7 de la page 22 du livre de mathématique. Réaliser les exercices avec soin sur une double feuille à petits carrés.",
+                        published : true,
+                        color: "#FF60EB"
+                    },
+                    {
+                        typeItem : "homework",
+                        title : "Exercices de trigonométrie",
+                        subject : "Mathématiques",
+                        audience : "2NDE A GR1",
+                        startHour : "",
+                        endHour : "",
+                        typeHomework : "Exercice en cours",
+                        teacher : "Alain Bono",
+                        description : "Suivre les consignes indiquées dans le fichier PDF ci-joint afin de réaliser les exercices 1, 2 et 4. Les formules à utiliser sont indiquées dans la fiche de description de la leçon.",
+                        published : true,
+                        color: "#63FF31"
+                    },
+                    {
+                        typeItem : "lesson",
+                        title : "Cours de trigonométrie (séance 4/5)",
+                        subject : "Mathématiques",
+                        audience : "2NDE A GR1",
+                        startHour : "8h55",
+                        endHour : "11h00",
+                        typeHomework : "",
+                        teacher : "Alain Bono",
+                        description : "Présentation de la trigonométrie. 3) Corrections croisées des exercices par les élèves...",
+                        published : true,
+                        color: "#63FF31"
+                    },
+                    {
+                        typeItem : "lesson",
+                        title : "Statistiques les bases",
+                        subject : "Mathématiques",
+                        audience : "TS2",
+                        startHour : "11h05",
+                        endHour : "12h",
+                        typeHomework : "",
+                        teacher : "Alain Bono",
+                        description : "Premier cours magistral sur les calculs de statistiques.",
+                        published : false,
+                        color: "#8B21FF"
+                    }
+                ]
+            },
+            {   dayName :"Jeudi 28 janvier 2016",
+                nbLessons : 1,
+                nbHomeworks : 2,
+                expanded : false,
+                pedagogicItemsOfTheDay : [
+                    {
+                        typeItem : "homework",
+                        title : "Exercices de trigonométrie",
+                        subject : "Mathématiques",
+                        audience : "TS1",
+                        startHour : "",
+                        endHour : "",
+                        typeHomework : "Devoir maison",
+                        teacher : "Alain Bono",
+                        description : "Faire les exercices 5, 6 et 7 de la page 22 du livre de mathématique. Réaliser les exercices avec soin sur une double feuille à petits carrés.",
+                        published : true,
+                        color: "#FF60EB"
+                    },
+                    {
+                        typeItem : "homework",
+                        title : "Exercices de trigonométrie",
+                        subject : "Mathématiques",
+                        audience : "2NDE A GR1",
+                        startHour : "",
+                        endHour : "",
+                        typeHomework : "Exercice en cours",
+                        teacher : "Alain Bono",
+                        description : "Suivre les consignes indiquées dans le fichier PDF ci-joint afin de réaliser les exercices 1, 2 et 4. Les formules à utiliser sont indiquées dans la fiche de description de la leçon.",
+                        published : true,
+                        color: "#63FF31"
+                    },
+                    {
+                        typeItem: "lesson",
+                        title: "Cours de trigonométrie (séance 2/5)",
+                        subject: "Mathématiques",
+                        audience: "2NDE A GR1",
+                        startHour: "8h55",
+                        endHour: "11h00",
+                        typeHomework: "",
+                        teacher: "Alain Bono",
+                        description: "Présentation de la trigonométrie. 2) Réalisation d'exercices en cours.",
+                        published: true,
+                        color: "#63FF31"
+                    }
+                ]
+            },
+            {   dayName :"Mardi 26 janvier 2016",
+                nbLessons : 2,
+                nbHomeworks : 0,
+                expanded : false,
+                pedagogicItemsOfTheDay : [
+                    {
+                        typeItem : "lesson",
+                        title : "Cours de trigonométrie (séance 1/5)",
+                        subject : "Mathématiques",
+                        audience : "2NDE B GR1",
+                        startHour : "8h55",
+                        endHour : "11h00",
+                        typeHomework : "",
+                        teacher : "Alain Bono",
+                        description : "Présentation de la trigonométrie. Cours est découpé en 3 parties : 1) Définitions et présentation sous forme d'exemple. 2) Réalisation d'exercices en cours. 3) Corrections croisées des exercices par les élèves...",
+                        published : true,
+                        color: "#C1FF45"
+                    },
+                    {
+                        typeItem : "lesson",
+                        title : "Cours de trigonométrie (séance 1/5)",
+                        subject : "Mathématiques",
+                        audience : "2NDE A GR1",
+                        startHour : "14h05",
+                        endHour : "17h00",
+                        typeHomework : "",
+                        teacher : "Alain Bono",
+                        description : "Présentation de la trigonométrie. Cours est découpé en 3 parties : 1) Définitions et présentation sous forme d'exemple. 2) Réalisation d'exercices en cours. 3) Corrections croisées des exercices par les élèves...",
+                        published : true,
+                        color: "#63FF31"
+                    }
+                ]
+            }
+        ]
     }
 
     $scope.lessons = model.lessons;
@@ -121,14 +265,44 @@ function DiaryController($scope, template, model, route, date, $location) {
             if (params.startDate != null) {
                 //put the start date in the scope?
             }
-            template.open('main', 'main');
-            template.open('main-view', 'calendar');
-            template.open('daily-event-details', 'daily-event-details');
             $scope.lesson = null;
             $scope.homework = null;
+            $scope.showCalendar();
+        },
+        mainView: function(params){
+            if ($scope.display.showList) {
+                $scope.showList();
+            } else {
+                $scope.lesson = null;
+                $scope.homework = null;
+                $scope.showCalendar();
+            }
         }
     });
 
+    // Navigation
+    $scope.showList = function() {
+        $scope.display.showList = true;
+        //load stuff
+        template.open('main', 'main');
+        template.open('main-view', 'list-view');
+    };
+
+    $scope.showCalendar = function() {
+        $scope.display.showList = false;
+        template.open('main', 'main');
+        template.open('main-view', 'calendar');
+        template.open('daily-event-details', 'daily-event-details');
+    };
+
+    //list-view interactions
+    $scope.expandDay = function(day) {
+        day.expanded = true;
+    };
+
+    $scope.collapseDay = function(day) {
+        day.expanded = undefined;
+    };
 
     var loadHomeworkFromRoute = function(idHomework) {
         var homework = model.homeworks.findWhere({ id: parseInt(idHomework)});

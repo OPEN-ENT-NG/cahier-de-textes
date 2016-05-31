@@ -1,0 +1,60 @@
+ul {
+    list-style-type: none;
+    margin-top: 0;
+    width: 99%;
+    border-left: 5px solid transparent !important;
+    padding-left: 10px;
+    padding-right: 15px;
+}
+
+ul li i {
+    color: #FF8500;
+}
+
+ul li i.caret {
+    height: 20px;
+    width: 25px;
+    display: block;
+    float: left !important;
+    color: #fff;
+    font-size: 25px;
+    font-family: Arial;
+    font-weight: 900;
+}
+
+ul li i.caret::before {
+    content: "▸";
+    color: #FF8500;
+}
+
+ul li i.caret.expanded::before {
+    content: "▾";
+    color: #FF8500;
+}
+
+ul li i.caret::before {
+    content: "▸";
+    color: #FF8500;
+}
+
+ul li i.icon {
+    font-size: 55px;
+    line-height: 55px;
+    text-align: center;
+}
+
+i.rack2::before {
+    content: "\e80d";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+i.cahier-textes2::before {
+    content: "\e86f";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}

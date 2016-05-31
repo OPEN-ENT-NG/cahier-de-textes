@@ -92,5 +92,8 @@
   "daily.homework.publish.confirm.multi": "Êtes-vous sûr(e) de vouloir publier ce travail à faire ?",
   "daily.homework.unpublish.confirm.one": "Êtes-vous sûr(e) de vouloir marquer ce travail à faire en tant que brouillon ?",
   "daily.homework.unpublish.confirm.multi": "Êtes-vous sûr(e) de vouloir marquer ces travaux à faire en tant que brouillon ?",
-  "homework.types": "Type de travail"
+  "homework.types": "Type de travail",
+  "diary.icon.show.calendar": "Calendrier des séances",
+  "diary.icon.show.list": "Liste des séances",
+  "diary.not.published": "(Brouillon)"
 }

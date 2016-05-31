@@ -1,0 +1,44 @@
+<div class="row">
+    <button ng-click="redirect('/createLessonView/default')">
+        <i18n>diary.lesson.create</i18n>
+    </button>
+    <button ng-click="redirect('/createHomeworkView')">
+        <i18n>diary.homework.create</i18n>
+    </button>
+    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
+       tooltip="diary.icon.show.list"></i>
+    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="showCalendar()"
+       tooltip="diary.icon.show.calendar"></i>
+    <hr />
+</div>
+
+<section class="cell twelve">
+    <ul class="colored">
+        <li ng-repeat="day in pedagogicItems.days">
+            <div class="twelve height-one">
+                <p>
+                    <a ng-if="day.expanded !== true" ng-click="expandDay(day)">
+                        <i class="caret"></i>[[day.dayName]]</a>
+                    <a ng-if="day.expanded === true" ng-click="collapseDay(day)">
+                        <i class="caret expanded"></i>[[day.dayName]]</a> Travail à faire ([[day.nbHomeworks]]) &nbsp; Séance ([[day.nbLessons]])
+                </p>
+            </div>
+            <ul ng-if="day.expanded === true">
+                <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay">
+                    <div class="one cell height-two" ng-if="pedagogicItem.typeItem === 'homework'">
+                        <i class="icon rack2" ng-style="{'color':pedagogicItem.color}"></i>
+                    </div>
+                    <div class="one cell height-two" ng-if="pedagogicItem.typeItem === 'lesson'">
+                        <i class="icon cahier-textes2" ng-style="{'color':pedagogicItem.color}"></i>
+                    </div>
+                    <div class="eleven cell height-one">
+                        <i ng-if="pedagogicItem.published === false"><i18n>diary.not.published</i18n></i>
+                        [[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]<br/>
+                        [[pedagogicItem.title]]
+                    </div>
+                    <div class="eleven cell height-one">[[pedagogicItem.description]]</div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</section>
