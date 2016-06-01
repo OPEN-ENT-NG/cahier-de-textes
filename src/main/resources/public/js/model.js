@@ -725,6 +725,7 @@ model.build = function () {
 
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
+                    model.lessons.all.splice(0, model.lessons.all.length);
                     lessons = lessons.concat(data);
                     that.addRange(
                         _.map(lessons, function (lesson) {
@@ -811,6 +812,7 @@ model.build = function () {
 
             model.me.structures.forEach(function (structureId) {
                 http().get('/diary/homework/' + structureId + '/' + start + '/' + end).done(function (data) {
+                    model.homeworks.all.splice(0, model.homeworks.all.length);
                     homeworks = homeworks.concat(data);
                     that.addRange(
                         _.map(homeworks, convertSqlToJsHomework)
