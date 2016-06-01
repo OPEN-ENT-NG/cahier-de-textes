@@ -59,10 +59,6 @@
                     
                     function setDaysContent() {
 
-                        if(!model.homeworksLoaded){
-                            return;
-                        }
-
                         model.calendar.days.forEach(function (day) {
                             day.dailyEvents = [];
                         });

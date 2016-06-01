@@ -1048,7 +1048,6 @@ function DiaryController($scope, template, model, route, date, $location) {
             model.lessons.syncLessons(function() {
                 model.homeworks.syncHomeworks(
                     function () {
-                        model.homeworksLoaded = true;
                         $scope.decrementCountdown();
                     }
                 );
@@ -1094,13 +1093,11 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.nextWeek = function () {
-        model.homeworksLoaded = undefined;
         var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
         refreshCalendar(nextMonday);
     };
 
     $scope.previousWeek = function () {
-        model.homeworksLoaded = undefined;
         var prevMonday = moment(model.calendar.firstDay).subtract(7, 'day');
         refreshCalendar(prevMonday);
     };
@@ -1114,7 +1111,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         model.calendar.setDate(momentDate);
         model.lessons.syncLessons();
         model.homeworks.syncHomeworks(function () {
-            model.homeworksLoaded = true;
             $scope.showCal = !$scope.showCal;
             $scope.$apply();
         });
