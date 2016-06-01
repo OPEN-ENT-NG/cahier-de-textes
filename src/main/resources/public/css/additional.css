@@ -76,7 +76,7 @@ i.cahier-textes2::before {
 }
 
 i.pencil::before {
-    content: "\e852";
+    content: "\e858";
     font-family:"fontello";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
