@@ -118,3 +118,7 @@ div.test .green {
     line-height: 12px;
     text-align: left;
 }
+
+.schedule .days div.schedule-items div.schedule-item {
+    z-index: 0;
+}
