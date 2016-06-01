@@ -1250,4 +1250,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors.push(e);
         $scope.$apply();
     };
+
+    $scope.initialization();
 }
