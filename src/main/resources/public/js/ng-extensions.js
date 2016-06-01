@@ -10,18 +10,19 @@
                 template: '<div class="days" >' +
                     '<div class="day" ng-repeat="day in calendar.days.all" style="height: 120px;">' +
                         // <= 3 homeworks for current day
-                        '<div ng-if="day.dailyEvents.length && day.dailyEvents.length <= 3">' +
+                        '<div class="test" ng-if="day.dailyEvents.length && day.dailyEvents.length <= 3">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-item"></container>' +
+                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
                         '</div>' +
                         // > 3 homeworks for current day
                         '<div class="opener" ng-if="day.dailyEvents.length && day.dailyEvents.length > 3" ' +
-                        'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
-                        '<i18n>daily.event</i18n>' +
-                        '<div class="daily-events" ng-class="{ show: day.openDailyEvents }">' +
-                            '<div class="item [[dailyEvent.color]]" ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-details"></container>' +
+                            'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
+                            '<i18n>daily.event</i18n>' +
+                            '<div class="test daily-events" ng-class="{ show: day.openDailyEvents }">' +
+                                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
