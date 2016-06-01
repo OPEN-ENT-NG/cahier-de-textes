@@ -95,5 +95,7 @@
   "homework.types": "Type de travail",
   "diary.icon.show.calendar": "Calendrier des séances",
   "diary.icon.show.list": "Liste des séances",
-  "diary.not.published": "(Brouillon)"
+  "diary.not.published": "(Brouillon)",
+  "diary.homework.label": "Travail à faire",
+  "diary.lesson.label": "Séance"
 }
