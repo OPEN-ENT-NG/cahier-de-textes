@@ -84,17 +84,17 @@
                         // wait until they are to create the homework panel
                         else {
                             var timerOccurences = 0;
-                            var timer = setTimeout(
+                            var timer = setInterval(
                                 function () {
                                     timeslots = $('.timeslots');
                                     if (timeslots.length === 8) {
-                                        clearTimeout(timer);
+                                        clearInterval(timer);
                                         placeTimeslots(timeslots);
                                     }
                                     timerOccurences++;
-                                    // 10s should be far than enough to have all timeslots loaded
-                                    if (timerOccurences > 100) {
-                                        clearTimeout(timer);
+                                    // 5s should be far than enough to have all timeslots loaded
+                                    if (timerOccurences > 50) {
+                                        clearInterval(timer);
                                     }
                                 }, 100);
                         }
