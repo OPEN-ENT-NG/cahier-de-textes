@@ -1094,11 +1094,13 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.nextWeek = function () {
         var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
+        model.calendar.week++;
         refreshCalendar(nextMonday);
     };
 
     $scope.previousWeek = function () {
         var prevMonday = moment(model.calendar.firstDay).subtract(7, 'day');
+        model.calendar.week--;
         refreshCalendar(prevMonday);
     };
 
