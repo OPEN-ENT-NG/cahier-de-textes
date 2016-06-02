@@ -1036,6 +1036,13 @@ function DiaryController($scope, template, model, route, date, $location) {
      * Load related data to lessons and homeworks from database
      */
     $scope.initialization = function () {
+
+        template.open('main', 'main');
+        template.open('create-lesson', 'create-lesson');
+        template.open('create-homework', 'create-homework');
+        template.open('daily-event-details', 'daily-event-details');
+        template.open('daily-event-item', 'daily-event-item');
+
         $scope.countdown = 5;
         var teacher = new Teacher();
         teacher.create($scope.decrementCountdown);
@@ -1073,20 +1080,13 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.decrementCountdown = function () {
         $scope.countdown--;
         if ($scope.countdown == 0) {
-            $scope.initTemplates();
+            $scope.showTemplates();
         }
     };
 
-    $scope.initTemplates = function () {
-        template.open('main', 'main');
-        template.open('create-lesson', 'create-lesson');
-        template.open('create-homework', 'create-homework');
-        template.open('daily-event-details', 'daily-event-details');
-        template.open('daily-event-item', 'daily-event-item');
-        setTimeout(function () {
-            $scope.showCal = !$scope.showCal;
-            $scope.$apply();
-        }, 100);
+    $scope.showTemplates = function () {
+        $scope.showCal = !$scope.showCal;
+        $scope.$apply();
     };
 
     $scope.nextWeek = function () {
