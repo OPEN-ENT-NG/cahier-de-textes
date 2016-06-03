@@ -7,7 +7,7 @@
                 },
                 restrict: 'E',
                 // ng-controller="DiaryController"
-                template: '<div class="days" >' +
+                template: '<div class="days" style="z-index: 1000;">' +
                     '<div class="day" ng-repeat="day in calendar.days.all" style="height: 120px;">' +
                         // <= 3 homeworks for current day
                         '<div class="test" ng-if="day.dailyEvents.length && day.dailyEvents.length <= 3">' +
@@ -19,10 +19,10 @@
                         '<div class="opener" ng-if="day.dailyEvents.length && day.dailyEvents.length > 3" ' +
                             'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
                             '<i18n>daily.event</i18n>' +
-                            '<div class="test daily-events" ng-class="{ show: day.openDailyEvents }">' +
-                                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
-                                '</div>' +
+                        '</div>' +
+                        '<div class="test daily-events" style="z-index: 1000;" ng-click="day.openDailyEvents = !day.openDailyEvents" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
+                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
