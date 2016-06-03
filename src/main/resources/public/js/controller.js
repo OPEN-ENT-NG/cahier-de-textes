@@ -878,6 +878,9 @@ function DiaryController($scope, template, model, route, date, $location) {
         var unpublishableHomeworks = itemsSelected.unPublishableSelectedHomeworks;
         var noStateChangeHomeworks = itemsSelected.noStateChangeHomeworks;
 
+        if (noStateChangeLessons.length > 0 || noStateChangeHomeworks.length > 0) {
+            return false;
+        }
 
         if (toPublish) {
             // nothing selected
@@ -885,8 +888,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 return false;
             } else {
                 var noUnpublishableItems = unpublishableHomeworks.length == 0 && unpublishableLessons.length == 0;
-                return (publishableLessons.length > 0 && noUnpublishableItems  && noStateChangeLessons.length == 0)
-                    || (publishableHomeworks.length > 0 && noUnpublishableItems && noStateChangeHomeworks.length == 0);
+                return (publishableLessons.length > 0 && noUnpublishableItems) || (publishableHomeworks.length > 0 && noUnpublishableItems);
             }
         } else {
             // nothing selected
@@ -894,8 +896,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 return false;
             } else {
                 var noPublishableItems = publishableLessons.length == 0 && publishableHomeworks.length == 0;
-                return (unpublishableLessons.length > 0 && noPublishableItems && noStateChangeLessons.length == 0)
-                    || (unpublishableHomeworks.length > 0 && noPublishableItems && noStateChangeHomeworks.length == 0);
+                return (unpublishableLessons.length > 0 && noPublishableItems) || (unpublishableHomeworks.length > 0 && noPublishableItems);
             }
         }
     }
