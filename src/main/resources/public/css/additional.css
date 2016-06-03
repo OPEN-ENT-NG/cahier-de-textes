@@ -120,6 +120,13 @@ div.test .green {
 }
 
 /*
+Override marging for homeworks display
+*/
+.schedule-item {
+    margin-top: 120px;
+}
+
+/*
 .schedule .days div.schedule-items div.schedule-item {
     z-index: 0;
 }*/
