@@ -284,6 +284,10 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.showList = function() {
         $scope.display.showList = true;
         //load stuff
+        $scope.getListViewData($scope.openListView());
+    };
+
+    $scope.openListView = function () {
         template.open('main', 'main');
         template.open('main-view', 'list-view');
     };
@@ -303,6 +307,106 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.collapseDay = function(day) {
         day.expanded = undefined;
     };
+
+    $scope.getListViewData = function(cb) {
+
+        var items = [];
+        var lessons = $scope.lessons;
+        var homeworks = $scope.homeworks;
+
+        var days = [];
+        lessons.forEach(function (lesson) {
+            if (_.contains(days, lesson.date) == false) {
+                days.push(lesson.date);
+            }
+        });
+
+        homeworks.forEach(function (homework) {
+            if (_.contains(days, homework.homework_due_date) == false) {
+                days.push(homework.homework_due_date);
+            }
+        });
+
+        console.log("nb days = " + days.length);
+
+        days.forEach(function (day) {
+
+            var pedagogicItemsOfTheDay = [];
+
+            var lessonsOfTheDay = lessons.filter(function (lesson) {
+                return lesson.date == day;
+            }).map (function(lesson) {
+                return $scope.convertLessonToPedagogicItem(lesson);
+            });
+
+            console.log("day: " + day + " nb lessonsOfTheDay = " + lessonsOfTheDay.length);
+
+            var homeworksOfTheDay = homeworks.filter(function (homework) {
+                return homework.homework_due_date == day;
+            }).map (function(homework) {
+                return $scope.convertHomeworkToPedagogicItem(homework);
+            });
+
+            console.log("nb homeworksOfTheDay = " + homeworksOfTheDay.length);
+
+            pedagogicItemsOfTheDay = homeworksOfTheDay.concat(lessonsOfTheDay);
+
+            console.log("nb pedagogicItemsOfTheDay = " + pedagogicItemsOfTheDay.length);
+
+            var pedagogicDay = {};
+            pedagogicDay.pedagogicItemsOfTheDay = pedagogicItemsOfTheDay;
+            pedagogicDay.dayName = moment(day.split(' ')[0]).format("dddd DD MMMM YYYY");
+            pedagogicDay.nbLessons = lessonsOfTheDay.length;
+            pedagogicDay.nbHomeworks = homeworksOfTheDay.length;
+            pedagogicDay.expanded = false;
+            items.push(pedagogicDay);
+        });
+
+        $scope.pedagogicItems = items;
+        if(typeof cb === 'function'){
+            cb();
+        }
+    }
+
+    $scope.convertLessonToPedagogicItem = function (lesson) {
+        var item = {};
+        item.typeItem = "lesson";
+        item.id = lesson.id;
+        item.title = lesson.title;
+        item.subject = lesson.subjectLabel;
+        item.audience = lesson.audienceLabel;
+        item.startHour = moment(lesson.date).minutes($scope.getMinutes(lesson.startTime)).format("HH[h]mm");
+        item.endHour = moment(lesson.date).minutes($scope.getMinutes(lesson.endTime)).format("HH[h]mm");
+        item.typeHomework = "";
+        item.teacher = lesson.teacherId;
+        item.description = lesson.description;
+        item.published = lesson.state == "published";
+        item.color = lesson.color;
+        return item;
+    }
+
+
+
+    $scope.convertHomeworkToPedagogicItem = function (homework) {
+        var item = {};
+        item.typeItem = "homework";
+        item.id = homework.id;
+        item.title = homework.homework_title;
+        item.subject = homework.subject_label;
+        item.audience = homework.audience_label;
+        item.startHour = "";
+        item.endHour = "";
+        item.typeHomework = homework.homework_type_label;
+        item.teacher = "teacher";
+        item.description = homework.homework_description;
+        item.published = homework.homework_state == "published";
+        item.color = homework.homework_color;
+        return item;
+    }
+
+    $scope.getMinutes = function (time) {
+        return time.split(':')[0] * 60 + time.split(':')[1];
+    }
 
     var loadHomeworkFromRoute = function(idHomework) {
         var homework = model.homeworks.findWhere({ id: parseInt(idHomework)});
