@@ -860,7 +860,7 @@ model.build = function () {
             audienceLabel: data.audience_label,
             audienceType: data.audience_type,
             description: data.lesson_description,
-            subject: model.subjects.findWhere({code: data.subject_code}),
+            subject: model.subjects.findWhere({id: data.subject_id}),
             subjectId: data.subject_id,
             subjectLabel: data.subject_label,
             teacherId: data.teacher_display_name,
