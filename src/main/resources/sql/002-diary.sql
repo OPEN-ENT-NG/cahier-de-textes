@@ -176,7 +176,7 @@ CREATE OR REPLACE FUNCTION diary.insert_groups_members() RETURNS trigger AS $$
       END IF;
       RETURN NULL;
     END;
-$$ LANGUAGE plpgsql VOLATILE
+$$ LANGUAGE plpgsql VOLATILE;
 
 CREATE OR REPLACE FUNCTION diary.insert_users_members() RETURNS trigger AS $$
      BEGIN
@@ -186,7 +186,7 @@ CREATE OR REPLACE FUNCTION diary.insert_users_members() RETURNS trigger AS $$
       END IF;
       RETURN NULL;
     END;
-$$ LANGUAGE plpgsql VOLATILE
+$$ LANGUAGE plpgsql VOLATILE;
 
 CREATE TRIGGER groups_trigger
   AFTER INSERT
