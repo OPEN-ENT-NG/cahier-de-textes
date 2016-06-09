@@ -425,6 +425,11 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.tabs.createLesson = params.idHomework ? 'homeworks' : 'lesson';
         $scope.tabs.showAnnotations = false;
 
+        var openLessonTemplates = function(){
+            template.open('main', 'main');
+            template.open('main-view', 'create-lesson');
+        }
+
         // open existing lesson for edit
         if (lesson) {
             if (!$scope.lesson) {
@@ -436,27 +441,18 @@ function DiaryController($scope, template, model, route, date, $location) {
                 beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
                 end: $scope.lesson.endMoment //moment($scope.lesson.end)
             }
+
+            $scope.loadHomeworksForCurrentLesson(function () {
+                openLessonTemplates();
+            });
         }
         // create new lesson
         else {
             var isTimeFromCalendar = ("timeFromCalendar" === params.timeFromCalendar);
             initLesson(isTimeFromCalendar);
-        }
-
-        var openLessonTemplates = function(){
-            template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
-        }
-
-        // open homeworks tab view so we need load homework data
-        // first (which is not loaded by default on lesson tab view)
-        if (params.idHomework) {
-            $scope.loadHomeworksForCurrentLesson(function () {
-                openLessonTemplates();
-            });
-        } else {
             openLessonTemplates();
         }
+
     };
 
     $scope.openHomeworkView = function(homework, params){
@@ -608,69 +604,18 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.endTime = $scope.newItem.end;
         $scope.lesson.date = $scope.newItem.date;
 
-
         $scope.lesson.save(
             function () {
-                // homeworks associated with lesson
-                // TODO move to model and refactor
-                if ($scope.lesson.homeworks && $scope.lesson.homeworks.all.length > 0) {
-
-                    var homeworkSavedCount = 0;
-                    var homeworkCount = $scope.lesson.homeworks.all.length;
-                    var execASyncPostLessonSave = true;
-
-                    $scope.lesson.homeworks.forEach(function (homework) {
-
-                        homework.lesson_id = $scope.lesson.id;
-                        // needed fields as in model.js Homework.prototype.toJSON
-                        homework.audience = $scope.lesson.audience;
-                        homework.subject = $scope.lesson.subject;
-                        homework.color = $scope.lesson.color;
-
-                        // homework might not have been sql loaded if user stayed on lesson tab
-                        if(typeof homework.loaded === 'undefined' || homework.loaded) {
-                            execASyncPostLessonSave = false;
-                            homework.save(
-                                // go back to calendar view once all homeworks saved ('back' button)
-                                function (x) {
-                                    homeworkSavedCount ++;
-                                    if (homeworkSavedCount == homeworkCount) {
-                                        $scope.postLessonSave(goToCalendarView);
-                                    }
-                                },
-                                function (e) {
-                                    validationError(e);
-                                });
-                        }
-                    });
-
-                    if(execASyncPostLessonSave){
-                        $scope.postLessonSave(goToCalendarView);
-                    }
-                } else {
-                    $scope.postLessonSave(goToCalendarView);
-                }
-        }, function (e) {
-            validationError(e);
-        });
-    };
-
-    $scope.postLessonSave = function(goToCalendarView){
-        notify.info('lesson.saved');
-
-        // TODO remove sync and investigate more
-        // actually there are some differences between the lesson object
-        // created from Lesson.prototype.create
-        // and the one retreived from db specially date fields as string or date or moment
-        model.lessons.syncLessons(function(){
-            model.homeworks.syncHomeworks(function(){
+                notify.info('lesson.saved');
+                $scope.lesson.audience = model.audiences.findWhere({id: $scope.lesson.audience.id});
                 $scope.$apply();
                 if (goToCalendarView) {
                     $scope.goToCalendarView();
                     $scope.lesson = null;
                     $scope.homework = null;
                 }
-            });
+            }, function (e) {
+            validationError(e);
         });
     };
 
@@ -1119,10 +1064,11 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.homework.dueDate = $scope.newItem.date;
         }
 
-        $scope.homework.save(function () {
+        var postHomeworkSave = function () {
             model.homeworks.syncHomeworks();
             $scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
+            $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
             $scope.$apply();
 
             if (goToCalendarView) {
@@ -1130,7 +1076,14 @@ function DiaryController($scope, template, model, route, date, $location) {
                 $scope.lesson = null;
                 $scope.homework = null;
             }
+        }
 
+        $scope.homework.save(function () {
+            if (this.lesson_id) {
+                syncHomeworks(postHomeworkSave);
+            } else {
+                syncLessonsAndHomeworks(postHomeworkSave)
+            }
         }, function (e) {
             validationError(e);
         });

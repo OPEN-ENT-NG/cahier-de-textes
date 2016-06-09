@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.Audience;
 import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -23,14 +24,21 @@ import static org.entcore.common.sql.SqlResult.*;
 public class HomeworkServiceImpl extends SqlCrudService implements HomeworkService {
 
     private DiaryService diaryService;
+    private AudienceService audienceService;
 
     private final static String DATABASE_TABLE ="homework";
     private final static Logger log = LoggerFactory.getLogger(HomeworkServiceImpl.class);
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
 
-    public HomeworkServiceImpl(final DiaryService diaryService) {
+    /**
+     *
+     * @param diaryService
+     * @param audienceService
+     */
+    public HomeworkServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
         this.diaryService = diaryService;
+        this.audienceService = audienceService;
     }
 
     @Override
@@ -123,45 +131,56 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler) {
-        if(homeworkObject != null) {
-            diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
+    public void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Audience audience, final Handler<Either<String, JsonObject>> handler) {
+        if (homeworkObject != null) {
+            stripNonHomeworkFields(homeworkObject);
+            audienceService.getOrCreateAudience(audience, new Handler<Either<String, JsonObject>>() {
                 @Override
                 public void handle(Either<String, JsonObject> event) {
-                    if(event.isRight()){
-                        final JsonArray attachments = homeworkObject.getArray("attachments");
-                        homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
-                        if(attachments != null && attachments.size() > 0) {
-                            //get next on the sequence to add the homework and value in FK on attachment
+                    if (event.isRight()) {
+                        diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
+                            @Override
+                            public void handle(Either<String, JsonObject> event) {
+                                if (event.isRight()) {
+                                    final JsonArray attachments = homeworkObject.getArray("attachments");
+                                    homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
+                                    if (attachments != null && attachments.size() > 0) {
+                                        //get next on the sequence to add the homework and value in FK on attachment
 
-                            sql.raw("select nextval('diary.homework_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        log.debug(event.right().getValue());
-                                        Long nextId = event.right().getValue().getLong("next_id");
-                                        homeworkObject.putNumber("id", nextId);
+                                        sql.raw("select nextval('diary.homework_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonObject> event) {
+                                                if (event.isRight()) {
+                                                    log.debug(event.right().getValue());
+                                                    Long nextId = event.right().getValue().getLong("next_id");
+                                                    homeworkObject.putNumber("id", nextId);
 
-                                        JsonArray parameters = new JsonArray().add(nextId);
-                                        for (Object id: attachments) {
-                                            parameters.add(id);
-                                        }
+                                                    JsonArray parameters = new JsonArray().add(nextId);
+                                                    for (Object id : attachments) {
+                                                        parameters.add(id);
+                                                    }
 
-                                        SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                                        sb.insert("diary.homework", homeworkObject, "id");
-                                        sb.prepared("update diary.attachment set homework_id = ? where id in " +
-                                                sql.listPrepared(attachments.toArray()), parameters);
+                                                    SqlStatementsBuilder sb = new SqlStatementsBuilder();
+                                                    sb.insert("diary.homework", homeworkObject, "id");
+                                                    sb.prepared("update diary.attachment set homework_id = ? where id in " +
+                                                            sql.listPrepared(attachments.toArray()), parameters);
 
-                                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                                                    sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                                                }
+                                            }
+                                        }));
+                                    } else {
+                                        //insert homework
+                                        sql.insert("diary.homework", homeworkObject, "id", validUniqueResultHandler(handler));
                                     }
+                                } else {
+                                    log.error("Teacher couldn't be retrieved or created.");
+                                    handler.handle(event.left());
                                 }
-                            }));
-                        } else {
-                            //insert homework
-                            sql.insert("diary.homework", homeworkObject, "id", validUniqueResultHandler(handler));
-                        }
+                            }
+                        });
                     } else {
-                        log.error("Teacher couldn't be retrieved or created.");
+                        log.error("Audience couldn't be retrieved or created.");
                         handler.handle(event.left());
                     }
                 }
@@ -169,11 +188,26 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         }
     }
 
+    /**
+     * fields not as column in table diary.homework so need to delete
+     * else will crash on createHomework or updateHomework
+     * TODO remove that try getting audience data from other object than homework JSON one
+     * (see {@link fr.openent.diary.controllers.LessonController}
+     *
+     * @param homeworkObject
+     */
+    private void stripNonHomeworkFields(final JsonObject homeworkObject) {
+
+        homeworkObject.removeField("audience_type");
+        homeworkObject.removeField("audience_name");
+    }
+
     @Override
     public void updateHomework(String homeworkId, JsonObject homeworkObject, Handler<Either<String, JsonObject>> handler) {
 
         // FIXME json sql do not work if SQL enum column
         homeworkObject.removeField("homework_state");
+        stripNonHomeworkFields(homeworkObject);
 
         StringBuilder sb = new StringBuilder();
         JsonArray values = new JsonArray();

@@ -29,7 +29,7 @@ public class Diary extends BaseServer {
         final DiaryService diaryService = new DiaryServiceImpl();
         final AudienceService audienceService = new AudienceServiceImpl();
         final LessonService lessonService = new LessonServiceImpl(diaryService, audienceService);
-        final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService);
+        final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService, audienceService);
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
 
@@ -46,7 +46,7 @@ public class Diary extends BaseServer {
 
         addController(lessonController);
 
-        HomeworkController homeworkController = new HomeworkController(homeworkService, lessonService);
+        HomeworkController homeworkController = new HomeworkController(homeworkService, lessonService, audienceService);
         SqlConf confHomework = SqlConfs.createConf(HomeworkController.class.getName());
         confHomework.setTable(HOMEWORK_TABLE);
         confHomework.setShareTable(HOMEWORK_SHARE_TABLE);

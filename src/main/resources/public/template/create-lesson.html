@@ -9,13 +9,10 @@
             required></select>
         </div>
         <div class="right-magnet cell">
-            <input type="radio" name="audience" value="class" ng-model="lesson.audienceType" />
-            <i18n>audience.type.class</i18n>
-            <input type="radio" name="audience" value="group" ng-model="lesson.audienceType" />
-            <i18n>audience.type.group</i18n>
+            <i18n>diary.audience</i18n>:
             <select 
                 ng-model="lesson.audience"
-                ng-options="audience as audience.name for audience in audiences.all"
+                ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
             ></select>
         </div>
     </div>
@@ -25,7 +22,7 @@
             <i18n>create.lesson.tabs.lesson</i18n>
         </header>
         <header ng-class="{ selected: tabs.createLesson === 'homeworks' }"
-                ng-click="tabs.createLesson = 'homeworks'; loadHomeworksForCurrentLesson()">
+                ng-click="tabs.createLesson = 'homeworks';">
             <i18n>create.lesson.tabs.homeworks</i18n>
         </header>
         <section ng-if="tabs.createLesson === 'lesson'">

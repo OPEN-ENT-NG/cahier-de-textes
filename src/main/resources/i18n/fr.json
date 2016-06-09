@@ -97,5 +97,6 @@
   "diary.icon.show.list": "Liste des séances",
   "diary.not.published": "(Brouillon)",
   "diary.homework.label": "Travail à faire",
-  "diary.lesson.label": "Séance"
+  "diary.lesson.label": "Séance",
+  "diary.audience": "Audience"
 }

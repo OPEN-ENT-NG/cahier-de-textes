@@ -1,5 +1,6 @@
 package fr.openent.diary.services;
 
+import fr.openent.diary.utils.Audience;
 import fr.wseduc.webutils.Either;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -22,7 +23,19 @@ public interface HomeworkService {
 
     //TODO can create teacher if not exists + chains handler
     //return {idHomework=value} or error
-    void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Creates a homework.
+     * - Will auto create teacher with id teacherId if it does not exists
+     * - Will auto create audience if it does not exists
+     *
+     * @param homeworkObject     Homework
+     * @param teacherId          Teacher id
+     * @param teacherDisplayName Displayed name of teacher
+     * @param audience           Audience (will be auto-created on lesson update if it does not exists)
+     * @param handler
+     */
+    void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Audience audience, final Handler<Either<String, JsonObject>> handler);
 
     void updateHomework(final String homeworkId, final JsonObject homeworkObject, final Handler<Either<String, JsonObject>> handler);
 

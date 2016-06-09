@@ -1,8 +1,10 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.HomeworkAccessFilter;
+import fr.openent.diary.services.AudienceService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
+import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -31,6 +33,7 @@ public class HomeworkController extends SharedResourceController {
 
     HomeworkService homeworkService;
     LessonService lessonService;
+    AudienceService audienceService;
 
     List<String> actionsForAutomaticSharing;
 
@@ -48,9 +51,10 @@ public class HomeworkController extends SharedResourceController {
 
     private final static Logger log = LoggerFactory.getLogger(HomeworkController.class);
 
-    public HomeworkController(HomeworkService homeworkService, LessonService lessonService) {
+    public HomeworkController(HomeworkService homeworkService, LessonService lessonService, AudienceService audienceService) {
         this.homeworkService = homeworkService;
         this.lessonService = lessonService;
+        this.audienceService = audienceService;
 
         //init automatic sharing actionsForAutomaticSharing
         actionsForAutomaticSharing = new ArrayList<String>();
@@ -143,7 +147,7 @@ public class HomeworkController extends SharedResourceController {
                         @Override
                         public void handle(JsonObject json) {
                         if(user.getStructures().contains(json.getString("school_id",""))){
-                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
+                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
                         } else {
                             badRequest(request,"Invalid school identifier.");
                         }
@@ -174,7 +178,7 @@ public class HomeworkController extends SharedResourceController {
                                 @Override
                                 public void handle(JsonObject json) {
                                 if(user.getStructures().contains(json.getString("school_id",""))){
-                                    homeworkService.createHomework(json, user.getUserId(), user.getUsername(), notEmptyResponseHandler(request, 201));
+                                    homeworkService.createHomework(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
                                 } else {
                                     badRequest(request,"Invalid school identifier.");
                                 }
@@ -205,10 +209,22 @@ public class HomeworkController extends SharedResourceController {
                 @Override
                 public void handle(final UserInfos user) {
                     if (user != null) {
-                        RequestUtils.bodyToJson(request, pathPrefix + "updateHomework",  new Handler<JsonObject>() {
+                        RequestUtils.bodyToJson(request, pathPrefix + "updateHomework", new Handler<JsonObject>() {
                             @Override
-                            public void handle(JsonObject json) {
-                                homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201));
+                            public void handle(final JsonObject json) {
+                                audienceService.getOrCreateAudience(new Audience(json), new Handler<Either<String, JsonObject>>() {
+
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201));
+                                        } else {
+                                            final String errorMsg = "Could not create audience.";
+                                            log.error(errorMsg);
+                                            badRequest(request, errorMsg);
+                                        }
+                                    }
+                                });
                             }
                         });
                     } else {
@@ -217,8 +233,8 @@ public class HomeworkController extends SharedResourceController {
                     }
                 }
             });
-        }else {
-            badRequest(request,"Invalid homework identifier.");
+        } else {
+            badRequest(request, "Invalid homework identifier.");
         }
     }
 

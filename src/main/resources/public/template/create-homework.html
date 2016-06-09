@@ -12,12 +12,9 @@
                     ng-options="subject as subject.label for subject in subjects.all" required></select>
         </div>
         <div class="right-magnet cell">
-            <input type="radio" name="audience" value="class" ng-model="homework.audienceType" />
-            <i18n>audience.type.class</i18n>
-            <input type="radio" name="audience" value="group" ng-model="homework.audienceType" />
-            <i18n>audience.type.group</i18n>
+            <i18n>diary.audience</i18n>:
             <select ng-model="homework.audience"
-                    ng-options="audience as audience.name for audience in audiences.all"></select>
+                    ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>
         </div>
     </div>
     <div class="row">

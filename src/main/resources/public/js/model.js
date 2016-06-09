@@ -58,23 +58,7 @@ Homework.prototype.update = function(cb, cbe) {
     var homework = this;
     http().putJson(url, this)
         .done(function(){
-            // sync homeworks cache with updated lesson
-            var found = false;
-
-            // tricky way but updating object in collection do not work
-            // have to remove and insert it in collection
-            model.homeworks.forEach(function(homeworkModel){
-                if(!found && homework.id === homeworkModel.id){
-                    model.homeworks.remove(homeworkModel);
-                    found = true;
-                }
-            });
-
-            if(found){
-                model.homeworks.push(homework);
-            }
-
-            if(typeof cb === 'function'){
+            if (typeof cb !== 'undefined') {
                 cb();
             }
         }.bind(this))
@@ -211,7 +195,11 @@ Homework.prototype.toJSON = function () {
         homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
         homework_description: this.description,
         homework_color: this.color,
-        homework_state: this.state
+        homework_state: this.state,
+        // used to auto create postgresql diary.audience if needed
+        // not this.audience object is originally from neo4j graph (see syncAudiences function)
+        audience_type: this.audience.type,
+        audience_name: this.audience.name
     };
 
     if (this.lesson_id) {
@@ -288,19 +276,79 @@ Lesson.prototype.calendarUpdate = function (cb, cbe) {
     }
 };
 
-//TODO
+/**
+ * Save attached homeworks of lesson
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Lesson.prototype.saveHomeworks = function (cb, cbe) {
+    var homeworkSavedCount = 0;
+    var homeworkCount = this.homeworks ? this.homeworks.all.length : 0;
+    var that = this;
+
+    // make sure subject and audience of homeworks are
+    // same as the lesson
+    if (homeworkCount > 0) {
+        this.homeworks.forEach(function (homework) {
+            homework.lesson_id = that.id;
+            // needed fields as in model.js Homework.prototype.toJSON
+            homework.audience = that.audience;
+            homework.subject = that.subject;
+            homework.color = that.color;
+
+            homework.save(
+                function (x) {
+                    homeworkSavedCount++;
+                    // callback function once all homeworks saved
+                    if (homeworkSavedCount === homeworkCount) {
+                        if (typeof cb === 'function') {
+                            cb();
+                        }
+                    }
+                },
+                function (e) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(e));
+                    }
+                });
+
+        });
+    } else {
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }
+
+
+};
+
+/**
+ * Save lesson and attached homeworks
+ * and sync calendar lessons and homeworks cache
+ * @param cb
+ * @param cbe
+ */
 Lesson.prototype.save = function(cb, cbe) {
 
     // startTime used for db save but startMoment in calendar view
     // startMoment day is given by lesson.date
     this.startMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.startTime));
     this.endMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.endTime));
+    var that = this;
+
+    var saveHomeworksAndSync = function(){
+        that.saveHomeworks(
+            function(){
+                syncLessonsAndHomeworks(cb);
+            }
+        );
+    };
 
     if(this.id) {
-        this.update(cb, cbe);
+        this.update(saveHomeworksAndSync, cbe);
     }
     else {
-        this.create(cb, cbe);
+        this.create(saveHomeworksAndSync, cbe);
     }
 };
 
@@ -327,6 +375,26 @@ Lesson.prototype.hasHomeworkWithId = function (idHomework) {
     return found;
 };
 
+
+var syncHomeworks = function (cb) {
+    model.homeworks.syncHomeworks(
+        function () {
+            if (typeof cb === 'function') {
+                cb();
+            }
+        });
+};
+
+var syncLessonsAndHomeworks = function (cb) {
+    model.lessons.syncLessons();
+    // need sync attached lesson homeworks
+    model.homeworks.syncHomeworks();
+
+    if (typeof cb === 'function') {
+        cb();
+    }
+};
+
 /**
  * Given a moment which contain reliable time data,
  * return a moment time with this time and the date specified.
@@ -351,22 +419,6 @@ Lesson.prototype.update = function(cb, cbe) {
 
     http().putJson(url, this)
         .done(function(){
-
-            // sync lessons cache with updated lesson
-            var found = false;
-
-            // tricky way but updating object in collection do not work
-            // have to remove and insert it in collection
-            model.lessons.forEach(function(lessonModel){
-                if(!found && lesson.id === lessonModel.id){
-                    model.lessons.remove(lessonModel);
-                    found = true;
-                }
-            });
-
-            if(found){
-                model.lessons.push(lesson);
-            }
 
             if(typeof cb === 'function'){
                 cb();
@@ -560,7 +612,7 @@ Lesson.prototype.toJSON = function () {
         lesson_annotation: this.annotations,
         lesson_state: this.state,
         // start columns not in lesson table TODO move
-        audience_type: this.audienceType,
+        audience_type: this.audience.type,
         audience_name: this.audience.name
     };
 
@@ -635,10 +687,6 @@ Teacher.prototype.create = function(cb) {
 
     model.me.structures.forEach(function (structureId) {
         http().postJson('/diary/teacher/' + structureId).done(function (e) {
-
-            if (e.status == '201') {
-                console.log('init subjects : ');
-            }
 
             if(typeof cb === 'function'){
                 cb();
@@ -775,9 +823,13 @@ model.build = function () {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {
                     structureData.classes = _.map(structureData.classes, function (audience) {
                         audience.structureId = structureId;
+                        audience.type = 'class';
+                        // TODO i18n
+                        audience.typeLabel = 'Classe';
                         return audience;
                     });
                     this.addRange(structureData.classes);
+                    // TODO get groups
                     nbStructures--;
                     if (nbStructures === 0) {
                         this.trigger('sync');
@@ -852,7 +904,7 @@ model.build = function () {
             }
         }
 
-        return {
+        var lesson =  {
             id: data.lesson_id,
             title: data.lesson_title,
             audience: model.audiences.findWhere({id: data.audience_id}),
@@ -877,6 +929,15 @@ model.build = function () {
             is_periodic: false,
             homeworks: lessonHomeworks
         }
+
+        // TODO i18n
+        if('group' === lesson.audienceType){
+            lesson.audienceTypeLabel = 'Groupe';
+        } else {
+            lesson.audienceTypeLabel = 'Classe';
+        }
+
+        return lesson;
     };
 
 
@@ -887,7 +948,7 @@ model.build = function () {
      * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
      */
     convertSqlToJsHomework = function(sqlHomework){
-        return   {
+        var homework =   {
             id: sqlHomework.id,
             description: sqlHomework.homework_description,
             audienceId: sqlHomework.audience_id,
@@ -899,7 +960,7 @@ model.build = function () {
             typeLabel: sqlHomework.homework_type_label,
             teacherId: sqlHomework.teacher_id,
             structureId: sqlHomework.structureId,
-            audienceId: sqlHomework.audience_id,
+            audienceType: sqlHomework.audience_type,
             audienceLabel: sqlHomework.audience_label,
             // TODO delete dueDate? (seems redondant info vs date field)
             dueDate: moment(sqlHomework.homework_due_date),
@@ -913,5 +974,12 @@ model.build = function () {
             lesson_id: sqlHomework.lesson_id
         };
 
+        if('group' === homework.audienceType){
+            homework.audienceTypeLabel = 'Groupe';
+        } else {
+            homework.audienceTypeLabel = 'Classe';
+        }
+
+        return homework;
     };
 }
