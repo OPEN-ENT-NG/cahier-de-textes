@@ -1,4 +1,4 @@
-<div class="schedule-item-content [[item.color]]" tooltip="[[item.audienceLabel]] - [[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+<div class="schedule-item-content" ng-style="{'background-color': item.color}" tooltip="[[item.audienceLabel]] - [[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
     <div class="cell twelve">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]

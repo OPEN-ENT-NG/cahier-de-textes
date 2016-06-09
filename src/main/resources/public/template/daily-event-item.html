@@ -1,5 +1,6 @@
-<div class="schedule-item-content homework-content [[dailyEvent.color]]" ng-click="redirect('/editHomeworkView/'+ dailyEvent.id); $event.stopPropagation()" >
-<!--ng-style="{'color': dailyEvent.color}"-->
+<div class="schedule-item-content homework-content" ng-style="{'border-color': dailyEvent.color, 'color': dailyEvent.color}"
+     ng-click="redirect('/editHomeworkView/'+ dailyEvent.id); $event.stopPropagation()" >
+
    <div class="cell twelve">
         [[dailyEvent.subjectLabel]]
 
