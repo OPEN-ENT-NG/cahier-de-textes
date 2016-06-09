@@ -29,6 +29,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private final static String DATABASE_TABLE ="homework";
     private final static Logger log = LoggerFactory.getLogger(HomeworkServiceImpl.class);
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
+    private static final String ID_OWNER_FIELD_NAME = "owner";
 
     /**
      *
@@ -144,6 +145,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                 if (event.isRight()) {
                                     final JsonArray attachments = homeworkObject.getArray("attachments");
                                     homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
+                                    homeworkObject.putString(ID_OWNER_FIELD_NAME, teacherId);
                                     if (attachments != null && attachments.size() > 0) {
                                         //get next on the sequence to add the homework and value in FK on attachment
 
@@ -221,12 +223,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             values.add(homeworkObject.getValue(attr));
         }
 
-        sb.delete(sb.length() - 2, sb.length());
-        String query =
-                "UPDATE diary.homework " +
-                        " SET " + sb.toString() + //TODO Vincent you can manage create and update date + "modified = NOW() " +
-                        "WHERE id = ? ";
-        sql.prepared(query, values.add(Sql.parseId(homeworkId)), validRowsResultHandler(handler));
+        sb.append(" modified = NOW()");
+        StringBuilder query = new StringBuilder("UPDATE diary.homework ");
+        query.append(" SET ").append(sb.toString()).append("WHERE id = ? ");
+        sql.prepared(query.toString(), values.add(Sql.parseId(homeworkId)), validRowsResultHandler(handler));
     }
 
     @Override
@@ -285,7 +285,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(id);
         }
 
-        sb.append("UPDATE diary.homework SET homework_state = '").append(finalState).append("' ");
+        sb.append("UPDATE diary.homework SET  modified = NOW(), homework_state = '").append(finalState).append("' ");
         sb.append("WHERE id in ");
         sb.append(sql.listPrepared(homeworkIds.toArray()));
         sb.append(" and homework_state = '").append(initialState).append("'");

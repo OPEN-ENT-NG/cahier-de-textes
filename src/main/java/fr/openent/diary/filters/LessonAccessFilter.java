@@ -52,7 +52,7 @@ public class LessonAccessFilter implements ResourcesProvider {
             JsonArray values = new JsonArray();
             query.append("SELECT count(*)")
                     .append(" FROM ").append(from.toString())
-                    .append(" WHERE t.id = ? AND t.teacher_id = ? OR (st.resource_id = ? AND st.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
+                    .append(" WHERE t.id = ? AND t.owner = ? OR (st.resource_id = ? AND st.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))
                     .append(" AND st.action = ?) ");
 
             values.add(Sql.parseId(resourceId));

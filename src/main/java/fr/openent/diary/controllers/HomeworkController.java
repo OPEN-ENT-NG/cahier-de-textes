@@ -65,8 +65,8 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/:id")
     @ApiDoc("Get a homework using its identifier")
-    //@SecuredAction(value = view_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void getHomework(final HttpServerRequest request) {
         final String homeworkId = request.params().get("id");
 
@@ -89,7 +89,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/list/:lessonId")
     @ApiDoc("Get all homeworks for a lesson")
-    //@SecuredAction(value = list_homeworks_by_lesson, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = list_homeworks_by_lesson, type = ActionType.AUTHENTICATED)
     public void listHomeworkByLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -108,7 +108,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/:etabId/:startDate/:endDate")
     @ApiDoc("Get all homeworks for a school")
-    //@SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
     public void listHomeworks(final HttpServerRequest request) {
         final String idSchool = request.params().get("etabId");
         final String startDate = request.params().get("startDate");
@@ -136,7 +136,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework")
     @ApiDoc("Create a homework")
-    //@SecuredAction(manage_resource)
+    @SecuredAction(manage_resource)
     public void createFreeHomework(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -162,7 +162,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework/:lessonId")
     @ApiDoc("Create a homework for a lesson")
-    //@SecuredAction(manage_resource)
+    @SecuredAction(manage_resource)
     public void createHomeworkForLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -196,13 +196,13 @@ public class HomeworkController extends SharedResourceController {
         });
     }
 
-    @Put("/homework/:homeworkId")
+    @Put("/homework/:id")
     @ApiDoc("Modify a homework")
-    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void modifyHomework(final HttpServerRequest request) {
 
-        final String homeworkId = request.params().get("homeworkId");
+        final String homeworkId = request.params().get("id");
 
         if (isValidHomeworkId(homeworkId)) {
             UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -240,8 +240,8 @@ public class HomeworkController extends SharedResourceController {
 
     @Delete("/homework/:id")
     @ApiDoc("Delete a homework")
-    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void deleteHomework(final HttpServerRequest request) {
 
         final String homeworkId = request.params().get("id");
@@ -266,7 +266,7 @@ public class HomeworkController extends SharedResourceController {
     //TODO : change action.type to resource + add filter
     @Post("/unPublishHomeworks")
     @ApiDoc("Unpublishes homeworks")
-    //@SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void unPublishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -301,7 +301,7 @@ public class HomeworkController extends SharedResourceController {
     //TODO : change action.type to resource + add filter
     @Post("/publishHomeworks")
     @ApiDoc("Publishes homeworks")
-    //@SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = publish_resource, type = ActionType.AUTHENTICATED)
     public void publishHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -335,24 +335,24 @@ public class HomeworkController extends SharedResourceController {
 
     @Get("/homework/share/json/:id")
     @ApiDoc("List rights for a given resource")
-    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
     }
 
     @Put("/homework/share/json/:id")
     @ApiDoc("Add rights for a given resource")
-    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
     }
 
     @Put("/homework/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
-    //@SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkAccessFilter.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
     }
@@ -366,7 +366,7 @@ public class HomeworkController extends SharedResourceController {
 
     //TODO : change action.type to resource + add filter
     @Delete("/deleteHomeworks")
-    //@SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
     public void deletes(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
