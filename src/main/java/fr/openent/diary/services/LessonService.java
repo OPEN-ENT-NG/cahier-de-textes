@@ -14,9 +14,9 @@ import java.util.List;
  */
 public interface LessonService extends CrudService {
 
-    void getAllLessonsForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForTeacher(final List<String> schoolIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllLessonsForStudent(final String schoolId, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
     void retrieveLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 

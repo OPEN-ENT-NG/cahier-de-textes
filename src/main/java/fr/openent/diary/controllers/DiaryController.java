@@ -24,6 +24,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -68,12 +69,12 @@ public class DiaryController extends BaseController {
         renderView(request);
     }
 
-    @Get("/subject/list/:schoolId")
+    @Get("/subject/list/:schoolIds")
     @ApiDoc("Get all subjects for a school")
     //@SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
     public void listSubjects(final HttpServerRequest request) {
-        final String schoolId = request.params().get("schoolId");
-        diaryService.listSubjects(schoolId, arrayResponseHandler(request));
+        final String[] schoolIds = request.params().get("schoolIds").split(":");
+        diaryService.listSubjects(Arrays.asList(schoolIds), arrayResponseHandler(request));
     }
 
     @Get("/audience/list/:schoolId")

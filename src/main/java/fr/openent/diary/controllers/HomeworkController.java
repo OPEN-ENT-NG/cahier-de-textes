@@ -20,6 +20,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -106,15 +107,15 @@ public class HomeworkController extends SharedResourceController {
         });
     }
 
-    @Get("/homework/:etabId/:startDate/:endDate")
+    @Get("/homework/:etabIds/:startDate/:endDate")
     @ApiDoc("Get all homeworks for a school")
     //@SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
     public void listHomeworks(final HttpServerRequest request) {
-        final String idSchool = request.params().get("etabId");
+        final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
 
-        log.debug("listHomeworks on school : " + idSchool);
+        log.debug("listHomeworks on schools : " + schoolIds);
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -122,9 +123,9 @@ public class HomeworkController extends SharedResourceController {
 
                 if(user != null){
                     if("Teacher".equals(user.getType())){
-                        homeworkService.getAllHomeworksForTeacher(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                        homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else { //if student
-                        homeworkService.getAllHomeworksForStudent(idSchool, user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
+                        homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                     } //TODO manage more type of users?
 
                 } else {

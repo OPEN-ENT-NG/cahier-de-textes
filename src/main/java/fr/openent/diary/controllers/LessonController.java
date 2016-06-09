@@ -20,6 +20,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
@@ -85,15 +86,15 @@ public class LessonController extends SharedResourceController {
     }
 
 
-    @Get("/lesson/:etabId/:startDate/:endDate")
+    @Get("/lesson/:etabIds/:startDate/:endDate")
     @ApiDoc("Get all lessons for etab")
     //@SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
     public void listLessons(final HttpServerRequest request) {
-        final String idSchool = request.params().get("etabId");
+        final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
 
-        log.debug("listLessons on school : " + idSchool);
+        log.debug("listLessons on schools : " + schoolIds);
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -101,9 +102,9 @@ public class LessonController extends SharedResourceController {
 
                 if(user != null){
                     if("Teacher".equals(user.getType())){
-                        lessonService.getAllLessonsForTeacher(idSchool, user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                        lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else { //if student
-                        lessonService.getAllLessonsForStudent(idSchool, user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
+                        lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                     } //TODO manage more type of users?
 
                 } else {

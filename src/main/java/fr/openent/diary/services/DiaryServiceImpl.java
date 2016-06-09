@@ -98,12 +98,17 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     }
 
     @Override
-    public void listSubjects(String schoolId, final Handler<Either<String, JsonArray>> handler) {
+    public void listSubjects(List<String> schoolIds, final Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT s.id as id, s.subject_label as label FROM diary.subject as s WHERE s.school_id = ?");
+        query.append("SELECT s.id as id, s.subject_label as label, s.school_id ")
+        .append(" FROM diary.subject as s WHERE s.school_id in")
+        .append(sql.listPrepared(schoolIds.toArray()));
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+        JsonArray parameters = new JsonArray();
+        for (String schoolId : schoolIds) {
+            parameters.add(Sql.parseId(schoolId));
+        }
 
         sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
     }

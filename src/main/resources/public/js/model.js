@@ -756,6 +756,21 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
 };
 
 
+/**
+ * Get school ids of current authenticated user as string
+ * seperated with ':'
+ * @returns {string} schoolid_1:schoolid_2:...
+ */
+var getUserStructuresIdsAsString = function () {
+    var structureIds = "";
+
+    model.me.structures.forEach(function (structureId) {
+        structureIds += structureId + ":";
+    });
+
+    return structureIds;
+}
+
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
@@ -771,22 +786,19 @@ model.build = function () {
             var countStructure = model.me.structures.length;
             model.lessons.all.splice(0, model.lessons.all.length);
 
-            model.me.structures.forEach(function (structureId) {
-                http().get('/diary/lesson/' + structureId + '/' + start + '/' + end).done(function (data) {
-                    model.lessons.all.splice(0, model.lessons.all.length);
-                    lessons = lessons.concat(data);
-                    that.addRange(
-                        _.map(lessons, function (lesson) {
-                            return sqlToJsLesson(lesson);
-                        })
-                    );
-                    countStructure--;
-                    if (countStructure === 0) {
-                        if(typeof cb === 'function'){
-                            cb();
-                        }
+            http().get('/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
+                lessons = lessons.concat(data);
+                that.addRange(
+                    _.map(lessons, function (lesson) {
+                        return sqlToJsLesson(lesson);
+                    })
+                );
+                countStructure--;
+                if (countStructure === 0) {
+                    if(typeof cb === 'function'){
+                        cb();
                     }
-                });
+                }
             });
         }, pushAll: function(datas) {
             if (datas) {
@@ -800,17 +812,15 @@ model.build = function () {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
-            model.me.structures.forEach(function (structureId) {
-                http().get('/diary/subject/list/' + structureId).done(function (data) {
-                    model.subjects.addRange(data);
-                    nbStructures--;
-                    if (nbStructures === 0) {
-                        if(typeof cb === 'function'){
-                            cb();
-                        }
+            http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
+                model.subjects.addRange(data);
+                nbStructures--;
+                if (nbStructures === 0) {
+                    if(typeof cb === 'function'){
+                        cb();
                     }
-                }.bind(that));
-            });
+                }
+            }.bind(that));
         }
     });
 
@@ -862,21 +872,19 @@ model.build = function () {
             var countStructure = model.me.structures.length;
             model.homeworks.all.splice(0, model.homeworks.all.length);
 
-            model.me.structures.forEach(function (structureId) {
-                http().get('/diary/homework/' + structureId + '/' + start + '/' + end).done(function (data) {
-                    model.homeworks.all.splice(0, model.homeworks.all.length);
-                    homeworks = homeworks.concat(data);
-                    that.addRange(
-                        _.map(homeworks, convertSqlToJsHomework)
-                    );
-                    countStructure--;
-                    if (countStructure === 0) {
-                        if(typeof cb === 'function'){
-                            cb();
-                        }
+            http().get('/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
+                homeworks = homeworks.concat(data);
+                that.addRange(
+                    _.map(homeworks, convertSqlToJsHomework)
+                );
+                countStructure--;
+                if (countStructure === 0) {
+                    if(typeof cb === 'function'){
+                        cb();
                     }
-                });
+                }
             });
+
         }, pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);

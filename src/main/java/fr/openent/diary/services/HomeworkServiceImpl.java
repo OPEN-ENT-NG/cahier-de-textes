@@ -63,7 +63,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getAllHomeworksForTeacher(String schoolId, String teacherId, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
+    public void getAllHomeworksForTeacher(List<String> schoolIds, String teacherId, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
@@ -74,17 +74,23 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
                 .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id")
-                .append(" WHERE h.teacher_id = ? AND h.school_id = ?")
+                .append(" WHERE h.teacher_id = ? AND h.school_id in ")
+                .append(sql.listPrepared(schoolIds.toArray()))
                 .append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD') AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')")
                 .append(" ORDER BY h.homework_due_date ASC");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId)).add(startDate).add(endDate);
+        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
+
+        for(String schoolId : schoolIds){
+            parameters.add(Sql.parseId(schoolId));
+        }
+        parameters.add(startDate).add(endDate);
 
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }
 
     @Override
-    public void getAllHomeworksForStudent(String schoolId, List<String> groupIds, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
+    public void getAllHomeworksForStudent(List<String> schoolIds, List<String> groupIds, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
 
         //TODO handle dates + modify current_date ?
         StringBuilder query = new StringBuilder();
@@ -96,14 +102,21 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
                 .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id")
-                .append(" WHERE h.school_id = ? AND h.audience_id in ")
+                .append(" WHERE h.school_id in ")
+                .append(sql.listPrepared(schoolIds.toArray()))
+                .append(" AND h.audience_id in ")
                 .append(sql.listPrepared(groupIds.toArray()))
                 .append(" AND h.homework_due_date < current_date")
                 .append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD') AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')")
                 .append(" AND h.homework_state = 'published'")
                 .append(" ORDER BY h.homework_due_date ASC");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+        JsonArray parameters = new JsonArray();
+
+        for(String schoolId : schoolIds){
+            parameters.add(Sql.parseId(schoolId));
+        }
+
         for (Object id: groupIds) {
             parameters.add(id);
         }

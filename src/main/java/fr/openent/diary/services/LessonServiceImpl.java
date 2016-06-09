@@ -44,8 +44,16 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         this.audienceService = audienceService;
     }
 
+    /**
+     *
+     * @param schoolIds Schools the teacher belong to
+     * @param teacherId
+     * @param startDate
+     * @param endDate
+     * @param handler
+     */
     @Override
-    public void getAllLessonsForTeacher(final String schoolId, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+    public void getAllLessonsForTeacher(final List<String> schoolIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
@@ -57,13 +65,18 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
                     .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
-                    .append(" WHERE l.teacher_id = ? AND l.school_id = ?")
+                    .append(" WHERE l.teacher_id = ? AND l.school_id in")
+                    .append(sql.listPrepared(schoolIds.toArray()))
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
                     .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.id, s.subject_label, a.audience_type, a.audience_label")
                     .append(" ORDER BY l.lesson_date ASC");
 
-            JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).add(Sql.parseId(schoolId))
-                    .add(startDate).add(endDate);
+            JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
+            for(String schoolId : schoolIds){
+                parameters.add(Sql.parseId(schoolId));
+            }
+
+            parameters.add(startDate).add(endDate);
 
             sql.prepared(query.toString(), parameters, new Handler<Message<JsonObject>>() {
                 @Override
@@ -123,7 +136,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
     @Override
-    public void getAllLessonsForStudent(final String schoolId, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+    public void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
@@ -135,14 +148,20 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
                     .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
-                    .append(" WHERE l.school_id = ? AND l.audience_id in ")
+                    .append(" WHERE l.school_id in ")
+                    .append(sql.listPrepared(schoolIds.toArray()))
+                    .append(" AND l.audience_id in ")
                     .append(sql.listPrepared(groupIds.toArray()))
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
                     .append(" AND l.lesson_state = 'published'")
                     .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_label, a.audience_type, a.audience_label")
                     .append(" ORDER BY l.lesson_date ASC");
 
-            JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+            JsonArray parameters = new JsonArray();
+            for(String schoolId : schoolIds){
+                parameters.add(Sql.parseId(schoolId));
+            }
+
             for (Object id: groupIds) {
                 parameters.add(id);
             }
