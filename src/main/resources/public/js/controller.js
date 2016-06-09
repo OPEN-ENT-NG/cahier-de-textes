@@ -267,7 +267,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
             $scope.lesson = null;
             $scope.homework = null;
-            $scope.showCalendar();
+            initialization();
         },
         mainView: function(params){
             if ($scope.display.showList) {
@@ -1093,19 +1093,19 @@ function DiaryController($scope, template, model, route, date, $location) {
     /**
      * Load related data to lessons and homeworks from database
      */
-    $scope.initialization = function () {
+    var initialization = function () {
 
         $scope.countdown = 5;
         var teacher = new Teacher();
-        teacher.create($scope.decrementCountdown);
-        model.subjects.syncSubjects($scope.decrementCountdown);
+        teacher.create($scope.decrementCountdown());
+        model.subjects.syncSubjects($scope.decrementCountdown());
         model.audiences.syncAudiences(function(){
             $scope.decrementCountdown();
 
             // call lessons/homework sync after audiences sync since
             // lesson and homework objects needs audience data to be built
-            model.lessons.syncLessons($scope.decrementCountdown);
-            model.homeworks.syncHomeworks($scope.decrementCountdown);
+            model.lessons.syncLessons($scope.decrementCountdown());
+            model.homeworks.syncHomeworks($scope.decrementCountdown());
         });
 
     };
@@ -1138,6 +1138,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.showTemplates = function () {
         template.open('main', 'main');
+        template.open('main-view', 'calendar');
         template.open('create-lesson', 'create-lesson');
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
@@ -1302,6 +1303,4 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors.push(e);
         $scope.$apply();
     };
-
-    $scope.initialization();
 }
