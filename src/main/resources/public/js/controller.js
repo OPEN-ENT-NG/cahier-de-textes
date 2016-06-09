@@ -1095,12 +1095,6 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.initialization = function () {
 
-        template.open('main', 'main');
-        template.open('create-lesson', 'create-lesson');
-        template.open('create-homework', 'create-homework');
-        template.open('daily-event-details', 'daily-event-details');
-        template.open('daily-event-item', 'daily-event-item');
-
         $scope.countdown = 5;
         var teacher = new Teacher();
         teacher.create($scope.decrementCountdown);
@@ -1143,6 +1137,11 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.showTemplates = function () {
+        template.open('main', 'main');
+        template.open('create-lesson', 'create-lesson');
+        template.open('create-homework', 'create-homework');
+        template.open('daily-event-details', 'daily-event-details');
+        template.open('daily-event-item', 'daily-event-item');
         $scope.showCal = !$scope.showCal;
         $scope.$apply();
     };

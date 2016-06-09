@@ -783,7 +783,6 @@ model.build = function () {
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
             var that = this;
 
-            var countStructure = model.me.structures.length;
             model.lessons.all.splice(0, model.lessons.all.length);
 
             http().get('/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
@@ -793,11 +792,9 @@ model.build = function () {
                         return sqlToJsLesson(lesson);
                     })
                 );
-                countStructure--;
-                if (countStructure === 0) {
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
+
+                if(typeof cb === 'function'){
+                    cb();
                 }
             });
         }, pushAll: function(datas) {
@@ -810,15 +807,11 @@ model.build = function () {
     this.collection(Subject, {
         syncSubjects: function (cb) {
             this.all = [];
-            var nbStructures = model.me.structures.length;
             var that = this;
             http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
                 model.subjects.addRange(data);
-                nbStructures--;
-                if (nbStructures === 0) {
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
+                if(typeof cb === 'function'){
+                    cb();
                 }
             }.bind(that));
         }
@@ -869,7 +862,6 @@ model.build = function () {
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
             var that = this;
 
-            var countStructure = model.me.structures.length;
             model.homeworks.all.splice(0, model.homeworks.all.length);
 
             http().get('/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
@@ -877,11 +869,8 @@ model.build = function () {
                 that.addRange(
                     _.map(homeworks, convertSqlToJsHomework)
                 );
-                countStructure--;
-                if (countStructure === 0) {
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
+                if(typeof cb === 'function'){
+                    cb();
                 }
             });
 
