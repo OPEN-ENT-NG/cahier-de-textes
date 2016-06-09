@@ -58,7 +58,7 @@ Homework.prototype.update = function(cb, cbe) {
     var homework = this;
     http().putJson(url, this)
         .done(function(){
-            if (typeof cb !== 'function') {
+            if (typeof cb === 'function') {
                 cb();
             }
         }.bind(this))
