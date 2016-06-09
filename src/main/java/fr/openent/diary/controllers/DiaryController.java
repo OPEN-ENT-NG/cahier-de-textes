@@ -64,14 +64,14 @@ public class DiaryController extends BaseController {
     }
 
     @Get("")
-    //@SecuredAction(value = view, type = ActionType.WORKFLOW)
+    @SecuredAction(value = view, type = ActionType.WORKFLOW)
     public void view(final HttpServerRequest request) {
         renderView(request);
     }
 
     @Get("/subject/list/:schoolIds")
     @ApiDoc("Get all subjects for a school")
-    //@SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
     public void listSubjects(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("schoolIds").split(":");
         diaryService.listSubjects(Arrays.asList(schoolIds), arrayResponseHandler(request));
@@ -79,7 +79,7 @@ public class DiaryController extends BaseController {
 
     @Get("/audience/list/:schoolId")
     @ApiDoc("Get all audiences for a school")
-    //@SecuredAction(value = list_audiences, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = list_audiences, type = ActionType.AUTHENTICATED)
     public void listAudiences(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         diaryService.listAudiences(schoolId, arrayResponseHandler(request));
@@ -87,7 +87,7 @@ public class DiaryController extends BaseController {
 
     @Post("/teacher/:schoolId")
     @ApiDoc("Get or create a teacher for a school")
-    //@SecuredAction(value = teacher_create, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = teacher_create, type = ActionType.AUTHENTICATED)
     public void getOrCreateTeacher(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -121,7 +121,7 @@ public class DiaryController extends BaseController {
     }
 
     @Post("/subjects/:schoolId/:teacherId")
-    //@SecuredAction(value = teacher_subjects, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = teacher_subjects, type = ActionType.AUTHENTICATED)
     public void initTeacherSubjects(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         final String teacherId = request.params().get("teacherId");

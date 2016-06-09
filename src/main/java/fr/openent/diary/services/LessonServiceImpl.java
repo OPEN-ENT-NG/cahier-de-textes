@@ -37,6 +37,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String ID_HOMEWORK_FIELD_NAME = "homework_id";
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
+    private static final String ID_OWNER_FIELD_NAME = "owner";
 
     public LessonServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
@@ -310,6 +311,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 if (event.isRight()) {
                     final JsonArray attachments = lessonObject.getArray("attachments");
                     lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
+                    lessonObject.putString(ID_OWNER_FIELD_NAME, teacherId);
 
                     if (attachments != null && attachments.size() > 0) {
                         createLessonWithAttachments(attachments, lessonObject, handler);
@@ -403,12 +405,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             values.add(lessonObject.getValue(attr));
         }
 
-        sb.delete(sb.length() - 2, sb.length());
-        String query =
-                "UPDATE diary.lesson " +
-                        " SET " + sb.toString() + //TODO Vincent you can manage create and update date + "modified = NOW() " +
-                        "WHERE id = ? ";
-        sql.prepared(query, values.add(Sql.parseId(lessonId)), validRowsResultHandler(handler));
+        sb.append(" modified = NOW()");
+        StringBuilder query = new StringBuilder("UPDATE diary.lesson ");
+        query.append(" SET ").append(sb.toString()).append("WHERE id = ? ");
+        sql.prepared(query.toString(), values.add(Sql.parseId(lessonId)), validRowsResultHandler(handler));
     }
 
 
@@ -478,14 +478,14 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         }
 
         // un/publish lessons
-        lessonSb.append("UPDATE diary.lesson SET lesson_state = '").append(finalState.toString()).append("' ");
+        lessonSb.append("UPDATE diary.lesson SET modified = NOW(), lesson_state = '").append(finalState.toString()).append("' ");
         lessonSb.append("WHERE id in ");
         lessonSb.append(sql.listPrepared(lessonIds.toArray()));
         lessonSb.append(" AND lesson_state = '").append(initialState.toString()).append("' ");
 
         // un/publish associated homeworks
         StringBuilder homeworkSb = new StringBuilder();
-        homeworkSb.append("UPDATE diary.homework SET homework_state = '").append(finalState.toString()).append("' ");
+        homeworkSb.append("UPDATE diary.homework SET modified = NOW(), homework_state = '").append(finalState.toString()).append("' ");
         homeworkSb.append("WHERE lesson_id in ");
         homeworkSb.append(sql.listPrepared(lessonIds.toArray()));
         homeworkSb.append(" AND homework_state = '").append(initialState.toString()).append("' ");
