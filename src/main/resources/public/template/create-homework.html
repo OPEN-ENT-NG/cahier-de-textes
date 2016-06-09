@@ -20,9 +20,9 @@
     <div class="row">
         <input type="text" i18n-placeholder="title" ng-model="homework.title" maxlength="50" required class="six cell" />
         <div class="five cell right-magnet">
-            <div class="one cell right-magnet [[homework.color]] height-one">
+            <div class="one cell right-magnet height-one">
                 &nbsp;
-                <color-select ng-model="homework.color"></color-select>
+                <input type="color" ng-model="homework.color">
             </div>
         </div>
     </div>

@@ -1237,7 +1237,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.audience = $scope.homework.audienc = model.audiences.first();
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
-        $scope.lesson.color = $scope.homework.color = 'pink';
+        $scope.lesson.color = $scope.homework.color = '#ff8000'; // orange
         $scope.lesson.state = 'draft';
         $scope.homework.type = model.homeworkTypes.first();
 
@@ -1273,7 +1273,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.homework.audience = model.audiences.first();
         $scope.homework.subject = model.subjects.first();
         $scope.homework.audienceType = 'class';
-        $scope.homework.color = 'pink';
+        $scope.homework.color = '#ff8000'; // orange
         $scope.homework.type = model.homeworkTypes.first();
         $scope.homework.state = 'draft';
         $scope.newItem = {
