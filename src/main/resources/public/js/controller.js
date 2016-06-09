@@ -1097,46 +1097,29 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         $scope.countdown = 5;
         var teacher = new Teacher();
-        teacher.create($scope.decrementCountdown());
-        model.subjects.syncSubjects($scope.decrementCountdown());
+        teacher.create(decrementCountdown());
+        model.subjects.syncSubjects(decrementCountdown());
         model.audiences.syncAudiences(function(){
-            $scope.decrementCountdown();
+            decrementCountdown();
 
             // call lessons/homework sync after audiences sync since
             // lesson and homework objects needs audience data to be built
-            model.lessons.syncLessons($scope.decrementCountdown());
-            model.homeworks.syncHomeworks($scope.decrementCountdown());
+            model.lessons.syncLessons(decrementCountdown());
+            model.homeworks.syncHomeworks(decrementCountdown());
         });
 
     };
 
-    /**
-     * Used when using consecutive callbacks
-     * and execute function once X callbacks have processed
-     * (for example init templates once all sync functions (homeworks, lessons, ...) have been processed)
-     * @param countDownVar Variable number to decrement at each call of this function
-     * @param cb Function to execute once the number of occurences have been reached
-     */
-    $scope.decrementSyncCountdown = function (countDownVar, cb) {
-        countDownVar--;
-
-        if (countDownVar == 0) {
-
-            if (typeof cb === 'function') {
-                cb();
-            }
-        }
-    }
 
     // TODO merge/use with decrementSyncCountDown
-    $scope.decrementCountdown = function () {
+    var decrementCountdown = function () {
         $scope.countdown--;
         if ($scope.countdown == 0) {
-            $scope.showTemplates();
+            showTemplates();
         }
     };
 
-    $scope.showTemplates = function () {
+    var showTemplates = function () {
         template.open('main', 'main');
         template.open('main-view', 'calendar');
         template.open('create-lesson', 'create-lesson');
@@ -1190,7 +1173,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         var path = '/editLessonView/' + item.id;
 
         // gap between days is quite important
-        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > 10;
+        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;
         // gap between minutes is tiny so y mouse move detection must be accurate
         // so user can change lesson time slightly
         var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > 0;
