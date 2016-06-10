@@ -927,11 +927,10 @@ model.build = function () {
             homeworks: lessonHomeworks
         }
 
-        // TODO i18n
         if('group' === lesson.audienceType){
-            lesson.audienceTypeLabel = 'Groupe';
+            lesson.audienceTypeLabel = lang.translate('diary.audience.group');
         } else {
-            lesson.audienceTypeLabel = 'Classe';
+            lesson.audienceTypeLabel = lang.translate('diary.audience.class');
         }
 
         return lesson;
@@ -972,9 +971,9 @@ model.build = function () {
         };
 
         if('group' === homework.audienceType){
-            homework.audienceTypeLabel = 'Groupe';
+            homework.audienceTypeLabel = lang.translate('diary.audience.group');
         } else {
-            homework.audienceTypeLabel = 'Classe';
+            homework.audienceTypeLabel = lang.translate('diary.audience.class');
         }
 
         return homework;
