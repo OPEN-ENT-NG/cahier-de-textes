@@ -228,8 +228,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         createHomeworkView: function(params){
             $scope.homework = null;
             $scope.openHomeworkView(null, params);
-            template.open('main', 'main');
-            template.open('main-view', 'create-homework');
         },
         editLessonView: function(params) {
 
@@ -257,9 +255,7 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
         },
         editHomeworkView: function(params) {
-            loadHomeworkFromRoute(params.idHomework);
-            template.open('main', 'main');
-            template.open('main-view', 'create-homework');
+            loadHomeworkFromRoute(params);
         },
         calendarView: function(params){
             if (params.startDate != null) {
@@ -408,10 +404,23 @@ function DiaryController($scope, template, model, route, date, $location) {
         return time.split(':')[0] * 60 + time.split(':')[1];
     }
 
-    var loadHomeworkFromRoute = function(idHomework) {
-        var homework = model.homeworks.findWhere({ id: parseInt(idHomework)});
+    var loadHomeworkFromRoute = function(params) {
+        // try find homework in current week homeworks cache
+        var homework = model.homeworks.findWhere({ id: parseInt(params.idHomework)});
+
         if (homework != null) {
             $scope.openHomeworkView(homework);
+        }
+        // load from db
+        else {
+            homework = new Homework();
+            homework.id = parseInt(params.idHomework);
+
+            homework.load(function(){
+                $scope.openHomeworkView(homework, params);
+            }, function(cbe){
+                notify.error(cbe.message);
+            });
         }
     };
 
@@ -463,18 +472,8 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
 
             $scope.homework.updateData(homework);
-
-            if (!$scope.homework.audience) {
-                $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audienceId});
-            }
-
-            if (!$scope.homework.subject) {
-                $scope.homework.subject = model.subjects.findWhere({id: $scope.homework.subjectId});
-            }
-
-            if (!$scope.homework.type) {
-                $scope.homework.type = model.homeworkTypes.findWhere({ id: $scope.homework.typeId });
-            }
+            template.open('main', 'main');
+            template.open('main-view', 'create-homework');
         } else {
             initHomework();
         }
@@ -1095,19 +1094,22 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     var initialization = function () {
 
-        $scope.countdown = 5;
+        $scope.countdown = 4;
         var teacher = new Teacher();
         teacher.create(decrementCountdown());
-        model.subjects.syncSubjects(decrementCountdown());
-        model.audiences.syncAudiences(function(){
-            decrementCountdown();
 
-            // call lessons/homework sync after audiences sync since
-            // lesson and homework objects needs audience data to be built
-            model.lessons.syncLessons(decrementCountdown());
-            model.homeworks.syncHomeworks(decrementCountdown());
+        // subjects and audiences needed to fill in
+        // homeworks and lessons props
+        model.subjects.syncSubjects(function () {
+            model.audiences.syncAudiences(function () {
+                decrementCountdown();
+
+                // call lessons/homework sync after audiences sync since
+                // lesson and homework objects needs audience data to be built
+                model.lessons.syncLessons(decrementCountdown());
+                model.homeworks.syncHomeworks(decrementCountdown());
+            });
         });
-
     };
 
 

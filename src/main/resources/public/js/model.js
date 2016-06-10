@@ -87,6 +87,43 @@ Homework.prototype.create = function(cb, cbe) {
 }
 
 /**
+ * Load homework object from id
+ * @param cb Callback function
+ * @param cbe Callback on error function
+ */
+Homework.prototype.load = function (cb, cbe) {
+
+    var homework = this;
+
+    var load = function () {
+        http().get('/diary/homework/' + homework.id)
+            .done(function (data) {
+                homework.updateData(sqlToJsHomework(data));
+
+                if (typeof cb === 'function') {
+                    cb();
+                }
+            })
+            .error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+            });
+    };
+
+    // might occur when user pressed F5 on lesson view
+    // needed to fill homework.audience and subject properties
+    if (model.audiences.all.length === 0) {
+        model.audiences.syncAudiences(
+            function () {
+                model.subjects.syncSubjects(load);
+            });
+    } else {
+        load();
+    }
+};
+
+/**
  * Deletes a list of lessons
  * @param lessons Lessons to be deleted
  * @param cb Callback
@@ -510,24 +547,36 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
     var lesson = this;
 
-    http().get('/diary/lesson/' + this.id)
-        .done(function (data) {
-            lesson.updateData(sqlToJsLesson(data));
+    var load = function () {
+        http().get('/diary/lesson/' + lesson.id)
+            .done(function (data) {
+                lesson.updateData(sqlToJsLesson(data));
 
-            if(loadHomeworks){
-                model.loadHomeworksForLesson(lesson, cb, cbe);
-            }
+                if (loadHomeworks) {
+                    model.loadHomeworksForLesson(lesson, cb, cbe);
+                }
 
-            if (typeof cb === 'function') {
-                cb();
-            }
-        })
-        .error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
-        });
-}
+                if (typeof cb === 'function') {
+                    cb();
+                }
+            })
+            .error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+            });
+    };
+
+    // might occur when user pressed F5 on lesson view
+    if (model.audiences.all.length === 0) {
+        model.audiences.syncAudiences(
+            function () {
+                model.subjects.syncSubjects(load)
+            });
+    } else {
+        load();
+    }
+};
 
 /**
  * Publishes the lesson
@@ -742,7 +791,7 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
         lesson.homeworks = new Collection(Homework);
 
         sqlHomeworks.forEach(function (sqlHomework) {
-            lesson.homeworks.push(convertSqlToJsHomework(sqlHomework));
+            lesson.homeworks.push(sqlToJsHomework(sqlHomework));
         });
 
         if (typeof cb === 'function') {
@@ -867,7 +916,7 @@ model.build = function () {
             http().get('/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
                 homeworks = homeworks.concat(data);
                 that.addRange(
-                    _.map(homeworks, convertSqlToJsHomework)
+                    _.map(homeworks, sqlToJsHomework)
                 );
                 if(typeof cb === 'function'){
                     cb();
@@ -943,12 +992,13 @@ model.build = function () {
      * @param sqlHomework
      * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
      */
-    convertSqlToJsHomework = function(sqlHomework){
+    sqlToJsHomework = function(sqlHomework){
         var homework =   {
             id: sqlHomework.id,
             description: sqlHomework.homework_description,
             audienceId: sqlHomework.audience_id,
             audience: model.audiences.findWhere({ id: sqlHomework.audience_id }),
+            subject: model.subjects.findWhere({ id: sqlHomework.subject_id }),
             subjectId: sqlHomework.subject_id,
             subjectLabel: sqlHomework.subject_label,
             type: model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
