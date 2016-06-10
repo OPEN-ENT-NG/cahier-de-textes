@@ -876,8 +876,7 @@ model.build = function () {
                     structureData.classes = _.map(structureData.classes, function (audience) {
                         audience.structureId = structureId;
                         audience.type = 'class';
-                        // TODO i18n
-                        audience.typeLabel = 'Classe';
+                        audience.typeLabel = lang.translate('diary.audience.class');
                         return audience;
                     });
                     this.addRange(structureData.classes);
