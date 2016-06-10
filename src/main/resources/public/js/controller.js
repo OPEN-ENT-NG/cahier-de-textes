@@ -24,6 +24,9 @@ routes.define(function ($routeProvider) {
         .when('/calendarView/:startDate', {
             action: 'calendarView'
         })
+        .when('/mainView', {
+            action: 'mainView'
+        })
         // default view
         .otherwise({
             action: 'calendarView'
@@ -232,7 +235,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         editLessonView: function(params) {
 
             if(!params.idLesson){
-                $scope.goToCalendarView(notify.error('daily.lesson.id.notspecified'));
+                $scope.goToMainView(notify.error('daily.lesson.id.notspecified'));
                 return;
             }
 
@@ -480,9 +483,17 @@ function DiaryController($scope, template, model, route, date, $location) {
         template.open('main-view', 'create-homework');
     };
 
-    $scope.closeLesson = function() {
+    /**
+     * Switch to main view (list or calendar)
+     * @param cb Callback function
+     */
+    $scope.goToMainView = function (cb) {
+        $location.path('/mainView');
 
-    };
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }
 
     /**
      * Switch to calendar view
@@ -593,10 +604,10 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Create or update lesson to database from page fields
-     * @param goToCalendarView if true will switch to calendar view
+     * @param goMainView if true will switch to calendar or list view
      * after create/update else stay on current page
      */
-    $scope.createOrUpdateLesson = function (goToCalendarView) {
+    $scope.createOrUpdateLesson = function (goMainView) {
 
         $scope.currentErrors = [];
 
@@ -608,9 +619,8 @@ function DiaryController($scope, template, model, route, date, $location) {
             function () {
                 notify.info('lesson.saved');
                 $scope.lesson.audience = model.audiences.findWhere({id: $scope.lesson.audience.id});
-                $scope.$apply();
-                if (goToCalendarView) {
-                    $scope.goToCalendarView();
+                if (goMainView) {
+                    $scope.goToMainView();
                     $scope.lesson = null;
                     $scope.homework = null;
                 }
@@ -629,21 +639,21 @@ function DiaryController($scope, template, model, route, date, $location) {
 
 
     /**
-     * Publishes or unpublishes homework and go back to calendar view
+     * Publishes or unpublishes homework and go back to main view
      * @param homework Homework
      * @param isPublish if true publishes homework else un-publishes it
      */
     $scope.publishHomeworkAndGoCalendarView = function (homework, isPublish) {
-        $scope.publishHomework(homework, isPublish, $scope.goToCalendarView());
+        $scope.publishHomework(homework, isPublish, $scope.goToMainView());
     }
 
     /**
-     * Publishes or unpublishes lesson and go back to calendar view
+     * Publishes or unpublishes lesson and go back to main view
      * @param lesson Lesson
      * @param isPublish if true publishes lesson else un-publishes it
      */
     $scope.publishLessonAndGoCalendarView = function (lesson, isPublish) {
-        $scope.publishLesson(lesson, isPublish, $scope.goToCalendarView());
+        $scope.publishLesson(lesson, isPublish, $scope.goToMainView());
     }
 
     /**
@@ -1058,7 +1068,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
 
-    $scope.createOrUpdateHomework = function (goToCalendarView) {
+    $scope.createOrUpdateHomework = function (goToMainView) {
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
@@ -1071,8 +1081,8 @@ function DiaryController($scope, template, model, route, date, $location) {
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
             $scope.$apply();
 
-            if (goToCalendarView) {
-                $scope.goToCalendarView();
+            if (goToMainView) {
+                $scope.goToMainView();
                 $scope.lesson = null;
                 $scope.homework = null;
             }
