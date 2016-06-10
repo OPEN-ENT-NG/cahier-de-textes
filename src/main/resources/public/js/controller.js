@@ -472,11 +472,12 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
 
             $scope.homework.updateData(homework);
-            template.open('main', 'main');
-            template.open('main-view', 'create-homework');
         } else {
             initHomework();
         }
+
+        template.open('main', 'main');
+        template.open('main-view', 'create-homework');
     };
 
     $scope.closeLesson = function() {
