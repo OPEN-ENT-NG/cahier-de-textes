@@ -144,6 +144,7 @@
                     if (!$.fn.timepicker) {
                         $.fn.timepicker = function () { };
                         loader.asyncLoad('/' + infraPrefix + '/public/js/bootstrap-timepicker.js', function () {
+                            // does not seem to work properly
                             element.timepicker({
                                 showMeridian: false,
                                 defaultTime: 'current'
@@ -156,6 +157,14 @@
                             return;
                         }
                         element.val(newVal.format("HH:mm"));
+                    });
+
+                    element.on('focus', function () {
+                        element.timepicker({
+                            showMeridian: false,
+                            defaultTime: 'current',
+                            minuteStep: 5
+                        });
                     });
 
                     element.on('change', function () {
