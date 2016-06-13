@@ -1258,6 +1258,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = '#ff8000'; // orange
         $scope.lesson.state = 'draft';
+        $scope.lesson.title = lang.translate('diary.lesson.label');
         $scope.homework.type = model.homeworkTypes.first();
 
         // init start/end time to calendar user's choice (HH:00) -> now (HH:00) + 1 hour
