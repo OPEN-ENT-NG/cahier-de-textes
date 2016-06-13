@@ -50,6 +50,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         createLesson: 'lesson'
     };
 
+    $scope.calendarLoaded = false;
     $scope.showCal = false;
     $scope.newLesson = new Lesson();
     // for static access to some global function
@@ -274,7 +275,11 @@ function DiaryController($scope, template, model, route, date, $location) {
             } else {
                 $scope.lesson = null;
                 $scope.homework = null;
-                $scope.showCalendar();
+                if($scope.calendarLoaded) {
+                    $scope.showCalendar();
+                } else {
+                    initialization();
+                }
             }
         }
     });
@@ -1128,6 +1133,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     var decrementCountdown = function () {
         $scope.countdown--;
         if ($scope.countdown == 0) {
+            $scope.calendarLoaded = true;
             showTemplates();
         }
     };
