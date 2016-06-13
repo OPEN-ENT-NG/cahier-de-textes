@@ -1252,8 +1252,17 @@ function DiaryController($scope, template, model, route, date, $location) {
 
         $scope.lesson = new Lesson();
         $scope.homework = new Homework();
+        var defaultAudience = null;
 
-        $scope.lesson.audience = $scope.homework.audienc = model.audiences.first();
+        if(model.me.classes && model.me.classes.length > 0){
+            defaultAudience = model.audiences.findWhere({id: model.me.classes[0]});
+        }
+
+        if(!defaultAudience){
+            defaultAudience = model.audiences.first();
+        }
+
+        $scope.lesson.audience = $scope.homework.audienc = defaultAudience;
         $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
         $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
         $scope.lesson.color = $scope.homework.color = '#ff8000'; // orange
