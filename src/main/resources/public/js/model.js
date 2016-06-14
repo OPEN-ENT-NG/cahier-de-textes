@@ -250,6 +250,8 @@ function Attachment(){}
 function Subject() { }
 function Audience() { }
 function HomeworkType(){}
+function PedagogicItem() { }
+
 
 function Lesson(data) {
     this.selected = false;
@@ -744,6 +746,45 @@ Teacher.prototype.create = function(cb) {
     });
 };
 
+model.convertLessonToPedagogicItem = function (lesson) {
+    var item = {};
+    item.typeItem = "lesson";
+    item.id = lesson.id;
+    item.title = lesson.title;
+    item.subject = lesson.subjectLabel;
+    item.audience = lesson.audienceLabel;
+    item.startHour = moment(lesson.date).minutes(model.getMinutes(lesson.startTime)).format("HH[h]mm");
+    item.endHour = moment(lesson.date).minutes(model.getMinutes(lesson.endTime)).format("HH[h]mm");
+    item.typeHomework = "";
+    item.teacher = lesson.teacherId;
+    item.description = lesson.description;
+    item.expandedDescription = false;
+    item.published = lesson.state == "published";
+    item.color = lesson.color;
+    return item;
+}
+
+model.convertHomeworkToPedagogicItem = function (homework) {
+    var item = {};
+    item.typeItem = "homework";
+    item.id = homework.id;
+    item.title = homework.homework_title;
+    item.subject = homework.subject_label;
+    item.audience = homework.audience_label;
+    item.startHour = "";
+    item.endHour = "";
+    item.typeHomework = homework.homework_type_label;
+    item.teacher = "teacher";
+    item.description = homework.homework_description;
+    item.expandedDescription = false;
+    item.published = homework.homework_state == "published";
+    item.color = homework.homework_color;
+    return item;
+};
+
+model.getMinutes = function (time) {
+    return time.split(':')[0] * 60 + time.split(':')[1];
+};
 
 model.parseError = function(e) {
     var error = {};
@@ -821,9 +862,9 @@ var getUserStructuresIdsAsString = function () {
 }
 
 model.build = function () {
-    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework]);
+    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
-
+    
     this.collection(Lesson, {
         syncLessons: function (cb) {
 
@@ -929,6 +970,78 @@ model.build = function () {
         }
     });
 
+    this.collection(PedagogicItem, {
+        reset: function() {
+            model.pedagogicItems.selectAll();
+            model.pedagogicItems.removeSelection();
+        },
+        syncPedagogicItems: function(cb){
+            var items = [];
+            var lessons = model.lessons.all;
+            var homeworks = model.homeworks.all;
+            var that = this;
+            model.pedagogicItems.reset();
+
+            var days = [];
+            lessons.forEach(function (lesson) {
+                if (_.contains(days, lesson.date) == false) {
+                    days.push(lesson.date);
+                }
+            });
+
+            homeworks.forEach(function (homework) {
+                if (_.contains(days, homework.dueDate) == false) {
+                    days.push(homework.dueDate);
+                }
+            });
+
+            console.log("nb days = " + days.length);
+
+            days.forEach(function (day) {
+
+                var pedagogicItemsOfTheDay = [];
+
+                var lessonsOfTheDay = lessons.filter(function (lesson) {
+                    return lesson.date.isSame(day);
+                }).map (function(lesson) {
+                    return model.convertLessonToPedagogicItem(lesson);
+                });
+
+                console.log("day: " + day + " nb lessonsOfTheDay = " + lessonsOfTheDay.length);
+
+                var homeworksOfTheDay = homeworks.filter(function (homework) {
+                    return homework.dueDate.isSame(day);
+                }).map (function(homework) {
+                    return model.convertHomeworkToPedagogicItem(homework);
+                });
+
+                console.log("nb homeworksOfTheDay = " + homeworksOfTheDay.length);
+
+                pedagogicItemsOfTheDay = homeworksOfTheDay.concat(lessonsOfTheDay);
+
+                console.log("nb pedagogicItemsOfTheDay = " + pedagogicItemsOfTheDay.length);
+
+                var pedagogicDay = {};
+                pedagogicDay.pedagogicItemsOfTheDay = pedagogicItemsOfTheDay;
+                pedagogicDay.dayName = day.format("dddd DD MMMM YYYY");
+                pedagogicDay.nbLessons = lessonsOfTheDay.length;
+                pedagogicDay.nbHomeworks = homeworksOfTheDay.length;
+                pedagogicDay.expanded = false;
+                items.push(pedagogicDay);
+            });
+
+            model.pedagogicItems.pushAll(items);
+
+            if(typeof cb === 'function'){
+                cb();
+            }
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }
+    });
+
     /**
      * Convert sql diary.lesson row to js row used in angular model
      * @param lesson Sql diary.lesson row
@@ -962,7 +1075,7 @@ model.build = function () {
             subjectLabel: data.subject_label,
             teacherId: data.teacher_display_name,
             structureId: data.school_id,
-            date: data.lesson_date,
+            date: moment(data.lesson_date),
             startTime: data.lesson_start_time,
             endTime: data.lesson_end_time,
             color: data.lesson_color,

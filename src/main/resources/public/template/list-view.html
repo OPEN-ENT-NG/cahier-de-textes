@@ -14,7 +14,7 @@
 
 <section>
     <ul class="colored">
-        <li ng-repeat="day in pedagogicItems">
+        <li ng-repeat="day in pedagogicItems.all">
             <div>
                 <p>
                     <a ng-if="day.expanded !== true" ng-click="expandDay(day)">
@@ -36,7 +36,7 @@
                                     [[pedagogicItem.title]]
                                 </em>
                             </div>
-                            <div>[[pedagogicItem.description]]</div>
+                            <div ng-bind-html="pedagogicItem.description"></div>
                         </div>
                     </div>
                 </li>
