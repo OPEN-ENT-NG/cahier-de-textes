@@ -252,6 +252,20 @@ function Audience() { }
 function HomeworkType(){}
 function PedagogicItem() { }
 
+PedagogicItem.prototype.descriptionMaxSize = 140;
+
+PedagogicItem.prototype.getPreviewDescription = function () {
+
+    if (this.description) {
+        if (this.description.length >= this.descriptionMaxSize) {
+            this.previewDescription = '<p>' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...' + '</p>';
+        } else {
+            this.previewDescription = this.description;
+        }
+    } else {
+        this.previewDescription = this.description;
+    }
+};
 
 function Lesson(data) {
     this.selected = false;
@@ -747,7 +761,7 @@ Teacher.prototype.create = function(cb) {
 };
 
 model.convertLessonToPedagogicItem = function (lesson) {
-    var item = {};
+    var item = new PedagogicItem();
     item.typeItem = "lesson";
     item.id = lesson.id;
     item.title = lesson.title;
@@ -761,11 +775,12 @@ model.convertLessonToPedagogicItem = function (lesson) {
     item.expandedDescription = false;
     item.published = lesson.state == "published";
     item.color = lesson.color;
+    item.getPreviewDescription();
     return item;
 }
 
 model.convertHomeworkToPedagogicItem = function (homework) {
-    var item = {};
+    var item = new PedagogicItem();
     item.typeItem = "homework";
     item.id = homework.id;
     item.title = homework.homework_title;
@@ -779,6 +794,7 @@ model.convertHomeworkToPedagogicItem = function (homework) {
     item.expandedDescription = false;
     item.published = homework.homework_state == "published";
     item.color = homework.homework_color;
+    item.getPreviewDescription();
     return item;
 };
 
@@ -995,8 +1011,6 @@ model.build = function () {
                 }
             });
 
-            console.log("nb days = " + days.length);
-
             days.forEach(function (day) {
 
                 var pedagogicItemsOfTheDay = [];
@@ -1007,19 +1021,13 @@ model.build = function () {
                     return model.convertLessonToPedagogicItem(lesson);
                 });
 
-                console.log("day: " + day + " nb lessonsOfTheDay = " + lessonsOfTheDay.length);
-
                 var homeworksOfTheDay = homeworks.filter(function (homework) {
                     return homework.dueDate.isSame(day);
                 }).map (function(homework) {
                     return model.convertHomeworkToPedagogicItem(homework);
                 });
 
-                console.log("nb homeworksOfTheDay = " + homeworksOfTheDay.length);
-
                 pedagogicItemsOfTheDay = homeworksOfTheDay.concat(lessonsOfTheDay);
-
-                console.log("nb pedagogicItemsOfTheDay = " + pedagogicItemsOfTheDay.length);
 
                 var pedagogicDay = {};
                 pedagogicDay.pedagogicItemsOfTheDay = pedagogicItemsOfTheDay;

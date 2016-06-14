@@ -36,7 +36,14 @@
                                     [[pedagogicItem.title]]
                                 </em>
                             </div>
-                            <div ng-bind-html="pedagogicItem.description"></div>
+                            <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expandedDescription = !pedagogicItem.expandedDescription">
+                                <span ng-show="!pedagogicItem.expandedDescription">
+                                     <span bind-html="pedagogicItem.previewDescription"></span>
+                                </span>
+                                <span ng-show="pedagogicItem.expandedDescription">
+                                     <span bind-html="pedagogicItem.description"></span>
+                                </span>
+                            </span>
                         </div>
                     </div>
                 </li>
