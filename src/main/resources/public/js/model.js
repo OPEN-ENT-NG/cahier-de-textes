@@ -1141,3 +1141,96 @@ model.build = function () {
         return homework;
     };
 }
+
+/**
+ * Returns default audience of connected user.
+ * @returns {*}
+ */
+model.getDefaultAudience = function(){
+    var defaultAudience = null;
+
+    if(model.me.classes && model.me.classes.length > 0){
+        defaultAudience = model.audiences.findWhere({id: model.me.classes[0]});
+    }
+
+    if(!defaultAudience){
+        defaultAudience = model.audiences.first();
+    }
+
+    return defaultAudience;
+}
+
+/**
+ * Default color of lesson and homeworks
+ * @type {string}
+ */
+const DEFAULT_ITEM_COLOR = '#ff8000';
+
+/**
+ * Default state of lesson or homework when created
+ * @type {string}
+ */
+const DEFAULT_STATE = 'draft';
+
+/**
+ * Init homework object on created.
+ * Set default attribute values
+ * @param homework
+ * @returns {*}
+ */
+model.initHomework = function () {
+
+    var homework = new Homework();
+
+    homework.audience = model.getDefaultAudience();
+    homework.subject = model.subjects.first();
+    homework.audienceType = homework.audience.type;
+    homework.type = model.homeworkTypes.first();
+    homework.color = DEFAULT_ITEM_COLOR;
+    homework.state = DEFAULT_STATE;
+
+    return homework;
+}
+
+/**
+ * Init lesson
+ * @returns {Lesson}
+ */
+model.initLesson = function (timeFromCalendar) {
+    var lesson = new Lesson();
+
+    lesson.audience = model.getDefaultAudience();
+    lesson.subject = model.subjects.first();
+    lesson.audienceType = lesson.audience.type;
+    lesson.color = DEFAULT_ITEM_COLOR;
+    lesson.state = DEFAULT_STATE;
+    lesson.title = lang.translate('diary.lesson.label');
+
+    var newItem = {};
+
+    if(timeFromCalendar) {
+        newItem = model.calendar.newItem;
+
+        // force to HH:00 -> HH:00 + 1 hour
+        newItem.beginning = newItem.beginning.minute(0).second(0);
+        newItem.date = newItem.beginning;
+
+        newItem.end = moment(newItem.beginning);
+        newItem.end.minute(0).second(0).add(1, 'hours');
+    }
+    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour
+    else {
+        newItem = {
+            date: moment().minute(0).second(0),
+            beginning: moment().minute(0).second(0),
+            end: moment().minute(0).second(0).add(1, 'hours')
+        }
+    }
+
+    lesson.newItem = newItem;
+    lesson.startTime = newItem.beginning;
+    lesson.endTime = newItem.end;
+    lesson.date = newItem.date;
+
+    return lesson;
+}

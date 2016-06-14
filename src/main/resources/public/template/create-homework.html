@@ -17,10 +17,11 @@
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>
         </div>
     </div>
+    <section class="homework-detail">
     <div class="row">
         <input type="text" i18n-placeholder="title" ng-model="homework.title" maxlength="50" required class="six cell" />
         <div class="five cell right-magnet">
-            <div class="one cell right-magnet height-one">
+            <div class="one cell right-magnet height-one" style="margin-right: 10px;">
                 &nbsp;
                 <input type="color" ng-model="homework.color">
             </div>
@@ -43,6 +44,7 @@
     <div class="row">
         <editor ng-model="homework.description" required></editor>
     </div>
+    </section>
     <div class="row">
         <!-- publishes the current lesson ang go back to calendar view -->
         <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-publish-homework')">

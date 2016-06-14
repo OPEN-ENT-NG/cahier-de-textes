@@ -50,6 +50,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         createLesson: 'lesson'
     };
 
+    $scope.calendarLoaded = false;
     $scope.showCal = false;
     $scope.newLesson = new Lesson();
     // for static access to some global function
@@ -132,7 +133,11 @@ function DiaryController($scope, template, model, route, date, $location) {
             } else {
                 $scope.lesson = null;
                 $scope.homework = null;
-                $scope.showCalendar();
+                if($scope.calendarLoaded) {
+                    $scope.showCalendar();
+                } else {
+                    initialization();
+                }
             }
         }
     });
@@ -885,6 +890,7 @@ function DiaryController($scope, template, model, route, date, $location) {
     var decrementCountdown = function () {
         $scope.countdown--;
         if ($scope.countdown == 0) {
+            $scope.calendarLoaded = true;
             showTemplates();
         }
     };
@@ -995,57 +1001,22 @@ function DiaryController($scope, template, model, route, date, $location) {
     }
 
     /**
-     * Init lesson object
+     * Init lesson object on create
      * @param initTimeFromCalendar If true will init start time/end time to calendar start/end time user choice
      * else to now -> now + 1 hour starting at the very beginning of hour (HH:00)
      */
     var initLesson = function (timeFromCalendar) {
 
-        $scope.lesson = new Lesson();
-        $scope.homework = new Homework();
-
-        $scope.lesson.audience = $scope.homework.audienc = model.audiences.first();
-        $scope.lesson.subject = $scope.homework.subject = model.subjects.first();
-        $scope.lesson.audienceType = $scope.homework.audienceType = 'class';
-        $scope.lesson.color = $scope.homework.color = '#ff8000'; // orange
-        $scope.lesson.state = 'draft';
-        $scope.homework.type = model.homeworkTypes.first();
-
-        // init start/end time to calendar user's choice (HH:00) -> now (HH:00) + 1 hour
-        if (timeFromCalendar) {
-            $scope.newItem = model.calendar.newItem;
-
-            // force to HH:00 -> HH:00 + 1 hour
-            $scope.newItem.beginning = $scope.newItem.beginning.minute(0).second(0);
-            $scope.newItem.date = $scope.newItem.beginning;
-
-            $scope.newItem.end = moment($scope.newItem.beginning);
-            $scope.newItem.end.minute(0).second(0).add(1, 'hours');
-        }
-        // init start/end time to now (HH:00) -> now (HH:00) + 1 hour
-        else {
-            $scope.newItem = {
-                date: moment().minute(0).second(0),
-                beginning: moment().minute(0).second(0),
-                end: moment().minute(0).second(0).add(1, 'hours')
-            }
-        }
-
-        $scope.lesson.date = $scope.newItem.date;
+        $scope.lesson = model.initLesson(timeFromCalendar);
+        $scope.newItem = $scope.lesson.newItem;
     }
 
+    /**
+     * Init homework object on create
+     */
     var initHomework = function() {
 
-        if (!$scope.homework) {
-            $scope.homework = new Homework();
-        }
-
-        $scope.homework.audience = model.audiences.first();
-        $scope.homework.subject = model.subjects.first();
-        $scope.homework.audienceType = 'class';
-        $scope.homework.color = '#ff8000'; // orange
-        $scope.homework.type = model.homeworkTypes.first();
-        $scope.homework.state = 'draft';
+        $scope.homework = model.initHomework();
         $scope.newItem = {
             date: moment().minute(0).second(0)
         };
