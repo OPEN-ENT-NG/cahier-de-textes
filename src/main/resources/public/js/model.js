@@ -52,6 +52,17 @@ Homework.prototype.isPublishable = function (toPublish) {
     return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
 };
 
+
+/**
+ * Says whether or not current user can edit an homework
+ * @param usertype
+ * @returns {*|boolean}
+ */
+model.canEdit = function () {
+    return model.me.type == "ENSEIGNANT";
+}
+
+
 Homework.prototype.update = function(cb, cbe) {
     var url = '/diary/homework/' + this.id;
 

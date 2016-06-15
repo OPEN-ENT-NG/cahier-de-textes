@@ -82,6 +82,9 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.homeworks = model.homeworks;
     $scope.pedagogicItems = model.pedagogicItems;
 
+    // Says whether or not current user can edit homeworks
+    $scope.isHomeworkEditable = model.canEdit();
+
     route({
         createLessonView: function(params){
             $scope.lesson = null;
@@ -537,6 +540,16 @@ function DiaryController($scope, template, model, route, date, $location) {
                 cb();
             }
         }
+
+    };
+
+    // Date functions
+    $scope.formatDate = function(date) {
+        return $scope.formatMoment(moment(date));
+    };
+
+    $scope.formatMoment = function(moment) {
+        return moment.lang('fr').format('DD/MM/YYYY');
     };
 
 
