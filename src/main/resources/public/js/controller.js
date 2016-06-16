@@ -96,13 +96,31 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.isHomeworkEditable = model.canEdit();
 
     route({
-        createLessonView: function(params){
-            $scope.lesson = null;
-            $scope.openLessonView(null, params);
+        createLessonView: function (params) {
+
+            var openFunc = function () {
+                $scope.lesson = null;
+                $scope.openLessonView(null, params);
+            };
+
+            if ($scope.calendarLoaded) {
+                openFunc();
+            } else {
+                initialization(false, openFunc)
+            }
         },
-        createHomeworkView: function(params){
-            $scope.homework = null;
-            $scope.openHomeworkView(null, params);
+        createHomeworkView: function (params) {
+
+            var openFunc = function () {
+                $scope.homework = null;
+                $scope.openHomeworkView(null, params);
+            };
+
+            if ($scope.calendarLoaded) {
+                openFunc();
+            } else {
+                initialization(false, openFunc)
+            }
         },
         editLessonView: function(params) {
 
@@ -138,7 +156,7 @@ function DiaryController($scope, template, model, route, $location) {
             }
             $scope.lesson = null;
             $scope.homework = null;
-            initialization();
+            initialization(true);
         },
         mainView: function(){
             if ($scope.display.showList) {
@@ -149,7 +167,7 @@ function DiaryController($scope, template, model, route, $location) {
                 if($scope.calendarLoaded) {
                     $scope.showCalendar();
                 } else {
-                    initialization();
+                    initialization(true);
                 }
             }
         }
@@ -890,34 +908,43 @@ function DiaryController($scope, template, model, route, $location) {
 
     /**
      * Load related data to lessons and homeworks from database
+     * @param cb Callback function
+     * @param bShowTemplates if true loads calendar templates after data loaded
+     * might be used when 
      */
-    var initialization = function () {
+    var initialization = function (bShowTemplates, cb) {
 
         $scope.countdown = 4;
         var teacher = new Teacher();
-        teacher.create(decrementCountdown());
+        teacher.create(decrementCountdown(bShowTemplates, cb));
 
         // subjects and audiences needed to fill in
         // homeworks and lessons props
         model.subjects.syncSubjects(function () {
             model.audiences.syncAudiences(function () {
-                decrementCountdown();
+                decrementCountdown(bShowTemplates, cb);
 
                 // call lessons/homework sync after audiences sync since
                 // lesson and homework objects needs audience data to be built
-                model.lessons.syncLessons(decrementCountdown());
-                model.homeworks.syncHomeworks(decrementCountdown());
+                model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb));
+                model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, cb));
             });
         });
     };
 
 
     // TODO merge/use with decrementSyncCountDown
-    var decrementCountdown = function () {
+    var decrementCountdown = function (bShowTemplates, cb) {
         $scope.countdown--;
         if ($scope.countdown == 0) {
             $scope.calendarLoaded = true;
-            showTemplates();
+
+            if(bShowTemplates) {
+                showTemplates();
+            }
+            if (typeof cb === 'function') {
+                cb();
+            }
         }
     };
 
