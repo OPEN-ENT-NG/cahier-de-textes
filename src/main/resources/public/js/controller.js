@@ -851,7 +851,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
 
         var postHomeworkSave = function () {
-            model.homeworks.syncHomeworks();
             $scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
