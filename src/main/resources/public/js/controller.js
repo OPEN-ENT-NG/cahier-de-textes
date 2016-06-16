@@ -62,7 +62,8 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     $scope.display = {
         showPanel: false,
-        showList: false
+        showList: false,
+        hideHomeworkPanel: false
     };
 
     /**
@@ -1040,4 +1041,17 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.currentErrors.push(e);
         $scope.$apply();
     };
+
+    /**
+     * Display or hide the homework panel
+     * in calendar view
+     */
+    $scope.toggleHomeworkPanel = function () {
+        $scope.display.hideHomeworkPanel = model.showHomeworkPanel;
+        model.showHomeworkPanel = !model.showHomeworkPanel;
+        // see ng-extensions.js
+        model.placeTimeslots($('.timeslots'));
+
+        $('.show-homeworks').css('opacity', $scope.display.hideHomeworkPanel ? 0.3 : 1);
+    }
 }
