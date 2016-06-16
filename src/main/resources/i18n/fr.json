@@ -100,5 +100,6 @@
   "diary.lesson.label": "Séance",
   "diary.audience": "Audience",
   "diary.audience.group": "Groupe",
-  "diary.audience.class": "Classe"
+  "diary.audience.class": "Classe",
+  "enseignant": "Enseignant"
 }

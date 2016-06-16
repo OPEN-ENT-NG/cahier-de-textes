@@ -1,6 +1,6 @@
 routes.define(function ($routeProvider) {
     $routeProvider
-        // go to create new lesson view
+    // go to create new lesson view
         .when('/createLessonView/:timeFromCalendar', {
             action: 'createLessonView'
         })
@@ -82,8 +82,8 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.homeworks = model.homeworks;
     $scope.pedagogicItems = model.pedagogicItems;
 
-    // Says whether or not current user can edit homeworks
-    $scope.isHomeworkEditable = model.canEdit();
+    // Says whether or not current user can edit homework & lesson
+    $scope.isLessonHomeworkEditable = model.canEdit();
 
     route({
         createLessonView: function(params){
@@ -390,8 +390,8 @@ function DiaryController($scope, template, model, route, date, $location) {
                     $scope.homework = null;
                 }
             }, function (e) {
-            validationError(e);
-        });
+                validationError(e);
+            });
     };
 
     /**
@@ -432,7 +432,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.publishLessons(lessons, isPublish, cb);
     }
 
-     /**
+    /**
      * Publish lessons
      * @param lessons Array of lessons to publish or unpublish
      * @param isPublish if true publishes the lessons else unpublishes them
@@ -527,14 +527,14 @@ function DiaryController($scope, template, model, route, date, $location) {
         if (needSqlSync) {
             model.loadHomeworksForLesson($scope.lesson,
 
-            function () {
-                if (typeof cb !== 'undefined') {
-                    cb();
-                }
-                $scope.$apply();
-            }, function (e) {
-                validationError(e);
-            });
+                function () {
+                    if (typeof cb !== 'undefined') {
+                        cb();
+                    }
+                    $scope.$apply();
+                }, function (e) {
+                    validationError(e);
+                });
         } else {
             if (typeof cb !== 'undefined') {
                 cb();
@@ -552,6 +552,9 @@ function DiaryController($scope, template, model, route, date, $location) {
         return moment.lang('fr').format('DD/MM/YYYY');
     };
 
+    $scope.formatTime = function(time) {
+        return moment(time).lang('fr').format('H:mm');
+    };
 
     /**
      * Close confirmation panel

@@ -668,7 +668,7 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
 
 
 /**
- * 
+ *
  * JSON object corresponding to sql diary.lesson table columns
  */
 Lesson.prototype.toJSON = function () {
@@ -891,7 +891,7 @@ var getUserStructuresIdsAsString = function () {
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
-    
+
     this.collection(Lesson, {
         syncLessons: function (cb) {
 

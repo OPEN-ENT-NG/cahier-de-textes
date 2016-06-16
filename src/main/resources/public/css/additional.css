@@ -126,6 +126,18 @@ Override marging for homeworks display
     margin-top: 120px;
 }
 
+.lessonTeacher {
+    margin-left: 100px;
+}
+
+.lessonHomeworkDescription {
+    min-height: 250px;
+    height: auto;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd !important;
+}
+
 section .homework-detail {
     margin-top: -1px;
     border: 1px solid;
