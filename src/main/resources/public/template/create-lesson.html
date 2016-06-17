@@ -50,7 +50,7 @@
 
                 <div ng-if="!isLessonHomeworkEditable" class="four cell lessonTeacher">
                     <label class="cell four"><i18n>enseignant</i18n></label>
-                    <input type="text" i18n-placeholder="enseignant" value="Mme Michu" maxlength="20" class="cell six" readonly/>
+                    <input type="text" i18n-placeholder="enseignant" ng-model="lesson.teacherId" maxlength="20" class="cell six" readonly/>
                 </div>
 
                 <!--ng-model="lesson.teacher"-->
