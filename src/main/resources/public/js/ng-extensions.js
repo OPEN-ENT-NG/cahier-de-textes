@@ -34,26 +34,38 @@
                      * Create the homeworks area in calendar view
                      * @param timeslots Elements with 'timeslot' css class (hour legend tag + 7 day slots)
                      */
-                    function placeTimeslots(timeslots) {
+                    model.placeTimeslots = function (timeslots) {
+
+                        var show = model.showHomeworkPanel;
 
                         if (typeof model.initialTimeSlotsOffset === 'undefined') {
                             model.initialTimeSlotsOffset = timeslots.offset().top;
                         }
 
                         // used to display homeworks in calendar view
-                        var extraTimeSlotsOffset = 120;
+                        const OFFSET = 120;
+                        var extraTimeSlotsOffset = 0;
                         var currentTimeSlotsOffset = (typeof timeslots.offset() === 'undefined') ? 0 : timeslots.offset().top;
 
                         // tricky way to not apply extra offset twice
-                        if ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + extraTimeSlotsOffset) && timeslots.offset().top > 0) {
+                        if (show && ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + OFFSET) && timeslots.offset().top > 0)) {
+                            extraTimeSlotsOffset = OFFSET;
+                        }
+                        // only reverse offset if homework panel is unfolded
+                        else if (!show && (model.initialTimeSlotsOffset != currentTimeSlotsOffset)) {
+                            extraTimeSlotsOffset = -OFFSET;
+                        }
+
+                        if (extraTimeSlotsOffset != 0) {
                             timeslots.offset({top: timeslots.offset().top + extraTimeSlotsOffset});
 
                             // apply same offset to the next hours bar in calendar view
                             var nextTimeSlots = $('.next-timeslots');
                             nextTimeSlots.offset({top: nextTimeSlots.offset().top + extraTimeSlotsOffset});
-
-                            $('.schedule .days').height(587 + extraTimeSlotsOffset);
                         }
+
+                        $('.schedule-item').css("margin-top", show ? OFFSET : 0);
+                        $('.schedule .days').height(587 + extraTimeSlotsOffset);
                     }
 
                     
@@ -78,7 +90,7 @@
                         var timeslots = $('.timeslots');
 
                         if (timeslots.length === 8) {
-                            placeTimeslots(timeslots);
+                            model.placeTimeslots(timeslots);
                         }
                         // if days timeslots are not yet positioned
                         // wait until they are to create the homework panel
@@ -89,7 +101,7 @@
                                     timeslots = $('.timeslots');
                                     if (timeslots.length === 8) {
                                         clearInterval(timer);
-                                        placeTimeslots(timeslots);
+                                        model.placeTimeslots(timeslots);
                                     }
                                     timerOccurences++;
                                     // 5s should be far than enough to have all timeslots loaded

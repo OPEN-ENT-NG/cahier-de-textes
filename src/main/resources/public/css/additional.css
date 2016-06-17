@@ -126,6 +126,31 @@ Override marging for homeworks display
     margin-top: 120px;
 }
 
+section .homework-detail {
+    margin-top: -1px;
+    border: 1px solid;
+    padding: 6px;"
+}
+
+.show-homeworks::before {
+    content: "\e80d";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-homeworks {
+    opacity: 0.3;
+    color: #FF8500;
+    padding-top: 7px;
+}
+
+.show-homeworks.selected {
+    opacity: 0.7;
+}
+
+
 .lessonTeacher {
     margin-left: 100px;
 }
@@ -137,14 +162,3 @@ Override marging for homeworks display
     background: #fff;
     border: 1px solid #ddd !important;
 }
-
-section .homework-detail {
-    margin-top: -1px;
-    border: 1px solid;
-    padding: 6px;"
-}
-
-/*
-.schedule .days div.schedule-items div.schedule-item {
-    z-index: 0;
-}*/

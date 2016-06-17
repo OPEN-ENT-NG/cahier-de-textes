@@ -31,7 +31,7 @@ routes.define(function ($routeProvider) {
         .otherwise({
             action: 'calendarView'
         })
-})
+});
 
 /**
  *
@@ -39,11 +39,10 @@ routes.define(function ($routeProvider) {
  * @param template
  * @param model
  * @param route
- * @param date
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, date, $location) {
+function DiaryController($scope, template, model, route, $location) {
 
     $scope.currentErrors = [];
     $scope.tabs = {
@@ -51,18 +50,29 @@ function DiaryController($scope, template, model, route, date, $location) {
     };
 
     $scope.calendarLoaded = false;
+    /**
+     * Used when refreshing calendar
+     * @type {boolean}
+     */
     $scope.showCal = false;
+    /**
+     * If false hides the grid/content of calendar,
+     * only remains the days at top
+     * @type {boolean}
+     */
+    $scope.showCalGrid = true;
     $scope.newLesson = new Lesson();
     // for static access to some global function
     $scope.newHomework = new Homework();
 
     $scope.confirmPanel = {
         item: undefined
-    }
+    };
 
     $scope.display = {
         showPanel: false,
-        showList: false
+        showList: false,
+        hideHomeworkPanel: false
     };
 
     /**
@@ -72,8 +82,8 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.itemMouseEvent = {
         lastMouseDownTime: undefined,
         lastMouseClientX: undefined,
-        lastMouseClientY: undefined,
-    }
+        lastMouseClientY: undefined
+    };
 
     $scope.lessons = model.lessons;
     $scope.audiences = model.audiences;
@@ -86,13 +96,31 @@ function DiaryController($scope, template, model, route, date, $location) {
     $scope.isLessonHomeworkEditable = model.canEdit();
 
     route({
-        createLessonView: function(params){
-            $scope.lesson = null;
-            $scope.openLessonView(null, params);
+        createLessonView: function (params) {
+
+            var openFunc = function () {
+                $scope.lesson = null;
+                $scope.openLessonView(null, params);
+            };
+
+            if ($scope.calendarLoaded) {
+                openFunc();
+            } else {
+                initialization(false, openFunc)
+            }
         },
-        createHomeworkView: function(params){
-            $scope.homework = null;
-            $scope.openHomeworkView(null, params);
+        createHomeworkView: function (params) {
+
+            var openFunc = function () {
+                $scope.homework = null;
+                $scope.openHomeworkView(null, params);
+            };
+
+            if ($scope.calendarLoaded) {
+                openFunc();
+            } else {
+                initialization(false, openFunc)
+            }
         },
         editLessonView: function(params) {
 
@@ -128,9 +156,9 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
             $scope.lesson = null;
             $scope.homework = null;
-            initialization();
+            initialization(true);
         },
-        mainView: function(params){
+        mainView: function(){
             if ($scope.display.showList) {
                 $scope.showList();
             } else {
@@ -139,7 +167,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 if($scope.calendarLoaded) {
                     $scope.showCalendar();
                 } else {
-                    initialization();
+                    initialization(true);
                 }
             }
         }
@@ -205,7 +233,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         var openLessonTemplates = function(){
             template.open('main', 'main');
             template.open('main-view', 'create-lesson');
-        }
+        };
 
         // open existing lesson for edit
         if (lesson) {
@@ -217,7 +245,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 date: moment($scope.lesson.date),
                 beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
                 end: $scope.lesson.endMoment //moment($scope.lesson.end)
-            }
+            };
 
             $scope.loadHomeworksForCurrentLesson(function () {
                 openLessonTemplates();
@@ -232,7 +260,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     };
 
-    $scope.openHomeworkView = function(homework, params){
+    $scope.openHomeworkView = function(homework){
 
         if (homework) {
             if (!$scope.homework) {
@@ -258,7 +286,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         if (typeof cb === 'function') {
             cb();
         }
-    }
+    };
 
     /**
      * Switch to calendar view
@@ -270,7 +298,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         if (typeof cb === 'function') {
             cb();
         }
-    }
+    };
 
     /**
      * Deletes selected items (lessons or homeworks)
@@ -303,7 +331,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         var postDelete = function(){
             notify.info('item.deleted');
             $scope.closeConfirmPanel();
-        }
+        };
 
         var deleteHomeworks = function(){
             $scope.newHomework.deleteHomeworks(homeworksToDelete,
@@ -313,13 +341,13 @@ function DiaryController($scope, template, model, route, date, $location) {
                 // calback error function
                 function (cbe) {notify.error(cbe.message)}
             );
-        }
+        };
 
         // note: associated homeworks are automatically deleted
         // sql delete cascade
         if (selectedLessons.length > 0) {
             $scope.newLesson.deleteLessons(selectedLessons,
-                function (cb) {
+                function () {
                     if (homeworksToDelete.length > 0) {
                         deleteHomeworks();
                     } else {
@@ -334,7 +362,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         } else {
             deleteHomeworks();
         }
-    }
+    };
 
     /**
      * Open selected lesson or homework
@@ -364,7 +392,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 $scope.redirect('/editHomeworkView/' + selectedHomework.id);
             }
         }
-    }
+    };
 
 
     /**
@@ -410,7 +438,7 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.publishHomeworkAndGoCalendarView = function (homework, isPublish) {
         $scope.publishHomework(homework, isPublish, $scope.goToMainView());
-    }
+    };
 
     /**
      * Publishes or unpublishes lesson and go back to main view
@@ -419,23 +447,25 @@ function DiaryController($scope, template, model, route, date, $location) {
      */
     $scope.publishLessonAndGoCalendarView = function (lesson, isPublish) {
         $scope.publishLesson(lesson, isPublish, $scope.goToMainView());
-    }
+    };
 
     /**
      * Publish lesson
+     * @param lesson Lesson to be published or unpublished
      * @param isPublish If true publishes the lesson (back to draft mode) else unpublishes it
      * @param cb Callback function
      */
     $scope.publishLesson = function (lesson, isPublish, cb) {
-        var lessons = new Array();
+        var lessons = [];
         lessons.push(lesson);
         $scope.publishLessons(lessons, isPublish, cb);
-    }
+    };
 
     /**
      * Publish lessons
      * @param lessons Array of lessons to publish or unpublish
      * @param isPublish if true publishes the lessons else unpublishes them
+     * @param cb Callback function
      * which is lesson id to delete
      */
     $scope.publishLessons = function (lessons, isPublish, cb) {
@@ -464,19 +494,21 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Publish lesson
-     * @param isUPublish If true publishes the lesson (back to draft mode) else unpublishes it
+     * @param homework Homework to be published or unpublished
+     * @param isPublish If true publishes the lesson (back to draft mode) else unpublishes it
      * @param cb Callback function
      */
     $scope.publishHomework = function (homework, isPublish, cb) {
-        var homeworks = new Array();
+        var homeworks = [];
         homeworks.push(homework);
         $scope.publishHomeworks(homeworks, isPublish, cb);
-    }
+    };
 
     /**
-     * Publish or un-publishes lessons
-     * @param lessons Array of lessons to publish or unpublish
+     * Publish or un-publishes homeworks
+     * @param homeworks Array of homeworks to publish or unpublish
      * @param isPublish If true publishes lesson else unpublishes it
+     * @param cb Callback function
      * which is lesson id to delete
      */
     $scope.publishHomeworks = function (homeworks, isPublish, cb) {
@@ -589,7 +621,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         var hasHomeworkOnlySelected = $scope.homeworks.selection().length == 1 && $scope.lessons.selection().length == 0;
 
         return hasLessonOnlySelected || hasHomeworkOnlySelected;
-    }
+    };
 
 
     /**
@@ -657,12 +689,12 @@ function DiaryController($scope, template, model, route, date, $location) {
             }
             $scope.closeConfirmPanel();
             $scope.$apply();
-        }
+        };
 
         if (lessons.length > 0) {
 
             model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish,
-                function (cb) {
+                function () {
                     lessons.forEach(function (lesson) {
                         lesson.changeState(toPublish);
                     });
@@ -675,7 +707,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         if (homeworks.length > 0) {
 
             model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish,
-                function (cb) {
+                function () {
                     homeworks.forEach(function (homework) {
                         homework.state = toPublish ? 'published' : 'draft';
                     });
@@ -684,7 +716,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                     notify.error(cbe.message);
                 })
         }
-    }
+    };
 
     $scope.getItemsPublishableSelectedCount = function (toPublish) {
 
@@ -695,7 +727,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         } else {
             return itemsSelected.unPublishableSelectedLessons.length + itemsSelected.unPublishableSelectedHomeworks.length;
         }
-    }
+    };
 
     /**
      * Telles whether it is possible to publish or not selected items.
@@ -736,7 +768,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 return (unpublishableLessons.length > 0 && noPublishableItems) || (unpublishableHomeworks.length > 0 && noPublishableItems);
             }
         }
-    }
+    };
 
     /**
      * Tells if at least one draft is selected and only drafts
@@ -755,7 +787,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
 
         return selected;
-    }
+    };
 
     /**
      * Tells if at least one published lesson is selected and only published ones
@@ -774,7 +806,7 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
 
         return selected;
-    }
+    };
 
     $scope.getSelectedLessons = function(){
         var itemArray = [];
@@ -784,13 +816,12 @@ function DiaryController($scope, template, model, route, date, $location) {
         });
 
         return itemArray;
-    }
+    };
 
 
 
     /**
      * Delete selected lessons
-     * @param item Lesson
      */
     $scope.deleteSelectedLessons = function () {
         $scope.currentErrors = [];
@@ -799,7 +830,7 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Delete lessons
-     * @param Lessons Lessons to be deleted
+     * @param lessons Lessons to be deleted
      * which is lesson id to delete
      */
     $scope.deleteLessons = function (lessons) {
@@ -824,10 +855,11 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.deleteHomework(homework, lesson, function(){
             $scope.closeConfirmPanel();
         });
-    }
+    };
 
     /**
      * Deletes an homework
+     * @param cb Callback function
      * @param homework Homework to be deleted
      * @param lesson Lesson attached to homework (optional)
      */
@@ -853,7 +885,6 @@ function DiaryController($scope, template, model, route, date, $location) {
         }
 
         var postHomeworkSave = function () {
-            model.homeworks.syncHomeworks();
             $scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
@@ -864,7 +895,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 $scope.lesson = null;
                 $scope.homework = null;
             }
-        }
+        };
 
         $scope.homework.save(function () {
             if (this.lesson_id) {
@@ -880,34 +911,43 @@ function DiaryController($scope, template, model, route, date, $location) {
 
     /**
      * Load related data to lessons and homeworks from database
+     * @param cb Callback function
+     * @param bShowTemplates if true loads calendar templates after data loaded
+     * might be used when 
      */
-    var initialization = function () {
+    var initialization = function (bShowTemplates, cb) {
 
         $scope.countdown = 4;
         var teacher = new Teacher();
-        teacher.create(decrementCountdown());
+        teacher.create(decrementCountdown(bShowTemplates, cb));
 
         // subjects and audiences needed to fill in
         // homeworks and lessons props
         model.subjects.syncSubjects(function () {
             model.audiences.syncAudiences(function () {
-                decrementCountdown();
+                decrementCountdown(bShowTemplates, cb);
 
                 // call lessons/homework sync after audiences sync since
                 // lesson and homework objects needs audience data to be built
-                model.lessons.syncLessons(decrementCountdown());
-                model.homeworks.syncHomeworks(decrementCountdown());
+                model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb));
+                model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, cb));
             });
         });
     };
 
 
     // TODO merge/use with decrementSyncCountDown
-    var decrementCountdown = function () {
+    var decrementCountdown = function (bShowTemplates, cb) {
         $scope.countdown--;
         if ($scope.countdown == 0) {
             $scope.calendarLoaded = true;
-            showTemplates();
+
+            if(bShowTemplates) {
+                showTemplates();
+            }
+            if (typeof cb === 'function') {
+                cb();
+            }
         }
     };
 
@@ -953,12 +993,13 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.itemMouseEvent.lastMouseDownTime = new Date().getTime();
         $scope.itemMouseEvent.lastMouseClientX = $event.clientX;
         $scope.itemMouseEvent.lastMouseClientY = $event.clientY;
-    }
+    };
 
     /**
      * Redirect to path only when user is doind a real click.
      * If user is draging item redirect will not be called
-     * @param path
+     * @param item Lesson being clicked or dragged
+     * @param $event
      */
     $scope.openOnClickSaveOnDrag = function (item, $event) {
 
@@ -979,7 +1020,7 @@ function DiaryController($scope, template, model, route, date, $location) {
                 $scope.redirect(path)
             }
         }
-    }
+    };
 
     $scope.redirect = function (path) {
         $location.path(path);
@@ -992,40 +1033,36 @@ function DiaryController($scope, template, model, route, date, $location) {
      * @returns {*}
      */
     var getSelectedHomeworks = function(){
-        var selectedHomeworks = model.homeworks.filter(function (homework) {
+        return model.homeworks.filter(function (homework) {
             return homework && homework.selected;
         });
-
-        return selectedHomeworks;
-    }
+    };
 
 
     $scope.getLessonsOrHomeworksSelectedCount = function () {
         return getSelectedLessons().length + getSelectedHomeworks().length;
-    }
+    };
 
     /**
      *
      * @returns {*}
      */
     var getSelectedLessons = function(){
-        var selectedLessons = model.lessons.filter(function (lesson) {
+        return model.lessons.filter(function (lesson) {
             return lesson && lesson.selected;
         });
-
-        return selectedLessons;
-    }
+    };
 
     /**
      * Init lesson object on create
-     * @param initTimeFromCalendar If true will init start time/end time to calendar start/end time user choice
+     * @param timeFromCalendar If true will init start time/end time to calendar start/end time user choice
      * else to now -> now + 1 hour starting at the very beginning of hour (HH:00)
      */
     var initLesson = function (timeFromCalendar) {
 
         $scope.lesson = model.initLesson(timeFromCalendar);
         $scope.newItem = $scope.lesson.newItem;
-    }
+    };
 
     /**
      * Init homework object on create
@@ -1036,11 +1073,24 @@ function DiaryController($scope, template, model, route, date, $location) {
         $scope.newItem = {
             date: moment().minute(0).second(0)
         };
-    }
+    };
 
     var validationError = function(e){
         notify.error(e.error);
         $scope.currentErrors.push(e);
         $scope.$apply();
+    };
+
+    /**
+     * Display or hide the homework panel
+     * in calendar view
+     */
+    $scope.toggleHomeworkPanel = function () {
+        $scope.display.hideHomeworkPanel = model.showHomeworkPanel;
+        model.showHomeworkPanel = !model.showHomeworkPanel;
+        // see ng-extensions.js
+        model.placeTimeslots($('.timeslots'));
+
+        $('.show-homeworks').css('opacity', $scope.display.hideHomeworkPanel ? 0.3 : 1);
     };
 }

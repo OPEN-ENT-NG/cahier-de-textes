@@ -1179,6 +1179,8 @@ model.getDefaultAudience = function(){
     return defaultAudience;
 }
 
+model.showHomeworkPanel = true;
+
 /**
  * Default color of lesson and homeworks
  * @type {string}
