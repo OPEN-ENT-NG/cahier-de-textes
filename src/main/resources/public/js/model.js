@@ -33,7 +33,7 @@ Homework.prototype.save = function(cb, cbe) {
  */
 Homework.prototype.isAttachedToLesson = function() {
     return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
-}
+};
 
 Homework.prototype.isDraft = function () {
     return this.state === "draft";
@@ -60,7 +60,7 @@ Homework.prototype.isPublishable = function (toPublish) {
  */
 model.canEdit = function () {
     return model.me.type == "ENSEIGNANT";
-}
+};
 
 
 Homework.prototype.update = function(cb, cbe) {
@@ -95,7 +95,7 @@ Homework.prototype.create = function(cb, cbe) {
                 cbe(model.parseError(e));
             }
         });
-}
+};
 
 /**
  * Load homework object from id
@@ -135,8 +135,8 @@ Homework.prototype.load = function (cb, cbe) {
 };
 
 /**
- * Deletes a list of lessons
- * @param lessons Lessons to be deleted
+ * Deletes a list of homeworks
+ * @param homeworks Homeworks to be deleted
  * @param cb Callback
  * @param cbe Callback on error
  */
@@ -164,7 +164,7 @@ Homework.prototype.deleteHomeworks = function (homeworks, cb, cbe) {
 
 /**
  * Deletes the homework
- * @param Optional lesson attached to homework
+ * @param lesson Lesson attached to homework
  * @param cb Callback after delete
  * @param cbe Callback on error
  */
@@ -213,6 +213,7 @@ Homework.prototype.delete = function (lesson, cb, cbe) {
 /**
  * Publishes or un publishes a list of lessons
  * @param itemArray Array of homeworks to publish or unpublish
+ * @param isPublish If true will publishes the homeworks else will unpublish
  * @param cb Callback function
  * @param cbe Callback function on error
  */
@@ -474,7 +475,7 @@ var getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
     momentTime.set('date', dateMoment.get('date'));
 
     return momentTime;
-}
+};
 
 Lesson.prototype.update = function(cb, cbe) {
     var url = '/diary/lesson/' + this.id;
@@ -567,6 +568,7 @@ Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
 
 /**
  * Load lesson object from id
+ * @param loadHomeworks  If true will load linked homeworks of current lesson
  * @param cb Callback function
  * @param cbe Callback on error function
  */
@@ -631,6 +633,8 @@ Lesson.prototype.publish = function (cb, cbe) {
 
 /**
  * Publishes or un publishes a list of lessons
+ * @param itemArray Array of ids of lessons to be publishes
+ * @para isPublish If true will publish lessons else unpublish
  * @param cb Callback
  * @param cbe Callback on error
  */
@@ -788,7 +792,7 @@ model.convertLessonToPedagogicItem = function (lesson) {
     item.color = lesson.color;
     item.getPreviewDescription();
     return item;
-}
+};
 
 model.convertHomeworkToPedagogicItem = function (homework) {
     var item = new PedagogicItem();
@@ -839,7 +843,7 @@ model.getItemsIds = function (items) {
     });
 
     return itemArray;
-}
+};
 
 /**
  * Get homeworks linked to a lesson
@@ -886,7 +890,7 @@ var getUserStructuresIdsAsString = function () {
     });
 
     return structureIds;
-}
+};
 
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem]);
@@ -1105,7 +1109,7 @@ model.build = function () {
             state: data.lesson_state,
             is_periodic: false,
             homeworks: lessonHomeworks
-        }
+        };
 
         if('group' === lesson.audienceType){
             lesson.audienceTypeLabel = lang.translate('diary.audience.group');
@@ -1159,7 +1163,7 @@ model.build = function () {
 
         return homework;
     };
-}
+};
 
 /**
  * Returns default audience of connected user.
@@ -1177,7 +1181,7 @@ model.getDefaultAudience = function(){
     }
 
     return defaultAudience;
-}
+};
 
 model.showHomeworkPanel = true;
 
@@ -1196,7 +1200,6 @@ const DEFAULT_STATE = 'draft';
 /**
  * Init homework object on created.
  * Set default attribute values
- * @param homework
  * @returns {*}
  */
 model.initHomework = function () {
@@ -1211,7 +1214,7 @@ model.initHomework = function () {
     homework.state = DEFAULT_STATE;
 
     return homework;
-}
+};
 
 /**
  * Init lesson
@@ -1254,4 +1257,4 @@ model.initLesson = function (timeFromCalendar) {
     lesson.date = newItem.date;
 
     return lesson;
-}
+};
