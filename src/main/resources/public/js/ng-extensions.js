@@ -65,7 +65,7 @@
                         }
 
                         $('.schedule-item').css("margin-top", show ? OFFSET : 0);
-                        $('.schedule .days').height(587 + extraTimeSlotsOffset);
+                        $('.schedule .days').height(587 + (show ? OFFSET : 0))
                     }
 
                     
