@@ -918,8 +918,14 @@ function DiaryController($scope, template, model, route, $location) {
     var initialization = function (bShowTemplates, cb) {
 
         $scope.countdown = 4;
-        var teacher = new Teacher();
-        teacher.create(decrementCountdown(bShowTemplates, cb));
+
+        // auto creates diary.teacher
+        if("ENSEIGNANT" === model.me.type) {
+            var teacher = new Teacher();
+            teacher.create(decrementCountdown(bShowTemplates, cb), validationError);
+        } else {
+            decrementCountdown(bShowTemplates, cb)
+        }
 
         // subjects and audiences needed to fill in
         // homeworks and lessons props

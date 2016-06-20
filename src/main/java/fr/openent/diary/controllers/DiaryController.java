@@ -94,24 +94,28 @@ public class DiaryController extends BaseController {
             @Override
             public void handle(final UserInfos user) {
                 if (user != null) {
-                    if (user.getStructures().contains(schoolId)) {
-                        diaryService.getOrCreateTeacher(user.getUserId(), user.getUsername(), new Handler<Either<String, JsonObject>>() {
-                            @Override
-                            public void handle(Either<String, JsonObject> event) {
-                                if (event.isRight()) {
-                                    //return 201 if teacher is created, 200 if it was retrieved
-                                    if (!Boolean.TRUE.equals(event.right().getValue().getBoolean("teacherFound"))) {
-                                        request.response().setStatusCode(200).end();
+                    if ("Teacher".equals(user.getType())) {
+                        if (user.getStructures().contains(schoolId)) {
+                            diaryService.getOrCreateTeacher(user.getUserId(), user.getUsername(), new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        //return 201 if teacher is created, 200 if it was retrieved
+                                        if (!Boolean.TRUE.equals(event.right().getValue().getBoolean("teacherFound"))) {
+                                            request.response().setStatusCode(200).end();
+                                        } else {
+                                            created(request);
+                                        }
                                     } else {
-                                        created(request);
+                                        DefaultResponseHandler.leftToResponse(request, event.left());
                                     }
-                                } else {
-                                    DefaultResponseHandler.leftToResponse(request, event.left());
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            badRequest(request, "Invalid school identifier.");
+                        }
                     } else {
-                        badRequest(request, "Invalid school identifier.");
+                        badRequest(request, "User is not a teacher");
                     }
                 } else {
                     unauthorized(request, "No user found in session.");
