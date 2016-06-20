@@ -15,7 +15,7 @@ function Homework() {
 }
 
 Homework.prototype.api = {
-    delete: '/diary/homework/:id',
+    delete: '/diary/homework/:id'
 };
 
 Homework.prototype.save = function(cb, cbe) {
@@ -404,7 +404,7 @@ Lesson.prototype.save = function(cb, cbe) {
     var saveHomeworksAndSync = function(){
         that.saveHomeworks(
             function(){
-                syncLessonsAndHomeworks(cb);
+                syncLessonsAndHomeworks(cb, cbe);
             }
         );
     };
@@ -450,10 +450,10 @@ var syncHomeworks = function (cb) {
         });
 };
 
-var syncLessonsAndHomeworks = function (cb) {
-    model.lessons.syncLessons();
+var syncLessonsAndHomeworks = function (cb, cbe) {
+    model.lessons.syncLessons(null, cbe);
     // need sync attached lesson homeworks
-    model.homeworks.syncHomeworks();
+    model.homeworks.syncHomeworks(null, cbe);
 
     if (typeof cb === 'function') {
         cb();
@@ -901,7 +901,7 @@ model.build = function () {
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.collection(Lesson, {
-        syncLessons: function (cb) {
+        syncLessons: function (cb, cbe) {
 
             var lessons = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
@@ -921,6 +921,10 @@ model.build = function () {
                 if(typeof cb === 'function'){
                     cb();
                 }
+            }).error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
             });
         }, pushAll: function(datas) {
             if (datas) {
@@ -930,7 +934,7 @@ model.build = function () {
     });
 
     this.collection(Subject, {
-        syncSubjects: function (cb) {
+        syncSubjects: function (cb, cbe) {
             this.all = [];
             var that = this;
             http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
@@ -938,12 +942,17 @@ model.build = function () {
                 if(typeof cb === 'function'){
                     cb();
                 }
-            }.bind(that));
+            }.bind(that))
+            .error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+            });
         }
     });
 
     this.collection(Audience, {
-        syncAudiences: function (cb) {
+        syncAudiences: function (cb, cbe) {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
@@ -965,7 +974,12 @@ model.build = function () {
                             cb();
                         }
                     }
-                }.bind(that));
+                }.bind(that))
+                .error(function (e) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(e));
+                    }
+                });
             });
         }
     });
@@ -979,7 +993,7 @@ model.build = function () {
     });
 
     this.collection(Homework, {
-        syncHomeworks: function(cb){
+        syncHomeworks: function(cb, cbe){
 
             var homeworks = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
@@ -995,6 +1009,10 @@ model.build = function () {
                 );
                 if(typeof cb === 'function'){
                     cb();
+                }
+            }).error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
                 }
             });
 

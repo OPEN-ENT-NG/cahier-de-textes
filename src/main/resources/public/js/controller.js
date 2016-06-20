@@ -935,10 +935,10 @@ function DiaryController($scope, template, model, route, $location) {
 
                 // call lessons/homework sync after audiences sync since
                 // lesson and homework objects needs audience data to be built
-                model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb));
-                model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, cb));
-            });
-        });
+                model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
+                model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
+            }, validationError);
+        }, validationError);
     };
 
 
@@ -987,11 +987,11 @@ function DiaryController($scope, template, model, route, $location) {
      */
     var refreshCalendar = function (momentDate) {
         model.calendar.setDate(momentDate);
-        model.lessons.syncLessons();
+        model.lessons.syncLessons(null, validationError);
         model.homeworks.syncHomeworks(function () {
             $scope.showCal = !$scope.showCal;
             $scope.$apply();
-        });
+        }, validationError);
     };
 
 
@@ -1081,10 +1081,14 @@ function DiaryController($scope, template, model, route, $location) {
         };
     };
 
-    var validationError = function(e){
-        notify.error(e.error);
-        $scope.currentErrors.push(e);
-        $scope.$apply();
+    var validationError = function (e) {
+
+        if (typeof e !== 'undefined') {
+            console.error(e);
+            notify.error(e.error);
+            $scope.currentErrors.push(e);
+            $scope.$apply();
+        }
     };
 
     /**
