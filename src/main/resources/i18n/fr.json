@@ -102,5 +102,6 @@
   "diary.audience": "Audience",
   "diary.audience.group": "Groupe",
   "diary.audience.class": "Classe",
-  "enseignant": "Enseignant"
+  "enseignant": "Enseignant",
+  "diary.invalid.login": "La session a expiré ou vous n'etes pas authentifié(e)"
 }

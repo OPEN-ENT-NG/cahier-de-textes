@@ -23,7 +23,7 @@ public interface DiaryService {
 
     void deleteSubject(final String subjectId, final Handler<Either<String, JsonObject>> handler);
 
-    void listSubjects(final List<String> schoolIds, final Handler<Either<String, JsonArray>> handler);
+    void listSubjects(final List<String> schoolIds, final String teacherId, final Handler<Either<String, JsonArray>> handler);
 
     void listAudiences(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 
