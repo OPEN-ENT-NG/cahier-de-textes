@@ -3,6 +3,7 @@ package fr.openent.diary.controllers;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
+import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
@@ -25,6 +26,7 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -129,5 +131,23 @@ public class DiaryController extends BaseController {
     public void initTeacherSubjects(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         final String teacherId = request.params().get("teacherId");
+    }
+
+    @Get("/pedagogicItems/list/")
+    @ApiDoc("Get all audiences for a school")
+    @SecuredAction(value = list_audiences, type = ActionType.AUTHENTICATED)
+    public void searchForPedagogicItems(final HttpServerRequest request) {
+        final String query = request.query();
+        final List<SearchCriterion> criteria = SearchCriterion.convertParametersToSearchCriteria(query);
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+            if (user != null) {
+                diaryService.listPedagogicItems(criteria, arrayResponseHandler(request));
+            } else {
+                unauthorized(request, "No user found in session.");
+            }
+            }
+        });
     }
 }

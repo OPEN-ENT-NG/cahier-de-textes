@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
@@ -136,13 +137,71 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
     }
 
-    public void getSubjects(final String schoolId, final String teacherId, final Handler<Either<String, JsonArray>> handler) {
+    @Override
+    public void listPedagogicItems(List<SearchCriterion> criteria, Handler<Either<String, JsonArray>> handler) {
 
-        StringBuilder query = new StringBuilder("MATCH (m:FieldOfStudy)");
-        query.append(" WHERE ");
-        query.append(" return m limit 10;");
+        StringBuilder queryLessons = new StringBuilder();
+        queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, ")
+                .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room, ")
+                .append(" l.lesson_color as color, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
+                .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, null as turn_in_type ")
+                .append(" FROM diary.lesson AS l")
+                .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
+                .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
+                .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
+                .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id");
 
+        //TODO : add number of homeworks for a lesson
 
+        StringBuilder queryHomeworks = new StringBuilder();
+        queryHomeworks.append("SELECT 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, ")
+                .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room, ")
+                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null as start_time, null as end_time, ")
+                .append(" '0' as time_order, h.homework_description as description, h.turn_in_type as turn_in_type ")
+                .append(" FROM diary.homework AS h")
+                .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
+                .append(" LEFT JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")
+                .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
+                .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id");
+
+        StringBuilder whereLessons = new StringBuilder(" WHERE 1=1 ");
+        StringBuilder whereHomeworks = new StringBuilder(" WHERE 1=1 ");
+        JsonArray parametersLessons = new JsonArray();
+        JsonArray parametersHomeworks = new JsonArray();
+        for (SearchCriterion criterion: criteria) {
+
+            switch (criterion.getType()) {
+                case START_DATE:    whereLessons.append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD')");
+                                    whereHomeworks.append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD')"); break;
+                case END_DATE:      whereLessons.append(" AND l.lesson_date <= to_date(?,'YYYY-MM-DD')");
+                                    whereHomeworks.append(" AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')"); break;
+                case AUDIENCE:      whereLessons.append(" AND l.audience_id = ?");
+                                    whereHomeworks.append(" AND h.audience_id = ?"); break;
+                case PUBLISH_STATE: whereLessons.append(" AND l.lesson_state = ?");
+                                    whereHomeworks.append(" AND h.homework_state = ?"); break;
+                case SUBJECT:       whereLessons.append(" AND l.subject_id = ?");
+                                    whereHomeworks.append(" AND h.subject_id = ?"); break;
+            }
+
+            parametersLessons.add(criterion.getValue());
+            parametersHomeworks.add(criterion.getValue());
+        }
+        queryLessons.append(whereLessons);
+        queryHomeworks.append(whereHomeworks);
+
+        StringBuilder queryFull = new StringBuilder("SELECT * FROM ( ");
+        queryFull.append(queryLessons.toString());
+        queryFull.append(" UNION ");
+        queryFull.append(queryHomeworks.toString());
+        queryFull.append(" ) as req ");
+        queryFull.append(" ORDER BY req.day DESC, req.time_order ASC");
+
+        if(parametersHomeworks.size() > 0) {
+            for (Object param: parametersHomeworks) {
+                parametersLessons.add(param);
+            }
+        }
+
+        sql.prepared(queryFull.toString(), parametersLessons, SqlResult.validResultHandler(handler));
     }
-
 }

@@ -26,21 +26,21 @@
             <ul ng-if="day.expanded === true">
                 <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay">
                     <div class="cell-no-float notification">
-                        <i ng-class="pedagogicItem.typeItem === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
+                        <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
                         <div class="table-cell">
                             <div>
                                 <i ng-if="pedagogicItem.published === false"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
                                 <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
                                 <em class="medium-importance">
-                                    <p style="display:inline" ng-if="pedagogicItem.typeItem === 'lesson'">[[pedagogicItem.startHour]] - [[pedagogicItem.endHour]]&nbsp;</p>
+                                    <p style="display:inline" ng-if="pedagogicItem.type_item === 'lesson'">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
                                     [[pedagogicItem.title]]
                                 </em>
                             </div>
-                            <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expandedDescription = !pedagogicItem.expandedDescription">
-                                <span ng-show="!pedagogicItem.expandedDescription">
-                                     <span bind-html="pedagogicItem.previewDescription"></span>
+                            <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
+                                <span ng-show="!pedagogicItem.expanded_description">
+                                     <span bind-html="pedagogicItem.preview_description"></span>
                                 </span>
-                                <span ng-show="pedagogicItem.expandedDescription">
+                                <span ng-show="pedagogicItem.expanded_description">
                                      <span bind-html="pedagogicItem.description"></span>
                                 </span>
                             </span>

@@ -1,5 +1,6 @@
 package fr.openent.diary.services;
 
+import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.webutils.Either;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -27,4 +28,9 @@ public interface DiaryService {
     void listAudiences(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 
     void getOrCreateTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * List all pedagogic items (lessons and homeworks) matching the given search criteria.
+     */
+    void listPedagogicItems(final List<SearchCriterion> criteria, final Handler<Either<String, JsonArray>> handler);
 }

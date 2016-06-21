@@ -176,12 +176,13 @@ function DiaryController($scope, template, model, route, $location) {
     // Navigation
     $scope.showList = function() {
         $scope.display.showList = true;
-        model.pedagogicItems.syncPedagogicItems($scope.openListView());
+        model.pedagogicItems.syncPedagogicItems($scope.openListView, validationError);
     };
 
     $scope.openListView = function () {
         template.open('main', 'main');
         template.open('main-view', 'list-view');
+        $scope.$apply();
     };
 
     $scope.showCalendar = function() {
