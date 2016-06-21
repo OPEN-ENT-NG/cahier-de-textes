@@ -74,7 +74,21 @@ public class DiaryController extends BaseController {
     @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
     public void listSubjects(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("schoolIds").split(":");
-        diaryService.listSubjects(Arrays.asList(schoolIds), arrayResponseHandler(request));
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(final UserInfos user) {
+                        if (user != null) {
+                            if ("Teacher".equals(user.getType())) {
+                                diaryService.listSubjects(Arrays.asList(schoolIds), user.getUserId(), arrayResponseHandler(request));
+                            } else {
+                                diaryService.listSubjects(Arrays.asList(schoolIds), null, arrayResponseHandler(request));
+                            }
+                        } else {
+                            badRequest(request, "diary.invalid.login");
+                        }
+                    }
+                }
+        );
     }
 
     @Get("/audience/list/:schoolId")
