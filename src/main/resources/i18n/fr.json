@@ -103,5 +103,6 @@
   "diary.audience.group": "Groupe",
   "diary.audience.class": "Classe",
   "enseignant": "Enseignant",
-  "diary.invalid.login": "La session a expiré ou vous n'etes pas authentifié(e)"
+  "diary.invalid.login": "La session a expiré ou vous n'etes pas authentifié(e)",
+  "diary.search.no.result": "Aucun résultat à afficher. Veuillez modifier les paramètres de votre recherche."
 }

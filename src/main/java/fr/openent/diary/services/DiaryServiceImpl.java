@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.utils.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
@@ -25,6 +26,11 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
     private final Neo4j neo = Neo4j.getInstance();
+
+    private final String QUERY_RETURN_TYPE_BOTH = "both";
+    private final String QUERY_RETURN_TYPE_LESSON = "lesson";
+    private final String QUERY_RETURN_TYPE_HOMEWORK = "homework";
+
     private final static String DATABASE_TABLE ="teacher"; //TODO handle attachments manually or the opposite?
     private final static Logger log = LoggerFactory.getLogger(DiaryServiceImpl.class);
     private static final String TEACHER_ID_FIELD_NAME = "id";
@@ -146,6 +152,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     @Override
     public void listPedagogicItems(List<SearchCriterion> criteria, Handler<Either<String, JsonArray>> handler) {
 
+        String queryReturnType = "";
+        JsonArray parameters = new JsonArray();
+
         StringBuilder queryLessons = new StringBuilder();
         queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, ")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room, ")
@@ -163,7 +172,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         queryHomeworks.append("SELECT 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, ")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room, ")
                 .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null as start_time, null as end_time, ")
-                .append(" '0' as time_order, h.homework_description as description, h.turn_in_type as turn_in_type ")
+                .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type ")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
                 .append(" LEFT JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")
@@ -183,31 +192,50 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                     whereHomeworks.append(" AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')"); break;
                 case AUDIENCE:      whereLessons.append(" AND l.audience_id = ?");
                                     whereHomeworks.append(" AND h.audience_id = ?"); break;
-                case PUBLISH_STATE: whereLessons.append(" AND l.lesson_state = ?");
-                                    whereHomeworks.append(" AND h.homework_state = ?"); break;
+                case PUBLISH_STATE: whereLessons.append(" AND l.lesson_state = ?::diary.resource_state");
+                                    whereHomeworks.append(" AND h.homework_state = ?::diary.resource_state"); break;
                 case SUBJECT:       whereLessons.append(" AND l.subject_id = ?");
                                     whereHomeworks.append(" AND h.subject_id = ?"); break;
+                case SEARCH_TYPE:   queryReturnType = criterion.getValue(); break;
             }
 
-            parametersLessons.add(criterion.getValue());
-            parametersHomeworks.add(criterion.getValue());
+            if (! CriteriaSearchType.SEARCH_TYPE.equals(criterion.getType())) {
+                parametersLessons.add(criterion.getValue());
+                parametersHomeworks.add(criterion.getValue());
+            }
+
         }
         queryLessons.append(whereLessons);
         queryHomeworks.append(whereHomeworks);
 
         StringBuilder queryFull = new StringBuilder("SELECT * FROM ( ");
-        queryFull.append(queryLessons.toString());
-        queryFull.append(" UNION ");
-        queryFull.append(queryHomeworks.toString());
+        if (queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) {
+            queryFull.append(queryLessons.toString());
+        }
+
+        if (queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) {
+            queryFull.append(" UNION ");
+        }
+
+        if (queryReturnType.equals(QUERY_RETURN_TYPE_HOMEWORK) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) {
+            queryFull.append(queryHomeworks.toString());
+        }
+
         queryFull.append(" ) as req ");
         queryFull.append(" ORDER BY req.day DESC, req.time_order ASC");
 
-        if(parametersHomeworks.size() > 0) {
-            for (Object param: parametersHomeworks) {
-                parametersLessons.add(param);
+        if((queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) && parametersLessons.size() > 0) {
+            for (Object param: parametersLessons) {
+                parameters.add(param);
             }
         }
 
-        sql.prepared(queryFull.toString(), parametersLessons, SqlResult.validResultHandler(handler));
+        if((queryReturnType.equals(QUERY_RETURN_TYPE_HOMEWORK) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) && parametersHomeworks.size() > 0) {
+            for (Object param: parametersHomeworks) {
+                parameters.add(param);
+            }
+        }
+
+        sql.prepared(queryFull.toString(), parameters, SqlResult.validResultHandler(handler));
     }
 }

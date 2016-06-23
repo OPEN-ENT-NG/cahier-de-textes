@@ -13,12 +13,12 @@ public enum CriteriaSearchType {
     END_DATE("endDate"),
     AUDIENCE("audience"),
     SUBJECT("subject"),
-    PUBLISH_STATE("publishState");
+    PUBLISH_STATE("publishState"),
+    SEARCH_TYPE("returnType"); // 'homework' or 'lesson' or 'both'
 
     private String name;
 
-    private static final Map<String,CriteriaSearchType> lookup
-            = new HashMap<String,CriteriaSearchType>();
+    private static final Map<String,CriteriaSearchType> lookup = new HashMap<String,CriteriaSearchType>();
 
     static {
         for(CriteriaSearchType type : values()) //or EnumSet.allOf(CriteriaSearchType.class)

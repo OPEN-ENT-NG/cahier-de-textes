@@ -14,6 +14,9 @@
 
 <section>
     <ul class="colored">
+        <div ng-show="pedagogicItems.all.length <= 0">
+            <i18n>diary.search.no.result</i18n>
+        </div>
         <li ng-repeat="day in pedagogicItems.all">
             <div>
                 <p>

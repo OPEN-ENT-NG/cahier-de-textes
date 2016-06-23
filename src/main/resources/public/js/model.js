@@ -989,7 +989,15 @@ model.build = function () {
         syncPedagogicItems: function(cb, cbe){
 
             model.pedagogicItems.reset();
-            http().get('/diary/pedagogicItems/list/?startDate=2016-06-15&endDate=2016-06-27').done(function (items) {
+
+            var params = {};
+            params.startDate = "2016-06-15";
+            params.endDate = "2016-06-27";
+            params.publishState = "draft";
+            params.returnType = "both";
+            
+            
+            http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
                 var pedagogicItemsFromDB = _.map(items, sqlToJsPedagogicItem);
 
