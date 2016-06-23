@@ -14,13 +14,21 @@
 
 <div class="row">
     <filters>
+        <ul>
         <li>
+            <i class="resize-homeworks-panel" ng-click="toggleHomeworkPanelMinified()"></i>
+
+            <i id="toggleCalendar" style="float: left !important; box-shadow: none; background: none; font-size: 42px;"
+               class="show-calendar-grid" ng-class="{ selected: display.hideCalendar == false}"
+               ng-click="toggleCalendar()" tooltip="diary.icon.show.calendargrid"></i>
+
             <i id="toggleHomeworkPanel" style="float: left !important; box-shadow: none; background: none; font-size: 42px;"
                class="show-homeworks" ng-class="{ selected: display.hideHomeworkPanel == false}"
                ng-click="toggleHomeworkPanel()" tooltip="diary.icon.show.homeworkpanel"></i>
-            <button ng-click="previousWeek(); ">&#8592;</button>
-            <button ng-click="nextWeek(); ">&#8594;</button>
+            <button ng-click="previousWeek(); " tooltip="diary.calendar.previousweek">&#8592;</button>
+            <button ng-click="nextWeek();" tooltip="diary.calendar.nextweek">&#8594;</button>
         </li>
+        </ul>
     </filters>
     <calendar-daily-events for="calendar"
                            ng-model="homeworks.all"

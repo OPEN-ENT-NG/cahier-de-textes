@@ -169,3 +169,36 @@ div.notification {
     border-style: solid;
     border-width: 1px 1px 1px 1px;
 }
+
+.show-calendar-grid::before {
+    content: "\e86f";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-calendar-grid {
+    opacity: 0.3;
+    color: #FF8500;
+    padding-top: 7px;
+}
+
+
+.resize-homeworks-panel::before {
+    content: "▾";
+    font-size: 30px;
+    vertical-align: middle;
+    background-color: transparent;
+}
+
+.resize-homeworks-panel {
+    font-size: 30px;
+    float: left;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+.resize-homeworks-panel .mini {
+    content: "▸";
+}
