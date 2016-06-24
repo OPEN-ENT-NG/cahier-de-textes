@@ -22,10 +22,10 @@
                         // > 3 homeworks for current day
                         // or > 1 homework and homework panel minified
                         '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
-                            'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
+                            'ng-click="toggleShowHwDetail(day)">' +
                             '<i18n>daily.event</i18n>' +
                         '</div>' +
-                        '<div class="test daily-events" style="z-index: 1000;" ' +
+                        '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
                             'ng-click="day.openDailyEvents = !day.openDailyEvents" ' +
                             'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
@@ -36,6 +36,22 @@
                 '</div>',
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
+
+                    /**
+                     * Toggle show display homework panel detail of a day
+                     * Note: jquery oldschool way since with angular could not fix some display problems
+                     * @param day
+                     */
+                    scope.toggleShowHwDetail = function (day) {
+
+                        var hwDayDetail = $('#hw-detail-' + day.index)
+
+                        if (hwDayDetail.hasClass('show')) {
+                            hwDayDetail.removeClass('show');
+                        } else {
+                            hwDayDetail.addClass('show');
+                        }
+                    };
 
                     /**
                      * Get the maximum number of homeworks of a day for current week
