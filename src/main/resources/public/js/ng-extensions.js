@@ -87,7 +87,7 @@
                      * @returns {Number|boolean}
                      */
                     scope.showNotAllHomeworks = function(day){
-                        return day.dailyEvents.length && !scope.showAllHomeworks(day);
+                        return day.dailyEvents && day.dailyEvents.length && !scope.showAllHomeworks(day);
                     };
 
                     /**
@@ -98,7 +98,7 @@
                      */
                     scope.showAllHomeworks = function (day) {
 
-                        if (day.dailyEvents.length == 0) {
+                        if (day.dailyEvents && day.dailyEvents.length == 0) {
                             return false;
                         }
 
