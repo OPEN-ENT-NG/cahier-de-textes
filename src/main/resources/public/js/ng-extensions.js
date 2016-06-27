@@ -6,8 +6,8 @@
                     ngModel: '='
                 },
                 restrict: 'E',
-                template: //'<div><i class="caret expanded">AA</i></div>'+
-                // '<div class="days" style="z-index: 1000; padding-left: 130px;">' +
+                template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
+                '<i class="resize-homeworks-panel" ng-class="{ expanded: !show.bShowHomeworksMinified}"  style="float: left; width: 130px;"  ng-click="toggleHomeworkPanelMinized()"></i></li></ul></span>'+
                 '<div class="days" style="z-index: 1000; ">' +
                     '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 120px;">' +
 
@@ -44,7 +44,7 @@
                      */
                     scope.toggleShowHwDetail = function (day) {
 
-                        var hwDayDetail = $('#hw-detail-' + day.index)
+                        var hwDayDetail = $('#hw-detail-' + day.index);
 
                         if (hwDayDetail.hasClass('show')) {
                             hwDayDetail.removeClass('show');
@@ -82,11 +82,20 @@
                     scope.show = model.show;
 
                     /**
+                     * Minify the homework panel or not
+                     * If it's minified, will only show one max homework
+                     * else 3
+                     */
+                    scope.toggleHomeworkPanelMinized = function () {
+                        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+                    };
+
+                    /**
                      *
                      * @param day
                      * @returns {Number|boolean}
                      */
-                    scope.showNotAllHomeworks = function(day){
+                    scope.showNotAllHomeworks = function (day) {
                         return day.dailyEvents && day.dailyEvents.length && !scope.showAllHomeworks(day);
                     };
 
@@ -203,6 +212,9 @@
                         // toggle buttons
                         $('.show-homeworks').css('opacity', bShowHomeworks ? 1 : 0.3);
                         $('.show-calendar-grid').css('opacity', bShowCalendar ? 1 : 0.3);
+
+
+                        $('#minimize_hw_span').css('display', (newHwPanelHeight > 0) ? 'inherit' : 'none');
 
                         model.show.bShowCalendar = bShowCalendar;
                         model.show.bShowHomeworks = bShowHomeworks;

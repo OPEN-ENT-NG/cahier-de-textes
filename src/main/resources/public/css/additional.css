@@ -185,13 +185,6 @@ div.notification {
 }
 
 
-.resize-homeworks-panel::before {
-    content: "▾";
-    font-size: 30px;
-    vertical-align: middle;
-    background-color: transparent;
-}
-
 .resize-homeworks-panel {
     font-size: 30px;
     float: left;
@@ -199,6 +192,20 @@ div.notification {
     background-color: transparent !important;
 }
 
-.resize-homeworks-panel .mini {
+.resize-homeworks-panel.expanded::before {
+    content: "▾";
+}
+
+.resize-homeworks-panel::before {
     content: "▸";
+}
+
+calendar-daily-events .days .day {
+    width: calc(100% / 7 - (130px) / 7) !important;
+    background: #e8e8e8 !important;
+}
+
+calendar-daily-events {
+    padding-left: 0px !important;
+    top: 111px !important;
 }
