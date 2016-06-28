@@ -269,6 +269,9 @@ function DiaryController($scope, template, model, route, $location) {
             }
 
             $scope.homework.updateData(homework);
+            $scope.newItem = {
+                date: $scope.homework.date
+            };
         } else {
             initHomework();
         }
@@ -820,6 +823,10 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
 
+    $scope.toggleShowHomeworkInLesson = function (homework) {
+        console.log('clicked');
+        homework.expanded = !homework.expanded;
+    };
 
     /**
      * Delete selected lessons
