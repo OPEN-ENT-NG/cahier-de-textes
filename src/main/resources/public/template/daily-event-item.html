@@ -1,5 +1,5 @@
 <div class="schedule-item-content homework-content" ng-style="{'border-color': dailyEvent.color, 'color': dailyEvent.color}"
-     ng-click="redirect('/editHomeworkView/'+ dailyEvent.id); $event.stopPropagation()" >
+     ng-click="redirect('/editHomeworkView/'+ dailyEvent.id); $event.stopPropagation()" tooltip="[[dailyEvent.title]]" >
 
    <div class="cell twelve">
         [[dailyEvent.subjectLabel]]
