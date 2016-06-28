@@ -269,6 +269,9 @@ function DiaryController($scope, template, model, route, $location) {
             }
 
             $scope.homework.updateData(homework);
+            $scope.newItem = {
+                date: $scope.homework.date
+            };
         } else {
             initHomework();
         }
@@ -820,6 +823,10 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
 
+    $scope.toggleShowHomeworkInLesson = function (homework) {
+        console.log('clicked');
+        homework.expanded = !homework.expanded;
+    };
 
     /**
      * Delete selected lessons
@@ -1097,11 +1104,27 @@ function DiaryController($scope, template, model, route, $location) {
      * in calendar view
      */
     $scope.toggleHomeworkPanel = function () {
-        $scope.display.hideHomeworkPanel = model.showHomeworkPanel;
-        model.showHomeworkPanel = !model.showHomeworkPanel;
-        // see ng-extensions.js
-        model.placeTimeslots($('.timeslots'));
 
-        $('.show-homeworks').css('opacity', $scope.display.hideHomeworkPanel ? 0.3 : 1);
+        $scope.display.hideHomeworkPanel = model.show.bShowHomeworks;
+        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, !model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
     };
+
+    /**
+     * Display/hide calendar
+     */
+    $scope.toggleCalendar = function () {
+
+        model.placeCalendarAndHomeworksPanel(!model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+    };
+
+
+    /**
+     * Minify the homework panel or not
+     * If it's minified, will only show one max homework
+     * else 3
+     */
+    $scope.toggleHomeworkPanelMinified = function(){
+        $scope.display.bShowHomeworksMinified = model.show.bShowHomeworksMinified;
+        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+    }
 }

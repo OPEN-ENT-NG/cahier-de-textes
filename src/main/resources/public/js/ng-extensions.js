@@ -6,21 +6,28 @@
                     ngModel: '='
                 },
                 restrict: 'E',
-                // ng-controller="DiaryController"
-                template: '<div class="days" style="z-index: 1000;">' +
-                    '<div class="day" ng-repeat="day in calendar.days.all" style="height: 120px;">' +
+                template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
+                '<i class="resize-homeworks-panel" ng-class="{ expanded: !show.bShowHomeworksMinified}"  style="float: left; width: 130px;"  ng-click="toggleHomeworkPanelMinized()"></i></li></ul></span>'+
+                '<div class="days" style="z-index: 1000; ">' +
+                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 120px;">' +
+
                         // <= 3 homeworks for current day
-                        '<div class="test" ng-if="day.dailyEvents.length && day.dailyEvents.length <= 3">' +
+                        // or 1 homework and homework panel minified
+                        '<div class="test" ng-if="showAllHomeworks(day)">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
                         '</div>' +
+
                         // > 3 homeworks for current day
-                        '<div class="opener" ng-if="day.dailyEvents.length && day.dailyEvents.length > 3" ' +
-                            'ng-click="day.openDailyEvents = !day.openDailyEvents">' +
+                        // or > 1 homework and homework panel minified
+                        '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
+                            'ng-click="toggleShowHwDetail(day)">' +
                             '<i18n>daily.event</i18n>' +
                         '</div>' +
-                        '<div class="test daily-events" style="z-index: 1000;" ng-click="day.openDailyEvents = !day.openDailyEvents" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
+                        '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
+                            'ng-click="day.openDailyEvents = !day.openDailyEvents" ' +
+                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
@@ -31,42 +38,189 @@
                     scope.calendar = model.calendar;
 
                     /**
-                     * Create the homeworks area in calendar view
-                     * @param timeslots Elements with 'timeslot' css class (hour legend tag + 7 day slots)
+                     * Toggle show display homework panel detail of a day
+                     * Note: jquery oldschool way since with angular could not fix some display problems
+                     * @param day
                      */
-                    model.placeTimeslots = function (timeslots) {
+                    scope.toggleShowHwDetail = function (day) {
 
-                        var show = model.showHomeworkPanel;
+                        var hwDayDetail = $('#hw-detail-' + day.index);
 
-                        if (typeof model.initialTimeSlotsOffset === 'undefined') {
-                            model.initialTimeSlotsOffset = timeslots.offset().top;
+                        if (hwDayDetail.hasClass('show')) {
+                            hwDayDetail.removeClass('show');
+                        } else {
+                            hwDayDetail.addClass('show');
+                        }
+                    };
+
+                    /**
+                     * Get the maximum number of homeworks of a day for current week
+                     */
+                    var getMaxHomeworksPerDay = function () {
+                        var max = 0;
+
+                        scope.calendar.days.all.forEach(function (day) {
+                            if (day.dailyEvents && day.dailyEvents.length > max) {
+                                max = day.dailyEvents.length;
+                            }
+                        });
+
+                        return max;
+                    };
+
+                    // default open state of calendar grid
+                    // and homework panel
+                    if(!model.show){
+                        model.show = {
+                            bShowCalendar: true,
+                            bShowHomeworks: true,
+                            bShowHomeworksMinified: false
+                        }
+                    };
+
+
+                    scope.show = model.show;
+
+                    /**
+                     * Minify the homework panel or not
+                     * If it's minified, will only show one max homework
+                     * else 3
+                     */
+                    scope.toggleHomeworkPanelMinized = function () {
+                        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+                    };
+
+                    /**
+                     *
+                     * @param day
+                     * @returns {Number|boolean}
+                     */
+                    scope.showNotAllHomeworks = function (day) {
+                        return day.dailyEvents && day.dailyEvents.length && !scope.showAllHomeworks(day);
+                    };
+
+                    /**
+                     *
+                     * @param day Current day
+                     * @returns {boolean} true if all homeworks of current day
+                     * should be displayed in homework panel
+                     */
+                    scope.showAllHomeworks = function (day) {
+
+                        if (day.dailyEvents && day.dailyEvents.length == 0) {
+                            return false;
                         }
 
-                        // used to display homeworks in calendar view
-                        const OFFSET = 120;
-                        var extraTimeSlotsOffset = 0;
-                        var currentTimeSlotsOffset = (typeof timeslots.offset() === 'undefined') ? 0 : timeslots.offset().top;
-
-                        // tricky way to not apply extra offset twice
-                        if (show && ((currentTimeSlotsOffset < model.initialTimeSlotsOffset + OFFSET) && timeslots.offset().top > 0)) {
-                            extraTimeSlotsOffset = OFFSET;
+                        // calendar hidden and homework panel maximized -> show all
+                        if (!model.show.bShowHomeworksMinified) {
+                            return !model.show.bShowCalendar || (day.dailyEvents.length <= 3);
+                        } else {
+                            return day.dailyEvents.length == 1;
                         }
-                        // only reverse offset if homework panel is unfolded
-                        else if (!show && (model.initialTimeSlotsOffset != currentTimeSlotsOffset)) {
-                            extraTimeSlotsOffset = -OFFSET;
+                    };
+
+                    scope.show = model.show;
+
+
+                    /**
+                     * Return the homework panel height that should be set
+                     * depending on calendar grid displayed state and homework panel minimized state
+                     * @param bShowCalendar True if calendar grid is visible
+                     * @param bShowHomeworks True if homeworks panel is visible
+                     * @param bShowHomeworksMinified True if homework panel is in minimized mode (max 1 homework displayed)
+                     * @returns {number} Homework panel height
+                     */
+                    var getHomeworkPanelHeight = function (bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+
+                        /**
+                         * Height of a single homework in homework panel
+                         * @type {number}
+                         */
+                        const HW_HEIGHT = 40;
+                        var homeworksPerDayDisplayed = 0;
+
+                        if (!bShowHomeworks) {
+                            return 0;
                         }
 
-                        if (extraTimeSlotsOffset != 0) {
-                            timeslots.offset({top: timeslots.offset().top + extraTimeSlotsOffset});
-
-                            // apply same offset to the next hours bar in calendar view
-                            var nextTimeSlots = $('.next-timeslots');
-                            nextTimeSlots.offset({top: nextTimeSlots.offset().top + extraTimeSlotsOffset});
+                        if (!bShowCalendar) {
+                            homeworksPerDayDisplayed = getMaxHomeworksPerDay();
+                        } else {
+                            homeworksPerDayDisplayed = bShowHomeworksMinified ? 1 : 3;
                         }
 
-                        $('.schedule-item').css("margin-top", show ? OFFSET : 0);
-                        $('.schedule .days').height(587 + (show ? OFFSET : 0))
-                    }
+                        return homeworksPerDayDisplayed * HW_HEIGHT;
+                    };
+
+
+                    /**
+                     * Display homeworks and lessons and set open state of homework panel
+                     * and calendar grid
+                     * @param bShowCalendar Show calendar panel
+                     * @param bShowHomeworks Show homework panel
+                     * @param bShowHomeworksMinified If true homework panel will be minified (max homeworks display with full detail = 1)
+                     */
+                    model.placeCalendarAndHomeworksPanel = function (bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+
+                        /**
+                         * Calendar height
+                         * @type {number}
+                         */
+                        const CAL_HEIGHT = 587;
+
+                        var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
+
+                        // reduce height of homework panel if requested
+                        $('.homeworkpanel').css('height', newHwPanelHeight);
+
+                        var prevTimeslotsBar = $('.previous-timeslots');
+                        var nextTimeslotsBar = $('.next-timeslots');
+
+                        // hours legend at left
+                        var hoursBar = $('.timeslots');
+                        var calItems = $('calendar .schedule-item-content');
+                        var calGrid = $('.schedule .days');
+
+                        // show/hide calendar items
+                        hoursBar.css('display', bShowCalendar ? 'inherit' : 'none');
+                        calItems.css('display', bShowCalendar ? 'inherit' : 'none');
+
+                        // do not hide previous timeslots bar
+                        // or else would make so hole/gap
+                        if (bShowCalendar) {
+                            prevTimeslotsBar.removeAttr('disabled');
+                        } else {
+                            prevTimeslotsBar.attr('disabled', 'disabled');
+                        }
+
+                        nextTimeslotsBar.css('display', bShowCalendar ? 'inherit' : 'none');
+
+                        calGrid.height(bShowCalendar ? (newHwPanelHeight + CAL_HEIGHT) : 0);
+
+                        hoursBar.css('margin-top', newHwPanelHeight);
+                        $('legend.timeslots').css('margin-top', '');
+                        $('legend.timeslots').css('top', newHwPanelHeight);
+                        nextTimeslotsBar.css('top', CAL_HEIGHT + newHwPanelHeight);
+
+                        $('.schedule-item').css('margin-top', bShowCalendar ? newHwPanelHeight : 0);
+                        calGrid.height(CAL_HEIGHT + (bShowCalendar ? newHwPanelHeight : 0));
+
+                        // set homework panel size with max number of homeworks
+                        $('.homeworkpanel').height(newHwPanelHeight);
+                        $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
+
+                        // toggle buttons
+                        $('.show-homeworks').css('opacity', bShowHomeworks ? 1 : 0.3);
+                        $('.show-calendar-grid').css('opacity', bShowCalendar ? 1 : 0.3);
+
+
+                        $('#minimize_hw_span').css('display', (newHwPanelHeight > 0) ? 'inherit' : 'none');
+
+                        model.show.bShowCalendar = bShowCalendar;
+                        model.show.bShowHomeworks = bShowHomeworks;
+                        model.show.bShowHomeworksMinified = bShowHomeworksMinified;
+
+                    };
 
                     
                     function setDaysContent() {
@@ -90,7 +244,7 @@
                         var timeslots = $('.timeslots');
 
                         if (timeslots.length === 8) {
-                            model.placeTimeslots(timeslots);
+                            model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
                         }
                         // if days timeslots are not yet positioned
                         // wait until they are to create the homework panel
@@ -101,7 +255,7 @@
                                     timeslots = $('.timeslots');
                                     if (timeslots.length === 8) {
                                         clearInterval(timer);
-                                        model.placeTimeslots(timeslots);
+                                        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
                                     }
                                     timerOccurences++;
                                     // 5s should be far than enough to have all timeslots loaded
