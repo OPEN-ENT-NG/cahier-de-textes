@@ -55,12 +55,21 @@ Homework.prototype.isPublishable = function (toPublish) {
 
 /**
  * Says whether or not current user can edit an homework
- * @param usertype
  * @returns {*|boolean}
  */
 model.canEdit = function () {
     return model.me.type == "ENSEIGNANT";
 };
+
+
+/**
+ * Says whether or not current user is a teacher
+ * @returns {*|boolean}
+ */
+model.isUserTeacher = function () {
+    return model.me.type == "ENSEIGNANT";
+};
+
 
 
 Homework.prototype.update = function(cb, cbe) {

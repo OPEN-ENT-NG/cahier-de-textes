@@ -95,6 +95,9 @@ function DiaryController($scope, template, model, route, $location) {
     // Says whether or not current user can edit homework & lesson
     $scope.isLessonHomeworkEditable = model.canEdit();
 
+    // Says whether or not current user is a teacher
+    $scope.isUserTeacher = model.isUserTeacher();
+
     route({
         createLessonView: function (params) {
 
