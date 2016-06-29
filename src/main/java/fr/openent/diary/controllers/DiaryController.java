@@ -177,19 +177,17 @@ public class DiaryController extends BaseController {
                                     public void handle(final UserInfos user) {
                                         if (user != null) {
 
+                                            List<String> groups = null;
                                             if("Teacher".equals(user.getType())){
                                                 SearchCriterion teacherId = new SearchCriterion();
                                                 teacherId.setValue(user.getUserId());
                                                 teacherId.setType(CriteriaSearchType.TEACHER);
                                                 criteria.add(teacherId);
                                             } else {
-                                                SearchCriterion studentGroups = new SearchCriterion();
-                                                studentGroups.setValue(convertGroupIdsToSqlClause(user.getGroupsIds()));
-                                                studentGroups.setType(CriteriaSearchType.GROUPS);
-                                                criteria.add(studentGroups);
+                                                groups = user.getClasses();
                                             }
 
-                                            diaryService.listPedagogicItems(criteria, arrayResponseHandler(request));
+                                            diaryService.listPedagogicItems(criteria, groups, arrayResponseHandler(request));
                                         } else {
                                             unauthorized(request, "No user found in session.");
                                         }
@@ -207,19 +205,5 @@ public class DiaryController extends BaseController {
                 }
             }
         });
-    }
-
-    /**
-     * Converts a list of group ids to a IN sql clause.
-     */
-    private String convertGroupIdsToSqlClause(List<String> groupIds) {
-        StringBuilder ids = new StringBuilder(" (");
-        for (String id: groupIds) {
-            ids.append("'").append(id).append("'");
-            ids.append(",");
-        }
-        ids.deleteCharAt(ids.length() - 1);
-        ids.append(") ");
-        return ids.toString();
     }
 }
