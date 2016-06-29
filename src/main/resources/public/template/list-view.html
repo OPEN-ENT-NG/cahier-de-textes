@@ -1,8 +1,8 @@
 <div class="row">
-    <button ng-click="redirect('/createLessonView/default')">
+    <button ng-click="redirect('/createLessonView/default')" ng-if="isUserTeacher">
         <i18n>diary.lesson.create</i18n>
     </button>
-    <button ng-click="redirect('/createHomeworkView')">
+    <button ng-click="redirect('/createHomeworkView')" ng-if="isUserTeacher">
         <i18n>diary.homework.create</i18n>
     </button>
     <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
