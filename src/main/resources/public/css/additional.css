@@ -184,6 +184,46 @@ div.notification {
     border-width: 1px 1px 1px 1px;
 }
 
+.show-calendar-grid::before {
+    content: "\e86f";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-calendar-grid {
+    opacity: 0.3;
+    color: #FF8500;
+    padding-top: 7px;
+}
+
+
+.resize-homeworks-panel {
+    font-size: 30px;
+    float: left;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+.resize-homeworks-panel.expanded::before {
+    content: "▾";
+}
+
+.resize-homeworks-panel::before {
+    content: "▸";
+}
+
+calendar-daily-events .days .day {
+    width: calc(100% / 7 - (130px) / 7) !important;
+    background: #e8e8e8 !important;
+}
+
+calendar-daily-events {
+    padding-left: 0px !important;
+    top: 111px !important;
+}
+
 .search-form-box {
     padding: 10px 10px 20px 15px;
     width: 40%;

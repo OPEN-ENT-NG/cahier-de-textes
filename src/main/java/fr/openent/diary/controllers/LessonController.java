@@ -104,8 +104,8 @@ public class LessonController extends SharedResourceController {
                     if("Teacher".equals(user.getType())){
                         lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else { //if student
-                        lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
-                    } //TODO manage more type of users?
+                        lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                } //TODO manage more type of users?
 
                 } else {
                     unauthorized(request,"No user found in session.");

@@ -108,7 +108,6 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         }
 
         if (ctx == Context.STUDENT) {
-            query.append(" AND h.homework_due_date < current_date ");
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 

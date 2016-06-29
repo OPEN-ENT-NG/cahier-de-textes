@@ -125,7 +125,7 @@ public class HomeworkController extends SharedResourceController {
                     if("Teacher".equals(user.getType())){
                         homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
                     } else { //if student
-                        homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
+                        homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
                     } //TODO manage more type of users?
 
                 } else {
