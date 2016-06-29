@@ -34,8 +34,25 @@
                         '</div>' +
                     '</div>' +
                 '</div>',
-                link: function(scope, element, attributes){
+                link: function(scope, element, location, attributes){
                     scope.calendar = model.calendar;
+                    
+                    /**
+                     * Redirect to homework or lesson view if homework attached to some lesson
+                     * @param homework Homework being clicked/selected
+                     * @param $event
+                     */
+                    scope.editSelectedHomework = function (homework, $event) {
+
+                        // prevent redirect on clicking on checkbox
+                        if (!($event.target && $event.target.type === "checkbox")) {
+                            if (homework.lesson_id == null) {
+                                window.location = '/diary#/editHomeworkView/' + homework.id;
+                            } else {
+                                window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;
+                            }
+                        }
+                    };
 
                     /**
                      * Toggle show display homework panel detail of a day
