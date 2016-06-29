@@ -36,6 +36,7 @@
                 '</div>',
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
+                    scope.isUserTeacher = model.isUserTeacher();
 
                     /**
                      * Toggle show display homework panel detail of a day

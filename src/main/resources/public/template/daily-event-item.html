@@ -12,7 +12,7 @@
 
     <div class="cell twelve">
         <span>[[dailyEvent.audienceLabel]]</span>
-        <input type="checkbox" ng-model="dailyEvent.selected"  style="float: right; margin-right: 5%; margin-top: 0px;"/>
+        <input ng-if="isUserTeacher" type="checkbox" ng-model="dailyEvent.selected"  style="float: right; margin-right: 5%; margin-top: 0px;"/>
 
         <!-- DRAFT STATE ICON -->
         <span ng-if="[[dailyEvent.state]]=='draft'" style="float: right; margin-top: 0px;">

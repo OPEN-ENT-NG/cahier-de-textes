@@ -36,11 +36,18 @@
     ></calendar-daily-events>
     <div class="row" ng-if="! showCal">
         <calendar
+                ng-if="isUserTeacher"
                 id="calendar"
                 class="twelve cell"
                 display-template="display-calendar-item"
                 create-template="create-lesson"
                 on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"></calendar>
+        <calendar
+                ng-if="!isUserTeacher"
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
                 items="lessons.all"></calendar>
     </div>
     <div class="row" ng-if="showCal">
