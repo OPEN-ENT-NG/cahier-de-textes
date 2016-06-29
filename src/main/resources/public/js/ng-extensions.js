@@ -26,7 +26,7 @@
                             '<i18n>daily.event</i18n>' +
                         '</div>' +
                         '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
-                            'ng-click="day.openDailyEvents = !day.openDailyEvents" ' +
+                            'ng-click="toggleOpenDailyEvents(day, $event)" ' +
                             'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
@@ -37,6 +37,18 @@
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
                     scope.isUserTeacher = model.isUserTeacher();
+
+                    /**
+                     * Open homeworks details when homeworks info is minimized
+                     * or vice versa
+                     * @param day
+                     * @param $event
+                     */
+                    scope.toggleOpenDailyEvent = function (day, $event) {
+                        if (!($event.target && $event.target.type === "checkbox")) {
+                            day.openDailyEvents = !day.openDailyEvents
+                        }
+                    };
 
                     /**
                      * Redirect to homework or lesson view if homework attached to some lesson
