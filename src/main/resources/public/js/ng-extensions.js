@@ -125,7 +125,7 @@
                      */
                     scope.showAllHomeworks = function (day) {
 
-                        if (day.dailyEvents && day.dailyEvents.length == 0) {
+                        if (!day.dailyEvents || (day.dailyEvents && day.dailyEvents.length == 0)) {
                             return false;
                         }
 
