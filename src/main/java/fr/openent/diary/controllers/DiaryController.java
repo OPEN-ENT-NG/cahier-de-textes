@@ -12,6 +12,7 @@ import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import fr.wseduc.webutils.http.Renders;
+import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
@@ -25,9 +26,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 
@@ -147,20 +146,51 @@ public class DiaryController extends BaseController {
         final String teacherId = request.params().get("teacherId");
     }
 
-    @Get("/pedagogicItems/list/")
+    @Post("/pedagogicItems/list")
     @ApiDoc("Get all audiences for a school")
     @SecuredAction(value = list_audiences, type = ActionType.AUTHENTICATED)
     public void searchForPedagogicItems(final HttpServerRequest request) {
-        final String query = request.query();
-        final List<SearchCriterion> criteria = SearchCriterion.convertParametersToSearchCriteria(query);
+
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-            if (user != null) {
-                diaryService.listPedagogicItems(criteria, arrayResponseHandler(request));
-            } else {
-                unauthorized(request, "No user found in session.");
-            }
+                if (user != null) {
+
+                    RequestUtils.bodyToJson(request, pathPrefix + "searchPedagogicItems", new Handler<JsonObject>() {
+                        @Override
+                        public void handle(final JsonObject json) {
+
+                            if (json != null) {
+
+                                final List<SearchCriterion> criteria = new ArrayList<SearchCriterion>();
+                                Set<Map.Entry<String, Object>> entries = json.toMap().entrySet();
+                                for (Map.Entry<String, Object> entry: entries) {
+                                    SearchCriterion criterion = SearchCriterion.convertParameterToSearchCriterion(entry);
+                                    if (criterion != null) {
+                                        criteria.add(criterion);
+                                    }
+                                }
+
+                                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                                    @Override
+                                    public void handle(final UserInfos user) {
+                                        if (user != null) {
+                                            diaryService.listPedagogicItems(criteria, arrayResponseHandler(request));
+                                        } else {
+                                            unauthorized(request, "No user found in session.");
+                                        }
+                                    }
+                                });
+                            } else {
+                                log.warn("No json search parameters given.");
+                                badRequest(request, "Wrong parameters.");
+                            }
+                        }
+                    });
+                } else {
+                    log.warn("No user found in session.");
+                    unauthorized(request, "No user found in session.");
+                }
             }
         });
     }

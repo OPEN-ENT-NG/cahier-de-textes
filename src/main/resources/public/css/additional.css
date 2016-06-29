@@ -32,11 +32,6 @@ ul li i.caret.expanded::before {
     color: #FF8500;
 }
 
-ul li i.caret::before {
-    content: "▸";
-    color: #FF8500;
-}
-
 ul li i.icon {
     font-size: 55px;
     line-height: 55px;
@@ -144,12 +139,31 @@ section .homework-detail {
     opacity: 0.3;
     color: #FF8500;
     padding-top: 7px;
+    padding-right: 7px;
 }
 
 .show-homeworks.selected {
     opacity: 0.7;
 }
 
+.show-lessons::before {
+    content: "\e86f";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-lessons {
+    opacity: 0.3;
+    color: #FF8500;
+    padding-top: 7px;
+    padding-right: 7px;
+}
+
+.show-lessons.selected {
+    opacity: 0.7;
+}
 
 .lessonTeacher {
     margin-left: 100px;
@@ -208,4 +222,14 @@ calendar-daily-events .days .day {
 calendar-daily-events {
     padding-left: 0px !important;
     top: 111px !important;
+}
+
+.search-form-box {
+    padding: 10px 10px 20px 15px;
+    width: 40%;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
 }

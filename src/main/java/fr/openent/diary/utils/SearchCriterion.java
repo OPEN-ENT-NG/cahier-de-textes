@@ -2,6 +2,7 @@ package fr.openent.diary.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by a457593 on 15/06/2016.
@@ -28,25 +29,20 @@ public class SearchCriterion {
     }
 
     /**
-     * Parses a query string into a list of search criterion.
-     * @param parameters '&' separated list of key=value search criteria.
+     * Converts an entry from a search form to a SearchCriterion. Returns null if the key does not match a known CriteriaSearchType.
+     * @param parameter
      * @return
      */
-    public static List<SearchCriterion> convertParametersToSearchCriteria(String parameters) {
+    public static SearchCriterion convertParameterToSearchCriterion(Map.Entry<String, Object> parameter) {
 
-        List<SearchCriterion> criteria = new ArrayList<>();
-        String[] params = parameters.split("&");
-        for (String param : params)
-        {
-            String name = param.split("=")[0];
-            String value = param.split("=")[1];
-            SearchCriterion criterion = new SearchCriterion();
-            criterion.setType(CriteriaSearchType.valueOfName(name));
-            criterion.setValue(value);
-            if (criterion.getType() != null) {
-                criteria.add(criterion);
-            }
+        SearchCriterion criterion = new SearchCriterion();
+        criterion.setType(CriteriaSearchType.valueOfName(parameter.getKey()));
+        if (criterion.getType() != null) {
+            criterion.setValue((String) parameter.getValue());
+        } else {
+            return null;
         }
-        return criteria;
+
+        return criterion;
     }
 }

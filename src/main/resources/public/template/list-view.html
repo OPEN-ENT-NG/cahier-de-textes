@@ -1,8 +1,8 @@
 <div class="row">
-    <button ng-click="redirect('/createLessonView/default')">
+    <button ng-click="redirect('/createLessonView/default')" ng-if="isUserTeacher">
         <i18n>diary.lesson.create</i18n>
     </button>
-    <button ng-click="redirect('/createHomeworkView')">
+    <button ng-click="redirect('/createHomeworkView')" ng-if="isUserTeacher">
         <i18n>diary.homework.create</i18n>
     </button>
     <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
@@ -12,8 +12,28 @@
     <hr />
 </div>
 
+<div ng-model="searchForm" class="search-form-box">
+    <i style="float: left !important; box-shadow: none; background: none; font-size: 42px;[[(searchForm.displayLesson) ? 'opacity:1' : 'opacity:0.3' ]]"
+       class="show-lessons" ng-class="{ selected: searchForm.displayLesson == false}"
+       ng-click="toggleFilterOnLesson()" tooltip="diary.icon.show.lessons"></i>
+    <i style="float: left !important; box-shadow: none; background: none; font-size: 42px;[[(searchForm.displayHomework) ? 'opacity:1' : 'opacity:0.3' ]]"
+       class="show-homeworks" ng-class="{ selected: searchForm.displayHomework == false}"
+       ng-click="toggleFilterOnHomework()" tooltip="diary.icon.show.homeworks"></i>
+    <p style="padding-left: 20px; display:inline;">
+        <label style="vertical-align:center">Période du </label>
+        <date-picker ng-model="searchForm.startDate"></date-picker>
+        <label style="vertical-align:center"> au </label>
+        <date-picker ng-model="searchForm.endDate"></date-picker>
+    </p>
+    <i class="searchengine-large" style="font-size: 30px; position: absolute; padding-top: 10px; padding-left: 15px; color: #FF8500;" ng-click="performPedagogicItemSearch()"></i>
+</div>
+
+
 <section>
     <ul class="colored">
+        <div ng-show="pedagogicItems.all.length <= 0">
+            <i18n>diary.search.no.result</i18n>
+        </div>
         <li ng-repeat="day in pedagogicItems.all">
             <div>
                 <p>
@@ -24,15 +44,22 @@
                 </p>
             </div>
             <ul ng-if="day.expanded === true">
-                <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay">
+                <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
                     <div class="cell-no-float notification">
                         <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
                         <div class="table-cell">
                             <div>
                                 <i ng-if="pedagogicItem.published === false"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
                                 <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
-                                <em class="medium-importance">
-                                    <p style="display:inline" ng-if="pedagogicItem.type_item === 'lesson'">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
+                                <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
+                                    <p style="display:inline">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
+                                    <p style="display:inline" ng-if="pedagogicItem.room">(<i18n>room</i18n> - [[pedagogicItem.room]])&nbsp;</p>
+                                    [[pedagogicItem.title]]
+                                </em>
+                                <em class="medium-importance" ng-if="pedagogicItem.type_item === 'homework'">
+                                    <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
+                                    <p style="display:inline" ng-if="pedagogicItem.turn_in === 'rack'"><i18n>diary.homework.turn-in.rack</i18n>&nbsp;</p>
+                                    <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
                                     [[pedagogicItem.title]]
                                 </em>
                             </div>

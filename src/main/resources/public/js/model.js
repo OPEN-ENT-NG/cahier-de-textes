@@ -863,9 +863,42 @@ var getUserStructuresIdsAsString = function () {
     return structureIds;
 };
 
+function SearchForm() {
+    this.startDate = {};
+    this.endDate = {};
+    this.publishState = {};
+    this.returnType = {};
+    this.displayLesson = {};
+    this.displayHomework = {};
+    this.audienceId = {};
+};
+
+SearchForm.prototype.initForTeacher = function () {
+    this.publishState = "draft";
+    this.returnType = "both";
+    var period = moment(model.calendar.dayForWeek).day(1);
+    this.startDate = period.format('YYYY-MM-DD');
+    this.endDate = period.add(15, 'days').format('YYYY-MM-DD');
+    this.displayLesson = true;
+    this.displayHomework = true;
+    this.audienceId = "";
+};
+
+SearchForm.prototype.getSearch = function () {
+
+    var params = {};
+    params.startDate = this.startDate;
+    params.endDate = this.endDate;
+    params.publishState = this.publishState;
+    params.returnType = this.returnType;
+    return params;
+};
+
 model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
+
+    this.searchForm = new SearchForm();
 
     this.collection(Lesson, {
         syncLessons: function (cb, cbe) {
@@ -996,41 +1029,8 @@ model.build = function () {
             model.pedagogicItems.removeSelection();
         },
         syncPedagogicItems: function(cb, cbe){
-
-            model.pedagogicItems.reset();
-            http().get('/diary/pedagogicItems/list/?startDate=2016-06-15&endDate=2016-06-27').done(function (items) {
-
-                var pedagogicItemsFromDB = _.map(items, sqlToJsPedagogicItem);
-
-                var days = _.groupBy(pedagogicItemsFromDB, 'day');
-
-                var pedagogicDays = [];
-
-                for (var day in days) {
-                    if (days.hasOwnProperty(day)) {
-                        var pedagogicDay = {};
-                        pedagogicDay.expanded = false;
-                        pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
-                        pedagogicDay.pedagogicItemsOfTheDay = days[day];
-
-                        var countItems = _.groupBy(pedagogicDay.pedagogicItemsOfTheDay, 'type_item');
-
-                        pedagogicDay.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
-                        pedagogicDay.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
-                        pedagogicDays.push(pedagogicDay);
-                    }
-                }
-
-                model.pedagogicItems.pushAll(pedagogicDays);
-
-                if (typeof cb === 'function') {
-                    cb();
-                }
-            }).error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-            });
+            var params = model.searchForm.getSearch();
+            model.performPedagogicItemSearch(params, cb, cbe);
         }, pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
@@ -1138,6 +1138,7 @@ model.build = function () {
     };
 
 
+    /** Converts sql pedagogic item to js data */
     sqlToJsPedagogicItem = function (data) {
         var item = new PedagogicItem();
         item.type_item = data.type_item;
@@ -1211,7 +1212,7 @@ model.initHomework = function () {
     homework.state = DEFAULT_STATE;
 
     return homework;
-}
+};
 
 /**
  * Init lesson
@@ -1254,4 +1255,42 @@ model.initLesson = function (timeFromCalendar) {
     lesson.date = newItem.date;
 
     return lesson;
-}
+};
+
+model.performPedagogicItemSearch = function (params, cb, cbe) {
+    model.pedagogicItems.reset();
+
+    http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
+
+        var pedagogicItemsFromDB = _.map(items, sqlToJsPedagogicItem);
+
+        var days = _.groupBy(pedagogicItemsFromDB, 'day');
+
+        var pedagogicDays = [];
+
+        for (var day in days) {
+            if (days.hasOwnProperty(day)) {
+                var pedagogicDay = {};
+                pedagogicDay.expanded = false;
+                pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
+                pedagogicDay.pedagogicItemsOfTheDay = days[day];
+
+                var countItems = _.groupBy(pedagogicDay.pedagogicItemsOfTheDay, 'type_item');
+
+                pedagogicDay.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
+                pedagogicDay.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
+                pedagogicDays.push(pedagogicDay);
+            }
+        }
+
+        model.pedagogicItems.pushAll(pedagogicDays);
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};

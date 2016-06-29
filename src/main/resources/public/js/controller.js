@@ -98,6 +98,8 @@ function DiaryController($scope, template, model, route, $location) {
     // Says whether or not current user is a teacher
     $scope.isUserTeacher = model.isUserTeacher();
 
+    $scope.searchForm = model.searchForm;
+
     route({
         createLessonView: function (params) {
 
@@ -179,6 +181,7 @@ function DiaryController($scope, template, model, route, $location) {
     // Navigation
     $scope.showList = function() {
         $scope.display.showList = true;
+        model.searchForm.initForTeacher();
         model.pedagogicItems.syncPedagogicItems($scope.openListView, validationError);
     };
 
@@ -1129,5 +1132,26 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.toggleHomeworkPanelMinified = function(){
         $scope.display.bShowHomeworksMinified = model.show.bShowHomeworksMinified;
         model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
-    }
+    };
+
+    $scope.toggleFilterOnHomework = function () {
+        $scope.searchForm.displayHomework = model.searchForm.displayHomework;
+        model.searchForm.displayHomework = !model.searchForm.displayHomework;
+    };
+
+    $scope.toggleFilterOnLesson = function () {
+        $scope.searchForm.displayLesson = model.searchForm.displayLesson;
+        model.searchForm.displayLesson = !model.searchForm.displayLesson;
+    };
+
+    $scope.performPedagogicItemSearch = function () {
+        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.openListView, validationError);
+    };
+
+    $scope.itemTypesDisplayed = function(item){
+        if ((item.type_item == "lesson" && $scope.searchForm.displayLesson) || (item.type_item == "homework" && $scope.searchForm.displayHomework)){
+            return true;
+        }
+        return false;
+    };
 }

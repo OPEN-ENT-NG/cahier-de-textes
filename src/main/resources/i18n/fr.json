@@ -106,5 +106,12 @@
   "diary.calendar.nextweek": "Semaine prochaine",
   "diary.calendar.previousweek": "Semaine précédente",
   "enseignant": "Enseignant",
-  "diary.invalid.login": "La session a expiré ou vous n'etes pas authentifié(e)"
+  "diary.invalid.login": "La session a expiré ou vous n'etes pas authentifié(e)",
+  "diary.search.no.result": "Aucun résultat à afficher. Veuillez modifier les paramètres de votre recherche.",
+  "diary.icon.show.homeworks": "Afficher / masquer le travail à faire.",
+  "diary.icon.show.lessons": "Afficher / masquer les séances.",
+  "diary.homework.turn-in.rack": "(A rendre dans le casier)",
+  "diary.homework.turn-in.lesson": "(A rendre en cours)",
+  "diary.search.period.start": "Période du : ",
+  "diary.search.period.to": " au : "
 }
