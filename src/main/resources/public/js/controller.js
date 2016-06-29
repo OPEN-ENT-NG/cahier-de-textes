@@ -95,6 +95,8 @@ function DiaryController($scope, template, model, route, $location) {
     // Says whether or not current user can edit homework & lesson
     $scope.isLessonHomeworkEditable = model.canEdit();
 
+    $scope.searchForm = model.searchForm;
+
     route({
         createLessonView: function (params) {
 
@@ -176,6 +178,7 @@ function DiaryController($scope, template, model, route, $location) {
     // Navigation
     $scope.showList = function() {
         $scope.display.showList = true;
+        model.searchForm.initForTeacher();
         model.pedagogicItems.syncPedagogicItems($scope.openListView, validationError);
     };
 
@@ -1103,5 +1106,26 @@ function DiaryController($scope, template, model, route, $location) {
         model.placeTimeslots($('.timeslots'));
 
         $('.show-homeworks').css('opacity', $scope.display.hideHomeworkPanel ? 0.3 : 1);
+    };
+
+    $scope.toggleFilterOnHomework = function () {
+        $scope.searchForm.displayHomework = model.searchForm.displayHomework;
+        model.searchForm.displayHomework = !model.searchForm.displayHomework;
+    };
+
+    $scope.toggleFilterOnLesson = function () {
+        $scope.searchForm.displayLesson = model.searchForm.displayLesson;
+        model.searchForm.displayLesson = !model.searchForm.displayLesson;
+    };
+
+    $scope.performPedagogicItemSearch = function () {
+        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.openListView, validationError);
+    }
+
+    $scope.itemTypesDisplayed = function(item){
+        if ((item.type_item == "lesson" && $scope.searchForm.displayLesson) || (item.type_item == "homework" && $scope.searchForm.displayHomework)){
+            return true;
+        }
+        return false;
     };
 }
