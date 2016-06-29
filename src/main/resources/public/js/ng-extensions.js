@@ -34,9 +34,10 @@
                         '</div>' +
                     '</div>' +
                 '</div>',
-                link: function(scope, element, location, attributes){
+                link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
-                    
+                    scope.isUserTeacher = model.isUserTeacher();
+
                     /**
                      * Redirect to homework or lesson view if homework attached to some lesson
                      * @param homework Homework being clicked/selected
@@ -53,7 +54,7 @@
                             }
                         }
                     };
-
+                    
                     /**
                      * Toggle show display homework panel detail of a day
                      * Note: jquery oldschool way since with angular could not fix some display problems

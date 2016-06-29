@@ -9,7 +9,7 @@
     <div class="cell twelve">
         <span>[[item.subjectLabel]]&nbsp; [[item.audienceLabel]]</span>
 
-        <input type="checkbox" ng-model="item.selected"   style="float: right; margin-right: 5%;"/>
+        <input ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"   style="float: right; margin-right: 5%;"/>
 
 		<span ng-if="[[item.state]]=='draft'">
             <i class="icon pencil" style="float: right;"></i>
