@@ -884,6 +884,16 @@ SearchForm.prototype.initForTeacher = function () {
     this.audienceId = "";
 };
 
+SearchForm.prototype.initForStudent = function () {
+    this.publishState = "published";
+    this.returnType = "both";
+    var period = moment(model.calendar.dayForWeek).day(1);
+    this.startDate = period.format('YYYY-MM-DD');
+    this.endDate = period.add(15, 'days').format('YYYY-MM-DD');
+    this.displayLesson = true;
+    this.displayHomework = true;
+};
+
 SearchForm.prototype.getSearch = function () {
 
     var params = {};

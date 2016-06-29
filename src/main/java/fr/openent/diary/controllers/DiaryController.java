@@ -3,6 +3,7 @@ package fr.openent.diary.controllers;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
+import fr.openent.diary.utils.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
@@ -175,6 +176,19 @@ public class DiaryController extends BaseController {
                                     @Override
                                     public void handle(final UserInfos user) {
                                         if (user != null) {
+
+                                            if("Teacher".equals(user.getType())){
+                                                SearchCriterion teacherId = new SearchCriterion();
+                                                teacherId.setValue(user.getUserId());
+                                                teacherId.setType(CriteriaSearchType.TEACHER);
+                                                criteria.add(teacherId);
+                                            } else {
+                                                SearchCriterion studentGroups = new SearchCriterion();
+                                                studentGroups.setValue(convertGroupIdsToSqlClause(user.getGroupsIds()));
+                                                studentGroups.setType(CriteriaSearchType.GROUPS);
+                                                criteria.add(studentGroups);
+                                            }
+
                                             diaryService.listPedagogicItems(criteria, arrayResponseHandler(request));
                                         } else {
                                             unauthorized(request, "No user found in session.");
@@ -193,5 +207,19 @@ public class DiaryController extends BaseController {
                 }
             }
         });
+    }
+
+    /**
+     * Converts a list of group ids to a IN sql clause.
+     */
+    private String convertGroupIdsToSqlClause(List<String> groupIds) {
+        StringBuilder ids = new StringBuilder(" (");
+        for (String id: groupIds) {
+            ids.append("'").append(id).append("'");
+            ids.append(",");
+        }
+        ids.deleteCharAt(ids.length() - 1);
+        ids.append(") ");
+        return ids.toString();
     }
 }

@@ -181,7 +181,11 @@ function DiaryController($scope, template, model, route, $location) {
     // Navigation
     $scope.showList = function() {
         $scope.display.showList = true;
-        model.searchForm.initForTeacher();
+        if($scope.isUserTeacher) {
+            model.searchForm.initForTeacher();
+        } else {
+            model.searchForm.initForStudent();
+        }
         model.pedagogicItems.syncPedagogicItems($scope.openListView, validationError);
     };
 

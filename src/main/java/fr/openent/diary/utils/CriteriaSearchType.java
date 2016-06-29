@@ -11,10 +11,12 @@ public enum CriteriaSearchType {
 
     START_DATE("startDate"),
     END_DATE("endDate"),
-    AUDIENCE("audience"),
+    AUDIENCE("audience"), // this and GROUPS are mutually exclusive
     SUBJECT("subject"),
     PUBLISH_STATE("publishState"),
-    SEARCH_TYPE("returnType"); // 'homework' or 'lesson' or 'both'
+    SEARCH_TYPE("returnType"), // 'homework' or 'lesson' or 'both'
+    TEACHER("teacher"), // teacher id
+    GROUPS("groups");  // classes and groups for a student, mutually exclusive with AUDIENCE
 
     private String name;
 
