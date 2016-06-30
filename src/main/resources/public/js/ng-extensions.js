@@ -44,9 +44,9 @@
                      * @param day
                      * @param $event
                      */
-                    scope.toggleOpenDailyEvent = function (day, $event) {
+                    scope.toggleOpenDailyEvents = function (day, $event) {
                         if (!($event.target && $event.target.type === "checkbox")) {
-                            day.openDailyEvents = !day.openDailyEvents
+                            day.openDailyEvents = !day.openDailyEvents;
                         }
                     };
 
@@ -78,6 +78,10 @@
 
                         if (hwDayDetail.hasClass('show')) {
                             hwDayDetail.removeClass('show');
+
+                            day.dailyEvents.forEach(function(dailyEvent){
+                                dailyEvent.selected = false;
+                            });
                         } else {
                             hwDayDetail.addClass('show');
                         }
