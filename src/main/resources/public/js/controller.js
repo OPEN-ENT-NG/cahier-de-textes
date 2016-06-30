@@ -259,6 +259,11 @@ function DiaryController($scope, template, model, route, $location) {
             };
 
             $scope.loadHomeworksForCurrentLesson(function () {
+                $scope.lesson.homeworks.forEach(function(homework){
+                   if(params.idHomework && params.idHomework == homework.id){
+                       homework.expanded = true;
+                   }
+                });
                 openLessonTemplates();
             });
         }

@@ -128,8 +128,8 @@
 
                 <div ng-show="homework.expanded">
                 <div class="row">
-                    <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" required readonly/>
-                    <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" required/>
+                    <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
+                    <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
                     <!-- deletes homework -->
                     <div class="controls">
                         <i ng-if="isLessonHomeworkEditable" class="trash" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)" style="float: right;" tooltip="daily.homework.delete">

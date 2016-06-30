@@ -49,7 +49,6 @@
     }
   },
   "required": [
-    "homework_title",
     "subject_id",
     "homework_type_id",
     "teacher_id",

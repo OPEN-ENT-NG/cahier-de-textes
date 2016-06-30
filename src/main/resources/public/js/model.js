@@ -4,7 +4,7 @@ function Homework() {
      * used in ui in homework tab in lesson view
      * @type {boolean}
      */
-    this.expanded = true;
+    this.expanded = false;
 
     /**
      * Delete calendar references of current homework
@@ -717,6 +717,7 @@ Lesson.prototype.addHomework = function () {
     var homework = new Homework();
     homework.dueDate = this.date;
     homework.type = model.homeworkTypes.first();
+    homework.title = homework.type.label;
     homework.state = this.state;
     this.homeworks.push(homework);
 };
@@ -1225,6 +1226,7 @@ model.initHomework = function () {
     homework.type = model.homeworkTypes.first();
     homework.color = DEFAULT_ITEM_COLOR;
     homework.state = DEFAULT_STATE;
+    homework.title = homework.type.label;
 
     return homework;
 };
