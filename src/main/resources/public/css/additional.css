@@ -233,3 +233,23 @@ calendar-daily-events {
     border-width: 1px;
     border-radius: 5px;
 }
+
+.lesson_homework {
+    font-size: 70px;
+    float: right;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+.lesson_homework.expanded::before {
+    content: "▾";
+}
+
+.lesson_homework::before {
+    content: "▸";
+}
+
+.homework-delimitation {
+    border: solid 0.1px #a5b6bb !important;
+    padding: 0px !important;
+}

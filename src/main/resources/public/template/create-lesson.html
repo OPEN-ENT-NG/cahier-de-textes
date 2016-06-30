@@ -112,6 +112,21 @@
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <section ng-show="tabs.createLesson === 'homeworks'">
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
+
+                <!-- minimized view -->
+                <div class="row">
+                    <div ng-show="!homework.expanded" class="four cell">
+                    <b>Devoir à rendre pour le [[formatDate(homework.dueDate)]]</b><br>
+                    [[homework.type.label]] - [[homework.title]]
+                    </div>
+                    <ul>
+                        <li>
+                            <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
+                        </li>
+                    </ul>
+                </div>
+
+                <div ng-show="homework.expanded">
                 <div class="row">
                     <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" required readonly/>
                     <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" required/>
@@ -185,6 +200,8 @@
                     <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                     <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
                 </div>
+                </div>
+                <hr class="homework-delimitation">
             </div>
             <div ng-if="isLessonHomeworkEditable" class="row">
                 <a ng-click="lesson.addHomework()"><i18n>lesson.homeworks.add</i18n></a>
