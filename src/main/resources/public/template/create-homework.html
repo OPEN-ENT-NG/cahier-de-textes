@@ -8,22 +8,32 @@
     <div class="row">
         <div class="six cell">
             <label><i18n>subject</i18n></label>
-            <select ng-model="homework.subject"
+            <select ng-if="isLessonHomeworkEditable"
+                    ng-model="homework.subject"
                     ng-options="subject as subject.label for subject in subjects.all" required></select>
+            <select ng-if="!isLessonHomeworkEditable"
+                    ng-model="homework.subject"
+                    ng-options="subject as subject.label for subject in subjects.all" disabled></select>
         </div>
         <div class="right-magnet cell">
             <i18n>diary.audience</i18n>:
-            <select ng-model="homework.audience"
+            <select ng-if="isLessonHomeworkEditable"
+                    ng-model="homework.audience"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>
+            <select ng-if="!isLessonHomeworkEditable"
+                    ng-model="homework.audience"
+                    ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all" disabled></select>
         </div>
     </div>
     <section class="homework-detail">
     <div class="row">
-        <input type="text" i18n-placeholder="title" ng-model="homework.title" maxlength="50" required class="six cell" />
+        <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" required readonly/>
+        <input ng-if="isLessonHomeworkEditable" type="text" i18n-placeholder="title" ng-model="homework.title" maxlength="50" required class="six cell" />
         <div class="five cell right-magnet">
             <div class="one cell right-magnet height-one" style="margin-right: 10px;">
                 &nbsp;
-                <input type="color" ng-model="homework.color">
+                <input ng-if="!isLessonHomeworkEditable" type="color" ng-model="homework.color" disabled>
+                <input ng-if="isLessonHomeworkEditable" type="color" ng-model="homework.color">
             </div>
         </div>
     </div>
@@ -31,39 +41,51 @@
         <div class="row">
             <div class="three cell">
                 <label class="cell three"><i18n>date</i18n></label>
-                <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
+                <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(newItem.date)]]" readonly/>
+                <date-picker ng-if="isLessonHomeworkEditable" ng-model="newItem.date"  class="cell six"></date-picker>
             </div>
 
             <label><i18n>homework.types</i18n></label>
-            <select
+            <select ng-if="!isLessonHomeworkEditable"
+                    ng-options="type as type.label for type in homeworkTypes.all"
+                    ng-model="homework.type"
+                    disabled>
+            </select>
+            <select ng-if="isLessonHomeworkEditable"
                 ng-options="type as type.label for type in homeworkTypes.all"
                 ng-model="homework.type">
             </select>
         </div>
     </div>
     <div class="row">
-        <editor ng-model="homework.description"></editor>
+        <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+        <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
     </div>
     </section>
     <div class="row">
         <!-- publishes the current lesson ang go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-publish-homework')">
+        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-publish-homework')">
             <i18n>daily.item.publish</i18n>
         </button>
 
         <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-unpublish-homework')">
+        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-unpublish-homework')">
             <i18n>daily.item.unpublish</i18n>
         </button>
         <!-- save homework in draft mode and go back to calendar view -->
-        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
+        <button ng-if="isLessonHomeworkEditable" class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
             <i18n>back</i18n>
         </button>
         <!-- save homework in draft mode -->
-        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(false)">
+        <button ng-if="isLessonHomeworkEditable" class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(false)">
             <i18n>save</i18n>
         </button>
         <!-- go back to calendar view without saving -->
-        <button type="button" class="right-magnet cancel" ng-click="redirect('/mainView')"><i18n>cancel</i18n></button>
+        <button ng-if="isLessonHomeworkEditable" type="button" class="right-magnet cancel" ng-click="redirect('/mainView')"><i18n>cancel</i18n></button>
+
+        <!-- go back to calendar view without saving -->
+        <button ng-if="!isLessonHomeworkEditable" class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+            <i18n>back</i18n>
+        </button>
     </div>
 </form>

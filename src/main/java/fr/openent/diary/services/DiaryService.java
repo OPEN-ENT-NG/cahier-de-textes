@@ -32,5 +32,5 @@ public interface DiaryService {
     /**
      * List all pedagogic items (lessons and homeworks) matching the given search criteria.
      */
-    void listPedagogicItems(final List<SearchCriterion> criteria, final Handler<Either<String, JsonArray>> handler);
+    void listPedagogicItems(final List<SearchCriterion> criteria, final List<String> groups, final Handler<Either<String, JsonArray>> handler);
 }

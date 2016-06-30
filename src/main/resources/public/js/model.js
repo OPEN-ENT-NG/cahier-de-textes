@@ -874,7 +874,7 @@ function SearchForm() {
 };
 
 SearchForm.prototype.initForTeacher = function () {
-    this.publishState = "draft";
+    this.publishState = "";
     this.returnType = "both";
     var period = moment(model.calendar.dayForWeek).day(1);
     this.startDate = period.format('YYYY-MM-DD');

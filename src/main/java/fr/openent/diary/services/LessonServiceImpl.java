@@ -141,7 +141,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.id as lesson_id, s.subject_label, l.school_id, t.teacher_display_name,")
+            query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color,")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, h.id as homework_id ")
                     .append(" FROM diary.lesson AS l")
@@ -155,7 +155,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(sql.listPrepared(groupIds.toArray()))
                     .append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD')")
                     .append(" AND l.lesson_state = 'published'")
-                    .append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_label, a.audience_type, a.audience_label")
+                    .append(" GROUP BY s.id, l.id, l.lesson_date, t.teacher_display_name, h.id, s.subject_label, a.audience_type, a.audience_label")
                     .append(" ORDER BY l.lesson_date ASC");
 
             JsonArray parameters = new JsonArray();
