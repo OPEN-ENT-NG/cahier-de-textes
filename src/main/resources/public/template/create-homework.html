@@ -16,7 +16,7 @@
                     ng-options="subject as subject.label for subject in subjects.all" disabled></select>
         </div>
         <div class="right-magnet cell">
-            <i18n>diary.audience</i18n>:
+            <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>&nbsp;:
             <select ng-if="isLessonHomeworkEditable"
                     ng-model="homework.audience"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>

@@ -1,5 +1,10 @@
 function Homework() {
 
+    /**
+     * used in ui in homework tab in lesson view
+     * @type {boolean}
+     */
+    this.expanded = true;
 
     /**
      * Delete calendar references of current homework
