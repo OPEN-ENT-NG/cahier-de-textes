@@ -238,7 +238,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         }
 
         queryFull.append(" ) as req ");
-        queryFull.append(" ORDER BY req.day DESC, req.time_order ASC");
+        queryFull.append(" ORDER BY req.day ASC, req.time_order ASC");
 
         if((queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) && parametersLessons.size() > 0) {
             for (Object param: parametersLessons) {
