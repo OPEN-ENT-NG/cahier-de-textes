@@ -37,7 +37,7 @@ public class SearchCriterion {
 
         SearchCriterion criterion = new SearchCriterion();
         criterion.setType(CriteriaSearchType.valueOfName(parameter.getKey()));
-        if (criterion.getType() != null) {
+        if (criterion.getType() != null && parameter.getValue() != null && parameter.getValue() != "") {
             criterion.setValue((String) parameter.getValue());
         } else {
             return null;

@@ -150,7 +150,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     }
 
     @Override
-    public void listPedagogicItems(List<SearchCriterion> criteria, Handler<Either<String, JsonArray>> handler) {
+    public void listPedagogicItems(List<SearchCriterion> criteria, List<String> groups, Handler<Either<String, JsonArray>> handler) {
 
         String queryReturnType = "";
         JsonArray parameters = new JsonArray();
@@ -199,16 +199,28 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case SEARCH_TYPE:   queryReturnType = criterion.getValue(); break;
                 case TEACHER:       whereLessons.append(" AND t.id = ?");
                                     whereHomeworks.append(" AND t.id = ?"); break;
-                case GROUPS:        whereLessons.append(" AND l.audience_id in ?");
-                                    whereHomeworks.append(" AND h.audience_id in ?"); break;
             }
 
             if (! CriteriaSearchType.SEARCH_TYPE.equals(criterion.getType())) {
                 parametersLessons.add(criterion.getValue());
                 parametersHomeworks.add(criterion.getValue());
             }
-
         }
+
+        //add groups for students
+        if (groups != null) {
+            String inClause = sql.listPrepared(groups.toArray());
+            whereLessons.append(" AND l.audience_id in ");
+            whereLessons.append(inClause);
+            whereHomeworks.append(" AND h.audience_id in ");
+            whereHomeworks.append(inClause);
+
+            for(String groupId : groups){
+                parametersLessons.add(Sql.parseId(groupId));
+                parametersHomeworks.add(Sql.parseId(groupId));
+            }
+        }
+
         queryLessons.append(whereLessons);
         queryHomeworks.append(whereHomeworks);
 
@@ -226,7 +238,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         }
 
         queryFull.append(" ) as req ");
-        queryFull.append(" ORDER BY req.day DESC, req.time_order ASC");
+        queryFull.append(" ORDER BY req.day ASC, req.time_order ASC");
 
         if((queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) && parametersLessons.size() > 0) {
             for (Object param: parametersLessons) {
