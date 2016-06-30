@@ -253,3 +253,8 @@ calendar-daily-events {
     border: solid 0.1px #a5b6bb !important;
     padding: 0px !important;
 }
+
+.trash:before {
+    font-size: 18px !important;
+    padding-right: 10px;
+}
