@@ -896,7 +896,7 @@ SearchForm.prototype.initForStudent = function () {
     var period = moment(model.calendar.dayForWeek).day(1);
     this.startDate = period.format('YYYY-MM-DD');
     this.endDate = period.add(15, 'days').format('YYYY-MM-DD');
-    this.displayLesson = true;
+    this.displayLesson = false;
     this.displayHomework = true;
 };
 
@@ -1285,10 +1285,12 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
 
         var pedagogicDays = [];
 
+        var dayExpanded = true;
+
         for (var day in days) {
             if (days.hasOwnProperty(day)) {
                 var pedagogicDay = {};
-                pedagogicDay.expanded = false;
+                pedagogicDay.expanded = dayExpanded;
                 pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
                 pedagogicDay.pedagogicItemsOfTheDay = days[day];
 
@@ -1297,6 +1299,7 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
                 pedagogicDay.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
                 pedagogicDay.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
                 pedagogicDays.push(pedagogicDay);
+                dayExpanded = false;
             }
         }
 
