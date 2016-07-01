@@ -66,26 +66,45 @@
                             }
                         }
                     };
-                    
+
                     /**
                      * Toggle show display homework panel detail of a day
                      * Note: jquery oldschool way since with angular could not fix some display problems
                      * @param day
                      */
                     scope.toggleShowHwDetail = function (day) {
+                        hideOrShowHwDetail(day, undefined, true);
+                    };
+
+                    /**
+                     *
+                     * @param day
+                     * @param hideHomeworks
+                     * @param unselectHomeworksOnHide
+                     */
+                    var hideOrShowHwDetail = function (day, hideHomeworks, unselectHomeworksOnHide) {
 
                         var hwDayDetail = $('#hw-detail-' + day.index);
 
-                        if (hwDayDetail.hasClass('show')) {
-                            hwDayDetail.removeClass('show');
+                        var isNotHidden = hwDayDetail.hasClass('show');
 
-                            day.dailyEvents.forEach(function(dailyEvent){
-                                dailyEvent.selected = false;
-                            });
+                        if (typeof hideHomeworks === 'undefined') {
+                            hideHomeworks = isNotHidden;
+                        }
+
+                        if (hideHomeworks) {
+                            hwDayDetail.removeClass('show');
                         } else {
                             hwDayDetail.addClass('show');
                         }
+
+                        if (hideHomeworks && unselectHomeworksOnHide) {
+                            day.dailyEvents.forEach(function (dailyEvent) {
+                                dailyEvent.selected = false;
+                            });
+                        }
                     };
+
 
                     /**
                      * Get the maximum number of homeworks of a day for current week
@@ -249,6 +268,12 @@
 
 
                         $('#minimize_hw_span').css('display', (newHwPanelHeight > 0) ? 'inherit' : 'none');
+
+                        if (!bShowCalendar) {
+                            model.calendar.days.all.forEach(function (day) {
+                                hideOrShowHwDetail(day, true, true);
+                            });
+                        }
 
                         model.show.bShowCalendar = bShowCalendar;
                         model.show.bShowHomeworks = bShowHomeworks;
