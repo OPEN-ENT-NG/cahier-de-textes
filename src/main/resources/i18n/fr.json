@@ -114,5 +114,6 @@
   "diary.homework.turn-in.rack": "(A rendre dans le casier)",
   "diary.homework.turn-in.lesson": "(A rendre en cours)",
   "diary.search.period.start": "Période du : ",
-  "diary.search.period.to": " au : "
+  "diary.search.period.to": " au : ",
+  "homework.date": "À faire pour le"
 }

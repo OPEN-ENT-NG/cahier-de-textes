@@ -1,7 +1,7 @@
 ﻿<form name="lessonform">
     <h2><i18n>lesson.details.title</i18n></h2>
     <div class="row">
-        <div class="six cell">
+        <div class="three cell">
             <label><i18n>subject</i18n></label>
             <select ng-if="isLessonHomeworkEditable"
                     ng-model="lesson.subject"
@@ -12,8 +12,8 @@
                     ng-options="subject as subject.label for subject in subjects.all"
                     disabled></select>
         </div>
-        <div class="right-magnet cell">
-            <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>&nbsp;:
+        <div class="three cell">
+            <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>
             <select
                     ng-if="isLessonHomeworkEditable"
                     ng-model="lesson.audience"
@@ -29,14 +29,14 @@
     </div>
 
     <section class="tabs row">
-        <header ng-class="{ selected: tabs.createLesson === 'lesson' }"
+        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
                 ng-click="tabs.createLesson = 'lesson'">
             <i18n>create.lesson.tabs.lesson</i18n>
-        </header>
-        <header ng-class="{ selected: tabs.createLesson === 'homeworks' }"
+        </headerHomeworkLesson>
+        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'homeworks' }"
                 ng-click="tabs.createLesson = 'homeworks';">
             <i18n>create.lesson.tabs.homeworks</i18n>
-        </header>
+        </headerHomeworkLesson>
 
 
 
@@ -138,7 +138,7 @@
                 </div>
                 <div class="row">
                     <div class="four cell">
-                        <label class="three cell"><i18n>date</i18n></label>
+                        <label class="three cell"><i18n>homework.date</i18n></label>
                         <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
                         <date-picker ng-if="isLessonHomeworkEditable" class="five cell" ng-model="homework.dueDate"></date-picker>
                     </div>
@@ -169,7 +169,7 @@
         </section>
 
 
-        <div class="row">
+        <div class="row lessonHomeworkBtn">
             <nav>
                 <!-- publishes the current lesson ang go back to calendar view -->
                 <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
