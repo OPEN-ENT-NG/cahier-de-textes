@@ -111,7 +111,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 
-        query.append(" ORDER BY h.homework_due_date ASC");
+        query.append(" ORDER BY h.homework_due_date ASC, h.created ASC ");
 
         log.debug(query);
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
