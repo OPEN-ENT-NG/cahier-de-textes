@@ -261,7 +261,8 @@ Homework.prototype.toJSON = function () {
         // used to auto create postgresql diary.audience if needed
         // not this.audience object is originally from neo4j graph (see syncAudiences function)
         audience_type: this.audience.type,
-        audience_name: this.audience.name
+        audience_name: this.audience.name,
+        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS') // "2016-07-05 11:48:22.18671"
     };
 
     if (this.lesson_id) {
@@ -715,6 +716,7 @@ Lesson.prototype.toJSON = function () {
 
 Lesson.prototype.addHomework = function () {
     var homework = new Homework();
+    homework.expanded = true;
     homework.dueDate = this.date;
     homework.type = model.homeworkTypes.first();
     homework.title = homework.type.label;
@@ -1220,6 +1222,8 @@ model.initHomework = function () {
 
     var homework = new Homework();
 
+    homework.created = new Date();
+    homework.expanded = true;
     homework.audience = model.getDefaultAudience();
     homework.subject = model.subjects.first();
     homework.audienceType = homework.audience.type;
