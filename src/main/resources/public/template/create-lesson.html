@@ -164,7 +164,7 @@
                 <hr class="homework-delimitation">
             </div>
             <div ng-if="isLessonHomeworkEditable" class="row">
-                <a ng-click="lesson.addHomework()"><i18n>lesson.homeworks.add</i18n></a>
+                <i class="add-icon" ng-class="" ng-click="lesson.addHomework()" tooltip="lesson.homeworks.add"></i>
             </div>
         </section>
 
@@ -172,12 +172,12 @@
         <div class="row lessonHomeworkBtn">
             <nav>
                 <!-- publishes the current lesson ang go back to calendar view -->
-                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && showConfirmPanel('confirm-publish-lesson')">
+                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
                     <i18n>daily.item.publish</i18n>
                 </button>
 
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && showConfirmPanel('confirm-unpublish-lesson')">
+                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
                     <i18n>daily.item.unpublish</i18n>
                 </button>
 
