@@ -40,7 +40,7 @@
     <div class="row">
         <div class="row">
             <div class="three cell">
-                <label class="cell three"><i18n>date</i18n></label>
+                <label class="cell"><i18n>homework.date</i18n></label>
                 <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(newItem.date)]]" readonly/>
                 <date-picker ng-if="isLessonHomeworkEditable" ng-model="newItem.date"  class="cell six"></date-picker>
             </div>
@@ -62,14 +62,14 @@
         <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
     </div>
     </section>
-    <div class="row">
+    <div class="row lessonHomeworkBtn">
         <!-- publishes the current lesson ang go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-publish-homework')">
+        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && publishHomework(homework, true)">
             <i18n>daily.item.publish</i18n>
         </button>
 
         <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && showConfirmPanel('confirm-unpublish-homework')">
+        <button class="right-magnet" type="submit" ng-if="isLessonHomeworkEditable && homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && publishHomework(homework, false)">
             <i18n>daily.item.unpublish</i18n>
         </button>
         <!-- save homework in draft mode and go back to calendar view -->
