@@ -46,7 +46,10 @@
             <ul ng-if="day.expanded === true">
                 <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
                     <div class="cell-no-float notification">
-                        <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
+                        <div class="table-cell-left">
+                            <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
+                            <input ng-if="isUserTeacher" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
+                        </div>
                         <div class="table-cell">
                             <div>
                                 <i ng-if="pedagogicItem.published === false"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
@@ -77,4 +80,30 @@
             </ul>
         </li>
     </ul>
+</section>
+
+<!-- action panel displayed if at least one lesson or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: pedagogicItems.selection().length === 0 }">
+    <div class="toggle">
+        <div class="row">
+            <button ng-click="showConfirmPanel('confirm-delete')">
+                <i18n>remove</i18n>
+            </button>
+            <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
+                <i18n>edit</i18n>
+            </button>
+            <!-- not implemented yet so always disabled -->
+            <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
+                <i18n>share</i18n>
+            </button>
+            <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
+            <button ng-click="showConfirmPanel('confirm-publish')" ng-if="hasPublishableOnlyItemsSelected(true)">
+                <i18n>daily.item.publish</i18n>
+            </button>
+            <!-- unpublish - lessons in published state and homeworks in published state not attached to lesson -->
+            <button ng-click="showConfirmPanel('confirm-unpublish')" ng-if="hasPublishableOnlyItemsSelected(false)">
+                <i18n>daily.item.unpublish</i18n>
+            </button>
+        </div>
+    </div>
 </section>

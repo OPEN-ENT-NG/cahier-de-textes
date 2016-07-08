@@ -324,8 +324,8 @@ function DiaryController($scope, template, model, route, $location) {
      * in calendar view from database
      */
     $scope.deleteSelectedItems = function () {
-        var selectedLessons = getSelectedLessons();
-        var selectedHomeworks = getSelectedHomeworks();
+        var selectedLessons = getSelectedPedagogicItems('lesson');
+        var selectedHomeworks = getSelectedPedagogicItems('homework');
 
         if ((selectedLessons.length + selectedHomeworks.length) === 0) {
             notify.error('daily.nohomeworkorlesson.selected');
@@ -388,10 +388,10 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.editSelectedItem = function () {
 
-        var selectedLessons = getSelectedLessons();
+        var selectedLessons = getSelectedPedagogicItems('lesson');
         var selectedLesson = selectedLessons.length > 0 ? selectedLessons[0] : null;
 
-        var selectedHomeworks = getSelectedHomeworks();
+        var selectedHomeworks = getSelectedPedagogicItems('homework');
         var selectedHomework = selectedHomeworks.length > 0 ? selectedHomeworks[0] : null;
 
         if (selectedHomework && selectedLesson) {
@@ -446,17 +446,8 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.publishSelectedLessons = function (isPublish) {
         $scope.currentErrors = [];
-        $scope.publishLessons($scope.getSelectedLessons(), isPublish);
-    };
-
-
-    /**
-     * Publishes or unpublishes homework and go back to main view
-     * @param homework Homework
-     * @param isPublish if true publishes homework else un-publishes it
-     */
-    $scope.publishHomeworkAndGoCalendarView = function (homework, isPublish) {
-        $scope.publishHomework(homework, isPublish, $scope.goToMainView());
+        var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
+        $scope.publishLessons(getSelectedPedagogicItems('lesson'), isPublish, notifyKey);
     };
 
     /**
@@ -465,19 +456,10 @@ function DiaryController($scope, template, model, route, $location) {
      * @param isPublish if true publishes lesson else un-publishes it
      */
     $scope.publishLessonAndGoCalendarView = function (lesson, isPublish) {
-        $scope.publishLesson(lesson, isPublish, $scope.goToMainView());
-    };
-
-    /**
-     * Publish lesson
-     * @param lesson Lesson to be published or unpublished
-     * @param isPublish If true publishes the lesson (back to draft mode) else unpublishes it
-     * @param cb Callback function
-     */
-    $scope.publishLesson = function (lesson, isPublish, cb) {
         var lessons = [];
         lessons.push(lesson);
-        $scope.publishLessons(lessons, isPublish, cb);
+        var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
+        $scope.publishLessons(lesson, isPublish, notifyKey, $scope.goToMainView());
     };
 
     /**
@@ -487,40 +469,26 @@ function DiaryController($scope, template, model, route, $location) {
      * @param cb Callback function
      * which is lesson id to delete
      */
-    $scope.publishLessons = function (lessons, isPublish, cb) {
+    $scope.publishLessons = function (lessons, isPublish, notifyKey, cb) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, function () {
-
-            // refresh state of lessons un/published
-            lessons.forEach(function (lesson) {
-                lesson.changeState(isPublish);
-            });
-
-            $scope.closeConfirmPanel();
-
-            notify.info(isPublish ? 'lesson.published' : 'lesson.unpublished');
-
-            if (typeof cb === 'function') {
-                cb();
-            }
-        }, function (e) {
+        model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, publishCB(lessons, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             validationError(e);
         });
     };
 
     /**
-     * Publish lesson
-     * @param homework Homework to be published or unpublished
-     * @param isPublish If true publishes the lesson (back to draft mode) else unpublishes it
-     * @param cb Callback function
+     * Publishes or unpublishes homework and go back to main view
+     * @param homework Homework
+     * @param isPublish if true publishes homework else un-publishes it
      */
-    $scope.publishHomework = function (homework, isPublish, cb) {
+    $scope.publishHomeworkAndGoCalendarView = function (homework, isPublish) {
         var homeworks = [];
         homeworks.push(homework);
-        $scope.publishHomeworks(homeworks, isPublish, cb);
+        var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
+        $scope.publishHomeworks(homework, isPublish, notifyKey, $scope.goToMainView());
     };
 
     /**
@@ -528,31 +496,38 @@ function DiaryController($scope, template, model, route, $location) {
      * @param homeworks Array of homeworks to publish or unpublish
      * @param isPublish If true publishes lesson else unpublishes it
      * @param cb Callback function
-     * which is lesson id to delete
      */
     $scope.publishHomeworks = function (homeworks, isPublish, cb) {
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, function () {
-
-            // refresh state of homeworks to published or unpublished
-            homeworks.forEach(function (homework) {
-                homework.state = isPublish ? 'published' : 'draft';
-            });
-
-            $scope.closeConfirmPanel();
-
-            notify.info(isPublish ? 'item.published' : 'item.unpublished');
-
-            if (typeof cb === 'function') {
-                cb();
-            }
-        }, function (e) {
+        var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
+        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             validationError(e);
         });
     };
+
+    /**
+     * Callback method after publishing a lesson, homework or mixed list of items
+     * @param list items to publish
+     * @param toPublish If true publishes lesson else unpublishes it
+     * @param notifyKey i18n key used to notify the user at the end of processing
+     * @param cb calback function
+     */
+    var publishCB = function (list, toPublish, notifyKey, cb) {
+        list.forEach(function (item) {
+            item.changeState(toPublish);
+        });
+
+        notify.info(notifyKey);
+        $scope.closeConfirmPanel();
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    };
+
 
     /**
      * Load homeworks for current lesson being edited
@@ -615,7 +590,6 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.processingData = false;
         $scope.display.showPanel = false;
         template.close('lightbox');
-        $scope.$apply();
     };
 
     /**
@@ -657,28 +631,24 @@ function DiaryController($scope, template, model, route, $location) {
         var unPublishableSelectedHomeworks = [];
         var noStateChangeHomeworks = []; // eg.: homework attached to a lesson
 
-        $scope.lessons.forEach(function (lesson) {
-            if (lesson.selected) {
-                if (lesson.isPublishable(true)) {
-                    publishableSelectedLessons.push(lesson);
-                } else if (lesson.isPublishable(false)) {
-                    unPublishableSelectedLessons.push(lesson);
-                } else {
-                    noStateChangeLessons.push(lesson);
-                }
+        getSelectedPedagogicItems('lesson').forEach(function (lesson) {
+            if (lesson.isPublishable(true)) {
+                publishableSelectedLessons.push(lesson);
+            } else if (lesson.isPublishable(false)) {
+                unPublishableSelectedLessons.push(lesson);
+            } else {
+                noStateChangeLessons.push(lesson);
             }
         });
 
         // only free homeworks can be published/unpublished
-        $scope.homeworks.forEach(function (homework) {
-            if (homework.selected) {
-                if (homework.isPublishable(true)) {
-                    publishableSelectedHomeworks.push(homework);
-                } else if (homework.isPublishable(false)) {
-                    unPublishableSelectedHomeworks.push(homework);
-                } else {
-                    noStateChangeHomeworks.push(homework);
-                }
+        getSelectedPedagogicItems('homework').forEach(function (homework) {
+            if (homework.isPublishable(true)) {
+                publishableSelectedHomeworks.push(homework);
+            } else if (homework.isPublishable(false)) {
+                unPublishableSelectedHomeworks.push(homework);
+            } else {
+                noStateChangeHomeworks.push(homework);
             }
         });
 
@@ -698,40 +668,19 @@ function DiaryController($scope, template, model, route, $location) {
         var homeworks = toPublish ? itemsToBePublished.publishableSelectedHomeworks : itemsToBePublished.unPublishableSelectedHomeworks;
         var lessons = toPublish ? itemsToBePublished.publishableSelectedLessons : itemsToBePublished.unPublishableSelectedLessons;
 
-        var postPublishFunction = function () {
-            $scope.processingData = false;
-
-            if(toPublish) {
-                notify.info('item.published');
-            } else {
-                notify.info('item.unpublished')
-            }
-            $scope.closeConfirmPanel();
-            $scope.$apply();
-        };
-
+        var notifyKey = toPublish ? 'item.published' : 'item.unpublished';
+        $scope.processingData = true;
+        
         if (lessons.length > 0) {
-
-            model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish,
-                function () {
-                    lessons.forEach(function (lesson) {
-                        lesson.changeState(toPublish);
-                    });
-                    postPublishFunction();
-                }, function (cbe) {
+            model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish, publishCB(lessons, toPublish, notifyKey),
+                function (cbe) {
                     notify.error(cbe.message);
                 })
         }
 
         if (homeworks.length > 0) {
-
-            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish,
-                function () {
-                    homeworks.forEach(function (homework) {
-                        homework.state = toPublish ? 'published' : 'draft';
-                    });
-                    postPublishFunction();
-                }, function (cbe) {
+            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish, publishCB(homeworks, toPublish, notifyKey),
+                function (cbe) {
                     notify.error(cbe.message);
                 })
         }
@@ -789,88 +738,18 @@ function DiaryController($scope, template, model, route, $location) {
         }
     };
 
-    /**
-     * Tells if at least one draft is selected and only drafts
-     * @returns {boolean} true if one draft lesson selected else false
-     */
-    $scope.isOneDraftOnlyInSelected = function () {
-
-        var selected = false;
-
-        model.lessons.selection().forEach(function (lesson) {
-            if (lesson.isDraft()) {
-                selected = true;
-            } else {
-                return false;
-            }
-        });
-
-        return selected;
+    var getSelectedHomeworks = function(){
+        return model.homeworks.selection();
     };
 
-    /**
-     * Tells if at least one published lesson is selected and only published ones
-     * @returns {boolean} true if one draft lesson published else false
-     */
-    $scope.isOnePublishedOnlyInSelected = function () {
-
-        var selected = false;
-
-        model.lessons.selection().forEach(function (lesson) {
-            if (lesson.isPublished()) {
-                selected = true;
-            } else {
-                return false;
-            }
-        });
-
-        return selected;
-    };
-
-    $scope.getSelectedLessons = function(){
-        var itemArray = [];
-
-        model.lessons.selection().forEach(function (lesson) {
-            itemArray.push(lesson);
-        });
-
-        return itemArray;
+    var getSelectedLessons = function(){
+        return model.lessons.selection();
     };
 
 
     $scope.toggleShowHomeworkInLesson = function (homework) {
         console.log('clicked');
         homework.expanded = !homework.expanded;
-    };
-
-    /**
-     * Delete selected lessons
-     */
-    $scope.deleteSelectedLessons = function () {
-        $scope.currentErrors = [];
-        $scope.deleteLessons($scope.getSelectedLessons());
-    };
-
-    /**
-     * Delete lessons
-     * @param lessons Lessons to be deleted
-     * which is lesson id to delete
-     */
-    $scope.deleteLessons = function (lessons) {
-        $scope.currentErrors = [];
-
-        $scope.newLesson.deleteLessons(lessons, function () {
-
-            // refresh current lessons cache to sync with lessons deleted
-            lessons.forEach(function (deletedLesson) {
-                deletedLesson.deleteModelReferences();
-            });
-
-            $scope.closeConfirmPanel();
-            notify.info('item.deleted');
-        },function (e) {
-            validationError(e);
-        });
     };
 
 
@@ -1055,31 +934,27 @@ function DiaryController($scope, template, model, route, $location) {
         $location.path(path);
     };
 
-
-
-    /**
-     *
-     * @returns {*}
-     */
-    var getSelectedHomeworks = function(){
-        return model.homeworks.filter(function (homework) {
-            return homework && homework.selected;
-        });
+    $scope.getPedagogicItemSelectedCount = function () {
+        return getSelectedPedagogicItems('lesson').length + getSelectedPedagogicItems('homework').length;
     };
 
-
-    $scope.getLessonsOrHomeworksSelectedCount = function () {
-        return getSelectedLessons().length + getSelectedHomeworks().length;
-    };
-
-    /**
-     *
-     * @returns {*}
-     */
-    var getSelectedLessons = function(){
-        return model.lessons.filter(function (lesson) {
-            return lesson && lesson.selected;
-        });
+    var getSelectedPedagogicItems = function(itemType){
+        if ($scope.display.showList == true) {
+            var selectedItems = new Array();
+            model.pedagogicItems.forEach(function (day) {
+                selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
+                        return item && item.type_item === itemType && item.selected;
+                    })
+                );
+            });
+            return selectedItems;    
+        } else {
+            if (itemType === 'homework') {
+                return getSelectedHomeworks();
+            } else {
+                return getSelectedLessons();
+            }
+        }
     };
 
     /**
