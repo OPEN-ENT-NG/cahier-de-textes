@@ -3,31 +3,18 @@
     <div class="row">
         <div class="three cell">
             <label><i18n>subject</i18n></label>
-            <select ng-if="isLessonHomeworkEditable"
-                    ng-model="lesson.subject"
+            <select ng-model="lesson.subject"
                     ng-options="subject as subject.label for subject in subjects.all"
                     required></select>
-            <select ng-if="!isLessonHomeworkEditable"
-                    ng-model="lesson.subject"
-                    ng-options="subject as subject.label for subject in subjects.all"
-                    disabled></select>
         </div>
         <div class="three cell">
             <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>
-            <select
-                    ng-if="isLessonHomeworkEditable"
-                    ng-model="lesson.audience"
+            <select ng-model="lesson.audience"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
-            ></select>
-            <select
-                    ng-if="!isLessonHomeworkEditable"
-                    ng-model="lesson.audience"
-                    ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
-                    disabled
             ></select>
         </div>
     </div>
-
+	
     <section class="tabs row">
         <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
                 ng-click="tabs.createLesson = 'lesson'">
@@ -38,25 +25,13 @@
             <i18n>create.lesson.tabs.homeworks</i18n>
         </headerHomeworkLesson>
 
-
-
-
-
         <section ng-show="tabs.createLesson === 'lesson'">
             <div class="row">
-                <input ng-if="isLessonHomeworkEditable" type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
-                <input ng-if="!isLessonHomeworkEditable" type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" readonly/>
-
-
-                <div ng-if="!isLessonHomeworkEditable" class="four cell lessonTeacher">
-                    <label class="cell four"><i18n>enseignant</i18n></label>
-                    <input type="text" i18n-placeholder="enseignant" ng-model="lesson.teacherId" maxlength="20" class="cell six" readonly/>
-                </div>
+                <input type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
 
                 <!--ng-model="lesson.teacher"-->
                 <div class="cell right-magnet">
-                    <input ng-if="!isLessonHomeworkEditable" type="color" ng-model="lesson.color" disabled>
-                    <input ng-if="isLessonHomeworkEditable" type="color" ng-model="lesson.color">
+                    <input type="color" ng-model="lesson.color">
                 </div>
 
             </div>
@@ -64,35 +39,30 @@
                 <!-- Beginning (Date: DD/MM/YYYY) -->
                 <div class="three cell">
                     <label class="cell three"><i18n>date</i18n></label>
-                    <input ng-if="!isLessonHomeworkEditable" type="text" class="cell six" value="[[formatDate(newItem.date)]]" readonly/>
-                    <date-picker ng-if="isLessonHomeworkEditable" ng-model="newItem.date"  class="cell six"></date-picker>
+                    <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
                 </div>
 
                 <!-- Beginning (Time: HH:mm) -->
                 <div class="three cell">
                     <label class="cell four"><i18n>start.time</i18n></label>
-                    <input ng-if="!isLessonHomeworkEditable" type="text" class="cell four" value="[[formatTime(newItem.beginning)]]" readonly/>
-                    <time-picker ng-if="isLessonHomeworkEditable" ng-model="newItem.beginning" class="cell four"></time-picker>
+                    <time-picker ng-model="newItem.beginning" class="cell four"></time-picker>
                 </div>
 
                 <!-- End (Time: HH:mm) -->
                 <div class="three cell">
                     <label class="cell four"><i18n>end.time</i18n></label>
-                    <input ng-if="!isLessonHomeworkEditable" type="text" class="cell four" value="[[formatTime(newItem.end)]]" readonly/>
-                    <time-picker ng-if="isLessonHomeworkEditable" ng-model="newItem.end" class="cell four"></time-picker>
+                    <time-picker ng-model="newItem.end" class="cell four"></time-picker>
                 </div>
                 <div class="two cell">
                     <label class="cell five"><i18n>room</i18n></label>
-                    <input ng-if="!isLessonHomeworkEditable" type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" readonly/>
-                    <input ng-if="isLessonHomeworkEditable" type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
+                    <input type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
                 </div>
 
             </div>
             <div class="row">
-                <div ng-if="!isLessonHomeworkEditable" ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
-                <editor ng-if="isLessonHomeworkEditable" ng-model="lesson.description"></editor>
+                <editor ng-model="lesson.description"></editor>
             </div>
-            <div ng-if="isLessonHomeworkEditable" class="row accordions">
+            <div class="row accordions">
                 <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
                     <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
                         <i18n>annotations.title</i18n>
@@ -172,31 +142,26 @@
         <div class="row lessonHomeworkBtn">
             <nav>
                 <!-- publishes the current lesson ang go back to calendar view -->
-                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
+                <button ng-if="lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
                     <i18n>daily.item.publish</i18n>
                 </button>
 
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-                <button ng-if="isLessonHomeworkEditable && lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
+                <button ng-if="lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
                     <i18n>daily.item.unpublish</i18n>
                 </button>
 
                 <!-- save lesson in draft mode and go back to calendar view -->
-                <button ng-if="isLessonHomeworkEditable" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
                     <i18n>back</i18n>
                 </button>
                 <!-- save lesson in draft mode -->
-                <button ng-if="isLessonHomeworkEditable" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(false)">
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(false)">
                     <i18n>save</i18n>
                 </button>
                 <!-- go back to calendar view without saving -->
-                <button ng-if="isLessonHomeworkEditable" class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+                <button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
                     <i18n>cancel</i18n>
-                </button>
-
-                <!-- go back to calendar view without saving -->
-                <button ng-if="!isLessonHomeworkEditable" class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
-                    <i18n>back</i18n>
                 </button>
             </nav>
         </div>
