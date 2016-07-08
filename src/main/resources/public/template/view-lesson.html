@@ -1,0 +1,98 @@
+﻿<!-- ELEVE / PARENT -->
+
+<div>
+	<h2><i18n>lesson.details.title</i18n></h2>
+	 <div class="row">
+        <div class="six cell">
+			<input type="color" ng-model="lesson.color" disabled>
+			<span ng-bind="lesson.subject.label" class="lessonHeader"></span>
+			<span ng-bind="lesson.audience.name" class="lessonHeader"></span>
+			<span ng-bind="lesson.teacherId" class="lessonHeader"></span>
+        </div>
+    </div>
+	
+	    <section class="tabs row">
+        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
+                ng-click="tabs.createLesson = 'lesson'">
+            <i18n>create.lesson.tabs.lesson</i18n>
+        </headerHomeworkLesson>
+        <headerHomeworkLesson ng-if="lesson.homeworks.all.length > 0" ng-class="{ selected: tabs.createLesson === 'homeworks' }"
+                ng-click="tabs.createLesson = 'homeworks';">
+            <i18n>create.lesson.tabs.homeworks</i18n>
+        </headerHomeworkLesson>
+		
+	    <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
+            <i18n>create.lesson.tabs.homeworks</i18n>
+        </headerHomeworkLesson>
+
+
+        <section ng-show="tabs.createLesson === 'lesson'">
+            <div class="row rowHeader">
+				<span class="lessonInfosGrey">[[formatDate(newItem.date)]]</span>
+				<span class="lessonInfosGrey">[[formatTime(newItem.beginning)]]-[[formatTime(newItem.end)]]</span>
+				<span ng-if="lesson.room" class="lessonInfosGrey">(Salle [[lesson.room]])</span>
+				<span ng-bind="lesson.title" class="lessonInfosBlack"></span>
+            </div>
+            <div class="row">
+                <div ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
+            </div>
+        </section>
+
+
+
+
+        <!-- HOMEWORK(S) ATTACHED TO LESSON -->
+        <section ng-show="tabs.createLesson === 'homeworks'">
+            <div class="row" ng-repeat="homework in lesson.homeworks.all">
+
+                <!-- minimized view -->
+                <div class="row">
+                    <div ng-show="!homework.expanded" class="four cell">
+                    <b>Devoir à rendre pour le [[formatDate(homework.dueDate)]]</b><br>
+                    [[homework.type.label]] - [[homework.title]]
+                    </div>
+                    <ul>
+                        <li>
+                            <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
+                        </li>
+                    </ul>
+                </div>
+
+                <div ng-show="homework.expanded">
+                <div class="row">
+                    <input type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
+                </div>
+                <div class="row">
+                    <div class="four cell">
+                        <label class="three cell"><i18n>homework.date</i18n></label>
+                        <input type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
+                    </div>
+                    <div class="five cell">
+                        <label class="three cell"><i18n>homework.type</i18n></label>
+                        <select class="seven cell"
+                                ng-options="type as type.label for type in homeworkTypes.all"
+                                ng-model="homework.type"
+                                disabled></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+                </div>
+                </div>
+                <hr class="homework-delimitation">
+            </div>
+        </section>
+
+
+        <div class="row lessonHomeworkBtn">
+            <nav>
+                <!-- go back to calendar view without saving -->
+                <button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+                    <i18n>back</i18n>
+                </button>
+            </nav>
+        </div>
+    </section>
+	
+	
+</div>

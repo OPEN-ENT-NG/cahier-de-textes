@@ -243,7 +243,12 @@ function DiaryController($scope, template, model, route, $location) {
 
         var openLessonTemplates = function(){
             template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
+            if (!$scope.isLessonHomeworkEditable){
+				template.open('main-view', 'view-lesson');
+            }
+            else{
+                template.open('main-view', 'create-lesson');
+            }
         };
 
         // open existing lesson for edit
