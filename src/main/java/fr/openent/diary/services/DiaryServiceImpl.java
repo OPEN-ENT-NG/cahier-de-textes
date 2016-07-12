@@ -156,10 +156,10 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray();
 
         StringBuilder queryLessons = new StringBuilder();
-        queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, ")
-                .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room, ")
+        queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
+                .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room,")
                 .append(" l.lesson_color as color, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
-                .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, null as turn_in_type ")
+                .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, null as turn_in_type")
                 .append(" FROM diary.lesson AS l")
                 .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
                 .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
@@ -169,10 +169,10 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         //TODO : add number of homeworks for a lesson
 
         StringBuilder queryHomeworks = new StringBuilder();
-        queryHomeworks.append("SELECT 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, ")
-                .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room, ")
-                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null as start_time, null as end_time, ")
-                .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type ")
+        queryHomeworks.append("SELECT 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, h.lesson_id as lesson_id,")
+                .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room,")
+                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null as start_time, null as end_time,")
+                .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
                 .append(" LEFT JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")

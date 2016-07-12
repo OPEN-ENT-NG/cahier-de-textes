@@ -46,12 +46,12 @@
     </section>
     <div class="row lessonHomeworkBtn">
         <!-- publishes the current lesson ang go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && publishHomework(homework, true)">
+        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && publishHomeworkAndGoCalendarView(homework, true)">
             <i18n>daily.item.publish</i18n>
         </button>
 
         <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && publishHomework(homework, false)">
+        <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && publishHomeworkAndGoCalendarView(homework, false)">
             <i18n>daily.item.unpublish</i18n>
         </button>
         <!-- save homework in draft mode and go back to calendar view -->

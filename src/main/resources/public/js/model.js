@@ -57,6 +57,9 @@ Homework.prototype.isPublishable = function (toPublish) {
     return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
 };
 
+Homework.prototype.changeState = function (toPublish) {
+    this.state = toPublish ? 'published' : 'draft';
+};
 
 /**
  * Says whether or not current user can edit an homework
@@ -225,10 +228,8 @@ Homework.prototype.delete = function (lesson, cb, cbe) {
 };
 
 /**
- * Publishes or un publishes a list of lessons
+ * Publishes or un publishes a list of homeworks
  * @param itemArray Array of homeworks to publish or unpublish
- * @param cb Callback function
- * @param cbe Callback function on error
  */
 model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
 
@@ -261,12 +262,15 @@ Homework.prototype.toJSON = function () {
         // used to auto create postgresql diary.audience if needed
         // not this.audience object is originally from neo4j graph (see syncAudiences function)
         audience_type: this.audience.type,
-        audience_name: this.audience.name,
-        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS') // "2016-07-05 11:48:22.18671"
+        audience_name: this.audience.name
     };
 
     if (this.lesson_id) {
         json.lesson_id = this.lesson_id
+    }
+
+    if (!this.id) {
+        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
     }
 
     return json;
@@ -291,6 +295,58 @@ PedagogicItem.prototype.getPreviewDescription = function () {
     } else {
         this.preview_description = this.description;
     }
+};
+
+PedagogicItem.prototype.isPublishable = function(toPublish){
+    return this.id && this.published == (toPublish ? 'draft' : 'published') && (this.lesson_id == this.id || this.lesson_id == null); // id test to detect free homeworks
+};
+
+PedagogicItem.prototype.delete = function(cb, cbe) {
+
+    var url = (this.type_item == "lesson") ? '/diary/lesson/' : '/diary/homework/';
+    var idToDelete = this.id;
+    http().delete(url + idToDelete, this).done(function (b) {
+
+        model.deletePedagogicItemReferences(idToDelete);
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+     });
+};
+
+PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
+
+    var url = (this.type_item == "lesson") ? '/diary/deleteLessons' : '/diary/deleteHomeworks';
+
+    var itemArray = {ids:model.getItemsIds(items)};
+
+    return http().deleteJson(url, itemArray).done(function (b) {
+
+        items.forEach(function (item) {
+            model.deletePedagogicItemReferences(item.id);
+        });
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
+model.deletePedagogicItemReferences = function(itemId) {
+    model.pedagogicItems.forEach(function (day) {
+        day.pedagogicItemsOfTheDay = _.reject(day.pedagogicItemsOfTheDay, function (item) {
+                return !item || item.lesson_id == itemId || item.id == itemId;
+            });
+    });
 };
 
 function Lesson(data) {
@@ -560,8 +616,7 @@ Lesson.prototype.delete = function (cb, cbe) {
  * @param cbe Callback on error
  */
 Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
-
-
+    
     var itemArray = {ids:model.getItemsIds(lessons)};
 
     return http().deleteJson("/diary/deleteLessons", itemArray).done(function(r){
@@ -815,13 +870,7 @@ model.parseError = function(e) {
  * @returns {Array} Array of id of the items
  */
 model.getItemsIds = function (items) {
-
-    var itemArray = [];
-    items.forEach(function (item) {
-        itemArray.push(item.id);
-    });
-
-    return itemArray;
+    return _.toArray(_.pluck(items, 'id'));
 };
 
 /**
@@ -1161,6 +1210,7 @@ model.build = function () {
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
+        item.lesson_id = data.lesson_id;
         item.title = data.title;
         item.subject = data.subject;
         item.audience = data.audience;
