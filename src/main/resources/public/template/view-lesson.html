@@ -1,6 +1,4 @@
-﻿<!-- ELEVE / PARENT -->
-
-<div>
+﻿<div>
 	<h2><i18n>lesson.details.title</i18n></h2>
 	 <div class="row">
         <div class="six cell">
@@ -38,9 +36,6 @@
             </div>
         </section>
 
-
-
-
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <section ng-show="tabs.createLesson === 'homeworks'">
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
@@ -59,30 +54,18 @@
                 </div>
 
                 <div ng-show="homework.expanded">
-                <div class="row">
-                    <input type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
-                </div>
-                <div class="row">
-                    <div class="four cell">
-                        <label class="three cell"><i18n>homework.date</i18n></label>
-                        <input type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
+                    <div class="row rowHeader">
+                        <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
+                        <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
+                        <span ng-bind="homework.title" class="lessonInfosBlack"></span>
                     </div>
-                    <div class="five cell">
-                        <label class="three cell"><i18n>homework.type</i18n></label>
-                        <select class="seven cell"
-                                ng-options="type as type.label for type in homeworkTypes.all"
-                                ng-model="homework.type"
-                                disabled></select>
+                    <div class="row">
+                        <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                     </div>
-                </div>
-                <div class="row">
-                    <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
-                </div>
                 </div>
                 <hr class="homework-delimitation">
             </div>
         </section>
-
 
         <div class="row lessonHomeworkBtn">
             <nav>
@@ -93,6 +76,4 @@
             </nav>
         </div>
     </section>
-	
-	
 </div>

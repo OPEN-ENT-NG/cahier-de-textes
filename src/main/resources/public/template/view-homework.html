@@ -1,0 +1,30 @@
+﻿<div>
+	<h2><i18n>homework.details.title</i18n></h2>
+	 <div class="row">
+        <div class="six cell">
+			<input type="color" ng-model="homework.color" disabled>
+			<span ng-bind="homework.subject.label" class="lessonHeader"></span>
+			<span ng-bind="homework.audience.name" class="lessonHeader"></span>
+        </div>
+    </div>
+	
+	<section class="homeworkInfos">
+        <!-- FREE HOMEWORK -->
+                    <div class="row rowHeader">
+                        <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
+                        <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
+                        <span ng-bind="homework.title" class="lessonInfosBlack"></span>
+                    </div>
+                    <div class="row">
+                        <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+                    </div>
+    </section>
+	<div class="row lessonHomeworkBtn">
+		<nav>
+			<!-- go back to calendar view without saving -->
+			<button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+				<i18n>back</i18n>
+			</button>
+		</nav>
+	</div>
+</div>
