@@ -297,7 +297,13 @@ function DiaryController($scope, template, model, route, $location) {
         }
 
         template.open('main', 'main');
-        template.open('main-view', 'create-homework');
+		if (!$scope.isLessonHomeworkEditable){
+			template.open('main-view', 'view-homework');
+        }
+        else{
+            template.open('main-view', 'create-homework');
+        }
+			
     };
 
     /**

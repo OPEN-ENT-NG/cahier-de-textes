@@ -262,12 +262,15 @@ Homework.prototype.toJSON = function () {
         // used to auto create postgresql diary.audience if needed
         // not this.audience object is originally from neo4j graph (see syncAudiences function)
         audience_type: this.audience.type,
-        audience_name: this.audience.name,
-        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS') // "2016-07-05 11:48:22.18671"
+        audience_name: this.audience.name
     };
 
     if (this.lesson_id) {
         json.lesson_id = this.lesson_id
+    }
+
+    if (!this.id) {
+        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
     }
 
     return json;

@@ -124,7 +124,7 @@ Override marging for homeworks display
 section .homework-detail {
     margin-top: -1px;
     border: 1px solid;
-    padding: 6px;"
+    padding: 6px;
 }
 
 .show-homeworks::before {
@@ -302,23 +302,29 @@ calendar-daily-events {
 }
 
 .lessonHeader{
+    font-size: 20px;
     font-weight: bold;
     margin: 20px;
 }
 
 .lessonInfosGrey{
-    font-size: 20px;
-    /*font-weight: bold;*/
+    font-size: 18px;
     color: #808080;
     margin: 20px;
 }
 
 .lessonInfosBlack{
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     margin: 20px;
 }
 
 .rowHeader{
     margin: 5px;
+}
+
+section .homeworkInfos {
+    margin-top: 38px;
+    border: 1px solid;
+    padding: 6px;
 }
