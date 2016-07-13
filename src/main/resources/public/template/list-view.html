@@ -83,7 +83,7 @@
 </section>
 
 <!-- action panel displayed if at least one lesson or homework selected -->
-<section class="toggle-buttons" ng-class="{ hide: pedagogicItems.selection().length === 0 }">
+<section class="toggle-buttons" ng-class="{ hide: getPedagogicItemSelectedCount() == 0 }">
     <div class="toggle">
         <div class="row">
             <button ng-click="showConfirmPanel('confirm-delete')">

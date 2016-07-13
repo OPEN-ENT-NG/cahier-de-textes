@@ -615,10 +615,8 @@ function DiaryController($scope, template, model, route, $location) {
      * @returns {boolean}
      */
     $scope.isOneHomeworkOrLessonStriclySelected = function () {
-        var hasLessonOnlySelected = $scope.lessons.selection().length == 1 && $scope.homeworks.selection().length == 0;
-        var hasHomeworkOnlySelected = $scope.homeworks.selection().length == 1 && $scope.lessons.selection().length == 0;
-
-        return hasLessonOnlySelected || hasHomeworkOnlySelected;
+        // simple js implementation of XOR as no native operator exists (like ^ in other languages)
+        return (getSelectedPedagogicItems('lesson').length() == 1) != (getSelectedPedagogicItems('homework').length() == 1);
     };
 
 

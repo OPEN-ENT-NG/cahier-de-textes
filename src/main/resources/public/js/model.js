@@ -1223,6 +1223,7 @@ model.build = function () {
         item.room = data.room;
         item.day = data.day;
         item.turn_in = (data.type_item == "lesson") ? "" : data.turn_in_type;
+        item.selected = false;
         return item;
     }
 };
