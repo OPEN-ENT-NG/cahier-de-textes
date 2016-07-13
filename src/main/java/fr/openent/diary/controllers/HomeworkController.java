@@ -107,13 +107,14 @@ public class HomeworkController extends SharedResourceController {
         });
     }
 
-    @Get("/homework/:etabIds/:startDate/:endDate")
+    @Get("/homework/:etabIds/:startDate/:endDate/:classId")
     @ApiDoc("Get all homeworks for a school")
     @SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
     public void listHomeworks(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
+        final String classId = request.params().get("classId");
 
         log.debug("listHomeworks on schools : " + schoolIds);
 
@@ -122,11 +123,20 @@ public class HomeworkController extends SharedResourceController {
             public void handle(UserInfos user) {
 
                 if(user != null){
-                    if("Teacher".equals(user.getType())){
-                        homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
-                    } else { //if student
-                        homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
-                    } //TODO manage more type of users?
+                    switch (user.getType()) {
+                        case "Teacher":
+                            homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        case "Student":
+                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        case "Relative":
+                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        default:
+                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                    }
 
                 } else {
                     unauthorized(request,"No user found in session.");

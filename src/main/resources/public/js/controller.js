@@ -91,12 +91,17 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
     $scope.pedagogicItems = model.pedagogicItems;
+    $scope.childs = model.childs;
+    $scope.child = model.child;
 
     // Says whether or not current user can edit homework & lesson
     $scope.isLessonHomeworkEditable = model.canEdit();
 
     // Says whether or not current user is a teacher
     $scope.isUserTeacher = model.isUserTeacher();
+
+    // Says whether or not current user is a parent
+    $scope.isUserParent = model.isUserParent();
 
     $scope.searchForm = model.searchForm;
 
@@ -759,7 +764,6 @@ function DiaryController($scope, template, model, route, $location) {
 
 
     $scope.toggleShowHomeworkInLesson = function (homework) {
-        console.log('clicked');
         homework.expanded = !homework.expanded;
     };
 
@@ -842,14 +846,18 @@ function DiaryController($scope, template, model, route, $location) {
 
         // subjects and audiences needed to fill in
         // homeworks and lessons props
-        model.subjects.syncSubjects(function () {
-            model.audiences.syncAudiences(function () {
-                decrementCountdown(bShowTemplates, cb);
+        model.childs.syncChildren(function() {
+            $scope.child = model.child;
+            $scope.children = model.childs;
+            model.subjects.syncSubjects(function () {
+                model.audiences.syncAudiences(function () {
+                    decrementCountdown(bShowTemplates, cb);
 
-                // call lessons/homework sync after audiences sync since
-                // lesson and homework objects needs audience data to be built
-                model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
-                model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
+                    // call lessons/homework sync after audiences sync since
+                    // lesson and homework objects needs audience data to be built
+                    model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
+                    model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
+                }, validationError);
             }, validationError);
         }, validationError);
     };
@@ -879,6 +887,11 @@ function DiaryController($scope, template, model, route, $location) {
         template.open('daily-event-item', 'daily-event-item');
         $scope.showCal = !$scope.showCal;
         $scope.$apply();
+    };
+
+    $scope.refreshCalendarCurrentWeek = function(){
+        console.log($scope.child);
+        refreshCalendar(moment(model.calendar.firstDay));
     };
 
     $scope.nextWeek = function () {

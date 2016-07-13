@@ -19,6 +19,8 @@ public interface HomeworkService {
 
     void getAllHomeworksForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
+    void getAllHomeworksForParent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+
     void retrieveHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
 
     //TODO can create teacher if not exists + chains handler

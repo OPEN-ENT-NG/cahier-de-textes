@@ -79,6 +79,15 @@ model.isUserTeacher = function () {
 };
 
 
+/**
+ * Says whether or not current user is a teacher
+ * @returns {*|boolean}
+ */
+model.isUserParent = function () {
+    return model.me.type == "PERSRELELEVE";
+};
+
+
 
 Homework.prototype.update = function(cb, cbe) {
     var url = '/diary/homework/' + this.id;
@@ -281,6 +290,24 @@ function Subject() { }
 function Audience() { }
 function HomeworkType(){}
 function PedagogicItem() { }
+function Child() {
+    /**
+     * @type String
+     */
+    this.id;
+    /**
+     * @type String
+     */
+    this.displayName;
+    /**
+     * @type String
+     */
+    this.classId;
+    /**
+     * @type String
+     */
+    this.className;
+}
 
 PedagogicItem.prototype.descriptionMaxSize = 140;
 
@@ -962,7 +989,7 @@ SearchForm.prototype.getSearch = function () {
 };
 
 model.build = function () {
-    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem]);
+    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.searchForm = new SearchForm();
@@ -977,7 +1004,15 @@ model.build = function () {
 
             model.lessons.all.splice(0, model.lessons.all.length);
 
-            http().get('/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
+            var urlGetLessons = '/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+
+            if (model.isUserParent() && model.child) {
+                urlGetLessons += model.child.classId;
+            } else {
+                urlGetLessons += '%20';
+            }
+
+            http().get(urlGetLessons).done(function (data) {
                 lessons = lessons.concat(data);
                 that.addRange(
                     _.map(lessons, function (lesson) {
@@ -1069,7 +1104,16 @@ model.build = function () {
 
             model.homeworks.all.splice(0, model.homeworks.all.length);
 
-            http().get('/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end).done(function (data) {
+            var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+
+            if (model.isUserParent() && model.childs && model.childs.all.length > 0) {
+                var child = model.childs.all[0];
+                urlGetHomeworks += child.classId;
+            } else {
+                urlGetHomeworks += '%20';
+            }
+
+            http().get(urlGetHomeworks).done(function (data) {
                 homeworks = homeworks.concat(data);
                 that.addRange(
                     _.map(homeworks, sqlToJsHomework)
@@ -1098,6 +1142,24 @@ model.build = function () {
         syncPedagogicItems: function(cb, cbe){
             var params = model.searchForm.getSearch();
             model.performPedagogicItemSearch(params, cb, cbe);
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }
+    });
+
+    /**
+     *
+     */
+    this.collection(Child, {
+        reset: function() {
+            // n.b: childs not 'children' since collection function adds a 's'
+            model.childs.selectAll();
+            model.childs.removeSelection();
+        },
+        syncChildren: function(cb, cbe){
+            model.listChildren(cb, cbe);
         }, pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
@@ -1367,4 +1429,40 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
             cbe(model.parseError(e));
         }
     });
+};
+
+/**
+ * List children of current authenticated user (if parent)
+ * @param cb Callback function
+ * @param cbe Callback error function
+ */
+model.listChildren = function (cb, cbe) {
+
+    // no children - abort
+    if (!model.me.childrenIds || model.me.childrenIds.length == 0) {
+        if (typeof cb === 'function') {
+            cb();
+        }
+        return;
+    }
+
+    http().get('/diary/children/list')
+        .done(function (data) {
+
+            model.childs.addRange(data);
+
+            if(model.childs.all.length > 0) {
+                model.child = model.childs.all[0];
+            }
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });
+
 };

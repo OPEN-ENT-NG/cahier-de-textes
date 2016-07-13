@@ -5,6 +5,22 @@
     <button ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
         <i18n>diary.homework.create</i18n>
     </button>
+    <h2 ng-if="isUserParent">
+        <div ng-if="children">
+            <div ng-if="children.all.length == 1">
+                [[child.displayName]]
+            </div>
+            <div ng-if="children.all.length > 1">
+                <span><i18n>diary.child</i18n>:</span>
+                <div>
+                    <select class="two cell"
+                            ng-options="child as child.displayName for child in children.all"
+                            ng-model="child"
+                    ng-change="refreshCalendarCurrentWeek()"></select>
+                </div>
+            </div>
+        </div>
+    </h2>
     <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
        tooltip="diary.icon.show.list"></i>
     <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="showCalendar()"

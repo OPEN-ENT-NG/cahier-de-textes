@@ -22,6 +22,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
@@ -47,6 +48,7 @@ public class DiaryController extends BaseController {
     HomeworkService homeworkService;
 
     private static final String view = "diary.view";
+    private static final String list_children = "diary.list.children";
     private static final String list_subjects = "diary.list.subjects";
     private static final String list_audiences = "diary.list.audiences";
     private static final String teacher_create = "diary.teacher.create";
@@ -205,5 +207,23 @@ public class DiaryController extends BaseController {
                 }
             }
         });
+    }
+
+    @Get("/children/list")
+    @ApiDoc("Get all children for current user (if applicable)")
+    @SecuredAction(value = list_children, type = ActionType.AUTHENTICATED)
+    public void listChildren(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(final UserInfos user) {
+                        if (user != null) {
+                            diaryService.listChildren(user.getUserId(), arrayResponseHandler(request));
+                        } else {
+                            badRequest(request, "diary.invalid.login");
+                        }
+                    }
+                }
+        );
     }
 }

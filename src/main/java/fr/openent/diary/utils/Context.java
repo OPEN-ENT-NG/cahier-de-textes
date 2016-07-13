@@ -7,5 +7,6 @@ package fr.openent.diary.utils;
 public enum Context {
     NONE,
     STUDENT,
-    TEACHER
+    TEACHER,
+    PARENT
 }
