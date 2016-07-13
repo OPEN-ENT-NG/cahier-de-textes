@@ -351,7 +351,7 @@ model.deletePedagogicItemReferences = function(itemId) {
 
 function Lesson(data) {
     this.selected = false;
-    this.collection(Attachment);
+    //this.collection(Attachment);
     // initialize homeworks collection (see lib.js)
     if(!this.homeworks) {
         this.collection(Homework);
