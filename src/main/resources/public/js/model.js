@@ -1210,7 +1210,8 @@ model.build = function () {
             endMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_end_time),
             state: data.lesson_state,
             is_periodic: false,
-            homeworks: lessonHomeworks
+            homeworks: lessonHomeworks,
+            locked: (!model.canEdit()) ? true : false
         };
 
         if('group' === lesson.audienceType){
