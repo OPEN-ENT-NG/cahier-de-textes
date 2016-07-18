@@ -307,6 +307,11 @@ function Child() {
      * @type String
      */
     this.className;
+    /**
+     * UI selected
+     * @type {boolean}
+     */
+    this.selected = false;
 }
 
 PedagogicItem.prototype.descriptionMaxSize = 140;
@@ -1106,9 +1111,8 @@ model.build = function () {
 
             var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
 
-            if (model.isUserParent() && model.childs && model.childs.all.length > 0) {
-                var child = model.childs.all[0];
-                urlGetHomeworks += child.classId;
+            if (model.isUserParent() && model.child) {
+                urlGetHomeworks += model.child.classId;
             } else {
                 urlGetHomeworks += '%20';
             }
