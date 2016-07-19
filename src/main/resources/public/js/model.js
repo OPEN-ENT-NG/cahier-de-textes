@@ -1458,6 +1458,7 @@ model.listChildren = function (cb, cbe) {
 
             if(model.childs.all.length > 0) {
                 model.child = model.childs.all[0];
+                model.child.selected = true;
             }
 
             if (typeof cb === 'function') {
