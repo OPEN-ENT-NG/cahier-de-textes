@@ -158,24 +158,7 @@ Homework.prototype.load = function (cb, cbe) {
  * @param cbe Callback on error
  */
 Homework.prototype.deleteHomeworks = function (homeworks, cb, cbe) {
-
-
-    var itemArray = {ids:model.getItemsIds(homeworks)};
-
-    return http().deleteJson("/diary/deleteHomeworks", itemArray).done(function(r){
-
-        homeworks.forEach(function (homework) {
-            homework.deleteModelReferences();
-        });
-
-        if(typeof cb === 'function'){
-            cb();
-        }
-    }).error(function(e){
-        if(typeof cbe === 'function'){
-            cbe(model.parseError(e));
-        }
-    });
+    model.deleteItemList(homeworks, 'homework', cb, cbe);
 };
 
 
@@ -280,7 +263,19 @@ function Attachment(){}
 function Subject() { }
 function Audience() { }
 function HomeworkType(){}
-function PedagogicItem() { }
+function PedagogicItem() {}
+function PedagogicDay() {
+    this.expanded = false;
+    this.dayName = moment().format("dddd DD MMMM YYYY");
+    this.pedagogicItemsOfTheDay = [];
+    this.nbLessons = 0;
+    this.nbHomeworks = 0;
+}
+
+
+PedagogicItem.prototype.deleteModelReferences = function () {
+    model.deletePedagogicItemReferences(this.id);
+};
 
 PedagogicItem.prototype.descriptionMaxSize = 140;
 
@@ -321,14 +316,41 @@ PedagogicItem.prototype.delete = function(cb, cbe) {
 
 PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
 
-    var url = (this.type_item == "lesson") ? '/diary/deleteLessons' : '/diary/deleteHomeworks';
+    // split into two arrays of pedagogicItem, one for the lessons, one for the homeworks
+    var itemsByType = _.partition(items, function(item) {
+        return item.type_item === 'lesson';
+    });
+
+    var countdown = 0;
+
+    if (itemsByType.length > 0 ) {
+        countdown = itemsByType.length;
+
+        itemsByType.forEach(function (arrayForTypeItem) {
+            if (arrayForTypeItem.length > 0) {
+                model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function() {countdown--;}, cbe);
+            } else {
+                countdown--;
+            }
+        });
+    }
+
+    if (countdown == 0) {
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }
+};
+
+model.deleteItemList = function (items, itemType, cb, cbe) {
+    var url = (itemType == "lesson") ? '/diary/deleteLessons' : '/diary/deleteHomeworks';
 
     var itemArray = {ids:model.getItemsIds(items)};
 
     return http().deleteJson(url, itemArray).done(function (b) {
 
         items.forEach(function (item) {
-            model.deletePedagogicItemReferences(item.id);
+            item.deleteModelReferences();
         });
 
         if (typeof cb === 'function') {
@@ -339,10 +361,10 @@ PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
             cbe(model.parseError(e));
         }
     });
-};
+}
 
 model.deletePedagogicItemReferences = function(itemId) {
-    model.pedagogicItems.forEach(function (day) {
+    model.pedagogicDays.forEach(function (day) {
         day.pedagogicItemsOfTheDay = _.reject(day.pedagogicItemsOfTheDay, function (item) {
                 return !item || item.lesson_id == itemId || item.id == itemId;
             });
@@ -615,24 +637,8 @@ Lesson.prototype.delete = function (cb, cbe) {
  * @param cb Callback
  * @param cbe Callback on error
  */
-Lesson.prototype.deleteLessons = function (lessons, cb, cbe) {
-    
-    var itemArray = {ids:model.getItemsIds(lessons)};
-
-    return http().deleteJson("/diary/deleteLessons", itemArray).done(function(r){
-
-        lessons.forEach(function (lesson) {
-            lesson.deleteModelReferences();
-        });
-
-        if(typeof cb === 'function'){
-            cb();
-        }
-    }).error(function(e){
-        if(typeof cbe === 'function'){
-            cbe(model.parseError(e));
-        }
-    });
+Lesson.prototype.deleteList = function (lessons, cb, cbe) {
+    model.deleteItemList(lessons, 'lesson', cb, cbe);
 };
 
 /**
@@ -1090,10 +1096,10 @@ model.build = function () {
         }
     });
 
-    this.collection(PedagogicItem, {
+    this.collection(PedagogicDay, {
         reset: function() {
-            model.pedagogicItems.selectAll();
-            model.pedagogicItems.removeSelection();
+            model.pedagogicDays.selectAll();
+            model.pedagogicDays.removeSelection();
         },
         syncPedagogicItems: function(cb, cbe){
             var params = model.searchForm.getSearch();
@@ -1330,7 +1336,7 @@ model.initLesson = function (timeFromCalendar) {
 };
 
 model.performPedagogicItemSearch = function (params, cb, cbe) {
-    model.pedagogicItems.reset();
+    model.pedagogicDays.reset();
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
@@ -1344,7 +1350,7 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
 
         for (var day in days) {
             if (days.hasOwnProperty(day)) {
-                var pedagogicDay = {};
+                var pedagogicDay = new PedagogicDay();
                 pedagogicDay.expanded = dayExpanded;
                 pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
                 pedagogicDay.pedagogicItemsOfTheDay = days[day];
@@ -1358,7 +1364,7 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
             }
         }
 
-        model.pedagogicItems.pushAll(pedagogicDays);
+        model.pedagogicDays.pushAll(pedagogicDays);
 
         if (typeof cb === 'function') {
             cb();

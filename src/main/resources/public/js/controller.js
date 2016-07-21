@@ -61,9 +61,21 @@ function DiaryController($scope, template, model, route, $location) {
      * @type {boolean}
      */
     $scope.showCalGrid = true;
-    $scope.newLesson = new Lesson();
     // for static access to some global function
+    $scope.newLesson = new Lesson();
     $scope.newHomework = new Homework();
+    $scope.newPedagogicItem = new PedagogicItem();
+
+    $scope.getStaticItem = function(itemType) {
+        if ($scope.display.showList == true) {
+            $scope.newPedagogicItem.type_item = itemType;
+            return $scope.newPedagogicItem;
+        } else if (itemType === "lesson") {
+            return $scope.newLesson;
+        } else {
+            return $scope.newHomework;
+        }
+    };
 
     $scope.confirmPanel = {
         item: undefined
@@ -90,7 +102,7 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.subjects = model.subjects;
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
-    $scope.pedagogicItems = model.pedagogicItems;
+    $scope.pedagogicDays = model.pedagogicDays;
 
     // Says whether or not current user can edit homework & lesson
     $scope.isLessonHomeworkEditable = model.canEdit();
@@ -186,7 +198,7 @@ function DiaryController($scope, template, model, route, $location) {
         } else {
             model.searchForm.initForStudent();
         }
-        model.pedagogicItems.syncPedagogicItems($scope.openListView, validationError);
+        model.pedagogicDays.syncPedagogicItems($scope.openListView, validationError);
     };
 
     $scope.openListView = function () {
@@ -345,18 +357,14 @@ function DiaryController($scope, template, model, route, $location) {
 
         // remove pending delete homeworks
         // ever embedded in selected pending delete lessons
-        var homeworksToDelete = selectedHomeworks.filter(function (homework) {
+        var lessonIds = model.getItemsIds(selectedLessons);
+        var homeworksToDelete = selectHomeworksToBeDeleted(selectedHomeworks, lessonIds);
 
-            var homeworkInSelectedLesson = false;
-
-            selectedLessons.forEach(function(lesson){
-                if(!homeworkInSelectedLesson && lesson.hasHomeworkWithId(homework.id)){
-                    homeworkInSelectedLesson = true;
-                }
+        var selectHomeworksToBeDeleted = function (selectedHomeworks, selectedLessonsId) {
+            return selectedHomeworks.filter(function (homework) {
+                return homework.lesson_id == null || !_.contains(selectedLessonsId, homework.lesson_id);
             });
-
-            return !homeworkInSelectedLesson;
-        });
+        };
 
         var postDelete = function(){
             notify.info('item.deleted');
@@ -364,7 +372,7 @@ function DiaryController($scope, template, model, route, $location) {
         };
 
         var deleteHomeworks = function(){
-            $scope.newHomework.deleteHomeworks(homeworksToDelete,
+            $scope.getStaticItem('homework').deleteList(homeworksToDelete,
                 function () {
                     postDelete();
                 },
@@ -376,7 +384,7 @@ function DiaryController($scope, template, model, route, $location) {
         // note: associated homeworks are automatically deleted
         // sql delete cascade
         if (selectedLessons.length > 0) {
-            $scope.newLesson.deleteLessons(selectedLessons,
+            $scope.getStaticItem('lesson').deleteList(selectedLessons,
                 function () {
                     if (homeworksToDelete.length > 0) {
                         deleteHomeworks();
@@ -622,7 +630,7 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.isOneHomeworkOrLessonStriclySelected = function () {
         // simple js implementation of XOR as no native operator exists (like ^ in other languages)
-        return (getSelectedPedagogicItems('lesson').length() == 1) != (getSelectedPedagogicItems('homework').length() == 1);
+        return (getSelectedPedagogicItems('lesson').length == 1) != (getSelectedPedagogicItems('homework').length == 1);
     };
 
 
@@ -950,8 +958,8 @@ function DiaryController($scope, template, model, route, $location) {
     var getSelectedPedagogicItems = function(itemType){
         if ($scope.display.showList == true) {
             var selectedItems = new Array();
-            model.pedagogicItems.forEach(function (day) {
-                selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
+            model.pedagogicDays.forEach(function (day) {
+                selectedItems = selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
                         return item && item.type_item === itemType && item.selected;
                     })
                 );
