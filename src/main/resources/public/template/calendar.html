@@ -5,6 +5,21 @@
     <button ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
         <i18n>diary.homework.create</i18n>
     </button>
+    <h2 ng-if="isUserParent">
+        <div ng-if="children">
+            <div ng-if="children.all.length == 1">
+                [[child.displayName]]
+            </div>
+            <div class="row" ng-if="children.all.length > 1">
+                <span class="two childFilter"
+                      ng-repeat="childd in children.all"
+                      ng-click="showCalendarForChild(childd)"
+                      ng-class="{ selected: childd.selected }">
+                    [[childd.displayName]]
+                </span>
+            </div>
+        </div>
+    </h2>
     <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
        tooltip="diary.icon.show.list"></i>
     <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="showCalendar()"
@@ -36,35 +51,41 @@
     ></calendar-daily-events>
     <div class="row" ng-if="! showCal">
         <calendar
-                ng-if="isUserTeacher"
+				ng-if="isUserTeacher"
                 id="calendar"
                 class="twelve cell"
                 display-template="display-calendar-item"
                 create-template="create-lesson"
                 on-create-open="redirect('/createLessonView/timeFromCalendar')"
                 items="lessons.all"></calendar>
-        <calendar
-                ng-if="!isUserTeacher"
+		<calendar
+				ng-if="!isUserTeacher"
                 id="calendar"
                 class="twelve cell"
                 display-template="display-calendar-item"
-                items="lessons.all"></calendar>
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"
+				readonly="true"></calendar>
     </div>
     <div class="row" ng-if="showCal">
         <calendar
-                ng-if="isUserTeacher"
+				ng-if="isUserTeacher"
                 id="calendar"
                 class="twelve cell"
                 display-template="display-calendar-item"
                 create-template="create-lesson"
                 on-create-open="redirect('/createLessonView/timeFromCalendar')"
                 items="lessons.all"></calendar>
-        <calendar
-                ng-if="!isUserTeacher"
+		<calendar
+				ng-if="!isUserTeacher"
                 id="calendar"
                 class="twelve cell"
                 display-template="display-calendar-item"
-                items="lessons.all"></calendar>
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"
+				readonly="true"></calendar>
     </div>
 </div>
 

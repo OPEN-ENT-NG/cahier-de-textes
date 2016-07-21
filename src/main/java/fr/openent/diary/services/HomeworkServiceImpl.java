@@ -107,7 +107,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(endDate.trim());
         }
 
-        if (ctx == Context.STUDENT) {
+        if (ctx == Context.STUDENT || ctx == Context.PARENT) {
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 
@@ -126,6 +126,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getAllHomeworksForTeacher(List<String> schoolIds, String teacherId, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
 
         getHomeworks(Context.TEACHER, schoolIds, null, teacherId, startDate, endDate, null, handler);
+    }
+
+    @Override
+    public void getAllHomeworksForParent(List<String> schoolIds, List<String> groupIds, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
+
+        getHomeworks(Context.PARENT, schoolIds, groupIds, null, startDate, endDate, null, handler);
     }
 
     @Override

@@ -86,13 +86,14 @@ public class LessonController extends SharedResourceController {
     }
 
 
-    @Get("/lesson/:etabIds/:startDate/:endDate")
+    @Get("/lesson/:etabIds/:startDate/:endDate/:classId")
     @ApiDoc("Get all lessons for etab")
     @SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
     public void listLessons(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
+        final String classId = request.params().get("classId");
 
         log.debug("listLessons on schools : " + schoolIds);
 
@@ -101,11 +102,23 @@ public class LessonController extends SharedResourceController {
             public void handle(UserInfos user) {
 
                 if(user != null){
-                    if("Teacher".equals(user.getType())){
-                        lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
-                    } else { //if student
-                        lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
-                } //TODO manage more type of users?
+                    // see UserInfoAdapterV1_0Json.java from entcore for user types
+                    switch (user.getType()) {
+                        case "Teacher":
+                            lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        case "Student":
+                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        case "Relative":
+                            List<String> childClasses = new ArrayList<>();
+                            childClasses.add(classId);
+                            lessonService.getAllLessonsForParent(Arrays.asList(schoolIds), childClasses, startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        default:
+                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            break;
+                    }
 
                 } else {
                     unauthorized(request,"No user found in session.");

@@ -328,3 +328,27 @@ section .homeworkInfos {
     border: 1px solid;
     padding: 6px;
 }
+
+
+.childFilter {
+    color: #a5b6bb;
+    border-color: grey;
+    box-shadow: 1px 2px 3px 1px;
+    padding: 10px;
+    margin: 10px;
+    margin-right: 12px;
+}
+
+.childFilter.selected {
+    background-color: #4bafd5;
+    cursor: pointer;
+    color: white;
+    box-shadow: 1px 2px 3px 1px;
+}
+
+.childFilter:hover {
+    background-color: #4bafd5;
+    cursor: pointer;
+    color: white;
+    box-shadow: 1px 2px 3px 1px;
+}

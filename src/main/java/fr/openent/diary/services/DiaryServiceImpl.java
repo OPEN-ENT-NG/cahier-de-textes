@@ -6,6 +6,7 @@ import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -253,5 +254,26 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         }
 
         sql.prepared(queryFull.toString(), parameters, SqlResult.validResultHandler(handler));
+    }
+
+    /**
+     * List children info about parent id
+     * @param parentId
+     * @param handler
+     */
+    public void listChildren(final String parentId, final Handler<Either<String, JsonArray>> handler) {
+
+
+        StringBuilder sb = new StringBuilder("");
+        sb.append(" MATCH (n:User {id : {id}}) ");
+        sb.append(" WHERE HAS(n.login) ");
+        sb.append(" MATCH n<-[:RELATED]-(child:User) ");
+        sb.append(" MATCH child-[:IN]->(gp:Group) ");
+        sb.append(" MATCH gp-[:DEPENDS]->(c:Class) ");
+        sb.append(" RETURN distinct  child.id as id, child.displayName as displayName, c.id as classId, c.name as className ");
+
+        JsonObject params = new JsonObject().putString("id", parentId);
+        neo.execute(sb.toString(), params, Neo4jResult.validResultHandler(handler));
+
     }
 }

@@ -11,7 +11,7 @@ public enum CriteriaSearchType {
 
     START_DATE("startDate"),
     END_DATE("endDate"),
-    AUDIENCE("audience"),
+    AUDIENCE("audienceId"),
     SUBJECT("subject"),
     PUBLISH_STATE("publishState"),
     SEARCH_TYPE("returnType"), // 'homework' or 'lesson' or 'both'
