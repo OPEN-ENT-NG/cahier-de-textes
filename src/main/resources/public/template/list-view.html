@@ -1,3 +1,18 @@
+<h2 ng-if="isUserParent">
+    <div ng-if="children">
+        <div ng-if="children.all.length == 1">
+            [[child.displayName]]
+        </div>
+        <div class="row" ng-if="children.all.length > 1">
+                <span class="two childFilter"
+                      ng-repeat="childd in children.all"
+                      ng-click="setChildFilter(childd)"
+                      ng-class="{ selected: childd.selected }">
+                    [[childd.displayName]]
+                </span>
+        </div>
+    </div>
+</h2>
 <div class="row">
     <button ng-click="redirect('/createLessonView/default')" ng-if="isUserTeacher">
         <i18n>diary.lesson.create</i18n>
@@ -25,6 +40,7 @@
         <label style="vertical-align:center"> au </label>
         <date-picker ng-model="searchForm.endDate" style="width: 80px"></date-picker>
     </p>
+    <input type="hidden" ng-model="searchForm.audienceId"/>
     <i class="searchengine-large" style="font-size: 30px; position: absolute; padding-top: 10px; padding-left: 30px; color: #FF8500;" ng-click="performPedagogicItemSearch()"></i>
 </div>
 

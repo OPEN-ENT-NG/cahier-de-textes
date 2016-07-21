@@ -1012,8 +1012,7 @@ function DiaryController($scope, template, model, route, $location) {
         }
     };
 
-    $scope.showCalendarForChild = function (child) {
-
+    $scope.setChildFilter = function(child, cb){
         $scope.children.forEach(function(theChild){
             theChild.selected = (theChild.id === child.id);
         });
@@ -1021,7 +1020,14 @@ function DiaryController($scope, template, model, route, $location) {
         child.selected = true;
         $scope.child = child;
         model.child = child;
-        refreshCalendarCurrentWeek();
+
+        if(typeof cb === 'function'){
+            cb();
+        }
+    };
+
+    $scope.showCalendarForChild = function (child) {
+        $scope.setChildFilter(child, refreshCalendarCurrentWeek);
     };
 
     /**

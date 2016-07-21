@@ -990,6 +990,12 @@ SearchForm.prototype.getSearch = function () {
     params.endDate = this.endDate;
     params.publishState = this.publishState;
     params.returnType = this.returnType;
+
+    if (model.isUserParent()) {
+        params.audienceId = model.child.classId;
+    }
+
+
     return params;
 };
 

@@ -14,7 +14,7 @@
     "state": {
       "type": "string"
     },
-    "audience": {
+    "audienceId": {
       "type": "string"
     },
     "subjectId": {
