@@ -131,7 +131,9 @@ public class HomeworkController extends SharedResourceController {
                             homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Relative":
-                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            List<String> childClasses = new ArrayList<>();
+                            childClasses.add(classId);
+                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), childClasses, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
                             homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));

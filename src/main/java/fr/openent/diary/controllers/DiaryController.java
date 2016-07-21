@@ -180,13 +180,24 @@ public class DiaryController extends BaseController {
                                         if (user != null) {
 
                                             List<String> groups = null;
-                                            if("Teacher".equals(user.getType())){
-                                                SearchCriterion teacherId = new SearchCriterion();
-                                                teacherId.setValue(user.getUserId());
-                                                teacherId.setType(CriteriaSearchType.TEACHER);
-                                                criteria.add(teacherId);
-                                            } else {
-                                                groups = user.getClasses();
+
+                                            // see UserInfoAdapterV1_0Json.java from entcore for user types
+                                            switch (user.getType()) {
+                                                case "Teacher":
+                                                    SearchCriterion teacherId = new SearchCriterion();
+                                                    teacherId.setValue(user.getUserId());
+                                                    teacherId.setType(CriteriaSearchType.TEACHER);
+                                                    criteria.add(teacherId);
+                                                    break;
+                                                case "Student":
+                                                    groups = user.getClasses();
+                                                    break;
+                                                // audience/group from selected child of parent
+                                                case "Relative":
+                                                    break;
+                                                default:
+                                                    groups = user.getClasses();
+                                                    break;
                                             }
 
                                             diaryService.listPedagogicItems(criteria, groups, arrayResponseHandler(request));

@@ -10,14 +10,13 @@
             <div ng-if="children.all.length == 1">
                 [[child.displayName]]
             </div>
-            <div ng-if="children.all.length > 1">
-                <span><i18n>diary.child</i18n>:</span>
-                <div>
-                    <select class="two cell"
-                            ng-options="child as child.displayName for child in children.all"
-                            ng-model="child"
-                    ng-change="refreshCalendarCurrentWeek()"></select>
-                </div>
+            <div class="row" ng-if="children.all.length > 1">
+                <span class="two childFilter"
+                      ng-repeat="childd in children.all"
+                      ng-click="showCalendarForChild(childd)"
+                      ng-class="{ selected: childd.selected }">
+                    [[childd.displayName]]
+                </span>
             </div>
         </div>
     </h2>

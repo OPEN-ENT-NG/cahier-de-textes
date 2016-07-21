@@ -307,6 +307,11 @@ function Child() {
      * @type String
      */
     this.className;
+    /**
+     * UI selected
+     * @type {boolean}
+     */
+    this.selected = false;
 }
 
 PedagogicItem.prototype.descriptionMaxSize = 140;
@@ -985,6 +990,12 @@ SearchForm.prototype.getSearch = function () {
     params.endDate = this.endDate;
     params.publishState = this.publishState;
     params.returnType = this.returnType;
+
+    if (model.isUserParent()) {
+        params.audienceId = model.child.classId;
+    }
+
+
     return params;
 };
 
@@ -1106,9 +1117,8 @@ model.build = function () {
 
             var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
 
-            if (model.isUserParent() && model.childs && model.childs.all.length > 0) {
-                var child = model.childs.all[0];
-                urlGetHomeworks += child.classId;
+            if (model.isUserParent() && model.child) {
+                urlGetHomeworks += model.child.classId;
             } else {
                 urlGetHomeworks += '%20';
             }
@@ -1454,6 +1464,7 @@ model.listChildren = function (cb, cbe) {
 
             if(model.childs.all.length > 0) {
                 model.child = model.childs.all[0];
+                model.child.selected = true;
             }
 
             if (typeof cb === 'function') {

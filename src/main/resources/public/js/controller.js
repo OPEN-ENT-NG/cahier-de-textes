@@ -889,8 +889,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.$apply();
     };
 
-    $scope.refreshCalendarCurrentWeek = function(){
-        console.log($scope.child);
+    refreshCalendarCurrentWeek = function(){
         refreshCalendar(moment(model.calendar.firstDay));
     };
 
@@ -1011,6 +1010,24 @@ function DiaryController($scope, template, model, route, $location) {
             $scope.currentErrors.push(e);
             $scope.$apply();
         }
+    };
+
+    $scope.setChildFilter = function(child, cb){
+        $scope.children.forEach(function(theChild){
+            theChild.selected = (theChild.id === child.id);
+        });
+
+        child.selected = true;
+        $scope.child = child;
+        model.child = child;
+
+        if(typeof cb === 'function'){
+            cb();
+        }
+    };
+
+    $scope.showCalendarForChild = function (child) {
+        $scope.setChildFilter(child, refreshCalendarCurrentWeek);
     };
 
     /**
