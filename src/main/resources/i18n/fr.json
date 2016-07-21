@@ -11,6 +11,7 @@
   "diary.manager": "Gestion",
   "diary.contrib": "Contribution",
   "diary.read": "Lecture",
+  "diary.publish": "Publication",
   "unsetImage": "Supprimer l'image",
   "group.Teacher": "Tous les enseignants du groupe {0}.",
   "group.Personnel": "Tous les personnels du groupe {0}.",

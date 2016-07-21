@@ -1043,7 +1043,7 @@ model.build = function () {
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
-        }
+        }, behaviours: 'diary'
     });
 
     this.collection(Subject, {
@@ -1141,7 +1141,7 @@ model.build = function () {
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
-        }
+        }, behaviours: 'diary'
     });
 
     this.collection(PedagogicItem, {
@@ -1198,6 +1198,8 @@ model.build = function () {
         }
 
         var lesson =  {
+            //for share directive you must have _id
+            _id:  data.lesson_id,
             id: data.lesson_id,
             title: data.lesson_title,
             audience: model.audiences.findWhere({id: data.audience_id}),
@@ -1242,6 +1244,8 @@ model.build = function () {
      */
     sqlToJsHomework = function(sqlHomework){
         var homework =   {
+            //for share directive you must have _id
+            _id:  sqlHomework.id,
             id: sqlHomework.id,
             description: sqlHomework.homework_description,
             audienceId: sqlHomework.audience_id,

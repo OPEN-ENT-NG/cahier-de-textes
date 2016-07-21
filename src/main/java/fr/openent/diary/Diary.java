@@ -33,11 +33,12 @@ public class Diary extends BaseServer {
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
 
-        LessonController lessonController = new LessonController(lessonService, diaryService, audienceService);
         SqlConf confLesson = SqlConfs.createConf(LessonController.class.getName());
         confLesson.setTable(LESSON_TABLE);
         confLesson.setShareTable(LESSON_SHARE_TABLE);
         confLesson.setSchema(DATABASE_SCHEMA);
+        LessonController lessonController = new LessonController(lessonService, diaryService, audienceService);
+
         SqlCrudService lessonSqlCrudService = new SqlCrudService(DATABASE_SCHEMA, LESSON_TABLE, LESSON_SHARE_TABLE,
                 new JsonArray().addString("*"), new JsonArray().add("*"), true);
         lessonController.setCrudService(lessonSqlCrudService);
@@ -46,11 +47,12 @@ public class Diary extends BaseServer {
 
         addController(lessonController);
 
-        HomeworkController homeworkController = new HomeworkController(homeworkService, lessonService, audienceService);
         SqlConf confHomework = SqlConfs.createConf(HomeworkController.class.getName());
         confHomework.setTable(HOMEWORK_TABLE);
         confHomework.setShareTable(HOMEWORK_SHARE_TABLE);
         confHomework.setSchema(DATABASE_SCHEMA);
+        HomeworkController homeworkController = new HomeworkController(homeworkService, lessonService, audienceService);
+
         SqlCrudService homeworkSqlCrudService = new SqlCrudService(DATABASE_SCHEMA, HOMEWORK_TABLE, HOMEWORK_SHARE_TABLE,
                 new JsonArray().addString("*"), new JsonArray().add("*"), true);
         homeworkController.setCrudService(homeworkSqlCrudService);

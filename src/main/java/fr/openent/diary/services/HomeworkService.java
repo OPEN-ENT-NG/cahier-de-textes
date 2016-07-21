@@ -2,6 +2,7 @@ package fr.openent.diary.services;
 
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.webutils.Either;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -13,13 +14,13 @@ import java.util.List;
  */
 public interface HomeworkService {
 
-    void getAllHomeworksForALesson(final String lessonId, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForALesson(final String lessonId, final UserInfos userInfos, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForTeacher(final List<String> schoolIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForStudent(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForParent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForParent(final List<String> schoolIds, final List<String> childClasses, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
     void retrieveHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
 

@@ -3,6 +3,7 @@ package fr.openent.diary.services;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.CrudService;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -14,11 +15,11 @@ import java.util.List;
  */
 public interface LessonService extends CrudService {
 
-    void getAllLessonsForTeacher(final List<String> schoolIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
     void retrieveLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 
