@@ -70,4 +70,8 @@ public class Audience {
     public AudienceType getAudienceType() {
         return audienceType;
     }
+
+    public Boolean isGroup() {
+        return AudienceType.GROUP.equals(audienceType);
+    }
 }

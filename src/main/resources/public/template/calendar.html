@@ -1,8 +1,8 @@
 <div class="row">
-    <button ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
+    <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
         <i18n>diary.lesson.create</i18n>
     </button>
-    <button ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
+    <button workflow="diary.createFreeHomework" ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
         <i18n>diary.homework.create</i18n>
     </button>
     <h2 ng-if="isUserParent">
@@ -99,8 +99,10 @@
             <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
                 <i18n>edit</i18n>
             </button>
-            <!-- not implemented yet so always disabled -->
-            <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
+            <button ng-click="openShareLessonPanel()" ng-show="homeworks.selection().length === 0" >
+                <i18n>share</i18n>
+            </button>
+            <button ng-click="openShareHomeworkPanel()" ng-show="lessons.selection().length === 0" >
                 <i18n>share</i18n>
             </button>
             <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->

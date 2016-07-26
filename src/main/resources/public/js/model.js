@@ -1025,12 +1025,15 @@ model.build = function () {
     this.searchForm = new SearchForm();
 
     this.collection(Lesson, {
+        loading: false,
         syncLessons: function (cb, cbe) {
+            var that = this;
+            if (that.loading)
+                return;
 
             var lessons = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
-            var that = this;
 
             model.lessons.all.splice(0, model.lessons.all.length);
 
@@ -1042,6 +1045,7 @@ model.build = function () {
                 urlGetLessons += '%20';
             }
 
+            that.loading = true;
             http().get(urlGetLessons).done(function (data) {
                 lessons = lessons.concat(data);
                 that.addRange(
@@ -1053,41 +1057,55 @@ model.build = function () {
                 if(typeof cb === 'function'){
                     cb();
                 }
+                that.loading = false;
             }).error(function (e) {
                 if (typeof cbe === 'function') {
                     cbe(model.parseError(e));
                 }
+                that.loading = false;
             });
         }, pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
-        }
+        }, behaviours: 'diary'
     });
 
     this.collection(Subject, {
+        loading: false,
         syncSubjects: function (cb, cbe) {
             this.all = [];
             var that = this;
+            if (that.loading)
+                return;
+
+            that.loading = true;
             http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
                 model.subjects.addRange(data);
                 if(typeof cb === 'function'){
                     cb();
                 }
+                that.loading = false;
             }.bind(that))
             .error(function (e) {
                 if (typeof cbe === 'function') {
                     cbe(model.parseError(e));
                 }
+                that.loading = false;
             });
         }
     });
 
     this.collection(Audience, {
+        loading: false,
         syncAudiences: function (cb, cbe) {
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
+            if (that.loading)
+                return;
+
+            that.loading = true;
             model.me.structures.forEach(function (structureId) {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {
                     structureData.classes = _.map(structureData.classes, function (audience) {
@@ -1106,11 +1124,14 @@ model.build = function () {
                             cb();
                         }
                     }
+
+                    that.loading = false;
                 }.bind(that))
                 .error(function (e) {
                     if (typeof cbe === 'function') {
                         cbe(model.parseError(e));
                     }
+                    that.loading = false;
                 });
             });
         }
@@ -1125,12 +1146,16 @@ model.build = function () {
     });
 
     this.collection(Homework, {
+        loading: false,
         syncHomeworks: function(cb, cbe){
 
             var homeworks = [];
             var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
             var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
             var that = this;
+
+            if (that.loading)
+                return;
 
             model.homeworks.all.splice(0, model.homeworks.all.length);
 
@@ -1142,6 +1167,7 @@ model.build = function () {
                 urlGetHomeworks += '%20';
             }
 
+            that.loading = true;
             http().get(urlGetHomeworks).done(function (data) {
                 homeworks = homeworks.concat(data);
                 that.addRange(
@@ -1150,17 +1176,19 @@ model.build = function () {
                 if(typeof cb === 'function'){
                     cb();
                 }
+                that.loading = false;
             }).error(function (e) {
                 if (typeof cbe === 'function') {
                     cbe(model.parseError(e));
                 }
+                that.loading = false;
             });
 
         }, pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
-        }
+        }, behaviours: 'diary'
     });
 
     this.collection(PedagogicDay, {
@@ -1217,6 +1245,8 @@ model.build = function () {
         }
 
         var lesson =  {
+            //for share directive you must have _id
+            _id:  data.lesson_id,
             id: data.lesson_id,
             title: data.lesson_title,
             audience: model.audiences.findWhere({id: data.audience_id}),
@@ -1261,6 +1291,8 @@ model.build = function () {
      */
     sqlToJsHomework = function(sqlHomework){
         var homework =   {
+            //for share directive you must have _id
+            _id:  sqlHomework.id,
             id: sqlHomework.id,
             description: sqlHomework.homework_description,
             audienceId: sqlHomework.audience_id,

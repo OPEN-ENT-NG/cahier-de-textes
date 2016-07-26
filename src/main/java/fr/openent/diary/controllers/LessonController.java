@@ -1,18 +1,19 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.LessonAccessFilter;
-import fr.openent.diary.services.AudienceService;
-import fr.openent.diary.services.DiaryService;
-import fr.openent.diary.services.LessonService;
+import fr.openent.diary.services.*;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
+import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
@@ -28,16 +29,17 @@ import static org.entcore.common.http.response.DefaultResponseHandler.*;
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class LessonController extends SharedResourceController {
+public class LessonController extends ControllerHelper {
 
-    LessonService lessonService;
-    DiaryService diaryService;
+    private LessonService lessonService;
+    private DiaryService diaryService;
     /**
      * Might be used to auto-create audiences on lesson create/update
      */
-    AudienceService audienceService;
+    private AudienceService audienceService;
+    private SharedService sharedService;
 
-    List<String> actionsForAutomaticSharing;
+    private List<String> actionsForAutomaticSharing;
 
     //Permissions
     private static final String view_resource = "diary.read";
@@ -54,11 +56,10 @@ public class LessonController extends SharedResourceController {
         this.lessonService = lessonService;
         this.diaryService = diaryService;
         this.audienceService = audienceSercice;
+        this.sharedService = new SharedServiceImpl(LessonController.class.getName());
 
         //init automatic sharing actionsForAutomaticSharing
-        actionsForAutomaticSharing = new ArrayList<String>();
-        actionsForAutomaticSharing.add(sharing_action_read);
-        actionsForAutomaticSharing.add(sharing_action_list);
+        actionsForAutomaticSharing = new ArrayList<String>(Arrays.asList(sharing_action_read, sharing_action_list));
     }
 
     @Get("/lesson/:id")
@@ -105,18 +106,18 @@ public class LessonController extends SharedResourceController {
                     // see UserInfoAdapterV1_0Json.java from entcore for user types
                     switch (user.getType()) {
                         case "Teacher":
-                            lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Student":
-                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Relative":
                             List<String> childClasses = new ArrayList<>();
                             childClasses.add(classId);
-                            lessonService.getAllLessonsForParent(Arrays.asList(schoolIds), childClasses, startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForParent(Arrays.asList(schoolIds), childClasses, user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
-                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                     }
 
@@ -129,7 +130,7 @@ public class LessonController extends SharedResourceController {
 
     @Post("/lesson")
     @ApiDoc("Create a lesson")
-    @SecuredAction(manage_resource)
+    @SecuredAction("diary.createLesson")
     public void createLesson(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -140,42 +141,38 @@ public class LessonController extends SharedResourceController {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
-                                // TODO uncomment when operational
-                                /*
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), new Audience(json), new Handler<Either<String, JsonObject>>() {
+                                final Audience audience = new Audience(json);
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
                                     @Override
                                     public void handle(Either<String, JsonObject> event) {
-
                                         if (event.isRight()) {
-                                            notEmptyResponseHandler(request, 201);
-                                            request.response().setStatusCode(201).end();
-                                            // disabled until working
-
+                                            final JsonObject result = event.right().getValue();
                                             //create automatic sharing
-                                            String resourceId = String.valueOf(event.right().getValue().getLong("id"));
+                                            final String resourceId = String.valueOf(result.getLong("id"));
 
-                                            // Groups and users
-                                            final List<String> groupsAndUserIds = new ArrayList<>();
-                                            //875-1464101573455 TPS teachers
-                                            groupsAndUserIds.add("875-1464101573455");
-//                                            if (user.getGroupsIds() != null) {
-//                                                groupsAndUserIds.addAll(user.getGroupsIds());
-//                                            }
-
-                                            if(groupsAndUserIds != null && groupsAndUserIds.size() != 0) {
-                                                LessonController.this.shareResource(user.getUserId(), groupsAndUserIds, resourceId, getActionsForAutomaticSharing() , notEmptyResponseHandler(request, 201));
+                                            if(!StringUtils.isEmpty(audience.getId())) {
+                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                        actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    Renders.renderJson(request, result);
+                                                                } else {
+                                                                    Renders.renderError(request);
+                                                                }
+                                                            }
+                                                        });
                                             } else {
-                                                log.warn("Sharing Lesson has encountered a problem.");
+                                                log.error("Sharing Lesson has encountered a problem.");
                                                 badRequest(request, "Sharing Lesson has encountered a problem.");
                                             }
 
                                         } else {
-                                            log.warn("Lesson could not be created.");
-                                            badRequest(request,"Lesson could not be created.");
+                                            log.error("Lesson could not be created.");
+                                            leftToResponse(request, event.left());
                                         }
                                     }
-                                });*/
+                                });
                             } else {
                                 log.warn("Invalid school identifier.");
                                 badRequest(request,"Invalid school identifier.");
@@ -322,14 +319,54 @@ public class LessonController extends SharedResourceController {
                         RequestUtils.bodyToJson(request, pathPrefix + "updateLesson",  new Handler<JsonObject>() {
                             @Override
                             public void handle(final JsonObject json) {
-                                // auto-create missing audiences if needeed
-                                audienceService.getOrCreateAudience(new Audience(json), new Handler<Either<String, JsonObject>>() {
+                                final Audience newAudience = new Audience(json);
+
+                                //old lesson for audience type and audience id
+                                lessonService.retrieveLesson(lessonId, new Handler<Either<String, JsonObject>>() {
                                     @Override
-                                    public void handle(Either<String, JsonObject> event) {
-                                        if (event.isRight()) {
-                                            lessonService.updateLesson(lessonId, json, notEmptyResponseHandler(request, 201));
+                                    public void handle(Either<String, JsonObject> eOldLesson) {
+                                        if (eOldLesson.isRight()) {
+                                            final Audience oldAudience = new Audience(eOldLesson.right().getValue());
+                                            // auto-create missing audiences if needeed
+                                            audienceService.getOrCreateAudience(newAudience, new Handler<Either<String, JsonObject>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonObject> event) {
+                                                    if (event.isRight()) {
+                                                        lessonService.updateLesson(lessonId, json, new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    final JsonObject result = event.right().getValue();
+
+                                                                    if(!StringUtils.isEmpty(newAudience.getId())) {
+                                                                        sharedService.updateShareResource(oldAudience.getId(), newAudience.getId(), lessonId,
+                                                                                oldAudience.isGroup(), newAudience.isGroup(), actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                                                    @Override
+                                                                                    public void handle(Either<String, JsonObject> event) {
+                                                                                        if (event.isRight()) {
+                                                                                            Renders.renderJson(request, result);
+                                                                                        } else {
+                                                                                            Renders.renderError(request);
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                    } else {
+                                                                        log.error("Sharing Lesson has encountered a problem.");
+                                                                        badRequest(request, "Sharing Lesson has encountered a problem.");
+                                                                    }
+                                                                } else {
+                                                                    log.error("Lesson could not be created.");
+                                                                    leftToResponse(request, event.left());
+                                                                }
+                                                            }
+                                                        });
+                                                    } else {
+                                                        leftToResponse(request, event.left());
+                                                    }
+                                                }
+                                            });
                                         } else {
-                                            leftToResponse(request, event.left());
+                                            leftToResponse(request, eOldLesson.left());
                                         }
                                     }
                                 });
@@ -360,6 +397,7 @@ public class LessonController extends SharedResourceController {
                 @Override
                 public void handle(final UserInfos user) {
                     if (user != null) {
+                        //Drop cascading, nothing to do for automatic share
                         lessonService.deleteLesson(lessonId, notEmptyResponseHandler(request, 201));
                     } else {
                         if (log.isDebugEnabled()) {
@@ -428,9 +466,5 @@ public class LessonController extends SharedResourceController {
      */
     private boolean isValidLessonId(String lessonId) {
         return lessonId != null && lessonId.matches("\\d+");
-    }
-
-    protected List<String> getActionsForAutomaticSharing() {
-        return this.actionsForAutomaticSharing;
     }
 }

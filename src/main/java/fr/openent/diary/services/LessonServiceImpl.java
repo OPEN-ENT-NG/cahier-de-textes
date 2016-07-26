@@ -9,6 +9,7 @@ import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -51,16 +52,19 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      *
      * @param ctx
      * @param schoolIds
-     * @param teacherId
      * @param startDate
      * @param endDate
      * @param handler
      */
-    private void getLessons(final Context ctx, final List<String> schoolIds, final List<String> groupIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+    private void getLessons(final Context ctx, final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
-
-            JsonArray parameters = new JsonArray();
+            final String userId = userInfos.getUserId();
+            final List<String> groupsAndUserIds = new ArrayList<>();
+            groupsAndUserIds.add(userId);
+            if (userInfos.getGroupsIds() != null) {
+                groupsAndUserIds.addAll(userInfos.getGroupsIds());
+            }
 
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
@@ -71,14 +75,12 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
                     .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                     .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
-                    .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id");
+                    .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
+                    .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id")
+                    .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
+                    .append(" WHERE (ls.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray())).append(" OR l.owner = ?) ");
 
-            query.append(" WHERE 1 = 1 ");
-
-            if (teacherId != null) {
-                query.append(" AND l.teacher_id = ? ");
-                parameters.add(Sql.parseId(teacherId));
-            }
+            final JsonArray parameters = new JsonArray(groupsAndUserIds.toArray()).add(userId);
 
             if (schoolIds != null && !schoolIds.isEmpty()) {
                 query.append(" AND l.school_id in").append(sql.listPrepared(schoolIds.toArray()));
@@ -86,8 +88,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     parameters.add(Sql.parseId(schoolId));
                 }
             }
-
-
+            //fixme Why audience filter, if an teacher share a resource to another teacher witch don't have these audiences, so the lesson don't return !!!!!!
             if (groupIds != null && !groupIds.isEmpty()) {
                 query.append(" AND l.audience_id in ");
                 query.append(sql.listPrepared(groupIds.toArray()));
@@ -181,24 +182,23 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         /**
          *
          * @param schoolIds Schools the teacher belong to
-         * @param teacherId
          * @param startDate
          * @param endDate
          * @param handler
          */
     @Override
-    public void getAllLessonsForTeacher(final List<String> schoolIds, final String teacherId, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.TEACHER, schoolIds, null, teacherId, startDate, endDate, handler);
+    public void getAllLessonsForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.TEACHER, schoolIds, null, userInfos, startDate, endDate, handler);
     }
 
     @Override
-    public void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.PARENT, schoolIds, groupIds, null, startDate, endDate, handler);
+    public void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.PARENT, schoolIds, groupIds, userInfos, startDate, endDate, handler);
     }
 
     @Override
-    public void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.STUDENT, schoolIds, groupIds, null, startDate, endDate, handler);
+    public void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.STUDENT, schoolIds, groupIds, userInfos, startDate, endDate, handler);
     }
 
     private void addLesson(JsonArray resultRefined, Set<Long> homeworkIds, JsonObject lastLesson) {

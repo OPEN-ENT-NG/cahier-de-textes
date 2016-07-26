@@ -1,18 +1,19 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.HomeworkAccessFilter;
-import fr.openent.diary.services.AudienceService;
-import fr.openent.diary.services.HomeworkService;
-import fr.openent.diary.services.LessonService;
+import fr.openent.diary.services.*;
 import fr.openent.diary.utils.Audience;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
+import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
@@ -30,11 +31,12 @@ import static org.entcore.common.http.response.DefaultResponseHandler.notEmptyRe
 /**
  * Created by a457593 on 23/02/2016.
  */
-public class HomeworkController extends SharedResourceController {
+public class HomeworkController extends ControllerHelper {
 
     HomeworkService homeworkService;
     LessonService lessonService;
     AudienceService audienceService;
+    private SharedService sharedService;
 
     List<String> actionsForAutomaticSharing;
 
@@ -46,9 +48,9 @@ public class HomeworkController extends SharedResourceController {
     private static final String list_homeworks_by_lesson = "diary.list.homeworks.lesson";
 
 
-    private static final String sharing_action_read = "fr.openent.diary.controllers.HomeworkController|getHomework";
-    private static final String sharing_action_list = "fr.openent.diary.controllers.HomeworkController|listHomeworks";
-    private static final String sharing_action_list_by_lesson = "fr.openent.diary.controllers.HomeworkController|listHomeworkByLesson";
+    private static final String sharing_action_read = "fr-openent-diary-controllers-HomeworkController|getHomework";
+    private static final String sharing_action_list = "fr-openent-diary-controllers-HomeworkController|listHomeworks";
+    private static final String sharing_action_list_by_lesson = "fr-openent-diary-controllers-HomeworkController|listHomeworkByLesson";
 
     private final static Logger log = LoggerFactory.getLogger(HomeworkController.class);
 
@@ -57,11 +59,10 @@ public class HomeworkController extends SharedResourceController {
         this.lessonService = lessonService;
         this.audienceService = audienceService;
 
+        this.sharedService = new SharedServiceImpl(HomeworkController.class.getName());
+
         //init automatic sharing actionsForAutomaticSharing
-        actionsForAutomaticSharing = new ArrayList<String>();
-        actionsForAutomaticSharing.add(sharing_action_read);
-        actionsForAutomaticSharing.add(sharing_action_list);
-        actionsForAutomaticSharing.add(sharing_action_list_by_lesson);
+        actionsForAutomaticSharing = new ArrayList<String>(Arrays.asList(sharing_action_read, sharing_action_list, sharing_action_list_by_lesson));
     }
 
     @Get("/homework/:id")
@@ -99,7 +100,7 @@ public class HomeworkController extends SharedResourceController {
             @Override
             public void handle(UserInfos user) {
                 if(user != null){
-                    homeworkService.getAllHomeworksForALesson(lessonId, arrayResponseHandler(request));
+                    homeworkService.getAllHomeworksForALesson(lessonId, user, arrayResponseHandler(request));
                 } else {
                     unauthorized(request,"No user found in session.");
                 }
@@ -121,22 +122,21 @@ public class HomeworkController extends SharedResourceController {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-
                 if(user != null){
                     switch (user.getType()) {
                         case "Teacher":
-                            homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user.getUserId(), startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Student":
-                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Relative":
                             List<String> childClasses = new ArrayList<>();
                             childClasses.add(classId);
-                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), childClasses, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), childClasses, user, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
-                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user.getClasses(), startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
                             break;
                     }
 
@@ -149,7 +149,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework")
     @ApiDoc("Create a homework")
-    @SecuredAction(manage_resource)
+    @SecuredAction("diary.createFreeHomework")
     public void createFreeHomework(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -160,7 +160,38 @@ public class HomeworkController extends SharedResourceController {
                         @Override
                         public void handle(JsonObject json) {
                         if(user.getStructures().contains(json.getString("school_id",""))){
-                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
+                            final Audience audience = new Audience(json);
+                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        final JsonObject result = event.right().getValue();
+                                        //create automatic sharing
+                                        final String resourceId = String.valueOf(result.getLong("id"));
+
+                                        if(!StringUtils.isEmpty(audience.getId())) {
+                                            sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                    actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                        @Override
+                                                        public void handle(Either<String, JsonObject> event) {
+                                                            if (event.isRight()) {
+                                                                Renders.renderJson(request, result);
+                                                            } else {
+                                                                Renders.renderError(request);
+                                                            }
+                                                        }
+                                                    });
+                                        } else {
+                                            log.error("Sharing Homework has encountered a problem.");
+                                            leftToResponse(request, event.left());
+                                        }
+
+                                    } else {
+                                        log.error("Homework could not be created.");
+                                        leftToResponse(request, event.left());
+                                    }
+                                }
+                            });
                         } else {
                             badRequest(request,"Invalid school identifier.");
                         }
@@ -175,7 +206,7 @@ public class HomeworkController extends SharedResourceController {
 
     @Post("/homework/:lessonId")
     @ApiDoc("Create a homework for a lesson")
-    @SecuredAction(manage_resource)
+    @SecuredAction("createHomeworkForLesson")
     public void createHomeworkForLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -225,12 +256,56 @@ public class HomeworkController extends SharedResourceController {
                         RequestUtils.bodyToJson(request, pathPrefix + "updateHomework", new Handler<JsonObject>() {
                             @Override
                             public void handle(final JsonObject json) {
-                                audienceService.getOrCreateAudience(new Audience(json), new Handler<Either<String, JsonObject>>() {
+                                final Audience newAudience = new Audience(json);
+                                audienceService.getOrCreateAudience(newAudience, new Handler<Either<String, JsonObject>>() {
 
                                     @Override
                                     public void handle(Either<String, JsonObject> event) {
                                         if (event.isRight()) {
-                                            homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201));
+                                            //Not sharing updating
+                                            if (!StringUtils.isEmpty(json.getString("lesson_id"))) {
+                                                homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201));
+                                            } else {
+                                                //free homework
+                                                homeworkService.retrieveHomework(homeworkId, new Handler<Either<String, JsonObject>>() {
+                                                    @Override
+                                                    public void handle(Either<String, JsonObject> eOldHomework) {
+                                                        if (eOldHomework.isRight()) {
+                                                            final Audience oldAudience = new Audience(eOldHomework.right().getValue());
+                                                            homeworkService.updateHomework(homeworkId, json, new Handler<Either<String, JsonObject>>() {
+                                                                @Override
+                                                                public void handle(Either<String, JsonObject> event) {
+                                                                    if (event.isRight()) {
+                                                                        final JsonObject result = event.right().getValue();
+
+                                                                        if (!StringUtils.isEmpty(newAudience.getId())) {
+                                                                            sharedService.updateShareResource(oldAudience.getId(), newAudience.getId(), homeworkId,
+                                                                                    oldAudience.isGroup(), newAudience.isGroup(), actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                                                        @Override
+                                                                                        public void handle(Either<String, JsonObject> event) {
+                                                                                            if (event.isRight()) {
+                                                                                                Renders.renderJson(request, result);
+                                                                                            } else {
+                                                                                                Renders.renderError(request);
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                        } else {
+                                                                            log.warn("Sharing Lesson has encountered a problem.");
+                                                                            badRequest(request, "Sharing Lesson has encountered a problem.");
+                                                                        }
+                                                                    } else {
+                                                                        log.error("Homework could not be updated.");
+                                                                        leftToResponse(request, event.left());
+                                                                    }
+                                                                }
+                                                            });
+                                                        } else {
+                                                            leftToResponse(request, eOldHomework.left());
+                                                        }
+                                                    }
+                                                });
+                                            }
                                         } else {
                                             final String errorMsg = "Could not create audience.";
                                             log.error(errorMsg);

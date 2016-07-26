@@ -83,6 +83,8 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.display = {
         showPanel: false,
+        showShareLessonPanel: false,
+        showShareHomeworkPanel: false,
         showList: false,
         hideHomeworkPanel: false
     };
@@ -1091,4 +1093,12 @@ function DiaryController($scope, template, model, route, $location) {
         }
         return false;
     };
+
+    $scope.openShareLessonPanel = function() {
+        $scope.display.showShareLessonPanel = true;
+    }
+
+    $scope.openShareHomeworkPanel = function() {
+        $scope.display.showShareHomeworkPanel = true;
+    }
 }
