@@ -47,10 +47,10 @@
 
 <section>
     <ul class="colored">
-        <div ng-show="pedagogicItems.all.length <= 0">
+        <div ng-show="pedagogicDays.all.length <= 0">
             <i18n>diary.search.no.result</i18n>
         </div>
-        <li ng-repeat="day in pedagogicItems.all">
+        <li ng-repeat="day in pedagogicDays.all">
             <div>
                 <p>
                     <a ng-if="day.expanded !== true" ng-click="expandDay(day)">
@@ -68,7 +68,7 @@
                         </div>
                         <div class="table-cell">
                             <div>
-                                <i ng-if="pedagogicItem.published === false"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
                                 <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
                                 <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
                                     <p style="display:inline">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>

@@ -117,6 +117,9 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.searchForm = model.searchForm;
 
+    // variable used to track number of call back calls (see publishCB)
+    $scope.cbCount = 0;
+
     route({
         createLessonView: function (params) {
 
@@ -214,6 +217,7 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.showCalendar = function() {
         $scope.display.showList = false;
+        refreshCalendar(moment(model.calendar.firstDay));
         template.open('main', 'main');
         template.open('main-view', 'calendar');
         template.open('daily-event-details', 'daily-event-details');
@@ -360,11 +364,6 @@ function DiaryController($scope, template, model, route, $location) {
             return;
         }
 
-        // remove pending delete homeworks
-        // ever embedded in selected pending delete lessons
-        var lessonIds = model.getItemsIds(selectedLessons);
-        var homeworksToDelete = selectHomeworksToBeDeleted(selectedHomeworks, lessonIds);
-
         var selectHomeworksToBeDeleted = function (selectedHomeworks, selectedLessonsId) {
             return selectedHomeworks.filter(function (homework) {
                 return homework.lesson_id == null || !_.contains(selectedLessonsId, homework.lesson_id);
@@ -374,17 +373,20 @@ function DiaryController($scope, template, model, route, $location) {
         var postDelete = function(){
             notify.info('item.deleted');
             $scope.closeConfirmPanel();
+            $scope.$apply();
         };
 
         var deleteHomeworks = function(){
-            $scope.getStaticItem('homework').deleteList(homeworksToDelete,
-                function () {
-                    postDelete();
-                },
+            $scope.getStaticItem('homework').deleteList(homeworksToDelete, postDelete,
                 // calback error function
                 function (cbe) {notify.error(cbe.message)}
             );
         };
+
+        // remove pending delete homeworks
+        // ever embedded in selected pending delete lessons
+        var lessonIds = model.getItemsIds(selectedLessons);
+        var homeworksToDelete = selectHomeworksToBeDeleted(selectedHomeworks, lessonIds);
 
         // note: associated homeworks are automatically deleted
         // sql delete cascade
@@ -483,7 +485,7 @@ function DiaryController($scope, template, model, route, $location) {
         var lessons = [];
         lessons.push(lesson);
         var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
-        $scope.publishLessons(lesson, isPublish, notifyKey, $scope.goToMainView());
+        $scope.publishLessons(lessons, isPublish, notifyKey, $scope.goToMainView());
     };
 
     /**
@@ -512,7 +514,7 @@ function DiaryController($scope, template, model, route, $location) {
         var homeworks = [];
         homeworks.push(homework);
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        $scope.publishHomeworks(homework, isPublish, notifyKey, $scope.goToMainView());
+        $scope.publishHomeworks(homeworks, isPublish, notifyKey, $scope.goToMainView());
     };
 
     /**
@@ -544,11 +546,14 @@ function DiaryController($scope, template, model, route, $location) {
             item.changeState(toPublish);
         });
 
-        notify.info(notifyKey);
+        $scope.cbCount--;
         $scope.closeConfirmPanel();
 
-        if (typeof cb === 'function') {
-            cb();
+        if ($scope.cbCount == 0 ){
+            notify.info(notifyKey);
+            if (typeof cb === 'function') {
+                cb();
+            }
         }
     };
 
@@ -634,8 +639,7 @@ function DiaryController($scope, template, model, route, $location) {
      * @returns {boolean}
      */
     $scope.isOneHomeworkOrLessonStriclySelected = function () {
-        // simple js implementation of XOR as no native operator exists (like ^ in other languages)
-        return (getSelectedPedagogicItems('lesson').length == 1) != (getSelectedPedagogicItems('homework').length == 1);
+        return (getSelectedPedagogicItems('lesson').length + getSelectedPedagogicItems('homework').length) == 1;
     };
 
 
@@ -692,6 +696,8 @@ function DiaryController($scope, template, model, route, $location) {
 
         var notifyKey = toPublish ? 'item.published' : 'item.unpublished';
         $scope.processingData = true;
+        var cbCount = ((lessons.length > 0) ? 1 : 0) + ((homeworks.length > 0) ? 1 : 0);
+        $scope.cbCount = cbCount;
         
         if (lessons.length > 0) {
             model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish, publishCB(lessons, toPublish, notifyKey),

@@ -166,7 +166,7 @@ Homework.prototype.load = function (cb, cbe) {
  * @param cb Callback
  * @param cbe Callback on error
  */
-Homework.prototype.deleteHomeworks = function (homeworks, cb, cbe) {
+Homework.prototype.deleteList = function (homeworks, cb, cbe) {
     model.deleteItemList(homeworks, 'homework', cb, cbe);
 };
 
@@ -273,26 +273,10 @@ function Subject() { }
 function Audience() { }
 function HomeworkType(){}
 function Child() {
-    /**
-     * @type String
-     */
-    this.id;
-    /**
-     * @type String
-     */
-    this.displayName;
-    /**
-     * @type String
-     */
-    this.classId;
-    /**
-     * @type String
-     */
-    this.className;
-    /**
-     * UI selected
-     * @type {boolean}
-     */
+    this.id; //String
+    this.displayName; //String
+    this.classId; //String
+    this.className; //String
     this.selected = false;
 }
 function PedagogicItem() {}
@@ -304,9 +288,26 @@ function PedagogicDay() {
     this.nbHomeworks = 0;
 }
 
+PedagogicDay.prototype.numberOfItems = function () {
+    return this.nbLessons + this.nbHomeworks;
+};
+
+PedagogicDay.prototype.resetCountValues = function () {
+    var countItems = _.groupBy(this.pedagogicItemsOfTheDay, 'type_item');
+    this.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
+    this.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
+};
 
 PedagogicItem.prototype.deleteModelReferences = function () {
     model.deletePedagogicItemReferences(this.id);
+};
+
+PedagogicItem.prototype.changeState = function (toPublish) {
+    this.state = toPublish ? 'published' : 'draft';
+};
+
+PedagogicItem.prototype.isPublished = function () {
+    return this.state === 'published';
 };
 
 PedagogicItem.prototype.descriptionMaxSize = 140;
@@ -325,7 +326,7 @@ PedagogicItem.prototype.getPreviewDescription = function () {
 };
 
 PedagogicItem.prototype.isPublishable = function(toPublish){
-    return this.id && this.published == (toPublish ? 'draft' : 'published') && (this.lesson_id == this.id || this.lesson_id == null); // id test to detect free homeworks
+    return this.id && this.state == (toPublish ? 'draft' : 'published') && (this.lesson_id == null || this.lesson_id == this.id); // id test to detect free homeworks
 };
 
 PedagogicItem.prototype.delete = function(cb, cbe) {
@@ -348,10 +349,16 @@ PedagogicItem.prototype.delete = function(cb, cbe) {
 
 PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
 
-    // split into two arrays of pedagogicItem, one for the lessons, one for the homeworks
-    var itemsByType = _.partition(items, function(item) {
-        return item.type_item === 'lesson';
-    });
+    // split into two arrays of PedagogicItem, one for the lessons, one for the homeworks
+    var itemsByType = []; // array of array(s)
+
+    if (items.length == 1) {
+        itemsByType.push(items);
+    } else {
+        itemsByType = _.partition(items, function(item) {
+            return item.type_item === 'lesson';
+        });
+    }
 
     var countdown = 0;
 
@@ -360,17 +367,18 @@ PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
 
         itemsByType.forEach(function (arrayForTypeItem) {
             if (arrayForTypeItem.length > 0) {
-                model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function() {countdown--;}, cbe);
+                model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function() {
+                    countdown--;
+                    if (countdown == 0) {
+                        if (typeof cb === 'function') {
+                            cb();
+                        }
+                    }
+                }, cbe);
             } else {
                 countdown--;
             }
         });
-    }
-
-    if (countdown == 0) {
-        if (typeof cb === 'function') {
-            cb();
-        }
     }
 };
 
@@ -398,8 +406,13 @@ model.deleteItemList = function (items, itemType, cb, cbe) {
 model.deletePedagogicItemReferences = function(itemId) {
     model.pedagogicDays.forEach(function (day) {
         day.pedagogicItemsOfTheDay = _.reject(day.pedagogicItemsOfTheDay, function (item) {
-                return !item || item.lesson_id == itemId || item.id == itemId;
-            });
+            return !item || item.lesson_id == itemId || item.id == itemId;
+        });
+        day.resetCountValues();
+    });
+
+    model.pedagogicDays.all = _.filter(model.pedagogicDays.all, function(day){
+        return day.numberOfItems() > 0;
     });
 };
 
@@ -1299,7 +1312,7 @@ model.build = function () {
         item.teacher = data.teacher;
         item.description = data.description;
         item.expanded_description = false;
-        item.published = data.state == "published";
+        item.state = data.state;
         item.color = data.color;
         item.getPreviewDescription();
         item.room = data.room;
