@@ -551,7 +551,8 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.cbCount--;
         $scope.closeConfirmPanel();
 
-        if ($scope.cbCount == 0 ){
+        if ($scope.cbCount <= 0 ){
+            $scope.cbCount = 0; // can't let cbCount go on negative to impact future calls.
             notify.info(notifyKey);
             if (typeof cb === 'function') {
                 cb();
