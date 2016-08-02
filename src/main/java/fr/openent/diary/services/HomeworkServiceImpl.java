@@ -132,7 +132,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void getAllHomeworksForALesson(String lessonId, final UserInfos userInfos, Handler<Either<String, JsonArray>> handler) {
-        getHomeworks(Context.NONE, null, null, null, null, null, lessonId, handler);
+        getHomeworks(Context.NONE, null, null, userInfos, null, null, lessonId, handler);
     }
 
     @Override
