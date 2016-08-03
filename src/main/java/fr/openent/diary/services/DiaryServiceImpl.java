@@ -12,13 +12,16 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 /**
@@ -274,6 +277,85 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
         JsonObject params = new JsonObject().putString("id", parentId);
         neo.execute(sb.toString(), params, Neo4jResult.validResultHandler(handler));
+
+    }
+
+    /**
+     * Creates diary.subject data from neodb graph or auto-creates default one if none exists in the neo base.
+     * @param teacherId
+     * @param handler
+     */
+    public void initTeacherSubjects(final String teacherId, final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler) {
+
+
+        final String DEFAULT_SUBJECT_LABEL = "Mathematiques";
+
+
+        StringBuilder sb = new StringBuilder("");
+        sb.append(" match (u:User {id : {id}}) where HEAD(u.profiles) = 'Teacher' and has(u.subjectTaught) return u.subjectTaught; ");
+
+        JsonObject params = new JsonObject().putString("id", teacherId);
+        neo.execute(sb.toString(), params, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> event) {
+                if ("ok".equals(event.body().getString("status"))) {
+                    final JsonArray result = event.body().getArray("result", new JsonArray());
+
+
+                    sql.raw("select nextval('diary.subject_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+                        @Override
+                        public void handle(Either<String, JsonObject> event) {
+                            if (event.isRight()) {
+
+                                Long nextId = event.right().getValue().getLong("next_id");
+
+                                final List<JsonObject> subjectLabels = new ArrayList<>();
+
+
+                                for (String schoolId : schoolIds) {
+                                    if (result.size() > 0) {
+                                        for (int i = 0; i < result.size(); i++) {
+                                            JsonObject jo = result.get(i);
+                                            final String subjectTaught = jo.getString("subjectTaught");
+
+                                            JsonObject joSubject = new JsonObject();
+                                            joSubject.putString("subject_label", subjectTaught);
+                                            joSubject.putString("school_id", schoolId);
+                                            joSubject.putString("teacher_id", teacherId);
+                                            joSubject.putNumber("id", nextId);
+
+                                            subjectLabels.add(joSubject);
+
+                                            nextId += 1;
+                                        }
+                                    }
+                                    // need create fake subject for current teacher
+                                    // if none does not exist in neo graph db
+                                    else {
+                                        JsonObject joSubject = new JsonObject();
+                                        joSubject.putString("subject_label", DEFAULT_SUBJECT_LABEL);
+                                        joSubject.putString("school_id", schoolId);
+                                        joSubject.putString("teacher_id", teacherId);
+                                        joSubject.putNumber("id", nextId);
+
+                                        subjectLabels.add(joSubject);
+                                    }
+                                }
+
+                                createSubjects(subjectLabels, handler);
+                            } else {
+                                log.error("diary.subject sequence could not be used.");
+                                handler.handle(event.left());
+                            }
+                        }
+                    }));
+
+
+                } else {
+                    handler.handle(new Either.Left<String, JsonObject>(event.body().getString("message")));
+                }
+            }
+        });
 
     }
 }

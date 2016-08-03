@@ -480,4 +480,29 @@ public class HomeworkController extends ControllerHelper {
     protected List<String> getActionsForAutomaticSharing() {
         return this.actionsForAutomaticSharing;
     }
+
+
+    @Get("/homeworktype")
+    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
+    @ResourceFilter(HomeworkAccessFilter.class)
+    public void initHomeworkTypes(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                            public void handle(Either<String, JsonObject> data) {
+                                created(request);
+                            }
+                        });
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("User not found in session.");
+                        }
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+    }
 }

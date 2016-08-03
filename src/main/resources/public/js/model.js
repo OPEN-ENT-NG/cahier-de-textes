@@ -1080,6 +1080,22 @@ model.build = function () {
                 return;
 
             that.loading = true;
+
+
+            var url = '/diary/subject/test';
+
+            http().get(url)
+                .done(function (data) {
+                    console.log('Subjects retrieved:');
+                    console.log(data);
+                }).error(function (e) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(e));
+                    }
+                    //that.loading = false;
+                });
+
+
             http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
                 model.subjects.addRange(data);
                 if(typeof cb === 'function'){

@@ -61,4 +61,12 @@ public interface HomeworkService {
      * @param handler
      */
     void unPublishHomeworks(final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler);
+
+
+    /**
+     * Init diary.homework_type table
+     * @param schoolIds Structures of current logged in user
+     * @param handler
+     */
+    void initHomeworkTypes(final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler);
 }
