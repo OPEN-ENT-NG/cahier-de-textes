@@ -16,6 +16,7 @@ import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
@@ -45,6 +46,7 @@ public class HomeworkController extends ControllerHelper {
     private static final String manage_resource = "diary.manager";
     private static final String publish_resource = "diary.publish";
     private static final String list_homeworks = "diary.list.homeworks";
+    private static final String list_homework_types = "diary.list.homeworktypes";
     private static final String list_homeworks_by_lesson = "diary.list.homeworks.lesson";
 
 
@@ -85,7 +87,7 @@ public class HomeworkController extends ControllerHelper {
                 }
             });
         } else {
-            badRequest(request,"Invalid homework identifier.");
+            badRequest(request, "Invalid homework identifier.");
         }
     }
 
@@ -99,10 +101,10 @@ public class HomeworkController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-                if(user != null){
+                if (user != null) {
                     homeworkService.getAllHomeworksForALesson(lessonId, user, arrayResponseHandler(request));
                 } else {
-                    unauthorized(request,"No user found in session.");
+                    unauthorized(request, "No user found in session.");
                 }
             }
         });
@@ -122,7 +124,7 @@ public class HomeworkController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-                if(user != null){
+                if (user != null) {
                     switch (user.getType()) {
                         case "Teacher":
                             homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
@@ -141,7 +143,7 @@ public class HomeworkController extends ControllerHelper {
                     }
 
                 } else {
-                    unauthorized(request,"No user found in session.");
+                    unauthorized(request, "No user found in session.");
                 }
             }
         });
@@ -155,46 +157,46 @@ public class HomeworkController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-                if(user != null){
+                if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
                         @Override
                         public void handle(JsonObject json) {
-                        if(user.getStructures().contains(json.getString("school_id",""))){
-                            final Audience audience = new Audience(json);
-                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        final JsonObject result = event.right().getValue();
-                                        //create automatic sharing
-                                        final String resourceId = String.valueOf(result.getLong("id"));
+                            if (user.getStructures().contains(json.getString("school_id", ""))) {
+                                final Audience audience = new Audience(json);
+                                homeworkService.createHomework(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            final JsonObject result = event.right().getValue();
+                                            //create automatic sharing
+                                            final String resourceId = String.valueOf(result.getLong("id"));
 
-                                        if(!StringUtils.isEmpty(audience.getId())) {
-                                            sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
-                                                    actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
-                                                        @Override
-                                                        public void handle(Either<String, JsonObject> event) {
-                                                            if (event.isRight()) {
-                                                                Renders.renderJson(request, result);
-                                                            } else {
-                                                                Renders.renderError(request);
+                                            if (!StringUtils.isEmpty(audience.getId())) {
+                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                        actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    Renders.renderJson(request, result);
+                                                                } else {
+                                                                    Renders.renderError(request);
+                                                                }
                                                             }
-                                                        }
-                                                    });
+                                                        });
+                                            } else {
+                                                log.error("Sharing Homework has encountered a problem.");
+                                                leftToResponse(request, event.left());
+                                            }
+
                                         } else {
-                                            log.error("Sharing Homework has encountered a problem.");
+                                            log.error("Homework could not be created.");
                                             leftToResponse(request, event.left());
                                         }
-
-                                    } else {
-                                        log.error("Homework could not be created.");
-                                        leftToResponse(request, event.left());
                                     }
-                                }
-                            });
-                        } else {
-                            badRequest(request,"Invalid school identifier.");
-                        }
+                                });
+                            } else {
+                                badRequest(request, "Invalid school identifier.");
+                            }
                         }
                     });
                 } else {
@@ -213,24 +215,24 @@ public class HomeworkController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-                if(user != null) {
-                    lessonService.retrieveLesson(lessonId, new Handler<Either<String, JsonObject>> () {
+                if (user != null) {
+                    lessonService.retrieveLesson(lessonId, new Handler<Either<String, JsonObject>>() {
                         @Override
                         public void handle(Either<String, JsonObject> event) {
-                        if (event.isRight()) {
-                            RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
-                                @Override
-                                public void handle(JsonObject json) {
-                                if(user.getStructures().contains(json.getString("school_id",""))){
-                                    homeworkService.createHomework(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
-                                } else {
-                                    badRequest(request,"Invalid school identifier.");
-                                }
-                                }
-                            });
-                        } else {
-                            badRequest(request, "Lesson identifier is unknown.");
-                        }
+                            if (event.isRight()) {
+                                RequestUtils.bodyToJson(request, pathPrefix + "createHomework", new Handler<JsonObject>() {
+                                    @Override
+                                    public void handle(JsonObject json) {
+                                        if (user.getStructures().contains(json.getString("school_id", ""))) {
+                                            homeworkService.createHomework(json, user.getUserId(), user.getUsername(), new Audience(json), notEmptyResponseHandler(request, 201));
+                                        } else {
+                                            badRequest(request, "Invalid school identifier.");
+                                        }
+                                    }
+                                });
+                            } else {
+                                badRequest(request, "Lesson identifier is unknown.");
+                            }
                         }
                     });
                 } else {
@@ -347,7 +349,7 @@ public class HomeworkController extends ControllerHelper {
                 }
             });
         } else {
-            badRequest(request,"Invalid homework identifier.");
+            badRequest(request, "Invalid homework identifier.");
         }
     }
 
@@ -481,28 +483,53 @@ public class HomeworkController extends ControllerHelper {
         return this.actionsForAutomaticSharing;
     }
 
-
-    @Get("/homeworktype")
-    @SecuredAction(value = manage_resource, type = ActionType.AUTHENTICATED)
-    @ResourceFilter(HomeworkAccessFilter.class)
-    public void initHomeworkTypes(final HttpServerRequest request) {
+    @Get("/homeworktype/initorlist")
+    @ApiDoc("Get or create homework types for current logged in user and its associated structures")
+    @SecuredAction(value = list_homework_types, type = ActionType.AUTHENTICATED)
+    public void getOrCreateHomeworkTypes(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                @Override
-                public void handle(final UserInfos user) {
-                    if (user != null) {
-                        homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
-                            public void handle(Either<String, JsonObject> data) {
-                                created(request);
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    if ("Teacher".equals(user.getType())) {
+
+                        homeworkService.listHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonArray>>() {
+                            @Override
+                            public void handle(Either<String, JsonArray> event) {
+                                if (event.isRight()) {
+                                    final JsonArray result = event.right().getValue();
+
+                                    // no homework type found need to autocreate them
+                                    // TODO check num of homework types match number of structures
+                                    if (event.right().getValue().size() == 0) {
+                                        homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonObject> event) {
+                                                if (event.isRight()) {
+                                                    created(request);
+                                                } else {
+                                                    Renders.renderError(request);
+                                                }
+                                            }
+                                        });
+                                        request.response().setStatusCode(200).end();
+                                    } else {
+                                        Renders.renderJson(request, result);
+                                    }
+                                } else {
+                                    log.error("Subjects could not be retrieved");
+                                    leftToResponse(request, event.left());
+                                }
                             }
                         });
                     } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("User not found in session.");
-                        }
-                        unauthorized(request, "No user found in session.");
+                        badRequest(request, "User is not a teacher");
                     }
+                } else {
+                    unauthorized(request, "No user found in session.");
                 }
-            });
+            }
+        });
     }
 }

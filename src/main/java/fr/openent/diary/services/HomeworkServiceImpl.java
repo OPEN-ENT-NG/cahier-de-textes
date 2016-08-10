@@ -10,6 +10,7 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -358,6 +359,8 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
                         sb.insert("diary.homework_type", homeworkType, "id");
                         nextId += 1;
+
+                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
                     }
                 } else {
                     log.error("diary.homeworktype sequence could not be used.");
@@ -365,6 +368,21 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 }
             }
         }));
+    }
+
+    @Override
+    public void listHomeworkTypes(List<String> schoolIds, Handler<Either<String, JsonArray>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * FROM diary.homework_type as ht WHERE ht.school_id IN " + Sql.listPrepared(schoolIds.toArray()));
+
+        JsonArray parameters = new JsonArray();
+
+        for (final String schoolId : schoolIds) {
+            parameters.addString(schoolId);
+        }
+
+        sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }
 }
 

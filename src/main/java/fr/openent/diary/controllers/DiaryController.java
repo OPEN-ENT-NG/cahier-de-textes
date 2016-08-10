@@ -104,9 +104,9 @@ public class DiaryController extends BaseController {
         diaryService.listAudiences(schoolId, arrayResponseHandler(request));
     }
 
-    @Get("/subject/test")
+    @Get("/subject/initorlist")
     @ApiDoc("Get or create a teacher for a school")
-    @SecuredAction(value = teacher_create, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
     public void getOrCreateSubjects(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
