@@ -861,17 +861,20 @@ function DiaryController($scope, template, model, route, $location) {
 
         // subjects and audiences needed to fill in
         // homeworks and lessons props
-        model.childs.syncChildren(function() {
+
+        model.childs.syncChildren(function () {
             $scope.child = model.child;
             $scope.children = model.childs;
             model.subjects.syncSubjects(function () {
                 model.audiences.syncAudiences(function () {
                     decrementCountdown(bShowTemplates, cb);
 
-                    // call lessons/homework sync after audiences sync since
-                    // lesson and homework objects needs audience data to be built
-                    model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
-                    model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
+                    model.homeworkTypes.syncHomeworkTypes(function () {
+                        // call lessons/homework sync after audiences sync since
+                        // lesson and homework objects needs audience data to be built
+                        model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
+                        model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
+                    }, validationError);
                 }, validationError);
             }, validationError);
         }, validationError);

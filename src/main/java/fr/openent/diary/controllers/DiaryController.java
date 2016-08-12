@@ -31,6 +31,7 @@ import org.vertx.java.platform.Container;
 import java.util.*;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
+import static org.entcore.common.http.response.DefaultResponseHandler.leftToResponse;
 
 /**
  * Created by a457593 on 18/02/2016.
@@ -102,6 +103,61 @@ public class DiaryController extends BaseController {
     public void listAudiences(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         diaryService.listAudiences(schoolId, arrayResponseHandler(request));
+    }
+
+    @Get("/subject/initorlist")
+    @ApiDoc("Get or create a teacher for a school")
+    @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
+    public void getOrCreateSubjects(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    if ("Teacher".equals(user.getType())) {
+
+                            diaryService.listSubjects(user.getStructures(), user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                                @Override
+                                public void handle(Either<String, JsonArray> event) {
+                                    if (event.isRight()) {
+                                        final JsonArray result = event.right().getValue();
+
+                                        // no subject found need auto-create default ones
+                                        if (event.right().getValue().size() == 0) {
+                                            diaryService.initTeacherSubjects(user.getUserId(), user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonObject> event) {
+                                                    if (event.isRight()) {
+                                                        if (event.right().getValue().containsField("id")) {
+                                                            created(request);
+                                                        }
+                                                        //return 201 if subject is created, 200 if it was retrieved
+                                                        else {
+                                                            request.response().setStatusCode(200).end();
+                                                        }
+                                                    } else {
+                                                        DefaultResponseHandler.leftToResponse(request, event.left());
+                                                    }
+                                                }
+                                            });
+                                            request.response().setStatusCode(200).end();
+                                        } else {
+                                            Renders.renderJson(request, result);
+                                        }
+                                    } else {
+                                        log.error("Subjects could not be retrieved");
+                                        leftToResponse(request, event.left());
+                                    }
+                                }
+                            });
+                    } else {
+                        badRequest(request, "User is not a teacher");
+                    }
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
     }
 
     @Post("/teacher/:schoolId")

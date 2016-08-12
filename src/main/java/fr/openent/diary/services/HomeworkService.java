@@ -4,8 +4,10 @@ import fr.openent.diary.utils.Audience;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Json;
 
 import java.util.List;
 
@@ -61,4 +63,19 @@ public interface HomeworkService {
      * @param handler
      */
     void unPublishHomeworks(final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler);
+
+
+    /**
+     * Init diary.homework_type table
+     * @param schoolIds Structures of current logged in user
+     * @param handler
+     */
+    void initHomeworkTypes(final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * List existing homework types for specified school ids
+     * @param schoolIds
+     * @param handler
+     */
+    void listHomeworkTypes(final List<String> schoolIds, Handler<Either<String, JsonArray>> handler);
 }

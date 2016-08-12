@@ -10,6 +10,7 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -338,6 +339,58 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         sb.append(" and homework_state = '").append(initialState).append("'");
 
         sql.prepared(sb.toString(), parameters, validRowsResultHandler(handler));
+    }
+
+    /**
+     * Init diary.homework_type table
+     * @param schoolIds Structures of current logged in user
+     * @param handler
+     */
+    public void initHomeworkTypes(final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler) {
+
+        sql.raw("select nextval('diary.homework_type_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+
+                    Long nextId = event.right().getValue().getLong("next_id");
+                    final String defaultHomeworkTypeLabel = "Devoir Maison";
+                    final String defaultHomeworkTypeCategory = "DM";
+                    SqlStatementsBuilder sb = new SqlStatementsBuilder();
+
+                    for (final String schoolId : schoolIds) {
+                        JsonObject homeworkType = new JsonObject();
+                        homeworkType.putNumber("id", nextId);
+                        homeworkType.putString("school_id", schoolId);
+                        homeworkType.putString("homework_type_label", defaultHomeworkTypeLabel);
+                        homeworkType.putString("homework_type_category", defaultHomeworkTypeCategory);
+
+                        sb.insert("diary.homework_type", homeworkType, "id");
+                        nextId += 1;
+
+                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                    }
+                } else {
+                    log.error("diary.homeworktype sequence could not be used.");
+                    handler.handle(event.left());
+                }
+            }
+        }));
+    }
+
+    @Override
+    public void listHomeworkTypes(List<String> schoolIds, Handler<Either<String, JsonArray>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT * FROM diary.homework_type as ht WHERE ht.school_id IN " + Sql.listPrepared(schoolIds.toArray()));
+
+        JsonArray parameters = new JsonArray();
+
+        for (final String schoolId : schoolIds) {
+            parameters.addString(schoolId);
+        }
+
+        sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }
 }
 

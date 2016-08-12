@@ -1080,7 +1080,8 @@ model.build = function () {
                 return;
 
             that.loading = true;
-            http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
+
+            http().get('/diary/subject/initorlist').done(function (data) {
                 model.subjects.addRange(data);
                 if(typeof cb === 'function'){
                     cb();
@@ -1138,11 +1139,43 @@ model.build = function () {
     });
 
     this.collection(HomeworkType, {
-        sync: function () {
-            this.load([
-                { id: 1, label: lang.translate('homework.type.home') }
-            ]);
-        }
+        loading: false,
+        syncHomeworkTypes: function(cb, cbe){
+
+            var homeworkTypes = [];
+            var that = this;
+
+            if (that.loading)
+                return;
+
+            model.homeworkTypes.all.splice(0, model.homeworkTypes.all.length);
+
+            var url = '/diary/homeworktype/initorlist';
+
+            var urlGetHomeworkTypes = url;
+
+            that.loading = true;
+            http().get(urlGetHomeworkTypes).done(function (data) {
+                homeworkTypes = homeworkTypes.concat(data);
+                that.addRange(
+                    _.map(homeworkTypes, sqlToJsHomeworkType)
+                );
+                if (typeof cb === 'function') {
+                    cb();
+                }
+                that.loading = false;
+            }).error(function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+                that.loading = false;
+            });
+
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
     });
 
     this.collection(Homework, {
@@ -1282,6 +1315,19 @@ model.build = function () {
         return lesson;
     };
 
+    /**
+     * Transform sql homework type data to json like
+     * @param sqlHomeworkType
+     * @returns {{id: *, structureId: (*|T), label: *, category: *}}
+     */
+    sqlToJsHomeworkType = function (sqlHomeworkType) {
+        return {
+            id: sqlHomeworkType.id,
+            structureId: sqlHomeworkType.school_id,
+            label: sqlHomeworkType.homework_type_label,
+            category: sqlHomeworkType.homework_type_category
+        };
+    };
 
     /**
      * Transform sql homework data (table diary.homework)
