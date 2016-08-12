@@ -54,6 +54,7 @@ public class DiaryController extends BaseController {
     private static final String teacher_create = "diary.teacher.create";
     private static final String teacher_subjects = "diary.teacher.subjects";
 
+
     public DiaryController(DiaryService diaryService, LessonService lessonService, HomeworkService homeworkService) {
         this.diaryService = diaryService;
         this.homeworkService = homeworkService;
@@ -184,10 +185,10 @@ public class DiaryController extends BaseController {
                                             // see UserInfoAdapterV1_0Json.java from entcore for user types
                                             switch (user.getType()) {
                                                 case "Teacher":
-                                                    SearchCriterion teacherId = new SearchCriterion();
+/*                                                    SearchCriterion teacherId = new SearchCriterion();
                                                     teacherId.setValue(user.getUserId());
                                                     teacherId.setType(CriteriaSearchType.TEACHER);
-                                                    criteria.add(teacherId);
+                                                    criteria.add(teacherId);*/
                                                     break;
                                                 case "Student":
                                                     groups = user.getClasses();
@@ -200,7 +201,7 @@ public class DiaryController extends BaseController {
                                                     break;
                                             }
 
-                                            diaryService.listPedagogicItems(criteria, groups, arrayResponseHandler(request));
+                                            diaryService.listPedagogicItems(user, criteria, groups, arrayResponseHandler(request));
                                         } else {
                                             unauthorized(request, "No user found in session.");
                                         }

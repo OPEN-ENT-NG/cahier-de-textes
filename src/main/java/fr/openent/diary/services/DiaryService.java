@@ -2,6 +2,7 @@ package fr.openent.diary.services;
 
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.webutils.Either;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -32,7 +33,7 @@ public interface DiaryService {
     /**
      * List all pedagogic items (lessons and homeworks) matching the given search criteria.
      */
-    void listPedagogicItems(final List<SearchCriterion> criteria, final List<String> groups, final Handler<Either<String, JsonArray>> handler);
+    void listPedagogicItems(final UserInfos userInfos, final List<SearchCriterion> criteria, final List<String> groups, final Handler<Either<String, JsonArray>> handler);
 
     /**
      *

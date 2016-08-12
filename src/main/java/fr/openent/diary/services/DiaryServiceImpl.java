@@ -11,6 +11,7 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -36,6 +37,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     private final static Logger log = LoggerFactory.getLogger(DiaryServiceImpl.class);
     private static final String TEACHER_ID_FIELD_NAME = "id";
     private static final String TEACHER_DISPLAY_NAME_FIELD_NAME = "teacher_display_name";
+
+    private static final String LESSON_GESTIONNAIRE_RIGHT   = "fr-openent-diary-controllers-LessonController|modifyLesson";
+    private static final String HOMEWORK_GESTIONNAIRE_RIGHT = "fr-openent-diary-controllers-HomeworkController|modifyHomework";
 
     public DiaryServiceImpl() {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
@@ -151,10 +155,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     }
 
     @Override
-    public void listPedagogicItems(List<SearchCriterion> criteria, List<String> groups, Handler<Either<String, JsonArray>> handler) {
+    public void listPedagogicItems(final UserInfos userInfos, List<SearchCriterion> criteria, List<String> groups, Handler<Either<String, JsonArray>> handler) {
 
         String queryReturnType = "";
         JsonArray parameters = new JsonArray();
+        final String userId = userInfos.getUserId();
 
         StringBuilder queryLessons = new StringBuilder();
         queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
@@ -165,7 +170,8 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
                 .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
                 .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id");
+                .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
+                .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id");
 
         //TODO : add number of homeworks for a lesson
 
@@ -178,7 +184,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
                 .append(" LEFT JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")
                 .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id");
+                .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id")
+                .append(" LEFT JOIN diary.homework_shares AS hs ON h.id = hs.resource_id");
+
 
         StringBuilder whereLessons = new StringBuilder(" WHERE 1=1 ");
         StringBuilder whereHomeworks = new StringBuilder(" WHERE 1=1 ");
@@ -208,6 +216,18 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
             }
         }
 
+        if (userInfos.getType().equals("Teacher")){
+            // retrieve lessons whose we are owner and those we have gestionnaire right on
+            whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
+            parametersLessons.add(userId);
+            parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
+
+            // retrieve homeworks whose we are owner and those we have gestionnaire right on
+            whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) ");
+            parametersHomeworks.add(userId);
+            parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+        }
+
         //add groups for students
         if (groups != null) {
             String inClause = sql.listPrepared(groups.toArray());
@@ -224,6 +244,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
         queryLessons.append(whereLessons);
         queryHomeworks.append(whereHomeworks);
+
 
         StringBuilder queryFull = new StringBuilder("SELECT * FROM ( ");
         if (queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) {

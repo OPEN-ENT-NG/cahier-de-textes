@@ -32,6 +32,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private final static Logger log = LoggerFactory.getLogger(HomeworkServiceImpl.class);
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
     private static final String ID_OWNER_FIELD_NAME = "owner";
+    private static final String GESTIONNAIRE_RIGHT = "fr-openent-diary-controllers-HomeworkController|modifyHomework";
 
     /**
      *
@@ -121,6 +122,13 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         if (ctx == Context.STUDENT || ctx == Context.PARENT) {
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
+        }
+
+        if (ctx == Context.TEACHER) {
+            // retrieve homeworks whose we are owner and those we have gestionnaire right on
+            query.append(" AND (h.owner = ? OR hs.action = ?) ");
+            parameters.add(userId);
+            parameters.add(this.GESTIONNAIRE_RIGHT);
         }
 
         query.append(" GROUP BY h.id, s.subject_label, a.audience_type, a.audience_label, th.homework_type_label ");
