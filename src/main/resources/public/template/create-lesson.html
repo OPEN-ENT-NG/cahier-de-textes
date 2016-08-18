@@ -9,7 +9,7 @@
         </div>
         <div class="three cell">
             <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>
-            <select ng-model="lesson.audience"
+            <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson)"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
             ></select>
         </div>
@@ -126,6 +126,13 @@
                                 ng-model="homework.type"></select>
                     </div>
                 </div>
+                <div>
+                    <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+                        <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+                              ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                            [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+                    </span>
+                </div>
                 <div class="row">
                     <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                     <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
@@ -134,7 +141,7 @@
                 <hr class="homework-delimitation">
             </div>
             <div ng-if="isLessonHomeworkEditable" class="row">
-                <i class="add-icon" ng-class="" ng-click="lesson.addHomework()" tooltip="lesson.homeworks.add"></i>
+                <i class="add-icon" ng-class="" ng-click="addHomeworkToLesson(lesson)" tooltip="lesson.homeworks.add"></i>
             </div>
         </section>
 

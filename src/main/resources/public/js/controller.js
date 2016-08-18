@@ -104,6 +104,7 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.subjects = model.subjects;
     $scope.homeworkTypes = model.homeworkTypes;
     $scope.homeworks = model.homeworks;
+    $scope.homeworksLoad = model.homeworksLoad;
     $scope.childs = model.childs;
     $scope.child = model.child;
     $scope.pedagogicDays = model.pedagogicDays;
@@ -267,7 +268,7 @@ function DiaryController($scope, template, model, route, $location) {
         var openLessonTemplates = function(){
             template.open('main', 'main');
             if (!$scope.isLessonHomeworkEditable){
-				template.open('main-view', 'view-lesson');
+                template.open('main-view', 'view-lesson');
             }
             else{
                 template.open('main-view', 'create-lesson');
@@ -288,9 +289,11 @@ function DiaryController($scope, template, model, route, $location) {
 
             $scope.loadHomeworksForCurrentLesson(function () {
                 $scope.lesson.homeworks.forEach(function(homework){
-                   if(params.idHomework && params.idHomework == homework.id){
-                       homework.expanded = true;
-                   }
+                    if(params.idHomework && params.idHomework == homework.id){
+                        homework.expanded = true;
+                    }
+
+                    model.loadHomeworksLoad(homework, homework.date, lesson.audience.id);
                 });
                 openLessonTemplates();
             });
@@ -319,14 +322,17 @@ function DiaryController($scope, template, model, route, $location) {
             initHomework();
         }
 
+        $scope.showHomeworksLoad($scope.homework);
+
         template.open('main', 'main');
-		if (!$scope.isLessonHomeworkEditable){
-			template.open('main-view', 'view-homework');
+        if (!$scope.isLessonHomeworkEditable){
+            template.open('main-view', 'view-homework');
         }
         else{
             template.open('main-view', 'create-homework');
+            template.open('homeworks-load', 'homeworks-load');
         }
-			
+
     };
 
     /**
@@ -701,7 +707,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.processingData = true;
         var cbCount = ((lessons.length > 0) ? 1 : 0) + ((homeworks.length > 0) ? 1 : 0);
         $scope.cbCount = cbCount;
-        
+
         if (lessons.length > 0) {
             model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish, publishCB(lessons, toPublish, notifyKey),
                 function (cbe) {
@@ -845,7 +851,7 @@ function DiaryController($scope, template, model, route, $location) {
      * Load related data to lessons and homeworks from database
      * @param cb Callback function
      * @param bShowTemplates if true loads calendar templates after data loaded
-     * might be used when 
+     * might be used when
      */
     var initialization = function (bShowTemplates, cb) {
 
@@ -880,8 +886,27 @@ function DiaryController($scope, template, model, route, $location) {
         }, validationError);
     };
 
+    /**
+     * Refresh homework load for all homeworks of current lesson
+     */
+    $scope.refreshHomeworkLoads = function (lesson) {
 
-    // TODO merge/use with decrementSyncCountDown
+        $scope.countdown = lesson.homeworks.all.length;
+
+        lesson.homeworks.all.forEach(function (homework) {
+            model.loadHomeworksLoad(homework, homework.date, lesson.audience.id, applyScopeOnFinish);
+        });
+
+    };
+
+    var applyScopeOnFinish = function(){
+        $scope.countdown --;
+
+        if ($scope.countdown == 0) {
+            $scope.$apply();
+        }
+    };
+
     var decrementCountdown = function (bShowTemplates, cb) {
         $scope.countdown--;
         if ($scope.countdown == 0) {
@@ -921,6 +946,10 @@ function DiaryController($scope, template, model, route, $location) {
         var prevMonday = moment(model.calendar.firstDay).subtract(7, 'day');
         model.calendar.week--;
         refreshCalendar(prevMonday);
+    };
+
+    $scope.addHomeworkToLesson = function(lesson){
+        lesson.addHomework(lesson);
     };
 
     /**
@@ -988,7 +1017,7 @@ function DiaryController($scope, template, model, route, $location) {
                     })
                 );
             });
-            return selectedItems;    
+            return selectedItems;
         } else {
             if (itemType === 'homework') {
                 return getSelectedHomeworks();
@@ -1011,12 +1040,14 @@ function DiaryController($scope, template, model, route, $location) {
 
     /**
      * Init homework object on create
+     * @param cb Callback function
+     * @param cbe Callback
      */
-    var initHomework = function() {
+    var initHomework = function(cb, cbe) {
 
-        $scope.homework = model.initHomework();
+        $scope.homework = model.initHomework(cb, cbe);
         $scope.newItem = {
-            date: moment().minute(0).second(0)
+            date: homework.date
         };
     };
 
@@ -1100,9 +1131,49 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.openShareLessonPanel = function() {
         $scope.display.showShareLessonPanel = true;
-    }
+    };
 
     $scope.openShareHomeworkPanel = function() {
         $scope.display.showShareHomeworkPanel = true;
-    }
+    };
+
+
+    $scope.PPP = function(){
+        alert('XXXX');
+    };
+
+    /**
+     * Display homework load for current homework
+     * @param homework
+     */
+    $scope.showHomeworksLoad = function (homework, forcedDate) {
+
+
+
+        var callback = function () {
+            //homework.homeworksLoad = homework.homeworksLoad;
+        };
+
+        var callbackErrorFunc = function () {
+            // TODO propagate error to front
+        };
+
+        model.loadHomeworksLoad(homework, forcedDate ? forcedDate : homework.date, homework.audience.id, callback, callbackErrorFunc);
+    };
+
+    $scope.isHighHomeworkLoad = function(homeworkLoad){
+        return homeworkLoad.countLoad > 2;
+    };
+
+    $scope.isLowHomeworkLoad = function(homeworkLoad){
+        return homeworkLoad.countLoad == 1;
+    };
+
+    $scope.isMediumHomeworkLoad = function(homeworkLoad){
+        return homeworkLoad.countLoad == 2;
+    };
+
+    $scope.isNoHomeworkLoad = function(homeworkLoad){
+        return homeworkLoad.countLoad == 0;
+    };
 }

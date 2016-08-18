@@ -6,6 +6,13 @@
 			<span ng-bind="homework.subject.label" class="lessonHeader"></span>
 			<span ng-bind="homework.audience.name" class="lessonHeader"></span>
         </div>
+		 <div>
+        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+            <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+				  ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+        </span>
+		 </div>
     </div>
 	
 	<section class="homeworkInfos">

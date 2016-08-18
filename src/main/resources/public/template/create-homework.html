@@ -13,7 +13,7 @@
         </div>
         <div class="three cell">
             <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>&nbsp;
-            <select ng-model="homework.audience"
+            <select ng-model="homework.audience" ng-change="showHomeworksLoad(homework)"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>
         </div>
     </div>
@@ -31,15 +31,21 @@
         <div class="row">
             <div class="three cell">
                 <label class="cell"><i18n>homework.date</i18n></label>
-                <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
+                <date-picker ng-model="newItem.date" ng-change="showHomeworksLoad(homework, newItem.date.getTime())"  class="cell six"></date-picker>
             </div>
-
             <label><i18n>homework.types</i18n></label>
             <select ng-options="type as type.label for type in homeworkTypes.all | filter:{type.structureId:homework.audience.schoolId}"
                 ng-model="homework.type">
             </select>
         </div>
     </div>
+        <div>
+        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+            <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+                  ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+        </span>
+        </div>
     <div class="row">
         <editor ng-model="homework.description"></editor>
     </div>

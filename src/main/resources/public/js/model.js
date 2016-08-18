@@ -271,6 +271,11 @@ Homework.prototype.toJSON = function () {
 function Attachment(){}
 function Subject() { }
 function Audience() { }
+/**
+ * Info about number of homeworks for a specific day
+ * @constructor
+ */
+function HomeworksLoad(){}
 function HomeworkType(){}
 function Child() {
     this.id; //String
@@ -820,13 +825,8 @@ Lesson.prototype.toJSON = function () {
     return json;
 };
 
-Lesson.prototype.addHomework = function () {
-    var homework = new Homework();
-    homework.expanded = true;
-    homework.dueDate = this.date;
-    homework.type = model.homeworkTypes.first();
-    homework.title = homework.type.label;
-    homework.state = this.state;
+Lesson.prototype.addHomework = function (cb) {
+    var homework = model.initHomework(this);
     this.homeworks.push(homework);
 };
 
@@ -923,6 +923,33 @@ model.parseError = function(e) {
 model.getItemsIds = function (items) {
     return _.toArray(_.pluck(items, 'id'));
 };
+
+/**
+ * Loads homework load data for current week of homework
+ * @param homework
+ * @param cb
+ * @param cbe
+ */
+model.loadHomeworksLoad = function (homework, date, audienceId, cb, cbe) {
+
+    http().get('/diary/homework/load/' + date + '/' + audienceId).done(function (sqlHomeworksLoads) {
+
+        homework.weekhomeworksload = new Array();
+
+        sqlHomeworksLoads.forEach(function (homeworkLoad) {
+            homework.weekhomeworksload.push(sqlToJsHomeworkLoad(homeworkLoad));
+        });
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
 
 /**
  * Get homeworks linked to a lesson
@@ -1316,6 +1343,19 @@ model.build = function () {
     };
 
     /**
+     * Transform sql homework load data to json like
+     * @param sqlHomeworkType
+     */
+    sqlToJsHomeworkLoad = function (sqlHomeworkload) {
+        return {
+            countLoad: sqlHomeworkload.countload,
+            description: sqlHomeworkload.countload + ' ' + lang.translate('diary.homework.label'),
+            day: moment(sqlHomeworkload.day).format('dddd').substring(0, 2).toUpperCase(), // 'lundi' -> 'lu' -> 'LU'
+            numDay: moment(sqlHomeworkload.day).format('DD') // 15
+        };
+    };
+
+    /**
      * Transform sql homework type data to json like
      * @param sqlHomeworkType
      * @returns {{id: *, structureId: (*|T), label: *, category: *}}
@@ -1437,21 +1477,38 @@ const DEFAULT_STATE = 'draft';
  * Init homework object on created.
  * Set default attribute values
  * @param homework
+ * @param cb Callback function
+ * @param cbe Callback function on error
  * @returns {*}
  */
-model.initHomework = function () {
+model.initHomework = function (lesson) {
 
     var homework = new Homework();
 
     homework.created = new Date();
     homework.expanded = true;
-    homework.audience = model.getDefaultAudience();
-    homework.subject = model.subjects.first();
-    homework.audienceType = homework.audience.type;
     homework.type = model.homeworkTypes.first();
-    homework.color = DEFAULT_ITEM_COLOR;
-    homework.state = DEFAULT_STATE;
     homework.title = homework.type.label;
+    homework.date = moment().minute(0).second(0);
+
+    // create homework attached to lesson
+    if (lesson) {
+        homework.audience = lesson.audience
+        homework.subject = lesson.subject;
+        homework.audienceType = homework.audience.type;
+        homework.color = lesson.color;
+        homework.state = lesson.state;
+    }
+    // free homework
+    else {
+        homework.audience = model.getDefaultAudience();
+        homework.subject = model.subjects.first();
+        homework.audienceType = homework.audience.type;
+        homework.color = DEFAULT_ITEM_COLOR;
+        homework.state = DEFAULT_STATE;
+    }
+
+    model.loadHomeworksLoad(homework, homework.date, homework.audience.id);
 
     return homework;
 };
