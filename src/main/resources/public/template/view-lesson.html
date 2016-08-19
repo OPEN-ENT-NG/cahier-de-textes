@@ -58,6 +58,11 @@
                         <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
                         <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
                         <span ng-bind="homework.title" class="lessonInfosBlack"></span>
+                        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+                        <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+                              ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+                        </span>
                     </div>
                     <div class="row">
                         <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>

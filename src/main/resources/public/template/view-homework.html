@@ -1,18 +1,17 @@
 ﻿<div>
 	<h2><i18n>homework.details.title</i18n></h2>
 	 <div class="row">
-        <div class="six cell">
+        <div class="five cell">
 			<input type="color" ng-model="homework.color" disabled>
 			<span ng-bind="homework.subject.label" class="lessonHeader"></span>
 			<span ng-bind="homework.audience.name" class="lessonHeader"></span>
-        </div>
-		 <div>
-        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+            <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
             <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
-				  ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                  ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
                 [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
-        </span>
-		 </div>
+            </span>
+            </div>
+        </div>
     </div>
 	
 	<section class="homeworkInfos">

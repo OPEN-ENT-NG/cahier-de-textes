@@ -359,6 +359,7 @@ section .homeworkInfos {
     border-width: 1px;
     padding: 1px;
     marging: 1px;
+    font-size: 14px;
 }
 
 .homeworksDayLoad.red {

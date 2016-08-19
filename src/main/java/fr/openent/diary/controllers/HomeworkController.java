@@ -495,40 +495,35 @@ public class HomeworkController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if (user != null) {
-                    if ("Teacher".equals(user.getType())) {
+                    homeworkService.listHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                final JsonArray result = event.right().getValue();
 
-                        homeworkService.listHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonArray>>() {
-                            @Override
-                            public void handle(Either<String, JsonArray> event) {
-                                if (event.isRight()) {
-                                    final JsonArray result = event.right().getValue();
-
-                                    // no homework type found need to autocreate them
-                                    // TODO check num of homework types match number of structures
-                                    if (event.right().getValue().size() == 0) {
-                                        homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonObject> event) {
-                                                if (event.isRight()) {
-                                                    created(request);
-                                                } else {
-                                                    Renders.renderError(request);
-                                                }
+                                // no homework type found need to autocreate them for teacher users
+                                // TODO check num of homework types match number of structures
+                                if (event.right().getValue().size() == 0 && "Teacher".equals(user.getType())) {
+                                    homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                                        @Override
+                                        public void handle(Either<String, JsonObject> event) {
+                                            if (event.isRight()) {
+                                                created(request);
+                                            } else {
+                                                Renders.renderError(request);
                                             }
-                                        });
-                                        request.response().setStatusCode(200).end();
-                                    } else {
-                                        Renders.renderJson(request, result);
-                                    }
+                                        }
+                                    });
+                                    request.response().setStatusCode(200).end();
                                 } else {
-                                    log.error("Subjects could not be retrieved");
-                                    leftToResponse(request, event.left());
+                                    Renders.renderJson(request, result);
                                 }
+                            } else {
+                                log.error("Subjects could not be retrieved");
+                                leftToResponse(request, event.left());
                             }
-                        });
-                    } else {
-                        badRequest(request, "User is not a teacher");
-                    }
+                        }
+                    });
                 } else {
                     unauthorized(request, "No user found in session.");
                 }

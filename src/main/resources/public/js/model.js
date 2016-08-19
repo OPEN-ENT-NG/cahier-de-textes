@@ -1108,19 +1108,35 @@ model.build = function () {
 
             that.loading = true;
 
-            http().get('/diary/subject/initorlist').done(function (data) {
-                model.subjects.addRange(data);
-                if(typeof cb === 'function'){
-                    cb();
-                }
-                that.loading = false;
-            }.bind(that))
-            .error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-                that.loading = false;
-            });
+            if (model.isUserTeacher()) {
+                http().get('/diary/subject/initorlist').done(function (data) {
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            } else {
+                http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            }
         }
     });
 
@@ -1350,7 +1366,7 @@ model.build = function () {
         return {
             countLoad: sqlHomeworkload.countload,
             description: sqlHomeworkload.countload + ' ' + lang.translate('diary.homework.label'),
-            day: moment(sqlHomeworkload.day).format('dddd').substring(0, 2).toUpperCase(), // 'lundi' -> 'lu' -> 'LU'
+            day: moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(), // 'lundi' -> 'lu' -> 'L'
             numDay: moment(sqlHomeworkload.day).format('DD') // 15
         };
     };
