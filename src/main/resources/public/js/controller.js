@@ -208,10 +208,16 @@ function DiaryController($scope, template, model, route, $location) {
         } else {
             model.searchForm.initForStudent();
         }
+
         model.pedagogicDays.syncPedagogicItems($scope.openListView, validationError);
     };
 
     $scope.openListView = function () {
+        if(!$scope.isUserTeacher) {
+            model.initSubjectFilters();
+        } else {
+            model.initSubjectFilters();
+        }
         template.open('main', 'main');
         template.open('main-view', 'list-view');
         $scope.$apply();

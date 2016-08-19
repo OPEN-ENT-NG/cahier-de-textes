@@ -42,6 +42,18 @@
     </p>
     <input type="hidden" ng-model="searchForm.audienceId"/>
     <i class="searchengine-large" style="font-size: 30px; position: absolute; padding-top: 10px; padding-left: 30px; color: #FF8500;" ng-click="performPedagogicItemSearch()"></i>
+
+    <div style="display: inline-block" ng-if="searchForm.subjectsFilters.length > 0" class="row line filters">
+        <div class="filters-icons">
+            <ul>
+                <li ng-repeat="subjectFilter in searchForm.subjectsFilters" ng-class="{selected: subjectFilter.selected}" ng-click="subjectFilter.toggleSelected()">
+                    <label>
+                        <i ng-style="{'background-color':subjectFilter.subjectColor, color: 'white', 'opacity': (subjectFilter.selected) ? 1 : 0.2}">[[subjectFilter.subjectInitials]]</i>
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 
@@ -61,7 +73,7 @@
             </div>
             <ul ng-if="day.expanded === true">
                 <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
-                    <div class="cell-no-float notification">
+                    <div ng-if="!pedagogicItem.isFiltered()" class="cell-no-float notification">
                         <div class="table-cell-left">
                             <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
                             <input ng-if="isUserTeacher" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
