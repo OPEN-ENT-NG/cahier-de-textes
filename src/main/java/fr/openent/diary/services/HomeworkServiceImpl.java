@@ -9,6 +9,7 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
+import org.entcore.common.utils.DateUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -16,7 +17,10 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.*;
@@ -383,6 +387,35 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         }
 
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
+    }
+
+
+    /**
+     *
+     * @param currentDate
+     * @param handler
+     */
+    @Override
+    public void getHomeworksLoad(final Date currentDate, final String audienceId, Handler<Either<String, JsonArray>> handler) {
+
+        if (currentDate != null) {
+            final String dateFormat = "YYYY-MM-dd";
+
+            StringBuilder query = new StringBuilder();
+            query.append(" select z.day, count(h.*) as countLoad from " );
+            query.append(" ( " );
+            query.append(" select (date_trunc('week',to_date(?, '" ).append(dateFormat).append("'))::date) + i as day " );
+            query.append(" from generate_series(0,6) i " );
+            query.append(" ) z " );
+            query.append(" left outer join diary.homework h on h.homework_due_date = z.day and h.audience_id = ? " );
+            query.append(" group by z.day order by z.day " );
+
+            JsonArray parameters = new JsonArray();
+            parameters.add(DateUtils.format(currentDate, dateFormat));
+            parameters.add(audienceId);
+
+            sql.prepared(query.toString(), parameters, validResultHandler(handler));
+        }
     }
 }
 

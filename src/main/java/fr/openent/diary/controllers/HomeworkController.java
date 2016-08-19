@@ -21,8 +21,10 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -48,6 +50,7 @@ public class HomeworkController extends ControllerHelper {
     private static final String list_homeworks = "diary.list.homeworks";
     private static final String list_homework_types = "diary.list.homeworktypes";
     private static final String list_homeworks_by_lesson = "diary.list.homeworks.lesson";
+    private static final String list_homeworks_load = "diary.list.homeworkloads";
 
 
     private static final String sharing_action_read = "fr-openent-diary-controllers-HomeworkController|getHomework";
@@ -492,44 +495,77 @@ public class HomeworkController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if (user != null) {
-                    if ("Teacher".equals(user.getType())) {
+                    homeworkService.listHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                final JsonArray result = event.right().getValue();
 
-                        homeworkService.listHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonArray>>() {
-                            @Override
-                            public void handle(Either<String, JsonArray> event) {
-                                if (event.isRight()) {
-                                    final JsonArray result = event.right().getValue();
-
-                                    // no homework type found need to autocreate them
-                                    // TODO check num of homework types match number of structures
-                                    if (event.right().getValue().size() == 0) {
-                                        homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonObject> event) {
-                                                if (event.isRight()) {
-                                                    created(request);
-                                                } else {
-                                                    Renders.renderError(request);
-                                                }
+                                // no homework type found need to autocreate them for teacher users
+                                // TODO check num of homework types match number of structures
+                                if (event.right().getValue().size() == 0 && "Teacher".equals(user.getType())) {
+                                    homeworkService.initHomeworkTypes(user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                                        @Override
+                                        public void handle(Either<String, JsonObject> event) {
+                                            if (event.isRight()) {
+                                                created(request);
+                                            } else {
+                                                Renders.renderError(request);
                                             }
-                                        });
-                                        request.response().setStatusCode(200).end();
-                                    } else {
-                                        Renders.renderJson(request, result);
-                                    }
+                                        }
+                                    });
+                                    request.response().setStatusCode(200).end();
                                 } else {
-                                    log.error("Subjects could not be retrieved");
-                                    leftToResponse(request, event.left());
+                                    Renders.renderJson(request, result);
                                 }
+                            } else {
+                                log.error("Subjects could not be retrieved");
+                                leftToResponse(request, event.left());
                             }
-                        });
-                    } else {
-                        badRequest(request, "User is not a teacher");
-                    }
+                        }
+                    });
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
             }
         });
+    }
+
+
+    @Get("/homework/load/:currentDate/:audienceId")
+    @ApiDoc("Get homeworks load (count by day) for current week of specified homework")
+    @SecuredAction(value = list_homeworks_load, type = ActionType.AUTHENTICATED)
+    public void getHomeworkLoad(final HttpServerRequest request) {
+
+        final String currentDateSt = request.params().get("currentDate");
+        final String audienceId = request.params().get("audienceId");
+        long currentDateMillis = Long.parseLong(currentDateSt);
+        final Date currentDate = new Date(currentDateMillis);
+
+        try {
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        homeworkService.getHomeworksLoad(currentDate, audienceId, new Handler<Either<String, JsonArray>>() {
+                            @Override
+                            public void handle(Either<String, JsonArray> event) {
+                                if (event.isRight()) {
+                                    final JsonArray result = event.right().getValue();
+                                    Renders.renderJson(request, result);
+                                } else {
+                                    log.error("Homeworks load could not be retrieved.");
+                                    leftToResponse(request, event.left());
+                                }
+                            }
+                        });
+                    } else {
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+        } catch (NumberFormatException e) {
+            badRequest(request, "Could not parse to integer date " + currentDateSt);
+        }
     }
 }

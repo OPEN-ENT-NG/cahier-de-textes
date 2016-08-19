@@ -1,0 +1,7 @@
+<div>
+    <span ng-repeat="homeworkLoad in homeworksLoad">
+        <span class="homeworksDayLoad" tooltip="[[homeworkLoad.countLoad]] diary.homework.label"
+              ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }" >
+            [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+    </span>
+</div>
