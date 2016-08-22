@@ -114,45 +114,43 @@ public class DiaryController extends BaseController {
             @Override
             public void handle(final UserInfos user) {
                 if (user != null) {
-                    if ("Teacher".equals(user.getType())) {
 
-                            diaryService.listSubjects(user.getStructures(), user.getUserId(), new Handler<Either<String, JsonArray>>() {
-                                @Override
-                                public void handle(Either<String, JsonArray> event) {
-                                    if (event.isRight()) {
-                                        final JsonArray result = event.right().getValue();
+                    diaryService.listSubjects(user.getStructures(), user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                final JsonArray result = event.right().getValue();
 
-                                        // no subject found need auto-create default ones
-                                        if (event.right().getValue().size() == 0) {
-                                            diaryService.initTeacherSubjects(user.getUserId(), user.getStructures(), new Handler<Either<String, JsonObject>>() {
-                                                @Override
-                                                public void handle(Either<String, JsonObject> event) {
-                                                    if (event.isRight()) {
-                                                        if (event.right().getValue().containsField("id")) {
-                                                            created(request);
-                                                        }
-                                                        //return 201 if subject is created, 200 if it was retrieved
-                                                        else {
-                                                            request.response().setStatusCode(200).end();
-                                                        }
-                                                    } else {
-                                                        DefaultResponseHandler.leftToResponse(request, event.left());
+                                // no subject found need auto-create default ones
+                                if (event.right().getValue().size() == 0) {
+                                    if ("Teacher".equals(user.getType())) {
+                                        diaryService.initTeacherSubjects(user.getUserId(), user.getStructures(), new Handler<Either<String, JsonObject>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonObject> event) {
+                                                if (event.isRight()) {
+                                                    if (event.right().getValue().containsField("id")) {
+                                                        created(request);
                                                     }
+                                                    //return 201 if subject is created, 200 if it was retrieved
+                                                    else {
+                                                        request.response().setStatusCode(200).end();
+                                                    }
+                                                } else {
+                                                    DefaultResponseHandler.leftToResponse(request, event.left());
                                                 }
-                                            });
-                                            request.response().setStatusCode(200).end();
-                                        } else {
-                                            Renders.renderJson(request, result);
-                                        }
-                                    } else {
-                                        log.error("Subjects could not be retrieved");
-                                        leftToResponse(request, event.left());
+                                            }
+                                        });
                                     }
+                                    request.response().setStatusCode(200).end();
+                                } else {
+                                    Renders.renderJson(request, result);
                                 }
-                            });
-                    } else {
-                        badRequest(request, "User is not a teacher");
-                    }
+                            } else {
+                                log.error("Subjects could not be retrieved");
+                                leftToResponse(request, event.left());
+                            }
+                        }
+                    });
                 } else {
                     unauthorized(request, "No user found in session.");
                 }

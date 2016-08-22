@@ -271,6 +271,11 @@ Homework.prototype.toJSON = function () {
 function Attachment(){}
 function Subject() { }
 function Audience() { }
+/**
+ * Info about number of homeworks for a specific day
+ * @constructor
+ */
+function HomeworksLoad(){}
 function HomeworkType(){}
 function Child() {
     this.id; //String
@@ -382,6 +387,13 @@ PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
     }
 };
 
+PedagogicItem.prototype.isFiltered = function () {
+    var subjectFilters = _.pluck(_.filter(model.searchForm.subjectsFilters, function(subject) {
+        return !subject.selected;
+    }), 'subjectName');
+    return _.contains(subjectFilters, this.subject);
+};
+
 model.deleteItemList = function (items, itemType, cb, cbe) {
     var url = (itemType == "lesson") ? '/diary/deleteLessons' : '/diary/deleteHomeworks';
 
@@ -414,6 +426,8 @@ model.deletePedagogicItemReferences = function(itemId) {
     model.pedagogicDays.all = _.filter(model.pedagogicDays.all, function(day){
         return day.numberOfItems() > 0;
     });
+
+    //add init subjects ?
 };
 
 function Lesson(data) {
@@ -820,13 +834,8 @@ Lesson.prototype.toJSON = function () {
     return json;
 };
 
-Lesson.prototype.addHomework = function () {
-    var homework = new Homework();
-    homework.expanded = true;
-    homework.dueDate = this.date;
-    homework.type = model.homeworkTypes.first();
-    homework.title = homework.type.label;
-    homework.state = this.state;
+Lesson.prototype.addHomework = function (cb) {
+    var homework = model.initHomework(this);
     this.homeworks.push(homework);
 };
 
@@ -925,6 +934,33 @@ model.getItemsIds = function (items) {
 };
 
 /**
+ * Loads homework load data for current week of homework
+ * @param homework
+ * @param cb
+ * @param cbe
+ */
+model.loadHomeworksLoad = function (homework, date, audienceId, cb, cbe) {
+
+    http().get('/diary/homework/load/' + date + '/' + audienceId).done(function (sqlHomeworksLoads) {
+
+        homework.weekhomeworksload = new Array();
+
+        sqlHomeworksLoads.forEach(function (homeworkLoad) {
+            homework.weekhomeworksload.push(sqlToJsHomeworkLoad(homeworkLoad));
+        });
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
+
+/**
  * Get homeworks linked to a lesson
  *
  * @param lesson
@@ -979,6 +1015,7 @@ function SearchForm() {
     this.displayLesson = {};
     this.displayHomework = {};
     this.audienceId = {};
+    this.subjectsFilters = [];
 };
 
 SearchForm.prototype.initForTeacher = function () {
@@ -1013,13 +1050,40 @@ SearchForm.prototype.getSearch = function () {
     if (model.isUserParent()) {
         params.audienceId = model.child.classId;
     }
-
-
     return params;
 };
 
+function SubjectFilter() {
+    this.subjectName = {};
+    this.subjectColor = {};
+    this.subjectInitials = {};
+    this.selected = true;
+};
+
+SubjectFilter.prototype.toggleSelected = function () {
+    this.selected = !this.selected;
+};
+
+// computes, sets and returns a unique string as initials for this subject.
+SubjectFilter.prototype.setInitials = function (initials) {
+    var charAt = 1;
+    var initial = this.nextInitials(initials, charAt);
+    while (_.contains(initials, initial)){
+        initial = this.nextInitials(initials, charAt++);
+    }
+    this.subjectInitials = initial;
+
+    return this.subjectInitials;
+};
+
+// returns the 1st Letter and the charAt letter to form initials for the given subject name.
+SubjectFilter.prototype.nextInitials = function (initials, charAt) {
+    var initial = this.subjectName.charAt(0) + this.subjectName.charAt(charAt);
+    return initial;
+};
+
 model.build = function () {
-    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicItem, Child]);
+    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.searchForm = new SearchForm();
@@ -1081,19 +1145,35 @@ model.build = function () {
 
             that.loading = true;
 
-            http().get('/diary/subject/initorlist').done(function (data) {
-                model.subjects.addRange(data);
-                if(typeof cb === 'function'){
-                    cb();
-                }
-                that.loading = false;
-            }.bind(that))
-            .error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-                that.loading = false;
-            });
+            if (model.isUserTeacher()) {
+                http().get('/diary/subject/initorlist').done(function (data) {
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            } else {
+                http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            }
         }
     });
 
@@ -1316,6 +1396,19 @@ model.build = function () {
     };
 
     /**
+     * Transform sql homework load data to json like
+     * @param sqlHomeworkType
+     */
+    sqlToJsHomeworkLoad = function (sqlHomeworkload) {
+        return {
+            countLoad: sqlHomeworkload.countload,
+            description: sqlHomeworkload.countload + ' ' + lang.translate('diary.homework.label'),
+            day: moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(), // 'lundi' -> 'lu' -> 'L'
+            numDay: moment(sqlHomeworkload.day).format('DD') // 15
+        };
+    };
+
+    /**
      * Transform sql homework type data to json like
      * @param sqlHomeworkType
      * @returns {{id: *, structureId: (*|T), label: *, category: *}}
@@ -1437,21 +1530,38 @@ const DEFAULT_STATE = 'draft';
  * Init homework object on created.
  * Set default attribute values
  * @param homework
+ * @param cb Callback function
+ * @param cbe Callback function on error
  * @returns {*}
  */
-model.initHomework = function () {
+model.initHomework = function (lesson) {
 
     var homework = new Homework();
 
     homework.created = new Date();
     homework.expanded = true;
-    homework.audience = model.getDefaultAudience();
-    homework.subject = model.subjects.first();
-    homework.audienceType = homework.audience.type;
     homework.type = model.homeworkTypes.first();
-    homework.color = DEFAULT_ITEM_COLOR;
-    homework.state = DEFAULT_STATE;
     homework.title = homework.type.label;
+    homework.date = moment().minute(0).second(0);
+
+    // create homework attached to lesson
+    if (lesson) {
+        homework.audience = lesson.audience
+        homework.subject = lesson.subject;
+        homework.audienceType = homework.audience.type;
+        homework.color = lesson.color;
+        homework.state = lesson.state;
+    }
+    // free homework
+    else {
+        homework.audience = model.getDefaultAudience();
+        homework.subject = model.subjects.first();
+        homework.audienceType = homework.audience.type;
+        homework.color = DEFAULT_ITEM_COLOR;
+        homework.state = DEFAULT_STATE;
+    }
+
+    model.loadHomeworksLoad(homework, homework.date, homework.audience.id);
 
     return homework;
 };
@@ -1575,4 +1685,29 @@ model.listChildren = function (cb, cbe) {
             }
         });
 
+};
+
+//builds the set of different subjects encountered in the pedagogic items of the list
+model.initSubjectFilters = function () {
+
+    var initials = [];
+    var subjects = [];
+    var filters = [];
+
+    model.pedagogicDays.forEach(function(pedagogicDay) {
+        pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItem) {
+            var subjectName = pedagogicItem.subject;
+            if (!_.contains(subjects, subjectName)) {
+                subjects.push(subjectName);
+                var filter = new SubjectFilter();
+                filter.subjectName = subjectName;
+                filter.subjectColor = pedagogicItem.color;
+                filter.subjectInitials = filter.setInitials(initials);
+                initials.push(filter.subjectInitials);
+                filters.push(filter);
+            }
+        });
+    });
+
+    model.searchForm.subjectsFilters = filters;
 };

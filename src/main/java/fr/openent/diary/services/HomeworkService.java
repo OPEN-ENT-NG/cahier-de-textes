@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.impl.Json;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,4 +79,12 @@ public interface HomeworkService {
      * @param handler
      */
     void listHomeworkTypes(final List<String> schoolIds, Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * Get homeworks load for current week
+     * @param currentDate
+     * @param audienceId
+     * @param handler
+     */
+    void getHomeworksLoad(final Date currentDate, String audienceId, Handler<Either<String, JsonArray>> handler);
 }
