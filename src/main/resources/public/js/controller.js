@@ -1053,7 +1053,7 @@ function DiaryController($scope, template, model, route, $location) {
 
         $scope.homework = model.initHomework(cb, cbe);
         $scope.newItem = {
-            date: homework.date
+            date: $scope.homework.date
         };
     };
 
