@@ -110,7 +110,7 @@
                     <div class="four cell">
                         <label class="three cell"><i18n>homework.date</i18n></label>
                         <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
-                        <date-picker ng-if="isLessonHomeworkEditable" class="five cell" ng-model="homework.dueDate"></date-picker>
+                        <date-picker ng-if="isLessonHomeworkEditable" ng-change="showHomeworksLoad(homework, homework.dueDate.getTime())" class="five cell" ng-model="homework.dueDate"></date-picker>
                     </div>
                     <div class="five cell">
                         <label class="three cell"><i18n>homework.type</i18n></label>
