@@ -268,9 +268,8 @@ public class HomeworkController extends ControllerHelper {
                                     public void handle(Either<String, JsonObject> event) {
                                         if (event.isRight()) {
                                             //Not sharing updating
-                                            if (!StringUtils.isEmpty(json.getString("lesson_id"))) {
-                                                homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201));
-                                            } else {
+                                            if (json.getInteger("lesson_id") != null) {
+                                                homeworkService.updateHomework(homeworkId, json, notEmptyResponseHandler(request, 201)); } else {
                                                 //free homework
                                                 homeworkService.retrieveHomework(homeworkId, new Handler<Either<String, JsonObject>>() {
                                                     @Override
