@@ -40,6 +40,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
     private static final String ID_OWNER_FIELD_NAME = "owner";
+    private static final String GESTIONNAIRE_RIGHT = "fr-openent-diary-controllers-LessonController|modifyLesson";
 
     public LessonServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
@@ -103,6 +104,13 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
             if (ctx == Context.STUDENT || ctx == Context.PARENT) {
                 query.append(" AND l.lesson_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
+            }
+
+            if (ctx == Context.TEACHER) {
+                // retrieve lessons whose we are owner and those we have gestionnaire right on
+                query.append(" AND (l.owner = ? OR ls.action = ?) ");
+                parameters.add(userId);
+                parameters.add(this.GESTIONNAIRE_RIGHT);
             }
 
             query.append(" GROUP BY l.id, l.lesson_date, t.teacher_display_name, h.id, s.id, s.subject_label, a.audience_type, a.audience_label ");
