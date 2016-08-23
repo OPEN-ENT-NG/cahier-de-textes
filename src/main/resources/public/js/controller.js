@@ -1049,9 +1049,9 @@ function DiaryController($scope, template, model, route, $location) {
      * @param cb Callback function
      * @param cbe Callback
      */
-    var initHomework = function(cb, cbe) {
+    var initHomework = function() {
 
-        $scope.homework = model.initHomework(cb, cbe);
+        $scope.homework = model.initHomework();
         $scope.newItem = {
             date: $scope.homework.date
         };
