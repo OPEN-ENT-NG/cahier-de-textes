@@ -239,10 +239,10 @@ public class DiaryController extends BaseController {
                                             // see UserInfoAdapterV1_0Json.java from entcore for user types
                                             switch (user.getType()) {
                                                 case "Teacher":
-/*                                                    SearchCriterion teacherId = new SearchCriterion();
+                                                    SearchCriterion teacherId = new SearchCriterion();
                                                     teacherId.setValue(user.getUserId());
                                                     teacherId.setType(CriteriaSearchType.TEACHER);
-                                                    criteria.add(teacherId);*/
+                                                    criteria.add(teacherId);
                                                     break;
                                                 case "Student":
                                                     groups = user.getClasses();

@@ -209,26 +209,24 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case SUBJECT:       whereLessons.append(" AND l.subject_id = ?");
                                     whereHomeworks.append(" AND h.subject_id = ?"); break;
                 case SEARCH_TYPE:   queryReturnType = criterion.getValue(); break;
-                case TEACHER:       whereLessons.append(" AND t.id = ?");
-                                    whereHomeworks.append(" AND t.id = ?"); break;
+                case TEACHER:       whereLessons.append("AND (l.owner = ? OR ls.action = ?) ");
+                                    whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) "); break;
             }
 
-            if (! CriteriaSearchType.SEARCH_TYPE.equals(criterion.getType())) {
+            if (! CriteriaSearchType.SEARCH_TYPE.equals(criterion.getType()) && ! CriteriaSearchType.TEACHER.equals(criterion.getType())) {
                 parametersLessons.add(criterion.getValue());
                 parametersHomeworks.add(criterion.getValue());
             }
-        }
 
-        if (userInfos.getType().equals("Teacher")){
-            // retrieve lessons whose we are owner and those we have gestionnaire right on
-            whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
-            parametersLessons.add(userId);
-            parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
+            if (CriteriaSearchType.TEACHER.equals(criterion.getType())) {
+                // retrieve lessons whose we are owner and those we have gestionnaire right on
+                parametersLessons.add(criterion.getValue());
+                parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
 
-            // retrieve homeworks whose we are owner and those we have gestionnaire right on
-            whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) ");
-            parametersHomeworks.add(userId);
-            parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+                // retrieve homeworks whose we are owner and those we have gestionnaire right on
+                parametersHomeworks.add(criterion.getValue());
+                parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+            }
         }
 
         //add groups for students
