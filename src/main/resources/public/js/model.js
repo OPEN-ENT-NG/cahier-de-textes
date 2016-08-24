@@ -427,7 +427,7 @@ model.deletePedagogicItemReferences = function(itemId) {
         return day.numberOfItems() > 0;
     });
 
-    //add init subjects ?
+    model.initSubjectFilters();
 };
 
 function Lesson(data) {
