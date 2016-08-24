@@ -209,7 +209,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case SUBJECT:       whereLessons.append(" AND l.subject_id = ?");
                                     whereHomeworks.append(" AND h.subject_id = ?"); break;
                 case SEARCH_TYPE:   queryReturnType = criterion.getValue(); break;
-                case TEACHER:       whereLessons.append("AND (l.owner = ? OR ls.action = ?) ");
+                case TEACHER:       whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
                                     whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) "); break;
             }
 
