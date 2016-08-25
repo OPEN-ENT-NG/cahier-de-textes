@@ -85,15 +85,17 @@
 
                 <!-- minimized view -->
                 <div class="row">
+                    <div>
+                        <ul>
+                            <li>
+                                <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
+                            </li>
+                        </ul>
+                    </div>
                     <div ng-show="!homework.expanded" class="four cell">
                     <b>Devoir à rendre pour le [[formatDate(homework.dueDate)]]</b><br>
                     [[homework.type.label]] - [[homework.title]]
                     </div>
-                    <ul>
-                        <li>
-                            <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
-                        </li>
-                    </ul>
                 </div>
 
                 <div ng-show="homework.expanded">

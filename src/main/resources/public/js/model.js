@@ -908,7 +908,7 @@ Teacher.prototype.create = function(cb, cbe) {
 };
 
 model.getMinutes = function (time) {
-    return time.split(':')[0] * 60 + time.split(':')[1];
+    return new Number(time.split(':')[0] * 60) + new Number(time.split(':')[1]);
 };
 
 model.parseError = function(e) {
