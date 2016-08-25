@@ -93,7 +93,7 @@
                                     <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
                                     [[pedagogicItem.title]]
                                 </em>
-                                <span class="tooltiptext-detail"><i18n>diary.view.item.detail</i18n></span>
+                                <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
                             </div>
                             <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
                                 <span ng-show="!pedagogicItem.expanded_description">
