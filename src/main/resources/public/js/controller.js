@@ -232,6 +232,24 @@ function DiaryController($scope, template, model, route, $location) {
         template.open('daily-event-details', 'daily-event-details');
     };
 
+    $scope.goToItemDetail = function(pedagogicItem) {
+        var url = "";
+
+        if (pedagogicItem.type_item === 'lesson') {
+            url = "/editLessonView/" + pedagogicItem.id + "/";
+        } else {
+            // open lesson view if homework is attached to a lesson
+            if (pedagogicItem.lesson_id) {
+                // set default tab to homework tab
+                $scope.tabs.createLesson = 'homeworks';
+                url = "/editLessonView/" + pedagogicItem.lesson_id + "/" + pedagogicItem.id;
+            } else {
+                url = "/editHomeworkView/" + pedagogicItem.id;
+            }
+        }
+        $location.url(url);
+    };
+
     //list-view interactions
     $scope.expandDay = function(day) {
         day.expanded = true;
