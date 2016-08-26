@@ -103,6 +103,31 @@ div.test .green {
     color: #46bfaf;
 }
 
+.tooltip-detail {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-detail .tooltiptext-detail {
+    visibility: hidden;
+    width: 120px;
+    background-color: #FF8500;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    top: 100%;
+    left: 100px;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.tooltip-detail:hover .tooltiptext-detail {
+    visibility: visible;
+    opacity: 1;
+}
+
 .homework-content {
     height: 32px;
     border: solid 2px;
