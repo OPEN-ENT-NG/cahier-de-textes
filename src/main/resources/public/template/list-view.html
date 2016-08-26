@@ -76,7 +76,7 @@
                     <div ng-if="!pedagogicItem.isFiltered()" class="cell-no-float notification">
                         <div class="table-cell-left">
                             <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
-                            <input ng-if="isUserTeacher" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
+                            <input ng-if="isUserTeacher" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
                         </div>
                         <div class="table-cell">
                             <div>
@@ -120,10 +120,18 @@
             <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
                 <i18n>edit</i18n>
             </button>
-            <!-- not implemented yet so always disabled -->
+            <!-- not implemented yet so always disabled 
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
+            </button>-->
+			
+			<button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0" >
+                <i18n>share</i18n>
             </button>
+            <button ng-click="openShareHomeworkPanel()" ng-show="getSelectedPedagogicItems('lesson').length === 0" >
+                <i18n>share</i18n>
+            </button>
+			
             <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
             <button ng-click="showConfirmPanel('confirm-publish')" ng-if="hasPublishableOnlyItemsSelected(true)">
                 <i18n>daily.item.publish</i18n>
