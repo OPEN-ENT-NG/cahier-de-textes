@@ -803,7 +803,7 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
 
 
 /**
- * 
+ *
  * JSON object corresponding to sql diary.lesson table columns
  */
 Lesson.prototype.toJSON = function () {
@@ -1490,6 +1490,10 @@ model.build = function () {
         item.day = data.day;
         item.turn_in = (data.type_item == "lesson") ? "" : data.turn_in_type;
         item.selected = false;
+
+        if (data.day) {
+            item.dayFormatted = moment(data.day).format("DD/MM/YYYY");
+        }
         return item;
     }
 };
@@ -1608,6 +1612,54 @@ model.initLesson = function (timeFromCalendar) {
 
     return lesson;
 };
+
+
+/**
+ * Load previous lessons from current one
+ * Attached homeworks to lessons are also loaded
+ * @param params
+ * @param cb
+ * @param cbe
+ */
+model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
+
+    var params = {};
+    params.endDateLesson = lesson.date.format("YYYY-MM-DD");
+    params.excludeLessonId = lesson.id;
+    params.endTime = lesson.endTime;
+    params.subject = lesson.subject.id;
+    params.audienceId = lesson.audience.id;
+    params.returnType = 'both';
+    params.homeworkLinkedToLesson = "true";
+
+    http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
+
+        var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
+
+        var groupByItemType = _.groupBy(previousLessonsAndHomeworks, 'type_item');
+
+        var previousLessons = groupByItemType.lesson;
+
+        if (previousLessons) {
+            var previousHomeworks = groupByItemType.homework;
+
+            previousLessons.forEach(function (lesson) {
+                lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
+            });
+
+            lesson.previousLessons = previousLessons;
+        }
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
+};
+
 
 model.performPedagogicItemSearch = function (params, cb, cbe) {
     model.pedagogicDays.reset();

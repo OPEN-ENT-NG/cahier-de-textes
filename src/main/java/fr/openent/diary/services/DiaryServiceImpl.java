@@ -157,12 +157,16 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
     }
 
+    private void addParameterLessonsAndHomeworks(Object parameter, JsonArray parametersLessons, JsonArray parametersHomeworks){
+        parametersLessons.add(parameter);
+        parametersHomeworks.add(parameter);
+    }
+
     @Override
     public void listPedagogicItems(final UserInfos userInfos, List<SearchCriterion> criteria, List<String> groups, Handler<Either<String, JsonArray>> handler) {
 
         String queryReturnType = "";
         JsonArray parameters = new JsonArray();
-        final String userId = userInfos.getUserId();
 
         StringBuilder queryLessons = new StringBuilder();
         queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
@@ -195,37 +199,57 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder whereHomeworks = new StringBuilder(" WHERE 1=1 ");
         JsonArray parametersLessons = new JsonArray();
         JsonArray parametersHomeworks = new JsonArray();
+
         for (SearchCriterion criterion: criteria) {
 
             switch (criterion.getType()) {
+                case EXCLUDE_LESSON_ID:
+                                    whereLessons.append(" AND l.id != ?");
+                                    parametersLessons.add(criterion.getValue());break;
+
+                case HOMEWORK_LINKED_TO_LESSON:
+                                    whereHomeworks.append(" and h.lesson_id IS NOT NULL "); break;
+
+                case START_TIME:    whereLessons.append(" AND l.lesson_start_time >= to_timestamp(?, 'hh24:mi:ss')::time");
+                                    parametersLessons.add(criterion.getValue());break;
+
+                case END_TIME:      whereLessons.append(" AND l.lesson_end_time <= to_timestamp(?, 'hh24:mi:ss')::time");
+                                    parametersLessons.add(criterion.getValue());break;
+
+                case END_DATE_LESSON:
+                                    whereLessons.append(" AND l.lesson_date <= to_date(?,'YYYY-MM-DD')");
+                                    parametersLessons.add(criterion.getValue());break;
+
                 case START_DATE:    whereLessons.append(" AND l.lesson_date >= to_date(?,'YYYY-MM-DD')");
-                                    whereHomeworks.append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD')"); break;
+                                    whereHomeworks.append(" AND h.homework_due_date >= to_date(?,'YYYY-MM-DD')");
+                                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
+
                 case END_DATE:      whereLessons.append(" AND l.lesson_date <= to_date(?,'YYYY-MM-DD')");
-                                    whereHomeworks.append(" AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')"); break;
+                                    whereHomeworks.append(" AND h.homework_due_date <= to_date(?,'YYYY-MM-DD')");
+                                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
+
                 case AUDIENCE:      whereLessons.append(" AND l.audience_id = ?");
-                                    whereHomeworks.append(" AND h.audience_id = ?"); break;
+                                    whereHomeworks.append(" AND h.audience_id = ?");
+                                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
+
                 case PUBLISH_STATE: whereLessons.append(" AND l.lesson_state = ?::diary.resource_state");
-                                    whereHomeworks.append(" AND h.homework_state = ?::diary.resource_state"); break;
+                                    whereHomeworks.append(" AND h.homework_state = ?::diary.resource_state");
+                                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
+
                 case SUBJECT:       whereLessons.append(" AND l.subject_id = ?");
-                                    whereHomeworks.append(" AND h.subject_id = ?"); break;
-                case SEARCH_TYPE:   queryReturnType = criterion.getValue(); break;
+                                    whereHomeworks.append(" AND h.subject_id = ?");
+                                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
+
+                case SEARCH_TYPE:   queryReturnType = (String) criterion.getValue(); break;
+
                 case TEACHER:       whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
-                                    whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) "); break;
-            }
+                                    whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) ");
 
-            if (! CriteriaSearchType.SEARCH_TYPE.equals(criterion.getType()) && ! CriteriaSearchType.TEACHER.equals(criterion.getType())) {
-                parametersLessons.add(criterion.getValue());
-                parametersHomeworks.add(criterion.getValue());
-            }
-
-            if (CriteriaSearchType.TEACHER.equals(criterion.getType())) {
-                // retrieve lessons whose we are owner and those we have gestionnaire right on
-                parametersLessons.add(criterion.getValue());
-                parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
-
-                // retrieve homeworks whose we are owner and those we have gestionnaire right on
-                parametersHomeworks.add(criterion.getValue());
-                parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+                                    parametersLessons.add(criterion.getValue());
+                                    parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
+                                    parametersHomeworks.add(criterion.getValue());
+                                    parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+                                    break;
             }
         }
 

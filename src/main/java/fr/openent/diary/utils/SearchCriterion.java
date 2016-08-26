@@ -10,13 +10,16 @@ import java.util.Map;
 public class SearchCriterion {
 
     private CriteriaSearchType type;
-    private String value;
+    /**
+     * Either string or number (e.g: id)
+     */
+    private Object value;
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -37,8 +40,11 @@ public class SearchCriterion {
 
         SearchCriterion criterion = new SearchCriterion();
         criterion.setType(CriteriaSearchType.valueOfName(parameter.getKey()));
-        if (criterion.getType() != null && parameter.getValue() != null && parameter.getValue() != "") {
-            criterion.setValue((String) parameter.getValue());
+        if (criterion.getType() != null && parameter.getValue() != null) {
+            if (parameter.getValue() instanceof String && ((String) parameter.getValue()).isEmpty()) {
+                return null;
+            }
+            criterion.setValue(parameter.getValue());
         } else {
             return null;
         }

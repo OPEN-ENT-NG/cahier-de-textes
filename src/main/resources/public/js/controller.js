@@ -1128,6 +1128,15 @@ function DiaryController($scope, template, model, route, $location) {
         model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.openListView, validationError);
     };
 
+
+    /**
+     * Load previous lessons data from current lesson being edited
+     * @param currentLesson Current lesson being edited
+     */
+    $scope.loadPreviousLessonsFromLesson = function (currentLesson) {
+        model.getPreviousLessonsFromLesson(currentLesson, function(){$scope.$apply()}, validationError);
+    };
+
     $scope.itemTypesDisplayed = function(item){
         if ((item.type_item == "lesson" && $scope.searchForm.displayLesson) || (item.type_item == "homework" && $scope.searchForm.displayHomework)){
             return true;
@@ -1143,10 +1152,6 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.display.showShareHomeworkPanel = true;
     };
 
-
-    $scope.PPP = function(){
-        alert('XXXX');
-    };
 
     /**
      * Display homework load for current homework
@@ -1181,5 +1186,10 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.isNoHomeworkLoad = function(homeworkLoad){
         return homeworkLoad.countLoad == 0;
+    };
+
+    $scope.displayPreviousLessonsTabAndLoad = function (lesson) {
+        $scope.tabs.createLesson = 'previouslessons';
+        $scope.loadPreviousLessonsFromLesson(lesson);
     };
 }
