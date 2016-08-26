@@ -65,6 +65,10 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.newLesson = new Lesson();
     $scope.newHomework = new Homework();
     $scope.newPedagogicItem = new PedagogicItem();
+	
+	// variables for show list
+	$scope.pedagogicLessonsSelected 	= new Array();
+	$scope.pedagogicHomeworksSelected 	= new Array();
 
     $scope.getStaticItem = function(itemType) {
         if ($scope.display.showList == true) {
@@ -230,6 +234,24 @@ function DiaryController($scope, template, model, route, $location) {
         template.open('main', 'main');
         template.open('main-view', 'calendar');
         template.open('daily-event-details', 'daily-event-details');
+    };
+
+    $scope.goToItemDetail = function(pedagogicItem) {
+        var url = "";
+
+        if (pedagogicItem.type_item === 'lesson') {
+            url = "/editLessonView/" + pedagogicItem.id + "/";
+        } else {
+            // open lesson view if homework is attached to a lesson
+            if (pedagogicItem.lesson_id) {
+                // set default tab to homework tab
+                $scope.tabs.createLesson = 'homeworks';
+                url = "/editLessonView/" + pedagogicItem.lesson_id + "/" + pedagogicItem.id;
+            } else {
+                url = "/editHomeworkView/" + pedagogicItem.id;
+            }
+        }
+        $location.url(url);
     };
 
     //list-view interactions
@@ -1024,6 +1046,46 @@ function DiaryController($scope, template, model, route, $location) {
                 );
             });
             return selectedItems;
+        } else {
+            if (itemType === 'homework') {
+                return getSelectedHomeworks();
+            } else {
+                return getSelectedLessons();
+            }
+        }
+    };
+	
+	
+	/**
+	* update pedagogic items selected
+	*/
+	$scope.updatePedagogicItemsSelected = function(itemType){
+		var selectedItems = new Array();
+		model.pedagogicDays.forEach(function (day) {
+			selectedItems = selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
+					return item && item.type_item === itemType && item.selected;
+				})
+			);
+		});
+		
+		if (itemType === 'homework'){
+			$scope.pedagogicHomeworksSelected = selectedItems;
+		} else {
+			$scope.pedagogicLessonsSelected = selectedItems;
+		}
+    };
+	
+	
+	/**
+	* get selected pedagogic items from item type
+	*/
+	$scope.getSelectedPedagogicItems = function(itemType){
+        if ($scope.display.showList == true) {
+			if (itemType === 'homework') {
+                return $scope.pedagogicHomeworksSelected;
+            } else {
+                return $scope.pedagogicLessonsSelected;
+            }
         } else {
             if (itemType === 'homework') {
                 return getSelectedHomeworks();

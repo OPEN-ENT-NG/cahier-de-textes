@@ -76,10 +76,10 @@
                     <div ng-if="!pedagogicItem.isFiltered()" class="cell-no-float notification">
                         <div class="table-cell-left">
                             <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
-                            <input ng-if="isUserTeacher" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
+                            <input ng-if="isUserTeacher" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
                         </div>
                         <div class="table-cell">
-                            <div>
+                            <div class="tooltip-detail" ng-click="goToItemDetail(pedagogicItem)">
                                 <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
                                 <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
                                 <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
@@ -93,6 +93,7 @@
                                     <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
                                     [[pedagogicItem.title]]
                                 </em>
+                                <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
                             </div>
                             <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
                                 <span ng-show="!pedagogicItem.expanded_description">
@@ -120,10 +121,18 @@
             <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
                 <i18n>edit</i18n>
             </button>
-            <!-- not implemented yet so always disabled -->
+            <!-- not implemented yet so always disabled 
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
+            </button>-->
+			
+			<button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0" >
+                <i18n>share</i18n>
             </button>
+            <button ng-click="openShareHomeworkPanel()" ng-show="getSelectedPedagogicItems('lesson').length === 0" >
+                <i18n>share</i18n>
+            </button>
+			
             <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
             <button ng-click="showConfirmPanel('confirm-publish')" ng-if="hasPublishableOnlyItemsSelected(true)">
                 <i18n>daily.item.publish</i18n>

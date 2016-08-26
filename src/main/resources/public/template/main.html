@@ -6,12 +6,12 @@
 </div>
 <div ng-if="display.showShareLessonPanel">
     <lightbox show="display.showShareLessonPanel" on-close="display.showShareLessonPanel=false;">
-        <share-panel app-prefix="'diary/lesson'" resources="lessons.selection()"></share-panel>
+        <share-panel app-prefix="'diary/lesson'" resources="getSelectedPedagogicItems('lesson')"></share-panel>
     </lightbox>
 </div>
 <div ng-if="display.showShareHomeworkPanel">
     <lightbox show="display.showShareHomeworkPanel" on-close="display.showShareHomeworkPanel=false;">
-        <share-panel app-prefix="'diary/homework'" resources="homeworks.selection()"></share-panel>
+        <share-panel app-prefix="'diary/homework'" resources="getSelectedPedagogicItems('homework')"></share-panel>
     </lightbox>
 </div>
 <container template="main-view"></container>

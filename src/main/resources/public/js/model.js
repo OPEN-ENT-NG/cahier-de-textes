@@ -1473,6 +1473,8 @@ model.build = function () {
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
+		//for share directive you must have _id
+        item._id = data.id;
         item.lesson_id = data.lesson_id;
         item.title = data.title;
         item.subject = data.subject;
