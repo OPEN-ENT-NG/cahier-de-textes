@@ -308,7 +308,15 @@ PedagogicItem.prototype.deleteModelReferences = function () {
 };
 
 PedagogicItem.prototype.changeState = function (toPublish) {
-    this.state = toPublish ? 'published' : 'draft';
+    //if item is a lesson may need to upgrade his related homework
+    if (this.type_item === 'lesson') {
+        var relatedToLesson = model.pedagogicDays.getItemsByLesson(this.id);
+        relatedToLesson.forEach(function (item) {
+            item.state = toPublish ? 'published' : 'draft';
+        })
+    } else {
+        this.state = toPublish ? 'published' : 'draft';
+    }
 };
 
 PedagogicItem.prototype.isPublished = function () {
@@ -1312,10 +1320,23 @@ model.build = function () {
         syncPedagogicItems: function(cb, cbe){
             var params = model.searchForm.getSearch();
             model.performPedagogicItemSearch(params, cb, cbe);
-        }, pushAll: function(datas) {
+        },
+        pushAll: function(datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
+        },
+        getItemsByLesson : function(lessonId) {
+            var items = [];
+
+            model.pedagogicDays.forEach(function (day) {
+                var relatedToLesson = _.filter(day.pedagogicItemsOfTheDay, function(item) {
+                    return item.lesson_id == lessonId;
+                });
+                items = _.union(items, relatedToLesson);
+            });
+
+            return items;
         }
     });
 
