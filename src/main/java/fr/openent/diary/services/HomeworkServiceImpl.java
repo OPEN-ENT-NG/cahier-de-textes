@@ -407,19 +407,19 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getHomeworksLoad(final Date currentDate, final String audienceId, Handler<Either<String, JsonArray>> handler) {
 
         if (currentDate != null) {
-            final String dateFormat = "YYYY-MM-dd";
+            //final String dateFormat = "YYYY-MM-dd";
 
             StringBuilder query = new StringBuilder();
             query.append(" select z.day, count(h.*) as countLoad from " );
             query.append(" ( " );
-            query.append(" select (date_trunc('week',to_date(?, '" ).append(dateFormat).append("'))::date) + i as day " );
+            query.append(" select (date_trunc('week',to_date(?, 'YYYY-MM-DD'))::date) + i as day " );
             query.append(" from generate_series(0,6) i " );
             query.append(" ) z " );
             query.append(" left outer join diary.homework h on h.homework_due_date = z.day and h.audience_id = ? " );
             query.append(" group by z.day order by z.day " );
 
             JsonArray parameters = new JsonArray();
-            parameters.add(DateUtils.format(currentDate, dateFormat));
+            parameters.add(DateUtils.format(currentDate, "YYYY-MM-dd"));
             parameters.add(audienceId);
 
             sql.prepared(query.toString(), parameters, validResultHandler(handler));
