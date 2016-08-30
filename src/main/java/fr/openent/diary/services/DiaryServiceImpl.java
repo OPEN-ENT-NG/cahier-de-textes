@@ -199,6 +199,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder whereHomeworks = new StringBuilder(" WHERE 1=1 ");
         JsonArray parametersLessons = new JsonArray();
         JsonArray parametersHomeworks = new JsonArray();
+        Integer maxResults = null;
 
         for (SearchCriterion criterion: criteria) {
 
@@ -210,10 +211,12 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case HOMEWORK_LINKED_TO_LESSON:
                                     whereHomeworks.append(" and h.lesson_id IS NOT NULL "); break;
 
-                case START_TIME:    whereLessons.append(" AND l.lesson_start_time >= to_timestamp(?, 'hh24:mi:ss')::time");
+                case START_DATE_TIME:
+                                    whereLessons.append(" AND to_timestamp(to_char(l.lesson_date, 'YYYY-MM-DD') || ' ' || to_char(l.lesson_start_time, 'hh24:mi:ss'), 'YYYY-MM-DD hh24:mi:ss') >= to_timestamp(?, 'YYYY-MM-DD hh24:mi:ss')");
                                     parametersLessons.add(criterion.getValue());break;
 
-                case END_TIME:      whereLessons.append(" AND l.lesson_end_time <= to_timestamp(?, 'hh24:mi:ss')::time");
+                case END_DATE_TIME:
+                                    whereLessons.append(" AND to_timestamp(to_char(l.lesson_date, 'YYYY-MM-DD') || ' ' || to_char(l.lesson_end_time, 'hh24:mi:ss'), 'YYYY-MM-DD hh24:mi:ss') <= to_timestamp(?, 'YYYY-MM-DD hh24:mi:ss')");
                                     parametersLessons.add(criterion.getValue());break;
 
                 case END_DATE_LESSON:
@@ -241,6 +244,8 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                     addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);break;
 
                 case SEARCH_TYPE:   queryReturnType = (String) criterion.getValue(); break;
+
+                case LIMIT:         maxResults = (Integer) criterion.getValue(); break;
 
                 case TEACHER:       whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
                                     whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) ");
@@ -297,6 +302,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
             for (Object param: parametersHomeworks) {
                 parameters.add(param);
             }
+        }
+
+        if (maxResults != null) {
+            queryFull.append(" LIMIT ? ");
+            parameters.add(maxResults);
         }
 
         sql.prepared(queryFull.toString(), parameters, SqlResult.validResultHandler(handler));

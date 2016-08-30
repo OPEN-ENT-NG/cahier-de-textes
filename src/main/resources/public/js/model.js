@@ -1626,13 +1626,13 @@ model.initLesson = function (timeFromCalendar) {
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
     var params = {};
-    params.endDateLesson = lesson.date.format("YYYY-MM-DD");
     params.excludeLessonId = lesson.id;
-    params.endTime = lesson.endTime;
+    params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + lesson.endTime;;
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
     params.returnType = 'both';
     params.homeworkLinkedToLesson = "true";
+    params.limit = 20;
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
