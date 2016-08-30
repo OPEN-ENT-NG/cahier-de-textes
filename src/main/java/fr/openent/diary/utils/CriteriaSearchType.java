@@ -9,6 +9,18 @@ import java.util.Map;
  */
 public enum CriteriaSearchType {
 
+    HOMEWORK_LINKED_TO_LESSON("homeworkLinkedToLesson"),
+    START_DATE_TIME("startDateTime"),
+    END_DATE_TIME("endDateTime"),
+    /**
+     * Filter to start date of lesson only (not homework date filter like start_date)
+     */
+    END_DATE_LESSON("endDateLesson"),
+    EXCLUDE_LESSON_ID("excludeLessonId"),
+    /**
+     * Limit max number of results retrieved
+     */
+    LIMIT("limit"),
     START_DATE("startDate"),
     END_DATE("endDate"),
     AUDIENCE("audienceId"),

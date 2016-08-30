@@ -65,6 +65,10 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.newLesson = new Lesson();
     $scope.newHomework = new Homework();
     $scope.newPedagogicItem = new PedagogicItem();
+	
+	// variables for show list
+	$scope.pedagogicLessonsSelected 	= new Array();
+	$scope.pedagogicHomeworksSelected 	= new Array();
 
     $scope.getStaticItem = function(itemType) {
         if ($scope.display.showList == true) {
@@ -1050,6 +1054,46 @@ function DiaryController($scope, template, model, route, $location) {
             }
         }
     };
+	
+	
+	/**
+	* update pedagogic items selected
+	*/
+	$scope.updatePedagogicItemsSelected = function(itemType){
+		var selectedItems = new Array();
+		model.pedagogicDays.forEach(function (day) {
+			selectedItems = selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
+					return item && item.type_item === itemType && item.selected;
+				})
+			);
+		});
+		
+		if (itemType === 'homework'){
+			$scope.pedagogicHomeworksSelected = selectedItems;
+		} else {
+			$scope.pedagogicLessonsSelected = selectedItems;
+		}
+    };
+	
+	
+	/**
+	* get selected pedagogic items from item type
+	*/
+	$scope.getSelectedPedagogicItems = function(itemType){
+        if ($scope.display.showList == true) {
+			if (itemType === 'homework') {
+                return $scope.pedagogicHomeworksSelected;
+            } else {
+                return $scope.pedagogicLessonsSelected;
+            }
+        } else {
+            if (itemType === 'homework') {
+                return getSelectedHomeworks();
+            } else {
+                return getSelectedLessons();
+            }
+        }
+    };
 
     /**
      * Init lesson object on create
@@ -1146,6 +1190,15 @@ function DiaryController($scope, template, model, route, $location) {
         model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.openListView, validationError);
     };
 
+
+    /**
+     * Load previous lessons data from current lesson being edited
+     * @param currentLesson Current lesson being edited
+     */
+    $scope.loadPreviousLessonsFromLesson = function (currentLesson) {
+        model.getPreviousLessonsFromLesson(currentLesson, function(){$scope.$apply()}, validationError);
+    };
+
     $scope.itemTypesDisplayed = function(item){
         if ((item.type_item == "lesson" && $scope.searchForm.displayLesson) || (item.type_item == "homework" && $scope.searchForm.displayHomework)){
             return true;
@@ -1161,10 +1214,6 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.display.showShareHomeworkPanel = true;
     };
 
-
-    $scope.PPP = function(){
-        alert('XXXX');
-    };
 
     /**
      * Display homework load for current homework
@@ -1199,5 +1248,10 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.isNoHomeworkLoad = function(homeworkLoad){
         return homeworkLoad.countLoad == 0;
+    };
+
+    $scope.displayPreviousLessonsTabAndLoad = function (lesson) {
+        $scope.tabs.createLesson = 'previouslessons';
+        $scope.loadPreviousLessonsFromLesson(lesson);
     };
 }
