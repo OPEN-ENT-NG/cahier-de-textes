@@ -26,6 +26,7 @@ public enum CriteriaSearchType {
     AUDIENCE("audienceId"),
     SUBJECT("subject"),
     PUBLISH_STATE("publishState"),
+    SORT_ORDER("sortOrder"),
     SEARCH_TYPE("returnType"), // 'homework' or 'lesson' or 'both'
     TEACHER("teacher"); // teacher id
 

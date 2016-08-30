@@ -9,7 +9,7 @@
         </div>
         <div class="three cell">
             <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>
-            <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson)"
+            <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson); loadPreviousLessonsFromLesson(lesson);"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
             ></select>
         </div>
@@ -154,7 +154,7 @@
 
         <!-- PREVIOUS LESSONS CREATED -->
         <section ng-show="tabs.createLesson === 'previouslessons'">
-            <div ng-show="!lesson.previousLessons">
+            <div ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
                 <i18n>daily.lesson.nopreviouslesson</i18n>
             </div>
 

@@ -200,10 +200,14 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parametersLessons = new JsonArray();
         JsonArray parametersHomeworks = new JsonArray();
         Integer maxResults = null;
+        boolean isAscSortOrder = true;
 
         for (SearchCriterion criterion: criteria) {
 
             switch (criterion.getType()) {
+                case SORT_ORDER:
+                                    isAscSortOrder = "ASC".equals(criterion.getValue().toString());
+                                    break;
                 case EXCLUDE_LESSON_ID:
                                     whereLessons.append(" AND l.id != ?");
                                     parametersLessons.add(criterion.getValue());break;
@@ -290,7 +294,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         }
 
         queryFull.append(" ) as req ");
-        queryFull.append(" ORDER BY req.day ASC, req.time_order ASC");
+
+        final String sortOrder = isAscSortOrder ? "ASC" : "DESC";
+        queryFull.append(" ORDER BY req.day " + sortOrder + ", req.time_order " + sortOrder);
 
         if((queryReturnType.equals(QUERY_RETURN_TYPE_LESSON) || queryReturnType.equals(QUERY_RETURN_TYPE_BOTH)) && parametersLessons.size() > 0) {
             for (Object param: parametersLessons) {

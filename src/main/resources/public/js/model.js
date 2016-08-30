@@ -1625,10 +1625,16 @@ model.initLesson = function (timeFromCalendar) {
  */
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
+    lesson.previousLessons = new Array();
     var params = {};
 
     if (lesson.id) {
         params.excludeLessonId = lesson.id;
+    }
+
+    // tricky way to detect if string date or moment date ...
+    // 12:00:00
+    if (lesson.endTime.length === 8) {
         params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + lesson.endTime;
     } else {
         params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + moment(lesson.endTime).format("HH:mm");
@@ -1637,7 +1643,8 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
     params.returnType = 'both';
-    params.homeworkLinkedToLesson = "true";
+    params.homeworkLinkedToLesson = "true"
+    params.sortOrder = "DESC";
     params.limit = 20;
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
