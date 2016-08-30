@@ -1626,8 +1626,14 @@ model.initLesson = function (timeFromCalendar) {
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
     var params = {};
-    params.excludeLessonId = lesson.id;
-    params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + lesson.endTime;;
+
+    if (lesson.id) {
+        params.excludeLessonId = lesson.id;
+        params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + lesson.endTime;
+    } else {
+        params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + moment(lesson.endTime).format("HH:mm");
+    }
+
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
     params.returnType = 'both';
