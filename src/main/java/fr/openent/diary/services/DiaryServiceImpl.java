@@ -341,7 +341,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void initTeacherSubjects(final String teacherId, final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler) {
 
 
-        final String DEFAULT_SUBJECT_LABEL = "Mathematiques";
+        final String DEFAULT_SUBJECT_LABEL = "Chimie";
 
 
         StringBuilder sb = new StringBuilder("");
