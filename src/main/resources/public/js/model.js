@@ -1753,6 +1753,8 @@ model.listChildren = function (cb, cbe) {
         return;
     }
 
+    model.childs.removeAll();
+
     http().get('/diary/children/list')
         .done(function (data) {
 
