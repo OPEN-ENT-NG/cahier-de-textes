@@ -424,7 +424,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             JsonArray parameters = new JsonArray();
             final String currentDateFormatted = DateUtils.format(currentDate, "YYYY-MM-dd");
 
-            log.debug("currentDateFormatted " + currentDateFormatted);
+            log.info("currentDateFormatted " + currentDateFormatted);
             parameters.add(currentDateFormatted);
             parameters.add(audienceId);
 
