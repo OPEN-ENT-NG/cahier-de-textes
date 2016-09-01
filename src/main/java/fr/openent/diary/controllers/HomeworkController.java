@@ -546,6 +546,7 @@ public class HomeworkController extends ControllerHelper {
                 @Override
                 public void handle(final UserInfos user) {
                     if (user != null) {
+                        log.debug("getHomeworkLoadController - currentDateSt " + currentDateSt);
                         homeworkService.getHomeworksLoad(currentDate, audienceId, new Handler<Either<String, JsonArray>>() {
                             @Override
                             public void handle(Either<String, JsonArray> event) {
