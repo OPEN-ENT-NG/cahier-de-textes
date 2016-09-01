@@ -48,7 +48,7 @@
             <ul>
                 <li ng-repeat="subjectFilter in searchForm.subjectsFilters" ng-class="{selected: subjectFilter.selected}" ng-click="subjectFilter.toggleSelected()">
                     <label>
-                        <i ng-style="{'background-color':subjectFilter.subjectColor, color: 'white', 'opacity': (subjectFilter.selected) ? 1 : 0.2}">[[subjectFilter.subjectInitials]]</i>
+                        <i ng-style="{'background-color':subjectFilter.subjectColor, color: 'white', 'opacity': (subjectFilter.selected) ? 1 : 0.2}" tooltip="[[subjectFilter.subjectName]]">[[subjectFilter.subjectInitials]]</i>
                     </label>
                 </li>
             </ul>
