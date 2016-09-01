@@ -409,7 +409,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         if (currentDate != null) {
 
 
-            log.debug("getHomeworksLoad - currentDate " + currentDate.getTime());
+            log.info("getHomeworksLoad - currentDate " + currentDate.getTime());
 
 
             StringBuilder query = new StringBuilder();

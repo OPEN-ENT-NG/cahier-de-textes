@@ -546,7 +546,7 @@ public class HomeworkController extends ControllerHelper {
                 @Override
                 public void handle(final UserInfos user) {
                     if (user != null) {
-                        log.debug("getHomeworkLoadController - currentDateSt " + currentDateSt);
+                        log.info("getHomeworkLoadController - currentDateSt " + currentDateSt);
                         homeworkService.getHomeworksLoad(currentDate, audienceId, new Handler<Either<String, JsonArray>>() {
                             @Override
                             public void handle(Either<String, JsonArray> event) {
@@ -554,7 +554,7 @@ public class HomeworkController extends ControllerHelper {
                                     final JsonArray result = event.right().getValue();
                                     Renders.renderJson(request, result);
                                 } else {
-                                    log.error("Homeworks load could not be retrieved.");
+                                    log.info("Homeworks load could not be retrieved.");
                                     leftToResponse(request, event.left());
                                 }
                             }
