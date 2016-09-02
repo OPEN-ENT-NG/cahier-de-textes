@@ -28,7 +28,7 @@
 </div>
 
 <div class="row">
-    <filters>
+    <filters style="padding-bottom: 12px;">
         <ul>
         <li>
             <i id="toggleCalendar" style="float: left !important; box-shadow: none; background: none; font-size: 42px;"
@@ -47,7 +47,7 @@
                            ng-model="homeworks.all"
                            ng-if="!display.hideHomeworkPanel"
                            on-create-open="redirect('/createHomeworkView')"
-                           style="z-index: 1000;"
+                           style="z-index: 1000; margin-top: -8px;"
     ></calendar-daily-events>
     <div class="row" ng-if="! showCal">
         <calendar
