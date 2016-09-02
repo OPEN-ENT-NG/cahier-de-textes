@@ -15,14 +15,14 @@
             ></select>
         </div>
     </div>
-	
+
     <section class="tabs row">
         <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
-                ng-click="tabs.createLesson = 'lesson'">
+                              ng-click="tabs.createLesson = 'lesson'">
             <i18n>create.lesson.tabs.lesson</i18n>
         </headerHomeworkLesson>
         <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'homeworks' }"
-                ng-click="tabs.createLesson = 'homeworks';">
+                              ng-click="tabs.createLesson = 'homeworks';">
             <i18n>create.lesson.tabs.homeworks</i18n>
         </headerHomeworkLesson>
         <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'previouslessons' }"
@@ -98,52 +98,52 @@
                         </ul>
                     </div>
                     <div ng-show="!homework.expanded" class="four cell">
-                    <b><i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]</b><br>
-                    [[homework.type.label]] - [[homework.title]]
+                        <b><i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]</b><br>
+                        [[homework.type.label]] - [[homework.title]]
                     </div>
                 </div>
 
                 <div ng-show="homework.expanded">
-                <div class="row">
-                    <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
-                    <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
-                    <!-- deletes homework -->
-                    <div class="controls">
-                        <i ng-if="isLessonHomeworkEditable" class="trash" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)" style="float: right;" tooltip="daily.homework.delete">
-                        </i>
+                    <div class="row">
+                        <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
+                        <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
+                        <!-- deletes homework -->
+                        <div class="controls">
+                            <i ng-if="isLessonHomeworkEditable" class="trash" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)" style="float: right;" tooltip="daily.homework.delete">
+                            </i>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="four cell">
-                        <label class="four cell"><i18n>homework.date</i18n></label>
-                        <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
-                        <date-picker ng-if="isLessonHomeworkEditable" ng-change="showHomeworksLoad(homework, homework.dueDate.getTime())" class="five cell" ng-model="homework.dueDate"></date-picker>
-                    </div>
-                    <div class="five cell">
-                        <label class="three cell"><i18n>homework.type</i18n></label>
-                        <select ng-if="!isLessonHomeworkEditable"
-                                class="seven cell"
-                                ng-options="type as type.label for type in homeworkTypes.all"
-                                ng-model="homework.type"
-                                disabled></select>
+                    <div class="row">
+                        <div class="four cell">
+                            <label class="four cell"><i18n>homework.date</i18n></label>
+                            <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
+                            <date-picker ng-if="isLessonHomeworkEditable" ng-change="showHomeworksLoad(homework, homework.dueDate.getTime())" class="five cell" ng-model="homework.dueDate"></date-picker>
+                        </div>
+                        <div class="five cell">
+                            <label class="three cell"><i18n>homework.type</i18n></label>
+                            <select ng-if="!isLessonHomeworkEditable"
+                                    class="seven cell"
+                                    ng-options="type as type.label for type in homeworkTypes.all"
+                                    ng-model="homework.type"
+                                    disabled></select>
 
-                        <select ng-if="isLessonHomeworkEditable"
-                                class="seven cell"
-                                ng-options="type as type.label for type in homeworkTypes.all"
-                                ng-model="homework.type"></select>
+                            <select ng-if="isLessonHomeworkEditable"
+                                    class="seven cell"
+                                    ng-options="type as type.label for type in homeworkTypes.all"
+                                    ng-model="homework.type"></select>
+                        </div>
                     </div>
-                </div>
-                <div>
+                    <div>
                     <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
                         <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
                               ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
                             [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
                     </span>
-                </div>
-                <div class="row">
-                    <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
-                    <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
-                </div>
+                    </div>
+                    <div class="row">
+                        <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+                        <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
+                    </div>
                 </div>
                 <hr class="homework-delimitation">
             </div>
@@ -159,8 +159,8 @@
                 <i18n>daily.lesson.nopreviouslesson</i18n>
             </div>
 
-            <div class="row" ng-repeat="pedagogicItem in lesson.previousLessons">
-                <div style="background-color: #2a9cc8; color: white;">
+            <div class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+                <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
                     [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
                 </div>
                 <div>
@@ -199,6 +199,12 @@
                     </div>
                 </div>
                 <br>
+            </div>
+
+            <!-- Scroll bar to see more previous lessons -->
+            <div class="showMoreLessonsBar"
+                 ng-if="lesson.previousLessonsDisplayed.length < lesson.previousLessons.length" ng-click="showMorePreviousLessons(lesson)">
+                Voir plus de séances précédentes
             </div>
         </section>
 

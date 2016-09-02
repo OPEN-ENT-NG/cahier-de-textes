@@ -1646,6 +1646,7 @@ model.initLesson = function (timeFromCalendar) {
  */
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
+    const dateFormat = "YYYY-MM-DD";
     lesson.previousLessons = new Array();
     var params = {};
 
@@ -1656,15 +1657,16 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     // tricky way to detect if string date or moment date ...
     // 12:00:00
     if (lesson.endTime.length === 8) {
-        params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + lesson.endTime;
+        params.endDateTime = lesson.date.format(dateFormat) + ' ' + lesson.endTime;
     } else {
-        params.endDateTime = lesson.date.format("YYYY-MM-DD") + ' ' + moment(lesson.endTime).format("HH:mm");
+        params.endDateTime = lesson.date.format(dateFormat) + ' ' + moment(lesson.endTime).format("HH:mm");
     }
 
+    params.startDate = lesson.date.add(-2, 'month').format(dateFormat);
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
     params.returnType = 'both';
-    params.homeworkLinkedToLesson = "true"
+    params.homeworkLinkedToLesson = "true";
     params.sortOrder = "DESC";
     params.limit = 20;
 
@@ -1684,6 +1686,7 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
             });
 
             lesson.previousLessons = previousLessons;
+            lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, 3));
         }
 
         if (typeof cb === 'function') {

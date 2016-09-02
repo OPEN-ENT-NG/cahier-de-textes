@@ -1258,4 +1258,14 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.tabs.createLesson = 'previouslessons';
         $scope.loadPreviousLessonsFromLesson(lesson);
     };
+
+    /**
+     * Show more previous lessons.
+     * By default number of previous lessons is 3.
+     * Will increase displayed previous lesson by 3.
+     */
+    $scope.showMorePreviousLessons = function (lesson) {
+        const displayStep = 3;
+        lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
+    }
 }
