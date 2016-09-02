@@ -81,10 +81,10 @@ public interface HomeworkService {
     void listHomeworkTypes(final List<String> schoolIds, Handler<Either<String, JsonArray>> handler);
 
     /**
-     * Get homeworks load for current week
-     * @param currentDate
-     * @param audienceId
+     * Get homeworks load for current week and current audience
+     * @param currentDateFormatted Current date in YYYY-MM-DD format
+     * @param audienceId Class/Group id
      * @param handler
      */
-    void getHomeworksLoad(final Date currentDate, String audienceId, Handler<Either<String, JsonArray>> handler);
+    void getHomeworksLoad(final String currentDateFormatted, String audienceId, Handler<Either<String, JsonArray>> handler);
 }

@@ -400,17 +400,13 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     /**
      *
-     * @param currentDate
+     * @param currentDateFormatted Current date in YYYY-MM-DD format
      * @param handler
      */
     @Override
-    public void getHomeworksLoad(final Date currentDate, final String audienceId, Handler<Either<String, JsonArray>> handler) {
+    public void getHomeworksLoad(final String currentDateFormatted, final String audienceId, Handler<Either<String, JsonArray>> handler) {
 
-        if (currentDate != null) {
-
-
-            log.info("getHomeworksLoad - currentDate " + currentDate.getTime());
-
+        if (currentDateFormatted != null && !currentDateFormatted.isEmpty()) {
 
             StringBuilder query = new StringBuilder();
             query.append(" select z.day, count(h.*) as countLoad from " );
@@ -422,9 +418,6 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" group by z.day order by z.day " );
 
             JsonArray parameters = new JsonArray();
-            final String currentDateFormatted = DateUtils.format(currentDate, "YYYY-MM-dd");
-
-            log.info("currentDateFormatted " + currentDateFormatted);
             parameters.add(currentDateFormatted);
             parameters.add(audienceId);
 

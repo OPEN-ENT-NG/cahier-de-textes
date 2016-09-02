@@ -536,18 +536,16 @@ public class HomeworkController extends ControllerHelper {
     @SecuredAction(value = list_homeworks_load, type = ActionType.AUTHENTICATED)
     public void getHomeworkLoad(final HttpServerRequest request) {
 
-        final String currentDateSt = request.params().get("currentDate");
+        // date in YYYY-MM-dd format
+        final String currentDateFormatted = request.params().get("currentDate");
         final String audienceId = request.params().get("audienceId");
-        long currentDateMillis = Long.parseLong(currentDateSt);
-        final Date currentDate = new Date(currentDateMillis);
 
         try {
             UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
                 @Override
                 public void handle(final UserInfos user) {
                     if (user != null) {
-                        log.info("getHomeworkLoadController - currentDateSt " + currentDateSt);
-                        homeworkService.getHomeworksLoad(currentDate, audienceId, new Handler<Either<String, JsonArray>>() {
+                        homeworkService.getHomeworksLoad(currentDateFormatted, audienceId, new Handler<Either<String, JsonArray>>() {
                             @Override
                             public void handle(Either<String, JsonArray> event) {
                                 if (event.isRight()) {
@@ -565,7 +563,7 @@ public class HomeworkController extends ControllerHelper {
                 }
             });
         } catch (NumberFormatException e) {
-            badRequest(request, "Could not parse to integer date " + currentDateSt);
+            badRequest(request, "Could not retrive homework load for week with date " + currentDateFormatted);
         }
     }
 }

@@ -321,7 +321,7 @@ function DiaryController($scope, template, model, route, $location) {
                         homework.expanded = true;
                     }
 
-                    model.loadHomeworksLoad(homework, homework.date, lesson.audience.id);
+                    model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), lesson.audience.id);
                 });
                 openLessonTemplates();
             });
@@ -1217,6 +1217,7 @@ function DiaryController($scope, template, model, route, $location) {
 
     /**
      * Display homework load for current homework
+     * @param forcedDate Date in millis since 1970-1-1
      * @param homework
      */
     $scope.showHomeworksLoad = function (homework, forcedDate) {
@@ -1231,7 +1232,10 @@ function DiaryController($scope, template, model, route, $location) {
             // TODO propagate error to front
         };
 
-        model.loadHomeworksLoad(homework, forcedDate ? forcedDate : homework.date, homework.audience.id, callback, callbackErrorFunc);
+        var date = forcedDate ? forcedDate : homework.date;
+        var formattedDate = moment(date).format("YYYY-MM-DD");
+
+        model.loadHomeworksLoad(homework, formattedDate, homework.audience.id, callback, callbackErrorFunc);
     };
 
     $scope.isHighHomeworkLoad = function(homeworkLoad){
