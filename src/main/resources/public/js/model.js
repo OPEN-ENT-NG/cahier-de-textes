@@ -1647,7 +1647,6 @@ model.initLesson = function (timeFromCalendar) {
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
     const dateFormat = "YYYY-MM-DD";
-    lesson.previousLessons = new Array();
     var params = {};
 
     if (lesson.id) {
@@ -1670,6 +1669,9 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     params.homeworkLinkedToLesson = "true";
     params.sortOrder = "DESC";
     params.limit = 20;
+
+    lesson.previousLessons = new Array();
+    lesson.previousLessonsDisplayed = new Array();
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
