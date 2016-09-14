@@ -1,6 +1,5 @@
 package fr.openent.diary.utils;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 

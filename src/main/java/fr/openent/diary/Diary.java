@@ -37,7 +37,7 @@ public class Diary extends BaseServer {
         confLesson.setTable(LESSON_TABLE);
         confLesson.setShareTable(LESSON_SHARE_TABLE);
         confLesson.setSchema(DATABASE_SCHEMA);
-        LessonController lessonController = new LessonController(lessonService, diaryService, audienceService);
+        LessonController lessonController = new LessonController(lessonService, homeworkService, diaryService, audienceService);
 
         SqlCrudService lessonSqlCrudService = new SqlCrudService(DATABASE_SCHEMA, LESSON_TABLE, LESSON_SHARE_TABLE,
                 new JsonArray().addString("*"), new JsonArray().add("*"), true);

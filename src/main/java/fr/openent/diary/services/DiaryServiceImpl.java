@@ -1,7 +1,6 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
@@ -22,7 +21,6 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 /**

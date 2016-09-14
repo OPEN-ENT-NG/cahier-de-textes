@@ -4,12 +4,9 @@ import fr.openent.diary.utils.Audience;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.json.impl.Json;
 
-import java.util.Date;
 import java.util.List;
 
 /**

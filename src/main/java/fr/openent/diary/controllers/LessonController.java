@@ -15,16 +15,20 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.VoidHandler;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
+import static org.entcore.common.user.UserUtils.getUserInfos;
 
 /**
  * Created by a457593 on 23/02/2016.
@@ -32,6 +36,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.*;
 public class LessonController extends ControllerHelper {
 
     private LessonService lessonService;
+    private HomeworkService homeworkService;
     private DiaryService diaryService;
     /**
      * Might be used to auto-create audiences on lesson create/update
@@ -52,8 +57,9 @@ public class LessonController extends ControllerHelper {
 
     private final static Logger log = LoggerFactory.getLogger(LessonController.class);
 
-    public LessonController(LessonService lessonService, DiaryService diaryService, AudienceService audienceSercice) {
+    public LessonController(LessonService lessonService, HomeworkService homeworkService, DiaryService diaryService, AudienceService audienceSercice) {
         this.lessonService = lessonService;
+        this.homeworkService = homeworkService;
         this.diaryService = diaryService;
         this.audienceService = audienceSercice;
         this.sharedService = new SharedServiceImpl(LessonController.class.getName());
@@ -450,7 +456,65 @@ public class LessonController extends ControllerHelper {
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
     @ResourceFilter(LessonAccessFilter.class)
     public void shareSubmit(final HttpServerRequest request) {
-        super.shareJsonSubmit(request, null, false);
+
+        //test if lesson has homework to share
+        final String lessonId = request.params().get("id");
+
+        request.expectMultiPart(true);
+        request.endHandler(new VoidHandler() {
+            @Override
+            protected void handle() {
+                final List<String> actions = request.formAttributes().getAll("actions");
+                final String groupId = request.formAttributes().get("groupId");
+                final String userId = request.formAttributes().get("userId");
+                if (actions == null || actions.isEmpty()) {
+                    badRequest(request, "No sharing action");
+                    return;
+                }
+                getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(final UserInfos user) {
+                        if (user != null) {
+                            homeworkService.getAllHomeworksForALesson(lessonId, user, new Handler<Either<String, JsonArray>>() {
+                                @Override
+                                public void handle(Either<String, JsonArray> event) {
+                                    if (event.isRight()) {
+                                        JsonArray homeworkIds = new JsonArray();
+                                        for (Object jsonObject: event.right().getValue()) {
+                                            homeworkIds.add(((JsonObject)jsonObject).getLong("id"));
+                                        }
+
+                                        //share related homework if there is any
+                                        if (homeworkIds.size() > 0) {
+                                            sharedService.shareOrUpdateLinkedResources(homeworkIds.toList(), userId, groupId, actions, new Handler<Either<String, JsonObject>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonObject> event) {
+                                                    if (event.isRight()) {
+                                                        processLessonShare(request);
+                                                    } else {
+                                                        badRequest(request, "Unable to share homework related to this lesson.");
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            processLessonShare(request);
+                                        }
+                                    } else {
+                                        badRequest(request, "Unable to get homework related to this lesson.");
+                                    }
+                                }
+
+                                private void processLessonShare(final HttpServerRequest request) {
+                                    shareJsonSubmit(request, null, false);
+                                }
+                            });
+                        } else {
+                            unauthorized(request, "No user found in session.");
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Put("/lesson/share/remove/:id")
@@ -458,7 +522,65 @@ public class LessonController extends ControllerHelper {
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
     @ResourceFilter(LessonAccessFilter.class)
     public void shareRemove(final HttpServerRequest request) {
-        super.removeShare(request, false);
+
+        //test if lesson has homework to share
+        final String lessonId = request.params().get("id");
+
+        request.expectMultiPart(true);
+        request.endHandler(new VoidHandler() {
+            @Override
+            protected void handle() {
+                final List<String> actions = request.formAttributes().getAll("actions");
+                final String groupId = request.formAttributes().get("groupId");
+                final String userId = request.formAttributes().get("userId");
+
+                getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(final UserInfos user) {
+                        if (user != null) {
+                            homeworkService.getAllHomeworksForALesson(lessonId, user, new Handler<Either<String, JsonArray>>() {
+                                @Override
+                                public void handle(Either<String, JsonArray> event) {
+                                    if (event.isRight()) {
+                                        JsonArray homeworkIds = new JsonArray();
+                                        for (Object jsonObject: event.right().getValue()) {
+                                            homeworkIds.add(((JsonObject)jsonObject).getLong("id"));
+                                        }
+
+                                        //share related homework if there is any
+                                        if (homeworkIds.size() > 0) {
+
+                                            final String memberId = (groupId == null) ? userId: groupId ;
+
+                                            sharedService.removeLinkedHomeworks(homeworkIds.toList(), memberId, actions, new Handler<Either<String, JsonObject>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonObject> event) {
+                                                    if (event.isRight()) {
+                                                        processRemoveLessonShare(request);
+                                                    } else {
+                                                        badRequest(request, "Unable to share homework related to this lesson.");
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            processRemoveLessonShare(request);
+                                        }
+                                    } else {
+                                        badRequest(request, "Unable to get homework related to this lesson.");
+                                    }
+                                }
+
+                                private void processRemoveLessonShare(final HttpServerRequest request) {
+                                    removeShare(request, false);
+                                }
+                            });
+                        } else {
+                            unauthorized(request, "No user found in session.");
+                        }
+                    }
+                });
+            }
+        });
     }
 
     /**
