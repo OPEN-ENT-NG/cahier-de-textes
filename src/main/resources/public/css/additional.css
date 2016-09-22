@@ -1,11 +1,11 @@
 ul {
-    list-style-type: none;
-    margin-top: 0;
-    width: 99%;
-    border-left: 5px solid transparent !important;
-    padding-left: 10px;
-    padding-right: 15px;
-}
+     list-style-type: none;
+     margin-top: 0;
+     width: 99%;
+     border-left: 5px solid transparent !important;
+     padding-left: 10px;
+     padding-right: 15px;
+ }
 
 ul li i {
     color: #FF8500;
@@ -413,4 +413,47 @@ section .homeworkInfos {
 
 .showMoreLessonsBar:hover {
     background-color: saddlebrown;
+}
+
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white;
+}
+.label-info {
+    background-color: #5bc0de;
+}
+
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.bootstrap-tagsinput .tag [data-role="remove"] {
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.bootstrap-tagsinput .tag [data-role="remove"]:after {
+    content: "x";
+    padding: 0px 2px;
+}
+
+.bootstrap-tagsinput .autocompletelist {
+    margin-top: 2px;
+    width: 200px;
+    padding: 2px 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.choosesubject {
+    cursor: pointer;
+    background-color: #0097cf;
 }

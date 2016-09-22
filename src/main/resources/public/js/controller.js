@@ -1267,5 +1267,5 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.showMorePreviousLessons = function (lesson) {
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
-    }
+        }
 }

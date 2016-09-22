@@ -416,8 +416,130 @@
             }
         });
 
+        module.directive('itemPicker', function () {
+            return {
+                scope: {
+                    ngModel: '=',
+                    ngChange: '&'
+                },
+                transclude: true,
+                replace: true,
+                restrict: 'E',
+                template: '<div class="bootstrap-tagsinput">'
+                    +'<span class="autocompletelist" style="position: absolute; top: 100%; left: 0px; z-index: 1000; display: none; right: auto;">TEST</span>'
+                    +'</div>',
+                link: function (scope, element, attributes) {
+
+                    scope.ngModelOriginal = scope.ngModel;
+
+                    var $input = $('<input type="text" placeholder="Saisir une matière">');
+
+                    var addInputSubject = function () {
+
+                        var resultsBox = $('.autocompletelist', element);
+
+                        // revert back original subject if any on tab out
+                        $input.bind('keyup', function (e) {
+                            // tab key
+                            if (e.keyCode === 9) {
+                                if (!scope.ngModel) {
+                                    scope.ngModel = scope.ngModelOriginal;
+
+                                    if (scope.ngModel) {
+                                        $('input', element).remove();
+                                        resultsBox.hide();
+                                    }
+                                    scope.$apply();
+                                }
+                            } else {
+                                var matchingSubjects = model.findSubjectsByLabel($input.val());
+                                resultsBox.empty();
+
+                                // display matching subjects if any
+                                if (matchingSubjects.length > 0) {
+
+                                    //var h = '';
+
+                                    for(var i=0; i < matchingSubjects.length; i++){
+                                        var $suggestedSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">'+matchingSubjects[i].label+'</span>');
+                                        $suggestedSubject.click(function(){
+                                            // TODO SET SUBJECT SELECTED
+                                            console.log('CLICKED');
+                                        });
+
+                                        resultsBox.append($suggestedSubject);
+                                    }
+                                    resultsBox.show();
+                                }
+                                // TODO ask user to create the subject if label enough long
+                                else if($input.val().length > 3) {
+                                    var $suggestCreateSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">Créer ('+$input.val()+')</span>');
+
+                                    $suggestCreateSubject.click(function(){
+                                        // TODO CREATE SUBJECT AND SET CURRENT SUBJECT
+                                        console.log('TODO CREATE!');
+                                    });
+
+                                    resultsBox.append($suggestCreateSubject);
+                                    resultsBox.show();
+                                }
+                            }
+
+                            if($input.val().length <= 1){
+                                resultsBox.hide();
+                            }
+                        });
+
+                        // revert back original subject if any on focus out if no subject set
+                        $input.focusout(function () {
+
+                            if (!scope.ngModel) {
+                                scope.ngModel = scope.ngModelOriginal;
+                                if (scope.ngModel) {
+                                    $('input', element).remove();
+                                }
+
+                                $('.autocompletelist', element).hide();
+                                scope.$apply();
+                            }
+                        });
+
+                        element.append($input);
+                    };
+
+                    if (!scope.ngModelOriginal) {
+                        addInputSubject();
+                    }
+
+                    scope.$watch('ngModel', function (newVal) {
+                        if (!newVal) {
+                            return;
+                        }
+
+                        var $tag = $('<span class="tag label label-info">' + newVal.label + '<span data-role="remove" placeholder="Supprimer la matière"></span></span>');
+                        $tag.data('item', newVal);
+                        element.append($tag);
+
+                        var removeCross = $('span[data-role=remove]', $tag);
+
+                        removeCross.click(function () {
+                            scope.ngModel = null;
+                            $tag.remove();
+
+                            addInputSubject();
+                            $input.focus();
+                            scope.$apply();
+                        });
+
+
+                    });
+
+
+                }
+            }
+        });
     },
     init: function (module) {
         this.addDirectives(module);
     }
-}
+};
