@@ -117,9 +117,6 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                     subjectObject.putNumber("id", nextId);
 
                     JsonArray parameters = new JsonArray().add(nextId);
-                    for (Object id : attachments) {
-                        parameters.add(id);
-                    }
 
                     SqlStatementsBuilder sb = new SqlStatementsBuilder();
                     sb.insert("diary.subject", subjectObject, "id");
