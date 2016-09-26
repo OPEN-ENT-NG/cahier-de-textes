@@ -3,6 +3,7 @@ package fr.openent.diary.controllers;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
+import fr.openent.diary.utils.Audience;
 import fr.openent.diary.utils.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.rs.ApiDoc;
@@ -18,6 +19,7 @@ import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -292,4 +294,65 @@ public class DiaryController extends BaseController {
                 }
         );
     }
+
+    /*
+    @Post("/subject")
+    @ApiDoc("Create a lesson")
+    @SecuredAction("diary.createSubject")
+    public void createSubject(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if(user != null){
+                    RequestUtils.bodyToJson(request, pathPrefix + "createLesson", new Handler<JsonObject>() {
+                        @Override
+                        public void handle(final JsonObject json) {
+                            if(user.getStructures().contains(json.getString("school_id",""))){
+                                final Audience audience = new Audience(json);
+                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            final JsonObject result = event.right().getValue();
+                                            //create automatic sharing
+                                            final String resourceId = String.valueOf(result.getLong("id"));
+
+                                            if(!StringUtils.isEmpty(audience.getId())) {
+                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                        actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    Renders.renderJson(request, result);
+                                                                } else {
+                                                                    Renders.renderError(request);
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                log.error("Sharing Lesson has encountered a problem.");
+                                                badRequest(request, "Sharing Lesson has encountered a problem.");
+                                            }
+
+                                        } else {
+                                            log.error("Lesson could not be created.");
+                                            leftToResponse(request, event.left());
+                                        }
+                                    }
+                                });
+                            } else {
+                                log.warn("Invalid school identifier.");
+                                badRequest(request,"Invalid school identifier.");
+                            }
+                        }
+                    });
+                } else {
+                    log.warn("No user found in session.");
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+    */
 }

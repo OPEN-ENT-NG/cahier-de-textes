@@ -270,6 +270,55 @@ Homework.prototype.toJSON = function () {
 
 function Attachment(){}
 function Subject() { }
+
+/**
+ * Saves the subject to databases.
+ * It's auto-created if it does not exists in database
+ * @param cb
+ * @param cbe
+ */
+Subject.prototype.save = function(cb, cbe){
+    if(this.id) {
+        // not implemented yet at this stage/ not needed
+    }
+    else {
+        this.create(cb, cbe);
+    }
+};
+
+/**
+ * Creates a subject
+ * @param cb Callback function
+ * @param cbe Callback on error function
+ */
+Subject.prototype.create = function (cb, cbe) {
+    var subject = this;
+    http().postJson('/diary/subject', this)
+        .done(function (b) {
+            subject.updateData(b);
+            model.subjects.pushAll([subject]);
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+
+Subject.prototype.toJSON = function () {
+
+    return {
+        id: this.id,
+        school_id: this.school_id,
+        subject_label: this.label,
+        teacher_id: this.teacher_id
+    }
+};
+
 function Audience() { }
 /**
  * Info about number of homeworks for a specific day
@@ -1810,6 +1859,25 @@ model.initSubjectFilters = function () {
 
 
 /**
+ * Find subject by id
+ * @param subjectId
+ * @returns {null} Subject with id set
+ */
+model.findSubjectById = function(subjectId){
+
+    var subjectMatch = null;
+
+    model.subjects.all.forEach(function (subject) {
+
+        if(subject.id == subjectId){
+            subjectMatch = subject;
+        }
+    });
+
+    return subjectMatch;
+};
+
+/**
  * Find subjects matching label user inputed.
  * @param label Label subject (might be partial, not case sensitive)
  */
@@ -1830,6 +1898,16 @@ model.findSubjectsByLabel = function (label) {
     }
 
     return subjectsFound;
+};
+
+
+/**
+ * Creates new subject
+ */
+model.createSubject = function(label){
+
+    var subject = new Subject();
+    subject.label = label;
 };
 
 /**

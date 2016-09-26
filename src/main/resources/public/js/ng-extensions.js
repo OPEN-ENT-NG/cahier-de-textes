@@ -425,9 +425,9 @@
                 transclude: true,
                 replace: true,
                 restrict: 'E',
-                template: '<div class="bootstrap-tagsinput">'
-                    +'<span class="autocompletelist" style="position: absolute; top: 100%; left: 0px; z-index: 1000; display: none; right: auto;">TEST</span>'
-                    +'</div>',
+                template: '<span class="bootstrap-tagsinput">'
+                    +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
+                    +'</span>',
                 link: function (scope, element, attributes) {
 
                     scope.ngModelOriginal = scope.ngModel;
@@ -452,32 +452,53 @@
                                     scope.$apply();
                                 }
                             } else {
-                                var matchingSubjects = model.findSubjectsByLabel($input.val());
+                                var inputVal = $input.val().trim();
+                                var matchingSubjects = model.findSubjectsByLabel(inputVal);
                                 resultsBox.empty();
 
                                 // display matching subjects if any
                                 if (matchingSubjects.length > 0) {
 
-                                    //var h = '';
+                                    var hasPerfectMatch = false;
 
-                                    for(var i=0; i < matchingSubjects.length; i++){
-                                        var $suggestedSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">'+matchingSubjects[i].label+'</span>');
-                                        $suggestedSubject.click(function(){
-                                            // TODO SET SUBJECT SELECTED
-                                            console.log('CLICKED');
+                                    for (var i = 0; i < matchingSubjects.length; i++) {
+
+                                        if (matchingSubjects[i].label.toLowerCase() === inputVal.toLowerCase()) {
+                                            hasPerfectMatch = true;
+                                        }
+
+                                        var $suggestedSubject = $('<span  data-subject-id="'+matchingSubjects[i].id+'" style="cursor:pointer; background-color: #0097cf; color: white;">' + matchingSubjects[i].label + '</span><br>');
+
+                                        $suggestedSubject.click(function (event) {
+                                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE/FF
+                                            scope.ngModel = model.findSubjectById(selectedSubjectId);
+                                            $input.hide();
+                                            resultsBox.hide();
+                                            scope.$apply();
+                                            event.stopPropagation();
                                         });
 
                                         resultsBox.append($suggestedSubject);
                                     }
                                     resultsBox.show();
                                 }
-                                // TODO ask user to create the subject if label enough long
-                                else if($input.val().length > 3) {
-                                    var $suggestCreateSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">Créer ('+$input.val()+')</span>');
+
+                                if(inputVal.length > 3 && !hasPerfectMatch) {
+                                    var $suggestCreateSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">Créer ('+$input.val()+')</span><br>');
 
                                     $suggestCreateSubject.click(function(){
-                                        // TODO CREATE SUBJECT AND SET CURRENT SUBJECT
-                                        console.log('TODO CREATE!');
+
+                                        // add confirm dialog box to create subject?
+                                        var newSubject = new Subject();
+                                        newSubject.label = input.val().trim();
+                                        newSubject.teacher_id = model.me.userId;
+                                        newSubject.school_id = this.audience.structureId;
+
+                                        var postCreateSubjectFunc = function(){
+                                            scope.ngModel = newSubject;
+                                            $input.hide();
+                                        };
+                                        newSubject.save(postCreateSubjectFunc);
                                     });
 
                                     resultsBox.append($suggestCreateSubject);
@@ -491,7 +512,10 @@
                         });
 
                         // revert back original subject if any on focus out if no subject set
-                        $input.focusout(function () {
+                        $input.focusout(function (event) {
+
+
+                            return;
 
                             if (!scope.ngModel) {
                                 scope.ngModel = scope.ngModelOriginal;
@@ -527,6 +551,8 @@
                             $tag.remove();
 
                             addInputSubject();
+                            $input.val('');
+                            $input.show();
                             $input.focus();
                             scope.$apply();
                         });
