@@ -445,7 +445,7 @@
                         var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
 
                         $suggestedSubject.click(function (event) {
-                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE/FF
+                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE
                             scope.ngModel = model.findSubjectById(selectedSubjectId);
                             $input.hide();
                             resultsBox.hide();
@@ -526,7 +526,12 @@
                                         var newSubject = new Subject();
                                         newSubject.label = $input.val().trim();
                                         newSubject.teacher_id = model.me.userId;
-                                        newSubject.school_id = scope.$parent.lesson.audience.structureId;
+
+                                        if (scope.$parent.lesson) {
+                                            newSubject.school_id = scope.$parent.lesson.audience.structureId;
+                                        } else {
+                                            newSubject.school_id = scope.$parent.homework.audience.structureId;
+                                        }
 
                                         var postCreateSubjectFunc = function(){
                                             scope.ngModel = newSubject;
@@ -586,6 +591,10 @@
                             $tag.remove();
 
                             addInputSubject();
+                            // on subject change reload previous lessons
+                            if (scope.$parent.lesson) {
+                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
+                            }
                             $input.val('');
                             $input.show();
                             $input.focus();

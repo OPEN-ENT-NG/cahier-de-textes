@@ -447,12 +447,13 @@ section .homeworkInfos {
 }
 
 .custom-tagsinput .autocompletelist {
-    margin-top: 2px;
-    width: 200px;
+    margin-top: -10px;
+    width: auto;
     padding: 2px 0;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     background-color: white;
+    box-shadow: 6px 6px 3px #808080;
 }
 
 .custom-tagsinput .custom-tag:hover{
