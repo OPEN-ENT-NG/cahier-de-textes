@@ -436,24 +436,30 @@ section .homeworkInfos {
     border-radius: .25em;
 }
 
-.bootstrap-tagsinput .tag [data-role="remove"] {
+.custom-tagsinput .custom-tag [data-role="remove"] {
     margin-left: 8px;
     cursor: pointer;
 }
 
-.bootstrap-tagsinput .tag [data-role="remove"]:after {
+.custom-tagsinput .custom-tag [data-role="remove"]:after {
     content: "x";
     padding: 0px 2px;
 }
 
-.bootstrap-tagsinput .autocompletelist {
+.custom-tagsinput .autocompletelist {
     margin-top: 2px;
     width: 200px;
     padding: 2px 0;
     border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: white;
+}
+
+.custom-tagsinput .custom-tag:hover{
+    background-color: blue;
 }
 
 .choosesubject {
     cursor: pointer;
-    background-color: #0097cf;
+    background-color: powderblue;
 }

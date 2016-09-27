@@ -296,7 +296,7 @@ Subject.prototype.create = function (cb, cbe) {
     http().postJson('/diary/subject', this)
         .done(function (b) {
             subject.updateData(b);
-            model.subjects.pushAll([subject]);
+            model.subjects.all.push(subject);
             if (typeof cb === 'function') {
                 cb();
             }
@@ -1904,10 +1904,11 @@ model.findSubjectsByLabel = function (label) {
 /**
  * Creates new subject
  */
-model.createSubject = function(label){
+model.createSubject = function(label, cb, cbe){
 
     var subject = new Subject();
     subject.label = label;
+    subject.save(cb, cbe);
 };
 
 /**

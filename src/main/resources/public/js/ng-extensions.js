@@ -425,18 +425,57 @@
                 transclude: true,
                 replace: true,
                 restrict: 'E',
-                template: '<span class="bootstrap-tagsinput">'
+                template: '<span class="custom-tagsinput">'
                     +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
                     +'</span>',
                 link: function (scope, element, attributes) {
 
-                    scope.ngModelOriginal = scope.ngModel;
-
                     var $input = $('<input type="text" placeholder="Saisir une matière">');
+                    var resultsBox = $('.autocompletelist', element);
+
+                    scope.ngModelOriginal = scope.ngModel;
+                    scope.addSubject = function(subject){
+                        var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
+                        $tag.data('item', subject);
+                        element.append($tag);
+                        return $tag;
+                    };
+
+                    scope.addSuggestedSubject = function(subject){
+                        var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
+
+                        $suggestedSubject.click(function (event) {
+                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE/FF
+                            scope.ngModel = model.findSubjectById(selectedSubjectId);
+                            $input.hide();
+                            resultsBox.hide();
+                            scope.$apply();
+                            event.stopPropagation();
+                        });
+
+                        resultsBox.append($suggestedSubject);
+                    };
 
                     var addInputSubject = function () {
 
-                        var resultsBox = $('.autocompletelist', element);
+                        var initSuggestedSubjectsBox = function(){
+                            resultsBox.empty();
+
+                            model.subjects.all.sort(function (a, b) {
+                                if (a.label > b.label)
+                                    return 1;
+                                if (a.label < b.label)
+                                    return -1;
+                                return 0;
+                            });
+
+                            for (var i = 0; i < model.subjects.all.length; i++) {
+                                scope.addSuggestedSubject(model.subjects.all[i]);
+                            }
+                            resultsBox.show();
+                        };
+
+                        initSuggestedSubjectsBox();
 
                         // revert back original subject if any on tab out
                         $input.bind('keyup', function (e) {
@@ -454,6 +493,13 @@
                             } else {
                                 var inputVal = $input.val().trim();
                                 var matchingSubjects = model.findSubjectsByLabel(inputVal);
+                                matchingSubjects.sort(function (a, b) {
+                                    if (a.label > b.label)
+                                        return 1;
+                                    if (a.label < b.label)
+                                        return -1;
+                                    return 0;
+                                });
                                 resultsBox.empty();
 
                                 // display matching subjects if any
@@ -463,46 +509,39 @@
 
                                     for (var i = 0; i < matchingSubjects.length; i++) {
 
-                                        if (matchingSubjects[i].label.toLowerCase() === inputVal.toLowerCase()) {
+                                        if (sansAccent(matchingSubjects[i].label.toLowerCase()) === sansAccent(inputVal.toLowerCase())) {
                                             hasPerfectMatch = true;
                                         }
 
-                                        var $suggestedSubject = $('<span  data-subject-id="'+matchingSubjects[i].id+'" style="cursor:pointer; background-color: #0097cf; color: white;">' + matchingSubjects[i].label + '</span><br>');
-
-                                        $suggestedSubject.click(function (event) {
-                                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE/FF
-                                            scope.ngModel = model.findSubjectById(selectedSubjectId);
-                                            $input.hide();
-                                            resultsBox.hide();
-                                            scope.$apply();
-                                            event.stopPropagation();
-                                        });
-
-                                        resultsBox.append($suggestedSubject);
+                                        scope.addSuggestedSubject(matchingSubjects[i]);
                                     }
                                     resultsBox.show();
                                 }
 
-                                if(inputVal.length > 3 && !hasPerfectMatch) {
-                                    var $suggestCreateSubject=$('<span style="cursor: pointer; background-color: #0097cf; color: white;">Créer ('+$input.val()+')</span><br>');
+                                if(inputVal.length > 2 && !hasPerfectMatch) {
+                                    var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
 
                                     $suggestCreateSubject.click(function(){
 
-                                        // add confirm dialog box to create subject?
                                         var newSubject = new Subject();
-                                        newSubject.label = input.val().trim();
+                                        newSubject.label = $input.val().trim();
                                         newSubject.teacher_id = model.me.userId;
-                                        newSubject.school_id = this.audience.structureId;
+                                        newSubject.school_id = scope.$parent.lesson.audience.structureId;
 
                                         var postCreateSubjectFunc = function(){
                                             scope.ngModel = newSubject;
+                                            scope.$parent.subject = newSubject;
+                                            resultsBox.hide();
                                             $input.hide();
+                                            $tag.show();
                                         };
                                         newSubject.save(postCreateSubjectFunc);
                                     });
 
                                     resultsBox.append($suggestCreateSubject);
                                     resultsBox.show();
+                                } else if(inputVal.length === 0){
+                                    initSuggestedSubjectsBox();
                                 }
                             }
 
@@ -512,8 +551,7 @@
                         });
 
                         // revert back original subject if any on focus out if no subject set
-                        $input.focusout(function (event) {
-
+                        element.focusout(function (event) {
 
                             return;
 
@@ -540,10 +578,7 @@
                             return;
                         }
 
-                        var $tag = $('<span class="tag label label-info">' + newVal.label + '<span data-role="remove" placeholder="Supprimer la matière"></span></span>');
-                        $tag.data('item', newVal);
-                        element.append($tag);
-
+                        var $tag = scope.addSubject(newVal);
                         var removeCross = $('span[data-role=remove]', $tag);
 
                         removeCross.click(function () {

@@ -295,49 +295,30 @@ public class DiaryController extends BaseController {
         );
     }
 
-    /*
+
     @Post("/subject")
     @ApiDoc("Create a lesson")
-    @SecuredAction("diary.createSubject")
+    //@SecuredAction("diary.createSubject")
     public void createSubject(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
                 if(user != null){
-                    RequestUtils.bodyToJson(request, pathPrefix + "createLesson", new Handler<JsonObject>() {
+                    RequestUtils.bodyToJson(request, pathPrefix + "createSubject", new Handler<JsonObject>() {
                         @Override
                         public void handle(final JsonObject json) {
                             if(user.getStructures().contains(json.getString("school_id",""))){
-                                final Audience audience = new Audience(json);
-                                lessonService.createLesson(json, user.getUserId(), user.getUsername(), audience, new Handler<Either<String, JsonObject>>() {
+                                diaryService.createSubject(json, new Handler<Either<String, JsonObject>>() {
                                     @Override
                                     public void handle(Either<String, JsonObject> event) {
+
+                                        final JsonObject result = event.right().getValue();
+
                                         if (event.isRight()) {
-                                            final JsonObject result = event.right().getValue();
-                                            //create automatic sharing
-                                            final String resourceId = String.valueOf(result.getLong("id"));
-
-                                            if(!StringUtils.isEmpty(audience.getId())) {
-                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
-                                                        actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
-                                                            @Override
-                                                            public void handle(Either<String, JsonObject> event) {
-                                                                if (event.isRight()) {
-                                                                    Renders.renderJson(request, result);
-                                                                } else {
-                                                                    Renders.renderError(request);
-                                                                }
-                                                            }
-                                                        });
-                                            } else {
-                                                log.error("Sharing Lesson has encountered a problem.");
-                                                badRequest(request, "Sharing Lesson has encountered a problem.");
-                                            }
-
+                                            Renders.renderJson(request, result);
                                         } else {
-                                            log.error("Lesson could not be created.");
-                                            leftToResponse(request, event.left());
+                                            Renders.renderError(request);
                                         }
                                     }
                                 });
@@ -354,5 +335,5 @@ public class DiaryController extends BaseController {
             }
         });
     }
-    */
+
 }
