@@ -420,7 +420,7 @@ section .homeworkInfos {
     color: white;
 }
 .label-info {
-    background-color: #5bc0de;
+    background-color: #2a9cc8;
 }
 
 .label {
@@ -434,6 +434,8 @@ section .homeworkInfos {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
 .custom-tagsinput .custom-tag [data-role="remove"] {
@@ -453,7 +455,7 @@ section .homeworkInfos {
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     background-color: white;
-    box-shadow: 6px 6px 3px #808080;
+    box-shadow: 6px 4px 3px #cfcfcf;
 }
 
 .custom-tagsinput .custom-tag:hover{
