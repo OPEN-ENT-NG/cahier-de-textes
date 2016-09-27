@@ -434,16 +434,42 @@
                     var resultsBox = $('.autocompletelist', element);
 
                     scope.ngModelOriginal = scope.ngModel;
-                    scope.addSubject = function(subject){
+
+                    /**
+                     * Display current subject of lesson or homework
+                     */
+                    scope.displaySubject = function(subject){
                         var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
                         element.append($tag);
+
+                        var removeCross = $('span[data-role=remove]', $tag);
+
+                        // on removing lesson/hw subject display input field to select another subject
+                        removeCross.click(function () {
+                            //scope.ngModel = null;
+                            $tag.remove();
+
+                            scope.addInputSubject();
+                            // on subject change reload previous lessons
+                            if (scope.$parent.lesson) {
+                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
+                            }
+                            $input.val('');
+                            $input.show();
+                            $input.focus();
+                            scope.$apply();
+                        });
+
                         return $tag;
                     };
 
                     scope.addSuggestedSubject = function(subject){
                         var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
 
+                        /**
+                         * on selecting subject set this subject to lesson/homework
+                         */
                         $suggestedSubject.click(function (event) {
                             var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE
                             scope.ngModel = model.findSubjectById(selectedSubjectId);
@@ -456,7 +482,7 @@
                         resultsBox.append($suggestedSubject);
                     };
 
-                    var addInputSubject = function () {
+                    scope.addInputSubject = function () {
 
                         var initSuggestedSubjectsBox = function(){
                             resultsBox.empty();
@@ -490,7 +516,9 @@
                                     }
                                     scope.$apply();
                                 }
-                            } else {
+                            }
+                            // search existing subject matching
+                            else {
                                 var inputVal = $input.val().trim();
                                 var matchingSubjects = model.findSubjectsByLabel(inputVal);
                                 matchingSubjects.sort(function (a, b) {
@@ -575,7 +603,7 @@
                     };
 
                     if (!scope.ngModelOriginal) {
-                        addInputSubject();
+                        scope.addInputSubject();
                     }
 
                     scope.$watch('ngModel', function (newVal) {
@@ -583,25 +611,7 @@
                             return;
                         }
 
-                        var $tag = scope.addSubject(newVal);
-                        var removeCross = $('span[data-role=remove]', $tag);
-
-                        removeCross.click(function () {
-                            scope.ngModel = null;
-                            $tag.remove();
-
-                            addInputSubject();
-                            // on subject change reload previous lessons
-                            if (scope.$parent.lesson) {
-                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
-                            }
-                            $input.val('');
-                            $input.show();
-                            $input.focus();
-                            scope.$apply();
-                        });
-
-
+                        scope.displaySubject(newVal);
                     });
 
 
