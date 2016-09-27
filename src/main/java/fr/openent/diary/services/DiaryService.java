@@ -43,4 +43,11 @@ public interface DiaryService {
      * @param handler
      */
     void listChildren(final String parentId, final Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * Get all classes and groups for the structure.
+     * @param schoolId
+     * @param handler
+     */
+    void listClasses(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 }

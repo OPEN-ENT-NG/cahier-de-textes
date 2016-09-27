@@ -292,4 +292,22 @@ public class DiaryController extends BaseController {
                 }
         );
     }
+
+    @Get("/classes/list/:schoolId")
+    @ApiDoc("Get all classes and groups for a school")
+    @SecuredAction(value = list_subjects, type = ActionType.AUTHENTICATED)
+    public void listClasses(final HttpServerRequest request) {
+        final String schoolId = request.params().get("schoolId");
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(final UserInfos user) {
+                if (user != null) {
+                    diaryService.listClasses(schoolId, arrayResponseHandler(request));
+                } else {
+                    badRequest(request, "diary.invalid.login");
+                }
+                }
+            }
+        );
+    }
 }

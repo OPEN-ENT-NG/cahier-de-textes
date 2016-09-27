@@ -415,4 +415,12 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         });
 
     }
+
+    @Override
+    public void listClasses(final String schoolId, final Handler<Either<String, JsonArray>> handler) {
+        StringBuilder query = new StringBuilder("");
+        query.append(" match (c:Class)-[BELONGS]->(s:Structure) where s.id='{id}'");
+        JsonObject params = new JsonObject().putString("id", schoolId);
+        neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
+    }
 }
