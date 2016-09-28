@@ -567,7 +567,6 @@
                                             scope.$parent.subject = newSubject;
                                             resultsBox.hide();
                                             $input.hide();
-                                            $tag.show();
                                         };
                                         newSubject.save(postCreateSubjectFunc);
                                     });
