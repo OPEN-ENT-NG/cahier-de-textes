@@ -546,7 +546,8 @@
                                     resultsBox.show();
                                 }
 
-                                if(inputVal.length > 2 && !hasPerfectMatch) {
+
+                                if(inputVal.length > 0 && !hasPerfectMatch) {
                                     var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
 
                                     $suggestCreateSubject.click(function(){
@@ -575,11 +576,8 @@
                                     resultsBox.show();
                                 } else if(inputVal.length === 0){
                                     initSuggestedSubjectsBox();
+                                    //scope.displaySubject()
                                 }
-                            }
-
-                            if($input.val().length <= 1){
-                                resultsBox.hide();
                             }
                         });
 
