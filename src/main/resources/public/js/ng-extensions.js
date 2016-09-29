@@ -427,11 +427,20 @@
                 restrict: 'E',
                 template: '<span class="custom-tagsinput">'
                     +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
+                    +'<span id="current-subject"></span>'
                     +'</span>',
                 link: function (scope, element, attributes) {
 
                     var $input = $('<input type="text" placeholder="Saisir une matière">');
+                    var $subjectContainer = $('#current-subject', element);
                     var resultsBox = $('.autocompletelist', element);
+                    var sortBySubjectLabel = function (a, b) {
+                        if (a.label > b.label)
+                            return 1;
+                        if (a.label < b.label)
+                            return -1;
+                        return 0;
+                    };
 
                     scope.ngModelOriginal = scope.ngModel;
 
@@ -441,7 +450,9 @@
                     scope.displaySubject = function(subject){
                         var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
-                        element.append($tag);
+                        // make sure only one subject of current lesson/hw will be displayed
+                        $subjectContainer.empty();
+                        $subjectContainer.append($tag);
 
                         var removeCross = $('span[data-role=remove]', $tag);
 
@@ -487,13 +498,7 @@
                         var initSuggestedSubjectsBox = function(){
                             resultsBox.empty();
 
-                            model.subjects.all.sort(function (a, b) {
-                                if (a.label > b.label)
-                                    return 1;
-                                if (a.label < b.label)
-                                    return -1;
-                                return 0;
-                            });
+                            model.subjects.all.sort(sortBySubjectLabel);
 
                             for (var i = 0; i < model.subjects.all.length; i++) {
                                 scope.addSuggestedSubject(model.subjects.all[i]);
@@ -521,13 +526,7 @@
                             else {
                                 var inputVal = $input.val().trim();
                                 var matchingSubjects = model.findSubjectsByLabel(inputVal);
-                                matchingSubjects.sort(function (a, b) {
-                                    if (a.label > b.label)
-                                        return 1;
-                                    if (a.label < b.label)
-                                        return -1;
-                                    return 0;
-                                });
+                                matchingSubjects.sort(sortBySubjectLabel);
                                 resultsBox.empty();
 
                                 // display matching subjects if any
@@ -546,7 +545,7 @@
                                     resultsBox.show();
                                 }
 
-
+                                // adds entry for creating subject only if subject keyed in does not exist
                                 if(inputVal.length > 0 && !hasPerfectMatch) {
                                     var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
 
@@ -575,7 +574,6 @@
                                     resultsBox.show();
                                 } else if(inputVal.length === 0){
                                     initSuggestedSubjectsBox();
-                                    //scope.displaySubject()
                                 }
                             }
                         });
