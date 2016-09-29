@@ -1637,7 +1637,7 @@ model.initHomework = function (lesson) {
         homework.state = DEFAULT_STATE;
     }
 
-    model.loadHomeworksLoad(homework, homework.date, homework.audience.id);
+    model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), homework.audience.id);
 
     return homework;
 };
