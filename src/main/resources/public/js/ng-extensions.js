@@ -7,9 +7,9 @@
                 },
                 restrict: 'E',
                 template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
-                '<i class="resize-homeworks-panel" ng-class="{ expanded: !show.bShowHomeworksMinified}"  style="float: left; width: 130px;"  ng-click="toggleHomeworkPanelMinized()"></i></li></ul></span>'+
+                '<i class="resize-homeworks-panel"   style="float: left; width: 130px;">&nbsp;</i></li></ul></span>'+
                 '<div class="days" style="z-index: 1000; ">' +
-                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 120px;">' +
+                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
 
                         // <= 3 homeworks for current day
                         // or 1 homework and homework panel minified
@@ -27,7 +27,7 @@
                         '</div>' +
                         '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
                             'ng-click="toggleOpenDailyEvents(day, $event)" ' +
-                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
+                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
@@ -166,7 +166,7 @@
 
                         // calendar hidden and homework panel maximized -> show all
                         if (!model.show.bShowHomeworksMinified) {
-                            return !model.show.bShowCalendar || (day.dailyEvents.length <= 3);
+                            return !model.show.bShowCalendar || (day.dailyEvents.length <= 1);
                         } else {
                             return day.dailyEvents.length == 1;
                         }
@@ -199,7 +199,7 @@
                         if (!bShowCalendar) {
                             homeworksPerDayDisplayed = getMaxHomeworksPerDay();
                         } else {
-                            homeworksPerDayDisplayed = bShowHomeworksMinified ? 1 : 3;
+                            homeworksPerDayDisplayed = 1;
                         }
 
                         return homeworksPerDayDisplayed * HW_HEIGHT;

@@ -225,19 +225,11 @@ div.notification {
 
 
 .resize-homeworks-panel {
-    font-size: 90px;
     float: left;
     vertical-align: middle !important;
     background-color: transparent !important;
 }
 
-.resize-homeworks-panel.expanded::before {
-    content: "▾";
-}
-
-.resize-homeworks-panel::before {
-    content: "▸";
-}
 
 calendar-daily-events .days .day {
     width: calc(100% / 7 - (130px) / 7) !important;
