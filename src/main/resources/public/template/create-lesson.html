@@ -1,12 +1,10 @@
-﻿<form name="lessonform">
-    <h2><i18n>lesson.details.title</i18n></h2>
+﻿<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></a></h1>
+<form name="lessonform">
     <div class="row">
-        <div class="three cell">
-            <label><i18n>subject</i18n></label>
+        <div class="two cell">
             <item-picker ng-model="lesson.subject" ng-change="loadPreviousLessonsFromLesson(lesson);"></item-picker>
         </div>
-        <div class="three cell">
-            <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>
+        <div class="two cell">
             <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson); loadPreviousLessonsFromLesson(lesson);"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
             ></select>

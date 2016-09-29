@@ -148,7 +148,7 @@ Override marging for homeworks display
 
 section .homework-detail {
     margin-top: -1px;
-    border: 1px solid;
+    border: 1px solid #4bafd5;
     padding: 6px;
 }
 
@@ -457,4 +457,14 @@ section .homeworkInfos {
 .choosesubject {
     cursor: pointer;
     background-color: powderblue;
+}
+
+.filter-big {
+    border: 1px solid #2a9cc8 !important;
+    height: 32px !important;
+    font-size:24px !important;
+}
+
+.tabs section {
+    border-color: #4bafd5 !important;
 }
