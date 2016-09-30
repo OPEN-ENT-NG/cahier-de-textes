@@ -6,10 +6,10 @@
 </div>
 <form name="homeworkform">
     <div class="row">
-        <div class="two cell">
+        <div class="three cell">
             <item-picker ng-model="homework.subject"></item-picker>
         </div>
-        <div class="two cell">
+        <div class="three cell">
             <select ng-model="homework.audience" ng-change="showHomeworksLoad(homework)"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select>
         </div>

@@ -426,7 +426,7 @@
                 replace: true,
                 restrict: 'E',
                 template: '<span class="custom-tagsinput">'
-                    +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
+                    +'<div class="autocompletelist" style="position: absolute; top: 100%; z-index: 1000; display: none; right: auto;"></div>'
                     +'<span id="current-subject"></span>'
                     +'</span>',
                 link: function (scope, element, attributes) {
@@ -448,7 +448,7 @@
                      * Display current subject of lesson or homework
                      */
                     scope.displaySubject = function(subject){
-                        var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
+                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
                         // make sure only one subject of current lesson/hw will be displayed
                         $subjectContainer.empty();
@@ -476,7 +476,7 @@
                     };
 
                     scope.addSuggestedSubject = function(subject){
-                        var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
+                        var $suggestedSubject = $('<span class="item-suggest"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
 
                         /**
                          * on selecting subject set this subject to lesson/homework
