@@ -2,13 +2,13 @@
     <div class="dropdown-display" ng-click="show();" ng-class="{ clicked: listVisible }">
         <span ng-if="!isPlaceholder">{{display}}</span>
 		<span class="placeholder" ng-if="isPlaceholder">{{placeholder}}</span>
-		<i class="fa fa-angle-down"></i>
+		<i class="arrow-down"></i>
     </div>
     <div class="dropdown-list">
         <div>
-            <div ng-repeat="subject in subjects" ng-click="select(subject)" ng-class="{ selected: isSelected(subject) }">
-                <span>{{property !== undefined ? subject[property] : subject}}</span>
-                <i class="fa fa-check"></i>
+            <div ng-repeat="audience in list" ng-click="select(audience)" ng-class="{ selected: isSelected(audience) }">
+                <span>{{property !== undefined ? audience[property] : audience}}</span>
+                <i class="check-selected"></i>
             </div>
         </div>
     </div>

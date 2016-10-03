@@ -608,10 +608,11 @@
                 }
             }
         });
-        module.directive('ent-dropdown', function ($rootscope) {
+
+        module.directive('entDropdown', function () {
             return {
                 restrict: "E",
-                templateUrl: "template/ent-dropdown.html",
+                templateUrl: "diary/public/template/ent-dropdown.html",
                 scope: {
                     placeholder: "@",
                     list: "=",
@@ -622,26 +623,19 @@
                     scope.listVisible = false;
                     scope.isPlaceholder = true;
 
-                    scope.select = function(item) {
+                    scope.select = function(audience) {
                         scope.isPlaceholder = false;
-                        scope.selected = item;
+                        scope.selected = audience;
+                        scope.listVisible = false;
                     };
 
-                    scope.isSelected = function(item) {
-                        return item[scope.property] === scope.selected[scope.property];
+                    scope.isSelected = function(audience) {
+                        return audience[scope.property] === scope.selected[scope.property];
                     };
 
                     scope.show = function() {
                         scope.listVisible = true;
                     };
-
-                    $rootScope.$on("documentClicked", function(inner, target) {
-                        console.log($(target[0]).is(".dropdown-display.clicked") || $(target[0]).parents(".dropdown-display.clicked").length > 0);
-                        if (!$(target[0]).is(".dropdown-display.clicked") && !$(target[0]).parents(".dropdown-display.clicked").length > 0)
-                            scope.$apply(function() {
-                                scope.listVisible = false;
-                            });
-                    });
 
                     scope.$watch("selected", function(value) {
                         scope.isPlaceholder = scope.selected[scope.property] === undefined;
