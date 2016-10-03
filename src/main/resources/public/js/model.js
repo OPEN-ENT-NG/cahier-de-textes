@@ -270,6 +270,55 @@ Homework.prototype.toJSON = function () {
 
 function Attachment(){}
 function Subject() { }
+
+/**
+ * Saves the subject to databases.
+ * It's auto-created if it does not exists in database
+ * @param cb
+ * @param cbe
+ */
+Subject.prototype.save = function(cb, cbe){
+    if(this.id) {
+        // not implemented yet at this stage/ not needed
+    }
+    else {
+        this.create(cb, cbe);
+    }
+};
+
+/**
+ * Creates a subject
+ * @param cb Callback function
+ * @param cbe Callback on error function
+ */
+Subject.prototype.create = function (cb, cbe) {
+    var subject = this;
+    http().postJson('/diary/subject', this)
+        .done(function (b) {
+            subject.updateData(b);
+            model.subjects.all.push(subject);
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });
+};
+
+
+Subject.prototype.toJSON = function () {
+
+    return {
+        id: this.id,
+        school_id: this.school_id,
+        subject_label: this.label,
+        teacher_id: this.teacher_id
+    }
+};
+
 function Audience() { }
 /**
  * Info about number of homeworks for a specific day
@@ -1806,4 +1855,83 @@ model.initSubjectFilters = function () {
     });
 
     model.searchForm.subjectsFilters = filters;
+};
+
+
+/**
+ * Find subject by id
+ * @param subjectId
+ * @returns {null} Subject with id set
+ */
+model.findSubjectById = function(subjectId){
+
+    var subjectMatch = null;
+
+    model.subjects.all.forEach(function (subject) {
+
+        if(subject.id == subjectId){
+            subjectMatch = subject;
+        }
+    });
+
+    return subjectMatch;
+};
+
+/**
+ * Find subjects matching label user inputed.
+ * @param label Label subject (might be partial, not case sensitive)
+ */
+model.findSubjectsByLabel = function (label) {
+
+    var subjectsFound = new Array();
+
+    if (label.length > 0) {
+        var labelLowerCaseNoAccent = sansAccent(label).toLowerCase();
+
+        model.subjects.all.forEach(function (subject) {
+            var labelSubjectLowerCaseNoAccent = sansAccent(subject.label.toLowerCase());
+
+            if (labelSubjectLowerCaseNoAccent.indexOf(labelLowerCaseNoAccent) != -1) {
+                subjectsFound.push(subject);
+            }
+        });
+    }
+
+    return subjectsFound;
+};
+
+
+/**
+ * Creates new subject
+ */
+model.createSubject = function(label, cb, cbe){
+
+    var subject = new Subject();
+    subject.label = label;
+    subject.save(cb, cbe);
+};
+
+/**
+ * removes accent from any string
+ * @param str
+ * @returns {*}
+ */
+var sansAccent = function (str) {
+    var accent = [
+        /[\300-\306]/g, /[\340-\346]/g, // A, a
+        /[\310-\313]/g, /[\350-\353]/g, // E, e
+        /[\314-\317]/g, /[\354-\357]/g, // I, i
+        /[\322-\330]/g, /[\362-\370]/g, // O, o
+        /[\331-\334]/g, /[\371-\374]/g, // U, u
+        /[\321]/g, /[\361]/g, // N, n
+        /[\307]/g, /[\347]/g // C, c
+    ];
+    var noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
+    
+
+    for (var i = 0; i < accent.length; i++) {
+        str = str.replace(accent[i], noaccent[i]);
+    }
+
+    return str;
 };

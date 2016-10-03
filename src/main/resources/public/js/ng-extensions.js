@@ -31,7 +31,7 @@
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
-                        '</div>' +4
+                        '</div>' +
                     '</div>' +
                 '</div>',
                 link: function(scope, element, attributes){
@@ -416,6 +416,198 @@
             }
         });
 
+        module.directive('itemPicker', function () {
+            return {
+                scope: {
+                    ngModel: '=',
+                    ngChange: '&'
+                },
+                transclude: true,
+                replace: true,
+                restrict: 'E',
+                template: '<span class="custom-tagsinput">'
+                    +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
+                    +'</span>',
+                link: function (scope, element, attributes) {
+
+                    var $input = $('<input type="text" placeholder="Saisir une matière">');
+                    var resultsBox = $('.autocompletelist', element);
+
+                    scope.ngModelOriginal = scope.ngModel;
+                    scope.addSubject = function(subject){
+                        var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
+                        $tag.data('item', subject);
+                        element.append($tag);
+                        return $tag;
+                    };
+
+                    scope.addSuggestedSubject = function(subject){
+                        var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
+
+                        $suggestedSubject.click(function (event) {
+                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE
+                            scope.ngModel = model.findSubjectById(selectedSubjectId);
+                            $input.hide();
+                            resultsBox.hide();
+                            scope.$apply();
+                            event.stopPropagation();
+                        });
+
+                        resultsBox.append($suggestedSubject);
+                    };
+
+                    var addInputSubject = function () {
+
+                        var initSuggestedSubjectsBox = function(){
+                            resultsBox.empty();
+
+                            model.subjects.all.sort(function (a, b) {
+                                if (a.label > b.label)
+                                    return 1;
+                                if (a.label < b.label)
+                                    return -1;
+                                return 0;
+                            });
+
+                            for (var i = 0; i < model.subjects.all.length; i++) {
+                                scope.addSuggestedSubject(model.subjects.all[i]);
+                            }
+                            resultsBox.show();
+                        };
+
+                        initSuggestedSubjectsBox();
+
+                        // revert back original subject if any on tab out
+                        $input.bind('keyup', function (e) {
+                            // tab key
+                            if (e.keyCode === 9) {
+                                if (!scope.ngModel) {
+                                    scope.ngModel = scope.ngModelOriginal;
+
+                                    if (scope.ngModel) {
+                                        $('input', element).remove();
+                                        resultsBox.hide();
+                                    }
+                                    scope.$apply();
+                                }
+                            } else {
+                                var inputVal = $input.val().trim();
+                                var matchingSubjects = model.findSubjectsByLabel(inputVal);
+                                matchingSubjects.sort(function (a, b) {
+                                    if (a.label > b.label)
+                                        return 1;
+                                    if (a.label < b.label)
+                                        return -1;
+                                    return 0;
+                                });
+                                resultsBox.empty();
+
+                                // display matching subjects if any
+                                if (matchingSubjects.length > 0) {
+
+                                    var hasPerfectMatch = false;
+
+                                    for (var i = 0; i < matchingSubjects.length; i++) {
+
+                                        if (sansAccent(matchingSubjects[i].label.toLowerCase()) === sansAccent(inputVal.toLowerCase())) {
+                                            hasPerfectMatch = true;
+                                        }
+
+                                        scope.addSuggestedSubject(matchingSubjects[i]);
+                                    }
+                                    resultsBox.show();
+                                }
+
+                                if(inputVal.length > 2 && !hasPerfectMatch) {
+                                    var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
+
+                                    $suggestCreateSubject.click(function(){
+
+                                        var newSubject = new Subject();
+                                        newSubject.label = $input.val().trim();
+                                        newSubject.teacher_id = model.me.userId;
+
+                                        if (scope.$parent.lesson) {
+                                            newSubject.school_id = scope.$parent.lesson.audience.structureId;
+                                        } else {
+                                            newSubject.school_id = scope.$parent.homework.audience.structureId;
+                                        }
+
+                                        var postCreateSubjectFunc = function(){
+                                            scope.ngModel = newSubject;
+                                            scope.$parent.subject = newSubject;
+                                            resultsBox.hide();
+                                            $input.hide();
+                                            $tag.show();
+                                        };
+                                        newSubject.save(postCreateSubjectFunc);
+                                    });
+
+                                    resultsBox.append($suggestCreateSubject);
+                                    resultsBox.show();
+                                } else if(inputVal.length === 0){
+                                    initSuggestedSubjectsBox();
+                                }
+                            }
+
+                            if($input.val().length <= 1){
+                                resultsBox.hide();
+                            }
+                        });
+
+                        // revert back original subject if any on focus out if no subject set
+                        element.focusout(function (event) {
+
+                            return;
+
+                            if (!scope.ngModel) {
+                                scope.ngModel = scope.ngModelOriginal;
+                                if (scope.ngModel) {
+                                    $('input', element).remove();
+                                }
+
+                                $('.autocompletelist', element).hide();
+                                scope.$apply();
+                            }
+                        });
+
+                        element.append($input);
+                    };
+
+                    if (!scope.ngModelOriginal) {
+                        addInputSubject();
+                    }
+
+                    scope.$watch('ngModel', function (newVal) {
+                        if (!newVal) {
+                            return;
+                        }
+
+                        var $tag = scope.addSubject(newVal);
+                        var removeCross = $('span[data-role=remove]', $tag);
+
+                        removeCross.click(function () {
+                            scope.ngModel = null;
+                            $tag.remove();
+
+                            addInputSubject();
+                            // on subject change reload previous lessons
+                            if (scope.$parent.lesson) {
+                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
+                            }
+                            $input.val('');
+                            $input.show();
+                            $input.focus();
+                            scope.$apply();
+                        });
+
+
+                    });
+
+
+                }
+            }
+        });
         module.directive('ent-dropdown', function ($rootscope) {
             return {
                 restrict: "E",
@@ -463,4 +655,4 @@
     init: function (module) {
         this.addDirectives(module);
     }
-}
+};

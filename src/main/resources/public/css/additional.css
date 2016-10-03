@@ -1,11 +1,11 @@
 ul {
-    list-style-type: none;
-    margin-top: 0;
-    width: 99%;
-    border-left: 5px solid transparent !important;
-    padding-left: 10px;
-    padding-right: 15px;
-}
+     list-style-type: none;
+     margin-top: 0;
+     width: 99%;
+     border-left: 5px solid transparent !important;
+     padding-left: 10px;
+     padding-right: 15px;
+ }
 
 ul li i {
     color: #FF8500;
@@ -415,10 +415,52 @@ section .homeworkInfos {
     background-color: saddlebrown;
 }
 
-ent-dropdown {
-
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white;
+}
+.label-info {
+    background-color: #5bc0de;
 }
 
-ent-dropdown.i {
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
 
+.custom-tagsinput .custom-tag [data-role="remove"] {
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.custom-tagsinput .custom-tag [data-role="remove"]:after {
+    content: "x";
+    padding: 0px 2px;
+}
+
+.custom-tagsinput .autocompletelist {
+    margin-top: -10px;
+    width: auto;
+    padding: 2px 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: 6px 6px 3px #808080;
+}
+
+.custom-tagsinput .custom-tag:hover{
+    background-color: blue;
+}
+
+.choosesubject {
+    cursor: pointer;
+    background-color: powderblue;
 }

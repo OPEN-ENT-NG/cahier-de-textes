@@ -100,9 +100,32 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         }
     }
 
+    /**
+     * Creates a subject
+     * @param subjectObject
+     * @param handler
+     */
     @Override
-    public void createSubject(JsonObject subjectObject, Handler<Either<String, JsonObject>> handler) {
+    public void createSubject(final JsonObject subjectObject, final Handler<Either<String, JsonObject>> handler) {
 
+        sql.raw("select nextval('diary.subject_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    log.debug(event.right().getValue());
+                    Long nextId = event.right().getValue().getLong("next_id");
+                    subjectObject.putNumber("id", nextId);
+
+                    JsonArray parameters = new JsonArray().add(nextId);
+
+                    SqlStatementsBuilder sb = new SqlStatementsBuilder();
+                    sb.insert("diary.subject", subjectObject, "id");
+
+
+                    sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                }
+            }
+        }));
     }
 
     @Override
