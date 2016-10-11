@@ -425,7 +425,7 @@
                 transclude: true,
                 replace: true,
                 restrict: 'E',
-                template: '<span class="custom-tagsinput">'
+                template: '<span class="custom-tagsinput four">'
                     +'<div class="autocompletelist" style="position: absolute; top: 100%; z-index: 1000; display: none; right: auto;"></div>'
                     +'<span id="current-subject"></span>'
                     +'</span>',
@@ -448,7 +448,7 @@
                      * Display current subject of lesson or homework
                      */
                     scope.displaySubject = function(subject){
-                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" id="remove-subject" title="Désafecter la matière"></span></span>');
+                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" style="float: right;" id="remove-subject" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
                         // make sure only one subject of current lesson/hw will be displayed
                         $subjectContainer.empty();
