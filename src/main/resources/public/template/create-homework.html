@@ -1,20 +1,16 @@
-﻿<div ng-if="display.showPanel">
+﻿<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.homework.label</i18n></a></h1>
+<div ng-if="display.showPanel">
     <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
         <container template="lightbox"></container>
     </lightbox>
 </div>
 <form name="homeworkform">
-    <h2><i18n>homework.details.title</i18n></h2>
     <div class="row">
         <div class="three cell">
-            <label><i18n>subject</i18n></label>
             <item-picker ng-model="homework.subject"></item-picker>
         </div>
         <div class="three cell">
-            <i18n>audience.type.class</i18n> / <i18n>audience.type.group</i18n>&nbsp;
             <ent-dropdown placeholder="classes" list="audiences.all" selected="homework.audience" property="name"></ent-dropdown>
-           <!-- <select ng-model="homework.audience" ng-change="showHomeworksLoad(homework)"
-                    ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"></select> -->
         </div>
     </div>
     <section class="homework-detail">

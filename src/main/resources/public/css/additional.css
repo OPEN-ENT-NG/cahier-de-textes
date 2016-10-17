@@ -148,7 +148,7 @@ Override marging for homeworks display
 
 section .homework-detail {
     margin-top: -1px;
-    border: 1px solid;
+    border: 1px solid #4bafd5;
     padding: 6px;
 }
 
@@ -225,19 +225,11 @@ div.notification {
 
 
 .resize-homeworks-panel {
-    font-size: 90px;
     float: left;
     vertical-align: middle !important;
     background-color: transparent !important;
 }
 
-.resize-homeworks-panel.expanded::before {
-    content: "▾";
-}
-
-.resize-homeworks-panel::before {
-    content: "▸";
-}
 
 calendar-daily-events .days .day {
     width: calc(100% / 7 - (130px) / 7) !important;
@@ -419,29 +411,14 @@ section .homeworkInfos {
     margin-right: 2px;
     color: white;
 }
-.label-info {
-    background-color: #5bc0de;
-}
 
-.label {
-    display: inline;
-    padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: .25em;
-}
 
-.custom-tagsinput .custom-tag [data-role="remove"] {
+.item-remove [data-role="remove"] {
     margin-left: 8px;
     cursor: pointer;
 }
 
-.custom-tagsinput .custom-tag [data-role="remove"]:after {
+.item-remove [data-role="remove"]:after {
     content: "x";
     padding: 0px 2px;
 }
@@ -453,16 +430,35 @@ section .homeworkInfos {
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     background-color: white;
-    box-shadow: 6px 6px 3px #808080;
+    box-shadow: 6px 4px 3px #cfcfcf;
 }
 
-.custom-tagsinput .custom-tag:hover{
-    background-color: blue;
+.item-suggest {
+    padding-left: 6px;
+    padding-right: 6px;
+    width: 100%;
+    white-space: nowrap;
 }
 
-.choosesubject {
-    cursor: pointer;
-    background-color: powderblue;
+.item-suggest:hover{
+    background-color: #2a9cc8;
+}
+
+
+
+.item-display {
+    border: 1px solid #2a9cc8;
+    color: #2a9cc8;
+    height: 32px;
+    font-size:24px;
+    border-radius: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    white-space: nowrap;
+}
+
+.tabs section {
+    border-color: #4bafd5 !important;
 }
 
 i.arrow-down {

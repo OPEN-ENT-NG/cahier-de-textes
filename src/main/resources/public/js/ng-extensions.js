@@ -7,9 +7,9 @@
                 },
                 restrict: 'E',
                 template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
-                '<i class="resize-homeworks-panel" ng-class="{ expanded: !show.bShowHomeworksMinified}"  style="float: left; width: 130px;"  ng-click="toggleHomeworkPanelMinized()"></i></li></ul></span>'+
+                '<i class="resize-homeworks-panel"   style="float: left; width: 130px;">&nbsp;</i></li></ul></span>'+
                 '<div class="days" style="z-index: 1000; ">' +
-                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 120px;">' +
+                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
 
                         // <= 3 homeworks for current day
                         // or 1 homework and homework panel minified
@@ -27,7 +27,7 @@
                         '</div>' +
                         '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
                             'ng-click="toggleOpenDailyEvents(day, $event)" ' +
-                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 3 }">' +
+                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
                             '<div ng-repeat="dailyEvent in day.dailyEvents">' +
                             '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
                             '</div>' +
@@ -166,7 +166,7 @@
 
                         // calendar hidden and homework panel maximized -> show all
                         if (!model.show.bShowHomeworksMinified) {
-                            return !model.show.bShowCalendar || (day.dailyEvents.length <= 3);
+                            return !model.show.bShowCalendar || (day.dailyEvents.length <= 1);
                         } else {
                             return day.dailyEvents.length == 1;
                         }
@@ -199,7 +199,7 @@
                         if (!bShowCalendar) {
                             homeworksPerDayDisplayed = getMaxHomeworksPerDay();
                         } else {
-                            homeworksPerDayDisplayed = bShowHomeworksMinified ? 1 : 3;
+                            homeworksPerDayDisplayed = 1;
                         }
 
                         return homeworksPerDayDisplayed * HW_HEIGHT;
@@ -426,24 +426,61 @@
                 replace: true,
                 restrict: 'E',
                 template: '<span class="custom-tagsinput">'
-                    +'<div class="autocompletelist" style="position: absolute; top: 100%; left: 60px; z-index: 1000; display: none; right: auto;"></div>'
+                    +'<div class="autocompletelist" style="position: absolute; top: 100%; z-index: 1000; display: none; right: auto;"></div>'
+                    +'<span id="current-subject"></span>'
                     +'</span>',
                 link: function (scope, element, attributes) {
 
                     var $input = $('<input type="text" placeholder="Saisir une matière">');
+                    var $subjectContainer = $('#current-subject', element);
                     var resultsBox = $('.autocompletelist', element);
+                    var sortBySubjectLabel = function (a, b) {
+                        if (a.label > b.label)
+                            return 1;
+                        if (a.label < b.label)
+                            return -1;
+                        return 0;
+                    };
 
                     scope.ngModelOriginal = scope.ngModel;
-                    scope.addSubject = function(subject){
-                        var $tag = $('<span class="custom-tag label label-info">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
+
+                    /**
+                     * Display current subject of lesson or homework
+                     */
+                    scope.displaySubject = function(subject){
+                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
-                        element.append($tag);
+                        // make sure only one subject of current lesson/hw will be displayed
+                        $subjectContainer.empty();
+                        $subjectContainer.append($tag);
+
+                        var removeCross = $('span[data-role=remove]', $tag);
+
+                        // on removing lesson/hw subject display input field to select another subject
+                        removeCross.click(function () {
+                            //scope.ngModel = null;
+                            $tag.remove();
+
+                            scope.addInputSubject();
+                            // on subject change reload previous lessons
+                            if (scope.$parent.lesson) {
+                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
+                            }
+                            $input.val('');
+                            $input.show();
+                            $input.focus();
+                            scope.$apply();
+                        });
+
                         return $tag;
                     };
 
                     scope.addSuggestedSubject = function(subject){
-                        var $suggestedSubject = $('<span class="custom-tag label label-info"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
+                        var $suggestedSubject = $('<span class="item-suggest"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
 
+                        /**
+                         * on selecting subject set this subject to lesson/homework
+                         */
                         $suggestedSubject.click(function (event) {
                             var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE
                             scope.ngModel = model.findSubjectById(selectedSubjectId);
@@ -456,18 +493,12 @@
                         resultsBox.append($suggestedSubject);
                     };
 
-                    var addInputSubject = function () {
+                    scope.addInputSubject = function () {
 
                         var initSuggestedSubjectsBox = function(){
                             resultsBox.empty();
 
-                            model.subjects.all.sort(function (a, b) {
-                                if (a.label > b.label)
-                                    return 1;
-                                if (a.label < b.label)
-                                    return -1;
-                                return 0;
-                            });
+                            model.subjects.all.sort(sortBySubjectLabel);
 
                             for (var i = 0; i < model.subjects.all.length; i++) {
                                 scope.addSuggestedSubject(model.subjects.all[i]);
@@ -490,16 +521,12 @@
                                     }
                                     scope.$apply();
                                 }
-                            } else {
+                            }
+                            // search existing subject matching
+                            else {
                                 var inputVal = $input.val().trim();
                                 var matchingSubjects = model.findSubjectsByLabel(inputVal);
-                                matchingSubjects.sort(function (a, b) {
-                                    if (a.label > b.label)
-                                        return 1;
-                                    if (a.label < b.label)
-                                        return -1;
-                                    return 0;
-                                });
+                                matchingSubjects.sort(sortBySubjectLabel);
                                 resultsBox.empty();
 
                                 // display matching subjects if any
@@ -518,7 +545,8 @@
                                     resultsBox.show();
                                 }
 
-                                if(inputVal.length > 2 && !hasPerfectMatch) {
+                                // adds entry for creating subject only if subject keyed in does not exist
+                                if(inputVal.length > 0 && !hasPerfectMatch) {
                                     var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
 
                                     $suggestCreateSubject.click(function(){
@@ -538,7 +566,6 @@
                                             scope.$parent.subject = newSubject;
                                             resultsBox.hide();
                                             $input.hide();
-                                            $tag.show();
                                         };
                                         newSubject.save(postCreateSubjectFunc);
                                     });
@@ -548,10 +575,6 @@
                                 } else if(inputVal.length === 0){
                                     initSuggestedSubjectsBox();
                                 }
-                            }
-
-                            if($input.val().length <= 1){
-                                resultsBox.hide();
                             }
                         });
 
@@ -575,7 +598,7 @@
                     };
 
                     if (!scope.ngModelOriginal) {
-                        addInputSubject();
+                        scope.addInputSubject();
                     }
 
                     scope.$watch('ngModel', function (newVal) {
@@ -583,25 +606,7 @@
                             return;
                         }
 
-                        var $tag = scope.addSubject(newVal);
-                        var removeCross = $('span[data-role=remove]', $tag);
-
-                        removeCross.click(function () {
-                            scope.ngModel = null;
-                            $tag.remove();
-
-                            addInputSubject();
-                            // on subject change reload previous lessons
-                            if (scope.$parent.lesson) {
-                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
-                            }
-                            $input.val('');
-                            $input.show();
-                            $input.focus();
-                            scope.$apply();
-                        });
-
-
+                        scope.displaySubject(newVal);
                     });
 
 
