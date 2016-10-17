@@ -939,6 +939,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.countdown--;
         if ($scope.countdown == 0) {
             $scope.calendarLoaded = true;
+            $scope.currentSchool = model.currentSchool;
 
             if(bShowTemplates) {
                 showTemplates();

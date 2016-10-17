@@ -616,11 +616,14 @@
                     placeholder: "@",
                     list: "=",
                     selected: "=",
-                    property: "@"
+                    property: "@",
+                    school: "="
                 },
                 link: function(scope) {
                     scope.listVisible = false;
                     scope.isPlaceholder = true;
+                    scope.searchPerformed = false;
+                    scope.otherAudiences = [];
 
                     scope.select = function(audience) {
                         scope.isPlaceholder = false;
@@ -634,6 +637,32 @@
 
                     scope.show = function() {
                         scope.listVisible = true;
+                    };
+
+                    scope.searchAudiences = function () {
+                        http().get('diary/classes/list/' + scope.school)
+                            .done(function (structureData) {
+                                scope.otherAudiences = _.map(structureData, function (data) {
+                                    var audience = {};
+                                    audience.structureId = scope.school;
+                                    audience.type = 'class';
+                                    audience.typeLabel = (data.className === 'class') ? lang.translate('diary.audience.class') :  lang.translate('diary.audience.group');
+                                    audience.id= data.classId;
+                                    audience.name = data.className;
+                                    return audience;
+                                });
+
+                                scope.otherAudiences = _.reject(scope.otherAudiences, function(audience) {
+                                    return _.contains(_.pluck(scope.list, 'name') , audience.name);
+                                });
+
+                                scope.searchPerformed = true;
+                                scope.$apply();
+                            }).error(function (e) {
+                            if (typeof cbe === 'function') {
+                                cbe(model.parseError(e));
+                            }
+                        });
                     };
 
                     scope.$watch("selected", function(value) {

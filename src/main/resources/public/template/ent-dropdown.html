@@ -5,10 +5,24 @@
 		<i class="arrow-down"></i>
     </div>
     <div class="dropdown-list">
-        <div>
-            <div ng-repeat="audience in list" ng-click="select(audience)" ng-class="{ selected: isSelected(audience) }">
-                <span>{{property !== undefined ? audience[property] : audience}}</span>
+        <div class="dropdown-list-content">
+            <div class="subtitle"><i18n>my.groups.and.classes</i18n></div>
+            <div class="item-list" ng-repeat="audience in list" ng-click="select(audience)" ng-class="{ selected: isSelected(audience) }">
+                <span class="audience-item">{{property !== undefined ? audience[property] : audience}}</span>
                 <i class="check-selected"></i>
+            </div>
+            <div ng-if="!searchPerformed">
+                <div class="search-link" ng-click="searchAudiences()"><i18n>search.groups.and.classes</i18n></div>
+            </div>
+            <div ng-if="searchPerformed">
+                <div class="subtitle"><i18n>other.groups.and.classes</i18n></div>
+                <div ng-if="otherAudiences.length <= 0" class="subtitle">
+                    <i18n>group.search.no.result</i18n>
+                </div>
+                <div class="item-list" ng-repeat="other in otherAudiences" ng-click="select(other)" ng-class="{ selected: isSelected(other) }">
+                    <span class="audience-item">{{property !== undefined ? other[property] : other}}</span>
+                    <i class="check-selected"></i>
+                </div>
             </div>
         </div>
     </div>

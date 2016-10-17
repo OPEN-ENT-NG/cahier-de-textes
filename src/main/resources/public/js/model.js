@@ -1144,6 +1144,7 @@ model.build = function () {
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.searchForm = new SearchForm();
+    this.currentSchool = {};
 
     this.collection(Lesson, {
         loading: false,
@@ -1243,6 +1244,7 @@ model.build = function () {
             if (that.loading)
                 return;
 
+            model.currentSchool = model.me.structures[0];
             that.loading = true;
             model.me.structures.forEach(function (structureId) {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {

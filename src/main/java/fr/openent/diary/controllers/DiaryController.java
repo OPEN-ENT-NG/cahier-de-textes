@@ -343,13 +343,13 @@ public class DiaryController extends BaseController {
     public void listClasses(final HttpServerRequest request) {
         final String schoolId = request.params().get("schoolId");
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(final UserInfos user) {
-                if (user != null) {
-                    diaryService.listClasses(schoolId, arrayResponseHandler(request));
-                } else {
-                    badRequest(request, "diary.invalid.login");
-                }
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        diaryService.listClasses(schoolId, arrayResponseHandler(request));
+                    } else {
+                        badRequest(request, "diary.invalid.login");
+                    }
                 }
             }
         );

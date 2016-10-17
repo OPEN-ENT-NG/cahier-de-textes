@@ -123,5 +123,9 @@
   "diary.search.period.to": " au : ",
   "diary.child": "Enfant",
   "homework.date": "À faire pour le",
-  "diary.view.item.detail": "Accéder au détail"
+  "diary.view.item.detail": "Accéder au détail",
+  "my.groups.and.classes" : "Mes classes et groupes",
+  "search.groups.and.classes" : "Rechercher dans l'établissement",
+  "other.groups.and.classes" : "Autres classes et groupes",
+  "group.search.no.result": "Aucune autre classe ou groupe."
 }
