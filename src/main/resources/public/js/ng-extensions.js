@@ -281,7 +281,7 @@
 
                     };
 
-                    
+
                     function setDaysContent() {
 
                         model.calendar.days.forEach(function (day) {
@@ -293,11 +293,11 @@
                                 if(item.dueDate && item.dueDate.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')){
                                     day.dailyEvents.push(item);
                                 }
-                                
+
                                 refDay.add('day', 1);
                             });
                         });
-                        
+
                         scope.calendar = model.calendar;
 
                         var timeslots = $('.timeslots');
@@ -324,16 +324,16 @@
                                 }, 100);
                         }
                     }
-                    
+
                     model.on('calendar.date-change', function(){
                         setDaysContent();
                         scope.$apply();
                     });
-                    
+
                     scope.$watchCollection('ngModel', function(newVal){
                         setDaysContent()
                     });
-                    
+
                     $('body').on('click', function(e){
                         if(e.target !== element[0] && element.find(e.target).length === 0){
                             model.calendar.days.forEach(function(day){
@@ -343,7 +343,7 @@
                         }
                     });
                 }
-            }    
+            }
         });
 
         module.directive('timePicker', function () {
@@ -425,13 +425,13 @@
                 transclude: true,
                 replace: true,
                 restrict: 'E',
-                template: '<span class="custom-tagsinput">'
+                template: '<span class="custom-tagsinput four">'
                     +'<div class="autocompletelist" style="position: absolute; top: 100%; z-index: 1000; display: none; right: auto;"></div>'
                     +'<span id="current-subject"></span>'
                     +'</span>',
-                link: function (scope, element, attributes) {
+                link: function (scope, element) {
 
-                    var $input = $('<input type="text" placeholder="Saisir une matière">');
+                    var $input = $('<input type="text" placeholder="Saisir une matière" id="input-subject">');
                     var $subjectContainer = $('#current-subject', element);
                     var resultsBox = $('.autocompletelist', element);
                     var sortBySubjectLabel = function (a, b) {
@@ -448,7 +448,7 @@
                      * Display current subject of lesson or homework
                      */
                     scope.displaySubject = function(subject){
-                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" title="Désafecter la matière"></span></span>');
+                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" style="float: right;" id="remove-subject" title="Désafecter la matière"></span></span>');
                         $tag.data('item', subject);
                         // make sure only one subject of current lesson/hw will be displayed
                         $subjectContainer.empty();
@@ -458,8 +458,7 @@
 
                         // on removing lesson/hw subject display input field to select another subject
                         removeCross.click(function () {
-                            //scope.ngModel = null;
-                            $tag.remove();
+                            $tag.hide();
 
                             scope.addInputSubject();
                             // on subject change reload previous lessons
@@ -486,6 +485,7 @@
                             scope.ngModel = model.findSubjectById(selectedSubjectId);
                             $input.hide();
                             resultsBox.hide();
+                            $('.item-display', element).show();
                             scope.$apply();
                             event.stopPropagation();
                         });
@@ -578,24 +578,18 @@
                             }
                         });
 
-                        // revert back original subject if any on focus out if no subject set
-                        element.focusout(function (event) {
-
-                            return;
-
-                            if (!scope.ngModel) {
-                                scope.ngModel = scope.ngModelOriginal;
-                                if (scope.ngModel) {
-                                    $('input', element).remove();
-                                }
-
-                                $('.autocompletelist', element).hide();
-                                scope.$apply();
-                            }
-                        });
-
                         element.append($input);
                     };
+
+                    $(element.context.ownerDocument).click(function(event){
+
+                        if(!$(event.target).is("item-suggest") && !$(event.target).is("#remove-subject") && !$(event.target).is("#input-subject")){
+                            // show subject selected
+                            $('.item-display', element).show();
+                            $input.hide();
+                            $('.autocompletelist', element).hide();
+                        }
+                    });
 
                     if (!scope.ngModelOriginal) {
                         scope.addInputSubject();

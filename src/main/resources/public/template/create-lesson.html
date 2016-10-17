@@ -1,7 +1,7 @@
 ﻿<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></a></h1>
 <form name="lessonform">
     <div class="row">
-        <div class="three cell">
+        <div class="cell" style="width: 21em">
             <item-picker ng-model="lesson.subject" ng-change="loadPreviousLessonsFromLesson(lesson);"></item-picker>
         </div>
         <div class="three cell">
@@ -211,19 +211,26 @@
                     <i18n>daily.item.publish</i18n>
                 </button>
 
+                <!-- share -->
+                <button class="right-magnet" ng-click="openShareLessonPanel(lesson)" >
+                    <i18n>share</i18n>
+                </button>
+
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
                 <button ng-if="lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
                     <i18n>daily.item.unpublish</i18n>
+                </button>
+
+                <!-- save lesson in draft mode -->
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(false)">
+                    <i18n>save</i18n>
                 </button>
 
                 <!-- save lesson in draft mode and go back to calendar view -->
                 <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
                     <i18n>back</i18n>
                 </button>
-                <!-- save lesson in draft mode -->
-                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(false)">
-                    <i18n>save</i18n>
-                </button>
+
                 <!-- go back to calendar view without saving -->
                 <button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
                     <i18n>cancel</i18n>

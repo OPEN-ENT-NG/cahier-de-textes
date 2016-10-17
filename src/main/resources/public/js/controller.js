@@ -65,7 +65,7 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.newLesson = new Lesson();
     $scope.newHomework = new Homework();
     $scope.newPedagogicItem = new PedagogicItem();
-	
+
 	// variables for show list
 	$scope.pedagogicLessonsSelected 	= new Array();
 	$scope.pedagogicHomeworksSelected 	= new Array();
@@ -392,8 +392,8 @@ function DiaryController($scope, template, model, route, $location) {
      * in calendar view from database
      */
     $scope.deleteSelectedItems = function () {
-        var selectedLessons = getSelectedPedagogicItems('lesson');
-        var selectedHomeworks = getSelectedPedagogicItems('homework');
+        var selectedLessons = $scope.getSelectedPedagogicItems('lesson');
+        var selectedHomeworks = $scope.getSelectedPedagogicItems('homework');
 
         if ((selectedLessons.length + selectedHomeworks.length) === 0) {
             notify.error('daily.nohomeworkorlesson.selected');
@@ -450,10 +450,10 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.editSelectedItem = function () {
 
-        var selectedLessons = getSelectedPedagogicItems('lesson');
+        var selectedLessons = $scope.getSelectedPedagogicItems('lesson');
         var selectedLesson = selectedLessons.length > 0 ? selectedLessons[0] : null;
 
-        var selectedHomeworks = getSelectedPedagogicItems('homework');
+        var selectedHomeworks = $scope.getSelectedPedagogicItems('homework');
         var selectedHomework = selectedHomeworks.length > 0 ? selectedHomeworks[0] : null;
 
         if (selectedHomework && selectedLesson) {
@@ -509,7 +509,7 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.publishSelectedLessons = function (isPublish) {
         $scope.currentErrors = [];
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        $scope.publishLessons(getSelectedPedagogicItems('lesson'), isPublish, notifyKey);
+        $scope.publishLessons($scope.getSelectedPedagogicItems('lesson'), isPublish, notifyKey);
     };
 
     /**
@@ -676,7 +676,7 @@ function DiaryController($scope, template, model, route, $location) {
      * @returns {boolean}
      */
     $scope.isOneHomeworkOrLessonStriclySelected = function () {
-        return (getSelectedPedagogicItems('lesson').length + getSelectedPedagogicItems('homework').length) == 1;
+        return ($scope.getSelectedPedagogicItems('lesson').length + $scope.getSelectedPedagogicItems('homework').length) == 1;
     };
 
 
@@ -694,7 +694,7 @@ function DiaryController($scope, template, model, route, $location) {
         var unPublishableSelectedHomeworks = [];
         var noStateChangeHomeworks = []; // eg.: homework attached to a lesson
 
-        getSelectedPedagogicItems('lesson').forEach(function (lesson) {
+        $scope.getSelectedPedagogicItems('lesson').forEach(function (lesson) {
             if (lesson.isPublishable(true)) {
                 publishableSelectedLessons.push(lesson);
             } else if (lesson.isPublishable(false)) {
@@ -705,7 +705,7 @@ function DiaryController($scope, template, model, route, $location) {
         });
 
         // only free homeworks can be published/unpublished
-        getSelectedPedagogicItems('homework').forEach(function (homework) {
+        $scope.getSelectedPedagogicItems('homework').forEach(function (homework) {
             if (homework.isPublishable(true)) {
                 publishableSelectedHomeworks.push(homework);
             } else if (homework.isPublishable(false)) {
@@ -1033,29 +1033,9 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
     $scope.getPedagogicItemSelectedCount = function () {
-        return getSelectedPedagogicItems('lesson').length + getSelectedPedagogicItems('homework').length;
+        return $scope.getSelectedPedagogicItems('lesson').length + $scope.getSelectedPedagogicItems('homework').length;
     };
 
-    var getSelectedPedagogicItems = function(itemType){
-        if ($scope.display.showList == true) {
-            var selectedItems = new Array();
-            model.pedagogicDays.forEach(function (day) {
-                selectedItems = selectedItems.concat(day.pedagogicItemsOfTheDay.filter(function (item) {
-                        return item && item.type_item === itemType && item.selected;
-                    })
-                );
-            });
-            return selectedItems;
-        } else {
-            if (itemType === 'homework') {
-                return getSelectedHomeworks();
-            } else {
-                return getSelectedLessons();
-            }
-        }
-    };
-	
-	
 	/**
 	* update pedagogic items selected
 	*/
@@ -1067,26 +1047,39 @@ function DiaryController($scope, template, model, route, $location) {
 				})
 			);
 		});
-		
+
 		if (itemType === 'homework'){
 			$scope.pedagogicHomeworksSelected = selectedItems;
 		} else {
 			$scope.pedagogicLessonsSelected = selectedItems;
 		}
     };
-	
-	
+
+
 	/**
 	* get selected pedagogic items from item type
 	*/
 	$scope.getSelectedPedagogicItems = function(itemType){
+
+        // share from lesson view
+        if ($scope.viewedLessonToShare) {
+            return $scope.viewedLessonToShare;
+        }
+        // share from homework view
+        else if ($scope.viewedHomeworkToShare) {
+            return $scope.viewedHomeworkToShare;
+        }
+
+        // list view
         if ($scope.display.showList == true) {
 			if (itemType === 'homework') {
                 return $scope.pedagogicHomeworksSelected;
             } else {
                 return $scope.pedagogicLessonsSelected;
             }
-        } else {
+        }
+        // calendar view
+        else {
             if (itemType === 'homework') {
                 return getSelectedHomeworks();
             } else {
@@ -1206,11 +1199,40 @@ function DiaryController($scope, template, model, route, $location) {
         return false;
     };
 
-    $scope.openShareLessonPanel = function() {
+    /**
+     * Opens the share lesson panel
+     * seee main;html -> getSelectedPedagogicItems
+     * @param item
+     */
+    $scope.openShareLessonPanel = function (viewedLesson) {
+
+        $scope.viewedHomeworkToShare = null;
+
+        if (viewedLesson) {
+            $scope.viewedLessonToShare = new Array();
+            $scope.viewedLessonToShare.push(viewedLesson);
+        } else {
+            $scope.viewedLessonToShare = null;
+        }
+
         $scope.display.showShareLessonPanel = true;
     };
 
-    $scope.openShareHomeworkPanel = function() {
+    /**
+     * Open the share homework panel
+     * see main.html -> getSelectedPedagogicItems
+     */
+    $scope.openShareHomeworkPanel = function (viewedHomework) {
+
+        $scope.viewedLessonToShare = null;
+
+        if (viewedHomework) {
+            $scope.viewedHomeworkToShare = new Array();
+            $scope.viewedHomeworkToShare.push(viewedHomework);
+        }
+        else {
+            $scope.viewedHomeworkToShare = null;
+        }
         $scope.display.showShareHomeworkPanel = true;
     };
 

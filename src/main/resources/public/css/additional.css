@@ -449,11 +449,11 @@ section .homeworkInfos {
 .item-display {
     border: 1px solid #2a9cc8;
     color: #2a9cc8;
-    height: 32px;
+    width: 100%;
+    float: left;
     font-size:24px;
     border-radius: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding: 3px;
     white-space: nowrap;
 }
 

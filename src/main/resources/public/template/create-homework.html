@@ -52,18 +52,25 @@
             <i18n>daily.item.publish</i18n>
         </button>
 
+        <!-- share the homework -->
+        <button class="right-magnet" ng-click="openShareHomeworkPanel(homework)" >
+            <i18n>share</i18n>
+        </button>
+
         <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
         <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && publishHomeworkAndGoCalendarView(homework, false)">
             <i18n>daily.item.unpublish</i18n>
-        </button>
-        <!-- save homework in draft mode and go back to calendar view -->
-        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
-            <i18n>back</i18n>
         </button>
         <!-- save homework in draft mode -->
         <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(false)">
             <i18n>save</i18n>
         </button>
+
+        <!-- save homework in draft mode and go back to calendar view -->
+        <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
+            <i18n>back</i18n>
+        </button>
+
         <!-- go back to calendar view without saving -->
         <button type="button" class="right-magnet cancel" ng-click="redirect('/mainView')"><i18n>cancel</i18n></button>
     </div>
