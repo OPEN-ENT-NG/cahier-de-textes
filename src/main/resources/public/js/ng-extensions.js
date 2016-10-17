@@ -485,6 +485,7 @@
                             scope.ngModel = model.findSubjectById(selectedSubjectId);
                             $input.hide();
                             resultsBox.hide();
+                            $('.item-display', element).show();
                             scope.$apply();
                             event.stopPropagation();
                         });
