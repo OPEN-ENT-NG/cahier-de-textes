@@ -1,4 +1,4 @@
-<div class="schedule-item-content" style="display: flex; flex-direction: column" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]]<br>[[item.audienceLabel]]<br>[[item.title]]<br>[[item.room]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+<div class="schedule-item-content" style="display: flex; flex-direction: column" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]]-[[item.audienceLabel]]<br>[[item.room]]<br>[[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
 
     <!-- 4 - HOUR -->
     <div style="display: flex; flex-direction: row; flex-wrap: nowrap">
@@ -7,7 +7,7 @@
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
         </span>
         <!-- 3 - SALLE -->
-        <span id="room" style="float: right; white-space: nowrap">[[item.room]]</span>
+        <span id="room" style="float: right; white-space: nowrap; margin-left: 0.5em">[[item.room]]</span>
     </div>
 
     <!-- -->

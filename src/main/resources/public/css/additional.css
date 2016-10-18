@@ -661,8 +661,26 @@ ent-dropdown div.show>div.dropdown-list {
     }
 }
 
-@media  (max-width: 600px) {
+@media (max-width: 800px) {
     .schedule-item-content #subjectlabel {
+        display: none;
+    }
+
+    #dailyeventlongtitle {
+        display: none;
+    }
+
+    #dailyeventshorttitle {
+        display: block;
+    }
+}
+
+@media (min-width: 800px) {
+    #dailyeventlongtitle {
+        display: block;
+    }
+
+    #dailyeventshorttitle {
         display: none;
     }
 }
@@ -670,5 +688,11 @@ ent-dropdown div.show>div.dropdown-list {
 @media  (max-width: 550px) {
     .schedule-item-content {
         font-size: 1em;
+    }
+}
+
+@media  (max-width: 650px) {
+    .homework-title {
+        display: none;
     }
 }

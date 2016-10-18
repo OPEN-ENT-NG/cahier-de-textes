@@ -23,7 +23,8 @@
                         // or > 1 homework and homework panel minified
                         '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
                             'ng-click="toggleShowHwDetail(day)">' +
-                            '<i18n>daily.event</i18n>' +
+                            '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' +
+                            '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' +
                         '</div>' +
                         '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
                             'ng-click="toggleOpenDailyEvents(day, $event)" ' +
