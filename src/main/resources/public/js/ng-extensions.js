@@ -539,7 +539,6 @@
                     scope.isPlaceholder = true;
                     scope.searchPerformed = false;
                     scope.otherAudiences = [];
-                    scope.selected = {};
                     scope.translated_placeholder = lang.translate(scope.placeholder);
 
                     scope.select = function(audience) {
