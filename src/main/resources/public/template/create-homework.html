@@ -7,7 +7,7 @@
 <form name="homeworkform">
     <div class="row">
         <div class="three cell">
-            <subject-picker ng-model="homework.subject" item="homework"></subject-picker>
+            <subject-picker ng-model="homework.subject" homework="homework"></subject-picker>
         </div>
         <div class="three cell">
             <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="homework.audience" property="name" school="currentSchool" lesson="" homework="homework"></ent-dropdown>
