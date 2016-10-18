@@ -1,19 +1,32 @@
-<div class="schedule-item-content" ng-style="{'background-color': item.color}" tooltip="[[item.audienceLabel]] - [[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
-    <div class="cell twelve">
+<div class="schedule-item-content" style="display: flex; flex-direction: column" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]]<br>[[item.audienceLabel]]<br>[[item.title]]<br>[[item.room]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+
+    <!-- 4 - HOUR -->
+    <div style="display: flex; flex-direction: row; flex-wrap: nowrap">
+        <span id="hour" style="white-space: nowrap; overflow: hidden">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
-
-        <div style="float: right; margin-right: 5%">[[item.room]]</div>
+        </span>
+        <!-- 3 - SALLE -->
+        <span id="room" style="float: right; white-space: nowrap">[[item.room]]</span>
     </div>
 
-    <div class="cell twelve">
-        <span>[[item.subjectLabel]]&nbsp; [[item.audienceLabel]]</span>
+    <!-- -->
+    <div style="overflow: hidden">
 
-        <input ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"   style="float: right; margin-right: 5%;"/>
+        <!--  2 - CLASSE -->
+        <span style="white-space: nowrap">[[item.audienceLabel]]</span>
 
-		<span ng-if="[[item.state]]=='draft'">
+        <!-- 5 - CHECK -->
+        <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"
+               style="float: right; margin-right: 5%; overflow: hidden;white-space: nowrap"/>
+
+        <!-- 1 - ICONE BROUILLON -->
+        <span id="state" ng-if="[[item.state]]=='draft'" style="width: 10%; float: right;white-space: nowrap">
             <i class="icon pencil" style="float: right;"></i>
-		</span>
+        </span>
     </div>
 
+    <div>
+        <span id="subjectlabel" style="overflow: hidden; text-overflow: ellipsis;white-space: nowrap">[[item.subjectLabel]]&nbsp;</span>
+    </div>
 </div>

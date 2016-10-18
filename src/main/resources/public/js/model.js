@@ -24,11 +24,31 @@ Homework.prototype.api = {
 };
 
 Homework.prototype.save = function(cb, cbe) {
+
+    var that = this;
+
     if(this.id) {
         this.update(cb, cbe);
     }
     else {
         this.create(cb, cbe);
+    }
+
+
+    var updateOrCreateHomework = function () {
+        if (that.id) {
+            that.update(cb, cbe);
+        }
+        else {
+            that.create(cb, cbe);
+        }
+    };
+
+    // autocreates subject if it does not exists
+    if(!this.subject.id){
+        this.subject.save(updateOrCreateHomework)
+    } else {
+        updateOrCreateHomework();
     }
 };
 
@@ -617,11 +637,20 @@ Lesson.prototype.save = function(cb, cbe) {
         );
     };
 
-    if(this.id) {
-        this.update(saveHomeworksAndSync, cbe);
-    }
-    else {
-        this.create(saveHomeworksAndSync, cbe);
+    var updateOrCreateLesson = function () {
+        if (that.id) {
+            that.update(saveHomeworksAndSync, cbe);
+        }
+        else {
+            that.create(saveHomeworksAndSync, cbe);
+        }
+    };
+
+    // autocreates subject if it does not exists
+    if(!this.subject.id){
+        this.subject.save(updateOrCreateLesson)
+    } else {
+        updateOrCreateLesson();
     }
 };
 
