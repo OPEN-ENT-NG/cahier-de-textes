@@ -350,7 +350,7 @@ function DiaryController($scope, template, model, route, $location) {
             initHomework();
         }
 
-        $scope.showHomeworksLoad($scope.homework);
+        $scope.showHomeworksLoad($scope.homework, null);
 
         template.open('main', 'main');
         if (!$scope.isLessonHomeworkEditable){
@@ -922,7 +922,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.countdown = lesson.homeworks.all.length;
 
         lesson.homeworks.all.forEach(function (homework) {
-            model.loadHomeworksLoad(homework, homework.date, lesson.audience.id, applyScopeOnFinish);
+            model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), lesson.audience.id, applyScopeOnFinish);
         });
 
     };
@@ -1243,13 +1243,15 @@ function DiaryController($scope, template, model, route, $location) {
      * @param forcedDate Date in millis since 1970-1-1
      * @param homework
      */
-    $scope.showHomeworksLoad = function (homework, forcedDate) {
+    $scope.showHomeworksLoad = function (homework, forcedDate, callback) {
 
+        var cb = function (){};
 
-
-        var callback = function () {
-            //homework.homeworksLoad = homework.homeworksLoad;
-        };
+        if (callback){
+            if (typeof callback === 'function') {
+                cb = callback;
+            }
+        }
 
         var callbackErrorFunc = function () {
             // TODO propagate error to front
@@ -1258,7 +1260,7 @@ function DiaryController($scope, template, model, route, $location) {
         var date = forcedDate ? forcedDate : homework.date;
         var formattedDate = moment(date).format("YYYY-MM-DD");
 
-        model.loadHomeworksLoad(homework, formattedDate, homework.audience.id, callback, callbackErrorFunc);
+        model.loadHomeworksLoad(homework, formattedDate, homework.audience.id, cb, callbackErrorFunc);
     };
 
     $scope.isHighHomeworkLoad = function(homeworkLoad){

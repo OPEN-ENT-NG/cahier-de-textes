@@ -501,7 +501,8 @@ i.check-selected::before {
 ent-dropdown {
     float: left;
     display: block;
-    width: 250px;
+    width: 100%;
+    padding-left: 10px;
 }
 
 ent-dropdown div {
@@ -540,6 +541,7 @@ ent-dropdown div.dropdown-display span {
 }
 ent-dropdown div.dropdown-display span.placeholder {
     color: #aaaaaa;
+    font-size: 20px;
 }
 ent-dropdown div.dropdown-display i {
     position: relative;

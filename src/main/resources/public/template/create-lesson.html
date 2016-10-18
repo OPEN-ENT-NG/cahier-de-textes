@@ -5,9 +5,8 @@
             <item-picker ng-model="lesson.subject" ng-change="loadPreviousLessonsFromLesson(lesson);"></item-picker>
         </div>
         <div class="three cell">
-            <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson); loadPreviousLessonsFromLesson(lesson);"
-                    ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
-            ></select>
+            <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="lesson.audience" property="name" school="currentSchool" lesson="lesson" homework="">
+            </ent-dropdown>
         </div>
     </div>
 

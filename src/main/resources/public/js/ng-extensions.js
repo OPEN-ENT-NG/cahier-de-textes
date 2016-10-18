@@ -617,13 +617,19 @@
                     list: "=",
                     selected: "=",
                     property: "@",
-                    school: "="
+                    school: "=",
+                    refreshFunc: "&",
+                    loadPreviousFunc: "&",
+                    lesson: "=",
+                    homework: "="
                 },
-                link: function(scope) {
+                link: function(scope, element, attrs) {
                     scope.listVisible = false;
                     scope.isPlaceholder = true;
                     scope.searchPerformed = false;
                     scope.otherAudiences = [];
+                    scope.selected = {};
+                    scope.translated_placeholder = lang.translate(scope.placeholder);
 
                     scope.select = function(audience) {
                         scope.isPlaceholder = false;
@@ -668,6 +674,17 @@
                     scope.$watch("selected", function(value) {
                         scope.isPlaceholder = scope.selected[scope.property] === undefined;
                         scope.display = scope.selected[scope.property];
+
+                        if (scope.lesson) {
+                            if (scope.lesson.homeworks.all.length > 0) {
+                                scope.$parent.refreshHomeworkLoads(scope.lesson);
+                            }
+                            scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
+                        }
+
+                        if (scope.homework) {
+                            scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
+                        }
                     });
                 }
             }

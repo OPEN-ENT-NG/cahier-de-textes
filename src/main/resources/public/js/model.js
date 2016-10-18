@@ -1624,7 +1624,7 @@ model.initHomework = function (lesson) {
 
     // create homework attached to lesson
     if (lesson) {
-        homework.audience = lesson.audience
+        homework.audience = lesson.audience;
         homework.subject = lesson.subject;
         homework.audienceType = homework.audience.type;
         homework.color = lesson.color;
