@@ -661,11 +661,13 @@ ent-dropdown div.show>div.dropdown-list {
     }
 }
 
-@media (max-width: 800px) {
+@media  (max-width: 600px) {
     .schedule-item-content #subjectlabel {
         display: none;
     }
+}
 
+@media  (max-width: 1060px) {
     #dailyeventlongtitle {
         display: none;
     }
@@ -675,7 +677,7 @@ ent-dropdown div.show>div.dropdown-list {
     }
 }
 
-@media (min-width: 800px) {
+@media (min-width: 1060px) {
     #dailyeventlongtitle {
         display: block;
     }
