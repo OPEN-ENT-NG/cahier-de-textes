@@ -8,7 +8,11 @@
 
     <!-- AUTOCOMPLETE -->
     <div ng-show="displaySearch">
-        <input type="text" id="input-subject" placeholder="Saisir une matière" ng-keyup="searchSubject($event)" ng-model="search"> <div class="autocompletelist" >
+        <input type="text" id="input-subject"
+               placeholder="Saisir une matière"
+               ng-keyup="searchSubject($event)"
+               ng-keydown="searchSubject($event)"
+               ng-model="search"> <div class="autocompletelist" >
             <div class="item-suggest"
                  ng-repeat="suggestedSubject in suggestedSubjects"
                  ng-click="selectSubject(suggestedSubject)"

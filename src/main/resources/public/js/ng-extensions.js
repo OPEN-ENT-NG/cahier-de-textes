@@ -421,7 +421,8 @@
                 scope: {
                     ngModel: '=',
                     ngChange: '&',
-                    item: "="
+                    lesson: "=",
+                    homework: "="
                 },
                 transclude: true,
                 replace: true,
@@ -445,6 +446,31 @@
                     scope.suggestedSubjects = new Array();
                     model.subjects.all.sort(sortBySubjectLabel);
 
+                    var setNewSubject = function (subjectLabel) {
+
+                        if(!subjectLabel){
+                            return;
+                        }
+
+                        subjectLabel = subjectLabel.trim();
+
+                        var existingSubject = null;
+
+                        for (var i = 0; i < model.subjects.all.length; i++) {
+                            if (sansAccent(model.subjects.all[i].label).toUpperCase() === sansAccent(subjectLabel).toUpperCase()) {
+                                existingSubject = model.subjects.all[i];
+                            }
+                        }
+
+                        if (!existingSubject) {
+                            scope.ngModel.label = subjectLabel;
+                            scope.ngModel.id = null;
+                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+                            scope.ngModel.teacher_id = model.me.userId;
+                        } else {
+                            scope.ngModel = existingSubject;
+                        }
+                    };
 
                     var initSuggestedSubjects = function() {
                         scope.suggestedSubjects = new Array();
@@ -477,8 +503,20 @@
                         }
                     };
 
+                    /**
+                     * Search subject from input by user
+                     */
                     scope.searchSubject = function (event) {
-                        // if (e.keyCode === 9) { TODO handle tab event
+
+                        if (event.type === 'keydown' && event.keyCode === 9) {
+                            scope.displaySearch = false;
+
+                            if (scope.search != '') {
+                                setNewSubject(scope.search);
+                            }
+                            return;
+                        }
+
                         scope.search = scope.search.trim();
 
                         if (scope.search != '') {
@@ -495,11 +533,13 @@
                         }
                     };
 
-                    scope.selectSubject = function(subject){
+                    scope.selectSubject = function (subject) {
                         scope.ngModel = subject;
                         scope.displaySearch = false;
+                        if (scope.lesson) {
+                            scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
+                        }
                     };
-
 
                     $(element.context.ownerDocument).click(function (event) {
                         if (!$(event.target).is("item-suggest") && !$(event.target).is("#remove-subject") && !$(event.target).is("#input-subject")) {
@@ -507,10 +547,7 @@
 
                             // new subject that will need to be created on lesson/homework save
                             if (scope.suggestedSubjects.length === 0) {
-                                scope.ngModel.label = scope.search;
-                                scope.ngModel.id = null;
-                                scope.ngModel.school_id = scope.item.audience.structureId;
-                                scope.ngModel.teacher_id = model.me.userId;
+                                setNewSubject(scope.search);
                             }
                             scope.$apply();
                         }
