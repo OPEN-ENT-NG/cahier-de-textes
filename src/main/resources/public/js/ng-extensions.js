@@ -416,24 +416,20 @@
             }
         });
 
-        module.directive('itemPicker', function () {
+        module.directive('subjectPicker', function () {
             return {
                 scope: {
                     ngModel: '=',
-                    ngChange: '&'
+                    ngChange: '&',
+                    item: "="
                 },
                 transclude: true,
                 replace: true,
                 restrict: 'E',
-                template: '<span class="custom-tagsinput four">'
-                    +'<div class="autocompletelist" style="position: absolute; top: 100%; z-index: 1000; display: none; right: auto;"></div>'
-                    +'<span id="current-subject"></span>'
-                    +'</span>',
+                templateUrl: 'diary/public/template/subject-picker.html',
                 link: function (scope, element) {
 
-                    var $input = $('<input type="text" placeholder="Saisir une matière" id="input-subject">');
-                    var $subjectContainer = $('#current-subject', element);
-                    var resultsBox = $('.autocompletelist', element);
+
                     var sortBySubjectLabel = function (a, b) {
                         if (a.label > b.label)
                             return 1;
@@ -442,168 +438,83 @@
                         return 0;
                     };
 
-                    scope.ngModelOriginal = scope.ngModel;
+                    scope.search = null;
+                    scope.displaySearch = false;
 
-                    /**
-                     * Display current subject of lesson or homework
-                     */
-                    scope.displaySubject = function(subject){
-                        var $tag = $('<span class="item-display item-remove">' + subject.label + '<span data-role="remove" style="float: right;" id="remove-subject" title="Désafecter la matière"></span></span>');
-                        $tag.data('item', subject);
-                        // make sure only one subject of current lesson/hw will be displayed
-                        $subjectContainer.empty();
-                        $subjectContainer.append($tag);
+                    // init suggested subjects with all subjects
+                    scope.suggestedSubjects = new Array();
+                    model.subjects.all.sort(sortBySubjectLabel);
 
-                        var removeCross = $('span[data-role=remove]', $tag);
 
-                        // on removing lesson/hw subject display input field to select another subject
-                        removeCross.click(function () {
-                            $tag.hide();
+                    var initSuggestedSubjects = function() {
+                        scope.suggestedSubjects = new Array();
 
-                            scope.addInputSubject();
-                            // on subject change reload previous lessons
-                            if (scope.$parent.lesson) {
-                                model.getPreviousLessonsFromLesson(scope.$parent.lesson, function(){scope.$apply()});
-                            }
-                            $input.val('');
-                            $input.show();
-                            $input.focus();
-                            scope.$apply();
-                        });
-
-                        return $tag;
+                        for (var i = 0; i < model.subjects.all.length; i++) {
+                            scope.suggestedSubjects.push(model.subjects.all[i]);
+                        }
                     };
 
-                    scope.addSuggestedSubject = function(subject){
-                        var $suggestedSubject = $('<span class="item-suggest"  data-subject-id="'+subject.id+'" style="cursor:pointer;">' + subject.label + '</span><br>');
+                    initSuggestedSubjects();
 
-                        /**
-                         * on selecting subject set this subject to lesson/homework
-                         */
-                        $suggestedSubject.click(function (event) {
-                            var selectedSubjectId = event.target.dataset.subjectId; // TODO test IE
-                            scope.ngModel = model.findSubjectById(selectedSubjectId);
-                            $input.hide();
-                            resultsBox.hide();
-                            $('.item-display', element).show();
-                            scope.$apply();
-                            event.stopPropagation();
-                        });
-
-                        resultsBox.append($suggestedSubject);
+                    scope.goToSearchMode = function(){
+                        scope.displaySearch = true;
+                        scope.search = '';
+                        initSuggestedSubjects();
                     };
 
-                    scope.addInputSubject = function () {
+                    scope.isSelected = function (subject) {
 
-                        var initSuggestedSubjectsBox = function(){
-                            resultsBox.empty();
-
-                            model.subjects.all.sort(sortBySubjectLabel);
-
-                            for (var i = 0; i < model.subjects.all.length; i++) {
-                                scope.addSuggestedSubject(model.subjects.all[i]);
+                        if(scope.ngModel && subject){
+                            if(scope.ngModel.id){
+                                return scope.ngModel.id === subject.id;
                             }
-                            resultsBox.show();
-                        };
-
-                        initSuggestedSubjectsBox();
-
-                        // revert back original subject if any on tab out
-                        $input.bind('keyup', function (e) {
-                            // tab key
-                            if (e.keyCode === 9) {
-                                if (!scope.ngModel) {
-                                    scope.ngModel = scope.ngModelOriginal;
-
-                                    if (scope.ngModel) {
-                                        $('input', element).remove();
-                                        resultsBox.hide();
-                                    }
-                                    scope.$apply();
-                                }
-                            }
-                            // search existing subject matching
+                            // subject may not have id if it's new one
                             else {
-                                var inputVal = $input.val().trim();
-                                var matchingSubjects = model.findSubjectsByLabel(inputVal);
-                                matchingSubjects.sort(sortBySubjectLabel);
-                                resultsBox.empty();
-
-                                // display matching subjects if any
-                                if (matchingSubjects.length > 0) {
-
-                                    var hasPerfectMatch = false;
-
-                                    for (var i = 0; i < matchingSubjects.length; i++) {
-
-                                        if (sansAccent(matchingSubjects[i].label.toLowerCase()) === sansAccent(inputVal.toLowerCase())) {
-                                            hasPerfectMatch = true;
-                                        }
-
-                                        scope.addSuggestedSubject(matchingSubjects[i]);
-                                    }
-                                    resultsBox.show();
-                                }
-
-                                // adds entry for creating subject only if subject keyed in does not exist
-                                if(inputVal.length > 0 && !hasPerfectMatch) {
-                                    var $suggestCreateSubject=$('<span class="custom-tag label label-info" style="cursor: pointer;">'+ $input.val() +' (Créer)</span><br>');
-
-                                    $suggestCreateSubject.click(function(){
-
-                                        var newSubject = new Subject();
-                                        newSubject.label = $input.val().trim();
-                                        newSubject.teacher_id = model.me.userId;
-
-                                        if (scope.$parent.lesson) {
-                                            newSubject.school_id = scope.$parent.lesson.audience.structureId;
-                                        } else {
-                                            newSubject.school_id = scope.$parent.homework.audience.structureId;
-                                        }
-
-                                        var postCreateSubjectFunc = function(){
-                                            scope.ngModel = newSubject;
-                                            scope.$parent.subject = newSubject;
-                                            resultsBox.hide();
-                                            $input.hide();
-                                        };
-                                        newSubject.save(postCreateSubjectFunc);
-                                    });
-
-                                    resultsBox.append($suggestCreateSubject);
-                                    resultsBox.show();
-                                } else if(inputVal.length === 0){
-                                    initSuggestedSubjectsBox();
-                                }
+                                return sansAccent(scope.ngModel.label) === sansAccent(subject.label);
                             }
-                        });
-
-                        element.append($input);
+                        } else {
+                            return false;
+                        }
                     };
 
-                    $(element.context.ownerDocument).click(function(event){
+                    scope.searchSubject = function (event) {
+                        // if (e.keyCode === 9) { TODO handle tab event
+                        scope.search = scope.search.trim();
 
-                        if(!$(event.target).is("item-suggest") && !$(event.target).is("#remove-subject") && !$(event.target).is("#input-subject")){
-                            // show subject selected
-                            $('.item-display', element).show();
-                            $input.hide();
-                            $('.autocompletelist', element).hide();
+                        if (scope.search != '') {
+                            var matchingSubjects = model.findSubjectsByLabel(scope.search);
+                            scope.suggestedSubjects = new Array();
+
+                            for (var i = 0; i < matchingSubjects.length; i++) {
+                                scope.suggestedSubjects.push(matchingSubjects[i]);
+                            }
+
+                            scope.$apply();
+                        } else {
+                            initSuggestedSubjects();
+                        }
+                    };
+
+                    scope.selectSubject = function(subject){
+                        scope.ngModel = subject;
+                        scope.displaySearch = false;
+                    };
+
+
+                    $(element.context.ownerDocument).click(function (event) {
+                        if (!$(event.target).is("item-suggest") && !$(event.target).is("#remove-subject") && !$(event.target).is("#input-subject")) {
+                            scope.displaySearch = false;
+
+                            // new subject that will need to be created on lesson/homework save
+                            if (scope.suggestedSubjects.length === 0) {
+                                scope.ngModel.label = scope.search;
+                                scope.ngModel.id = null;
+                                scope.ngModel.school_id = scope.item.audience.structureId;
+                                scope.ngModel.teacher_id = model.me.userId;
+                            }
+                            scope.$apply();
                         }
                     });
-
-                    if (!scope.ngModelOriginal) {
-                        scope.addInputSubject();
-                    }
-
-                    scope.$watch('ngModel', function (newVal) {
-                        if (!newVal) {
-                            return;
-                        }
-
-                        scope.displaySubject(newVal);
-                    });
-
-
                 }
             }
         });

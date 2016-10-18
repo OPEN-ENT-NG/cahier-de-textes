@@ -2,9 +2,9 @@
 <form name="lessonform">
     <div class="row">
         <div class="cell" style="width: 21em">
-            <item-picker ng-model="lesson.subject" ng-change="loadPreviousLessonsFromLesson(lesson);"></item-picker>
+            <subject-picker ng-model="lesson.subject" item="lesson" ng-change="loadPreviousLessonsFromLesson(lesson);"></subject-picker>
         </div>
-        <div class="three cell">
+        <div class="three cell" style="margin-left: 20px">
             <select ng-model="lesson.audience" ng-change="refreshHomeworkLoads(lesson); loadPreviousLessonsFromLesson(lesson);"
                     ng-options="audience as audience.name group by audience.typeLabel for audience in audiences.all"
             ></select>

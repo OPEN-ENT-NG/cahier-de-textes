@@ -1,11 +1,11 @@
 ul {
-    list-style-type: none;
-    margin-top: 0;
-    width: 99%;
-    border-left: 5px solid transparent !important;
-    padding-left: 10px;
-    padding-right: 15px;
-}
+     list-style-type: none;
+     margin-top: 0;
+     width: 99%;
+     border-left: 5px solid transparent !important;
+     padding-left: 10px;
+     padding-right: 15px;
+ }
 
 ul li i {
     color: #FF8500;
@@ -421,27 +421,40 @@ section .homeworkInfos {
 .item-remove [data-role="remove"]:after {
     content: "x";
     padding: 0px 2px;
+    color: #FF8500;
 }
 
 .custom-tagsinput .autocompletelist {
     margin-top: -10px;
-    width: auto;
+    width: 100%;
     padding: 2px 0;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border: solid 1px #2a9cc8;
     background-color: white;
-    box-shadow: 6px 4px 3px #cfcfcf;
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    right: auto;
+    color: #2a9cc8;
 }
 
 .item-suggest {
-    padding-left: 6px;
-    padding-right: 6px;
+    padding-left: 10px;
     width: 100%;
+    line-height: 40px;
+    height: 31px;
+    vertical-align: middle;
     white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.item-suggest.selected {
+    color: white;
+    background-color: #2875c7;
 }
 
 .item-suggest:hover{
-    background-color: #2a9cc8;
+    background-color: #F0F0F0;
 }
 
 
@@ -622,4 +635,38 @@ ent-dropdown div.search-link {
 }
 ent-dropdown div.show>div.dropdown-list {
     transform: scale(1, 1);
+}
+
+/*
+    Priorité d'affichage
+    1 - Icône de brouillon - 300px
+    2 - Classe - 300px
+    3 - Salle - 600px
+    4 - Matière - 600px
+    5 - Case à cocher de sélection(1) - 800px
+    6 - Horaire - 800px
+
+*/
+@media  (max-width: 850px) {
+    .schedule-item-content #hour {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content input {
+        display: none;
+    }
+}
+
+@media  (max-width: 600px) {
+    .schedule-item-content #subjectlabel {
+        display: none;
+    }
+}
+
+@media  (max-width: 550px) {
+    .schedule-item-content {
+        font-size: 1em;
+    }
 }
