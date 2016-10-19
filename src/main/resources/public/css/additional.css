@@ -283,10 +283,10 @@ calendar-daily-events {
 
 .tabs headerHomeworkLesson.selected {
     border: none;
-    border-left: 2px solid #4bafd5;
-    border-top: 2px solid #4bafd5;
-    border-right: 2px solid #4bafd5;
-    border-bottom: 2px solid #fff;
+    border-left: 1px solid #4bafd5;
+    border-top: 1px solid #4bafd5;
+    border-right: 1px solid #4bafd5;
+    border-bottom: 1px solid #fff;
     color: #4bafd5;
     text-transform: uppercase;
 }
