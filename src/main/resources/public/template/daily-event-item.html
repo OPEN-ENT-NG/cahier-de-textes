@@ -1,8 +1,8 @@
 <div class="schedule-item-content homework-content" ng-style="{'border-color': dailyEvent.color, 'color': dailyEvent.color}"
-     ng-click="editSelectedHomework(dailyEvent, $event);" tooltip="[[dailyEvent.title]]" >
+     ng-click="editSelectedHomework(dailyEvent, $event);" tooltip="[[dailyEvent.subjectLabel]]<br>[[dailyEvent.title]]" >
 
    <div class="cell twelve">
-        [[dailyEvent.subjectLabel]]
+        <div id="subjectlabelhwpanel">[[dailyEvent.subjectLabel]]</div>
 
         <!-- ASSOCIATED LESSON ICON -->
         <div style="float: right; margin-right: 5%;" ng-show="[[dailyEvent.lesson_id]]">
