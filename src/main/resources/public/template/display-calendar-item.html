@@ -1,13 +1,13 @@
-<div class="schedule-item-content" style="display: flex; flex-direction: column" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]]-[[item.audienceLabel]]<br>[[item.room]]<br>[[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+<div class="schedule-item-content" style="display: flex; flex-direction: column; box-sizing: border-box" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]] - [[item.audienceLabel]] - [[item.room]]<br>[[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
 
     <!-- 4 - HOUR -->
     <div style="display: flex; flex-direction: row; flex-wrap: nowrap">
-        <span id="hour" style="white-space: nowrap; overflow: hidden">
+        <span id="hour" style="white-space: nowrap; overflow: hidden;  margin-right: 0.5em">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
         </span>
         <!-- 3 - SALLE -->
-        <span id="room" style="float: right; white-space: nowrap; margin-left: 0.5em">[[item.room]]</span>
+        <span id="room" style="float: right; white-space: nowrap;">[[item.room]]</span>
     </div>
 
     <!-- -->
@@ -18,7 +18,7 @@
 
         <!-- 5 - CHECK -->
         <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"
-               style="float: right; margin-right: 5%; overflow: hidden;white-space: nowrap"/>
+               style="float: right; margin-right: 0.6em; overflow: hidden;white-space: nowrap"/>
 
         <!-- 1 - ICONE BROUILLON -->
         <span id="state" ng-if="[[item.state]]=='draft'" style="width: 10%; float: right;white-space: nowrap">
