@@ -415,6 +415,8 @@ section .homeworkInfos {
 
 .item-remove [data-role="remove"] {
     margin-left: 8px;
+    font-size: 28px;
+    font-weight: bold;
     cursor: pointer;
 }
 
