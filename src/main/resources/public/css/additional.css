@@ -467,7 +467,6 @@ section .homeworkInfos {
     font-size:24px;
     border-radius: 3px;
     padding: 3px;
-    white-space: nowrap;
 }
 
 .tabs section {
