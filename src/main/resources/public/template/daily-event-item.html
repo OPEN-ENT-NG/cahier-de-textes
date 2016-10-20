@@ -2,7 +2,7 @@
      ng-click="editSelectedHomework(dailyEvent, $event);" tooltip="[[dailyEvent.subjectLabel]]<br>[[dailyEvent.title]]" >
 
    <div class="cell twelve">
-        <div id="subjectlabelhwpanel">[[dailyEvent.subjectLabel]]</div>
+        <span id="subjectlabelhwpanel">[[dailyEvent.subjectLabel]]</span>
 
         <!-- ASSOCIATED LESSON ICON -->
         <div style="float: right; margin-right: 5%;" ng-show="[[dailyEvent.lesson_id]]">
