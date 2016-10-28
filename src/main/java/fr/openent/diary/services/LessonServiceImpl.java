@@ -1,15 +1,14 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.Audience;
-import fr.openent.diary.utils.Context;
+import fr.openent.diary.utils.*;
 import fr.openent.diary.utils.DateUtils;
-import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
+import org.entcore.common.utils.*;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -50,22 +49,20 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
 
     /**
-     *
-     * @param ctx
-     * @param schoolIds
-     * @param startDate
-     * @param endDate
+     * Retrieves all lessons for a context.
+     * @param ctx User context (student/teacher/none)
+     * @param userId user's identifier
+     * @param schoolIds Structure ids
+     * @param memberIds List of sharing members identifier (ENT groups, User and child id if parent).
+     * @param startDate Homework due date after this date
+     * @param endDate Homework due date before this date
      * @param handler
      */
-    private void getLessons(final Context ctx, final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+    private void getLessons(final Context ctx, final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
-            final String userId = userInfos.getUserId();
-            final List<String> groupsAndUserIds = new ArrayList<>();
-            groupsAndUserIds.add(userId);
-            if (userInfos.getGroupsIds() != null) {
-                groupsAndUserIds.addAll(userInfos.getGroupsIds());
-            }
+
+            memberIds.add(userId);
 
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
@@ -79,23 +76,14 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
                     .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id")
                     .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
-                    .append(" WHERE (ls.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray())).append(" OR l.owner = ?) ");
+                    .append(" WHERE (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
 
-            final JsonArray parameters = new JsonArray(groupsAndUserIds.toArray()).add(userId);
+            final JsonArray parameters = new JsonArray(memberIds.toArray()).add(userId);
 
             if (schoolIds != null && !schoolIds.isEmpty()) {
                 query.append(" AND l.school_id in").append(sql.listPrepared(schoolIds.toArray()));
                 for (String schoolId : schoolIds) {
                     parameters.add(Sql.parseId(schoolId));
-                }
-            }
-            //fixme Why audience filter, if an teacher share a resource to another teacher witch don't have these audiences, so the lesson don't return !!!!!!
-            if (groupIds != null && !groupIds.isEmpty()) {
-                query.append(" AND l.audience_id in ");
-                query.append(sql.listPrepared(groupIds.toArray()));
-
-                for (String groupId : groupIds) {
-                    parameters.add(groupId);
                 }
             }
 
@@ -195,18 +183,18 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
          * @param handler
          */
     @Override
-    public void getAllLessonsForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.TEACHER, schoolIds, null, userInfos, startDate, endDate, handler);
+    public void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, handler);
     }
 
     @Override
-    public void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.PARENT, schoolIds, groupIds, userInfos, startDate, endDate, handler);
+    public void getAllLessonsForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, handler);
     }
 
     @Override
-    public void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.STUDENT, schoolIds, groupIds, userInfos, startDate, endDate, handler);
+    public void getAllLessonsForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.STUDENT, userId, schoolIds, memberIds, startDate, endDate, handler);
     }
 
     private void addLesson(JsonArray resultRefined, Set<Long> homeworkIds, JsonObject lastLesson) {

@@ -101,7 +101,7 @@ public class HomeworkController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 if (user != null) {
-                    homeworkService.getAllHomeworksForALesson(lessonId, user, arrayResponseHandler(request));
+                    homeworkService.getAllHomeworksForALesson(user.getUserId(), lessonId, user.getGroupsIds(), arrayResponseHandler(request));
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -109,14 +109,14 @@ public class HomeworkController extends ControllerHelper {
         });
     }
 
-    @Get("/homework/:etabIds/:startDate/:endDate/:classId")
+    @Get("/homework/:etabIds/:startDate/:endDate/:childId")
     @ApiDoc("Get all homeworks for a school")
     @SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
     public void listHomeworks(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
-        final String classId = request.params().get("classId");
+        final String childId = request.params().get("childId");
 
         log.debug("listHomeworks on schools : " + schoolIds);
 
@@ -126,18 +126,21 @@ public class HomeworkController extends ControllerHelper {
                 if (user != null) {
                     switch (user.getType()) {
                         case "Teacher":
-                            homeworkService.getAllHomeworksForTeacher(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForTeacher(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Student":
-                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Relative":
-                            List<String> childClasses = new ArrayList<>();
-                            childClasses.add(classId);
-                            homeworkService.getAllHomeworksForParent(Arrays.asList(schoolIds), childClasses, user, startDate, endDate, arrayResponseHandler(request));
+                            final List<String> memberIds = new ArrayList<>();
+                            memberIds.add(childId); // little trick to search for the lessons the child can access.
+                            if (user.getGroupsIds() != null) {
+                                memberIds.addAll(user.getGroupsIds());
+                            }
+                            homeworkService.getAllHomeworksForParent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
-                            homeworkService.getAllHomeworksForStudent(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                     }
 

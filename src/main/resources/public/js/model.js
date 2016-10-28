@@ -1191,7 +1191,7 @@ model.build = function () {
             var urlGetLessons = '/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
 
             if (model.isUserParent() && model.child) {
-                urlGetLessons += model.child.classId;
+                urlGetLessons += model.child.id;
             } else {
                 urlGetLessons += '%20';
             }
@@ -1363,7 +1363,7 @@ model.build = function () {
             var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
 
             if (model.isUserParent() && model.child) {
-                urlGetHomeworks += model.child.classId;
+                urlGetHomeworks += model.child.id;
             } else {
                 urlGetHomeworks += '%20';
             }

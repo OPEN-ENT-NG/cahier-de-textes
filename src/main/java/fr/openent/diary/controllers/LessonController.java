@@ -93,14 +93,14 @@ public class LessonController extends ControllerHelper {
     }
 
 
-    @Get("/lesson/:etabIds/:startDate/:endDate/:classId")
+    @Get("/lesson/:etabIds/:startDate/:endDate/:childId")
     @ApiDoc("Get all lessons for etab")
     @SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
     public void listLessons(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");
         final String endDate = request.params().get("endDate");
-        final String classId = request.params().get("classId");
+        final String childId = request.params().get("childId");
 
         log.debug("listLessons on schools : " + schoolIds);
 
@@ -112,18 +112,21 @@ public class LessonController extends ControllerHelper {
                     // see UserInfoAdapterV1_0Json.java from entcore for user types
                     switch (user.getType()) {
                         case "Teacher":
-                            lessonService.getAllLessonsForTeacher(Arrays.asList(schoolIds), user, startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForTeacher(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Student":
-                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), user, startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "Relative":
-                            List<String> childClasses = new ArrayList<>();
-                            childClasses.add(classId);
-                            lessonService.getAllLessonsForParent(Arrays.asList(schoolIds), childClasses, user, startDate, endDate, arrayResponseHandler(request));
+                            final List<String> memberIds = new ArrayList<>();
+                            memberIds.add(childId); // little trick to search for the lessons the child can access.
+                            if (user.getGroupsIds() != null) {
+                                memberIds.addAll(user.getGroupsIds());
+                            }
+                            lessonService.getAllLessonsForParent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
-                            lessonService.getAllLessonsForStudent(Arrays.asList(schoolIds), user.getClasses(), user, startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
                             break;
                     }
 
@@ -475,7 +478,7 @@ public class LessonController extends ControllerHelper {
                     @Override
                     public void handle(final UserInfos user) {
                         if (user != null) {
-                            homeworkService.getAllHomeworksForALesson(lessonId, user, new Handler<Either<String, JsonArray>>() {
+                            homeworkService.getAllHomeworksForALesson(user.getUserId(), lessonId, user.getGroupsIds(), new Handler<Either<String, JsonArray>>() {
                                 @Override
                                 public void handle(Either<String, JsonArray> event) {
                                     if (event.isRight()) {
@@ -538,7 +541,7 @@ public class LessonController extends ControllerHelper {
                     @Override
                     public void handle(final UserInfos user) {
                         if (user != null) {
-                            homeworkService.getAllHomeworksForALesson(lessonId, user, new Handler<Either<String, JsonArray>>() {
+                            homeworkService.getAllHomeworksForALesson(user.getUserId(), lessonId, user.getGroupsIds(), new Handler<Either<String, JsonArray>>() {
                                 @Override
                                 public void handle(Either<String, JsonArray> event) {
                                     if (event.isRight()) {

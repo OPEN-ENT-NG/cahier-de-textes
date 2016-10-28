@@ -15,11 +15,38 @@ import java.util.List;
  */
 public interface LessonService extends CrudService {
 
-    void getAllLessonsForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all lessons for a Teacher's context.
+     * @param userId teacher's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups or User).
+     * @param startDate starting date of the period from which to retrieve the lessons.
+     * @param endDate ending date of the period from which to retrieve the lessons.
+     * @param handler
+     */
+    void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllLessonsForParent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all lessons for a Parent's context.
+     * @param userId parent's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups, User and child id).
+     * @param startDate starting date of the period from which to retrieve the lessons.
+     * @param endDate ending date of the period from which to retrieve the lessons.
+     * @param handler
+     */
+    void getAllLessonsForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllLessonsForStudent(final List<String> schoolIds, final List<String> groupIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all lessons for a Student's context.
+     * @param userId student's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups or User).
+     * @param startDate starting date of the period from which to retrieve the lessons.
+     * @param endDate ending date of the period from which to retrieve the lessons.
+     * @param handler
+     */
+    void getAllLessonsForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
     void retrieveLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 

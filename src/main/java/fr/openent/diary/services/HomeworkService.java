@@ -14,13 +14,42 @@ import java.util.List;
  */
 public interface HomeworkService {
 
-    void getAllHomeworksForALesson(final String lessonId, final UserInfos userInfos, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForALesson(final String userId, final String lessonId, final List<String> memberIds, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForTeacher(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all homework for a Teacher's context.
+     * @param userId teacher's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups or User).
+     * @param startDate starting date of the period from which to retrieve the homework.
+     * @param endDate ending date of the period from which to retrieve the homework.
+     * @param handler
+     */
+    void getAllHomeworksForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForStudent(final List<String> schoolIds, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all homework for a Parent's context.
+     * @param userId parent's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups, User and child id).
+     * @param startDate starting date of the period from which to retrieve the homework.
+     * @param endDate ending date of the period from which to retrieve the homework.
+     * @param handler
+     */
+    void getAllHomeworksForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-    void getAllHomeworksForParent(final List<String> schoolIds, final List<String> childClasses, final UserInfos userInfos, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    /**
+     * Retrieves all homework for a Student's context.
+     * @param userId student's identifier.
+     * @param schoolIds list of structure's identifiers.
+     * @param memberIds list of sharing members identifier (ENT groups or User).
+     * @param startDate starting date of the period from which to retrieve the homework.
+     * @param endDate ending date of the period from which to retrieve the homework.
+     * @param handler
+     */
+    void getAllHomeworksForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+
+
 
     void retrieveHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
 

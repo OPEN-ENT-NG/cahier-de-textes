@@ -46,24 +46,20 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     /**
-     *
+     * Retrieves all homework for a context.
      * @param ctx User context (student/teacher/none)
+     * @param userId user's identifier
      * @param schoolIds Structure ids
-     * @param audienceIds Audiences
+     * @param memberIds List of sharing members identifier (ENT groups, User and child id if parent).
      * @param startDate Homework due date after this date
      * @param endDate Homework due date before this date
      * @param lessonId Filter homework belonging to this lesson
      * @param handler
      */
-    private void getHomeworks(Context ctx, List<String> schoolIds, List<String> audienceIds, final UserInfos userInfos, String startDate, String endDate, String lessonId, Handler<Either<String, JsonArray>> handler){
-        final String userId = userInfos.getUserId();
-        final List<String> groupsAndUserIds = new ArrayList<>();
-        groupsAndUserIds.add(userId);
-        if (userInfos.getGroupsIds() != null) {
-            groupsAndUserIds.addAll(userInfos.getGroupsIds());
-        }
-
+    private void getHomeworks(final Context ctx, final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final String lessonId, final Handler<Either<String, JsonArray>> handler){
         final String DATE_FORMAT = "YYYY-MM-DD";
+
+        memberIds.add(userId);
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
@@ -79,12 +75,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" LEFT JOIN diary.homework_shares AS hs ON h.id = hs.resource_id")
                 .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id")
                 .append(" LEFT JOIN diary.members AS m ON (hs.member_id = m.id AND m.group_id IS NOT NULL)")
-                .append(" WHERE (( h.lesson_id IS NULL AND (hs.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR h.owner = ?))")
-                .append("        OR (h.lesson_id IS NOT NULL AND (ls.member_id IN " + Sql.listPrepared(groupsAndUserIds.toArray()) + " OR h.owner = ?))) ");
+                .append(" WHERE (( h.lesson_id IS NULL AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray()) + " OR h.owner = ?))")
+                .append("        OR (h.lesson_id IS NOT NULL AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray()) + " OR h.owner = ?))) ");
 
-        final JsonArray parameters = new JsonArray(groupsAndUserIds.toArray()).add(userId);
+        final JsonArray parameters = new JsonArray(memberIds.toArray()).add(userId);
 
-        for (final String g : groupsAndUserIds) {
+        for (final String g : memberIds) {
             parameters.addString(g);
         }
 
@@ -94,14 +90,6 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" AND h.school_id in ").append(sql.listPrepared(schoolIds.toArray()));
             for (String schoolId : schoolIds) {
                 parameters.add(Sql.parseId(schoolId.trim()));
-            }
-        }
-
-        //fixme Why audience filter, if an teacher share a resource to another teacher witch don't have these audiences, so the lesson don't return !!!!!!
-        if (audienceIds != null && !audienceIds.isEmpty()) {
-            query.append(" AND h.audience_id in ").append(sql.listPrepared(audienceIds.toArray()));
-            for (String audienceId : audienceIds) {
-                parameters.add(Sql.parseId(audienceId.trim()));
             }
         }
 
@@ -139,25 +127,23 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getAllHomeworksForALesson(String lessonId, final UserInfos userInfos, Handler<Either<String, JsonArray>> handler) {
-        getHomeworks(Context.NONE, null, null, userInfos, null, null, lessonId, handler);
+    public void getAllHomeworksForALesson(final String userId, final String lessonId, final List<String> memberIds, Handler<Either<String, JsonArray>> handler) {
+        getHomeworks(Context.NONE, userId, null, memberIds, null, null, lessonId, handler);
     }
 
     @Override
-    public void getAllHomeworksForTeacher(List<String> schoolIds, final UserInfos userInfos, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
-
-        getHomeworks(Context.TEACHER, schoolIds, null, userInfos, startDate, endDate, null, handler);
+    public void getAllHomeworksForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getHomeworks(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, null, handler);
     }
 
     @Override
-    public void getAllHomeworksForParent(List<String> schoolIds, List<String> childClasses, final UserInfos userInfos, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
-
-        getHomeworks(Context.PARENT, schoolIds, childClasses, userInfos, startDate, endDate, null, handler);
+    public void getAllHomeworksForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getHomeworks(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, handler);
     }
 
     @Override
-    public void getAllHomeworksForStudent(List<String> schoolIds, final UserInfos userInfos, String startDate, String endDate, Handler<Either<String, JsonArray>> handler) {
-        getHomeworks(Context.STUDENT, schoolIds, userInfos.getClasses(), userInfos, startDate, endDate, null, handler);
+    public void getAllHomeworksForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getHomeworks(Context.STUDENT, userId, schoolIds, memberIds, startDate, endDate, null, handler);
     }
 
     @Override
