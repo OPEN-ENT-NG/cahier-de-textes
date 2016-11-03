@@ -27,14 +27,6 @@ Homework.prototype.save = function(cb, cbe) {
 
     var that = this;
 
-    if(this.id) {
-        this.update(cb, cbe);
-    }
-    else {
-        this.create(cb, cbe);
-    }
-
-
     var updateOrCreateHomework = function () {
         if (that.id) {
             that.update(cb, cbe);
