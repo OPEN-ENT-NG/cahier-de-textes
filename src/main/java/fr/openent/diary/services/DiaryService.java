@@ -35,7 +35,7 @@ public interface DiaryService {
     /**
      * List all pedagogic items (lessons and homeworks) matching the given search criteria.
      */
-    void listPedagogicItems(final UserInfos userInfos, final List<SearchCriterion> criteria, final List<String> groups, final Handler<Either<String, JsonArray>> handler);
+    void listPedagogicItems(final UserInfos userInfos, final List<SearchCriterion> criteria, final List<String> memberIds, final Handler<Either<String, JsonArray>> handler);
 
     /**
      *
@@ -45,9 +45,16 @@ public interface DiaryService {
     void listChildren(final String parentId, final Handler<Either<String, JsonArray>> handler);
 
     /**
-     * Get all classes and groups for the structure.
+     * Get all classes for the structure.
      * @param schoolId
      * @param handler
      */
     void listClasses(final String schoolId, final Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * Get all groups for the structure.
+     * @param schoolId
+     * @param handler
+     */
+    void listGroups(final String schoolId, final Handler<Either<String, JsonArray>> handler);
 }

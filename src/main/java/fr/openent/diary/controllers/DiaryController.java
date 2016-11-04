@@ -257,7 +257,7 @@ public class DiaryController extends BaseController {
                                                     break;
                                             }
 
-                                            diaryService.listPedagogicItems(user, criteria, groups, arrayResponseHandler(request));
+                                            diaryService.listPedagogicItems(user, criteria, user.getGroupsIds(), arrayResponseHandler(request));
                                         } else {
                                             unauthorized(request, "No user found in session.");
                                         }

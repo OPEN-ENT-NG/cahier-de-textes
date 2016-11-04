@@ -184,8 +184,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     }
 
     @Override
-    public void listPedagogicItems(final UserInfos userInfos, List<SearchCriterion> criteria, List<String> groups, Handler<Either<String, JsonArray>> handler) {
+    public void listPedagogicItems(final UserInfos userInfos, List<SearchCriterion> criteria, List<String> memberIds, Handler<Either<String, JsonArray>> handler) {
 
+        memberIds.add(userInfos.getUserId());
         String queryReturnType = "";
         JsonArray parameters = new JsonArray();
 
@@ -272,30 +273,34 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
                 case LIMIT:         maxResults = (Integer) criterion.getValue(); break;
 
-                case TEACHER:       whereLessons.append(" AND (l.owner = ? OR ls.action = ?) ");
-                                    whereHomeworks.append(" AND (h.owner = ? OR hs.action = ?) ");
+                /*
+                case TEACHER:       whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) ");
+                                    whereHomeworks.append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ? OR hs.action = ?) ");
 
                                     parametersLessons.add(criterion.getValue());
                                     parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
                                     parametersHomeworks.add(criterion.getValue());
                                     parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
                                     break;
+                                    */
             }
         }
 
-        //add groups for students
-        if (groups != null) {
-            String inClause = sql.listPrepared(groups.toArray());
-            whereLessons.append(" AND l.audience_id in ");
-            whereLessons.append(inClause);
-            whereHomeworks.append(" AND h.audience_id in ");
-            whereHomeworks.append(inClause);
-
-            for(String groupId : groups){
-                parametersLessons.add(Sql.parseId(groupId));
-                parametersHomeworks.add(Sql.parseId(groupId));
-            }
+        whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) ");
+        for (String memberId : memberIds) {
+            parametersLessons.add(memberId);
         }
+        parametersLessons.add(userInfos.getUserId());
+        parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
+
+        whereHomeworks.append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ? OR hs.action = ?) ");
+
+        for (String memberId : memberIds) {
+            parametersHomeworks.add(memberId);
+        }
+        parametersHomeworks.add(userInfos.getUserId());
+        parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
+
 
         queryLessons.append(whereLessons);
         queryHomeworks.append(whereHomeworks);
@@ -444,6 +449,17 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder query = new StringBuilder("");
         query.append(" match (c:Class)-[BELONGS]->(s:Structure) where s.id={id} return c.id as classId, c.name as className");
         JsonObject params = new JsonObject().putString("id", schoolId);
+        neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
+    }
+
+
+    @Override
+    public void listGroups(final String schoolId, final Handler<Either<String, JsonArray>> handler) {
+        StringBuilder query = new StringBuilder("");
+        query.append(" match (mg:ManualGroup)-[BELONGS]->(s:Structure) where s.id={id} return mg.id as groupId, mg.name as groupName ");
+        query.append(" UNION ");
+        query.append(" match (mg:ManualGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) where s.id={id} return mg.id as groupId, mg.name as groupName ");
+        JsonObject params = new JsonObject().putString("id", schoolId).putString("id", schoolId);
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 }
