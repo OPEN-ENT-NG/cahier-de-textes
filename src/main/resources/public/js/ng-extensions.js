@@ -586,7 +586,8 @@
                     };
 
                     scope.isSelected = function(audience) {
-                        return audience[scope.property] === scope.selected[scope.property];
+                        // FIXME scope.selected can be undefined (?)
+                        return scope.selected !== undefined && audience[scope.property] === scope.selected[scope.property];
                     };
 
                     scope.show = function() {
