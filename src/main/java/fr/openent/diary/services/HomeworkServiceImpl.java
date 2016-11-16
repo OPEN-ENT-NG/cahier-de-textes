@@ -3,6 +3,7 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.utils.Audience;
 import fr.openent.diary.utils.Context;
+import fr.openent.diary.utils.HomeworkType;
 import fr.openent.diary.utils.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -15,6 +16,8 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.awt.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -342,19 +345,21 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                     final String defaultHomeworkTypeLabel = "Devoir Maison";
                     final String defaultHomeworkTypeCategory = "DM";
                     SqlStatementsBuilder sb = new SqlStatementsBuilder();
-
                     for (final String schoolId : schoolIds) {
-                        JsonObject homeworkType = new JsonObject();
-                        homeworkType.putNumber("id", nextId);
-                        homeworkType.putString("school_id", schoolId);
-                        homeworkType.putString("homework_type_label", defaultHomeworkTypeLabel);
-                        homeworkType.putString("homework_type_category", defaultHomeworkTypeCategory);
+                        for (HomeworkType homeworkTypeVal : HomeworkType.values()) {
+                            JsonObject homeworkType = new JsonObject();
+                            homeworkType.putNumber("id", nextId);
+                            homeworkType.putString("school_id", schoolId);
+                            homeworkType.putString("homework_type_label", homeworkTypeVal.getLabel());
+                            homeworkType.putString("homework_type_category", homeworkTypeVal.getCategory());
 
-                        sb.insert("diary.homework_type", homeworkType, "id");
-                        nextId += 1;
+                            sb.insert("diary.homework_type", homeworkType, "id");
+                            nextId += 1;
 
-                        sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+                        }
                     }
+                    sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
+
                 } else {
                     log.error("diary.homeworktype sequence could not be used.");
                     handler.handle(event.left());
