@@ -220,7 +220,7 @@
                          * Calendar height
                          * @type {number}
                          */
-                        const CAL_HEIGHT = 587;
+                        const CAL_HEIGHT = 782;
 
                         var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
 
