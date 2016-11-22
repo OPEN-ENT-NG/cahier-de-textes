@@ -345,10 +345,14 @@ function Child() {
     this.className; //String
     this.selected = false;
 }
-function PedagogicItem() {}
+function PedagogicItem() {
+    this.selected = false;
+}
 function PedagogicDay() {
-    this.expanded = false;
+    this.selected = false;
     this.dayName = moment().format("dddd DD MMMM YYYY");
+    this.shortName = this.dayName.substring(0,2);
+    this.shortDate = moment().format("DD/MM");
     this.pedagogicItemsOfTheDay = [];
     this.nbLessons = 0;
     this.nbHomeworks = 0;
@@ -498,6 +502,12 @@ model.deletePedagogicItemReferences = function(itemId) {
 
     model.initSubjectFilters();
 };
+
+model.unselectDays = function (){
+    model.pedagogicDays.forEach(function (day) {
+        day.selected = undefined;
+    });
+}
 
 function Lesson(data) {
     this.selected = false;
@@ -1786,13 +1796,15 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
 
         var pedagogicDays = [];
 
-        var dayExpanded = true;
+        var daySelected = true;
 
         for (var day in days) {
             if (days.hasOwnProperty(day)) {
                 var pedagogicDay = new PedagogicDay();
-                pedagogicDay.expanded = dayExpanded;
+                pedagogicDay.selected = daySelected;
                 pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
+                pedagogicDay.shortName = pedagogicDay.dayName.substring(0,2);
+                pedagogicDay.shortDate = moment().format("DD/MM");
                 pedagogicDay.pedagogicItemsOfTheDay = days[day];
 
                 var countItems = _.groupBy(pedagogicDay.pedagogicItemsOfTheDay, 'type_item');
@@ -1800,7 +1812,7 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
                 pedagogicDay.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
                 pedagogicDay.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
                 pedagogicDays.push(pedagogicDay);
-                dayExpanded = false;
+                daySelected = false;
             }
         }
 

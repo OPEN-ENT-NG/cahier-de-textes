@@ -58,57 +58,69 @@
 
 
 <section>
-    <ul class="colored">
-        <div ng-show="pedagogicDays.all.length <= 0">
-            <i18n>diary.search.no.result</i18n>
-        </div>
-        <li ng-repeat="day in pedagogicDays.all">
-            <div>
-                <p>
-                    <a ng-if="day.expanded !== true" ng-click="expandDay(day)">
-                        <i class="caret"></i>[[day.dayName]]</a>
-                    <a ng-if="day.expanded === true" ng-click="collapseDay(day)">
-                        <i class="caret expanded"></i>[[day.dayName]]</a> <strong><i18n>diary.homework.label</i18n> ([[day.nbHomeworks]])&nbsp; <i18n>diary.lesson.label</i18n> ([[day.nbLessons]])</strong>
-                </p>
-            </div>
-            <ul ng-if="day.expanded === true">
-                <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
-                    <div ng-if="!pedagogicItem.isFiltered()" class="cell-no-float notification">
-                        <div class="table-cell-left">
-                            <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
-                            <input ng-if="isUserTeacher" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
-                        </div>
-                        <div class="table-cell">
-                            <div class="tooltip-detail" ng-click="goToItemDetail(pedagogicItem)">
-                                <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
-                                <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
-                                    <p style="display:inline">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
-                                    <p style="display:inline" ng-if="pedagogicItem.room">(<i18n>room</i18n> - [[pedagogicItem.room]])&nbsp;</p>
-                                    [[pedagogicItem.title]]
-                                </em>
-                                <em class="medium-importance" ng-if="pedagogicItem.type_item === 'homework'">
-                                    <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
-                                    <p style="display:inline" ng-if="pedagogicItem.turn_in === 'rack'"><i18n>diary.homework.turn-in.rack</i18n>&nbsp;</p>
-                                    <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
-                                    [[pedagogicItem.title]]
-                                </em>
-                                <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
-                            </div>
-                            <span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
-                                <span ng-show="!pedagogicItem.expanded_description">
-                                     <span bind-html="pedagogicItem.preview_description"></span>
-                                </span>
-                                <span ng-show="pedagogicItem.expanded_description">
-                                     <span bind-html="pedagogicItem.description"></span>
-                                </span>
-                            </span>
+    <div ng-if="pedagogicDays.all.length <= 0">
+        <i18n>diary.search.no.result</i18n>
+    </div>
+    <div ng-if="pedagogicDays.all.length > 0">
+        <div class="pedagogic-day-container">
+            <ul>
+                <li ng-repeat="day in pedagogicDays.all">
+                    <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="selectDay(day, pedagogicDays)">
+                        <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.shortName]]</div>
+                        <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">
+                            [[day.shortDate]]&nbsp;
+                            [[day.nbHomeworks]]<i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
+                            [[day.nbLessons]]<i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
                         </div>
                     </div>
                 </li>
             </ul>
-        </li>
-    </ul>
+        </div>
+    </div>
+    <div class="pedagogic-item-container">
+        <ul>
+            <li ng-repeat="day in pedagogicDays.all">
+                <div class="pedagogic-item-card">
+                    <ul ng-if="day.pedagogicItemsOfTheDay">
+                        <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
+                            <div ng-if="!pedagogicItem.isFiltered() && day.selected" class="notification">
+                                <div class="table-cell-left">
+                                    <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
+                                    <input ng-if="isUserTeacher" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
+                                </div>
+                                <div class="table-cell">
+                                    <div class="tooltip-detail" ng-click="goToItemDetail(pedagogicItem)">
+                                        <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                        <em class="high-importance">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
+                                        <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
+                                            <p style="display:inline">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
+                                            <p style="display:inline" ng-if="pedagogicItem.room">(<i18n>room</i18n> - [[pedagogicItem.room]])&nbsp;</p>
+                                            [[pedagogicItem.title]]
+                                        </em>
+                                        <em class="medium-importance" ng-if="pedagogicItem.type_item === 'homework'">
+                                            <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
+                                            <p style="display:inline" ng-if="pedagogicItem.turn_in === 'rack'"><i18n>diary.homework.turn-in.rack</i18n>&nbsp;</p>
+                                            <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
+                                            [[pedagogicItem.title]]
+                                        </em>
+                                        <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
+                                    </div>
+									<span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
+										<span ng-show="!pedagogicItem.expanded_description">
+											 <span bind-html="pedagogicItem.preview_description"></span>
+										</span>
+										<span ng-show="pedagogicItem.expanded_description">
+											 <span bind-html="pedagogicItem.description"></span>
+										</span>
+									</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
 </section>
 
 <!-- action panel displayed if at least one lesson or homework selected -->
@@ -125,14 +137,14 @@
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
             </button>-->
-			
-			<button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0" >
+
+            <button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0" >
                 <i18n>share</i18n>
             </button>
             <button ng-click="openShareHomeworkPanel()" ng-show="getSelectedPedagogicItems('lesson').length === 0" >
                 <i18n>share</i18n>
             </button>
-			
+
             <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
             <button ng-click="showConfirmPanel('confirm-publish')" ng-if="hasPublishableOnlyItemsSelected(true)">
                 <i18n>daily.item.publish</i18n>

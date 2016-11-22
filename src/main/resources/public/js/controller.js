@@ -255,12 +255,9 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
     //list-view interactions
-    $scope.expandDay = function(day) {
-        day.expanded = true;
-    };
-
-    $scope.collapseDay = function(day) {
-        day.expanded = undefined;
+    $scope.selectDay = function(day) {
+        model.unselectDays();
+        day.selected = true;
     };
 
     var loadHomeworkFromRoute = function(params) {

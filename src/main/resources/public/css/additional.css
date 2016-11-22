@@ -1,35 +1,10 @@
 ul {
-     list-style-type: none;
-     margin-top: 0;
-     width: 99%;
-     border-left: 5px solid transparent !important;
-     padding-left: 10px;
-     padding-right: 15px;
- }
-
-ul li i {
-    color: #FF8500;
-}
-
-ul li i.caret {
-    height: 20px;
-    width: 25px;
-    display: block;
-    float: left !important;
-    color: #fff;
-    font-size: 25px;
-    font-family: Arial;
-    font-weight: 900;
-}
-
-ul li i.caret::before {
-    content: "▸";
-    color: #FF8500;
-}
-
-ul li i.caret.expanded::before {
-    content: "▾";
-    color: #FF8500;
+    list-style-type: none;
+    margin-top: 0;
+    width: 99%;
+    border-left: 5px solid transparent !important;
+    padding-left: 10px;
+    padding-right: 15px;
 }
 
 ul li i.icon {
@@ -203,10 +178,10 @@ section .homework-detail {
 }
 
 div.notification {
-    border-color: rgba(136,136,136,0.60);
-    box-shadow: 2px 3px 0px 0px rgba(136,136,136,0.60);
+    border-color: #2a9cc8;
     border-style: solid;
     border-width: 1px 1px 1px 1px;
+    margin-bottom: 5px;
 }
 
 .show-calendar-grid::before {
@@ -247,6 +222,7 @@ calendar-daily-events {
     background-color: #ffffff;
     margin-bottom: 20px;
     border: solid;
+    border-color: #2a9cc8;
     border-width: 1px;
     border-radius: 5px;
 }
@@ -510,6 +486,88 @@ i.check-selected::before {
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
+}
+
+div.pedagogic-day-container {
+    box-sizing: border-box;
+    width: 25%;
+    float:left;
+}
+
+.pedagogic-day-card {
+    box-sizing: border-box;
+    border: 1px solid #2a9cc8;
+    color: #2a9cc8;
+    width: 99%;
+    height: 55px;
+    float: left;
+    font-size:24px;
+    background-color: white;
+    margin-bottom: 2px;
+}
+
+.pedagogic-day-card .selected{
+    color: white;
+    background-color: #2a9cc8;
+}
+
+.thumbnail{
+    box-sizing: border-box;
+    color: #2a9cc8;
+    width: 25%;
+    height: 100%;
+    float: left;
+    font-size:45px;
+    font-style: bold;
+    padding: 14px;
+    text-transform: capitalize;
+    border-right : 1px;
+}
+
+.thumb-selected{
+    color: white;
+    background-color: #2a9cc8;
+    text-transform: capitalize;
+}
+
+.summary{
+    color: #2a9cc8;
+    width: 75%;
+    height: 100%;
+    padding:  15px 0px 0px 15px;
+    font-size: 30px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.sum-selected{
+    color: white;
+    background-color: #7bbcf0;
+}
+
+.day-card-icon {
+    font-size: 26px;
+    line-height: 24px;
+    text-align: center;
+    display: inline-block;
+    padding:  0px 0px 0px 5px;
+}
+
+.card-icon-selected{
+    color: white;
+    background-color: #7bbcf0;
+}
+
+div.pedagogic-item-container {
+    box-sizing: border-box;
+    width: 75%;
+    float:left;
+}
+
+.pedagogic-item-card {
+    box-sizing: border-box;
+    width: 99%;
+    float: right;
 }
 
 ent-dropdown {
