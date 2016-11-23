@@ -469,6 +469,24 @@ i.arrow-down::before {
     background-image:none;
 }
 
+i.arrow-up{
+    height: 20px;
+    width: 25px;
+    display: block;
+    float: right !important;
+    color: #FF8500;
+    font-size: 25px;
+    font-weight: 900;
+}
+
+i.arrow-up::before {
+    content: "\e840";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
 i.check-selected {
     height: 20px;
     width: 25px;

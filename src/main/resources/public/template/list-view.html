@@ -107,9 +107,11 @@
 									<span class="inline" style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
 										<span ng-show="!pedagogicItem.expanded_description">
 											 <span bind-html="pedagogicItem.preview_description"></span>
+											 <i ng-if="(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize)" class="arrow-down"></i>
 										</span>
 										<span ng-show="pedagogicItem.expanded_description">
 											 <span bind-html="pedagogicItem.description"></span>
+											 <i class="arrow-up"></i>
 										</span>
 									</span>
                                 </div>
