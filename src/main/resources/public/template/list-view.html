@@ -85,7 +85,10 @@
                             <div ng-if="!pedagogicItem.isFiltered() && day.selected" class="notification">
                                 <div class="table-cell-left">
                                     <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
-                                    <input ng-if="isUserTeacher" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" type="checkbox" ng-model="pedagogicItem.selected" style="margin-top: 10px; margin-left: 15px; display: block;"/>
+                                    <label class="checkbox" ng-if="isUserTeacher" style="margin-top: 10px; margin-left: 15px; display: block;">
+                                        <input type="checkbox" ng-model="pedagogicItem.selected" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" />
+                                        <span></span>
+                                    </label>
                                 </div>
                                 <div class="table-cell">
                                     <div class="tooltip-detail" ng-click="goToItemDetail(pedagogicItem)">
