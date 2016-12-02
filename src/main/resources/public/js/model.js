@@ -1161,6 +1161,12 @@ SubjectFilter.prototype.nextInitials = function (initials, charAt) {
 };
 
 model.build = function () {
+    calendar.startOfDay=8;
+    calendar.endOfDay=19;
+    calendar.dayHeight = 60;
+    model.calendar = new calendar.Calendar({
+        week: moment().week()
+    });
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 

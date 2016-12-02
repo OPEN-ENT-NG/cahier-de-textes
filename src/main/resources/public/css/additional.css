@@ -726,3 +726,8 @@ ent-dropdown div.show>div.dropdown-list {
         display: none;
     }
 }
+
+.schedule .timeslot {
+    height: 60px !important;
+    line-height: 60px !important;
+}
