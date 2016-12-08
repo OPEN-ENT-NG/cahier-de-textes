@@ -3,9 +3,9 @@ package fr.openent.diary.utils;
 public enum HomeworkType {
 
     //Objets directement construits
-    DevoirMaison ("Devoir Maison test", "DM"),
-    Exercice ("Exercice(s) test", "EX"),
-    Autre ("Autre test", "A");
+    DevoirMaison ("Devoir Maison", "DM"),
+    Exercice ("Exercice(s)", "EX"),
+    Autre ("Autre", "A");
 
     private String label = "";
     private String category = "";

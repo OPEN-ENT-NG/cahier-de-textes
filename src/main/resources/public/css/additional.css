@@ -283,32 +283,32 @@ calendar-daily-events {
 
 .tabs headerHomeworkLesson.selected {
     border: none;
-    border-left: 1px solid #4bafd5;
+    /*border-left: 1px solid #4bafd5;
     border-top: 1px solid #4bafd5;
-    border-right: 1px solid #4bafd5;
-    border-bottom: 1px solid #fff;
+    border-right: 1px solid #4bafd5;*/
+    border-bottom: 2px solid #4bafd5;
     color: #4bafd5;
     text-transform: uppercase;
 }
 .tabs headerHomeworkLesson.selected {
-    background: #fff;
+    /*background: #fff;*/
 }
 
 .tabs headerHomeworkLesson {
     color: #555;
-    font-size: 14px;
-    font-weight: bold;
+    /*font-size: 14px;
+    font-weight: bold;*/
     background: transparent;
     margin-right: 10px;
     -webkit-transition: border-bottom 250ms ease;
     transition: border-bottom 250ms ease;
-    border-bottom: 1px solid #000;
+    /*border-bottom: 1px solid #000;*/
 }
 
 .tabs headerHomeworkLesson {
     display: inline-block;
     padding: 6px;
-    background: #eee;
+    /*background: #eee;*/
 }
 
 .tabs headerHomeworkLesson:hover {
@@ -347,6 +347,27 @@ section .homeworkInfos {
     padding: 6px;
 }
 
+.float-right{
+    float: right;
+}
+
+.float-left{
+    float: left;
+}
+
+.margintopimportant{
+    margin-top:10px !important;
+}
+
+.lessonstate-red{
+    padding-left: 400px;
+    color: red;
+}
+
+.lessonstate-green{
+    padding-left: 400px;
+    color: green;
+}
 
 .childFilter {
     color: #a5b6bb;

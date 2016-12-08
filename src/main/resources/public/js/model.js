@@ -1623,7 +1623,7 @@ model.showHomeworkPanel = true;
  * Default color of lesson and homeworks
  * @type {string}
  */
-const DEFAULT_ITEM_COLOR = '#ff8000';
+const DEFAULT_ITEM_COLOR = '#CECEF6';
 
 /**
  * Default state of lesson or homework when created
