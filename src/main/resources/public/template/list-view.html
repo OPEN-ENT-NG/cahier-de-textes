@@ -111,8 +111,6 @@
                                             </em>
                                             <em class="medium-importance" ng-if="pedagogicItem.type_item === 'homework'">
                                                 <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
-                                                <p style="display:inline" ng-if="pedagogicItem.turn_in === 'rack'"><i18n>diary.homework.turn-in.rack</i18n>&nbsp;</p>
-                                                <p style="display:inline" ng-if="pedagogicItem.turn_in === 'lesson'"><i18n>diary.homework.turn-in.lesson</i18n>&nbsp;</p>
                                                 [[pedagogicItem.title]]
                                             </em>
 											<span ng-show="!pedagogicItem.expanded_description">
