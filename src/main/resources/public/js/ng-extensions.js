@@ -220,7 +220,7 @@
                          * Calendar height
                          * @type {number}
                          */
-                        const CAL_HEIGHT = 587;
+                        const CAL_HEIGHT = 722;
 
                         var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
 
@@ -621,10 +621,10 @@
                     };
 
                     scope.$watch("selected", function(value) {
-                        scope.isPlaceholder = scope.selected[scope.property] === undefined;
-                        scope.display = scope.selected[scope.property];
+                        scope.isPlaceholder = scope.selected === undefined || scope.selected[scope.property] === undefined;
+                        scope.display = (scope.selected !== undefined) && scope.selected[scope.property];
 
-                        if (scope.lesson) {
+                        if (scope.lesson && scope.lesson.id) {
                             if (scope.lesson.homeworks.all.length > 0) {
                                 scope.$parent.refreshHomeworkLoads(scope.lesson);
                             }

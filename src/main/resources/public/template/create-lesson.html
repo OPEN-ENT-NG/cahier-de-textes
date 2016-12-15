@@ -1,4 +1,44 @@
-﻿<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></a></h1>
+﻿<div>
+    <span class="float-left">
+        <h1 class="float-left margintopimportant"><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></h1><h1 ng-if="lesson.state == 'draft'" class="lessonstate-red">(Brouillon)</h1><h1 ng-if="lesson.state == 'published'" class="lessonstate-green">(Publié)</h1>
+    </span>
+    <span class="float-right">
+        <div class="row lessonHomeworkBtn">
+            <nav>
+                <!-- publishes the current lesson ang go back to calendar view -->
+                <button ng-if="lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
+                    <i18n>daily.item.publish</i18n>
+                </button>
+
+                <!-- share -->
+                <!--<button class="right-magnet" ng-click="openShareLessonPanel(lesson)" >-->
+                    <!--<i18n>share</i18n>-->
+                <!--</button>-->
+
+                <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
+                <button ng-if="lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
+                    <i18n>daily.item.unpublish</i18n>
+                </button>
+
+                <!-- save lesson in draft mode -->
+                <button ng-if="lesson.id" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
+                    <i18n>save</i18n>
+                </button>
+
+                <!-- save & publish lesson in create mode -->
+                <button ng-if="lesson.id == null" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createAndPublishLesson(lesson, true, true)">
+                    <i18n>daily.item.publish</i18n>
+                </button>
+
+                <!-- go back to calendar view without saving -->
+                <button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+                    <i18n>cancel</i18n>
+                </button>
+            </nav>
+        </div>
+    </span>
+</div>
+
 <form name="lessonform">
     <div class="row">
         <div class="cell" style="width: 21em">
@@ -10,27 +50,36 @@
         </div>
     </div>
 
-    <section class="tabs row">
-        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
-                              ng-click="tabs.createLesson = 'lesson'">
-            <i18n>create.lesson.tabs.lesson</i18n>
-        </headerHomeworkLesson>
-        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'homeworks' }"
-                              ng-click="tabs.createLesson = 'homeworks';">
-            <i18n>create.lesson.tabs.homeworks</i18n>
-        </headerHomeworkLesson>
-        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'previouslessons' }"
-                              ng-click="displayPreviousLessonsTabAndLoad(lesson);">
-            <i18n>create.lesson.tabs.previouslessons</i18n>
-        </headerHomeworkLesson>
+    <div class="row twelve cell tabs margintopimportant" data-ng-init="data.tabSelected = 'lesson'">
+        <div class="cell">
+            <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'lesson'}"
+                                  data-ng-click="data.tabSelected = 'lesson'">
+                <i18n>create.lesson.tabs.lesson</i18n>
+            </headerHomeworkLesson>
+            <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'homeworks'}"
+                                  data-ng-click="data.tabSelected = 'homeworks'">
+                <i18n>create.lesson.tabs.homeworks</i18n>
+            </headerHomeworkLesson>
+            <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'previouslessons'}"
+                                  data-ng-click="data.tabSelected = 'previouslessons'">
+                <i18n>create.lesson.tabs.previouslessons</i18n>
+            </headerHomeworkLesson>
+        </div>
+    </div>
 
-        <section ng-show="tabs.createLesson === 'lesson'">
+    <div class="vertical-spacing">
+        &nbsp;
+    </div>
+
+    <article class="twelve cell ng-scope">
+    <div ng-switch="data.tabSelected">
+        <div ng-switch-when="lesson">
             <div class="row">
                 <input type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
 
                 <!--ng-model="lesson.teacher"-->
-                <div class="cell right-magnet">
-                    <input type="color" ng-model="lesson.color">
+                <div class="cell float-right" style="margin-right: 20%;">
+                   Choisir une couleur de séance :  <input type="color" ng-model="lesson.color">
                 </div>
 
             </div>
@@ -71,15 +120,10 @@
                     </div>
                 </article>
             </div>
-        </section>
-
-
-
-
-
+        </div>
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
-        <section ng-show="tabs.createLesson === 'homeworks'">
+        <div ng-switch-when="homeworks">
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
 
                 <!-- minimized view -->
@@ -144,10 +188,10 @@
             <div ng-if="isLessonHomeworkEditable" class="row">
                 <i class="add-icon" ng-class="" ng-click="addHomeworkToLesson(lesson)" tooltip="lesson.homeworks.add"></i>
             </div>
-        </section>
+        </div>
 
         <!-- PREVIOUS LESSONS CREATED -->
-        <section ng-show="tabs.createLesson === 'previouslessons'">
+        <div ng-switch-when="previouslessons">
             <div ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
                 <i18n>daily.lesson.nopreviouslesson</i18n>
             </div>
@@ -199,36 +243,8 @@
                  ng-if="lesson.previousLessonsDisplayed.length < lesson.previousLessons.length" ng-click="showMorePreviousLessons(lesson)">
                 Voir plus de séances précédentes
             </div>
-        </section>
-
-
-        <div class="row lessonHomeworkBtn">
-            <nav>
-                <!-- publishes the current lesson ang go back to calendar view -->
-                <button ng-if="lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
-                    <i18n>daily.item.publish</i18n>
-                </button>
-
-                <!-- share -->
-                <button class="right-magnet" ng-click="openShareLessonPanel(lesson)" >
-                    <i18n>share</i18n>
-                </button>
-
-                <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-                <button ng-if="lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
-                    <i18n>daily.item.unpublish</i18n>
-                </button>
-
-                <!-- save lesson in draft mode -->
-                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
-                    <i18n>save</i18n>
-                </button>
-
-                <!-- go back to calendar view without saving -->
-                <button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
-                    <i18n>cancel</i18n>
-                </button>
-            </nav>
         </div>
-    </section>
+    </div>
+
+    </article>
 </form>

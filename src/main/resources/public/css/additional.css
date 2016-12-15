@@ -15,7 +15,7 @@ ul li i.icon {
 
 i.rack2::before {
     content: "\e80d";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -23,7 +23,7 @@ i.rack2::before {
 
 i.cahier-textes2::before {
     content: "\e86f";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -47,7 +47,7 @@ i.cahier-textes2::before {
 
 i.pencil::before {
     content: "\e858";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -129,7 +129,7 @@ section .homework-detail {
 
 .show-homeworks::before {
     content: "\e80d";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -148,7 +148,7 @@ section .homework-detail {
 
 .show-lessons::before {
     content: "\e86f";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -186,7 +186,7 @@ div.notification {
 
 .show-calendar-grid::before {
     content: "\e86f";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -256,32 +256,32 @@ calendar-daily-events {
 
 .tabs headerHomeworkLesson.selected {
     border: none;
-    border-left: 1px solid #4bafd5;
+    /*border-left: 1px solid #4bafd5;
     border-top: 1px solid #4bafd5;
-    border-right: 1px solid #4bafd5;
-    border-bottom: 1px solid #fff;
+    border-right: 1px solid #4bafd5;*/
+    border-bottom: 2px solid #4bafd5;
     color: #4bafd5;
     text-transform: uppercase;
 }
 .tabs headerHomeworkLesson.selected {
-    background: #fff;
+    /*background: #fff;*/
 }
 
 .tabs headerHomeworkLesson {
     color: #555;
-    font-size: 14px;
-    font-weight: bold;
+    /*font-size: 14px;
+    font-weight: bold;*/
     background: transparent;
     margin-right: 10px;
     -webkit-transition: border-bottom 250ms ease;
     transition: border-bottom 250ms ease;
-    border-bottom: 1px solid #000;
+    /*border-bottom: 1px solid #000;*/
 }
 
 .tabs headerHomeworkLesson {
     display: inline-block;
     padding: 6px;
-    background: #eee;
+    /*background: #eee;*/
 }
 
 .tabs headerHomeworkLesson:hover {
@@ -320,6 +320,27 @@ section .homeworkInfos {
     padding: 6px;
 }
 
+.float-right{
+    float: right;
+}
+
+.float-left{
+    float: left;
+}
+
+.margintopimportant{
+    margin-top:10px !important;
+}
+
+.lessonstate-red{
+    padding-left: 400px;
+    color: red;
+}
+
+.lessonstate-green{
+    padding-left: 400px;
+    color: green;
+}
 
 .childFilter {
     color: #a5b6bb;
@@ -460,7 +481,7 @@ i.arrow-down {
 
 i.arrow-down::before {
     content: "\e841";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -497,7 +518,7 @@ i.check-selected {
 
 i.check-selected::before {
     content: "\e871";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -640,7 +661,7 @@ div.pedagogic-item-container {
 
 i.homework::before {
     content: "\e80d";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -649,7 +670,7 @@ i.homework::before {
 
 i.diary::before {
     content: "\e86f";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -848,4 +869,9 @@ ent-dropdown div.show>div.dropdown-list {
     .homework-title {
         display: none;
     }
+}
+
+.schedule .timeslot {
+    height: 60px !important;
+    line-height: 60px !important;
 }

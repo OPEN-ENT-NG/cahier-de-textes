@@ -1143,6 +1143,12 @@ SearchForm.prototype.getSearch = function () {
 };
 
 model.build = function () {
+    calendar.startOfDay=8;
+    calendar.endOfDay=19;
+    calendar.dayHeight = 60;
+    model.calendar = new calendar.Calendar({
+        week: moment().week()
+    });
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
@@ -1599,7 +1605,7 @@ model.showHomeworkPanel = true;
  * Default color of lesson and homeworks
  * @type {string}
  */
-const DEFAULT_ITEM_COLOR = '#ff8000';
+const DEFAULT_ITEM_COLOR = '#CECEF6';
 
 /**
  * Default state of lesson or homework when created

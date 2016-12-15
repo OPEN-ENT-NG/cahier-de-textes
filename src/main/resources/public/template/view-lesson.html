@@ -8,23 +8,30 @@
 			<span ng-bind="lesson.teacherId" class="lessonHeader"></span>
         </div>
     </div>
-	
-	    <section class="tabs row">
-        <headerHomeworkLesson ng-class="{ selected: tabs.createLesson === 'lesson' }"
-                ng-click="tabs.createLesson = 'lesson'">
-            <i18n>create.lesson.tabs.lesson</i18n>
-        </headerHomeworkLesson>
-        <headerHomeworkLesson ng-if="lesson.homeworks.all.length > 0" ng-class="{ selected: tabs.createLesson === 'homeworks' }"
-                ng-click="tabs.createLesson = 'homeworks';">
-            <i18n>create.lesson.tabs.homeworks</i18n>
-        </headerHomeworkLesson>
-		
-	    <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
-            <i18n>create.lesson.tabs.homeworks</i18n>
-        </headerHomeworkLesson>
 
+    <div class="row twelve cell tabs" data-ng-init="data.tabSelected = 'lesson'">
+        <div class="cell">
+            <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'lesson'}"
+                                  data-ng-click="data.tabSelected = 'lesson'">
+                <i18n>create.lesson.tabs.lesson</i18n>
+            </headerHomeworkLesson>
+            <headerHomeworkLesson ng-if="lesson.homeworks.all.length > 0" data-ng-class="{'selected': data.tabSelected === 'homeworks'}"
+                                                                          data-ng-click="data.tabSelected = 'homeworks'">
+                <i18n>create.lesson.tabs.homeworks</i18n>
+            </headerHomeworkLesson>
 
-        <section ng-show="tabs.createLesson === 'lesson'">
+            <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
+                <i18n>create.lesson.tabs.homeworks</i18n>
+            </headerHomeworkLesson>
+        </div>
+    </div>
+
+    <div class="vertical-spacing">
+        &nbsp;
+    </div>
+
+    <div ng-switch="data.tabSelected">
+        <div ng-switch-when="lesson">
             <div class="row rowHeader">
 				<span class="lessonInfosGrey">[[formatDate(newItem.date)]]</span>
 				<span class="lessonInfosGrey">[[formatTime(newItem.beginning)]]-[[formatTime(newItem.end)]]</span>
@@ -34,45 +41,46 @@
             <div class="row">
                 <div ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
             </div>
-        </section>
+        </div>
+    </div>
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
-        <section ng-show="tabs.createLesson === 'homeworks'">
-            <div class="row" ng-repeat="homework in lesson.homeworks.all">
+    <div ng-switch-when="homeworks">
+        <div class="row" ng-repeat="homework in lesson.homeworks.all">
 
-                <!-- minimized view -->
-                <div class="row">
-                    <div>
-                        <ul>
-                            <li>
-                                <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
-                            </li>
-                        </ul>
-                    </div>
-                    <div ng-show="!homework.expanded" class="four cell">
-                    <b>Devoir à rendre pour le [[formatDate(homework.dueDate)]]</b><br>
-                    [[homework.type.label]] - [[homework.title]]
-                    </div>
+            <!-- minimized view -->
+            <div class="row">
+                <div>
+                    <ul>
+                        <li>
+                            <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
+                        </li>
+                    </ul>
                 </div>
-
-                <div ng-show="homework.expanded">
-                    <div class="row rowHeader">
-                        <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
-                        <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
-                        <span ng-bind="homework.title" class="lessonInfosBlack"></span>
-                        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
-                        <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
-                              ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
-                [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
-                        </span>
-                    </div>
-                    <div class="row">
-                        <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
-                    </div>
+                <div ng-show="!homework.expanded" class="four cell">
+                <b>Devoir à rendre pour le [[formatDate(homework.dueDate)]]</b><br>
+                [[homework.type.label]] - [[homework.title]]
                 </div>
-                <hr class="homework-delimitation">
             </div>
-        </section>
+
+            <div ng-show="homework.expanded">
+                <div class="row rowHeader">
+                    <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
+                    <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
+                    <span ng-bind="homework.title" class="lessonInfosBlack"></span>
+                    <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+                    <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+                          ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+            [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+                    </span>
+                </div>
+                <div class="row">
+                    <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+                </div>
+            </div>
+            <hr class="homework-delimitation">
+        </div>
+    </div>
 
         <div class="row lessonHomeworkBtn">
             <nav>
