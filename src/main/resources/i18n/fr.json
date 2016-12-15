@@ -128,5 +128,6 @@
   "my.groups.and.classes" : "Mes classes et groupes",
   "search.groups.and.classes" : "Rechercher dans l'établissement",
   "other.groups.and.classes" : "Autres classes et groupes",
-  "group.search.no.result": "Aucune autre classe ou groupe."
+  "group.search.no.result": "Aucune autre classe ou groupe.",
+  "diary.filter.all.subjects" : "Toutes les matières"
 }

@@ -137,7 +137,7 @@ section .homework-detail {
 
 .show-homeworks {
     opacity: 0.3;
-    color: #FF8500;
+    color: #46bfaf;
     padding-top: 7px;
     padding-right: 7px;
 }
@@ -156,7 +156,7 @@ section .homework-detail {
 
 .show-lessons {
     opacity: 0.3;
-    color: #FF8500;
+    color: #763294;
     padding-top: 7px;
     padding-right: 7px;
 }
@@ -218,13 +218,10 @@ calendar-daily-events {
 
 .search-form-box {
     padding: 10px 10px 20px 15px;
-    width: 500px;
-    background-color: #ffffff;
+    width: 75%;
     margin-bottom: 20px;
-    border: solid;
-    border-color: #2a9cc8;
-    border-width: 1px;
-    border-radius: 5px;
+    border: none;
+    display: inline-block;
 }
 
 .lesson_homework {
@@ -515,18 +512,21 @@ div.pedagogic-day-container {
 .pedagogic-day-card {
     box-sizing: border-box;
     border: 1px solid #2a9cc8;
+    box-shadow: 0 1px 3px;
     color: #2a9cc8;
     width: 99%;
     height: 55px;
     float: left;
     font-size:24px;
     background-color: white;
-    margin-bottom: 2px;
+    margin-bottom: 5px;
 }
 
 .pedagogic-day-card .selected{
     color: white;
     background-color: #2a9cc8;
+    border-style: none;
+    border: 0px;
 }
 
 .thumbnail{
@@ -586,6 +586,74 @@ div.pedagogic-item-container {
     box-sizing: border-box;
     width: 99%;
     float: right;
+    height: 155px;
+}
+
+.hover-orange:hover{
+    color: #FF8351;
+}
+
+.down-open:hover{
+    color: #FF8351;
+}
+
+.filter2 {
+    font-size : 30px;
+    font-style: normal;
+    line-height: 48px;
+    text-align: center;
+    width: 50px !important;
+    display: inline-block;
+    border-radius: 2px;
+    box-shadow: none;
+    background: #AAA;
+    color : #fff;
+    float: left !important;
+    margin-bottom: 5px;
+    margin-right: 3px;
+}
+
+.filter2.diary.selected {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+    background-color: #763294;
+}
+
+.filter2.homework.selected {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+    background-color: #46bfaf;
+}
+
+.subjects {
+    display : inline;
+    background-color: #f9f9f9;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 16px;
+    padding: 2px;
+}
+
+.subjects:focus {
+    background-color: #f9f9f9;
+    border-bottom: 2px solid #FF8500;
+    outline: 0;
+}
+
+i.homework::before {
+    content: "\e80d";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+    color : #fff;
+}
+
+i.diary::before {
+    content: "\e86f";
+    font-family:"fontello";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+    color : #fff;
 }
 
 ent-dropdown {

@@ -219,9 +219,9 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.openListView = function () {
         if(!$scope.isUserTeacher) {
-            model.initSubjectFilters();
+            model.initSubjects();
         } else {
-            model.initSubjectFilters();
+            model.initSubjects();
         }
         template.open('main', 'main');
         template.open('main-view', 'list-view');
@@ -1178,7 +1178,7 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
     $scope.performPedagogicItemSearch = function () {
-        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.openListView, validationError);
+        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.isUserTeacher, $scope.openListView, validationError);
     };
 
 
@@ -1289,5 +1289,5 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.showMorePreviousLessons = function (lesson) {
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
-        }
+    };
 }

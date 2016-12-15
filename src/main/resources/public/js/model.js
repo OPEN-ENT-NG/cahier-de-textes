@@ -461,10 +461,10 @@ PedagogicItem.prototype.deleteList = function(items, cb, cbe) {
 };
 
 PedagogicItem.prototype.isFiltered = function () {
-    var subjectFilters = _.pluck(_.filter(model.searchForm.subjectsFilters, function(subject) {
-        return !subject.selected;
-    }), 'subjectName');
-    return _.contains(subjectFilters, this.subject);
+    if (model.searchForm.selectedSubject != null) {
+        return !(this.subject === model.searchForm.selectedSubject);
+    }
+    return false;
 };
 
 model.deleteItemList = function (items, itemType, cb, cbe) {
@@ -500,7 +500,7 @@ model.deletePedagogicItemReferences = function(itemId) {
         return day.numberOfItems() > 0;
     });
 
-    model.initSubjectFilters();
+    model.initSubjects();
 };
 
 model.unselectDays = function (){
@@ -1103,7 +1103,8 @@ function SearchForm() {
     this.displayLesson = {};
     this.displayHomework = {};
     this.audienceId = {};
-    this.subjectsFilters = [];
+    this.subjects = [];
+    this.selectedSubject = null;
 };
 
 SearchForm.prototype.initForTeacher = function () {
@@ -1139,35 +1140,6 @@ SearchForm.prototype.getSearch = function () {
         params.audienceId = model.child.classId;
     }
     return params;
-};
-
-function SubjectFilter() {
-    this.subjectName = {};
-    this.subjectColor = {};
-    this.subjectInitials = {};
-    this.selected = true;
-};
-
-SubjectFilter.prototype.toggleSelected = function () {
-    this.selected = !this.selected;
-};
-
-// computes, sets and returns a unique string as initials for this subject.
-SubjectFilter.prototype.setInitials = function (initials) {
-    var charAt = 1;
-    var initial = this.nextInitials(initials, charAt);
-    while (_.contains(initials, initial)){
-        initial = this.nextInitials(initials, charAt++);
-    }
-    this.subjectInitials = initial;
-
-    return this.subjectInitials;
-};
-
-// returns the 1st Letter and the charAt letter to form initials for the given subject name.
-SubjectFilter.prototype.nextInitials = function (initials, charAt) {
-    var initial = this.subjectName.charAt(0) + this.subjectName.charAt(charAt);
-    return initial;
 };
 
 model.build = function () {
@@ -1401,7 +1373,7 @@ model.build = function () {
         },
         syncPedagogicItems: function(cb, cbe){
             var params = model.searchForm.getSearch();
-            model.performPedagogicItemSearch(params, cb, cbe);
+            model.performPedagogicItemSearch(params, model.isUserTeacher(), cb, cbe);
         },
         pushAll: function(datas) {
             if (datas) {
@@ -1785,7 +1757,7 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 };
 
 
-model.performPedagogicItemSearch = function (params, cb, cbe) {
+model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
     model.pedagogicDays.reset();
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
@@ -1796,12 +1768,12 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
 
         var pedagogicDays = [];
 
-        var daySelected = true;
+        var aDayIsSelected = false;
 
         for (var day in days) {
             if (days.hasOwnProperty(day)) {
                 var pedagogicDay = new PedagogicDay();
-                pedagogicDay.selected = daySelected;
+                pedagogicDay.selected = false;
                 pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
                 pedagogicDay.shortName = pedagogicDay.dayName.substring(0,2);
                 pedagogicDay.shortDate = moment().format("DD/MM");
@@ -1811,12 +1783,31 @@ model.performPedagogicItemSearch = function (params, cb, cbe) {
 
                 pedagogicDay.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
                 pedagogicDay.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
+
+                //select default day
+                if (isTeacher) {
+                    if (!aDayIsSelected) {
+                        pedagogicDay.selected = true;
+                        aDayIsSelected = true;
+                    }
+                } else {
+                    if (pedagogicDay.nbHomeworks > 0 && !aDayIsSelected) {
+                        pedagogicDay.selected = true;
+                        aDayIsSelected = true;
+                    }
+                }
                 pedagogicDays.push(pedagogicDay);
-                daySelected = false;
             }
         }
 
+        if (pedagogicDays[0] && !aDayIsSelected) {
+            pedagogicDays[0].selected = true;
+        }
+
         model.pedagogicDays.pushAll(pedagogicDays);
+        model.initSubjects();
+
+
 
         if (typeof cb === 'function') {
             cb();
@@ -1868,30 +1859,21 @@ model.listChildren = function (cb, cbe) {
 };
 
 //builds the set of different subjects encountered in the pedagogic items of the list
-model.initSubjectFilters = function () {
+model.initSubjects = function () {
 
-    var initials = [];
     var subjects = [];
-    var filters = [];
 
     model.pedagogicDays.forEach(function(pedagogicDay) {
         pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItem) {
             var subjectName = pedagogicItem.subject;
             if (!_.contains(subjects, subjectName)) {
                 subjects.push(subjectName);
-                var filter = new SubjectFilter();
-                filter.subjectName = subjectName;
-                filter.subjectColor = pedagogicItem.color;
-                filter.subjectInitials = filter.setInitials(initials);
-                initials.push(filter.subjectInitials);
-                filters.push(filter);
             }
         });
     });
 
-    model.searchForm.subjectsFilters = filters;
+    model.searchForm.subjects = subjects;
 };
-
 
 /**
  * Find subject by id
