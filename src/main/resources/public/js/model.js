@@ -1782,7 +1782,7 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
                 pedagogicDay.selected = false;
                 pedagogicDay.dayName = moment(day).format("dddd DD MMMM YYYY");
                 pedagogicDay.shortName = pedagogicDay.dayName.substring(0,2);
-                pedagogicDay.shortDate = moment().format("DD/MM");
+                pedagogicDay.shortDate = moment(day).format("DD/MM");
                 pedagogicDay.pedagogicItemsOfTheDay = days[day];
 
                 var countItems = _.groupBy(pedagogicDay.pedagogicItemsOfTheDay, 'type_item');

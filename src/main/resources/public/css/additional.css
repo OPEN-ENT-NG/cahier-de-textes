@@ -499,7 +499,7 @@ i.arrow-up{
 
 i.arrow-up::before {
     content: "\e840";
-    font-family:"fontello";
+    font-family:"ong-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
