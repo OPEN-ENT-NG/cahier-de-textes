@@ -476,12 +476,42 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
 
+    $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
+        // $scope.currentErrors = [];
+        //
+        // $scope.lesson.startTime = $scope.newItem.beginning;
+        // $scope.lesson.endTime = $scope.newItem.end;
+        // $scope.lesson.date = $scope.newItem.date;
+        //
+        // $scope.lesson.save(
+        //     function () {
+        //         notify.info('lesson.saved');
+        //         $scope.lesson.audience = model.audiences.findWhere({id: $scope.lesson.audience.id});
+        //     }, function (e) {
+        //         validationError(e);
+        //     });
+        //
+        //
+        // var lessons = [];
+        // lessons.push(lesson);
+        // var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
+        // $scope.publishLessons(lessons, isPublish, notifyKey, $scope.goToMainView());
+
+
+            $scope.createOrUpdateLesson(goMainView, function(){
+                $scope.publishLessonAndGoCalendarView(lesson, isPublish);
+            });
+            //$scope.publishLessonAndGoCalendarView(lesson, isPublish);
+
+    };
+
+
     /**
      * Create or update lesson to database from page fields
      * @param goMainView if true will switch to calendar or list view
      * after create/update else stay on current page
      */
-    $scope.createOrUpdateLesson = function (goMainView) {
+    $scope.createOrUpdateLesson = function (goMainView, cb) {
 
         $scope.currentErrors = [];
 
@@ -497,6 +527,9 @@ function DiaryController($scope, template, model, route, $location) {
                     $scope.goToMainView();
                     $scope.lesson = null;
                     $scope.homework = null;
+                }
+                if (typeof cb === 'function') {
+                    cb();
                 }
             }, function (e) {
                 validationError(e);

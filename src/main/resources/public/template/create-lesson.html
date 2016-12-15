@@ -1,6 +1,6 @@
 ﻿<div>
     <span class="float-left">
-        <h1 class="float-left margintopimportant"><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></a></h1><h1 ng-if="lesson.state == 'draft'" class="lessonstate-red">(Brouillon)</h1><h1 ng-if="lesson.state == 'published'" class="lessonstate-green">(Publié)</h1>
+        <h1 class="float-left margintopimportant"><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></h1><h1 ng-if="lesson.state == 'draft'" class="lessonstate-red">(Brouillon)</h1><h1 ng-if="lesson.state == 'published'" class="lessonstate-green">(Publié)</h1>
     </span>
     <span class="float-right">
         <div class="row lessonHomeworkBtn">
@@ -21,8 +21,13 @@
                 </button>
 
                 <!-- save lesson in draft mode -->
-                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
+                <button ng-if="lesson.id" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
                     <i18n>save</i18n>
+                </button>
+
+                <!-- save & publish lesson in create mode -->
+                <button ng-if="lesson.id == null" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createAndPublishLesson(lesson, true, true)">
+                    <i18n>daily.item.publish</i18n>
                 </button>
 
                 <!-- go back to calendar view without saving -->
