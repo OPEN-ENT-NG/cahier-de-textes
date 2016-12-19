@@ -20,14 +20,14 @@
                     <i18n>daily.item.unpublish</i18n>
                 </button>
 
-                <!-- save lesson in draft mode -->
-                <button ng-if="lesson.id" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
-                    <i18n>save</i18n>
-                </button>
-
                 <!-- save & publish lesson in create mode -->
                 <button ng-if="lesson.id == null" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createAndPublishLesson(lesson, true, true)">
                     <i18n>daily.item.publish</i18n>
+                </button>
+
+                <!-- save lesson in draft mode -->
+                <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
+                    <i18n>save</i18n>
                 </button>
 
                 <!-- go back to calendar view without saving -->
