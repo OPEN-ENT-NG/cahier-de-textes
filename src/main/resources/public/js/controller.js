@@ -472,6 +472,18 @@ function DiaryController($scope, template, model, route, $location) {
         }
     };
 
+    /**
+     * Create homework and publishes it
+     * @param homework Homework being created
+     * @param isPublish
+     * @param goMainView
+     */
+    $scope.createAndPublishHomework = function (homework, isPublish, goMainView) {
+        $scope.createOrUpdateHomework(goMainView, function () {
+            $scope.publishHomeworkAndGoCalendarView(homework, isPublish);
+        });
+    };
+
 
     $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
         // $scope.currentErrors = [];
@@ -874,7 +886,7 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
 
-    $scope.createOrUpdateHomework = function (goToMainView) {
+    $scope.createOrUpdateHomework = function (goToMainView, cb) {
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
@@ -885,6 +897,10 @@ function DiaryController($scope, template, model, route, $location) {
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
             $scope.$apply();
+
+            if (typeof cb === 'function') {
+                cb();
+            }
 
             if (goToMainView) {
                 $scope.goToMainView();

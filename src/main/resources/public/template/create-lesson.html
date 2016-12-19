@@ -1,6 +1,10 @@
 ﻿<div>
     <span class="float-left">
-        <h1 class="float-left margintopimportant"><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></h1><h1 ng-if="lesson.state == 'draft'" class="lessonstate-red">(Brouillon)</h1><h1 ng-if="lesson.state == 'published'" class="lessonstate-green">(Publié)</h1>
+        <h1 class="float-left margintopimportant">
+            <a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n>
+        </h1>
+        <h1 ng-if="lesson.state == 'draft'" class="itemstate-red">(Brouillon)</h1>
+        <h1 ng-if="lesson.state == 'published'" class="itemstate-green">(Publié)</h1>
     </span>
     <span class="float-right">
         <div class="row lessonHomeworkBtn">

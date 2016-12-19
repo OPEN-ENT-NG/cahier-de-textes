@@ -332,13 +332,15 @@ section .homeworkInfos {
     margin-top:10px !important;
 }
 
-.lessonstate-red{
-    padding-left: 400px;
+.itemstate-red{
+    padding-left: 20px;
+    float: left;
     color: red;
 }
 
-.lessonstate-green{
-    padding-left: 400px;
+.itemstate-green{
+    padding-left: 20px;
+    float: left;
     color: green;
 }
 
