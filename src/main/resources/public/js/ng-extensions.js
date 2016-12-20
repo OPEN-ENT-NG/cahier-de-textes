@@ -704,7 +704,7 @@
                      * Text for searching through label, title, ...
                      * @type {string}
                      */
-                    scope.multiSearchLesson = "";
+                    scope.multiSearch = "";
 
 
                     var timeout;
@@ -804,7 +804,13 @@
                         period.add(-60, 'days').format('YYYY-MM-DD');
                         params.startDate = period.format('YYYY-MM-DD');
                         params.endDate = moment(scope.endDate).add(1, 'days');
-                        params.multiSearchLesson = scope.multiSearchLesson.trim();
+
+                        if(scope.itemType == 'lesson'){
+                            params.multiSearchLesson = scope.multiSearch.trim();
+                        } else {
+                            params.multiSearchHomework = scope.multiSearch.trim();
+                        }
+
                         params.returnType = scope.itemType;
 
                         model.pedagogicDaysQuickSearch = new Array();
