@@ -881,7 +881,7 @@ ent-dropdown div.show>div.dropdown-list {
 .quick-search {
     width: 2%;
     z-index: 10000;
-    background: white;
+    background: transparent;
     position: fixed;
     float: left;
 }
