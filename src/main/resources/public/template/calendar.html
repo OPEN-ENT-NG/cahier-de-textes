@@ -1,3 +1,4 @@
+<div id="mainDiaryContainer" style="float: left; width: 98%;">
 <h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n></a></h1>
 <div class="row">
     <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
@@ -90,6 +91,11 @@
     </div>
 </div>
 </div>
+</div>
+
+<quick-search item-type="lessontype" class="quick-search lessontype"></quick-search>
+<quick-search item-type="homeworktype" class="quick-search homeworktype"></quick-search>
+
 <!-- action panel displayed if at least one lesson or homework selected -->
 <section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0 && homeworks.selection().length === 0  }">
     <div class="toggle">
