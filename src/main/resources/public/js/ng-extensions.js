@@ -804,6 +804,7 @@
                         period.add(-60, 'days').format('YYYY-MM-DD');
                         params.startDate = period.format('YYYY-MM-DD');
                         params.endDate = moment(scope.endDate).add(1, 'days');
+                        params.sortOrder = "DESC";
 
                         if(scope.itemType == 'lesson'){
                             params.multiSearchLesson = scope.multiSearch.trim();

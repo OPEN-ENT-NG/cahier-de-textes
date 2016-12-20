@@ -882,7 +882,7 @@ ent-dropdown div.show>div.dropdown-list {
     width: 2%;
     z-index: 10000;
     background: transparent;
-    position: fixed;
+    position: relative;
     float: left;
 }
 
@@ -910,16 +910,22 @@ ent-dropdown div.show>div.dropdown-list {
     font-size: 30px !important;
 }
 
-.quick-search-card-hover:hover {
+.quick-search-card{
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+}
+
+.quick-search-card:hover{
     background-color: #e2e8ff;
 }
 
+
 .quick-search.lessontype {
-    top: 440px;
+    top: 365px;
 }
 
 .quick-search.homeworktype {
-    top: 300px;
+    top: 220px;
 }
 
 .quick-search-showmore {

@@ -1,7 +1,9 @@
 <!-- TODO DRAGGEABLE -->
-<article class="quick-search-card-hover"  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDay.pedagogicItemsOfTheDay" style="padding-bottom: 5px !important; padding-top: 5px !important;">
-    <span style="font-weight: bold;">[[pedagogicItemOfTheDay.dayFormatted]]</span>
-    <span>[[pedagogicItemOfTheDay.audience]]</span><br>
-    [[pedagogicItemOfTheDay.subject]]<br>
-    <i>[[pedagogicItemOfTheDay.title]]</i>
+<article class="quick-search-card" ng-style="{'background-color': pedagogicItemOfTheDay.color}"  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDay.pedagogicItemsOfTheDay" style="padding-bottom: 5px !important; padding-top: 5px !important;">
+    <em class="medium-importance" style="color: white !important;">
+        <span style="font-weight: bold;">[[pedagogicItemOfTheDay.dayFormatted]]</span>
+        <span>[[pedagogicItemOfTheDay.audience]]</span><br>
+        [[pedagogicItemOfTheDay.subject]]<br>
+        <i>[[pedagogicItemOfTheDay.title]]</i>
+    </em>
 </article>
