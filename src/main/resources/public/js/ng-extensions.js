@@ -660,7 +660,7 @@
                      * Number of items displayed by default
                      * @type {number}
                      */
-                    var defaultMaxPedagogicItemsDisplayed = 5;
+                    var defaultMaxPedagogicItemsDisplayed = 6;
 
                     scope.maxPedagogicItemsDisplayed = defaultMaxPedagogicItemsDisplayed;
 
