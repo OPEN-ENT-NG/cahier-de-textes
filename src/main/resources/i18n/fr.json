@@ -131,5 +131,7 @@
   "search.groups.and.classes" : "Rechercher dans l'établissement",
   "other.groups.and.classes" : "Autres classes et groupes",
   "group.search.no.result": "Aucune autre classe ou groupe.",
-  "diary.filter.all.subjects" : "Toutes les matières"
+  "diary.filter.all.subjects" : "Toutes les matières",
+  "diary.quicksearch.lessons.noresult": "Aucune séance ne correspond à vos critères",
+  "diary.quicksearch.homeworks.noresult": "Aucun travail à faire ne correspond à vos critères"
 }

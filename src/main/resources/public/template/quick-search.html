@@ -32,7 +32,8 @@
 
     <!-- display "no results" text -->
     <div ng-if="displayNoResultsText" class="quick-search-noresults">
-        <label><i18n>diary.search.no.result</i18n></label>
+        <label ng-if="itemType=='lesson'"><i18n>diary.quicksearch.lessons.noresult</i18n></label>
+        <label ng-if="itemType=='homework'"><i18n>diary.quicksearch.homeworks.noresult</i18n></label>
     </div>
 
     <!-- Display more -->
