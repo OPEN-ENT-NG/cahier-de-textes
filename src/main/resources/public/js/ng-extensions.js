@@ -587,7 +587,7 @@
 
                     scope.isSelected = function(audience) {
                         // FIXME scope.selected can be undefined (?)
-                        return scope.selected !== undefined && audience[scope.property] === scope.selected[scope.property];
+                        return scope.selected !== undefined && scope.selected != null && audience[scope.property] === scope.selected[scope.property];
                     };
 
                     scope.show = function() {
@@ -621,7 +621,7 @@
                     };
 
                     scope.$watch("selected", function(value) {
-                        scope.isPlaceholder = scope.selected === undefined || scope.selected[scope.property] === undefined;
+                        scope.isPlaceholder = scope.selected === undefined || scope.selected === undefined === null || scope.selected[scope.property] === undefined;
                         scope.display = (scope.selected !== undefined) && scope.selected[scope.property];
 
                         if (scope.lesson && scope.lesson.id) {
@@ -635,6 +635,226 @@
                             scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
                         }
                     });
+                }
+            }
+        });
+
+
+        /**
+         * Directive to perform a quick search among lessons and homeworks
+         */
+        module.directive('quickSearch', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/template/quick-search.html",
+                scope: {
+                    ngModel: '=',
+                    /**
+                     * Item type 'lesson' or 'homework'
+                     */
+                    itemType: "="
+                },
+                link: function (scope, element, attrs) {
+
+                    /**
+                     * Number of items displayed by default
+                     * @type {number}
+                     */
+                    var defaultMaxPedagogicItemsDisplayed = 5;
+
+                    scope.maxPedagogicItemsDisplayed = defaultMaxPedagogicItemsDisplayed;
+
+                    /**
+                     * Max pedagofic items step increament
+                     * @type {number}
+                     */
+                    var maxPedagogicDaysDisplayedStep = 3;
+
+                    /**
+                     * If true the search if detailled panel is minified else not
+                     * (by default minified/not visible)
+                     * @type {boolean}
+                     */
+                    scope.panelVisible = false;
+
+                    /**
+                     * Pedagogic items search results
+                     * @type {Array}
+                     */
+                    scope.pedagogicItems = [];
+
+                    /**
+                     * Last pressed key time
+                     * Prevent searching
+                     */
+                    scope.lastPressedKeyTime;
+
+                    /**
+                     * Pedagogic items of the day displayed.
+                     * Max
+                     */
+                    scope.quickSearchPedagogicDaysDisplayed = new Array();
+
+                    /**
+                     * Default search time = end of current week
+                     */
+                    scope.endDate = moment().endOf('week');
+
+                    /**
+                     * Text for searching through label, title, ...
+                     * @type {string}
+                     */
+                    scope.multiSearchLesson = "";
+
+                    scope.setPanelVisible = function (isVisible, $event) {
+
+                        if (!$event.target || $event.target.type !== "text") {
+                            // TODO check that other panel (from either lesson or homework) is not visible as well!
+                            // TODO rename panelVisible -> panelMaximized
+                            scope.panelVisible = isVisible;
+
+                            // let enough room to display quick search panel maximized
+                            if (isVisible) {
+                                $('#mainDiaryContainer').width('84%');
+                                $('.quick-search').width('16%');
+                            } else {
+                                $('#mainDiaryContainer').width('98%');
+                                $('.quick-search').width('2%');
+                            }
+                        }
+                    };
+
+                    var timeout;
+
+                    /**
+                     * Flag indicating it's first search (used for not displaying the 'show more' arrow
+                     * @type {boolean}
+                     */
+                    var isFirstSearch = true;
+
+
+                    var initQuickSearch = function () {
+                        scope.endDate = moment().endOf('week');
+                        scope.quickSearchPedagogicDays = new Array();
+                    };
+
+                    initQuickSearch();
+
+                    var isQuickSearchLesson = (attrs.itemType === 'lessontype') ? true : false;
+                    scope.itemType = isQuickSearchLesson ? 'lesson' : 'homework';
+                    scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
+
+                    /**
+                     * By default X pedagogic items are displayed.
+                     * This allows to display more items
+                     */
+                    scope.quickSearchNextPedagogicDays = function () {
+                        scope.maxPedagogicItemsDisplayed += maxPedagogicDaysDisplayedStep;
+                        scope.quickSearch(false);
+                    };
+
+                    /**
+                     *  If true will display the orange arrow to display more items
+                     *  else not.
+                     * @type {boolean}
+                     */
+                    scope.isNextPedagogicDaysDisplayed = false;
+
+                    /**
+                     * Displays "no results" if true else blank
+                     * @type {boolean}
+                     */
+                    scope.displayNoResultsText = false;
+
+                    /**
+                     * Returns true if the "next" arrow button should be displayed meaning
+                     * there are other items
+                     * @returns {boolean}
+                     */
+                    var isNextPedagogicDaysDisplayed2 = function (itemsDisplayedCount) {
+                        return !isFirstSearch && itemsDisplayedCount > 0 && itemsDisplayedCount >= scope.maxPedagogicItemsDisplayed;
+                    };
+
+
+                    var performQuickSearch = function() {
+
+                        clearTimeout(timeout); // this way will not run infinitely
+
+                        var params = new SearchForm(true);
+                        params.initForTeacher();
+                        params.isQuickSearch = true;
+                        params.limit = scope.maxPedagogicItemsDisplayed + 1; // +1 thingy will help to know if there are extra items to be displayed
+                        var period = moment(model.calendar.dayForWeek).day(1);
+                        period.add(-60, 'days').format('YYYY-MM-DD');
+                        params.startDate = period.format('YYYY-MM-DD');
+                        params.endDate = moment(scope.endDate).add(1, 'days');
+                        params.multiSearchLesson = scope.multiSearchLesson.trim();
+                        params.returnType = scope.itemType;
+
+                        model.pedagogicDaysQuickSearch = new Array();
+                        scope.quickSearchPedagogicDaysDisplayed.length = 0;
+
+                        model.performPedagogicItemSearch(params, model.isUserTeacher(),
+                            // callback
+                            function () {
+                                isFirstSearch = false;
+                                scope.quickSearchPedagogicDays = isQuickSearchLesson ? model.pedagogicDaysQuickSearchLesson : model.pedagogicDaysQuickSearchHomework;
+
+                                scope.displayNoResultsText = (scope.quickSearchPedagogicDays.length == 0);
+
+                                var idxSearchPedagogicItem = 0;
+                                // count number of displayed items
+                                scope.quickSearchPedagogicDays.forEach(function (pedagogicDay) {
+
+                                    if (idxSearchPedagogicItem < scope.maxPedagogicItemsDisplayed) {
+                                        scope.quickSearchPedagogicDaysDisplayed.push(pedagogicDay);
+                                    }
+
+                                    pedagogicDay.pedagogicItemsOfTheDay.forEach(function () {
+                                        idxSearchPedagogicItem++;
+                                    });
+                                });
+
+                                scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed2(idxSearchPedagogicItem);
+                                scope.$apply();
+                            },
+                            // callback on error
+                            function (cbe) {
+                                console.error('Callback errors');
+                                console.log(cbe);
+                                notify.error(cbe.message);
+                            }
+                        );
+                    };
+
+                    scope.quickSearch = function (resetMaxDisplayedItems) {
+
+                        if (resetMaxDisplayedItems) {
+                            scope.maxPedagogicItemsDisplayed = defaultMaxPedagogicItemsDisplayed;
+                        }
+
+                        if (timeout) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                        }
+
+                        // start searching after 0.4s (prevent spamming request to backend)
+                        timeout = setTimeout(performQuickSearch, 400);
+                    };
+                }
+            }
+        });
+
+        /**
+         * Directive for result items
+         */
+        module.directive('quickSearchItem', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/template/quick-search-item.html",
+                scope: false,
+                link: function (scope, element, attrs) {
+                    // TODO handle drag function
                 }
             }
         });

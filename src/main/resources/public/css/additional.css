@@ -208,7 +208,7 @@ div.notification {
 
 calendar-daily-events .days .day {
     width: calc(100% / 7 - (130px) / 7) !important;
-    background: #e8e8e8 !important;
+    background: #ddd !important;
 }
 
 calendar-daily-events {
@@ -876,4 +876,67 @@ ent-dropdown div.show>div.dropdown-list {
 .schedule .timeslot {
     height: 60px !important;
     line-height: 60px !important;
+}
+
+.quick-search {
+    width: 2%;
+    z-index: 10000;
+    background: white;
+    position: fixed;
+    float: left;
+}
+
+/* */
+.quick-search-label-minified {
+    color: cornflowerblue;
+    background-color: #ddd;
+    width: 100px;
+    margin-left: 15px;
+    text-align: center;
+    border-radius: 15px 15px 0px 0px;
+    transform: rotate(90deg);
+    transform-origin: left;
+}
+
+.quick-search-label-minified:hover {
+    background-color: #ccc;
+    color: #f9f9f9;
+}
+
+.row.down-open:hover{
+    color: orangered !important;
+}
+.down-open:before{
+    font-size: 30px !important;
+}
+
+.quick-search-card-hover:hover {
+    background-color: #e2e8ff;
+}
+
+.quick-search.lessontype {
+    top: 430px;
+}
+
+.quick-search.homeworktype {
+    top: 300px;
+}
+
+.quick-search-showmore {
+    text-align: center;
+    color: orange;
+}
+
+.quick-search-noresults {
+    font-size: small;
+    text-align: justify;
+    margin: 10px;
+}
+
+.quick-search-results {
+    border: 1px solid lightgrey;
+    position: absolute;
+    background-color: white;
+    max-height: 400px;
+    overflow: auto;
 }

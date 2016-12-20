@@ -19,6 +19,9 @@
     },
     "subjectId": {
       "type": "string"
+    },
+    "multiSearchLesson": {
+      "type": "string"
     }
   }
 }

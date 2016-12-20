@@ -1095,7 +1095,7 @@ var getUserStructuresIdsAsString = function () {
     return structureIds;
 };
 
-function SearchForm() {
+function SearchForm(isQuickSearch) {
     this.startDate = {};
     this.endDate = {};
     this.publishState = {};
@@ -1105,6 +1105,18 @@ function SearchForm() {
     this.audienceId = {};
     this.subjects = [];
     this.selectedSubject = null;
+    this.subjectsFilters = [];
+    /**
+     * If true search result will be stored in model.quickSearchPedagogicDays instead of model.pedagogicDays
+     * @type {boolean}
+     */
+    this.isQuickSearch = isQuickSearch;
+    /**
+     * Custom pedagogic days array.
+     * Avoid conflicting with model.pedagogicDays)
+     * @type {Array}
+     */
+    this.customPedagogicDaysArray;
 };
 
 SearchForm.prototype.initForTeacher = function () {
@@ -1152,7 +1164,7 @@ model.build = function () {
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
-    this.searchForm = new SearchForm();
+    this.searchForm = new SearchForm(false);
     this.currentSchool = {};
 
     this.collection(Lesson, {
@@ -1764,7 +1776,19 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
 
 model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
-    model.pedagogicDays.reset();
+
+    // global quick search panel
+    if (params.isQuickSearch) {
+        if (params.returnType === 'lesson') {
+            model.pedagogicDaysQuickSearchLesson = new Array();
+        } else {
+            model.pedagogicDaysQuickSearchHomework = new Array();
+        }
+    }
+    // 'classical' view list
+    else {
+        model.pedagogicDays.reset();
+    }
 
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
@@ -1810,10 +1834,18 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
             pedagogicDays[0].selected = true;
         }
 
-        model.pedagogicDays.pushAll(pedagogicDays);
+        // global quick search panel
+        if (params.isQuickSearch) {
+            if (params.returnType === 'lesson') {
+                model.pedagogicDaysQuickSearchLesson = model.pedagogicDaysQuickSearchLesson.concat(pedagogicDays);
+            } else {
+                model.pedagogicDaysQuickSearchHomework = model.pedagogicDaysQuickSearchHomework.concat(pedagogicDays);
+            }
+        } else {
+            model.pedagogicDays.pushAll(pedagogicDays);
+        }
+
         model.initSubjects();
-
-
 
         if (typeof cb === 'function') {
             cb();

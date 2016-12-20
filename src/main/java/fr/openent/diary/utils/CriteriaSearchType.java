@@ -20,6 +20,16 @@ public enum CriteriaSearchType {
      * Limit max number of results retrieved
      */
     LIMIT("limit"),
+    /**
+     * Multi search criteria on title, class/group label and subjects
+     * for lessons
+     */
+    QUICK_SEARCH_LESSON("multiSearchLesson"),
+    /**
+     * Multi search criteria on title, class/group label and subjects
+     * for homeworks
+     */
+    QUICK_SEARCH_HOMEWORK("multiSearchHomework"),
     START_DATE("startDate"),
     END_DATE("endDate"),
     AUDIENCE("audienceId"),

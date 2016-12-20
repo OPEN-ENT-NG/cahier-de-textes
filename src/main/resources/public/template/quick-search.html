@@ -1,0 +1,42 @@
+<!-- minified quick search panel -->
+<div ng-click="setPanelVisible(true, $event)"  class="quick-search-label-minified" ng-show="!panelVisible">
+    [[panelLabel]]
+</div>
+
+<!-- maximized quick search panel -->
+<div class="quick-search-results" ng-show="panelVisible">
+
+    <!-- Search criteria -->
+    <div ng-click="setPanelVisible(false, $event)"
+         style="background-color: #ddd; padding-top: 10px; padding-left: 10px; margin-bottom: 10px;">
+
+        <label style="font-weight: bold; color: #2a9cc8;"
+               ng-click="setPanelVisible(false, $event)">
+            [[panelLabel]]
+        </label>
+        <!-- TODO I18n-->
+        <div style="background-color: #ddd">
+            <input type="text" style="background-color: white;" placeholder="&#x1f50d; Libéllé"
+                   ng-keypressed="quickSearch(true)" ng-keyup="quickSearch(true)" ng-model="multiSearchLesson" size="16"/>
+            <br>
+            <label class="cell">Jusqu'au</label>
+            <date-picker ng-model="endDate" ng-change="quickSearch(true)" class="cell six"></date-picker>
+        </div>
+    </div>
+    <br>
+
+    <!-- Results -->
+    <div  ng-repeat="quickSearchPedagogicDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
+       <quick-search-item></quick-search-item>
+    </div>
+
+    <!-- display "no results" text -->
+    <div ng-if="displayNoResultsText" class="quick-search-noresults">
+        <label><i18n>diary.search.no.result</i18n></label>
+    </div>
+
+    <!-- Display more -->
+    <div class="quick-search-showmore down-open" tooltip="Voir plus" ng-show="isNextPedagogicDaysDisplayed" ng-click="quickSearchNextPedagogicDays()" class="row down-open">
+
+    </div>
+</div>

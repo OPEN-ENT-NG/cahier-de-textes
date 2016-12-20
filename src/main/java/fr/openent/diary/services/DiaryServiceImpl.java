@@ -191,10 +191,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray();
 
         StringBuilder queryLessons = new StringBuilder();
-        queryLessons.append("SELECT 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
+        queryLessons.append("SELECT distinct 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room,")
                 .append(" l.lesson_color as color, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
-                .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, null as turn_in_type")
+                .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, ")
+                .append(" enum_first(null::diary.homework_turn_in_type) as turn_in_type ") // have to get a random enum else the UNION won't work!
                 .append(" FROM diary.lesson AS l")
                 .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
                 .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
@@ -205,9 +206,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         //TODO : add number of homeworks for a lesson
 
         StringBuilder queryHomeworks = new StringBuilder();
-        queryHomeworks.append("SELECT 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, h.lesson_id as lesson_id,")
+        queryHomeworks.append("SELECT distinct 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, h.lesson_id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room,")
-                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null as start_time, null as end_time,")
+                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null::time as start_time, null::time as end_time,")
                 .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
@@ -272,6 +273,37 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case SEARCH_TYPE:   queryReturnType = (String) criterion.getValue(); break;
 
                 case LIMIT:         maxResults = (Integer) criterion.getValue(); break;
+
+                /**
+                 * Lesson quick multi criteria search
+                 */
+                case QUICK_SEARCH_LESSON:
+
+                    final String searchWordUpperCaseLesson = criterion.getValue().toString().toUpperCase();
+
+                    whereLessons.append(" AND ( UPPER(s.subject_label) LIKE ? ");
+                    whereLessons.append(" OR UPPER(l.lesson_title) LIKE ? ");
+                    whereLessons.append(" OR UPPER(a.audience_label) LIKE ? ) ");
+
+                    parametersLessons.add("%" + searchWordUpperCaseLesson + "%");
+                    parametersLessons.add("%" + searchWordUpperCaseLesson + "%");
+                    parametersLessons.add("%" + searchWordUpperCaseLesson + "%");
+                    break;
+                /**
+                 * Homework quick multi criteria search
+                 */
+                case QUICK_SEARCH_HOMEWORK:
+
+                    final String searchWordUpperCaseHomework = criterion.getValue().toString().toUpperCase();
+
+                    whereHomeworks.append(" AND ( UPPER(s.subject_label) LIKE ? ");
+                    whereHomeworks.append(" OR UPPER(h.homework_title) LIKE ? ");
+                    whereHomeworks.append(" OR UPPER(a.audience_label) LIKE ? )");
+
+                    parametersHomeworks.add("%" + searchWordUpperCaseHomework + "%");
+                    parametersHomeworks.add("%" + searchWordUpperCaseHomework + "%");
+                    parametersHomeworks.add("%" + searchWordUpperCaseHomework + "%");
+                    break;
 
                 /*
                 case TEACHER:       whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) ");
