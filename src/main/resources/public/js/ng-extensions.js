@@ -754,7 +754,7 @@
                                 $('#mainDiaryContainer').width('84%');
                                 $('.quick-search').width('16%');
                             } else {
-                                $('#mainDiaryContainer').width('98%');
+                                $('#mainDiaryContainer').width('97%');
                                 $('.quick-search').width('2%');
                             }
                         }
