@@ -890,7 +890,7 @@ ent-dropdown div.show>div.dropdown-list {
 .quick-search-label-minified {
     color: cornflowerblue;
     background-color: #ddd;
-    width: 100px;
+    width: 120px;
     margin-left: 15px;
     text-align: center;
     border-radius: 15px 15px 0px 0px;
@@ -915,7 +915,7 @@ ent-dropdown div.show>div.dropdown-list {
 }
 
 .quick-search.lessontype {
-    top: 430px;
+    top: 440px;
 }
 
 .quick-search.homeworktype {
