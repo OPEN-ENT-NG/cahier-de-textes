@@ -706,23 +706,6 @@
                      */
                     scope.multiSearchLesson = "";
 
-                    scope.setPanelVisible = function (isVisible, $event) {
-
-                        if (!$event.target || $event.target.type !== "text") {
-                            // TODO check that other panel (from either lesson or homework) is not visible as well!
-                            // TODO rename panelVisible -> panelMaximized
-                            scope.panelVisible = isVisible;
-
-                            // let enough room to display quick search panel maximized
-                            if (isVisible) {
-                                $('#mainDiaryContainer').width('84%');
-                                $('.quick-search').width('16%');
-                            } else {
-                                $('#mainDiaryContainer').width('98%');
-                                $('.quick-search').width('2%');
-                            }
-                        }
-                    };
 
                     var timeout;
 
@@ -743,6 +726,39 @@
                     var isQuickSearchLesson = (attrs.itemType === 'lessontype') ? true : false;
                     scope.itemType = isQuickSearchLesson ? 'lesson' : 'homework';
                     scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
+
+
+
+                    scope.setPanelVisible = function (isVisible, $event) {
+
+                        if (!$event.target || $event.target.type !== "text") {
+
+                            scope.panelVisible = isVisible;
+
+                            if (scope.itemType == 'lesson') {
+                                model.lessonPanelVisible = isVisible;
+
+                                if (typeof model.homeworkPanelVisible != 'undefined') {
+                                    isVisible |= model.homeworkPanelVisible;
+                                }
+                            } else if (scope.itemType == 'homework') {
+                                model.homeworkPanelVisible = isVisible;
+
+                                if (typeof model.lessonPanelVisible != 'undefined') {
+                                    isVisible |= model.lessonPanelVisible;
+                                }
+                            }
+
+                            // let enough room to display quick search panel maximized
+                            if (isVisible) {
+                                $('#mainDiaryContainer').width('84%');
+                                $('.quick-search').width('16%');
+                            } else {
+                                $('#mainDiaryContainer').width('98%');
+                                $('.quick-search').width('2%');
+                            }
+                        }
+                    };
 
                     /**
                      * By default X pedagogic items are displayed.
