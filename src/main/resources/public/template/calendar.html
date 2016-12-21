@@ -93,8 +93,11 @@
 </div>
 </div>
 
-<quick-search ng-if="isUserTeacher" item-type="lessontype" class="quick-search lessontype"></quick-search>
-<quick-search ng-if="isUserTeacher" item-type="homeworktype" class="quick-search homeworktype"></quick-search>
+<!-- quick search panel -->
+<div ng-if="isUserTeacher">
+    <quick-search item-type="lessontype" class="quick-search lessontype"></quick-search>
+    <quick-search item-type="homeworktype" class="quick-search homeworktype"></quick-search>
+</div>
 
 <!-- action panel displayed if at least one lesson or homework selected -->
 <section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0 && homeworks.selection().length === 0  }">
