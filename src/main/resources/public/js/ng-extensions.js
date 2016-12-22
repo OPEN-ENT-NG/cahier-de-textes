@@ -9,31 +9,31 @@
                 template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
                 '<i class="resize-homeworks-panel"   style="float: left; width: 130px;">&nbsp;</i></li></ul></span>'+
                 '<div class="days" style="z-index: 1000; ">' +
-                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
+                '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
 
-                        // <= 3 homeworks for current day
-                        // or 1 homework and homework panel minified
-                        '<div class="test" ng-if="showAllHomeworks(day)">' +
-                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
-                            '</div>' +
-                        '</div>' +
+                // <= 3 homeworks for current day
+                // or 1 homework and homework panel minified
+                '<div class="test" ng-if="showAllHomeworks(day)">' +
+                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
+                '</div>' +
+                '</div>' +
 
-                        // > 3 homeworks for current day
-                        // or > 1 homework and homework panel minified
-                        '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
-                            'ng-click="toggleShowHwDetail(day)">' +
-                            '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' +
-                            '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' +
-                        '</div>' +
-                        '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
-                            'ng-click="toggleOpenDailyEvents(day, $event)" ' +
-                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
-                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
+                // > 3 homeworks for current day
+                // or > 1 homework and homework panel minified
+                '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
+                'ng-click="toggleShowHwDetail(day)">' +
+                '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' +
+                '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' +
+                '</div>' +
+                '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
+                'ng-click="toggleOpenDailyEvents(day, $event)" ' +
+                'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
+                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div>',
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
@@ -877,7 +877,33 @@
                 templateUrl: "diary/public/template/quick-search-item.html",
                 scope: false,
                 link: function (scope, element, attrs) {
-                    // TODO handle drag function
+
+                    var originalTop;
+                    var originalLeft;
+
+                    var element = angular.element(element);
+
+                    element.on('startDrag', function (event) {
+
+                        event.target.style.opacity = .8;
+
+                        if (!originalTop) {
+                            originalTop = element.find('article').position().top;
+                            originalLeft = element.find('article').position().left;
+                        }
+                    });
+
+                    element.on('stopDrag', function (event) {
+
+                        event.target.style.opacity = "";
+
+                        element.find('article').css({
+                            position: 'initial',
+                            top: originalTop + 'px',
+                            left: originalLeft + 'px'
+                        });
+                    });
+
                 }
             }
         });
