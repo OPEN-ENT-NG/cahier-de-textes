@@ -16,10 +16,10 @@
         </label>
         <!-- TODO I18n-->
         <div style="background-color: #ddd">
-            <input type="text" style="background-color: white;" placeholder="&#x1f50d; Libéllé"
+            <input type="text" style="background-color: white;" translate attr="placeholder" placeholder="diary.quicksearch.zoomlabel"
                    ng-keypressed="quickSearch(true)" ng-keyup="quickSearch(true)" ng-model="multiSearch" size="16"/>
             <br>
-            <label class="cell">Jusqu'au</label>
+            <label class="cell"><i18n>diary.quicksearch.until</i18n></label>
             <date-picker ng-model="endDate" ng-change="quickSearch(true)" class="cell six"></date-picker>
         </div>
     </div>

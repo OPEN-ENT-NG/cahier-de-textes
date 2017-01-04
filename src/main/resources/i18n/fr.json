@@ -134,5 +134,7 @@
   "diary.filter.all.subjects" : "Toutes les matières",
   "diary.quicksearch.lessons.noresult": "Aucune séance ne correspond à vos critères",
   "diary.quicksearch.homeworks.noresult": "Aucun travail à faire ne correspond à vos critères",
+  "diary.quicksearch.until": "Jusqu'au",
+  "diary.quicksearch.zoomlabel": "&#x1f50d; Libéllé",
   "diary.list.view.label": "Vue liste"
 }
