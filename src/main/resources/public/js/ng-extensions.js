@@ -731,21 +731,20 @@
 
                     scope.setPanelVisible = function (isVisible, $event) {
 
+
                         if (!$event.target || $event.target.type !== "text") {
 
                             scope.panelVisible = isVisible;
 
+                            // hide the other panel (panel or homework)
                             if (scope.itemType == 'lesson') {
-                                model.lessonPanelVisible = isVisible;
-
-                                if (typeof model.homeworkPanelVisible != 'undefined') {
-                                    isVisible |= model.homeworkPanelVisible;
+                                // tricky way to get the other directive for homeworks
+                                if (isQuickSearchLesson) {
+                                    scope.$parent.$$childTail.panelVisible = false;
                                 }
                             } else if (scope.itemType == 'homework') {
-                                model.homeworkPanelVisible = isVisible;
-
-                                if (typeof model.lessonPanelVisible != 'undefined') {
-                                    isVisible |= model.lessonPanelVisible;
+                                if (!isQuickSearchLesson) {
+                                    scope.$parent.$$childHead.panelVisible = false;
                                 }
                             }
 
