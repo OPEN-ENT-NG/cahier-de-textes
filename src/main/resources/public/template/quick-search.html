@@ -25,11 +25,10 @@
     </div>
     <br>
 
-    <!-- Display next items -->
+    <!-- Display previous items -->
     <!-- -ng-show="isPreviousPedagogicDaysDisplayed" -->
     <div class="quick-search-showmore row up-open"
-         ng-show="!isFirstSearch"
-         ng-class="{disabled: !isPreviousPedagogicDaysDisplayed}"
+         ng-show="isPreviousPedagogicDaysDisplayed"
          tooltip="Voir moins"
          ng-click="isPreviousPedagogicDaysDisplayed && quickSearchPreviousPedagogicDays()">
 
@@ -46,12 +45,10 @@
         <label ng-if="itemType=='homework'"><i18n>diary.quicksearch.homeworks.noresult</i18n></label>
     </div>
 
-    <!-- Display previous items -->
+    <!-- Display next items -->
     <div class="quick-search-showmore row down-open"
-         ng-show="!isFirstSearch"
-         ng-class="{disabled: !isNextPedagogicDaysDisplayed}"
+         ng-show="isNextPedagogicDaysDisplayed"
          tooltip="Voir plus"
-         ng-show="isNextPedagogicDaysDisplayed && isNextPedagogicDaysDisplayed"
          ng-click="quickSearchNextPedagogicDays()">
 
     </div>

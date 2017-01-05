@@ -814,7 +814,7 @@
                      * @returns {boolean}
                      */
                     var isPreviousPedagogicDaysDisplayed = function () {
-                        return !scope.isFirstSearch &&  0 < pedagogicItemDisplayedIdxStart;
+                        return !scope.isFirstSearch &&  0 < pedagogicItemDisplayedIdxStart && scope.quickSearchPedagogicDaysDisplayed.length > 0;
                     };
 
                     /**
@@ -823,7 +823,10 @@
                      * @returns {boolean}
                      */
                     var isNextPedagogicDaysDisplayed = function (pedagogicItemCount) {
-                        return !scope.isFirstSearch &&  pedagogicItemDisplayedIdxStart <= pedagogicItemCount;
+                        return !scope.isFirstSearch
+                            &&  pedagogicItemDisplayedIdxStart <= pedagogicItemCount
+                            && scope.quickSearchPedagogicDaysDisplayed.length > 0
+                            && scope.quickSearchPedagogicDaysDisplayed.length >= pedagogicDaysDisplayedStep;
                     };
 
 
@@ -891,6 +894,8 @@
 
                         if (resetMaxDisplayedItems) {
                             scope.maxPedagogicItemsDisplayed = defaultMaxPedagogicItemsDisplayed;
+                            pedagogicItemDisplayedIdxStart = 0;
+                            pedagogicItemDisplayedIdxEnd = defaultMaxPedagogicItemsDisplayed - 1;
                         }
 
                         if (timeout) {

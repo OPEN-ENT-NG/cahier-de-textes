@@ -911,10 +911,6 @@ ent-dropdown div.show>div.dropdown-list {
     color: orangered !important;
 }
 
-.quick-search-showmore.disabled{
-    color: grey !important;
-    cursor: default !important;
-}
 
 .quick-search-card{
     font-size: 14px !important;
