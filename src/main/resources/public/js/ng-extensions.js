@@ -668,7 +668,7 @@
                      * Max pedagofic items step increament
                      * @type {number}
                      */
-                    var maxPedagogicDaysDisplayedStep = 3;
+                    var pedagogicDaysDisplayedStep = defaultMaxPedagogicItemsDisplayed;
 
                     /**
                      * If true the search if detailled panel is minified else not
@@ -713,7 +713,10 @@
                      * Flag indicating it's first search (used for not displaying the 'show more' arrow
                      * @type {boolean}
                      */
-                    var isFirstSearch = true;
+                    scope.isFirstSearch = true;
+
+                    var pedagogicItemDisplayedIdxStart = 0;
+                    var pedagogicItemDisplayedIdxEnd = defaultMaxPedagogicItemsDisplayed - 1; // array index starts at 0
 
 
                     var initQuickSearch = function () {
@@ -764,7 +767,32 @@
                      * This allows to display more items
                      */
                     scope.quickSearchNextPedagogicDays = function () {
-                        scope.maxPedagogicItemsDisplayed += maxPedagogicDaysDisplayedStep;
+
+                        if (!scope.isNextPedagogicDaysDisplayed) {
+                            return;
+                        }
+
+                        pedagogicItemDisplayedIdxStart += pedagogicDaysDisplayedStep;
+                        pedagogicItemDisplayedIdxEnd += pedagogicDaysDisplayedStep;
+
+                        scope.maxPedagogicItemsDisplayed = Math.max(scope.maxPedagogicItemsDisplayed, pedagogicItemDisplayedIdxEnd);
+
+                        scope.quickSearch(false);
+                    };
+
+                    /**
+                     *
+                     */
+                    scope.quickSearchPreviousPedagogicDays = function () {
+
+                        if (!scope.isPreviousPedagogicDaysDisplayed) {
+                            return;
+                        }
+
+                        pedagogicItemDisplayedIdxStart -= pedagogicDaysDisplayedStep;
+                        pedagogicItemDisplayedIdxStart = Math.max(0, pedagogicItemDisplayedIdxStart);
+                        pedagogicItemDisplayedIdxEnd -= pedagogicDaysDisplayedStep;
+
                         scope.quickSearch(false);
                     };
 
@@ -782,12 +810,20 @@
                     scope.displayNoResultsText = false;
 
                     /**
+                     * Compute if the button for recent items should be displayed
+                     * @returns {boolean}
+                     */
+                    var isPreviousPedagogicDaysDisplayed = function () {
+                        return !scope.isFirstSearch &&  0 < pedagogicItemDisplayedIdxStart;
+                    };
+
+                    /**
                      * Returns true if the "next" arrow button should be displayed meaning
                      * there are other items
                      * @returns {boolean}
                      */
-                    var isNextPedagogicDaysDisplayed2 = function (itemsDisplayedCount) {
-                        return !isFirstSearch && itemsDisplayedCount > 0 && itemsDisplayedCount >= scope.maxPedagogicItemsDisplayed;
+                    var isNextPedagogicDaysDisplayed = function (pedagogicItemCount) {
+                        return !scope.isFirstSearch &&  pedagogicItemDisplayedIdxStart <= pedagogicItemCount;
                     };
 
 
@@ -798,14 +834,14 @@
                         var params = new SearchForm(true);
                         params.initForTeacher();
                         params.isQuickSearch = true;
-                        params.limit = scope.maxPedagogicItemsDisplayed + 1; // +1 thingy will help to know if there are extra items to be displayed
+                        params.limit = scope.maxPedagogicItemsDisplayed + 1; // +1 thingy will help to know if extra items can be displayed
                         var period = moment(model.calendar.dayForWeek).day(1);
                         period.add(-60, 'days').format('YYYY-MM-DD');
                         params.startDate = period.format('YYYY-MM-DD');
                         params.endDate = moment(scope.endDate).add(1, 'days');
                         params.sortOrder = "DESC";
 
-                        if(scope.itemType == 'lesson'){
+                        if (scope.itemType == 'lesson') {
                             params.multiSearchLesson = scope.multiSearch.trim();
                         } else {
                             params.multiSearchHomework = scope.multiSearch.trim();
@@ -819,25 +855,27 @@
                         model.performPedagogicItemSearch(params, model.isUserTeacher(),
                             // callback
                             function () {
-                                isFirstSearch = false;
+                                scope.isFirstSearch = false;
                                 scope.quickSearchPedagogicDays = isQuickSearchLesson ? model.pedagogicDaysQuickSearchLesson : model.pedagogicDaysQuickSearchHomework;
-
                                 scope.displayNoResultsText = (scope.quickSearchPedagogicDays.length == 0);
 
                                 var idxSearchPedagogicItem = 0;
+                                scope.quickSearchPedagogicDaysDisplayed = new Array();
+
                                 // count number of displayed items
                                 scope.quickSearchPedagogicDays.forEach(function (pedagogicDay) {
 
-                                    if (idxSearchPedagogicItem < scope.maxPedagogicItemsDisplayed) {
-                                        scope.quickSearchPedagogicDaysDisplayed.push(pedagogicDay);
-                                    }
-
-                                    pedagogicDay.pedagogicItemsOfTheDay.forEach(function () {
+                                    pedagogicDay.pedagogicItemsOfTheDay.forEach(function (pedagogicItemOfTheDay) {
+                                        if ((pedagogicItemDisplayedIdxStart <= idxSearchPedagogicItem) && (idxSearchPedagogicItem <= pedagogicItemDisplayedIdxEnd)) {
+                                            scope.quickSearchPedagogicDaysDisplayed.push(pedagogicItemOfTheDay);
+                                        }
                                         idxSearchPedagogicItem++;
                                     });
                                 });
 
-                                scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed2(idxSearchPedagogicItem);
+                                // enable/disable next/previous items arrow buttons
+                                scope.isPreviousPedagogicDaysDisplayed = isPreviousPedagogicDaysDisplayed();
+                                scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed(idxSearchPedagogicItem);
                                 scope.$apply();
                             },
                             // callback on error
@@ -875,7 +913,7 @@
                 restrict: "E",
                 templateUrl: "diary/public/template/quick-search-item.html",
                 scope: false,
-                link: function (scope, element, attrs) {
+                link: function (scope, element) {
 
                     var originalTop;
                     var originalLeft;
@@ -892,6 +930,8 @@
                         }
                     });
 
+                    // help revert back to original position of element
+                    // that is being dragged on stop drag
                     element.on('stopDrag', function (event) {
 
                         event.target.style.opacity = "";

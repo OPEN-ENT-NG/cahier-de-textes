@@ -25,8 +25,18 @@
     </div>
     <br>
 
+    <!-- Display next items -->
+    <!-- -ng-show="isPreviousPedagogicDaysDisplayed" -->
+    <div class="quick-search-showmore row up-open"
+         ng-show="!isFirstSearch"
+         ng-class="{disabled: !isPreviousPedagogicDaysDisplayed}"
+         tooltip="Voir moins"
+         ng-click="isPreviousPedagogicDaysDisplayed && quickSearchPreviousPedagogicDays()">
+
+    </div>
+
     <!-- Results -->
-    <div  ng-repeat="quickSearchPedagogicDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
+    <div  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
        <quick-search-item></quick-search-item>
     </div>
 
@@ -36,8 +46,13 @@
         <label ng-if="itemType=='homework'"><i18n>diary.quicksearch.homeworks.noresult</i18n></label>
     </div>
 
-    <!-- Display more -->
-    <div class="quick-search-showmore down-open" tooltip="Voir plus" ng-show="isNextPedagogicDaysDisplayed" ng-click="quickSearchNextPedagogicDays()" class="row down-open">
+    <!-- Display previous items -->
+    <div class="quick-search-showmore row down-open"
+         ng-show="!isFirstSearch"
+         ng-class="{disabled: !isNextPedagogicDaysDisplayed}"
+         tooltip="Voir plus"
+         ng-show="isNextPedagogicDaysDisplayed && isNextPedagogicDaysDisplayed"
+         ng-click="quickSearchNextPedagogicDays()">
 
     </div>
 </div>

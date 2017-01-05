@@ -903,11 +903,17 @@ ent-dropdown div.show>div.dropdown-list {
     color: #f9f9f9;
 }
 
+.row.up-open:hover{
+    color: orangered !important;
+}
+
 .row.down-open:hover{
     color: orangered !important;
 }
-.down-open:before{
-    font-size: 30px !important;
+
+.quick-search-showmore.disabled{
+    color: grey !important;
+    cursor: default !important;
 }
 
 .quick-search-card{
@@ -933,6 +939,10 @@ ent-dropdown div.show>div.dropdown-list {
     color: orange;
 }
 
+.quick-search-showmore::before {
+    font-size: 30px !important;
+}
+
 .quick-search-noresults {
     font-size: small;
     text-align: justify;
@@ -943,6 +953,4 @@ ent-dropdown div.show>div.dropdown-list {
     border: 1px solid lightgrey;
     position: absolute;
     background-color: white;
-    max-height: 400px;
-    overflow: auto;
 }
