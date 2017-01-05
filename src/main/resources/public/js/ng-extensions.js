@@ -635,6 +635,13 @@
                             scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
                         }
                     });
+
+                    $(element.context.ownerDocument).click(function (event) {
+                        if (!$(event.target).is("audience-item")) {
+                            scope.display = false;
+                            scope.$apply();
+                        }
+                    });
                 }
             }
         });
