@@ -29,7 +29,8 @@
     <!-- -ng-show="isPreviousPedagogicDaysDisplayed" -->
     <div class="quick-search-showmore row up-open"
          ng-show="isPreviousPedagogicDaysDisplayed"
-         tooltip="Voir moins"
+         attr="tooltip"
+         tooltip="diary.quicksearch.previous"
          ng-click="isPreviousPedagogicDaysDisplayed && quickSearchPreviousPedagogicDays()">
 
     </div>
@@ -48,7 +49,8 @@
     <!-- Display next items -->
     <div class="quick-search-showmore row down-open"
          ng-show="isNextPedagogicDaysDisplayed"
-         tooltip="Voir plus"
+         attr="tooltip"
+         tooltip="diary.quicksearch.next"
          ng-click="quickSearchNextPedagogicDays()">
 
     </div>
