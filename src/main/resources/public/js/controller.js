@@ -192,6 +192,10 @@ function DiaryController($scope, template, model, route, $location) {
         },
         mainView: function(){
             if ($scope.display.showList) {
+                $scope.lesson = null;
+                $scope.homework = null;
+                $scope.pedagogicLessonsSelected 	= new Array();
+                $scope.pedagogicHomeworksSelected 	= new Array();
                 $scope.showList();
             } else {
                 $scope.lesson = null;
