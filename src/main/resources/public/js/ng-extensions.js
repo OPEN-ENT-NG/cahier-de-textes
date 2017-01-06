@@ -739,6 +739,13 @@
 
                             scope.panelVisible = isVisible;
 
+                            /**
+                             * On first panel maximize search items
+                             */
+                            if (scope.isFirstSearch) {
+                                scope.quickSearch(true);
+                            }
+
                             // hide the other panel (panel or homework)
                             if (scope.itemType == 'lesson') {
                                 // tricky way to get the other directive for homeworks
