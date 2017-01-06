@@ -1157,7 +1157,7 @@ SearchForm.prototype.getSearch = function () {
 model.build = function () {
     calendar.startOfDay=8;
     calendar.endOfDay=19;
-    calendar.dayHeight = 60;
+    calendar.dayHeight = 65;
     model.calendar = new calendar.Calendar({
         week: moment().week()
     });
