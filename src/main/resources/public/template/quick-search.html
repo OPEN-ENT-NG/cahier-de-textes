@@ -16,28 +16,41 @@
         </label>
         <!-- TODO I18n-->
         <div style="background-color: #ddd">
-            <input type="text" style="background-color: white;" placeholder="&#x1f50d; Libéllé"
+            <input type="text" style="background-color: white;" translate attr="placeholder" placeholder="diary.quicksearch.zoomlabel"
                    ng-keypressed="quickSearch(true)" ng-keyup="quickSearch(true)" ng-model="multiSearch" size="16"/>
             <br>
-            <label class="cell">Jusqu'au</label>
+            <label class="cell"><i18n>diary.quicksearch.until</i18n></label>
             <date-picker ng-model="endDate" ng-change="quickSearch(true)" class="cell six"></date-picker>
         </div>
     </div>
     <br>
 
+    <!-- Display previous items -->
+    <!-- -ng-show="isPreviousPedagogicDaysDisplayed" -->
+    <div class="quick-search-showmore row up-open"
+         ng-show="isPreviousPedagogicDaysDisplayed"
+         attr="tooltip"
+         tooltip="diary.quicksearch.previous"
+         ng-click="isPreviousPedagogicDaysDisplayed && quickSearchPreviousPedagogicDays()">
+
+    </div>
+
     <!-- Results -->
-    <div  ng-repeat="quickSearchPedagogicDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
+    <div  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
        <quick-search-item></quick-search-item>
     </div>
 
     <!-- display "no results" text -->
     <div ng-if="displayNoResultsText" class="quick-search-noresults">
-        <label ng-if="itemType=='lesson'"><i18n>diary.quicksearch.lessons.noresult</i18n></label>
-        <label ng-if="itemType=='homework'"><i18n>diary.quicksearch.homeworks.noresult</i18n></label>
+        <label><i18n>diary.quicksearch.noresult</i18n></label>
     </div>
 
-    <!-- Display more -->
-    <div class="quick-search-showmore down-open" tooltip="Voir plus" ng-show="isNextPedagogicDaysDisplayed" ng-click="quickSearchNextPedagogicDays()" class="row down-open">
+    <!-- Display next items -->
+    <div class="quick-search-showmore row down-open"
+         ng-show="isNextPedagogicDaysDisplayed"
+         attr="tooltip"
+         tooltip="diary.quicksearch.next"
+         ng-click="quickSearchNextPedagogicDays()">
 
     </div>
 </div>

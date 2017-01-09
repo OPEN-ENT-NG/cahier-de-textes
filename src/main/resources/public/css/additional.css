@@ -875,8 +875,8 @@ ent-dropdown div.show>div.dropdown-list {
 }
 
 .schedule .timeslot {
-    height: 60px !important;
-    line-height: 60px !important;
+    height: 65px !important;
+    line-height: 65px !important;
 }
 
 .quick-search {
@@ -904,12 +904,14 @@ ent-dropdown div.show>div.dropdown-list {
     color: #f9f9f9;
 }
 
+.row.up-open:hover{
+    color: orangered !important;
+}
+
 .row.down-open:hover{
     color: orangered !important;
 }
-.down-open:before{
-    font-size: 30px !important;
-}
+
 
 .quick-search-card{
     font-size: 14px !important;
@@ -934,6 +936,10 @@ ent-dropdown div.show>div.dropdown-list {
     color: orange;
 }
 
+.quick-search-showmore::before {
+    font-size: 30px !important;
+}
+
 .quick-search-noresults {
     font-size: small;
     text-align: justify;
@@ -944,6 +950,4 @@ ent-dropdown div.show>div.dropdown-list {
     border: 1px solid lightgrey;
     position: absolute;
     background-color: white;
-    max-height: 400px;
-    overflow: auto;
 }
