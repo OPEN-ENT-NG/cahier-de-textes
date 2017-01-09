@@ -83,7 +83,7 @@
             <li ng-repeat="day in pedagogicDays.all">
                 <div class="pedagogic-item-card" ng-if="day.pedagogicItemsOfTheDay && day.selected">
                     <ul>
-                        <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
+                        <li ng-repeat="pedagogicItem in filteredDays = (day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed)">
                             <article ng-if="!pedagogicItem.isFiltered()" class="notification">
                                 <div ng-if="(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize)" class="row hover-orange" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
                                     <div class="cell" style="margin-left: 90px;">
@@ -137,6 +137,9 @@
                                 </div>
                             </article>
                         </li>
+                        <p ng-if="filteredDays.length === 0" class="row info tuto">
+                            <i18n>diary.search.no.result</i18n>
+                        </p>
                     </ul>
                 </div>
             </li>
