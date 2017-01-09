@@ -476,7 +476,7 @@ i.arrow-down {
     width: 25px;
     display: block;
     float: right !important;
-    color: #FF8500;
+    /*color: #FF8500;*/
     font-size: 25px;
     font-weight: 900;
 }
@@ -772,7 +772,8 @@ ent-dropdown div.item-list:hover {
 }
 ent-dropdown div.item-list.selected {
     background: #2875c7;
-    color: white;
+    color: #FF8500;
+    font-weight: bold;
 }
 ent-dropdown span.audience-item {
     height: 31px;
