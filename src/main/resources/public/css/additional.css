@@ -818,8 +818,23 @@ ent-dropdown div.show>div.dropdown-list {
     6 - Horaire - 800px
 
 */
-@media  (max-width: 850px) {
-    .schedule-item-content #hour {
+/**
+ Hide room when screen res < 900 px
+ */
+@media  (max-width: 900px) {
+    .schedule-item-content #room {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-start {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-end {
         display: none;
     }
 }

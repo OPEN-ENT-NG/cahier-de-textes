@@ -1,29 +1,33 @@
 <div class="schedule-item-content" style="display: flex; flex-direction: column; box-sizing: border-box" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]] - [[item.audienceLabel]] - [[item.room]]<br>[[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
 
-    <!-- 4 - HOUR -->
-    <div style="display: flex; flex-direction: row; flex-wrap: nowrap">
-        <span id="hour" style="white-space: nowrap; overflow: hidden;  margin-right: 0.5em">
+    <div style="display: flex; flex-direction: row; flex-wrap: nowrap; padding-bottom: 0px !important; overflow: hidden;">
+        <!-- Hour Start -->
+        <span id="hour-start" style="white-space: nowrap; overflow: hidden;">
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
-        -[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]
         </span>
         <!-- 3 - SALLE -->
-        <span id="room" style="float: right; white-space: nowrap;">[[item.room]]</span>
-    </div>
-
-    <!-- -->
-    <div style="overflow: hidden">
-
-        <!--  2 - CLASSE -->
-        <span style="white-space: nowrap">[[item.audienceLabel]]</span>
+        <span id="room" style="white-space: nowrap; margin-left: 0.5em;">[[item.room]]</span>
 
         <!-- 5 - CHECK -->
         <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"
-               style="float: right; margin-right: 0.6em; overflow: hidden;white-space: nowrap"/>
+               style="float: right; margin-left: auto; overflow: hidden;white-space: nowrap"/>
+    </div>
+
+    <!-- -->
+    <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+
+        <!-- End Hour -->
+        <span id="hour-end" style="margin-right: 0.5em">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
+
+        <!--  2 - CLASSE -->
+        <span style="white-space: nowrap;">[[item.audienceLabel]]</span>
 
         <!-- 1 - ICONE BROUILLON -->
-        <span id="state" ng-if="[[item.state]]=='draft'" style="width: 10%; float: right;white-space: nowrap">
-            <i class="icon pencil" style="float: right;"></i>
+        <span id="state" ng-if="[[item.state]]=='draft'" style="margin-left: auto; margin-right: 0.4em; white-space: nowrap; float: right ">
+            <i class="icon pencil"></i>
         </span>
+
+
     </div>
 
     <div>
