@@ -9,31 +9,31 @@
                 template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' +
                 '<i class="resize-homeworks-panel"   style="float: left; width: 130px;">&nbsp;</i></li></ul></span>'+
                 '<div class="days" style="z-index: 1000; ">' +
-                    '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
+                '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
 
-                        // <= 3 homeworks for current day
-                        // or 1 homework and homework panel minified
-                        '<div class="test" ng-if="showAllHomeworks(day)">' +
-                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
-                            '</div>' +
-                        '</div>' +
+                // <= 3 homeworks for current day
+                // or 1 homework and homework panel minified
+                '<div class="test" ng-if="showAllHomeworks(day)">' +
+                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
+                '</div>' +
+                '</div>' +
 
-                        // > 3 homeworks for current day
-                        // or > 1 homework and homework panel minified
-                        '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
-                            'ng-click="toggleShowHwDetail(day)">' +
-                            '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' +
-                            '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' +
-                        '</div>' +
-                        '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
-                            'ng-click="toggleOpenDailyEvents(day, $event)" ' +
-                            'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
-                            '<div ng-repeat="dailyEvent in day.dailyEvents">' +
-                            '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
+                // > 3 homeworks for current day
+                // or > 1 homework and homework panel minified
+                '<div class="opener" ng-if="showNotAllHomeworks(day)" ' +
+                'ng-click="toggleShowHwDetail(day)">' +
+                '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' +
+                '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' +
+                '</div>' +
+                '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' +
+                'ng-click="toggleOpenDailyEvents(day, $event)" ' +
+                'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' +
+                '<div ng-repeat="dailyEvent in day.dailyEvents">' +
+                '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
                 '</div>',
                 link: function(scope, element, attributes){
                     scope.calendar = model.calendar;
@@ -220,7 +220,7 @@
                          * Calendar height
                          * @type {number}
                          */
-                        const CAL_HEIGHT = 722;
+                        const CAL_HEIGHT = 775;
 
                         var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
 
@@ -668,7 +668,7 @@
                      * Max pedagofic items step increament
                      * @type {number}
                      */
-                    var maxPedagogicDaysDisplayedStep = 3;
+                    var pedagogicDaysDisplayedStep = defaultMaxPedagogicItemsDisplayed;
 
                     /**
                      * If true the search if detailled panel is minified else not
@@ -713,7 +713,10 @@
                      * Flag indicating it's first search (used for not displaying the 'show more' arrow
                      * @type {boolean}
                      */
-                    var isFirstSearch = true;
+                    scope.isFirstSearch = true;
+
+                    var pedagogicItemDisplayedIdxStart = 0;
+                    var pedagogicItemDisplayedIdxEnd = defaultMaxPedagogicItemsDisplayed - 1; // array index starts at 0
 
 
                     var initQuickSearch = function () {
@@ -731,21 +734,27 @@
 
                     scope.setPanelVisible = function (isVisible, $event) {
 
+
                         if (!$event.target || $event.target.type !== "text") {
 
                             scope.panelVisible = isVisible;
 
-                            if (scope.itemType == 'lesson') {
-                                model.lessonPanelVisible = isVisible;
+                            /**
+                             * On first panel maximize search items
+                             */
+                            if (scope.isFirstSearch) {
+                                scope.quickSearch(true);
+                            }
 
-                                if (typeof model.homeworkPanelVisible != 'undefined') {
-                                    isVisible |= model.homeworkPanelVisible;
+                            // hide the other panel (panel or homework)
+                            if (scope.itemType == 'lesson') {
+                                // tricky way to get the other directive for homeworks
+                                if (isQuickSearchLesson) {
+                                    scope.$parent.$$childTail.panelVisible = false;
                                 }
                             } else if (scope.itemType == 'homework') {
-                                model.homeworkPanelVisible = isVisible;
-
-                                if (typeof model.lessonPanelVisible != 'undefined') {
-                                    isVisible |= model.lessonPanelVisible;
+                                if (!isQuickSearchLesson) {
+                                    scope.$parent.$$childHead.panelVisible = false;
                                 }
                             }
 
@@ -765,7 +774,32 @@
                      * This allows to display more items
                      */
                     scope.quickSearchNextPedagogicDays = function () {
-                        scope.maxPedagogicItemsDisplayed += maxPedagogicDaysDisplayedStep;
+
+                        if (!scope.isNextPedagogicDaysDisplayed) {
+                            return;
+                        }
+
+                        pedagogicItemDisplayedIdxStart += pedagogicDaysDisplayedStep;
+                        pedagogicItemDisplayedIdxEnd += pedagogicDaysDisplayedStep;
+
+                        scope.maxPedagogicItemsDisplayed = Math.max(scope.maxPedagogicItemsDisplayed, pedagogicItemDisplayedIdxEnd);
+
+                        scope.quickSearch(false);
+                    };
+
+                    /**
+                     *
+                     */
+                    scope.quickSearchPreviousPedagogicDays = function () {
+
+                        if (!scope.isPreviousPedagogicDaysDisplayed) {
+                            return;
+                        }
+
+                        pedagogicItemDisplayedIdxStart -= pedagogicDaysDisplayedStep;
+                        pedagogicItemDisplayedIdxStart = Math.max(0, pedagogicItemDisplayedIdxStart);
+                        pedagogicItemDisplayedIdxEnd -= pedagogicDaysDisplayedStep;
+
                         scope.quickSearch(false);
                     };
 
@@ -783,12 +817,23 @@
                     scope.displayNoResultsText = false;
 
                     /**
+                     * Compute if the button for recent items should be displayed
+                     * @returns {boolean}
+                     */
+                    var isPreviousPedagogicDaysDisplayed = function () {
+                        return !scope.isFirstSearch &&  0 < pedagogicItemDisplayedIdxStart && scope.quickSearchPedagogicDaysDisplayed.length > 0;
+                    };
+
+                    /**
                      * Returns true if the "next" arrow button should be displayed meaning
                      * there are other items
                      * @returns {boolean}
                      */
-                    var isNextPedagogicDaysDisplayed2 = function (itemsDisplayedCount) {
-                        return !isFirstSearch && itemsDisplayedCount > 0 && itemsDisplayedCount >= scope.maxPedagogicItemsDisplayed;
+                    var isNextPedagogicDaysDisplayed = function (pedagogicItemCount) {
+                        return !scope.isFirstSearch
+                            &&  pedagogicItemDisplayedIdxStart <= pedagogicItemCount
+                            && scope.quickSearchPedagogicDaysDisplayed.length > 0
+                            && scope.quickSearchPedagogicDaysDisplayed.length >= pedagogicDaysDisplayedStep;
                     };
 
 
@@ -799,14 +844,14 @@
                         var params = new SearchForm(true);
                         params.initForTeacher();
                         params.isQuickSearch = true;
-                        params.limit = scope.maxPedagogicItemsDisplayed + 1; // +1 thingy will help to know if there are extra items to be displayed
+                        params.limit = scope.maxPedagogicItemsDisplayed + 1; // +1 thingy will help to know if extra items can be displayed
                         var period = moment(model.calendar.dayForWeek).day(1);
                         period.add(-60, 'days').format('YYYY-MM-DD');
                         params.startDate = period.format('YYYY-MM-DD');
                         params.endDate = moment(scope.endDate).add(1, 'days');
                         params.sortOrder = "DESC";
 
-                        if(scope.itemType == 'lesson'){
+                        if (scope.itemType == 'lesson') {
                             params.multiSearchLesson = scope.multiSearch.trim();
                         } else {
                             params.multiSearchHomework = scope.multiSearch.trim();
@@ -820,25 +865,27 @@
                         model.performPedagogicItemSearch(params, model.isUserTeacher(),
                             // callback
                             function () {
-                                isFirstSearch = false;
+                                scope.isFirstSearch = false;
                                 scope.quickSearchPedagogicDays = isQuickSearchLesson ? model.pedagogicDaysQuickSearchLesson : model.pedagogicDaysQuickSearchHomework;
-
                                 scope.displayNoResultsText = (scope.quickSearchPedagogicDays.length == 0);
 
                                 var idxSearchPedagogicItem = 0;
+                                scope.quickSearchPedagogicDaysDisplayed = new Array();
+
                                 // count number of displayed items
                                 scope.quickSearchPedagogicDays.forEach(function (pedagogicDay) {
 
-                                    if (idxSearchPedagogicItem < scope.maxPedagogicItemsDisplayed) {
-                                        scope.quickSearchPedagogicDaysDisplayed.push(pedagogicDay);
-                                    }
-
-                                    pedagogicDay.pedagogicItemsOfTheDay.forEach(function () {
+                                    pedagogicDay.pedagogicItemsOfTheDay.forEach(function (pedagogicItemOfTheDay) {
+                                        if ((pedagogicItemDisplayedIdxStart <= idxSearchPedagogicItem) && (idxSearchPedagogicItem <= pedagogicItemDisplayedIdxEnd)) {
+                                            scope.quickSearchPedagogicDaysDisplayed.push(pedagogicItemOfTheDay);
+                                        }
                                         idxSearchPedagogicItem++;
                                     });
                                 });
 
-                                scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed2(idxSearchPedagogicItem);
+                                // enable/disable next/previous items arrow buttons
+                                scope.isPreviousPedagogicDaysDisplayed = isPreviousPedagogicDaysDisplayed();
+                                scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed(idxSearchPedagogicItem);
                                 scope.$apply();
                             },
                             // callback on error
@@ -854,6 +901,8 @@
 
                         if (resetMaxDisplayedItems) {
                             scope.maxPedagogicItemsDisplayed = defaultMaxPedagogicItemsDisplayed;
+                            pedagogicItemDisplayedIdxStart = 0;
+                            pedagogicItemDisplayedIdxEnd = defaultMaxPedagogicItemsDisplayed - 1;
                         }
 
                         if (timeout) {
@@ -876,8 +925,36 @@
                 restrict: "E",
                 templateUrl: "diary/public/template/quick-search-item.html",
                 scope: false,
-                link: function (scope, element, attrs) {
-                    // TODO handle drag function
+                link: function (scope, element) {
+
+                    var originalTop;
+                    var originalLeft;
+
+                    var element = angular.element(element);
+
+                    element.on('startDrag', function (event) {
+
+                        event.target.style.opacity = .8;
+
+                        if (!originalTop) {
+                            originalTop = element.find('article').position().top;
+                            originalLeft = element.find('article').position().left;
+                        }
+                    });
+
+                    // help revert back to original position of element
+                    // that is being dragged on stop drag
+                    element.on('stopDrag', function (event) {
+
+                        event.target.style.opacity = "";
+
+                        element.find('article').css({
+                            position: 'initial',
+                            top: originalTop + 'px',
+                            left: originalLeft + 'px'
+                        });
+                    });
+
                 }
             }
         });

@@ -1,3 +1,9 @@
+<span class="float-left">
+    <h1 class="float-left margintopimportant">
+        <a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.list.view.label</i18n>
+    </h1>
+</span>
+
 <h2 ng-if="isUserParent">
     <div ng-if="children">
         <div ng-if="children.all.length == 1">
@@ -52,7 +58,9 @@
 
 <section>
     <div ng-if="pedagogicDays.all.length <= 0">
-        <i18n>diary.search.no.result</i18n>
+        <p class="row info tuto">
+            <i18n>diary.search.no.result</i18n>
+        </p>
     </div>
     <div ng-if="pedagogicDays.all.length > 0">
         <div class="pedagogic-day-container">
@@ -75,7 +83,7 @@
             <li ng-repeat="day in pedagogicDays.all">
                 <div class="pedagogic-item-card" ng-if="day.pedagogicItemsOfTheDay && day.selected">
                     <ul>
-                        <li ng-repeat="pedagogicItem in day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed">
+                        <li ng-repeat="pedagogicItem in filteredDays = (day.pedagogicItemsOfTheDay | filter : itemTypesDisplayed)">
                             <article ng-if="!pedagogicItem.isFiltered()" class="notification">
                                 <div ng-if="(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize)" class="row hover-orange" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
                                     <div class="cell" style="margin-left: 90px;">
@@ -129,6 +137,9 @@
                                 </div>
                             </article>
                         </li>
+                        <p ng-if="filteredDays.length === 0" class="row info tuto">
+                            <i18n>diary.filter.no.result</i18n>
+                        </p>
                     </ul>
                 </div>
             </li>
