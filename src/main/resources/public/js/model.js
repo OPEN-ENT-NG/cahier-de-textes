@@ -873,6 +873,8 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
                 model.lessons.remove(lessonModel);
 
                 lessonModel.changeState(isPublish);
+                // update tooltip text (has state label in it)
+                lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
                 updateLessons.push(lessonModel);
             }
         });
@@ -1508,9 +1510,9 @@ model.build = function () {
      * Tricky responsive must be linked to additional.css behaviour
      * @param lesson
      */
-    var getResponsiveLessonTooltipText = function (lesson) {
+    getResponsiveLessonTooltipText = function (lesson) {
 
-        var tooltipText = lesson.title;
+        var tooltipText = lesson.title + ' ('+lang.translate(lesson.state)+')';
         var screenWidth = window.innerWidth;
 
         // < 900 px display room
