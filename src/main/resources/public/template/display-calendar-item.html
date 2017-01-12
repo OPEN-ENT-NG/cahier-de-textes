@@ -1,4 +1,7 @@
-<div class="schedule-item-content" style="display: flex; flex-direction: column; box-sizing: border-box" ng-style="{'background-color': item.color}" tooltip="[[item.subjectLabel]] - [[item.audienceLabel]] - [[item.room]]<br>[[item.title]]" ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
+<!--  tooltip="[[item.subjectLabel]] - [[item.audienceLabel]] - [[item.room]]<br>[[item.title]]" -->
+<div class="schedule-item-content" style="display: flex; flex-direction: column; box-sizing: border-box" ng-style="{'background-color': item.color}"
+     tooltip="[[item.tooltipText]]"
+     ng-click="openOnClickSaveOnDrag(item, $event)" ng-mouseDown="setMouseDownTime($event)">
 
     <div style="display: flex; flex-direction: row; flex-wrap: nowrap; padding-bottom: 0px !important; overflow: hidden;">
         <!-- Hour Start -->
@@ -6,20 +9,20 @@
         [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
         </span>
         <!-- 3 - SALLE -->
-        <span id="room" style="white-space: nowrap; margin-left: 0.5em;">[[item.room]]</span>
+        <span id="room" style="white-space: nowrap; margin-left: 0.5em; overflow: hidden; text-overflow: ellipsis;">[[item.room]]</span>
 
         <!-- 5 - CHECK -->
         <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected"
-               style="float: right; margin-left: auto; overflow: hidden;white-space: nowrap"/>
+               style="float: right; margin-left: auto; overflow: hidden;white-space: nowrap; min-width: 1em;"/>
     </div>
 
     <!-- -->
     <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
 
-        <!-- End Hour -->
+        <!-- 1 - End Hour -->
         <span id="hour-end" style="margin-right: 0.5em">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
 
-        <!--  2 - CLASSE -->
+        <!-- 2 - CLASSE -->
         <span style="white-space: nowrap;">[[item.audienceLabel]]</span>
 
         <!-- 1 - ICONE BROUILLON -->

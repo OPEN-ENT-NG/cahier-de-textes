@@ -818,6 +818,7 @@ ent-dropdown div.show>div.dropdown-list {
     6 - Horaire - 800px
 
 */
+/* Responsive text for lesson must be synced with model.js -> setLessonTooltipText  with responsive tooltip ! */
 /**
  Hide room when screen res < 900 px
  */
