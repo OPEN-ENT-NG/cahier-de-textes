@@ -90,7 +90,8 @@ function DiaryController($scope, template, model, route, $location) {
         showShareLessonPanel: false,
         showShareHomeworkPanel: false,
         showList: false,
-        hideHomeworkPanel: false
+        hideHomeworkPanel: false,
+        hideCalendar : false,
     };
 
     /**
@@ -1198,7 +1199,8 @@ function DiaryController($scope, template, model, route, $location) {
     $scope.toggleHomeworkPanel = function () {
 
         $scope.display.hideHomeworkPanel = model.show.bShowHomeworks;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, !model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+        model.show.bShowHomeworks = !model.show.bShowHomeworks;
+        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
     };
 
     /**
@@ -1206,7 +1208,9 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.toggleCalendar = function () {
 
-        model.placeCalendarAndHomeworksPanel(!model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+        $scope.display.hideCalendar = model.show.bShowCalendar;
+        model.show.bShowCalendar = !model.show.bShowCalendar;
+        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
     };
 
 

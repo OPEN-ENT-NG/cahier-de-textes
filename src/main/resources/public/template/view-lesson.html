@@ -1,8 +1,9 @@
 ﻿<div>
 	<h1><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></h1>
-	 <div class="row">
+	 <div class="row" style="margin-bottom: 20px;">
         <div class="cell">
-			<input type="color" ng-model="lesson.color" disabled>
+            <span style="background-color: #CECEF6; padding-left: 45px;;"></span>
+			<!--<input type="color" ng-model="lesson.color" disabled>-->
 			<span ng-bind="lesson.subject.label" class="lessonHeader"></span>
 			<span ng-bind="lesson.audience.name" class="lessonHeader"></span>
 			<span ng-bind="lesson.teacherId" class="lessonHeader"></span>
@@ -18,6 +19,11 @@
             <headerHomeworkLesson ng-if="lesson.homeworks.all.length > 0" data-ng-class="{'selected': data.tabSelected === 'homeworks'}"
                                                                           data-ng-click="data.tabSelected = 'homeworks'">
                 <i18n>create.lesson.tabs.homeworks</i18n>
+            </headerHomeworkLesson>
+
+            <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'previouslessons'}"
+                                  data-ng-click="data.tabSelected = 'previouslessons'">
+                <i18n>create.lesson.tabs.previouslessons</i18n>
             </headerHomeworkLesson>
 
             <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
@@ -42,7 +48,7 @@
                 <div ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
             </div>
         </div>
-    </div>
+
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
     <div ng-switch-when="homeworks">
@@ -81,6 +87,63 @@
             </div>
             <hr class="homework-delimitation">
         </div>
+    </div>
+
+    <!-- PREVIOUS LESSONS CREATED -->
+    <div ng-switch-when="previouslessons">
+        <div ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
+            <i18n>daily.lesson.nopreviouslesson</i18n>
+        </div>
+
+        <div class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+            <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
+                [[pedagogicItem.dayFormatted]] - [[ pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
+            </div>
+            <div>
+                <!-- LESSON DESCRIPTION -->
+                <div style="float: left; width: 50%;">
+                    <div><span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]</div>
+                    <span class="inline"
+                          style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
+                          ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
+                                <span ng-show="!pedagogicItem.expanded_description">
+                                     <span bind-html="pedagogicItem.preview_description"></span>
+                                </span>
+                                <span ng-show="pedagogicItem.expanded_description">
+                                     <span bind-html="pedagogicItem.description"></span>
+                                </span>
+                            </span>
+                </div>
+
+                <!-- ATTACHED HOMEWORKS-->
+                <div style="float: right; width: 50%;">
+                    <div class="row" ng-repeat="homework in pedagogicItem.homeworks">
+                        <b><i18n>homework.date</i18n> [[homework.dayFormatted]]</b><br>
+                        [[homework.title]]<br>
+                        <span class="inline"
+                              style="[[(homework.description.length >= homework.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
+                              ng-click="homework.expanded_description = !homework.expanded_description">
+                                <span ng-show="!homework.expanded_description">
+                                     <span bind-html="homework.preview_description"></span>
+                                </span>
+                                <span ng-show="homework.expanded_description">
+                                     <span bind-html="homework.description"></span>
+                                </span>
+                            </span>
+                        <br>
+                    </div>
+                </div>
+            </div>
+            <br>
+        </div>
+
+        <!-- Scroll bar to see more previous lessons -->
+        <div class="showMoreLessonsBar"
+             ng-if="lesson.previousLessonsDisplayed.length < lesson.previousLessons.length" ng-click="showMorePreviousLessons(lesson)">
+            Voir plus de séances précédentes
+        </div>
+    </div>
+
     </div>
 
         <div class="row lessonHomeworkBtn">

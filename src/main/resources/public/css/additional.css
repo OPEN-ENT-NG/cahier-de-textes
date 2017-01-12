@@ -724,6 +724,11 @@ ent-dropdown div.dropdown-display span.placeholder {
     color: #aaaaaa;
     font-size: 20px;
 }
+
+#placeholder{
+    font-size: 17px !important;
+}
+
 ent-dropdown div.dropdown-display i {
     position: relative;
     width:14px;

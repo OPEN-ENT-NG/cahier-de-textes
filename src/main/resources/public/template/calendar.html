@@ -1,5 +1,7 @@
 <div id="mainDiaryContainer" style="float: left; width: 97%;">
-<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n></a></h1>
+<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>
+    <!--&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n>-->
+</a></h1>
 <div class="row">
     <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
         <i18n>diary.lesson.create</i18n>
@@ -33,12 +35,10 @@
     <filters style="padding-bottom: 12px;">
         <ul>
         <li>
-            <i id="toggleCalendar" style="float: left !important; box-shadow: none; background: none; font-size: 42px;"
-               class="show-calendar-grid" ng-class="{ selected: display.hideCalendar == false}"
+            <i id="toggleCalendar" class="[[(display.hideCalendar == false) ? 'filter2 diary selected' : 'filter2 diary' ]]"
                ng-click="toggleCalendar()" tooltip="diary.icon.show.calendargrid"></i>
 
-            <i id="toggleHomeworkPanel" style="float: left !important; box-shadow: none; background: none; font-size: 42px;"
-               class="show-homeworks" ng-class="{ selected: display.hideHomeworkPanel == false}"
+            <i id="toggleHomeworkPanel" class="[[(display.hideHomeworkPanel == false) ? 'filter2 homework selected' : 'filter2 homework' ]]"
                ng-click="toggleHomeworkPanel()" tooltip="diary.icon.show.homeworkpanel"></i>
             <button ng-click="previousWeek(); " tooltip="diary.calendar.previousweek">&#8592;</button>
             <button ng-click="nextWeek();" tooltip="diary.calendar.nextweek">&#8594;</button>
