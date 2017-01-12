@@ -621,6 +621,7 @@ div.pedagogic-item-container {
 }
 
 .filter2 {
+    height: 40px;
     font-size : 30px;
     font-style: normal;
     line-height: 48px;
@@ -724,6 +725,11 @@ ent-dropdown div.dropdown-display span.placeholder {
     color: #aaaaaa;
     font-size: 20px;
 }
+
+#placeholder{
+    font-size: 17px !important;
+}
+
 ent-dropdown div.dropdown-display i {
     position: relative;
     width:14px;
@@ -818,8 +824,24 @@ ent-dropdown div.show>div.dropdown-list {
     6 - Horaire - 800px
 
 */
-@media  (max-width: 850px) {
-    .schedule-item-content #hour {
+/* Responsive text for lesson must be synced with model.js -> setLessonTooltipText  with responsive tooltip ! */
+/**
+ Hide room when screen res < 900 px
+ */
+@media  (max-width: 900px) {
+    .schedule-item-content #room {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-start {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-end {
         display: none;
     }
 }

@@ -1,5 +1,7 @@
 <div id="mainDiaryContainer" style="float: left; width: 97%;">
-<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n></a></h1>
+<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>
+    <!--&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n>-->
+</a></h1>
 <div class="row">
     <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
         <i18n>diary.lesson.create</i18n>
@@ -30,7 +32,7 @@
 
 <div>
 <div class="row">
-    <filters style="padding-bottom: 12px;">
+    <filters style="padding-bottom: 0.8em;">
         <ul>
         <li>
             <i id="toggleCalendar" class="[[(display.hideCalendar == false) ? 'filter2 diary selected' : 'filter2 diary' ]]"
