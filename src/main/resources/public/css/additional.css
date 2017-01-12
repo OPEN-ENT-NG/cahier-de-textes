@@ -621,6 +621,7 @@ div.pedagogic-item-container {
 }
 
 .filter2 {
+    height: 40px;
     font-size : 30px;
     font-style: normal;
     line-height: 48px;
