@@ -611,6 +611,7 @@
                                 });
 
                                 scope.searchPerformed = true;
+                                scope.listVisible = true;
                                 scope.$apply();
                             }).error(function (e) {
                             if (typeof cbe === 'function') {
@@ -636,6 +637,10 @@
                                 scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
                             }
                         }
+                    });
+
+                    $(element.context.ownerDocument).click(function (event) {
+                        scope.listVisible = false;
                     });
                 }
             }
