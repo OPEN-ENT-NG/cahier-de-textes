@@ -913,6 +913,65 @@
                         // start searching after 0.4s (prevent spamming request to backend)
                         timeout = setTimeout(performQuickSearch, 400);
                     };
+
+
+                    var handleCalendarItemsDrop = function () {
+
+                        var timeslots = $('.days').find('.timeslot');
+
+                        timeslots.each(function (index) {
+                            var timeslot = $(this);
+
+                            // allow drag
+                            timeslot.on('dragover', function (event) {
+                                event.preventDefault();
+                            });
+
+                            timeslot.on('dragenter', function (event) {
+                                timeslot.css('background-color', 'blue');
+                            });
+
+                            timeslot.on('dragleave', function (event) {
+                                timeslot.css('background-color', '');
+                            });
+
+                            // TODO allow drop only if pedagogic lesson item
+                            timeslot.on('drop', function ($event) {
+                                $event.preventDefault();
+                                timeslot.css('background-color', '');
+
+                                // TODO get hour/day where it has been dropped
+
+                                // duplicate dragged lesson
+                                var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
+                                var newLesson = new Lesson();
+                                newLesson.id = pedagogicItemOfTheDay.id;
+
+                                newLesson.load(false, function () {
+                                    // will force new lesson to be created in DB
+                                    newLesson.id = null;
+
+                                    // startTime and end format from db is "HH:MM:SS" as text type
+                                    // for lesson save startTime need to be moment time type with date
+                                    newLesson.date = moment(newLesson.date);
+                                    newLesson.startTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.startTime);
+                                    newLesson.endTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.endTime);
+
+                                    newLesson.save(function () {
+                                        // display new items created
+                                        scope.$apply();
+                                    }, function (error) {
+                                        console.error(error);
+                                    });
+                                }, function (error) {
+                                    console.error(error);
+                                });
+                            });
+                        });
+                    };
+
+                    // wait until calendar loaded
+                    setTimeout(handleCalendarItemsDrop, 2000);
                 }
             }
         });
@@ -927,34 +986,27 @@
                 scope: false,
                 link: function (scope, element) {
 
-                    var originalTop;
-                    var originalLeft;
+                    var angElement = angular.element(element);
 
-                    var element = angular.element(element);
+                    angElement.on('drag', function(){
+                        angElement.css('opacity', 0.9);
+                    });
 
-                    element.on('startDrag', function (event) {
+                    scope.dragCondition = function (item) {
+                        return true;
+                    };
 
-                        event.target.style.opacity = .8;
+                    scope.dropCondition = function (targetItem) {
+                        return false;
+                    };
 
-                        if (!originalTop) {
-                            originalTop = element.find('article').position().top;
-                            originalLeft = element.find('article').position().left;
+                    scope.drag = function(item, $originalEvent) {
+                        try {
+                            $originalEvent.dataTransfer.setData('application/json', JSON.stringify(item));
+                        } catch (e) {
+                            $originalEvent.dataTransfer.setData('Text', JSON.stringify(item));
                         }
-                    });
-
-                    // help revert back to original position of element
-                    // that is being dragged on stop drag
-                    element.on('stopDrag', function (event) {
-
-                        event.target.style.opacity = "";
-
-                        element.find('article').css({
-                            position: 'initial',
-                            top: originalTop + 'px',
-                            left: originalLeft + 'px'
-                        });
-                    });
-
+                    };
                 }
             }
         });

@@ -627,8 +627,8 @@ Lesson.prototype.save = function(cb, cbe) {
 
     // startTime used for db save but startMoment in calendar view
     // startMoment day is given by lesson.date
-    this.startMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.startTime));
-    this.endMoment = getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.endTime));
+    this.startMoment = model.getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.startTime));
+    this.endMoment = model.getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.endTime));
     var that = this;
 
     var saveHomeworksAndSync = function(){
@@ -706,7 +706,7 @@ var syncLessonsAndHomeworks = function (cb) {
  * @param momentTime Moment date
  * @returns {*}
  */
-var getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
+model.getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
     var dateMoment = moment(date);
 
     momentTime.set('year', dateMoment.get('year'));
@@ -714,7 +714,7 @@ var getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
     momentTime.set('date', dateMoment.get('date'));
 
     return momentTime;
-}
+};
 
 Lesson.prototype.update = function(cb, cbe) {
     var url = '/diary/lesson/' + this.id;
@@ -1752,6 +1752,12 @@ model.initLesson = function (timeFromCalendar) {
     lesson.startTime = newItem.beginning;
     lesson.endTime = newItem.end;
     lesson.date = newItem.date;
+
+    console.log('lesson.startTime:');
+    console.log(lesson.startTime);
+
+    console.log('lesson.endTime: ');
+    console.log(lesson.endTime);
 
     return lesson;
 };
