@@ -1163,6 +1163,12 @@ model.build = function () {
     model.calendar = new calendar.Calendar({
         week: moment().week()
     });
+
+    // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
+    // note: model.calendar.startOfDay does not work in console.
+    model.startOfDay = calendar.startOfDay;
+    model.endOfDay = calendar.endOfDay;
+
     model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
@@ -1752,12 +1758,6 @@ model.initLesson = function (timeFromCalendar) {
     lesson.startTime = newItem.beginning;
     lesson.endTime = newItem.end;
     lesson.date = newItem.date;
-
-    console.log('lesson.startTime:');
-    console.log(lesson.startTime);
-
-    console.log('lesson.endTime: ');
-    console.log(lesson.endTime);
 
     return lesson;
 };

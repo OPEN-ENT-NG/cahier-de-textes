@@ -203,6 +203,11 @@
                             homeworksPerDayDisplayed = 1;
                         }
 
+                        // max homeworks per day displayed used for drag and drop directive
+                        // to detect dropped day of the week area
+                        model.homeworksPerDayDisplayed = homeworksPerDayDisplayed;
+
+
                         return homeworksPerDayDisplayed * HW_HEIGHT;
                     };
 
@@ -334,6 +339,86 @@
                     scope.$watchCollection('ngModel', function(newVal){
                         setDaysContent()
                     });
+
+                    var handleCalendarHomeworksDrop = function () {
+
+                        var timeslots = $('.homeworkpanel');
+
+                        var homeworkSlotsPerDay = model.homeworksPerDayDisplayed;// 1;//timeslots.length / 7;
+
+                        timeslots.each(function (index) {
+
+                            var timeslot = $(this);
+
+                            // allow drag
+                            timeslot.on('dragover', function (event) {
+                                event.preventDefault();
+                            });
+
+                            timeslot.on('dragenter', function (event) {
+                                // TODO better color than flashy one!
+                                timeslot.css('background-color', 'red');
+                            });
+
+                            timeslot.on('dragleave', function (event) {
+                                timeslot.css('background-color', '');
+                            });
+
+                            timeslot.on('drop', function ($event) {
+                                $event.preventDefault();
+                                timeslot.css('background-color', '');
+
+                                // duplicate dragged lesson
+                                var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
+
+                                // do not drop if item type is not a lesson
+                                if (pedagogicItemOfTheDay.type_item !== 'homework') {
+                                    return;
+                                }
+
+                                var newHomework = new Homework();
+                                newHomework.id = pedagogicItemOfTheDay.id;
+
+                                var newHomeworkDayOfWeek = Math.floor(index / homeworkSlotsPerDay) + 1;
+                                //var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
+                                //var newLessonEndTime = newLessonStartTime + 1;
+
+                                newHomework.load(function () {
+                                    // will force new lesson to be created in DB
+                                    newHomework.id = null;
+
+                                    // startTime and end format from db is "HH:MM:SS" as text type
+                                    // for lesson save startTime need to be moment time type with date
+                                    newHomework.dueDate = moment(newHomework.dueDate);
+                                    newHomework.startTime = moment(newHomework.date.format('YYYY-MM-DD') + ' ' + newHomework.startTime);
+                                    //newHomework.startTime.hour(newLessonStartTime);
+                                    //newHomework.startTime.minute(0);
+                                    newHomework.startTime.day(newHomeworkDayOfWeek);
+
+                                    // TODO refactor endTime = startTime + 1h
+                                    newHomework.endTime = moment(newHomework.date.format('YYYY-MM-DD') + ' ' + newHomework.endTime);
+                                    //newHomework.endTime.hour(newLessonEndTime);
+                                    //newHomework.endTime.minute(0);
+                                    newHomework.endTime.day(newHomeworkDayOfWeek);
+                                    newHomework.endTime.week(model.calendar.week);
+
+                                    newHomework.dueDate.day(newHomeworkDayOfWeek);
+                                    newHomework.dueDate.week(model.calendar.week);
+
+
+                                    newHomework.save(function () {
+                                    }, function (error) {
+                                        console.error(error);
+                                    });
+                                }, function (error) {
+                                    console.error(error);
+                                });
+                            });
+                        });
+                    };
+
+                    // wait until calendar loaded
+                    setTimeout(handleCalendarHomeworksDrop, 2000);
 
                     $('body').on('click', function(e){
                         if(e.target !== element[0] && element.find(e.target).length === 0){
@@ -914,64 +999,6 @@
                         timeout = setTimeout(performQuickSearch, 400);
                     };
 
-
-                    var handleCalendarItemsDrop = function () {
-
-                        var timeslots = $('.days').find('.timeslot');
-
-                        timeslots.each(function (index) {
-                            var timeslot = $(this);
-
-                            // allow drag
-                            timeslot.on('dragover', function (event) {
-                                event.preventDefault();
-                            });
-
-                            timeslot.on('dragenter', function (event) {
-                                timeslot.css('background-color', 'blue');
-                            });
-
-                            timeslot.on('dragleave', function (event) {
-                                timeslot.css('background-color', '');
-                            });
-
-                            // TODO allow drop only if pedagogic lesson item
-                            timeslot.on('drop', function ($event) {
-                                $event.preventDefault();
-                                timeslot.css('background-color', '');
-
-                                // TODO get hour/day where it has been dropped
-
-                                // duplicate dragged lesson
-                                var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
-                                var newLesson = new Lesson();
-                                newLesson.id = pedagogicItemOfTheDay.id;
-
-                                newLesson.load(false, function () {
-                                    // will force new lesson to be created in DB
-                                    newLesson.id = null;
-
-                                    // startTime and end format from db is "HH:MM:SS" as text type
-                                    // for lesson save startTime need to be moment time type with date
-                                    newLesson.date = moment(newLesson.date);
-                                    newLesson.startTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.startTime);
-                                    newLesson.endTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.endTime);
-
-                                    newLesson.save(function () {
-                                        // display new items created
-                                        scope.$apply();
-                                    }, function (error) {
-                                        console.error(error);
-                                    });
-                                }, function (error) {
-                                    console.error(error);
-                                });
-                            });
-                        });
-                    };
-
-                    // wait until calendar loaded
-                    setTimeout(handleCalendarItemsDrop, 2000);
                 }
             }
         });

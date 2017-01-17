@@ -965,6 +965,87 @@ function DiaryController($scope, template, model, route, $location) {
         }, validationError);
     };
 
+    var handleCalendarLessonsDrop = function () {
+
+        var timeslots = $('.days').find('.timeslot');
+
+        var timeslotsPerDay = timeslots.length / 7;
+
+        timeslots.each(function (index) {
+
+            var timeslot = $(this);
+
+            // allow drag
+            timeslot.on('dragover', function ($event) {
+                event.preventDefault();
+            });
+
+            timeslot.on('dragenter', function (event) {
+                timeslot.css('background-color', 'blue');
+            });
+
+            timeslot.on('dragleave', function (event) {
+                timeslot.css('background-color', '');
+            });
+
+            timeslot.on('drop', function ($event) {
+                $event.preventDefault();
+                timeslot.css('background-color', '');
+
+                // duplicate dragged lesson
+                var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
+
+                // do not drop if item type is not a lesson
+                if (pedagogicItemOfTheDay.type_item !== 'lesson') {
+                    return;
+                }
+
+                var newLesson = new Lesson();
+                newLesson.id = pedagogicItemOfTheDay.id;
+
+                var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
+                var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
+                var newLessonEndTime = newLessonStartTime + 1;
+
+                newLesson.load(false, function () {
+                    // will force new lesson to be created in DB
+                    newLesson.id = null;
+
+                    // startTime and end format from db is "HH:MM:SS" as text type
+                    // for lesson save startTime need to be moment time type with date
+                    newLesson.date = moment(newLesson.date);
+                    newLesson.startTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.startTime);
+                    newLesson.startTime.hour(newLessonStartTime);
+                    newLesson.startTime.minute(0);
+                    newLesson.startTime.day(newLessonDayOfWeek);
+
+                    newLesson.endTime = moment(newLesson.date.format('YYYY-MM-DD') + ' ' + newLesson.endTime);
+                    newLesson.endTime.hour(newLessonEndTime);
+                    newLesson.endTime.minute(0);
+                    newLesson.endTime.day(newLessonDayOfWeek);
+                    newLesson.endTime.week(model.calendar.week);
+
+                    newLesson.date.day(newLessonDayOfWeek);
+                    newLesson.date.week(model.calendar.week);
+
+
+                    newLesson.save(function () {
+                        // display new items created
+                        scope.quickSearch(false);
+                        scope.$apply();
+                    }, function (error) {
+                        console.error(error);
+                    });
+                }, function (error) {
+                    console.error(error);
+                });
+            });
+        });
+    };
+
+
+
+
     /**
      * Refresh homework load for all homeworks of current lesson
      */
@@ -1347,4 +1428,7 @@ function DiaryController($scope, template, model, route, $location) {
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
     };
+
+    // wait until calendar loaded
+    setTimeout(handleCalendarLessonsDrop, 2000);
 }
