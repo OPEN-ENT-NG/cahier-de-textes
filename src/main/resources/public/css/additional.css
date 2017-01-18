@@ -225,7 +225,8 @@ calendar-daily-events {
 }
 
 .lesson_homework {
-    font-size: 70px;
+    font-size: 50px;
+    color: #4bafd5;
     float: left;
     margin-left: -25px;
     vertical-align: middle !important;
