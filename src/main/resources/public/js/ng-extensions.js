@@ -663,7 +663,7 @@
                      */
                     itemType: "="
                 },
-                link: function (scope, element, attrs) {
+                link: function (scope, element, attrs, location) {
 
                     /**
                      * Number of items displayed by default
@@ -987,10 +987,8 @@
                                     newLesson.date.week(model.calendar.week);
 
 
-                                    newLesson.save(function () {
-                                        // display new items created by reloading
-                                        scope.quickSearch(false);
-                                        scope.$apply();
+                                    newLesson.save(function (data) {
+                                        window.location = '/diary#/editLessonView/' + newLesson.id;
                                     }, function (error) {
                                         console.error(error);
                                     });
@@ -1071,10 +1069,8 @@
                                     newHomework.dueDate.week(model.calendar.week);
 
 
-                                    newHomework.save(function () {
-                                        // display new items created by reloading
-                                        scope.quickSearch(false);
-                                        scope.$apply();
+                                    newHomework.save(function (data) {
+                                        window.location = '/diary#/editHomeworkView/' + newHomework.id;
                                     }, function (error) {
                                         console.error(error);
                                     });

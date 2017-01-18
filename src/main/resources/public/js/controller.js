@@ -1024,7 +1024,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.$apply();
     };
 
-    refreshCalendarCurrentWeek = function(){
+    $scope.refreshCalendarCurrentWeek = function(){
         refreshCalendar(moment(model.calendar.firstDay));
     };
 
