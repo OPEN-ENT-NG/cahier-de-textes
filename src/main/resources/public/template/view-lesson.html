@@ -97,7 +97,7 @@
 
         <div class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
             <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
-                [[pedagogicItem.dayFormatted]] - [[ pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
+                [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[ pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
             </div>
             <div>
                 <!-- LESSON DESCRIPTION -->

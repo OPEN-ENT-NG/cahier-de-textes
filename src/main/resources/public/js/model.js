@@ -1642,6 +1642,7 @@ model.build = function () {
 
         if (data.day) {
             item.dayFormatted = moment(data.day).format("DD/MM/YYYY");
+            item.dayOfWeek = moment(data.day).format("dddd");
         }
         return item;
     }
@@ -1707,7 +1708,7 @@ model.initHomework = function (lesson) {
     }
     // free homework
     else {
-        homework.audience = model.getDefaultAudience();
+        homework.audience = {}; //sets the default audience to undefined
         homework.subject = model.subjects.first();
         homework.audienceType = homework.audience.type;
         homework.color = DEFAULT_ITEM_COLOR;
@@ -1726,7 +1727,7 @@ model.initHomework = function (lesson) {
 model.initLesson = function (timeFromCalendar) {
     var lesson = new Lesson();
 
-    lesson.audience = model.getDefaultAudience();
+    lesson.audience = {}; //sets the default audience to undefined
     lesson.subject = model.subjects.first();
     lesson.audienceType = lesson.audience.type;
     lesson.color = DEFAULT_ITEM_COLOR;

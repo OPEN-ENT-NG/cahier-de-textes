@@ -595,7 +595,6 @@
                     };
 
                     scope.isSelected = function(audience) {
-                        // FIXME scope.selected can be undefined (?)
                         return scope.selected !== undefined && scope.selected != null && audience[scope.property] === scope.selected[scope.property];
                     };
 
@@ -621,6 +620,7 @@
                                 });
 
                                 scope.searchPerformed = true;
+                                scope.listVisible = true;
                                 scope.$apply();
                             }).error(function (e) {
                             if (typeof cbe === 'function') {
@@ -630,19 +630,26 @@
                     };
 
                     scope.$watch("selected", function(value) {
-                        scope.isPlaceholder = scope.selected === undefined || scope.selected === undefined === null || scope.selected[scope.property] === undefined;
-                        scope.display = (scope.selected !== undefined) && scope.selected[scope.property];
+                        scope.isPlaceholder = true;
+                        if (scope.selected !== null && scope.selected !== undefined) {
+                            scope.isPlaceholder = scope.selected[scope.property] === undefined;
+                            scope.display = scope.selected[scope.property];
 
-                        if (scope.lesson && scope.lesson.id) {
-                            if (scope.lesson.homeworks.all.length > 0) {
-                                scope.$parent.refreshHomeworkLoads(scope.lesson);
+                            if (scope.lesson && scope.lesson.id) {
+                                if (scope.lesson.homeworks.all.length > 0) {
+                                    scope.$parent.refreshHomeworkLoads(scope.lesson);
+                                }
+                                scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                             }
-                            scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
-                        }
 
-                        if (scope.homework) {
-                            scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
+                            if (scope.homework && scope.homework.audience) {
+                                scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
+                            }
                         }
+                    });
+
+                    $(element.context.ownerDocument).click(function (event) {
+                        scope.listVisible = false;
                     });
                 }
             }
