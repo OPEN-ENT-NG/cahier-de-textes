@@ -12,11 +12,18 @@
                placeholder="Saisir une matière"
                ng-keyup="searchSubject($event)"
                ng-keydown="searchSubject($event)"
-               ng-model="search"> <div class="autocompletelist" >
-            <div class="item-suggest"
+               ng-model="search">
+            <!-- Subjects found -->
+            <div class="autocompletelist" ng-if="suggestedSubjects.length > 0" >
+                <div class="item-suggest"
                  ng-repeat="suggestedSubject in suggestedSubjects"
                  ng-click="selectSubject(suggestedSubject)"
-                 ng-class="{ selected: isSelected(suggestedSubject) }">[[suggestedSubject.label]]</div>
-        </div>
+                 ng-class="{ selected: isSelected(suggestedSubject) }">[[suggestedSubject.label]]
+                </div>
+            </div>
+            <!-- No subjects found -->
+            <div class="autocompletelist item-suggest" ng-if="suggestedSubjects.length === 0">
+                <i18n>diary.subjectpicker.labelsubjectnotfound</i18n>
+            </div>
     <div>
 </span>
