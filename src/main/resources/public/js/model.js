@@ -1636,6 +1636,7 @@ model.build = function () {
 
         if (data.day) {
             item.dayFormatted = moment(data.day).format("DD/MM/YYYY");
+            item.dayOfWeek = moment(data.day).format("dddd");
         }
         return item;
     }
