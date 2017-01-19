@@ -454,7 +454,16 @@
 
                     // init suggested subjects with all subjects
                     scope.suggestedSubjects = new Array();
-                    model.subjects.all.sort(sortBySubjectLabel);
+
+                    // custom subject collection
+                    // containing base subject collection + current ones being created by used
+                    var subjects = new Array();
+
+                    model.subjects.all.forEach(function (subject) {
+                        subjects.push(subject);
+                    });
+
+                    subjects.sort(sortBySubjectLabel);
 
                     var setNewSubject = function (subjectLabel) {
 
@@ -466,17 +475,19 @@
 
                         var existingSubject = null;
 
-                        for (var i = 0; i < model.subjects.all.length; i++) {
-                            if (sansAccent(model.subjects.all[i].label).toUpperCase() === sansAccent(subjectLabel).toUpperCase()) {
-                                existingSubject = model.subjects.all[i];
+                        for (var i = 0; i < subjects.length; i++) {
+                            if (sansAccent(subjects[i].label).toUpperCase() === sansAccent(subjectLabel).toUpperCase()) {
+                                existingSubject = subjects.all[i];
                             }
                         }
 
                         if (!existingSubject) {
+                            scope.ngModel = new Subject();
                             scope.ngModel.label = subjectLabel;
                             scope.ngModel.id = null;
                             scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
                             scope.ngModel.teacher_id = model.me.userId;
+                            subjects.push(scope.ngModel);
                         } else {
                             scope.ngModel = existingSubject;
                         }
@@ -485,8 +496,8 @@
                     var initSuggestedSubjects = function() {
                         scope.suggestedSubjects = new Array();
 
-                        for (var i = 0; i < model.subjects.all.length; i++) {
-                            scope.suggestedSubjects.push(model.subjects.all[i]);
+                        for (var i = 0; i < subjects.length; i++) {
+                            scope.suggestedSubjects.push(subjects[i]);
                         }
                     };
 
@@ -1061,14 +1072,10 @@
                                     // for lesson save startTime need to be moment time type with date
                                     newHomework.dueDate = moment(newHomework.dueDate);
                                     newHomework.startTime = moment(newHomework.date.format('YYYY-MM-DD') + ' ' + newHomework.startTime);
-                                    //newHomework.startTime.hour(newLessonStartTime);
-                                    //newHomework.startTime.minute(0);
                                     newHomework.startTime.day(newHomeworkDayOfWeek);
 
                                     // TODO refactor endTime = startTime + 1h
                                     newHomework.endTime = moment(newHomework.date.format('YYYY-MM-DD') + ' ' + newHomework.endTime);
-                                    //newHomework.endTime.hour(newLessonEndTime);
-                                    //newHomework.endTime.minute(0);
                                     newHomework.endTime.day(newHomeworkDayOfWeek);
                                     newHomework.endTime.week(model.calendar.week);
 
