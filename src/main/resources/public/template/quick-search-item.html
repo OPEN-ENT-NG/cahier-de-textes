@@ -1,4 +1,9 @@
-<article class="quick-search-card" draggable="true" ng-style="{'background-color': pedagogicItemOfTheDay.color}"
+<!-- draggable="true" -->
+<article class="quick-search-card"
+         dragstart="drag(pedagogicItemOfTheDay, $originalEvent)"
+         dragcondition="dragCondition(pedagogicItemOfTheDay);"
+         dropcondition="dropCondition(pedagogicItemOfTheDay)"
+         ng-style="{'background-color': pedagogicItemOfTheDay.color}"
 
          style="padding-bottom: 5px !important; padding-top: 5px !important;">
     <em class="medium-importance" style="color: white !important;">

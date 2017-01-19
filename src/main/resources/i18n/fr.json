@@ -143,5 +143,6 @@
   "diary.quicksearch.previous": "Précédent",
   "diary.quicksearch.zoomlabel": "&#x1f50d; Libellé",
   "diary.list.view.label": "Vue liste",
-  "diary.filter.no.result": "Vos options de filtre actuelles ne permettent pas l'affichage d'éléments."
+  "diary.filter.no.result": "Vos options de filtre actuelles ne permettent pas l'affichage d'éléments.",
+  "diary.subjectpicker.labelsubjectnotfound": "Créer la matière"
 }

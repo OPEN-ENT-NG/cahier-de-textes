@@ -234,6 +234,8 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
     $scope.showCalendar = function() {
+        model.lessonsDropHandled = false;
+        model.homeworksDropHandled = false;
         $scope.display.showList = false;
         refreshCalendar(moment(model.calendar.firstDay));
         template.open('main', 'main');
@@ -934,6 +936,11 @@ function DiaryController($scope, template, model, route, $location) {
      */
     var initialization = function (bShowTemplates, cb) {
 
+        // will force quick search panel to load (e.g: when returning to calendar view)
+        // see ng-extensions.js -> quickSearch directive
+        model.lessonsDropHandled = false;
+        model.homeworksDropHandled = false;
+
         $scope.countdown = 4;
 
         // auto creates diary.teacher
@@ -964,6 +971,11 @@ function DiaryController($scope, template, model, route, $location) {
             }, validationError);
         }, validationError);
     };
+
+
+
+
+
 
     /**
      * Refresh homework load for all homeworks of current lesson
@@ -1012,7 +1024,7 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.$apply();
     };
 
-    refreshCalendarCurrentWeek = function(){
+    $scope.refreshCalendarCurrentWeek = function(){
         refreshCalendar(moment(model.calendar.firstDay));
     };
 
@@ -1347,4 +1359,6 @@ function DiaryController($scope, template, model, route, $location) {
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
     };
+
+
 }
