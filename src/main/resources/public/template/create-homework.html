@@ -78,7 +78,7 @@
         </div>
     </div>
         <div>
-            <label class="one cell"><i18n>homework.load</i18n></label>
+            <label class="cell space-right"><i18n>homework.load</i18n></label>
             <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
             <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
                   ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
