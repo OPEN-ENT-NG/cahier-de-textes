@@ -69,6 +69,7 @@
   "daily.item.publishing": "Publication en cours",
   "daily.item.unpublishing": "Dépublication en cours",
   "homework.type": "Type",
+  "homework.load": "Charge de travail",
   "item.deleted": "La suppression s'est correctement effectuée.",
   "lesson.published": "La séance a bien été publiée.",
   "lesson.unpublished": "La séance a bien été dépubliée.",
@@ -143,5 +144,6 @@
   "diary.quicksearch.zoomlabel": "&#x1f50d; Libellé",
   "diary.list.view.label": "Vue liste",
   "diary.filter.no.result": "Vos options de filtre actuelles ne permettent pas l'affichage d'éléments.",
-  "diary.subjectpicker.labelsubjectnotfound": "Créer la matière"
+  "diary.subjectpicker.labelsubjectnotfound": "Créer la matière",
+  "homework.add": "Ajouter un travail à faire"
 }

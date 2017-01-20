@@ -372,9 +372,12 @@ section .homeworkInfos {
     border-radius: 3px;
     border-style: solid;
     border-width: 1px;
-    padding: 1px;
-    marging: 1px;
-    font-size: 14px;
+    margin: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+    font-size: 16px;
 }
 
 .homeworksDayLoad.red {
@@ -973,4 +976,8 @@ ent-dropdown div.show>div.dropdown-list {
     border: 1px solid lightgrey;
     position: absolute;
     background-color: white;
+}
+
+.space-right {
+    padding-right: 30px;
 }
