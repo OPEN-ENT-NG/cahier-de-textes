@@ -1067,9 +1067,9 @@
                                 newHomework.load(function () {
                                     // will force new lesson to be created in DB
                                     newHomework.id = null;
+                                    newHomework.lesson_id = null;
 
-                                    // startTime and end format from db is "HH:MM:SS" as text type
-                                    // for lesson save startTime need to be moment time type with date
+                                    // startTime and end format from db is "HH:MM:SS" as text type for lesson save startTime need to be moment time type with date
                                     newHomework.dueDate = moment(newHomework.dueDate);
                                     newHomework.startTime = moment(newHomework.date.format('YYYY-MM-DD') + ' ' + newHomework.startTime);
                                     newHomework.startTime.day(newHomeworkDayOfWeek);
@@ -1084,6 +1084,10 @@
 
 
                                     newHomework.save(function (data) {
+                                        // remove homework from model so will force reload
+                                        // needed because homework.dueDate need a specific format !
+                                        var homework = model.homeworks.findWhere({ id: parseInt(newHomework.id)});
+                                        model.homeworks.remove(homework);
                                         window.location = '/diary#/editHomeworkView/' + newHomework.id;
                                     }, function (error) {
                                         console.error(error);
