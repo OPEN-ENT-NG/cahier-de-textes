@@ -128,6 +128,12 @@
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <div ng-switch-when="homeworks">
+            <div ng-if="isLessonHomeworkEditable" class="row">
+                <!-- add homework to lesson -->
+                <button type="submit" data-ng-click="addHomeworkToLesson(lesson)">
+                    <i18n>homework.add</i18n>
+                </button>
+            </div>
             <div class="row" ng-repeat="homework in lesson.homeworks.all">
 
                 <!-- minimized view -->
@@ -189,9 +195,6 @@
                     </div>
                 </div>
                 <hr class="homework-delimitation" ng-if="($index + 1) < lesson.homeworks.all.length">
-            </div>
-            <div ng-if="isLessonHomeworkEditable" class="row">
-                <i class="add-icon" ng-class="" ng-click="addHomeworkToLesson(lesson)" tooltip="lesson.homeworks.add"></i>
             </div>
         </div>
 
