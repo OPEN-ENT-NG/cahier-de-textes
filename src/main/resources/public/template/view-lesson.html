@@ -2,7 +2,7 @@
 	<h1><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n></h1>
 	 <div class="row" style="margin-bottom: 20px;">
         <div class="cell">
-            <span style="background-color: #CECEF6; padding-left: 45px;;"></span>
+            <span ng-style="{background: lesson.color}" style="padding-left: 45px;;"></span>
 			<!--<input type="color" ng-model="lesson.color" disabled>-->
 			<span ng-bind="lesson.subject.label" class="lessonHeader"></span>
 			<span ng-bind="lesson.audience.name" class="lessonHeader"></span>

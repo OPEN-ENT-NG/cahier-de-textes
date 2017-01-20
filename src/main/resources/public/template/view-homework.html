@@ -2,7 +2,7 @@
 	<h1><i18n>diary.title</i18n>&nbsp;-&nbsp;<i18n>diary.homework.label</i18n></h1>
 	 <div class="row">
         <div class="six cell">
-			<input type="color" ng-model="homework.color" disabled>
+            <span ng-style="{background: homework.color}" style="padding-left: 45px;;"></span>
 			<span ng-bind="homework.subject.label" class="lessonHeader"></span>
 			<span ng-bind="homework.audience.name" class="lessonHeader"></span>
             <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
