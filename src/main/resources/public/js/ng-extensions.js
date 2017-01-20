@@ -1004,6 +1004,7 @@
                                     newLesson.date.day(newLessonDayOfWeek);
                                     newLesson.date.week(model.calendar.week);
 
+                                    newLesson.state = 'draft';
 
                                     newLesson.save(function (data) {
                                         window.location = '/diary#/editLessonView/' + newLesson.id;
@@ -1068,6 +1069,7 @@
                                     // will force new lesson to be created in DB
                                     newHomework.id = null;
                                     newHomework.lesson_id = null;
+                                    newHomework.state = "draft"
 
                                     // startTime and end format from db is "HH:MM:SS" as text type for lesson save startTime need to be moment time type with date
                                     newHomework.dueDate = moment(newHomework.dueDate);
