@@ -75,7 +75,7 @@
         &nbsp;
     </div>
 
-    <article class="twelve cell ng-scope">
+    <div class="twelve cell ng-scope">
     <div ng-switch="data.tabSelected">
         <div ng-switch-when="lesson">
             <div class="row">
@@ -134,7 +134,7 @@
                     <i18n>homework.add</i18n>
                 </button>
             </div>
-            <div class="row" ng-repeat="homework in lesson.homeworks.all">
+            <article class="row" ng-repeat="homework in lesson.homeworks.all">
 
                 <!-- minimized view -->
                 <div class="row">
@@ -194,8 +194,7 @@
                         <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
                     </div>
                 </div>
-                <hr class="homework-delimitation" ng-if="($index + 1) < lesson.homeworks.all.length">
-            </div>
+            </article>
         </div>
 
         <!-- PREVIOUS LESSONS CREATED -->
@@ -254,5 +253,5 @@
         </div>
     </div>
 
-    </article>
+    </div>
 </form>
