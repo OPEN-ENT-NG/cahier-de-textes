@@ -477,7 +477,7 @@
 
                         for (var i = 0; i < subjects.length; i++) {
                             if (sansAccent(subjects[i].label).toUpperCase() === sansAccent(subjectLabel).toUpperCase()) {
-                                existingSubject = subjects.all[i];
+                                existingSubject = subjects[i];
                             }
                         }
 
@@ -548,7 +548,6 @@
                                 scope.suggestedSubjects.push(matchingSubjects[i]);
                             }
 
-                            scope.$apply();
                         } else {
                             initSuggestedSubjects();
                         }
