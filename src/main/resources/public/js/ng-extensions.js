@@ -956,7 +956,7 @@
                             });
 
                             timeslot.on('dragenter', function (event) {
-                                timeslot.css('border', 'blue 1px dashed');
+                                timeslot.css('border', 'blue 2px dashed');
                                 timeslot.css('border-radius', '3px');
                                 //timeslot.css('background-color', 'blue');
                             });
@@ -1045,7 +1045,7 @@
 
                             timeslot.on('dragenter', function ($event) {
                                 // FIXME red color not visible because overidden by grey color !important
-                                timeslot.css('border', 'blue 1px dashed');
+                                timeslot.css('border', 'blue 2px dashed');
                                 timeslot.css('border-radius', '3px');
                                 //timeslot.css('background-color', 'red');
                             });
