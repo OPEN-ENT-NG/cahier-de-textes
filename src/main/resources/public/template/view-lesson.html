@@ -52,7 +52,7 @@
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
     <div ng-switch-when="homeworks">
-        <div class="row" ng-repeat="homework in lesson.homeworks.all">
+        <article class="row" ng-repeat="homework in lesson.homeworks.all">
 
             <!-- minimized view -->
             <div class="row">
@@ -85,8 +85,7 @@
                     <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                 </div>
             </div>
-            <hr class="homework-delimitation">
-        </div>
+        </article>
     </div>
 
     <!-- PREVIOUS LESSONS CREATED -->
