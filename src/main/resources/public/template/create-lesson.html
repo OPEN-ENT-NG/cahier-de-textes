@@ -157,11 +157,6 @@
                     <div class="row">
                         <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
                         <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
-                        <!-- deletes homework -->
-                        <div class="controls">
-                            <i ng-if="isLessonHomeworkEditable" class="trash" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)" style="float: right;" tooltip="daily.homework.delete">
-                            </i>
-                        </div>
                     </div>
                     <div class="row">
                         <div class="four cell">
@@ -194,6 +189,12 @@
                     <div class="row">
                         <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                         <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
+                    </div>
+                    <!-- deletes homework -->
+                    <div class="controls">
+                        <button ng-if="isLessonHomeworkEditable"  ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)">
+                            <i18n>diary.delete</i18n>
+                        </button>
                     </div>
                 </div>
             </article>
