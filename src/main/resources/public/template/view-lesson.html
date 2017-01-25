@@ -61,10 +61,10 @@
             <div class="row"  ng-click="toggleShowHomeworkInLesson(homework)">
                 <!-- titre  -->
                 <h2 ng-show="!homework.expanded" class="hover-orange" data-tooltip="Déplier" style="float: left;">
-                    <i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]
+                    [[homework.title]]
                 </h2>
                 <h2 ng-hide="!homework.expanded" class="hover-orange" data-tooltip="Plier" style="float: left;">
-                    <i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]
+                    [[homework.title]]
                 </h2>
 
                 <!-- chevron -->
@@ -77,7 +77,8 @@
             <!-- daily.homework.givenduedate homework.type.label homework.title -->
             <div ng-show="homework.expanded">
                 <div class="row rowHeader">
-                    <span ng-bind="homework.title" class="lessonInfosBlack"></span>
+                    <span class="lessonInfosBlack"><i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]</span>
+                    <span class="lessonInfosBlack"><i18n>homework.load</i18n></span>
                     <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
                     <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
                           ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
