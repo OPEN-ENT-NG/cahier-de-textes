@@ -208,7 +208,7 @@ Homework.prototype.delete = function (lesson, cb, cbe) {
     };
 
     if (this.id) {
-        http().delete('/diary/homework/' + this.id, this)
+        http().delete('/diary/homework/' + this.id)
             .done(function (b) {
 
                 deleteHomeworkReferences();
