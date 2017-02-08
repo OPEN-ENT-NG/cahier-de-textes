@@ -477,7 +477,7 @@
 
                         for (var i = 0; i < subjects.length; i++) {
                             if (sansAccent(subjects[i].label).toUpperCase() === sansAccent(subjectLabel).toUpperCase()) {
-                                existingSubject = subjects.all[i];
+                                existingSubject = subjects[i];
                             }
                         }
 
@@ -548,7 +548,6 @@
                                 scope.suggestedSubjects.push(matchingSubjects[i]);
                             }
 
-                            scope.$apply();
                         } else {
                             initSuggestedSubjects();
                         }
@@ -957,15 +956,20 @@
                             });
 
                             timeslot.on('dragenter', function (event) {
-                                timeslot.css('background-color', 'blue');
+                                timeslot.css('border', 'blue 2px dashed');
+                                timeslot.css('border-radius', '3px');
+                                //timeslot.css('background-color', 'blue');
                             });
 
                             timeslot.on('dragleave', function (event) {
-                                timeslot.css('background-color', '');
+                                //timeslot.css('background-color', '');
+                                timeslot.css('border', '');
+                                timeslot.css('border-radius', '');
                             });
 
                             timeslot.on('drop', function ($event) {
                                 $event.preventDefault();
+
                                 timeslot.css('background-color', '');
 
                                 // duplicate dragged lesson
@@ -1041,11 +1045,15 @@
 
                             timeslot.on('dragenter', function ($event) {
                                 // FIXME red color not visible because overidden by grey color !important
-                                timeslot.css('background-color', 'red');
+                                timeslot.css('border', 'blue 2px dashed');
+                                timeslot.css('border-radius', '3px');
+                                //timeslot.css('background-color', 'red');
                             });
 
                             timeslot.on('dragleave', function (event) {
-                                timeslot.css('css', 'color: blue !important');
+                                //timeslot.css('css', 'color: blue !important');
+                                timeslot.css('border', '');
+                                timeslot.css('border-radius', '');
                             });
 
                             timeslot.on('drop', function ($event) {

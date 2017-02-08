@@ -100,6 +100,7 @@
   "daily.homework.unpublish.confirm.one": "Êtes-vous sûr(e) de vouloir dépublier ce travail à faire ?",
   "daily.homework.unpublish.confirm.multi": "Êtes-vous sûr(e) de vouloir dépublier ces travails à faire ?",
   "daily.homework.givenduedate": "Devoir à rendre pour le",
+  "daily.homework.givenduedateshort": "Devoir à rendre",
   "homework.types": "Type de travail",
   "diary.icon.show.calendar": "Calendrier des séances",
   "diary.icon.show.list": "Liste des séances",
@@ -145,5 +146,7 @@
   "diary.list.view.label": "Vue liste",
   "diary.filter.no.result": "Vos options de filtre actuelles ne permettent pas l'affichage d'éléments.",
   "diary.subjectpicker.labelsubjectnotfound": "Créer la matière",
-  "homework.add": "Ajouter un travail à faire"
+  "homework.add": "Ajouter un travail à faire",
+  "diary.fordate": "Pour le",
+  "diary.delete": "Supprimer"
 }
