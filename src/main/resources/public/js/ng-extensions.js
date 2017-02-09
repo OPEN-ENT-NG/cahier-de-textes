@@ -665,6 +665,81 @@
             }
         });
 
+        /**
+         * Directive to perform a quick search among lessons and homeworks
+         */
+        module.directive('attachmentsx', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/template/attachments.html",
+                scope: {
+                    ngModel: '=',
+                    item: '='
+                },
+                link: function($scope){
+                    $scope.showPersonalAttachments = false;
+
+                    // open up personal storage
+                    $scope.addAttachment = function(){
+                        console.log("HELLO");
+                        $scope.showPersonalAttachments = true;
+                    };
+                }
+            }
+        });
+
+        /**
+         *
+         */
+        module.directive('attachment', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/template/attachment.html",
+                scope: {
+                    /**
+                     * Attachment
+                     */
+                    ngModel: '=',
+                    /**
+                     * Reference to lesson or homework
+                     */
+                    attachment: '=',
+                    /**
+                     * 'lesson' or 'homework'
+                     */
+                    itemType: '='
+                },
+                controller: function (scope, element, attrs, location) {
+
+                    /**
+                     * As seen from entcore, behaviour.js
+                     * @param attachment
+                     */
+                    scope.downloadAttachment = function () {
+                        scope.attachment.download();
+                    };
+
+                    // detachFromItem = function (itemId, itemType, cb, cbe) {
+                    /**
+                     * Removes attachment from lesson or homework
+                     * but DOES NOT remove the file physically
+                     */
+                    scope.removeAttachment = function () {
+                        scope.attachment.detachFromItem(scope.item.id, scope.itemType,
+                            // callback function TODO handle
+                            function () {
+
+                            },
+                            // callback on error function TODO handle
+                            function () {
+
+                            }
+                        );
+                    }
+                }
+            }
+        });
+
 
         /**
          * Directive to perform a quick search among lessons and homeworks

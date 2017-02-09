@@ -1,0 +1,20 @@
+Pièces jointes
+<button ng-click="addAttachment()" style="border-radius: 25px; font-size: 25px;">+</button>
+<br>
+
+
+<!-- Core attachment directive link -->
+<lightbox show="showPersonalAttachments" on-close="showPersonalAttachments = false">
+    <media-library ng-model="selectedAttachments"
+                   ng-change="alert(selectedAttachments)"
+                   file-format="'any'"
+                   >
+
+    </media-library>
+    <button ng-click="addAttachment()">Ajouter</button>
+</lightbox>
+
+<!-- Attachments list -->
+<span ng-repeat="attachment in item.attachments">
+    <attachment attachment="attachment"></attachment>
+</span>

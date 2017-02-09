@@ -110,21 +110,27 @@
                     <input type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
                 </div>
 
+                </div>
+                <div class="row">
+                    <editor ng-model="lesson.description"></editor>
+                </div>
+
+                <attachmentsx item="lesson">
+                </attachmentsx>
+
+                <br><br>
+                <!-- END -->
+                <div class="row accordions">
+                    <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
+                        <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
+                            <i18n>annotations.title</i18n>
+                        </h2>
+                        <div class="toggle">
+                            <editor ng-model="lesson.annotations"></editor>
+                        </div>
+                    </article>
+                </div>
             </div>
-            <div class="row">
-                <editor ng-model="lesson.description"></editor>
-            </div>
-            <div class="row accordions">
-                <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
-                    <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
-                        <i18n>annotations.title</i18n>
-                    </h2>
-                    <div class="toggle">
-                        <editor ng-model="lesson.annotations"></editor>
-                    </div>
-                </article>
-            </div>
-        </div>
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <div ng-switch-when="homeworks">
@@ -224,7 +230,7 @@
                                      <span bind-html="pedagogicItem.description"></span>
                                 </span>
                             </span>
-                    </div>
+                        </div>
 
                     <!-- ATTACHED HOMEWORKS-->
                     <div style="float: right; width: 50%;">

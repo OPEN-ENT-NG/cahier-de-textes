@@ -1,3 +1,84 @@
+/**
+ * Model of attachment from
+ * table diary.attachment (DB)
+ * @constructor
+ */
+function Attachment() {
+    /**
+     * Attachment id as in diary.attachment table
+     * @type {number}
+     */
+    this.id = null;
+
+    this.user_id = null;
+    /**
+     * Id of stored document within the document module
+     * (see mongodb -> Documents table)
+     * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
+     * @type {string}
+     */
+    this.document_id = null;
+    /***
+     * Creation date
+     * @type {null}
+     */
+    this.creation_date = null;
+    /**
+     * Filename of attachment
+     * @type {string}
+     */
+    this.document_label = null;
+};
+
+/**
+ * Model from table
+ * diary.lesson_has_attachment
+ * @constructor
+ */
+function LessonAttachment() {
+
+}
+
+/**
+ * Download the attachment
+ */
+Attachment.prototype.download = function () {
+    window.location = '/workspace/document/' + this.document_id;
+};
+
+/**
+ * Detach attachment to a lesson
+ * (this will not remove it, file will be kept in workspace)
+ * @param itemId Id of item (lesson id or homework id)
+ * @param itemType Type of item ('lesson' or 'homework')
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Attachment.prototype.detachFromItem = function (itemId, itemType, cb, cbe) {
+
+    var url = '/diary/attachment/' + this.id + '/' + itemId + '/' + itemType;
+
+
+
+    return;
+    /*
+     http().delete(url, this)
+     .done(function (b) {
+
+     $scope.apply();
+
+     if (typeof cb === 'function') {
+     cb();
+     }
+     })
+     .error(function (e) {
+     if (typeof cbe === 'function') {
+     cbe(model.parseError(e));
+     }
+     });
+     */
+};
+
 function Homework() {
 
     /**
@@ -5,6 +86,11 @@ function Homework() {
      * @type {boolean}
      */
     this.expanded = false;
+
+    /**
+     * Attachments
+     */
+    this.collection(Attachment);
 
     /**
      * Delete calendar references of current homework
@@ -16,6 +102,25 @@ function Homework() {
         if (idxHomeworkToDelete >= 0) {
             model.homeworks.splice(idxHomeworkToDelete, 1);
         }
+    };
+
+
+    /**
+     * Adds an attachment
+     * @param attachment
+     */
+    this.addAttachment = function (attachment) {
+        this.attachments.push(attachment);
+    };
+
+    /**
+     * Removes attachment associated to this lesson
+     * @param attachment
+     * @param cb
+     * @param cbe
+     */
+    this.detachAttachment = function (attachment, cb, cbe) {
+        attachment.detachFromItem(this.id, 'lesson', cb, cbe);
     };
 }
 
@@ -1494,11 +1599,26 @@ model.build = function () {
             lesson.audienceTypeLabel = lang.translate('diary.audience.class');
         }
 
+        if (data.attachments) {
+            lesson.attachments = _.map(JSON.parse(data.attachments), jsonToJsAttachment);
+        }
+
 
         var tooltip = getResponsiveLessonTooltipText(lesson);
 
         lesson.tooltipText = tooltip;
         return lesson;
+    };
+
+    jsonToJsAttachment = function (data) {
+        var att = new Attachment();
+        att.id = data.id;
+        att.user_id = data.user_id;
+        att.creation_date = data.creation_date;
+        att.document_id = data.document_id;
+        att.document_label = data.document_label;
+
+        return att;
     };
 
     /**

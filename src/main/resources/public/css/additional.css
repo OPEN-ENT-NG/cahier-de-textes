@@ -981,3 +981,7 @@ ent-dropdown div.show>div.dropdown-list {
 .space-right {
     padding-right: 30px;
 }
+
+i.remove-small {
+    color: #FF8500 !important;
+}
