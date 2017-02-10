@@ -385,7 +385,6 @@ Homework.prototype.toJSON = function () {
     return json;
 };
 
-function Attachment(){}
 function Subject() { }
 
 /**

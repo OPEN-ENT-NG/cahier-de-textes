@@ -678,6 +678,7 @@
                      */
                     item: '='
                 },
+                controller: function($scope){},
                 link: function($scope){
                     $scope.selectedAttachments = new Array();
                     $scope.display = {};
@@ -687,6 +688,85 @@
                     $scope.showPersonalAttachments = function(){
                         $scope.display.showPersonalAttachments = true;
                     };
+
+
+                    /**
+                     * Selected attachments from media library directive
+                     * see attachments.html
+                     * @param selectedAttachments Selected attachments in personal storage view
+                     */
+                    $scope.updateSelectedAttachments = function (selectedAttachments) {
+                        $scope.selectedAttachments = selectedAttachments;
+                    };
+
+                    /**
+                     *
+                     * @param documentId
+                     */
+                    var hasAttachmentInItem = function(documentId){
+                        if(!$scope.item.attachments || $scope.item.attachments.length === 0){
+                            return false;
+                        } else {
+                            $scope.item.attachments.all.forEach(function(itemAttachment){
+                                if(itemAttachment.document_id === documentId){
+                                    return true;
+                                }
+                            });
+
+                            return false;
+                        }
+                    };
+
+
+                    /**
+                     * Associates the selected attachments from directive
+                     * to current item (lesson or homework)
+                     */
+                    $scope.linkAttachmentsToItem = function () {
+
+                        if ($scope.selectedAttachments.length === 0) {
+                            notify.info('diary.attachments.selectattachmentstolink');
+                        }
+
+                        else {
+                            // check attachment not ever present in personal storage ...
+                            if ($scope.item.attachments && $scope.item.attachment.length > 0) {
+
+                                var matchingItemAttachments = new Array();
+
+                                model.mediaLibrary.appDocuments.documents.forEach(function (document) {
+                                    if (document && document._id) {
+                                        if (hasAttachmentInItem(document._id)) {
+                                            matchingItemAttachments.push(document);
+                                        }
+                                    }
+                                });
+
+                                if (matchingItemAttachments.length > 0) {
+                                    // TODO removes silently attachment ?
+                                    notify.info('diary.attachments.selectattachmentstolink');
+                                }
+
+
+                            } else {
+                                $scope.selectedAttachments.forEach(function(selectedAttachment){
+                                    var itemAttachment = new Attachment();
+
+                                    //itemAttachment.id = null;
+                                    itemAttachment.user_id = model.me.userId;
+                                    itemAttachment.document_id = selectedAttachment._id;
+                                    //itemAttachment.creation_date = new Date();
+                                    itemAttachment.document_label = selectedAttachment.name;
+
+                                    $scope.item.addAttachment(itemAttachment);
+                                });
+
+                                console.log("ITEM ATTACHMENTS:");
+                                console.log($scope.item.attachments);
+                            }
+                        }
+
+                    }
                 }
             }
         });
