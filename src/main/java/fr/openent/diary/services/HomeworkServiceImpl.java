@@ -36,6 +36,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
     private static final String ID_OWNER_FIELD_NAME = "owner";
     private static final String GESTIONNAIRE_RIGHT = "fr-openent-diary-controllers-HomeworkController|modifyHomework";
+    private static final String GESTIONNAIRE_RIGHT_LESSON = "fr-openent-diary-controllers-LessonController|modifyLesson";
 
     /**
      *
@@ -63,31 +64,25 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         final String DATE_FORMAT = "YYYY-MM-DD";
 
         memberIds.add(userId);
+        final JsonArray parameters = new JsonArray();
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
-                .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label")
-
+                .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label,")
+                .append(" att.attachments ")
                 .append(" FROM diary.homework AS h")
 
-                .append(" LEFT JOIN diary.homework_type as th ON h.homework_type_id = th.id")
+                .append(" INNER JOIN diary.homework_type as th ON h.homework_type_id = th.id")
                 .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
-                .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id")
-                .append(" LEFT JOIN diary.homework_shares AS hs ON h.id = hs.resource_id")
-                .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id")
-                .append(" LEFT JOIN diary.members AS m ON (hs.member_id = m.id AND m.group_id IS NOT NULL)")
-                .append(" WHERE (( h.lesson_id IS NULL AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray()) + " OR h.owner = ?))")
-                .append("        OR (h.lesson_id IS NOT NULL AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray()) + " OR h.owner = ?))) ");
+                .append(" INNER JOIN diary.subject as s ON s.id = h.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = h.audience_id")
+                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
+                .append(" FROM diary.homework_has_attachment as ha INNER JOIN diary.attachment a ON ha.attachment_id = a.id")
+                .append(" WHERE ha.homework_id = h.id) att ON TRUE");
 
-        final JsonArray parameters = new JsonArray(memberIds.toArray()).add(userId);
 
-        for (final String g : memberIds) {
-            parameters.addString(g);
-        }
-
-        parameters.add(userId);
+                query.append(" WHERE 1=1 ");
 
         if (schoolIds != null && !schoolIds.isEmpty()) {
             query.append(" AND h.school_id in ").append(sql.listPrepared(schoolIds.toArray()));
@@ -115,6 +110,34 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 
+
+                query.append(" AND ((h.lesson_id IS NOT NULL AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
+                .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
+                .append(" WHERE l.id = ls.resource_id")
+                .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
+
+        for (final String g : memberIds) {
+            parameters.addString(g);
+        }
+        parameters.add(userId);
+
+        if (ctx == Context.TEACHER) {
+            // retrieve homeworks whose lesson we are owner and those we have gestionnaire right on
+            query.append(" AND (l.owner = ? OR ls.action = ?) ");
+            parameters.add(userId);
+            parameters.add(this.GESTIONNAIRE_RIGHT_LESSON);
+        }
+
+        query.append(")) OR ( h.lesson_id IS NULL AND EXISTS (SELECT 1 FROM diary.homework_shares hs  ")
+                .append(" LEFT JOIN diary.members AS m ON (hs.member_id = m.id AND m.group_id IS NOT NULL)")
+                .append(" WHERE h.id = hs.resource_id")
+                .append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ?) ");
+
+        for (final String g : memberIds) {
+            parameters.addString(g);
+        }
+        parameters.add(userId);
+
         if (ctx == Context.TEACHER) {
             // retrieve homeworks whose we are owner and those we have gestionnaire right on
             query.append(" AND (h.owner = ? OR hs.action = ?) ");
@@ -122,7 +145,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(this.GESTIONNAIRE_RIGHT);
         }
 
-        query.append(" GROUP BY h.id, s.subject_label, a.audience_type, a.audience_label, th.homework_type_label ");
+        query.append(")))");
         query.append(" ORDER BY h.homework_due_date ASC, h.created ASC ");
 
         log.debug(query);
