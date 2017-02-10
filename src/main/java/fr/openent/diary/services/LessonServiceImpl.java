@@ -189,8 +189,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
 
     /**
-     * fields not as column in table diary.lesson so need to delete
-     * else will crash on createLesson or updateLesson
+     * fields not present as column in table diary.lesson
+     * so need to delete them else will crash on createLesson or updateLesson
      * TODO remove that try getting audience data from other object than lesson JSON one
      * (see {@link fr.openent.diary.controllers.LessonController}
      *
@@ -201,6 +201,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         lessonObject.removeField("audience_type");
         lessonObject.removeField("audience_name");
         lessonObject.removeField("lesson_id");
+        lessonObject.removeField("attachments");
     }
 
     /**

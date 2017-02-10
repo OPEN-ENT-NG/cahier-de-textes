@@ -1019,7 +1019,8 @@ Lesson.prototype.toJSON = function () {
         lesson_state: this.state,
         // start columns not in lesson table TODO move
         audience_type: this.audience.type,
-        audience_name: this.audience.name
+        audience_name: this.audience.name,
+        attachments: this.attachments
     };
 
     if (this.room) {

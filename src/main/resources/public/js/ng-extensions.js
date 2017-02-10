@@ -673,16 +673,19 @@
                 restrict: "E",
                 templateUrl: "diary/public/template/attachments.html",
                 scope: {
-                    ngModel: '=',
+                    /**
+                     * Lesson or homework
+                     */
                     item: '='
                 },
                 link: function($scope){
-                    $scope.showPersonalAttachments = false;
+                    $scope.selectedAttachments = new Array();
+                    $scope.display = {};
+                    $scope.display.showPersonalAttachments = false;
 
                     // open up personal storage
-                    $scope.addAttachment = function(){
-                        console.log("HELLO");
-                        $scope.showPersonalAttachments = true;
+                    $scope.showPersonalAttachments = function(){
+                        $scope.display.showPersonalAttachments = true;
                     };
                 }
             }
@@ -699,17 +702,17 @@
                     /**
                      * Attachment
                      */
-                    ngModel: '=',
+                    attachment: '=',
                     /**
                      * Reference to lesson or homework
                      */
-                    attachment: '=',
+                    item: '=',
                     /**
                      * 'lesson' or 'homework'
                      */
                     itemType: '='
                 },
-                controller: function (scope, element, attrs, location) {
+                link: function (scope, element, attrs, location) {
 
                     /**
                      * As seen from entcore, behaviour.js
