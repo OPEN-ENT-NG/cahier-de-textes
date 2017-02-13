@@ -201,7 +201,6 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         lessonObject.removeField("audience_type");
         lessonObject.removeField("audience_name");
         lessonObject.removeField("lesson_id");
-        lessonObject.removeField("attachments");
     }
 
     /**
