@@ -985,3 +985,20 @@ ent-dropdown div.show>div.dropdown-list {
 i.remove-small {
     color: #FF8500 !important;
 }
+
+div.theopener {
+    color: white;
+    background-color: #FF8500;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 25px;
+    font-size: 24px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.26);
+    border-radius: 25px;
+}
