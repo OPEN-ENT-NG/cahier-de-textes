@@ -54,29 +54,22 @@ Attachment.prototype.download = function () {
  * @param cb Callback
  * @param cbe Callback on error
  */
-Attachment.prototype.detachFromItem = function (itemId, itemType, cb, cbe) {
+Attachment.prototype.detachFromItem = function (item, cb, cbe) {
 
-    var url = '/diary/attachment/' + this.id + '/' + itemId + '/' + itemType;
+    var that = this;
 
+    if (item && item.attachments) {
 
+        var udpatedAttachments = new Array();
 
-    return;
-    /*
-     http().delete(url, this)
-     .done(function (b) {
+        item.attachments.forEach(function (attachment) {
+            if(attachment && attachment.document_id !== that.document_id){
+                udpatedAttachments.push(attachment);
+            }
+        });
 
-     $scope.apply();
-
-     if (typeof cb === 'function') {
-     cb();
-     }
-     })
-     .error(function (e) {
-     if (typeof cbe === 'function') {
-     cbe(model.parseError(e));
-     }
-     });
-     */
+        item.attachments = udpatedAttachments;
+    }
 };
 
 function Homework() {
@@ -90,7 +83,7 @@ function Homework() {
     /**
      * Attachments
      */
-    this.collection(Attachment);
+    this.attachments = new Array();
 
     /**
      * Delete calendar references of current homework
@@ -110,7 +103,7 @@ function Homework() {
      * @param attachment
      */
     this.addAttachment = function (attachment) {
-        this.attachments.push(attachment);
+        this.attachments.pushAll(attachment);
     };
 
     /**
@@ -622,7 +615,33 @@ function Lesson(data) {
     }
     this.subject = (data) ? data.subject : new Subject();
     this.audience = (data) ? data.audience : new Audience();
+
+    /**
+     * Attachments
+     */
+    this.attachments = new Array();
+    /*
+    this.collection(Attachment, {
+        loading: false,
+        syncAttachments: function(cb, cbe){
+            // TODO
+
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
+    });*/
+
     var that = this;
+
+    /**
+     * Adds an attachment
+     * @param attachment
+     */
+    this.addAttachment = function (attachment) {
+        this.attachments.push(attachment);
+    };
 
     /**
      * Delete calendar references of current lesson

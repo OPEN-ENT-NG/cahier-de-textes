@@ -678,7 +678,23 @@
                      */
                     item: '='
                 },
-                controller: function($scope){},
+                controller: function($scope){
+                    $scope.removeAttachment = function (attachment) {
+
+                        console.log('removeAttachment');
+
+                        attachment.detachFromItem(scope.item,
+                            // callback function TODO handle
+                            function () {
+
+                            },
+                            // callback on error function TODO handle
+                            function () {
+
+                            }
+                        );
+                    }
+                },
                 link: function($scope){
                     $scope.selectedAttachments = new Array();
                     $scope.display = {};
@@ -687,6 +703,10 @@
                     // open up personal storage
                     $scope.showPersonalAttachments = function(){
                         $scope.display.showPersonalAttachments = true;
+                    };
+
+                    $scope.hidePersonalAttachments = function(){
+                        $scope.display.showPersonalAttachments = false;
                     };
 
 
@@ -707,7 +727,7 @@
                         if(!$scope.item.attachments || $scope.item.attachments.length === 0){
                             return false;
                         } else {
-                            $scope.item.attachments.all.forEach(function(itemAttachment){
+                            $scope.item.attachments.forEach(function(itemAttachment){
                                 if(itemAttachment.document_id === documentId){
                                     return true;
                                 }
@@ -730,14 +750,15 @@
 
                         else {
                             // check attachment not ever present in personal storage ...
-                            if ($scope.item.attachments && $scope.item.attachment.length > 0) {
+                            if ($scope.item.attachments && $scope.item.attachments.length > 0) {
 
                                 var matchingItemAttachments = new Array();
 
-                                model.mediaLibrary.appDocuments.documents.forEach(function (document) {
-                                    if (document && document._id) {
-                                        if (hasAttachmentInItem(document._id)) {
-                                            matchingItemAttachments.push(document);
+                                // not naming 'document'
+                                model.mediaLibrary.appDocuments.documents.forEach(function (theDoc) {
+                                    if (theDoc && theDoc._id) {
+                                        if (hasAttachmentInItem(theDoc._id)) {
+                                            matchingItemAttachments.push(theDoc);
                                         }
                                     }
                                 });
@@ -749,6 +770,9 @@
 
 
                             } else {
+
+                                var newAttachments = new Array();
+
                                 $scope.selectedAttachments.forEach(function(selectedAttachment){
                                     var itemAttachment = new Attachment();
 
@@ -758,14 +782,31 @@
                                     //itemAttachment.creation_date = new Date();
                                     itemAttachment.document_label = selectedAttachment.name;
 
+                                    newAttachments.push(itemAttachment);
                                     $scope.item.addAttachment(itemAttachment);
                                 });
-
-                                console.log("ITEM ATTACHMENTS:");
-                                console.log($scope.item.attachments);
                             }
+
+                            // close media library directive
+                            $scope.hidePersonalAttachments();
                         }
 
+                    };
+
+                    $scope.removeAttachmentXX = function (attachment) {
+
+                        console.log('removeAttachment');
+
+                        attachment.detachFromItem(scope.item.id, scope.itemType,
+                            // callback function TODO handle
+                            function () {
+
+                            },
+                            // callback on error function TODO handle
+                            function () {
+
+                            }
+                        );
                     }
                 }
             }
@@ -777,6 +818,7 @@
         module.directive('attachment', function () {
             return {
                 restrict: "E",
+                require: '^attachmentsx',
                 templateUrl: "diary/public/template/attachment.html",
                 scope: {
                     /**
@@ -808,7 +850,8 @@
                      * but DOES NOT remove the file physically
                      */
                     scope.removeAttachment = function () {
-                        scope.attachment.detachFromItem(scope.item.id, scope.itemType,
+
+                        scope.attachment.detachFromItem(scope.item,
                             // callback function TODO handle
                             function () {
 
