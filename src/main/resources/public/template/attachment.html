@@ -1,5 +1,5 @@
 <span>
     <a data-ng-click="downloadAttachment()" tooltip="Ouvrir la pièce jointe">[[attachment.document_label]]&nbsp;</a>
 
-    <i class="remove-small" ng-click="removeAttachment()" tooltip="Supprimer la pièce jointe"></i>
+    <i class="remove-small" ng-if="!readonly" ng-click="removeAttachment()" tooltip="Supprimer la pièce jointe"></i>
 </span>

@@ -676,12 +676,14 @@
                     /**
                      * Lesson or homework
                      */
-                    item: '='
+                    item: '=',
+                    /**
+                     * If true, user won't be able to add or modify current attachments (for student for example)
+                     */
+                    readonly: '='
                 },
                 controller: function($scope){
                     $scope.removeAttachment = function (attachment) {
-
-                        console.log('removeAttachment');
 
                         attachment.detachFromItem(scope.item,
                             // callback function TODO handle
@@ -795,8 +797,6 @@
 
                     $scope.removeAttachmentXX = function (attachment) {
 
-                        console.log('removeAttachment');
-
                         attachment.detachFromItem(scope.item.id, scope.itemType,
                             // callback function TODO handle
                             function () {
@@ -830,9 +830,9 @@
                      */
                     item: '=',
                     /**
-                     * 'lesson' or 'homework'
+                     *  If true, user won't be able to add or modify current attachments (for student for example)
                      */
-                    itemType: '='
+                    readonly: '='
                 },
                 link: function (scope, element, attrs, location) {
 
@@ -851,14 +851,19 @@
                      */
                     scope.removeAttachment = function () {
 
+                        // do not modify current attachment if readonly
+                        if (scope.readonly === true) {
+                            return;
+                        }
+
                         scope.attachment.detachFromItem(scope.item,
-                            // callback function TODO handle
-                            function () {
-
+                            // callback function
+                            function (cb) {
+                                notify.info(cbe.message);
                             },
-                            // callback on error function TODO handle
-                            function () {
-
+                            // callback on error function
+                            function (cbe) {
+                                notify.error(cbe.message);
                             }
                         );
                     }

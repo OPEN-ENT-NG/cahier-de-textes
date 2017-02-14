@@ -48,9 +48,8 @@ Attachment.prototype.download = function () {
 
 /**
  * Detach attachment to a lesson
- * (this will not remove it, file will be kept in workspace)
- * @param itemId Id of item (lesson id or homework id)
- * @param itemType Type of item ('lesson' or 'homework')
+ * Attachment link will be detached to back end on lesson save
+ * @param item Lesson or homework
  * @param cb Callback
  * @param cbe Callback on error
  */
@@ -63,12 +62,19 @@ Attachment.prototype.detachFromItem = function (item, cb, cbe) {
         var udpatedAttachments = new Array();
 
         item.attachments.forEach(function (attachment) {
-            if(attachment && attachment.document_id !== that.document_id){
+            if (attachment && attachment.document_id !== that.document_id) {
                 udpatedAttachments.push(attachment);
             }
         });
 
         item.attachments = udpatedAttachments;
+
+        if (typeof cb === 'function') {
+            cb();
+        } else (typeof cbe === 'function')
+        {
+            cbe();
+        }
     }
 };
 
@@ -604,7 +610,7 @@ model.unselectDays = function (){
     model.pedagogicDays.forEach(function (day) {
         day.selected = undefined;
     });
-}
+};
 
 function Lesson(data) {
     this.selected = false;
@@ -619,7 +625,9 @@ function Lesson(data) {
     /**
      * Attachments
      */
-    this.attachments = new Array();
+    if (!this.attachments) {
+        this.attachments = new Array();
+    }
     /*
     this.collection(Attachment, {
         loading: false,
