@@ -665,6 +665,212 @@
             }
         });
 
+        /**
+         * Directive to perform a quick search among lessons and homeworks
+         */
+        module.directive('attachmentsx', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/template/attachments.html",
+                scope: {
+                    /**
+                     * Lesson or homework
+                     */
+                    item: '=',
+                    /**
+                     * If true, user won't be able to add or modify current attachments (for student for example)
+                     */
+                    readonly: '='
+                },
+                controller: function($scope){
+                    $scope.removeAttachment = function (attachment) {
+
+                        attachment.detachFromItem(scope.item,
+                            // callback function TODO handle
+                            function () {
+
+                            },
+                            // callback on error function TODO handle
+                            function () {
+
+                            }
+                        );
+                    }
+                },
+                link: function($scope){
+                    $scope.selectedAttachments = new Array();
+                    $scope.display = {};
+                    $scope.display.showPersonalAttachments = false;
+
+                    // open up personal storage
+                    $scope.showPersonalAttachments = function(){
+                        $scope.display.showPersonalAttachments = true;
+                    };
+
+                    $scope.hidePersonalAttachments = function(){
+                        $scope.display.showPersonalAttachments = false;
+                    };
+
+
+                    /**
+                     * Selected attachments from media library directive
+                     * see attachments.html
+                     * @param selectedAttachments Selected attachments in personal storage view
+                     */
+                    $scope.updateSelectedAttachments = function (selectedAttachments) {
+                        $scope.selectedAttachments = selectedAttachments;
+                    };
+
+                    /**
+                     *
+                     * @param documentId
+                     */
+                    var hasAttachmentInItem = function(documentId){
+                        if(!$scope.item.attachments || $scope.item.attachments.length === 0){
+                            return false;
+                        } else {
+                            $scope.item.attachments.forEach(function(itemAttachment){
+                                if(itemAttachment.document_id === documentId){
+                                    return true;
+                                }
+                            });
+
+                            return false;
+                        }
+                    };
+
+
+                    /**
+                     * Associates the selected attachments from directive
+                     * to current item (lesson or homework)
+                     */
+                    $scope.linkAttachmentsToItem = function () {
+
+                        if ($scope.selectedAttachments.length === 0) {
+                            notify.info('diary.attachments.selectattachmentstolink');
+                        }
+
+                        else {
+                            // check attachment not ever present in personal storage ...
+                            if ($scope.item.attachments && $scope.item.attachments.length > 0) {
+
+                                var matchingItemAttachments = new Array();
+
+                                // not naming 'document'
+                                model.mediaLibrary.appDocuments.documents.forEach(function (theDoc) {
+                                    if (theDoc && theDoc._id) {
+                                        if (hasAttachmentInItem(theDoc._id)) {
+                                            matchingItemAttachments.push(theDoc);
+                                        }
+                                    }
+                                });
+
+                                if (matchingItemAttachments.length > 0) {
+                                    // TODO removes silently attachment ?
+                                    notify.info('diary.attachments.selectattachmentstolink');
+                                }
+
+
+                            } else {
+
+                                var newAttachments = new Array();
+
+                                $scope.selectedAttachments.forEach(function(selectedAttachment){
+                                    var itemAttachment = new Attachment();
+
+                                    //itemAttachment.id = null;
+                                    itemAttachment.user_id = model.me.userId;
+                                    itemAttachment.document_id = selectedAttachment._id;
+                                    //itemAttachment.creation_date = new Date();
+                                    itemAttachment.document_label = selectedAttachment.name;
+
+                                    newAttachments.push(itemAttachment);
+                                    $scope.item.addAttachment(itemAttachment);
+                                });
+                            }
+
+                            // close media library directive
+                            $scope.hidePersonalAttachments();
+                        }
+
+                    };
+
+                    $scope.removeAttachmentXX = function (attachment) {
+
+                        attachment.detachFromItem(scope.item.id, scope.itemType,
+                            // callback function TODO handle
+                            function () {
+
+                            },
+                            // callback on error function TODO handle
+                            function () {
+
+                            }
+                        );
+                    }
+                }
+            }
+        });
+
+        /**
+         *
+         */
+        module.directive('attachment', function () {
+            return {
+                restrict: "E",
+                require: '^attachmentsx',
+                templateUrl: "diary/public/template/attachment.html",
+                scope: {
+                    /**
+                     * Attachment
+                     */
+                    attachment: '=',
+                    /**
+                     * Reference to lesson or homework
+                     */
+                    item: '=',
+                    /**
+                     *  If true, user won't be able to add or modify current attachments (for student for example)
+                     */
+                    readonly: '='
+                },
+                link: function (scope, element, attrs, location) {
+
+                    /**
+                     * As seen from entcore, behaviour.js
+                     * @param attachment
+                     */
+                    scope.downloadAttachment = function () {
+                        scope.attachment.download();
+                    };
+
+                    // detachFromItem = function (itemId, itemType, cb, cbe) {
+                    /**
+                     * Removes attachment from lesson or homework
+                     * but DOES NOT remove the file physically
+                     */
+                    scope.removeAttachment = function () {
+
+                        // do not modify current attachment if readonly
+                        if (scope.readonly === true) {
+                            return;
+                        }
+
+                        scope.attachment.detachFromItem(scope.item,
+                            // callback function
+                            function (cb) {
+                                notify.info(cbe.message);
+                            },
+                            // callback on error function
+                            function (cbe) {
+                                notify.error(cbe.message);
+                            }
+                        );
+                    }
+                }
+            }
+        });
+
 
         /**
          * Directive to perform a quick search among lessons and homeworks
