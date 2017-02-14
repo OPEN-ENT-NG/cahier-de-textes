@@ -631,18 +631,6 @@ function Lesson(data) {
     if (!this.attachments) {
         this.attachments = new Array();
     }
-    /*
-    this.collection(Attachment, {
-        loading: false,
-        syncAttachments: function(cb, cbe){
-            // TODO
-
-        }, pushAll: function(datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
-    });*/
 
     var that = this;
 
@@ -1583,10 +1571,10 @@ model.build = function () {
 
         // only initialize homeworks attached to lesson
         // with only id
-        if (data.homework_id) {
-            for (var i = 0; i < data.homework_id.length; i++) {
+        if (data.homework_ids) {
+            for (var i = 0; i < data.homework_ids.length; i++) {
                 var homework = new Homework();
-                homework.id = data.homework_id[i];
+                homework.id = data.homework_ids[i];
                 homework.lesson_id = parseInt(data.lesson_id);
                 homework.loaded = false; // means full data from sql not loaded
                 lessonHomeworks.push(homework);
