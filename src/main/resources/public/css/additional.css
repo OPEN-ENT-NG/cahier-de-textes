@@ -15,7 +15,7 @@ ul li i.icon {
 
 i.rack2::before {
     content: "\e80d";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -23,7 +23,7 @@ i.rack2::before {
 
 i.cahier-textes2::before {
     content: "\e86f";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -47,7 +47,7 @@ i.cahier-textes2::before {
 
 i.pencil::before {
     content: "\e858";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -129,7 +129,7 @@ section .homework-detail {
 
 .show-homeworks::before {
     content: "\e80d";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -148,7 +148,7 @@ section .homework-detail {
 
 .show-lessons::before {
     content: "\e86f";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -186,7 +186,7 @@ div.notification {
 
 .show-calendar-grid::before {
     content: "\e86f";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -487,7 +487,7 @@ i.arrow-down {
 
 i.arrow-down::before {
     content: "\e841";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -505,7 +505,7 @@ i.arrow-up{
 
 i.arrow-up::before {
     content: "\e840";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -524,7 +524,7 @@ i.check-selected {
 
 i.check-selected::before {
     content: "\e871";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -668,7 +668,7 @@ div.pedagogic-item-container {
 
 i.homework::before {
     content: "\e80d";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
@@ -677,7 +677,7 @@ i.homework::before {
 
 i.diary::before {
     content: "\e86f";
-    font-family:"ong-icons";
+    font-family:"generic-icons";
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
