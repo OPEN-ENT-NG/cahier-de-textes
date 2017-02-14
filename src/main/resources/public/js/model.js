@@ -1755,6 +1755,10 @@ model.build = function () {
             lesson_id: sqlHomework.lesson_id
         };
 
+        if (sqlHomework.attachments) {
+            homework.attachments = _.map(JSON.parse(sqlHomework.attachments), jsonToJsAttachment);
+        }
+
         if('group' === homework.audienceType){
             homework.audienceTypeLabel = lang.translate('diary.audience.group');
         } else {
