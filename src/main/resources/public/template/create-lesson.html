@@ -1,4 +1,4 @@
-﻿<div>
+﻿﻿<div>
     <span class="float-left">
         <h1 class="float-left margintopimportant">
             <a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n>
@@ -16,7 +16,7 @@
 
                 <!-- share -->
                 <!--<button class="right-magnet" ng-click="openShareLessonPanel(lesson)" >-->
-                <!--<i18n>share</i18n>-->
+                    <!--<i18n>share</i18n>-->
                 <!--</button>-->
 
                 <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
@@ -76,29 +76,61 @@
     </div>
 
     <div class="twelve cell ng-scope">
-        <div ng-switch="data.tabSelected">
-            <article ng-switch-when="lesson">
-                <div class="row">
-                    <input type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
+    <div ng-switch="data.tabSelected">
+        <div ng-switch-when="lesson">
+            <div class="row">
+                <input type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
 
-                    <!--ng-model="lesson.teacher"-->
-                    <div class="cell float-right" style="margin-right: 20%;">
-                        Couleur de séance :  <input type="color" ng-model="lesson.color">
-                    </div>
+                <!--ng-model="lesson.teacher"-->
+                <div class="cell float-right" style="margin-right: 20%;">
+                   Couleur de séance :  <input type="color" ng-model="lesson.color">
+                </div>
+
+            </div>
+            <div class="row">
+                <!-- Beginning (Date: DD/MM/YYYY) -->
+                <div class="three cell">
+                    <label class="cell three"><i18n>date</i18n></label>
+                    <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
+                </div>
+
+                <!-- Beginning (Time: HH:mm) -->
+                <div class="three cell">
+                    <label class="cell four"><i18n>start.time</i18n></label>
+                    <time-picker ng-model="newItem.beginning" class="cell four"></time-picker>
+                </div>
+
+                <!-- End (Time: HH:mm) -->
+                <div class="three cell">
+                    <label class="cell four"><i18n>end.time</i18n></label>
+                    <time-picker ng-model="newItem.end" class="cell four"></time-picker>
+                </div>
+                <div class="two cell">
+                    <label class="cell five"><i18n>room</i18n></label>
+                    <input type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
+                </div>
 
                 </div>
                 <div class="row">
-                    <!-- Beginning (Date: DD/MM/YYYY) -->
-                    <div class="three cell">
-                        <label class="cell three"><i18n>date</i18n></label>
-                        <date-picker ng-model="newItem.date"  class="cell six"></date-picker>
-                    </div>
+                    <editor ng-model="lesson.description"></editor>
+                </div>
 
-                    <!-- Beginning (Time: HH:mm) -->
-                    <div class="three cell">
-                        <label class="cell four"><i18n>start.time</i18n></label>
-                        <time-picker ng-model="newItem.beginning" class="cell four"></time-picker>
-                    </div>
+                <attachmentsx item="lesson">
+                </attachmentsx>
+
+                <br><br>
+                <!-- END -->
+                <div class="row accordions">
+                    <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
+                        <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
+                            <i18n>annotations.title</i18n>
+                        </h2>
+                        <div class="toggle">
+                            <editor ng-model="lesson.annotations"></editor>
+                        </div>
+                    </article>
+                </div>
+            </div>
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
         <div ng-switch-when="homeworks">
@@ -125,91 +157,45 @@
                         <i ng-show="!homework.expanded" data-tooltip="Déplier" class="down-open"></i>
                         <i ng-hide="!homework.expanded" data-tooltip="Plier" class="up-open ng-hide"></i>
                     </div>
-                    <div class="two cell">
-                        <label class="cell five"><i18n>room</i18n></label>
-                        <input type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
-                    </div>
+                </div>
 
-                </div>
-                <div class="row">
-                    <editor ng-model="lesson.description"></editor>
-                </div>
-                <div class="row accordions">
-                    <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
-                        <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
-                            <i18n>annotations.title</i18n>
-                        </h2>
-                        <div class="toggle">
-                            <editor ng-model="lesson.annotations"></editor>
-                        </div>
-                    </article>
-                </div>
-            </article>
-
-            <!-- HOMEWORK(S) ATTACHED TO LESSON -->
-            <div ng-switch-when="homeworks">
-                <div ng-if="isLessonHomeworkEditable" class="row">
-                    <!-- add homework to lesson -->
-                    <button type="submit" data-ng-click="addHomeworkToLesson(lesson)">
-                        <i18n>homework.add</i18n>
-                    </button>
-                </div>
-                <div class="row" ng-repeat="homework in lesson.homeworks.all">
-
-                    <!-- minimized view -->
+                <div ng-show="homework.expanded">
                     <div class="row">
                         <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
                         <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
-                        <div ng-show="!homework.expanded" class="four cell">
-                            <b><i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]</b><br>
-                            [[homework.type.label]] - [[homework.title]]
+                    </div>
+                    <div class="row">
+                        <div class="four cell">
+                            <label class="four cell"><i18n>homework.date</i18n></label>
+                            <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
+                            <date-picker ng-if="isLessonHomeworkEditable" ng-change="showHomeworksLoad(homework, homework.dueDate.getTime())" class="five cell" ng-model="homework.dueDate"></date-picker>
+                        </div>
+                        <div class="five cell">
+                            <label class="three cell"><i18n>homework.type</i18n></label>
+                            <select ng-if="!isLessonHomeworkEditable"
+                                    class="seven cell"
+                                    ng-options="type as type.label for type in homeworkTypes.all"
+                                    ng-model="homework.type"
+                                    disabled></select>
+
+                            <select ng-if="isLessonHomeworkEditable"
+                                    class="seven cell"
+                                    ng-options="type as type.label for type in homeworkTypes.all"
+                                    ng-model="homework.type"></select>
                         </div>
                     </div>
-
-                    <div ng-show="homework.expanded">
-                        <div class="row">
-                            <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
-                            <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell"/>
-                            <!-- deletes homework -->
-                            <div class="controls">
-                                <i ng-if="isLessonHomeworkEditable" class="trash" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)" style="float: right;" tooltip="daily.homework.delete">
-                                </i>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="four cell">
-                                <label class="four cell"><i18n>homework.date</i18n></label>
-                                <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
-                                <date-picker ng-if="isLessonHomeworkEditable" ng-change="showHomeworksLoad(homework, homework.dueDate.getTime())" class="five cell" ng-model="homework.dueDate"></date-picker>
-                            </div>
-                            <div class="five cell">
-                                <label class="three cell"><i18n>homework.type</i18n></label>
-                                <select ng-if="!isLessonHomeworkEditable"
-                                        class="seven cell"
-                                        ng-options="type as type.label for type in homeworkTypes.all"
-                                        ng-model="homework.type"
-                                        disabled></select>
-
-                                <select ng-if="isLessonHomeworkEditable"
-                                        class="seven cell"
-                                        ng-options="type as type.label for type in homeworkTypes.all"
-                                        ng-model="homework.type"></select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="cell space-right"><i18n>homework.load</i18n></label>
-                            <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+                    <div>
+                        <label class="cell space-right"><i18n>homework.load</i18n></label>
+                        <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
                         <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
                               ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
                             [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
                     </span>
-                        </div>
-                        <div class="row">
-                            <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
-                            <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
-                        </div>
                     </div>
-                    <hr class="homework-delimitation" ng-if="($index + 1) < lesson.homeworks.all.length">
+                    <div class="row">
+                        <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
+                        <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
+                    </div>
                     <!-- deletes homework -->
                     <div class="controls">
                         <button ng-if="isLessonHomeworkEditable"  ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)">
@@ -218,41 +204,42 @@
                     </div>
                 </div>
             </article>
+        </div>
 
-            <!-- PREVIOUS LESSONS CREATED -->
-            <div ng-switch-when="previouslessons">
-                <article ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
-                    <i18n>daily.lesson.nopreviouslesson</i18n>
-                </article>
+        <!-- PREVIOUS LESSONS CREATED -->
+        <div ng-switch-when="previouslessons">
+            <div ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
+                <i18n>daily.lesson.nopreviouslesson</i18n>
+            </div>
 
-                <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
-                    <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
-                        [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
-                    </div>
-                    <div>
-                        <!-- LESSON DESCRIPTION -->
-                        <div style="float: left; margin-top: 10px;" ng-style="true ?{width: 50%}:{width: 100%}">
-                            <div><span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]</div>
-                            <span class="inline"
-                                  style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]];"
-                                  ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
-                                <span ng-show="!pedagogicItem.expanded_description" style="margin-top: 5px;">
+            <div class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+                <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
+                    [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
+                </div>
+                <div>
+                    <!-- LESSON DESCRIPTION -->
+                    <div style="float: left; width: 50%;">
+                        <div><span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]</div>
+                        <span class="inline"
+                              style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
+                              ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
+                                <span ng-show="!pedagogicItem.expanded_description">
                                      <span bind-html="pedagogicItem.preview_description"></span>
                                 </span>
-                                <span ng-show="pedagogicItem.expanded_description" style="margin-top: 5px;">
+                                <span ng-show="pedagogicItem.expanded_description">
                                      <span bind-html="pedagogicItem.description"></span>
                                 </span>
                             </span>
                         </div>
 
-                        <!-- ATTACHED HOMEWORKS ng-style="(pedagogicItem.homeworks.length > 0) ?{width: 50%}:{width: 100%}" -->
-                        <div style="float: right;" >
-                            <div class="row" ng-repeat="homework in pedagogicItem.homeworks">
-                                <b><i18n>homework.date</i18n> [[homework.dayFormatted]]</b><br>
-                                [[homework.title]]<br>
-                                <span class="inline"
-                                      style="[[(homework.description.length >= homework.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
-                                      ng-click="homework.expanded_description = !homework.expanded_description">
+                    <!-- ATTACHED HOMEWORKS-->
+                    <div style="float: right; width: 50%;">
+                        <div class="row" ng-repeat="homework in pedagogicItem.homeworks">
+                            <b><i18n>homework.date</i18n> [[homework.dayFormatted]]</b><br>
+                            [[homework.title]]<br>
+                            <span class="inline"
+                                  style="[[(homework.description.length >= homework.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
+                                  ng-click="homework.expanded_description = !homework.expanded_description">
                                 <span ng-show="!homework.expanded_description">
                                      <span bind-html="homework.preview_description"></span>
                                 </span>
@@ -260,21 +247,19 @@
                                      <span bind-html="homework.description"></span>
                                 </span>
                             </span>
-                                <br>
-                            </div>
+                            <br>
                         </div>
                     </div>
-                    <br>
-                </article>
-
-                <!-- Scroll bar to see more previous lessons -->
-                <div class="showMoreLessonsBar"
-                     ng-if="lesson.previousLessonsDisplayed.length < lesson.previousLessons.length" ng-click="showMorePreviousLessons(lesson)">
-                    Voir plus de séances précédentes
                 </div>
+                <br>
+            </div>
+
+            <!-- Scroll bar to see more previous lessons -->
+            <div class="showMoreLessonsBar"
+                 ng-if="lesson.previousLessonsDisplayed.length < lesson.previousLessons.length" ng-click="showMorePreviousLessons(lesson)">
+                Voir plus de séances précédentes
             </div>
         </div>
-
     </div>
 
     </div>

@@ -1,3 +1,83 @@
+/**
+ * Model of attachment from
+ * table diary.attachment (DB)
+ * @constructor
+ */
+function Attachment() {
+    /**
+     * Attachment id as in diary.attachment table
+     * @type {number}
+     */
+    this.id = null;
+
+    this.user_id = null;
+    /**
+     * Id of stored document within the document module
+     * (see mongodb -> Documents table)
+     * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
+     * @type {string}
+     */
+    this.document_id = null;
+    /***
+     * Creation date
+     * @type {null}
+     */
+    this.creation_date = null;
+    /**
+     * Filename of attachment
+     * @type {string}
+     */
+    this.document_label = null;
+};
+
+/**
+ * Model from table
+ * diary.lesson_has_attachment
+ * @constructor
+ */
+function LessonAttachment() {
+
+}
+
+/**
+ * Download the attachment
+ */
+Attachment.prototype.download = function () {
+    window.location = '/workspace/document/' + this.document_id;
+};
+
+/**
+ * Detach attachment to a lesson
+ * Attachment link will be detached to back end on lesson save
+ * @param item Lesson or homework
+ * @param cb Callback
+ * @param cbe Callback on error
+ */
+Attachment.prototype.detachFromItem = function (item, cb, cbe) {
+
+    var that = this;
+
+    if (item && item.attachments) {
+
+        var udpatedAttachments = new Array();
+
+        item.attachments.forEach(function (attachment) {
+            if (attachment && attachment.document_id !== that.document_id) {
+                udpatedAttachments.push(attachment);
+            }
+        });
+
+        item.attachments = udpatedAttachments;
+
+        if (typeof cb === 'function') {
+            cb();
+        } else (typeof cbe === 'function')
+        {
+            cbe();
+        }
+    }
+};
+
 function Homework() {
 
     /**
@@ -5,6 +85,11 @@ function Homework() {
      * @type {boolean}
      */
     this.expanded = false;
+
+    /**
+     * Attachments
+     */
+    this.attachments = new Array();
 
     /**
      * Delete calendar references of current homework
@@ -16,6 +101,25 @@ function Homework() {
         if (idxHomeworkToDelete >= 0) {
             model.homeworks.splice(idxHomeworkToDelete, 1);
         }
+    };
+
+
+    /**
+     * Adds an attachment
+     * @param attachment
+     */
+    this.addAttachment = function (attachment) {
+        this.attachments.pushAll(attachment);
+    };
+
+    /**
+     * Removes attachment associated to this lesson
+     * @param attachment
+     * @param cb
+     * @param cbe
+     */
+    this.detachAttachment = function (attachment, cb, cbe) {
+        attachment.detachFromItem(this.id, 'lesson', cb, cbe);
     };
 }
 
@@ -280,7 +384,6 @@ Homework.prototype.toJSON = function () {
     return json;
 };
 
-function Attachment(){}
 function Subject() { }
 
 /**
@@ -507,7 +610,7 @@ model.unselectDays = function (){
     model.pedagogicDays.forEach(function (day) {
         day.selected = undefined;
     });
-}
+};
 
 function Lesson(data) {
     this.selected = false;
@@ -518,7 +621,35 @@ function Lesson(data) {
     }
     this.subject = (data) ? data.subject : new Subject();
     this.audience = (data) ? data.audience : new Audience();
+
+    /**
+     * Attachments
+     */
+    if (!this.attachments) {
+        this.attachments = new Array();
+    }
+    /*
+    this.collection(Attachment, {
+        loading: false,
+        syncAttachments: function(cb, cbe){
+            // TODO
+
+        }, pushAll: function(datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
+    });*/
+
     var that = this;
+
+    /**
+     * Adds an attachment
+     * @param attachment
+     */
+    this.addAttachment = function (attachment) {
+        this.attachments.push(attachment);
+    };
 
     /**
      * Delete calendar references of current lesson
@@ -914,7 +1045,8 @@ Lesson.prototype.toJSON = function () {
         lesson_state: this.state,
         // start columns not in lesson table TODO move
         audience_type: this.audience.type,
-        audience_name: this.audience.name
+        audience_name: this.audience.name,
+        attachments: this.attachments
     };
 
     if (this.room) {
@@ -1494,11 +1626,26 @@ model.build = function () {
             lesson.audienceTypeLabel = lang.translate('diary.audience.class');
         }
 
+        if (data.attachments) {
+            lesson.attachments = _.map(JSON.parse(data.attachments), jsonToJsAttachment);
+        }
+
 
         var tooltip = getResponsiveLessonTooltipText(lesson);
 
         lesson.tooltipText = tooltip;
         return lesson;
+    };
+
+    jsonToJsAttachment = function (data) {
+        var att = new Attachment();
+        att.id = data.id;
+        att.user_id = data.user_id;
+        att.creation_date = data.creation_date;
+        att.document_id = data.document_id;
+        att.document_label = data.document_label;
+
+        return att;
     };
 
     /**

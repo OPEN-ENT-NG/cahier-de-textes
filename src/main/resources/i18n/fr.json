@@ -148,5 +148,7 @@
   "diary.subjectpicker.labelsubjectnotfound": "Créer la matière",
   "homework.add": "Ajouter un travail à faire",
   "diary.fordate": "Pour le",
-  "diary.delete": "Supprimer"
+  "diary.delete": "Supprimer",
+  "diary.attachments.selectattachmentstolink": "Veuillez sélectionner une ou plusieurs pièces jointes à associer",
+  "diary.attachments.label": "Pièces jointes"
 }
