@@ -277,16 +277,21 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT l.id as lesson_id, s.subject_label, l.subject_id, l.school_id, l.teacher_id, a.audience_type,")
                 .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
-                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state")
+                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state,")
+                .append(" att.attachments ")
                 .append(" FROM diary.lesson as l")
-                .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
+                .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
+                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
+                .append(" FROM diary.lesson_has_attachment as la INNER JOIN diary.attachment a ON la.attachment_id = a.id")
+                .append(" WHERE la.lesson_id = l.id) att ON TRUE")
                 .append(" WHERE l.id = ?");
 
         JsonArray parameters = new JsonArray().add(Sql.parseId(lessonId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
+
 
     /**
      * Update lesson in db from JSON lesson object
