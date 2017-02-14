@@ -205,7 +205,8 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                     final JsonArray attachments = homeworkObject.getArray("attachments");
                                     homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
                                     homeworkObject.putString(ID_OWNER_FIELD_NAME, teacherId);
-                                    if (attachments != null && attachments.size() > 0) {
+                                    // TPE disabled until working done
+                                    if (false && attachments != null && attachments.size() > 0) {
                                         //get next on the sequence to add the homework and value in FK on attachment
 
                                         sql.raw("select nextval('diary.homework_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
@@ -232,6 +233,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                         }));
                                     } else {
                                         //insert homework
+                                        homeworkObject.removeField("attachments");
                                         sql.insert("diary.homework", homeworkObject, "id", validUniqueResultHandler(handler));
                                     }
                                 } else {
@@ -268,6 +270,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         // FIXME json sql do not work if SQL enum column
         homeworkObject.removeField("homework_state");
+
+        // TPE 14022017
+        homeworkObject.removeField("attachments");
         stripNonHomeworkFields(homeworkObject);
 
         StringBuilder sb = new StringBuilder();

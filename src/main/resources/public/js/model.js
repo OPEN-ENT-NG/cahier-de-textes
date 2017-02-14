@@ -89,7 +89,9 @@ function Homework() {
     /**
      * Attachments
      */
-    this.attachments = new Array();
+    if (!this.attachments) {
+        this.attachments = new Array();
+    }
 
     /**
      * Delete calendar references of current homework
@@ -109,7 +111,7 @@ function Homework() {
      * @param attachment
      */
     this.addAttachment = function (attachment) {
-        this.attachments.pushAll(attachment);
+        this.attachments.push(attachment);
     };
 
     /**
@@ -370,7 +372,8 @@ Homework.prototype.toJSON = function () {
         // used to auto create postgresql diary.audience if needed
         // not this.audience object is originally from neo4j graph (see syncAudiences function)
         audience_type: this.audience.type,
-        audience_name: this.audience.name
+        audience_name: this.audience.name,
+        attachments: this.attachments
     };
 
     if (this.lesson_id) {
