@@ -47,6 +47,8 @@
             <div class="row">
                 <div ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
             </div>
+            <attachmentsx item="lesson" readonly="true">
+            </attachmentsx>
         </div>
 
 
@@ -88,6 +90,8 @@
                 <div class="row">
                     <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                 </div>
+                <attachmentsx item="homework" readonly="true">
+                </attachmentsx>
             </div>
         </article>
     </div>
@@ -149,8 +153,6 @@
 
     </div>
 
-    <attachmentsx item="lesson" readonly="true">
-    </attachmentsx>
 
         <div class="row lessonHomeworkBtn">
             <nav>

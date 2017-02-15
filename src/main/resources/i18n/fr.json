@@ -150,5 +150,8 @@
   "diary.fordate": "Pour le",
   "diary.delete": "Supprimer",
   "diary.attachments.selectattachmentstolink": "Veuillez sélectionner une ou plusieurs pièces jointes à associer",
-  "diary.attachments.label": "Pièces jointes"
+  "diary.attachments.label": "Pièces jointes",
+  "diary.attachments.add": "Ajouter une pièce jointe",
+  "diary.attachments.delete": "Supprimer la pièce jointe",
+  "diary.attachments.open": "Ouvrir la pièce jointe"
 }

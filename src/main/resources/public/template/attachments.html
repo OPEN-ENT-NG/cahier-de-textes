@@ -1,7 +1,9 @@
 <!-- if readonly only display attachment label if there are attachments -->
 <span class="two" ng-if="!readonly || (readonly && item.attachments.length > 0)">
 <i18n>diary.attachments.label</i18n>
-    <div ng-if="!readonly" class="theopener" ng-click="showPersonalAttachments()" tooltip="Ajouter un pièce jointe">
+    <div ng-if="!readonly" class="theopener" ng-click="showPersonalAttachments()"
+         attr="tooltip"
+         tooltip="diary.attachments.add">
         +
     </div>
 </span>
