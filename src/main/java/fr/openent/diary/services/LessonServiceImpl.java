@@ -32,7 +32,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     private final static String DATABASE_TABLE ="lesson";
     private final static Logger log = LoggerFactory.getLogger(LessonServiceImpl.class);
-    private static final String ID_LESSON_FIELD_NAME = "lesson_id";
+    private static final String ID_LESSON_FIELD_NAME = "id";
     private static final String ID_HOMEWORK_FIELD_NAME = "homework_id";
     private static final String LESSON_DATE_FIELD_NAME = "lesson_date";
     private static final String ID_TEACHER_FIELD_NAME = "teacher_id";
@@ -173,8 +173,6 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void createLesson(final JsonObject lessonObject, final String teacherId, final String teacherDisplayName, final Audience audience, final Handler<Either<String, JsonObject>> handler) {
 
         if (lessonObject != null) {
-            stripNonLessonFields(lessonObject);
-
             // auto-creates teacher if it does not exists
             diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
 
@@ -206,6 +204,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         lessonObject.removeField("audience_type");
         lessonObject.removeField("audience_name");
         lessonObject.removeField("lesson_id");
+        lessonObject.removeField("attachments");
     }
 
     /**
@@ -228,6 +227,9 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     final JsonArray attachments = lessonObject.getArray("attachments");
                     lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
                     lessonObject.putString(ID_OWNER_FIELD_NAME, teacherId);
+
+                    //strip non sql field
+                    stripNonLessonFields(lessonObject);
 
                     if (attachments != null && attachments.size() > 0) {
                         createLessonWithAttachments(attachments, lessonObject, teacherId, handler);
@@ -311,10 +313,6 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                               final JsonArray nextIds = event.right().getValue();
 
                                               SqlStatementsBuilder sb = new SqlStatementsBuilder();
-                                              //strip non sql field
-                                              stripNonLessonFields(lessonObject);
-                                              lessonObject.removeField("attachments");
-                                              lessonObject.putNumber("id", nextLessonId);
 
                                               sb.insert("diary.lesson", lessonObject, "id");
 
