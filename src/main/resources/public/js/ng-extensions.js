@@ -698,10 +698,36 @@
                     }
                 },
                 link: function($scope){
-                    $scope.selectedAttachments = new Array();
+                    //$scope.selectedAttachments = new Array();
                     $scope.display = {};
                     $scope.display.showPersonalAttachments = false;
+                    setTimeout(function(){
+                        var addButton =  $('.right-magnet.vertical-spacing-twice');
+                        addButton.hide();
+                    }, 500);
 
+                    /**
+                     *
+                     * @returns {*}
+                     */
+                    var getMediaLibraryScope = function(){
+                        // tricky way to get that mediaLibrary directive ...
+                        var i = 0;
+                        var mediaLibraryScope = null;
+
+                        for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
+                            if(i === 0 && !cs.attachment){
+                                mediaLibraryScope = cs.$$nextSibling.$$childTail.$$childTail.$$childTail;
+                                return mediaLibraryScope;
+                            }
+                            i ++;
+                        }
+
+                        return null;
+                    };
+
+                    var mediaLibraryScope = null;
+;
                     // open up personal storage
                     $scope.showPersonalAttachments = function(){
                         $scope.display.showPersonalAttachments = true;
@@ -718,25 +744,68 @@
                      * @param selectedAttachments Selected attachments in personal storage view
                      */
                     $scope.updateSelectedAttachments = function (selectedAttachments) {
-                        $scope.selectedAttachments = selectedAttachments;
+                        // TODO DELETE
                     };
 
                     /**
                      *
                      * @param documentId
                      */
-                    var hasAttachmentInItem = function(documentId){
+                    var hasAttachmentInItem = function(documentId) {
+
+                        var hasAttachment = false;
+
                         if(!$scope.item.attachments || $scope.item.attachments.length === 0){
-                            return false;
+                            hasAttachment = false;
                         } else {
                             $scope.item.attachments.forEach(function(itemAttachment){
+
                                 if(itemAttachment.document_id === documentId){
-                                    return true;
+                                    hasAttachment = true;
                                 }
                             });
-
-                            return false;
                         }
+
+                        return hasAttachment;
+                    };
+
+                    /**
+                     *
+                     * @returns {*}
+                     */
+                    var getSelectedDocuments = function () {
+                        var selectedDocuments = _.where(mediaLibraryScope.documents, {
+                            selected: true
+                        });
+
+                        return selectedDocuments;
+                    };
+
+                    /**
+                     *
+                     * @param selectedAttachments Selected documents in media library directive
+                     */
+                    var addSelectedDocumentsToItem = function (newSelectedAttachments) {
+
+                        if (!newSelectedAttachments || newSelectedAttachments.length === 0) {
+                            return;
+                        }
+
+                        var newAttachments = new Array();
+
+                        newSelectedAttachments.forEach(function (selectedAttachment) {
+
+                            if (!hasAttachmentInItem(selectedAttachment._id)) {
+                                var itemAttachment = new Attachment();
+
+                                itemAttachment.user_id = model.me.userId;
+                                itemAttachment.document_id = selectedAttachment._id;
+                                itemAttachment.document_label = selectedAttachment.name;
+
+                                newAttachments.push(itemAttachment);
+                                $scope.item.addAttachment(itemAttachment);
+                            }
+                        });
                     };
 
 
@@ -746,49 +815,18 @@
                      */
                     $scope.linkAttachmentsToItem = function () {
 
-                        if ($scope.selectedAttachments.length === 0) {
+                        if (mediaLibraryScope == null) {
+                            mediaLibraryScope = getMediaLibraryScope();
+                        }
+
+                        var selectedAttachments = getSelectedDocuments();
+
+                        if (selectedAttachments.length === 0) {
                             notify.info('diary.attachments.selectattachmentstolink');
                         }
 
                         else {
-                            // check attachment not ever present in personal storage ...
-                            if ($scope.item.attachments && $scope.item.attachments.length > 0) {
-
-                                var matchingItemAttachments = new Array();
-
-                                // not naming 'document'
-                                model.mediaLibrary.appDocuments.documents.forEach(function (theDoc) {
-                                    if (theDoc && theDoc._id) {
-                                        if (hasAttachmentInItem(theDoc._id)) {
-                                            matchingItemAttachments.push(theDoc);
-                                        }
-                                    }
-                                });
-
-                                if (matchingItemAttachments.length > 0) {
-                                    // TODO removes silently attachment ?
-                                    notify.info('diary.attachments.selectattachmentstolink');
-                                }
-
-
-                            } else {
-
-                                var newAttachments = new Array();
-
-                                $scope.selectedAttachments.forEach(function(selectedAttachment){
-                                    var itemAttachment = new Attachment();
-
-                                    //itemAttachment.id = null;
-                                    itemAttachment.user_id = model.me.userId;
-                                    itemAttachment.document_id = selectedAttachment._id;
-                                    //itemAttachment.creation_date = new Date();
-                                    itemAttachment.document_label = selectedAttachment.name;
-
-                                    newAttachments.push(itemAttachment);
-                                    $scope.item.addAttachment(itemAttachment);
-                                });
-                            }
-
+                            addSelectedDocumentsToItem(selectedAttachments);
                             // close media library directive
                             $scope.hidePersonalAttachments();
                         }
@@ -859,7 +897,7 @@
                         scope.attachment.detachFromItem(scope.item,
                             // callback function
                             function (cb) {
-                                notify.info(cbe.message);
+                                notify.info(cb.message);
                             },
                             // callback on error function
                             function (cbe) {
