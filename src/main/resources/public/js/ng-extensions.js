@@ -682,48 +682,56 @@
                      */
                     readonly: '='
                 },
-                controller: function($scope){
-                    $scope.removeAttachment = function (attachment) {
-
-                        attachment.detachFromItem(scope.item,
-                            // callback function TODO handle
-                            function () {
-
-                            },
-                            // callback on error function TODO handle
-                            function () {
-
-                            }
-                        );
-                    }
+                controller: function(){
                 },
                 link: function($scope){
                     //$scope.selectedAttachments = new Array();
                     $scope.display = {};
                     $scope.display.showPersonalAttachments = false;
-                    setTimeout(function(){
-                        var addButton =  $('.right-magnet.vertical-spacing-twice');
-                        addButton.hide();
-                    }, 500);
+                    $scope.mediaLibraryScope = null;
+
+                    /**
+                     * Set selected or not documents within
+                     * media library documents
+                     */
+                    var syncSelectedDocumentsFromItemAttachments = function(){
+
+                        var theScope = getMediaLibraryScope();
+
+                        console.log('TheScope');
+                        console.log(theScope);
+
+
+                        theScope.documents.forEach(function(document){
+                            document.selected = hasAttachmentInItem(document._id);
+                        });
+
+                        theScope.$apply();
+                    };
 
                     /**
                      *
                      * @returns {*}
                      */
-                    var getMediaLibraryScope = function(){
+                    var getMediaLibraryScope = function () {
+
+                        if ($scope.mediaLibraryScope != null) {
+                            return $scope.mediaLibraryScope;
+                        }
+
                         // tricky way to get that mediaLibrary directive ...
                         var i = 0;
                         var mediaLibraryScope = null;
 
                         for (var cs = $scope.$$childHead; cs; cs = cs.$$nextSibling) {
-                            if(i === 0 && !cs.attachment){
+                            if (i === 0 && !cs.attachment) {
                                 mediaLibraryScope = cs.$$nextSibling.$$childTail.$$childTail.$$childTail;
-                                return mediaLibraryScope;
+                                break;
                             }
-                            i ++;
+                            i++;
                         }
 
-                        return null;
+                        $scope.mediaLibraryScope = mediaLibraryScope;
                     };
 
                     var mediaLibraryScope = null;
@@ -731,6 +739,10 @@
                     // open up personal storage
                     $scope.showPersonalAttachments = function(){
                         $scope.display.showPersonalAttachments = true;
+                        setTimeout(function(){
+                            // FIXME can't find mediaLibrary scopre at first time !!
+                            syncSelectedDocumentsFromItemAttachments();
+                        }, 300);
                     };
 
                     $scope.hidePersonalAttachments = function(){
@@ -774,7 +786,7 @@
                      * @returns {*}
                      */
                     var getSelectedDocuments = function () {
-                        var selectedDocuments = _.where(mediaLibraryScope.documents, {
+                        var selectedDocuments = _.where(getMediaLibraryScope().documents, {
                             selected: true
                         });
 
@@ -833,7 +845,11 @@
 
                     };
 
-                    $scope.removeAttachmentXX = function (attachment) {
+                    /**
+                     * Removes the attachment from item (lesson or homework)
+                     * @param attachment
+                     */
+                    $scope.removeAttachment = function (attachment) {
 
                         attachment.detachFromItem(scope.item.id, scope.itemType,
                             // callback function TODO handle
@@ -845,7 +861,13 @@
 
                             }
                         );
-                    }
+                    };
+
+
+                    setTimeout(function () {
+                        var addButton = $('.right-magnet.vertical-spacing-twice');
+                        addButton.hide();
+                    }, 500);
                 }
             }
         });
