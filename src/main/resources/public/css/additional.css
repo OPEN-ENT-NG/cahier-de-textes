@@ -393,18 +393,22 @@ section .homeworkInfos {
 }
 
 .showMoreLessonsBar {
-    color: white;
-    background-color: #FF8500;
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 2px;
     padding-bottom: 2px;
-    border-radius: 5px;
     text-align: center;
+    border: none;
+    box-shadow: none;
+    color: #FF8500;
+    background: #F0F0F0;
+    line-height: 30px;
+    width: 300px;
 }
 
 .showMoreLessonsBar:hover {
-    background-color: saddlebrown;
+    color: #FFFFFF;
+    background-color: #FF8500;
 }
 
 .bootstrap-tagsinput .tag {
@@ -1001,4 +1005,9 @@ div.theopener {
     position: relative;
     box-shadow: 0 1px 3px rgba(0,0,0,0.26);
     border-radius: 25px;
+}
+
+.headerLessonStudentView {
+    margin-top: 20px;
+    margin-bottom: 30px;
 }
