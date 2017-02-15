@@ -143,17 +143,19 @@
             <article class="row" ng-repeat="homework in lesson.homeworks.all">
 
                 <!-- minimized view -->
-                    <div class="row">
-                        <div>
-                            <ul>
-                                <li>
-                                    <i class="lesson_homework" ng-class="{ expanded: homework.expanded}" ng-click="toggleShowHomeworkInLesson(homework)" tooltip="diary.icon.show.homework"></i>
-                                </li>
-                            </ul>
-                        </div>
-                        <div ng-show="!homework.expanded" class="four cell">
-                            <b><i18n>daily.homework.givenduedate</i18n> [[formatDate(homework.dueDate)]]</b><br>
-                            [[homework.type.label]] - [[homework.title]]
+                <div class="row"  ng-click="toggleShowHomeworkInLesson(homework)">
+                    <!-- titre  -->
+                    <h2 ng-show="!homework.expanded" class="hover-orange" data-tooltip="Déplier" style="float: left;">
+                        [[homework.title]]
+                    </h2>
+                    <h2 ng-hide="!homework.expanded" class="hover-orange" data-tooltip="Plier" style="float: left;">
+                        [[homework.title]]
+                    </h2>
+
+                    <!-- chevron -->
+                    <div class="cell right-magnet hover-orange">
+                        <i ng-show="!homework.expanded" data-tooltip="Déplier" class="down-open"></i>
+                        <i ng-hide="!homework.expanded" data-tooltip="Plier" class="up-open ng-hide"></i>
                     </div>
                 </div>
 
