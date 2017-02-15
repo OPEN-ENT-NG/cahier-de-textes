@@ -194,6 +194,8 @@
                         <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                         <editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
                     </div>
+                    <attachmentsx item="homework">
+                    </attachmentsx>
                     </div>
             </div>
         </div>
