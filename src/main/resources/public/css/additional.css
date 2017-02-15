@@ -1002,3 +1002,8 @@ div.theopener {
     box-shadow: 0 1px 3px rgba(0,0,0,0.26);
     border-radius: 25px;
 }
+
+.headerLessonStudentView {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
