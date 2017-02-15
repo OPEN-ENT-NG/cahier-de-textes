@@ -61,7 +61,7 @@ public class Attachment {
 
         StringBuilder sb = new StringBuilder("INSERT INTO ");
         sb.append(schema).append(".").append(table);
-        sb.append("VALUES (").append(this.id).append(",'");
+        sb.append(" VALUES (").append(this.id).append(",'");
         sb.append(this.userId).append("','");
         sb.append(this.entId).append("',current_date,'");
         sb.append(this.documentLabel).append("'");

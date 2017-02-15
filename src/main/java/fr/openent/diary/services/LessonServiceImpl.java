@@ -42,7 +42,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String JSON_KEY_DOCUMENT_LABEL = "document_label";
     private static final String SQL_KEY_ATTACHMENT_ID = "id";
     private static final String SQL_ATTACHMENT_SEQ_NAME = "diary.attachment_id_seq";
-    private static final String SQL_ATTACHMENT_NEXT_VAL_ALIAS = "valId";
+    private static final String SQL_ATTACHMENT_NEXT_VAL_ALIAS = "valid";
     private static final String SQL_ATTACHMENT_TABLE_NAME = "attachment";
     private static final String SQL_LESSON_HAS_ATTACHMENT_TABLE_NAME = "lesson_has_attachment";
 
@@ -298,7 +298,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                      if (i>0) {
                                          nextValQuery.append(",");
                                      }
-                                     nextValQuery.append("nextval(").append(SQL_ATTACHMENT_SEQ_NAME).append(") as ");
+                                     nextValQuery.append("nextval('").append(SQL_ATTACHMENT_SEQ_NAME).append("') as ");
                                      nextValQuery.append(SQL_ATTACHMENT_NEXT_VAL_ALIAS).append(i);
                                  }
                                  nextValQuery.append(";");
@@ -307,11 +307,14 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                       @Override
                                       public void handle(Either<String, JsonArray> event) {
                                           if (event.isRight()) {
+                                              //nextIds is a json array with as many columns as next val needed
                                               final JsonArray nextIds = event.right().getValue();
 
                                               SqlStatementsBuilder sb = new SqlStatementsBuilder();
                                               //strip non sql field
+                                              stripNonLessonFields(lessonObject);
                                               lessonObject.removeField("attachments");
+                                              lessonObject.putNumber("id", nextLessonId);
 
                                               sb.insert("diary.lesson", lessonObject, "id");
 
@@ -326,10 +329,11 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                                                   att.setDocumentLabel(documents.get(entId));
 
                                                   if (sqlId == null) {
-                                                      Object object = nextIds.get(nextValIndex);
+                                                      Object object = nextIds.get(0);
                                                       if (object instanceof JsonObject) {
                                                           JsonObject nextVal = (JsonObject) object;
-                                                          Long id = nextVal.getLong(SQL_ATTACHMENT_NEXT_VAL_ALIAS + nextValIndex);
+                                                          String alias = SQL_ATTACHMENT_NEXT_VAL_ALIAS + nextValIndex;
+                                                          Long id = nextVal.getLong(alias);
                                                           att.setId(id);
                                                           //add the new attached document
                                                           sb.raw(att.toQuery(DiaryController.DATABASE_SCHEMA, SQL_ATTACHMENT_TABLE_NAME));
@@ -366,7 +370,12 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      */
     private Map<String, Long> getAttachedDocumentMap(Set<String> attachmentIds, JsonArray attachments) {
         Map<String, Long> attachedDocuments = new HashMap<String, Long>();
-        attachedDocuments.keySet().addAll(attachmentIds);
+
+        Iterator<String> itIds = attachmentIds.iterator();
+        while (itIds.hasNext()) {
+            String key = itIds.next();
+            attachedDocuments.put(key, null);
+        }
 
         Iterator<Object> itAttach = attachments.iterator();
         while (itAttach.hasNext()) {
