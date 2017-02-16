@@ -45,12 +45,9 @@
 				<span ng-bind="lesson.title" class="lessonInfosBlack"></span>
             </div>
             <div class="row">
-                <div ng-bind-html="lesson.description" class="lessonHomeworkDescription"></div>
+                <div bind-html="lesson.description" class="lessonHomeworkDescription"></div>
             </div>
-            <attachmentsx item="lesson" readonly="true">
-            </attachmentsx>
         </div>
-
 
         <!-- HOMEWORK(S) ATTACHED TO LESSON -->
     <div ng-switch-when="homeworks">
@@ -90,8 +87,6 @@
                 <div class="row">
                     <div ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                 </div>
-                <attachmentsx item="homework" readonly="true">
-                </attachmentsx>
             </div>
         </article>
     </div>
