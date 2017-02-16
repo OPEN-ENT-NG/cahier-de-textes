@@ -735,7 +735,7 @@
                     };
 
                     var mediaLibraryScope = null;
-;
+
                     // open up personal storage
                     $scope.showPersonalAttachments = function(){
                         $scope.display.showPersonalAttachments = true;
@@ -864,10 +864,10 @@
                     };
 
 
-                    setTimeout(function () {
+                    setInterval(function () {
                         var addButton = $('.right-magnet.vertical-spacing-twice');
                         addButton.hide();
-                    }, 500);
+                    }, 400);
                 }
             }
         });
