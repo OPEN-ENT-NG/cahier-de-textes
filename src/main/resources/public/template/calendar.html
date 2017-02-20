@@ -1,5 +1,5 @@
 <div id="mainDiaryContainer" style="float: left; width: 97%;">
-<h1><a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n>
+<h1><a href="#" ng-click="goToCalendarView()"><i18n>diary.title</i18n>
     <!--&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n>-->
 </a></h1>
 <div class="row">
@@ -24,9 +24,9 @@
             </div>
         </div>
     </h2>
-    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="showList()"
+    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()"
        tooltip="diary.icon.show.list"></i>
-    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="showCalendar()"
+    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()"
        tooltip="diary.icon.show.calendar"></i>
 </div>
 

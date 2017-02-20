@@ -21,8 +21,11 @@ routes.define(function ($routeProvider) {
         .when('/editHomeworkView/:idHomework/:idLesson', {
             action: 'editHomeworkView'
         })
-        .when('/calendarView/:startDate', {
+        .when('/calendarView/:mondayOfWeek', {
             action: 'calendarView'
+        })
+        .when('/listView', {
+            action: 'listView'
         })
         .when('/mainView', {
             action: 'mainView'
@@ -32,6 +35,12 @@ routes.define(function ($routeProvider) {
             action: 'calendarView'
         })
 });
+
+/**
+ * Date calendar pattern for url date parsing
+ * @type {string}
+ */
+const CAL_DATE_PATTERN = "YYYY-MM-DD";
 
 /**
  *
@@ -91,7 +100,7 @@ function DiaryController($scope, template, model, route, $location) {
         showShareHomeworkPanel: false,
         showList: false,
         hideHomeworkPanel: false,
-        hideCalendar : false,
+        hideCalendar : false
     };
 
     /**
@@ -183,29 +192,31 @@ function DiaryController($scope, template, model, route, $location) {
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params);
         },
-        calendarView: function(params){
-            if (params.startDate != null) {
-                //put the start date in the scope?
+        calendarView: function (params) {
+
+            var mondayOfWeek = moment();
+
+            // mondayOfWeek as string date formatted YYYY-MM-DD
+            if (params.mondayOfWeek) {
+                mondayOfWeek = moment(params.mondayOfWeek);
+            } else {
+                mondayOfWeek = mondayOfWeek.weekday(0);
             }
+
+            $scope.showCalendar(mondayOfWeek);
+        },
+        listView: function(){
             $scope.lesson = null;
             $scope.homework = null;
-            initialization(true);
+            $scope.pedagogicLessonsSelected 	= new Array();
+            $scope.pedagogicHomeworksSelected 	= new Array();
+            $scope.showList();
         },
         mainView: function(){
             if ($scope.display.showList) {
-                $scope.lesson = null;
-                $scope.homework = null;
-                $scope.pedagogicLessonsSelected 	= new Array();
-                $scope.pedagogicHomeworksSelected 	= new Array();
-                $scope.showList();
+                $scope.goToListView(null);
             } else {
-                $scope.lesson = null;
-                $scope.homework = null;
-                if($scope.calendarLoaded) {
-                    $scope.showCalendar();
-                } else {
-                    initialization(true);
-                }
+                $scope.goToCalendarView(null);
             }
         }
     });
@@ -233,14 +244,50 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.$apply();
     };
 
-    $scope.showCalendar = function() {
+    /**
+     *
+     * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
+     */
+    $scope.showCalendar = function(momentMondayOfWeek) {
+
+        $scope.display.showList = false;
+
+        if (!$scope.calendarLoaded) {
+            initialization(true);
+            return;
+        }
+
+        if (!momentMondayOfWeek) {
+            momentMondayOfWeek = moment();
+        }
+
+        momentMondayOfWeek = momentMondayOfWeek.weekday(0);
+
         model.lessonsDropHandled = false;
         model.homeworksDropHandled = false;
         $scope.display.showList = false;
-        refreshCalendar(moment(model.calendar.firstDay));
+
+        // need reload lessons or homeworks if week changed
+        var syncItems = momentMondayOfWeek.week() != model.calendar.week;
+
+        $scope.lesson = null;
+        $scope.homework = null;
+
+        model.calendar.week = momentMondayOfWeek.week();
+        model.calendar.setDate(momentMondayOfWeek);
+
         template.open('main', 'main');
         template.open('main-view', 'calendar');
         template.open('daily-event-details', 'daily-event-details');
+
+        // need sync lessons and homeworks if calendar week changed
+        if (syncItems) {
+            model.lessons.syncLessons(null, validationError);
+            model.homeworks.syncHomeworks(function () {
+                $scope.showCal = !$scope.showCal;
+                $scope.$apply();
+            }, validationError);
+        }
     };
 
     $scope.goToItemDetail = function(pedagogicItem) {
@@ -380,11 +427,33 @@ function DiaryController($scope, template, model, route, $location) {
     };
 
     /**
+     * Go to list view
+     * @param cb
+     */
+    $scope.goToListView = function (cb) {
+        $location.path('/listView');
+    };
+
+    /**
      * Switch to calendar view
+     * @param firstMonday First monday formatted as DD/MM/YYYY'
      * @param cb Callback function
      */
-    $scope.goToCalendarView = function (cb) {
-        $location.path('/calendarView');
+    $scope.goToCalendarView = function (firstMonday, cb) {
+
+        var calendarViewPath = '/calendarView';
+
+        if (typeof firstMonday != 'undefined' && firstMonday != null) {
+            calendarViewPath += '/' + firstMonday;
+        } else {
+            if (model.calendar && model.calendar.week) {
+                calendarViewPath += '/' + moment().week(model.calendar.week).weekday(0).format(CAL_DATE_PATTERN);
+            } else {
+                calendarViewPath += '/' + moment().weekday(0).format(CAL_DATE_PATTERN);
+            }
+        }
+
+        $location.path(calendarViewPath);
 
         if (typeof cb === 'function') {
             cb();
@@ -1024,38 +1093,31 @@ function DiaryController($scope, template, model, route, $location) {
         $scope.$apply();
     };
 
+    /**
+     * Refresh calendar view for current week
+     */
     $scope.refreshCalendarCurrentWeek = function(){
-        refreshCalendar(moment(model.calendar.firstDay));
+        $scope.show(moment(model.calendar.firstDay));
     };
 
+    /**
+     * Opens the next week view of calendar
+     */
     $scope.nextWeek = function () {
         var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
-        model.calendar.week++;
-        refreshCalendar(nextMonday);
+        $scope.goToCalendarView(nextMonday.format(CAL_DATE_PATTERN));
     };
 
+    /**
+     * Opens the previous week view of calendar
+     */
     $scope.previousWeek = function () {
-        var prevMonday = moment(model.calendar.firstDay).subtract(7, 'day');
-        model.calendar.week--;
-        refreshCalendar(prevMonday);
+        var prevMonday = moment(model.calendar.firstDay).add(-7, 'day');
+        $scope.goToCalendarView(prevMonday.format(CAL_DATE_PATTERN));
     };
 
     $scope.addHomeworkToLesson = function(lesson){
         lesson.addHomework(lesson);
-    };
-
-    /**
-     * Refresh calendar from given date.
-     * Will refresh ui and lessons and homeworks week data cache
-     * @param momentDate Start date (monday only)
-     */
-    var refreshCalendar = function (momentDate) {
-        model.calendar.setDate(momentDate);
-        model.lessons.syncLessons(null, validationError);
-        model.homeworks.syncHomeworks(function () {
-            $scope.showCal = !$scope.showCal;
-            $scope.$apply();
-        }, validationError);
     };
 
 
