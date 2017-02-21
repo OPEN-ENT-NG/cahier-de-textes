@@ -500,7 +500,7 @@ PedagogicItem.prototype.getPreviewDescription = function () {
 
     if (this.description) {
         if (this.description.length >= this.descriptionMaxSize) {
-            this.preview_description = '<p>' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
+            this.preview_description = '<p class="itemPreview">' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
         } else {
             this.preview_description = this.description;
         }

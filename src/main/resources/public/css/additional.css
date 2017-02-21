@@ -1015,3 +1015,7 @@ div.theopener {
 .addHomeworkToLessonBtn {
     margin-bottom: 10px;
 }
+
+.itemPreview:hover {
+    background-color: #78daff;
+}
