@@ -49,6 +49,8 @@ function DiaryController($scope, template, model, route, $location) {
         createLesson: 'lesson'
     };
 
+    $scope.lessonDescriptionIsReadOnly = false;
+
     $scope.calendarLoaded = false;
     /**
      * Used when refreshing calendar
@@ -133,6 +135,7 @@ function DiaryController($scope, template, model, route, $location) {
 
             var openFunc = function () {
                 $scope.lesson = null;
+                $scope.lessonDescriptionIsReadOnly = false;
                 $scope.openLessonView(null, params);
             };
 
@@ -165,6 +168,7 @@ function DiaryController($scope, template, model, route, $location) {
             var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
 
             if (lesson != null) {
+                $scope.lessonDescriptionIsReadOnly = false;
                 $scope.openLessonView(lesson, params);
             }
             // case when viewing homework and lesson not in current week
@@ -1042,6 +1046,15 @@ function DiaryController($scope, template, model, route, $location) {
 
     $scope.addHomeworkToLesson = function(lesson){
         lesson.addHomework(lesson);
+    };
+
+    $scope.setLessonDescriptionMode = function(){
+        if ($scope.lessonDescriptionIsReadOnly) {
+            $scope.lessonDescriptionIsReadOnly = false;
+        }
+        else {
+            $scope.lessonDescriptionIsReadOnly = true;
+        }
     };
 
     /**

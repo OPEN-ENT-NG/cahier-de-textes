@@ -112,10 +112,16 @@
 
                 </div>
                 <div class="row">
-                    <editor ng-model="lesson.description"></editor>
+                    <editor ng-if="!lessonDescriptionIsReadOnly" ng-model="lesson.description"></editor>
+                    <button ng-if="!lessonDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setLessonDescriptionMode()">
+                        <i18n>description.see</i18n>
+                    </button>
+                    <!-- see lesson.description in readonly -->
+                    <div ng-if="lessonDescriptionIsReadOnly" bind-html="lesson.description" class="lessonHomeworkDescription"></div>
+                    <button ng-if="lessonDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setLessonDescriptionMode()">
+                        <i18n>description.edit</i18n>
+                    </button>
                 </div>
-
-
 
                 <br><br>
                 <!-- END -->
