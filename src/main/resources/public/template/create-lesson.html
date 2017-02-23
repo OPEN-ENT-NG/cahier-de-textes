@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="row twelve cell tabs margintopimportant" data-ng-init="data.tabSelected = 'lesson'">
+    <div class="row twelve cell tabs margintopimportant" ng-model="data.tabSelected" data-ng-init="data.tabSelected = 'lesson'">
         <div class="cell">
             <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'lesson'}"
                                   data-ng-click="data.tabSelected = 'lesson'">
@@ -65,7 +65,7 @@
                 <i18n>create.lesson.tabs.homeworks</i18n>
             </headerHomeworkLesson>
             <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'previouslessons'}"
-                                  data-ng-click="data.tabSelected = 'previouslessons'">
+                                  data-ng-click="data.tabSelected = 'previouslessons'; loadPreviousLessonsFromLesson(lesson)">
                 <i18n>create.lesson.tabs.previouslessons</i18n>
             </headerHomeworkLesson>
         </div>
@@ -211,7 +211,7 @@
                 <i18n>daily.lesson.nopreviouslesson</i18n>
             </article>
 
-            <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+            <article ng-click="goToItemDetail(pedagogicItem, true)" class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
                 <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
                     [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
                 </div>

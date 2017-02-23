@@ -1915,6 +1915,10 @@ model.initLesson = function (timeFromCalendar) {
  */
 model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
 
+    if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
+        return;
+    }
+
     const dateFormat = "YYYY-MM-DD";
     var params = {};
 
@@ -1942,6 +1946,7 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     lesson.previousLessons = new Array();
     lesson.previousLessonsDisplayed = new Array();
 
+    lesson.previousLessonsLoading = true;
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
 
         var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
@@ -1958,6 +1963,8 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
             });
 
             lesson.previousLessons = previousLessons;
+            lesson.previousLessonsLoaded = true;
+            lesson.previousLessonsLoading = false;
             lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, 3));
         }
 

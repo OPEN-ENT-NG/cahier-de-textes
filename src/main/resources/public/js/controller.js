@@ -51,9 +51,14 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location) {
+function DiaryController($scope, template, model, route, $location, $window) {
 
     $scope.currentErrors = [];
+
+    $scope.data = {
+        tabSelected: 'lesson'
+    };
+
     $scope.tabs = {
         createLesson: 'lesson'
     };
@@ -290,7 +295,12 @@ function DiaryController($scope, template, model, route, $location) {
         }
     };
 
-    $scope.goToItemDetail = function(pedagogicItem) {
+    /**
+     *
+     * @param pedagogicItem
+     * @param newWindow if true will open item detail in new windows else in same window
+     */
+    $scope.goToItemDetail = function(pedagogicItem, newWindow) {
         var url = "";
 
         if (pedagogicItem.type_item === 'lesson') {
@@ -305,7 +315,13 @@ function DiaryController($scope, template, model, route, $location) {
                 url = "/editHomeworkView/" + pedagogicItem.id;
             }
         }
-        $location.url(url);
+
+        if(newWindow){
+            $window.open('/diary#' + url);
+        } else {
+            $location.url(url);
+        }
+
     };
 
     //list-view interactions
@@ -341,6 +357,7 @@ function DiaryController($scope, template, model, route, $location) {
      */
     $scope.openLessonView = function(lesson, params){
 
+        $scope.data.tabSelected = 'lesson';
         $scope.tabs.createLesson = params.idHomework ? 'homeworks' : 'lesson';
         $scope.tabs.showAnnotations = false;
 
@@ -360,6 +377,7 @@ function DiaryController($scope, template, model, route, $location) {
                 $scope.lesson = new Lesson();
             }
             $scope.lesson.updateData(lesson);
+            $scope.lesson.previousLessonsLoaded = false; // will force reload
             $scope.newItem = {
                 date: moment($scope.lesson.date),
                 beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
