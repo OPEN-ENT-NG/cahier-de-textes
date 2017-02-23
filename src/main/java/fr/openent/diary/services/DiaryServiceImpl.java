@@ -199,11 +199,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 .append(" FROM diary.lesson AS l")
                 .append(" JOIN diary.teacher as t ON t.id = l.teacher_id")
                 .append(" LEFT JOIN diary.homework as h ON l.id = h.lesson_id")
-                .append(" LEFT JOIN diary.subject as s ON s.id = l.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = l.audience_id")
-                .append(" LEFT JOIN diary.lesson_shares AS ls ON l.id = ls.resource_id");
+                .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id");
 
-        //TODO : add number of homeworks for a lesson
 
         StringBuilder queryHomeworks = new StringBuilder();
         queryHomeworks.append("SELECT distinct 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, h.lesson_id as lesson_id,")
@@ -212,10 +210,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
-                .append(" LEFT JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")
-                .append(" LEFT JOIN diary.subject as s ON s.id = h.subject_id")
-                .append(" LEFT JOIN diary.audience as a ON a.id = h.audience_id")
-                .append(" LEFT JOIN diary.homework_shares AS hs ON h.id = hs.resource_id");
+                .append(" INNER JOIN diary.homework_type as ht ON ht.id = h.homework_type_id")
+                .append(" INNER JOIN diary.subject as s ON s.id = h.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = h.audience_id");
 
 
         StringBuilder whereLessons = new StringBuilder(" WHERE 1=1 ");
@@ -304,28 +301,19 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                     parametersHomeworks.add("%" + searchWordUpperCaseHomework + "%");
                     parametersHomeworks.add("%" + searchWordUpperCaseHomework + "%");
                     break;
-
-                /*
-                case TEACHER:       whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) ");
-                                    whereHomeworks.append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ? OR hs.action = ?) ");
-
-                                    parametersLessons.add(criterion.getValue());
-                                    parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
-                                    parametersHomeworks.add(criterion.getValue());
-                                    parametersHomeworks.add(this.HOMEWORK_GESTIONNAIRE_RIGHT);
-                                    break;
-                                    */
             }
         }
 
-        whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) ");
+        whereLessons.append(" and exists (select 1 from diary.lesson_shares ls where ls.resource_id = l.id ");
+        whereLessons.append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ? OR ls.action = ?) )");
         for (String memberId : memberIds) {
             parametersLessons.add(memberId);
         }
         parametersLessons.add(userInfos.getUserId());
         parametersLessons.add(this.LESSON_GESTIONNAIRE_RIGHT);
 
-        whereHomeworks.append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ? OR hs.action = ?) ");
+        whereHomeworks.append(" and exists (select 1 from diary.homework_shares hs where hs.resource_id = h.id ");
+        whereHomeworks.append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ? OR hs.action = ?) )");
 
         for (String memberId : memberIds) {
             parametersHomeworks.add(memberId);
