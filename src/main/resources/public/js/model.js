@@ -1,4 +1,10 @@
 /**
+ * Default date format
+ * @type {string}
+ */
+const DATE_FORMAT = 'YYYY-MM-DD';
+
+/**
  * Model of attachment from
  * table diary.attachment (DB)
  * @constructor
@@ -365,7 +371,7 @@ Homework.prototype.toJSON = function () {
         teacher_id: model.me.userId,
         school_id: this.audience.structureId,
         audience_id: this.audience.id,
-        homework_due_date: moment(this.dueDate).format('YYYY-MM-DD'),
+        homework_due_date: moment(this.dueDate).format(DATE_FORMAT),
         homework_description: this.description,
         homework_color: this.color,
         homework_state: this.state,
@@ -1028,7 +1034,7 @@ Lesson.prototype.toJSON = function () {
         audience_id: this.audience.id,
         lesson_title: this.title,
         lesson_color: this.color,
-        lesson_date: moment(this.date).format('YYYY-MM-DD'),
+        lesson_date: moment(this.date).format(DATE_FORMAT),
         lesson_start_time: moment(this.startTime).format('HH:mm'),
         lesson_end_time: moment(this.endTime).format('HH:mm'),
         lesson_description: this.description,
@@ -1248,8 +1254,8 @@ SearchForm.prototype.initForTeacher = function () {
     this.publishState = "";
     this.returnType = "both";
     var period = moment(model.calendar.dayForWeek).day(1);
-    this.startDate = period.format('YYYY-MM-DD');
-    this.endDate = period.add(15, 'days').format('YYYY-MM-DD');
+    this.startDate = period.format(DATE_FORMAT);
+    this.endDate = period.add(15, 'days').format(DATE_FORMAT);
     this.displayLesson = true;
     this.displayHomework = true;
     this.audienceId = "";
@@ -1259,8 +1265,8 @@ SearchForm.prototype.initForStudent = function () {
     this.publishState = "published";
     this.returnType = "both";
     var period = moment(model.calendar.dayForWeek).day(1);
-    this.startDate = period.format('YYYY-MM-DD');
-    this.endDate = period.add(15, 'days').format('YYYY-MM-DD');
+    this.startDate = period.format(DATE_FORMAT);
+    this.endDate = period.add(15, 'days').format(DATE_FORMAT);
     this.displayLesson = false;
     this.displayHomework = true;
 };
@@ -1306,8 +1312,8 @@ model.build = function () {
                 return;
 
             var lessons = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
+            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
 
             model.lessons.all.splice(0, model.lessons.all.length);
 
@@ -1474,8 +1480,8 @@ model.build = function () {
         syncHomeworks: function(cb, cbe){
 
             var homeworks = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format('YYYY-MM-DD');
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format('YYYY-MM-DD');
+            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
             var that = this;
 
             if (that.loading)
@@ -1857,7 +1863,7 @@ model.initHomework = function (lesson) {
         homework.state = DEFAULT_STATE;
     }
 
-    model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), homework.audience.id);
+    model.loadHomeworksLoad(homework, moment(homework.date).format(DATE_FORMAT), homework.audience.id);
 
     return homework;
 };
@@ -1919,7 +1925,6 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
         return;
     }
 
-    const dateFormat = "YYYY-MM-DD";
     var params = {};
 
     if (lesson.id) {
@@ -1929,9 +1934,9 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     // tricky way to detect if string date or moment date ...
     // 12:00:00
     if (lesson.endTime.length === 8) {
-        params.endDateTime = lesson.date.format(dateFormat) + ' ' + lesson.endTime;
+        params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + lesson.endTime;
     } else {
-        params.endDateTime = lesson.date.format(dateFormat) + ' ' + moment(lesson.endTime).format("HH:mm");
+        params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + moment(lesson.endTime).format("HH:mm");
     }
 
     var clonedLessonMoment = moment(new Date(lesson.date));
