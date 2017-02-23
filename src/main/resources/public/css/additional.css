@@ -1030,3 +1030,7 @@ div.theopener {
 .itemPreview:hover {
     background-color: #78daff;
 }
+
+i.external-link:before{
+    content:'\e8aa';
+}

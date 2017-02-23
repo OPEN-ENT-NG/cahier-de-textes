@@ -214,12 +214,14 @@
             <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
                 <div class="prev-lesson-summary"  ng-click="goToItemDetail(pedagogicItem, true)">
                     [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
+                    <i class="external-link"></i>
                 </div>
                 <div>
                     <!-- LESSON DESCRIPTION -->
                         <div  style="float: left; width: 50%; margin-top: 15px;">
                         <div class="hover-orange" ng-click="goToItemDetail(pedagogicItem, true)">
                             <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]
+                            <i class="external-link"></i>
                         </div>
                         <span class="inline"
                                   style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
