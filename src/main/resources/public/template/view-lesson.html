@@ -97,14 +97,16 @@
             <i18n>daily.lesson.nopreviouslesson</i18n>
         </div>
 
-        <article ng-click="goToItemDetail(pedagogicItem, true)" class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
-            <div style="background-color: #2a9cc8; color: white; padding-left: 5px;">
+        <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+            <div ng-click="goToItemDetail(pedagogicItem, true)" class="prev-lesson-summary">
                 [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[ pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
             </div>
             <div>
                 <!-- LESSON DESCRIPTION -->
                 <div style="float: left; width: 50%; margin-top: 15px;">
-                    <div><span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]</div>
+                    <div class="hover-orange" ng-click="goToItemDetail(pedagogicItem, true)">
+                        <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[pedagogicItem.title]]
+                    </div>
                     <span class="inline"
                           style="[[(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize) ? 'cursor:pointer' : 'cursor:default' ]]"
                           ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">

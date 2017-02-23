@@ -620,6 +620,17 @@ div.pedagogic-item-container {
     height: 155px;
 }
 
+
+.prev-lesson-summary {
+     background-color: #2a9cc8;
+     color: white;
+     padding-left: 5px;
+}
+
+.prev-lesson-summary:hover {
+    color: #FF8351;
+}
+
 .hover-orange:hover{
     color: #FF8351;
 }
