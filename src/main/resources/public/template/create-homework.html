@@ -86,7 +86,17 @@
         </span>
         </div>
     <div class="row">
-        <editor ng-model="homework.description"></editor>
+        <!--<editor ng-model="homework.description"></editor>-->
+
+        <editor ng-if="!homeworkDescriptionIsReadOnly" ng-model="homework.description"></editor>
+        <button ng-if="!homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">
+            <i18n>description.see</i18n>
+        </button>
+        <!-- see homework.description in readonly -->
+        <div ng-if="homeworkDescriptionIsReadOnly" bind-html="homework.description" class="lessonHomeworkDescription"></div>
+        <button ng-if="homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">
+            <i18n>description.edit</i18n>
+        </button>
     </div>
     </section>
 </form>
