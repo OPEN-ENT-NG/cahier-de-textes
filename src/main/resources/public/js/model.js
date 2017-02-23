@@ -1940,7 +1940,7 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     }
 
     var clonedLessonMoment = moment(new Date(lesson.date));
-    params.startDate = clonedLessonMoment.add(-2, 'month').format(dateFormat);
+    params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
     params.returnType = 'both';
