@@ -153,5 +153,7 @@
   "diary.attachments.label": "Pièces jointes",
   "diary.attachments.add": "Ajouter une ou plusieurs pièces jointes",
   "diary.attachments.delete": "Supprimer la pièce jointe",
-  "diary.attachments.download": "Télécharger la pièce jointe"
+  "diary.attachments.download": "Télécharger la pièce jointe",
+  "description.see": "aperçu",
+  "description.edit": "éditer"
 }

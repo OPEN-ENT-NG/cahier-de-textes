@@ -63,6 +63,9 @@ function DiaryController($scope, template, model, route, $location, $window) {
         createLesson: 'lesson'
     };
 
+    $scope.lessonDescriptionIsReadOnly = false;
+    $scope.homeworkDescriptionIsReadOnly = false;
+
     $scope.calendarLoaded = false;
     /**
      * Used when refreshing calendar
@@ -147,6 +150,8 @@ function DiaryController($scope, template, model, route, $location, $window) {
 
             var openFunc = function () {
                 $scope.lesson = null;
+                $scope.lessonDescriptionIsReadOnly = false;
+                $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.openLessonView(null, params);
             };
 
@@ -160,6 +165,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
 
             var openFunc = function () {
                 $scope.homework = null;
+                $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.openHomeworkView(null, params);
             };
 
@@ -179,6 +185,8 @@ function DiaryController($scope, template, model, route, $location, $window) {
             var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
 
             if (lesson != null) {
+                $scope.lessonDescriptionIsReadOnly = false;
+                $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.openLessonView(lesson, params);
             }
             // case when viewing homework and lesson not in current week
@@ -225,6 +233,32 @@ function DiaryController($scope, template, model, route, $location, $window) {
             }
         }
     });
+
+
+    /**
+     * Permet d'afficher un aperçu de la description d'une leçon en readonly
+     */
+    $scope.setLessonDescriptionMode = function() {
+        if ($scope.lessonDescriptionIsReadOnly) {
+            $scope.lessonDescriptionIsReadOnly = false;
+        }
+        else {
+            $scope.lessonDescriptionIsReadOnly = true;
+        }
+    }
+
+    /**
+     * Permet d'afficher un aperçu de la description d'un TAF en readonly
+     */
+    $scope.setHomeworkDescriptionMode = function() {
+        if ($scope.homeworkDescriptionIsReadOnly) {
+            $scope.homeworkDescriptionIsReadOnly = false;
+        }
+        else {
+            $scope.homeworkDescriptionIsReadOnly = true;
+        }
+    }
+
 
     // Navigation
     $scope.showList = function() {
@@ -335,6 +369,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
         var homework = model.homeworks.findWhere({ id: parseInt(params.idHomework)});
 
         if (homework != null) {
+            $scope.homeworkDescriptionIsReadOnly = false;
             $scope.openHomeworkView(homework);
         }
         // load from db
@@ -343,6 +378,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
             homework.id = parseInt(params.idHomework);
 
             homework.load(function(){
+                $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.openHomeworkView(homework, params);
             }, function(cbe){
                 notify.error(cbe.message);
