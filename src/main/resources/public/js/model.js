@@ -1915,17 +1915,39 @@ model.initLesson = function (timeFromCalendar) {
 /**
  * Load previous lessons from current one
  * Attached homeworks to lessons are also loaded
- * @param params
- * @param cb
- * @param cbe
+ * @param lesson
+ * @param useDeltaStep
+ * @param cb Callback function
+ * @param cbe Callback on error function
  */
-model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
+model.getPreviousLessonsFromLesson = function (lesson, useDeltaStep, cb, cbe) {
 
-    if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
+    if (useDeltaStep) {
+        if (lesson.allPreviousLessonsLoaded) {
+            return;
+        }
+    } else if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
         return;
     }
 
+    if (!useDeltaStep) {
+        lesson.allPreviousLessonsLoaded = false;
+    }
+
+    var defaultCount = 6;
+
+    var idx_start = 0;
+    var idx_end = idx_start + defaultCount;
+
+    if (useDeltaStep) {
+        idx_start += defaultCount;
+        idx_end += defaultCount;
+    }
+
     var params = {};
+
+    params.offset = idx_start;
+    params.limit = idx_end;
 
     if (lesson.id) {
         params.excludeLessonId = lesson.id;
@@ -1940,19 +1962,25 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
     }
 
     var clonedLessonMoment = moment(new Date(lesson.date));
-    params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
+    //params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
     params.subject = lesson.subject.id;
     params.audienceId = lesson.audience.id;
-    params.returnType = 'both';
+    params.returnType = 'lesson'; // will allow get lessons first, then homeworks later
     params.homeworkLinkedToLesson = "true";
     params.sortOrder = "DESC";
-    params.limit = 20;
 
-    lesson.previousLessons = new Array();
+    if (!lesson.previousLessons) {
+        lesson.previousLessons = new Array();
+    }
     lesson.previousLessonsDisplayed = new Array();
 
     lesson.previousLessonsLoading = true;
     http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
+
+        // all lessons loaded
+        if (items.length < defaultCount) {
+            lesson.allPreviousLessonsLoaded = true;
+        }
 
         var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
 
@@ -1961,21 +1989,45 @@ model.getPreviousLessonsFromLesson = function (lesson, cb, cbe) {
         var previousLessons = groupByItemType.lesson;
 
         if (previousLessons) {
-            var previousHomeworks = groupByItemType.homework;
+            var previousLessonIds = new Array();
 
             previousLessons.forEach(function (lesson) {
-                lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
+                previousLessonIds.push(lesson.id);
             });
 
-            lesson.previousLessons = previousLessons;
+
+            // load linked homeworks of previous lessons
+            var paramsHomeworks = {};
+            paramsHomeworks.returnType = 'homework';
+            paramsHomeworks.homeworkLessonIds = previousLessonIds;
+
+            http().postJson('/diary/pedagogicItems/list', paramsHomeworks).done(function (items2) {
+
+                var previousHomeworks = _.map(items2, sqlToJsPedagogicItem);
+
+                previousLessons.forEach(function (lesson) {
+                    lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
+                });
+
+                lesson.previousLessons = lesson.previousLessons.concat(previousLessons);
+                lesson.previousLessonsLoaded = true;
+                lesson.previousLessonsLoading = false;
+                lesson.previousLessonsDisplayed = lesson.previousLessons;
+
+                if (typeof cb === 'function') {
+                    cb();
+                }
+            });
+        } else {
+            lesson.previousLessons = new Array();
             lesson.previousLessonsLoaded = true;
             lesson.previousLessonsLoading = false;
-            lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, 3));
+            lesson.previousLessonsDisplayed = lesson.previousLessons;
+            if (typeof cb === 'function') {
+                cb();
+            }
         }
 
-        if (typeof cb === 'function') {
-            cb();
-        }
     }).error(function (e) {
         if (typeof cbe === 'function') {
             cbe(model.parseError(e));

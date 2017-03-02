@@ -557,6 +557,7 @@
                         scope.ngModel = subject;
                         scope.displaySearch = false;
                         if (scope.lesson) {
+                            scope.lesson.previousLessonsLoaded = false;
                             scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                         }
                     };
@@ -649,6 +650,8 @@
                                 if (scope.lesson.homeworks.all.length > 0) {
                                     scope.$parent.refreshHomeworkLoads(scope.lesson);
                                 }
+
+                                scope.lesson.previousLessonsLoaded = false;
                                 scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                             }
 

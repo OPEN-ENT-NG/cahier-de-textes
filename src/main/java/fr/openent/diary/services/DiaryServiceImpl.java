@@ -220,7 +220,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parametersLessons = new JsonArray();
         JsonArray parametersHomeworks = new JsonArray();
         Integer maxResults = null;
+        Integer offset = null;
         boolean isAscSortOrder = true;
+        ArrayList<Integer> homeworkLessonIds = null;
 
         for (SearchCriterion criterion: criteria) {
 
@@ -270,6 +272,17 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 case SEARCH_TYPE:   queryReturnType = (String) criterion.getValue(); break;
 
                 case LIMIT:         maxResults = (Integer) criterion.getValue(); break;
+
+                case OFFSET:        offset = (Integer) criterion.getValue(); break;
+
+                case HOMEWORK_LESSON_IDS:
+                                    homeworkLessonIds =    (ArrayList) criterion.getValue();
+                                    if (!homeworkLessonIds.isEmpty()) {
+                                        whereHomeworks.append(" AND h.lesson_id IN" + sql.listPrepared(homeworkLessonIds.toArray()));
+                                        for (Integer id : homeworkLessonIds) {
+                                            parametersHomeworks.add(id);
+                                        }
+                                    }
 
                 /**
                  * Lesson quick multi criteria search
@@ -359,6 +372,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         if (maxResults != null) {
             queryFull.append(" LIMIT ? ");
             parameters.add(maxResults);
+        }
+
+        if(offset != null){
+            queryFull.append(" OFFSET ? ");
+            parameters.add(offset);
         }
 
         sql.prepared(queryFull.toString(), parameters, SqlResult.validResultHandler(handler));

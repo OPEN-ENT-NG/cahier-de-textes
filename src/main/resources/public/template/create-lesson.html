@@ -217,7 +217,7 @@
                 <i18n>daily.lesson.nopreviouslesson</i18n>
             </article>
 
-            <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="showMorePreviousLessons(lesson)">
+            <article class="row" ng-repeat="pedagogicItem in lesson.previousLessonsDisplayed" overflow-y="scroll"  bottom-scroll="loadMorePreviousLessonsFromLesson(lesson)">
                 <div class="prev-lesson-summary"  ng-click="goToItemDetail(pedagogicItem, true)">
                     [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.audience]]
                     <i class="external-link"></i>
@@ -261,6 +261,10 @@
                     </div>
                 </div>
                 <br>
+            </article>
+
+            <article ng-if="lesson.previousLessonsLoading">
+                <h1 class="reduce-block-eight nomargin" style="text-align: center;"><i18n><span class="no-style ng-scope">Chargement ...</span></i18n></h1>
             </article>
         </div>
     </div>

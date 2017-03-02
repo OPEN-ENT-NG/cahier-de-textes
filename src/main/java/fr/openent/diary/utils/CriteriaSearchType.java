@@ -15,11 +15,19 @@ public enum CriteriaSearchType {
      * Filter to start date of lesson only (not homework date filter like start_date)
      */
     END_DATE_LESSON("endDateLesson"),
+    /**
+     * Filter on some particular homework ids
+     */
+    HOMEWORK_LESSON_IDS("homeworkLessonIds"),
     EXCLUDE_LESSON_ID("excludeLessonId"),
     /**
      * Limit max number of results retrieved
      */
     LIMIT("limit"),
+    /**
+     * Start of returning row
+     */
+    OFFSET("offset"),
     /**
      * Multi search criteria on title, class/group label and subjects
      * for lessons

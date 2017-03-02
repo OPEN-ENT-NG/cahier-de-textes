@@ -1366,13 +1366,16 @@ function DiaryController($scope, template, model, route, $location, $window) {
         model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.isUserTeacher, $scope.openListView, validationError);
     };
 
+    $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
+        model.getPreviousLessonsFromLesson(currentLesson, true, function(){$scope.$apply()}, validationError);
+    };
 
     /**
      * Load previous lessons data from current lesson being edited
      * @param currentLesson Current lesson being edited
      */
     $scope.loadPreviousLessonsFromLesson = function (currentLesson) {
-        model.getPreviousLessonsFromLesson(currentLesson, function(){$scope.$apply()}, validationError);
+        model.getPreviousLessonsFromLesson(currentLesson, false, function(){$scope.$apply()}, validationError);
     };
 
     $scope.itemTypesDisplayed = function(item){
