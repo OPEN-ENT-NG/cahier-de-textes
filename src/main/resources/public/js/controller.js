@@ -1224,7 +1224,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
     // gets the selected date from pedagogic items but can't be in the past.
     $scope.selectedDateInTheFuture = function (){
         var date = model.selectedPedagogicDate();
-        return moment().min(moment(date), moment()).format("YYYY-MM-DD");
+        return moment().min(moment(date), moment()).format("YYYY-MM-DD"); // see moment.js doc on min pre 2.7.0 version (highly confusing !)
     };
 
 	/**
