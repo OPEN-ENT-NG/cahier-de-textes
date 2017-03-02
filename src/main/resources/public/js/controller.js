@@ -145,6 +145,8 @@ function DiaryController($scope, template, model, route, $location, $window) {
     // variable used to track number of call back calls (see publishCB)
     $scope.cbCount = 0;
 
+    $scope.selectedDueDate = undefined; // date selected in list view. It can allow to init homework on a different due_date.
+
     route({
         createLessonView: function (params) {
 
@@ -161,12 +163,12 @@ function DiaryController($scope, template, model, route, $location, $window) {
                 initialization(false, openFunc)
             }
         },
-        createHomeworkView: function (params) {
+        createHomeworkView: function () {
 
             var openFunc = function () {
                 $scope.homework = null;
                 $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.openHomeworkView(null, params);
+                $scope.openHomeworkView(null);
             };
 
             if ($scope.calendarLoaded) {
@@ -269,6 +271,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
             model.searchForm.initForStudent();
         }
 
+        $scope.selectedDueDate = undefined;
         model.pedagogicDays.syncPedagogicItems($scope.openListView, validationError);
     };
 
@@ -362,6 +365,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
     $scope.selectDay = function(day) {
         model.unselectDays();
         day.selected = true;
+        $scope.selectedDueDate = moment(day.dayName, "dddd DD MMMM YYYY");
     };
 
     var loadHomeworkFromRoute = function(params) {
@@ -440,7 +444,7 @@ function DiaryController($scope, template, model, route, $location, $window) {
 
     };
 
-    $scope.openHomeworkView = function(homework){
+    $scope.openHomeworkView = function(homework, params){
 
         if (homework) {
             if (!$scope.homework) {
@@ -452,7 +456,8 @@ function DiaryController($scope, template, model, route, $location, $window) {
                 date: $scope.homework.date
             };
         } else {
-            initHomework();
+            var dueDate = $scope.selectedDateInTheFuture();
+            initHomework(dueDate);
         }
 
         $scope.showHomeworksLoad($scope.homework, null);
@@ -1216,6 +1221,12 @@ function DiaryController($scope, template, model, route, $location, $window) {
         return $scope.getSelectedPedagogicItems('lesson').length + $scope.getSelectedPedagogicItems('homework').length;
     };
 
+    // gets the selected date from pedagogic items but can't be in the past.
+    $scope.selectedDateInTheFuture = function (){
+        var date = model.selectedPedagogicDate();
+        return moment().min(moment(date), moment()).format("YYYY-MM-DD"); // see moment.js doc on min pre 2.7.0 version (highly confusing !)
+    };
+
 	/**
 	* update pedagogic items selected
 	*/
@@ -1275,18 +1286,18 @@ function DiaryController($scope, template, model, route, $location, $window) {
      */
     var initLesson = function (timeFromCalendar) {
 
-        $scope.lesson = model.initLesson(timeFromCalendar);
+        var selectedDate = $scope.selectedDateInTheFuture();
+
+        $scope.lesson = model.initLesson(timeFromCalendar, selectedDate);
         $scope.newItem = $scope.lesson.newItem;
     };
 
     /**
      * Init homework object on create
-     * @param cb Callback function
-     * @param cbe Callback
+     * @param dueDate if set the dueDate of the homework
      */
-    var initHomework = function() {
-
-        $scope.homework = model.initHomework();
+    var initHomework = function(dueDate) {
+        $scope.homework = model.initHomework(dueDate);
         $scope.newItem = {
             date: $scope.homework.date
         };

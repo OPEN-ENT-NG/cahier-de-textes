@@ -621,6 +621,16 @@ model.unselectDays = function (){
     });
 };
 
+// gets the selected date from pedagogic items
+model.selectedPedagogicDate = function (){
+    var selectedDay = _.findWhere(model.pedagogicDays.all, {selected : true});
+    if (selectedDay) {
+        return moment(selectedDay.dayName, "dddd DD MMMM YYYY").format("YYYY-MM-DD");
+    } else {
+        return moment();
+    }
+};
+
 function Lesson(data) {
     this.selected = false;
     //this.collection(Attachment);
@@ -1836,7 +1846,7 @@ const DEFAULT_STATE = 'draft';
  * @param cbe Callback function on error
  * @returns {*}
  */
-model.initHomework = function (lesson) {
+model.initHomework = function (dueDate, lesson) {
 
     var homework = new Homework();
 
@@ -1844,7 +1854,7 @@ model.initHomework = function (lesson) {
     homework.expanded = true;
     homework.type = model.homeworkTypes.first();
     homework.title = homework.type.label;
-    homework.date = moment().minute(0).second(0);
+    homework.date = (dueDate) ? dueDate : moment().minute(0).second(0);
 
     // create homework attached to lesson
     if (lesson) {
@@ -1872,7 +1882,7 @@ model.initHomework = function (lesson) {
  * Init lesson
  * @returns {Lesson}
  */
-model.initLesson = function (timeFromCalendar) {
+model.initLesson = function (timeFromCalendar, selectedDate) {
     var lesson = new Lesson();
 
     lesson.audience = {}; //sets the default audience to undefined
@@ -1894,10 +1904,12 @@ model.initLesson = function (timeFromCalendar) {
         newItem.end = moment(newItem.beginning);
         newItem.end.minute(0).second(0).add(1, 'hours');
     }
-    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour
+    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {
+        var itemDate = (selectedDate) ? moment(selectedDate): moment();
+
         newItem = {
-            date: moment().minute(0).second(0),
+            date: itemDate,
             beginning: moment().minute(0).second(0),
             end: moment().minute(0).second(0).add(1, 'hours')
         }

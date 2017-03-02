@@ -619,7 +619,9 @@ div.pedagogic-item-container {
     box-sizing: border-box;
     width: 99%;
     float: right;
-    height: 155px;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 
