@@ -72,7 +72,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             StringBuilder homeworkAggregate = new StringBuilder();
             homeworkAggregate.append("(select json_agg(DISTINCT h.id) FILTER (WHERE h.id IS NOT NULL");
             if (ctx != Context.TEACHER) {
-                homeworkAggregate.append(" AND l.lesson_end_time > CURRENT_TIME");
+                homeworkAggregate.append(" AND to_timestamp(to_char(l.lesson_date, 'YYYY-MM-DD') || ' ' || to_char(l.lesson_end_time, 'hh24:mi:ss'), 'YYYY-MM-DD hh24:mi:ss') > localtimestamp ");
             }
 
             homeworkAggregate.append(") from diary.homework h where h.lesson_id = l.id) as homework_ids");
