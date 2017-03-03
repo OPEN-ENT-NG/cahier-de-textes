@@ -21,14 +21,15 @@
                 <i18n>create.lesson.tabs.homeworks</i18n>
             </headerHomeworkLesson>
 
+            <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
+                <i18n>create.lesson.tabs.homeworks</i18n>
+            </headerHomeworkLesson>
+
             <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'previouslessons'}"
                                   data-ng-click="data.tabSelected = 'previouslessons'">
                 <i18n>create.lesson.tabs.previouslessons</i18n>
             </headerHomeworkLesson>
 
-            <headerHomeworkLesson ng-if="lesson.homeworks.all.length == 0">
-                <i18n>create.lesson.tabs.homeworks</i18n>
-            </headerHomeworkLesson>
         </div>
     </div>
 
