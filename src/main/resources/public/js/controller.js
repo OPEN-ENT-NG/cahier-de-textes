@@ -237,6 +237,40 @@ function DiaryController($scope, template, model, route, $location, $window) {
     });
 
 
+
+    $scope.setLessonDescriptionMode = function(homeworkId) {
+        if ($scope.lessonDescriptionIsReadOnly) {
+            $scope.lessonDescriptionIsReadOnly = false;
+        }
+        else {
+            $scope.lessonDescriptionIsReadOnly = true;
+        }
+    }
+
+	
+	/**
+     * Permet de switcher entre l'aperçu  et l'édition de la description d'un devoir d'une leçon
+     */
+	$scope.changeHomeworkDescriptionMode = function(homeworkId, apercu) {
+		var editor = $('#edit_' + homeworkId); 
+		var ro = $('#descr_' + homeworkId); 
+		var btnApercu = $('#btn_apercu_' + homeworkId); 
+		var btnEdit = $('#btn_edit_' + homeworkId); 
+		
+		if (apercu) {
+			editor.hide();
+			btnApercu.hide();
+			ro.show();
+			btnEdit.show();
+		}
+		else {
+			ro.hide();
+			btnEdit.hide();
+			editor.show();
+			btnApercu.show();
+		}
+    }
+	
     /**
      * Permet d'afficher un aperçu de la description d'une leçon en readonly
      */

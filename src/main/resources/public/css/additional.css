@@ -1031,6 +1031,10 @@ div.theopener {
     margin-bottom: 10px;
 }
 
+.hidden {
+	display: none;
+}
+
 .itemPreview:hover {
     background-color: #78daff;
 }
