@@ -1,7 +1,7 @@
 module.exports = config:
   plugins:
-    fbFlo:
-      port:8888
+    git_digest:
+      always_run:true    
     afterBrunch: [
       'ncp ../dist/view/diary.html ../src/main/resources/view/diary.html',
       'ncp ../dist/ ../src/main/resources/public'

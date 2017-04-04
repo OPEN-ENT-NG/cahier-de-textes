@@ -4044,6 +4044,9 @@ var DATE_FORMAT = 'YYYY-MM-DD';
  * @constructor
  */
 function LessonAttachment() {}
+function Audience() {}
+function HomeworksLoad() {}
+function HomeworkType() {}
 
 /**
  * Says whether or not current user can edit an homework
@@ -4087,10 +4090,6 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
         }
     });
 };
-
-function Audience() {}
-function HomeworksLoad() {}
-function HomeworkType() {}
 
 model.deleteItemList = function (items, itemType, cb, cbe) {
     var url = itemType == "lesson" ? '/diary/deleteLessons' : '/diary/deleteHomeworks';
