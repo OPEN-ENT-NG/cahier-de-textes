@@ -1,0 +1,9 @@
+<span>
+    <a data-ng-click="downloadAttachment()"
+       attr="tooltip"
+       tooltip="diary.attachments.download">[[attachment.document_label]]&nbsp;</a>
+
+    <i class="remove-small" ng-if="!readonly" ng-click="removeAttachment()"
+       attr="tooltip"
+       tooltip="diary.attachments.delete"></i>
+</span>

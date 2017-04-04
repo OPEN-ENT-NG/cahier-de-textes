@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "homework_title": "Devoir",
+        "subject_label": "test",
+        "subject_code": "test",
+        "homework_type_id": "1",
+        "teacher_id": "",
+        "school_id": "",
+        "audience_type": "class",
+        "audience_code": "27cdca5e-49fa-4253-8677-f87eba65ce7a",
+        "audience_label": "6e3",
+        "homework_due_date": "2016-03-19",
+        "homework_description": "C'est un devoir",
+        "homework_color": "pink"
+    }
+]

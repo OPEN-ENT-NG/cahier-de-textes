@@ -1,0 +1,22 @@
+[
+  {
+    "lesson_id":"0325415",
+    "subject_code":"Maths",
+    "subject_label":"Maths",
+    "school_id":"eab00001-58cc-4372-a567-0e02b2c3d476",
+    "teacher_id":"f47ac10b-58cc-4372-a567-0e02b2c3d479",
+    "teacher_display_name":"Mlle Violette Chombier",
+    "audience_type":"CLASSE",
+    "audience_code":"1F",
+    "audience_label":"1ère F",
+    "lesson_title":"Maths Ch.1 Leçon 2",
+    "lesson_room":"112",
+    "lesson_color":"000000",
+    "lesson_date":"2016/02/29",
+    "lesson_start_time":"10h00",
+    "lesson_end_time":"12h00",
+    "lesson_description":"Cette leçon porte sur de l'algorythmique.",
+    "lesson_annotation":"Devoir surprise à donner !",
+    "homeworks":["15487555", "15487556","15487557"]
+  }
+]

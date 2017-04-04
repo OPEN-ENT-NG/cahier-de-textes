@@ -1,0 +1,128 @@
+<div id="mainDiaryContainer" style="float: left; width: 97%;">
+<h1><a href="#" ng-click="goToCalendarView()"><i18n>diary.title</i18n>
+    <!--&nbsp;-&nbsp;<i18n>diary.calendar.label</i18n>-->
+</a></h1>
+<div class="row">
+    <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
+        <i18n>diary.lesson.create</i18n>
+    </button>
+    <button workflow="diary.createFreeHomework" ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
+        <i18n>diary.homework.create</i18n>
+    </button>
+    <h2 ng-if="isUserParent">
+        <div ng-if="children">
+            <div ng-if="children.all.length == 1">
+                [[child.displayName]]
+            </div>
+            <div class="row" ng-if="children.all.length > 1">
+                <span class="two childFilter"
+                      ng-repeat="childd in children.all"
+                      ng-click="showCalendarForChild(childd)"
+                      ng-class="{ selected: childd.selected }">
+                    [[childd.displayName]]
+                </span>
+            </div>
+        </div>
+    </h2>
+    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()"
+       tooltip="diary.icon.show.list"></i>
+    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()"
+       tooltip="diary.icon.show.calendar"></i>
+</div>
+
+<div>
+<div class="row">
+    <filters style="padding-bottom: 0.8em;">
+        <ul>
+        <li>
+            <i id="toggleCalendar" class="[[(display.hideCalendar == false) ? 'filter2 diary selected' : 'filter2 diary' ]]"
+               ng-click="toggleCalendar()" tooltip="diary.icon.show.calendargrid"></i>
+
+            <i id="toggleHomeworkPanel" class="[[(display.hideHomeworkPanel == false) ? 'filter2 homework selected' : 'filter2 homework' ]]"
+               ng-click="toggleHomeworkPanel()" tooltip="diary.icon.show.homeworkpanel"></i>
+            <button ng-click="previousWeek(); " tooltip="diary.calendar.previousweek">&#8592;</button>
+            <button ng-click="nextWeek();" tooltip="diary.calendar.nextweek">&#8594;</button>
+        </li>
+        </ul>
+    </filters>
+    <calendar-daily-events for="calendar"
+                           ng-model="homeworks.all"
+                           ng-if="!display.hideHomeworkPanel"
+                           on-create-open="redirect('/createHomeworkView')"
+                           style="z-index: 1000; margin-top: -8px;"
+    ></calendar-daily-events>
+    <div class="row" ng-if="! showCal">
+        <calendar
+				ng-if="isUserTeacher"
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"></calendar>
+		<calendar
+				ng-if="!isUserTeacher"
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"
+				readonly="true"></calendar>
+    </div>
+    <div class="row" ng-if="showCal">
+        <calendar
+				ng-if="isUserTeacher"
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"></calendar>
+		<calendar
+				ng-if="!isUserTeacher"
+                id="calendar"
+                class="twelve cell"
+                display-template="display-calendar-item"
+                create-template="create-lesson"
+                on-create-open="redirect('/createLessonView/timeFromCalendar')"
+                items="lessons.all"
+				readonly="true"></calendar>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- quick search panel -->
+<div ng-if="isUserTeacher">
+    <quick-search item-type="lessontype" class="quick-search lessontype"></quick-search>
+    <quick-search item-type="homeworktype" class="quick-search homeworktype"></quick-search>
+</div>
+
+<!-- action panel displayed if at least one lesson or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: lessons.selection().length === 0 && homeworks.selection().length === 0  }">
+    <div class="toggle">
+        <div class="row">
+            <button ng-click="showConfirmPanel('confirm-delete')">
+                <i18n>remove</i18n>
+            </button>
+            <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
+                <i18n>edit</i18n>
+            </button>
+            <button ng-click="openShareLessonPanel()" ng-show="homeworks.selection().length === 0" >
+                <i18n>share</i18n>
+            </button>
+            <button ng-click="openShareHomeworkPanel()" ng-show="lessons.selection().length === 0" >
+                <i18n>share</i18n>
+            </button>
+            <!-- publish - lessons in draft state and homeworks in draft state not attached to lesson -->
+            <button ng-click="showConfirmPanel('confirm-publish')" ng-if="hasPublishableOnlyItemsSelected(true)">
+                <i18n>daily.item.publish</i18n>
+            </button>
+            <!-- unpublish - lessons in published state and homeworks in published state not attached to lesson -->
+            <button ng-click="showConfirmPanel('confirm-unpublish')" ng-if="hasPublishableOnlyItemsSelected(false)">
+                <i18n>daily.item.unpublish</i18n>
+            </button>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,22 @@
+<div class="schedule-item-content homework-content" ng-style="{'border-color': dailyEvent.color, 'color': dailyEvent.color}"
+     ng-click="editSelectedHomework(dailyEvent, $event);" tooltip="[[dailyEvent.subjectLabel]]<br>[[dailyEvent.title]]" >
+
+   <div class="cell twelve">
+        <span id="subjectlabelhwpanel">[[dailyEvent.subjectLabel]]</span>
+
+        <!-- ASSOCIATED LESSON ICON -->
+        <div style="float: right; margin-right: 5%;" ng-show="[[dailyEvent.lesson_id]]">
+            <i class="icon cahier-textes2"></i>
+        </div>
+    </div>
+
+    <div class="cell twelve">
+        <span>[[dailyEvent.audienceLabel]]</span>
+        <input ng-if="isUserTeacher" type="checkbox" ng-model="dailyEvent.selected"  style="float: right; margin-right: 5%; margin-top: 0px;"/>
+
+        <!-- DRAFT STATE ICON -->
+        <span ng-if="[[dailyEvent.state]]=='draft'" style="float: right; margin-top: 0px;">
+            <i class="icon pencil"></i>
+		</span>
+    </div>
+</div>

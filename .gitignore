@@ -9,3 +9,8 @@
 /.idea
 /node_modules
 *.iml
+/dist
+bower_components
+node_modules
+.bowerrc
+yarn-error.log
