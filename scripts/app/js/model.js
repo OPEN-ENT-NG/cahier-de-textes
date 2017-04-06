@@ -10,11 +10,10 @@ const DATE_FORMAT = 'YYYY-MM-DD';
  * diary.lesson_has_attachment
  * @constructor
  */
-function LessonAttachment() {
-
-}
-
-
+function LessonAttachment() {}
+function Audience() { }
+function HomeworksLoad(){}
+function HomeworkType(){}
 
 
 
@@ -64,12 +63,6 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
         }
     });
 };
-
-
-
-function Audience() { }
-function HomeworksLoad(){}
-function HomeworkType(){}
 
 
 

@@ -13,7 +13,7 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window) {
+function DiaryController($scope, template, model, route, $location, $window,LessonService) {
 
     $scope.currentErrors = [];
 
@@ -199,6 +199,17 @@ function DiaryController($scope, template, model, route, $location, $window) {
     });
 
 
+
+
+    $scope.initCourses = function(){
+        if(model.me.type === 'ENSEIGNANT'){
+            LessonService.getMergeCourses(model.me.structures[0],model.me.userId,model.calendar.dayForWeek) .then(function(result){
+                console.log("result",result);
+            })  ;
+        }
+    };
+
+    $scope.initCourses();
 
     $scope.setLessonDescriptionMode = function(homeworkId) {
         if ($scope.lessonDescriptionIsReadOnly) {
