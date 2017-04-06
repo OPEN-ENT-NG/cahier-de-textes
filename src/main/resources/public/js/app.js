@@ -129,14 +129,6 @@ var AngularExtensions = {
 
 'use strict';
 
-(function () {
-	'use strict';
-
-	AngularExtensions.addModuleConfig(function (module) {});
-})();
-
-'use strict';
-
 /**
  * Date calendar pattern for url date parsing
  * @type {string}
@@ -152,7 +144,7 @@ var CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window) {
+function DiaryController($scope, template, model, route, $location, $window, LessonService) {
 
     $scope.currentErrors = [];
 
@@ -336,6 +328,16 @@ function DiaryController($scope, template, model, route, $location, $window) {
             }
         }
     });
+
+    $scope.initCourses = function () {
+        if (model.me.type === 'ENSEIGNANT') {
+            LessonService.getMergeCourses(model.me.structures[0], model.me.userId, model.calendar.dayForWeek).then(function (result) {
+                console.log("result", result);
+            });
+        }
+    };
+
+    $scope.initCourses();
 
     $scope.setLessonDescriptionMode = function (homeworkId) {
         if ($scope.lessonDescriptionIsReadOnly) {
@@ -2194,6 +2196,159 @@ function DiaryController($scope, template, model, route, $location, $window) {
 		'use strict';
 
 		AngularExtensions.addModuleConfig(function (module) {
+
+				module.directive('calendar', function ($compile) {
+						return {
+								restrict: 'E',
+								scope: true,
+								//TODO no the good url
+								//templateUrl: '/' + infraPrefix + '/public/template/calendar.html',
+
+								templateUrl: '/diary/public/js/directives/calendar/calendar.template.html',
+								controller: function controller($scope, $timeout) {
+										var refreshCalendar = function refreshCalendar() {
+												model.calendar.clearScheduleItems();
+												$scope.items = _.where(_.map($scope.items, function (item) {
+														item.beginning = item.startMoment;
+														item.end = item.endMoment;
+														return item;
+												}), {
+														is_periodic: false
+												});
+												model.calendar.addScheduleItems($scope.items);
+												$scope.calendar = model.calendar;
+												$scope.moment = moment;
+												$scope.display.editItem = false;
+												$scope.display.createItem = false;
+
+												$scope.editItem = function (item) {
+														$scope.calendarEditItem = item;
+														$scope.display.editItem = true;
+												};
+
+												$scope.createItem = function (day, timeslot) {
+														$scope.newItem = {};
+														var year = model.calendar.year;
+														if (day.index < model.calendar.firstDay.dayOfYear()) {
+																year++;
+														}
+														$scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
+														$scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
+														model.calendar.newItem = $scope.newItem;
+														$scope.onCreateOpen();
+												};
+
+												$scope.closeCreateWindow = function () {
+														$scope.display.createItem = false;
+														$scope.onCreateClose();
+												};
+
+												$scope.updateCalendarWeek = function () {
+														//annoying new year workaround
+														if (moment(model.calendar.dayForWeek).week() === 1 && moment(model.calendar.dayForWeek).dayOfYear() > 7) {
+																model.calendar = new calendar.Calendar({
+																		week: moment(model.calendar.dayForWeek).week(),
+																		year: moment(model.calendar.dayForWeek).year() + 1
+																});
+														} else if (moment(model.calendar.dayForWeek).week() === 53 && moment(model.calendar.dayForWeek).dayOfYear() < 7) {
+																model.calendar = new calendar.Calendar({
+																		week: moment(model.calendar.dayForWeek).week(),
+																		year: moment(model.calendar.dayForWeek).year() - 1
+																});
+														} else {
+																model.calendar = new calendar.Calendar({
+																		week: moment(model.calendar.dayForWeek).week(),
+																		year: moment(model.calendar.dayForWeek).year()
+																});
+														}
+														model.trigger('calendar.date-change');
+														refreshCalendar();
+												};
+
+												$scope.previousTimeslots = function () {
+														calendar.startOfDay--;
+														calendar.endOfDay--;
+														model.calendar = new calendar.Calendar({
+																week: moment(model.calendar.dayForWeek).week(),
+																year: moment(model.calendar.dayForWeek).year()
+														});
+														refreshCalendar();
+												};
+
+												$scope.nextTimeslots = function () {
+														calendar.startOfDay++;
+														calendar.endOfDay++;
+														model.calendar = new calendar.Calendar({
+																week: moment(model.calendar.dayForWeek).week(),
+																year: moment(model.calendar.dayForWeek).year()
+														});
+														refreshCalendar();
+												};
+
+												console.log($scope.items);
+										};
+
+										calendar.setCalendar = function (cal) {
+												model.calendar = cal;
+												refreshCalendar();
+										};
+
+										$timeout(function () {
+												refreshCalendar();
+												$scope.$watchCollection('items', refreshCalendar);
+										}, 0);
+										$scope.refreshCalendar = refreshCalendar;
+								},
+								link: function link(scope, element, attributes) {
+										var allowCreate;
+										scope.display = {};
+										scope.display.readonly = false;
+										attributes.$observe('createTemplate', function () {
+												if (attributes.createTemplate) {
+														template.open('schedule-create-template', attributes.createTemplate);
+														allowCreate = true;
+												}
+												if (attributes.displayTemplate) {
+														template.open('schedule-display-template', attributes.displayTemplate);
+												}
+										});
+										attributes.$observe('readonly', function () {
+												if (attributes.readonly && attributes.readonly !== 'false') {
+														scope.display.readonly = true;
+												}
+												if (attributes.readonly && attributes.readonly == 'false') {
+														scope.display.readonly = false;
+												}
+										});
+
+										scope.items = scope.$eval(attributes.items);
+										scope.onCreateOpen = function () {
+												if (!allowCreate) {
+														return;
+												}
+												scope.$eval(attributes.onCreateOpen);
+												scope.display.createItem = true;
+										};
+										scope.onCreateClose = function () {
+												scope.$eval(attributes.onCreateClose);
+										};
+										scope.$watch(function () {
+												return scope.$eval(attributes.items);
+										}, function (newVal) {
+												scope.items = newVal;
+										});
+								}
+						};
+				});
+		});
+})();
+
+'use strict';
+
+(function () {
+		'use strict';
+
+		AngularExtensions.addModuleConfig(function (module) {
 				module.directive('entDropdown', function () {
 						return {
 								restrict: "E",
@@ -4027,6 +4182,89 @@ Teacher.prototype.create = function (cb, cbe) {
                 action: 'calendarView'
             });
         });
+    });
+})();
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    var LessonService = function () {
+        function LessonService($http, $q) {
+            _classCallCheck(this, LessonService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.context = {
+                'dateFormat': 'YYYY-MM-DD'
+            };
+        }
+
+        _createClass(LessonService, [{
+            key: 'getMergeCourses',
+            value: function getMergeCourses(structureId, teacherId, firstDayOfWeek) {
+                var _this = this;
+
+                return this.$q.all([this.getScheduleCourses(structureId, teacherId, firstDayOfWeek), this.getSubjects(structureId)]).then(function (results) {
+                    var courses = results[0];
+                    var subjects = results[1];
+                    return _this.mappingCourses(courses, subjects);
+                });
+            }
+        }, {
+            key: 'mappingCourses',
+            value: function mappingCourses(courses, subjects) {
+                _.each(courses, function (course) {
+                    course.subject = subjects[course.subjectId];
+                });
+                return courses;
+            }
+        }, {
+            key: 'getScheduleCourses',
+            value: function getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
+                var begin = moment(firstDayOfWeek);
+                var end = moment(firstDayOfWeek).add(6, 'd');
+
+                var url = '/directory/timetable/teacher/' + structureId + '/' + teacherId;
+                var params = {
+                    begin: begin.format(this.context.dateFormat),
+                    end: end.format(this.context.dateFormat)
+                };
+                return this.$http.get(url, params).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getSubjects',
+            value: function getSubjects(structureId) {
+                if (!this.context.subjectPromise) {
+                    var url = '/directory/timetable/subjects/' + structureId;
+                    this.context.subjectPromise = this.$http.get(url).then(function (subjects) {
+                        //create a indexed array
+                        var results = {};
+                        _.each(subjects, function (subject) {
+                            results[subject.subjectId] = subject;
+                        });
+                        return results;
+                    });
+                }
+                return this.context.subjectPromise.then(function (result) {
+                    return result.data;
+                });
+            }
+        }]);
+
+        return LessonService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.service("LessonService", LessonService);
     });
 })();
 

@@ -3,6 +3,7 @@
 
     class LessonService {
 
+
         constructor($http,$q) {
             this.$http = $http;
             this.$q = $q;
@@ -15,18 +16,18 @@
             return this.$q.all([
                     this.getScheduleCourses(structureId, teacherId, firstDayOfWeek),
                     this.getSubjects(structureId)
-                ]).then(function(results){
+                ]).then(results =>{
                     let courses = results[0];
                     let subjects = results[1];
-                    return mappingCourses(courses,subjects);
+                    return this.mappingCourses(courses,subjects);
              });
         }
 
         mappingCourses(courses,subjects){
-            _.each(courses,function(course){
+            _.each(courses,course =>{
                 course.subject = subjects[course.subjectId];
             });
-            return result;
+            return courses;
         }
 
         getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
@@ -38,22 +39,26 @@
                 begin: begin.format(this.context.dateFormat),
                 end: end.format(this.context.dateFormat)
             };
-            return this.$http.get(url,params);
+            return this.$http.get(url,params).then(result =>{
+                return result.data;
+            });
         }
 
         getSubjects(structureId){
             if (!this.context.subjectPromise){
                 var url = `/directory/timetable/subjects/${structureId}`;
-                this.context.subjectPromise = this.$http.get(url).then(function(subjects){
+                this.context.subjectPromise = this.$http.get(url).then(subjects =>{
                     //create a indexed array
                     let results = {};
-                    _.each(subjects,function(subject){
+                    _.each(subjects,subject=>{
                         results[subject.subjectId] = subject;
                     });
                     return results;
                 });
             }
-            return this.context.subjectPromise;
+            return this.context.subjectPromise.then(result =>{
+                return result.data;
+            });
         }
     }
 
