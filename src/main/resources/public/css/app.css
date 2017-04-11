@@ -1050,6 +1050,47 @@ i.external-link:before{
     content:'\e8aa';
 }
 
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/styles.scss */
+.main {
+  /*
+  background-color: red !important;
+*/ }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+.diary-item-calendar {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  .diary-item-calendar.diary-schedule {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.5);
+    border-style: dashed;
+    border-width: 1px; }
+  /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  .diary-item-calendar .diary-item-calendar-container .item-line {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding-bottom: 0px !important;
+    overflow: hidden; }
+    /* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    .diary-item-calendar .diary-item-calendar-container .item-line .hour {
+      white-space: nowrap;
+      overflow: hidden; }
+    /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    .diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox {
+      float: right;
+      margin-left: auto;
+      overflow: hidden;
+      white-space: nowrap;
+      min-width: 1em; }
+    /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    .diary-item-calendar .diary-item-calendar-container .item-line .rom {
+      white-space: nowrap;
+      margin-left: 0.5em;
+      overflow: hidden;
+      text-overflow: ellipsis; }
 
 
 /*# sourceMappingURL=app.css.map*/

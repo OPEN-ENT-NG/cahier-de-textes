@@ -26,6 +26,11 @@ model.canEdit = function () {
 };
 
 
+model.getCourseService = function(){
+    return angular.injector(['ng','app']).get("CourseService");
+};
+
+
 /**
  * Says whether or not current user is a teacher
  * @returns {*|boolean}
@@ -154,7 +159,6 @@ model.getMomentDateTimeFromDateAndMomentTime = function (date, momentTime) {
 
     return momentTime;
 };
-
 
 
 /**
@@ -362,9 +366,11 @@ model.build = function () {
                 that.loading = false;
             });
         }, pushAll: function(datas) {
+
             if (datas) {
                 this.all = _.union(this.all, datas);
             }
+            console.log(model.lessons);
         }, behaviours: 'diary'
     });
 
@@ -410,6 +416,7 @@ model.build = function () {
                         that.loading = false;
                     });
             }
+
         }
     });
 
@@ -886,51 +893,6 @@ model.initHomework = function (dueDate, lesson) {
     model.loadHomeworksLoad(homework, moment(homework.date).format(DATE_FORMAT), homework.audience.id);
 
     return homework;
-};
-
-/**
- * Init lesson
- * @returns {Lesson}
- */
-model.initLesson = function (timeFromCalendar, selectedDate) {
-    var lesson = new Lesson();
-
-    lesson.audience = {}; //sets the default audience to undefined
-    lesson.subject = model.subjects.first();
-    lesson.audienceType = lesson.audience.type;
-    lesson.color = DEFAULT_ITEM_COLOR;
-    lesson.state = DEFAULT_STATE;
-    lesson.title = lang.translate('diary.lesson.label');
-
-    var newItem = {};
-
-    if(timeFromCalendar) {
-        newItem = model.calendar.newItem;
-
-        // force to HH:00 -> HH:00 + 1 hour
-        newItem.beginning = newItem.beginning.minute(0).second(0);
-        newItem.date = newItem.beginning;
-
-        newItem.end = moment(newItem.beginning);
-        newItem.end.minute(0).second(0).add(1, 'hours');
-    }
-    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
-    else {
-        var itemDate = (selectedDate) ? moment(selectedDate): moment();
-
-        newItem = {
-            date: itemDate,
-            beginning: moment().minute(0).second(0),
-            end: moment().minute(0).second(0).add(1, 'hours')
-        }
-    }
-
-    lesson.newItem = newItem;
-    lesson.startTime = newItem.beginning;
-    lesson.endTime = newItem.end;
-    lesson.date = newItem.date;
-
-    return lesson;
 };
 
 

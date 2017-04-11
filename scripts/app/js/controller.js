@@ -13,7 +13,8 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window,LessonService) {
+function DiaryController($scope, template, model, route, $location, $window,CourseService) {
+
 
     $scope.currentErrors = [];
 
@@ -73,15 +74,7 @@ function DiaryController($scope, template, model, route, $location, $window,Less
         hideCalendar : false
     };
 
-    /**
-     * Used to know if user clicked on calendar event
-     * or is dragging  to prevent ng-click
-     */
-    $scope.itemMouseEvent = {
-        lastMouseDownTime: undefined,
-        lastMouseClientX: undefined,
-        lastMouseClientY: undefined
-    };
+
 
     $scope.lessons = model.lessons;
     $scope.audiences = model.audiences;
@@ -111,7 +104,6 @@ function DiaryController($scope, template, model, route, $location, $window,Less
 
     route({
         createLessonView: function (params) {
-
             var openFunc = function () {
                 $scope.lesson = null;
                 $scope.lessonDescriptionIsReadOnly = false;
@@ -170,6 +162,7 @@ function DiaryController($scope, template, model, route, $location, $window,Less
             loadHomeworkFromRoute(params);
         },
         calendarView: function (params) {
+            $scope.display.showList = false;
 
             var mondayOfWeek = moment();
 
@@ -200,16 +193,6 @@ function DiaryController($scope, template, model, route, $location, $window,Less
 
 
 
-
-    $scope.initCourses = function(){
-        if(model.me.type === 'ENSEIGNANT'){
-            LessonService.getMergeCourses(model.me.structures[0],model.me.userId,model.calendar.dayForWeek) .then(function(result){
-                console.log("result",result);
-            })  ;
-        }
-    };
-
-    $scope.initCourses();
 
     $scope.setLessonDescriptionMode = function(homeworkId) {
         if ($scope.lessonDescriptionIsReadOnly) {
@@ -328,7 +311,6 @@ function DiaryController($scope, template, model, route, $location, $window,Less
         template.open('main', 'main');
         template.open('main-view', 'calendar');
         template.open('daily-event-details', 'daily-event-details');
-
         // need sync lessons and homeworks if calendar week changed
         if (syncItems) {
             model.lessons.syncLessons(null, validationError);
@@ -1109,9 +1091,6 @@ function DiaryController($scope, template, model, route, $location, $window,Less
 
 
 
-
-
-
     /**
      * Refresh homework load for all homeworks of current lesson
      */
@@ -1166,59 +1145,12 @@ function DiaryController($scope, template, model, route, $location, $window,Less
         $scope.show(moment(model.calendar.firstDay));
     };
 
-    /**
-     * Opens the next week view of calendar
-     */
-    $scope.nextWeek = function () {
-        var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
-        $scope.goToCalendarView(nextMonday.format(CAL_DATE_PATTERN));
-    };
 
-    /**
-     * Opens the previous week view of calendar
-     */
-    $scope.previousWeek = function () {
-        var prevMonday = moment(model.calendar.firstDay).add(-7, 'day');
-        $scope.goToCalendarView(prevMonday.format(CAL_DATE_PATTERN));
-    };
 
     $scope.addHomeworkToLesson = function(lesson){
         lesson.addHomework(lesson);
     };
 
-
-    $scope.setMouseDownTime = function ($event) {
-        $scope.itemMouseEvent.lastMouseDownTime = new Date().getTime();
-        $scope.itemMouseEvent.lastMouseClientX = $event.clientX;
-        $scope.itemMouseEvent.lastMouseClientY = $event.clientY;
-    };
-
-    /**
-     * Redirect to path only when user is doind a real click.
-     * If user is draging item redirect will not be called
-     * @param item Lesson being clicked or dragged
-     * @param $event
-     */
-    $scope.openOnClickSaveOnDrag = function (item, $event) {
-
-        var path = '/editLessonView/' + item.id;
-
-        // gap between days is quite important
-        var xMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;
-        // gap between minutes is tiny so y mouse move detection must be accurate
-        // so user can change lesson time slightly
-        var yMouseMoved = Math.abs($scope.itemMouseEvent.lastMouseClientY - $event.clientY) > 0;
-
-        // fast click = no drag = real click
-        // or cursor did not move
-        if ((!xMouseMoved && !yMouseMoved) || (new Date().getTime() - $scope.itemMouseEvent.lastMouseDownTime) < 300) {
-
-            // do not redirect to lesson view if user clicked on checkbox
-            if (!($event.target && $event.target.type === "checkbox")) {
-                $scope.redirect(path)
-            }
-        }
-    };
 
     $scope.redirect = function (path) {
         $location.path(path);

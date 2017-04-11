@@ -4,7 +4,7 @@
  *
  */
 var diariesBehaviours = {
-	resources: { 
+	resources: {
 		//lessons
 		shareSubmitLesson: {
 			right: "fr-openent-diary-controllers-LessonController|shareSubmit"

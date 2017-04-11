@@ -40,6 +40,5 @@
                     action: 'calendarView'
                 });
         });
-
     });
 })();

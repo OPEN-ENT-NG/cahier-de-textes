@@ -1,0 +1,76 @@
+<!--  tooltip="[[item.subjectLabel]] - [[item.audienceLabel]] - [[item.room]]<br>[[item.title]]" -->
+
+<div class="diary-item-calendar schedule-item-content"
+     ng-style="{'background-color': item.color}"
+     ng-class="{'diary-schedule' :item.type==='schedule' }"
+     tooltip="[[item.tooltipText]]">
+     <!-- #######################
+          ######## lessons part
+          ########################-->
+    <div ng-click="openOnClickSaveOnDrag(item, $event)"
+        ng-mouseDown="setMouseDownTime($event)"
+        ng-if="item.type!=='schedule'"
+        class="diary-item-calendar-container">
+        <div class="item-line">
+            <!-- Hour Start -->
+            <span id="hour-start" class="hour">
+                [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
+            </span>
+            <!-- 3 - SALLE -->
+            <span id="room" class="room">[[item.room]]</span>
+
+            <!-- 5 - CHECK -->
+            <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected" class="item-checkbox"/>
+        </div>
+        <div style="item-line">
+            <!-- 1 - End Hour -->
+            <span id="hour-end" class="hour">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
+            <!-- 2 - CLASSE -->
+            <span  class="room">[[item.audienceLabel]]</span>
+            <!-- 1 - ICONE BROUILLON -->
+            <span id="state" ng-if="[[item.state]]=='draft'" class="item-checkbox">
+                <i class="icon pencil"></i>
+            </span>
+        </div>
+
+        <div>
+            <span id="subjectlabel" class="subjectlabel" >[[item.subjectLabel]]&nbsp;</span>
+        </div>
+    </div>
+    <!-- #######################
+         ######## schedule part
+         ########################-->
+
+    <div
+        ng-if="item.type==='schedule'"
+        class="diary-item-calendar-container">
+        <div class="item-line">
+            <!-- Hour Start -->
+            <span id="hour-start" class="hour">
+                [[item.startMoment.format('HH')]]h[[item.startMoment.format('mm')]]
+            </span>
+            <!-- 3 - SALLE -->
+            <span id="room" class="room">[[item.room]]</span>
+
+            <!-- 5 - CHECK -->
+        </div>
+
+        <!-- -->
+        <div style="item-line">
+            <!-- 1 - End Hour -->
+            <span id="hour-end" class="hour">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
+            <!-- 2 - CLASSE -->
+            <span  class="room">[[item.audienceLabel]]</span>
+            <!-- 1 - ICONE BROUILLON -->
+            <span id="state" ng-if="[[item.state]]=='draft'" class="item-checkbox">
+                <i class="icon pencil"></i>
+            </span>
+        </div>
+
+        <div>
+            <span id="subjectlabel" class="subjectlabel" >[[item.subjectLabel]]&nbsp;</span>
+        </div>
+    </div>
+
+
+</div>

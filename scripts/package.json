@@ -10,16 +10,15 @@
     "ng-annotate-brunch": "^1.7.2",
     "babel-preset-es2015": "^6.24.0",
     "babel-brunch": "^6.1.1",
-    "git-digest-brunch": "git+https://git@github.com/mikefarah/git-digest-brunch.git"
-  },
-  "dependencies": {
-    "after-brunch": "0.0.5",
-    "angularjs-templates-brunch": "^1.0.0"
+    "after-brunch": "0.0.5"
   },
   "scripts": {
     "postinstall": "bower install",
     "clean": "rimraf ../dist/*",
     "dev": "brunch w -s",
     "build-prod": "brunch build --production —config production"
+  },
+  "dependencies": {
+    "git-digest-brunch": "^1.0.3"
   }
 }
