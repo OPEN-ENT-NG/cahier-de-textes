@@ -3,13 +3,13 @@
 <div class="diary-item-calendar schedule-item-content"
      ng-style="{'background-color': item.color}"
      ng-class="{'diary-schedule' :item.type==='schedule' }"
-     tooltip="[[item.tooltipText]]">
+     diary-tooltip="[[item.tooltipText]]">
      <!-- #######################
           ######## lessons part
           ########################-->
     <div ng-click="openOnClickSaveOnDrag(item, $event)"
         ng-mouseDown="setMouseDownTime($event)"
-        ng-if="item.type!=='schedule'"
+
         class="diary-item-calendar-container">
         <div class="item-line">
             <!-- Hour Start -->
@@ -20,9 +20,9 @@
             <span id="room" class="room">[[item.room]]</span>
 
             <!-- 5 - CHECK -->
-            <input id="itemcheckbox" ng-if="isUserTeacher" type="checkbox" ng-model="item.selected" class="item-checkbox"/>
+            <input id="itemcheckbox" ng-if="params.isUserTeacher" type="checkbox" ng-model="item.selected" class="item-checkbox"/>
         </div>
-        <div style="item-line">
+        <div class="item-line">
             <!-- 1 - End Hour -->
             <span id="hour-end" class="hour">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
             <!-- 2 - CLASSE -->
@@ -39,10 +39,11 @@
     </div>
     <!-- #######################
          ######## schedule part
-         ########################-->
+         ########################
+     -->
 
     <div
-        ng-if="item.type==='schedule'"
+        ng-if="item.type==='sdchedule'"
         class="diary-item-calendar-container">
         <div class="item-line">
             <!-- Hour Start -->

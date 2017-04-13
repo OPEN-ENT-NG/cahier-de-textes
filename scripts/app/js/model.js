@@ -307,12 +307,15 @@ var getUserStructuresIdsAsString = function () {
 
 
 model.build = function () {
+
     calendar.startOfDay=8;
     calendar.endOfDay=19;
     calendar.dayHeight = 65;
-    model.calendar = new calendar.Calendar({
+    console.log("dont build !");
+    /*model.calendar = new calendar.Calendar({
         week: moment().week()
     });
+    */
 
     // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
     // note: model.calendar.startOfDay does not work in console.
@@ -328,6 +331,8 @@ model.build = function () {
     this.collection(Lesson, {
         loading: false,
         syncLessons: function (cb, cbe) {
+            console.warn("deprecated");
+            return;
             var that = this;
             if (that.loading)
                 return;
@@ -599,7 +604,8 @@ model.build = function () {
      * @param lesson Sql diary.lesson row
      */
     sqlToJsLesson = function (data) {
-
+        console.warn("deprecated");
+        return;
         var lessonHomeworks = new Array();
 
         // only initialize homeworks attached to lesson
@@ -662,6 +668,8 @@ model.build = function () {
     };
 
     jsonToJsAttachment = function (data) {
+        console.warn("deprecated");
+        return;
         var att = new Attachment();
         att.id = data.id;
         att.user_id = data.user_id;
@@ -688,7 +696,8 @@ model.build = function () {
      * @param lesson
      */
     getResponsiveLessonTooltipText = function (lesson) {
-
+        console.warn("deprecated use utils service");
+        return;
         var tooltipText = lesson.title + ' ('+lang.translate(lesson.state)+')';
         var screenWidth = window.innerWidth;
 
@@ -893,6 +902,52 @@ model.initHomework = function (dueDate, lesson) {
     model.loadHomeworksLoad(homework, moment(homework.date).format(DATE_FORMAT), homework.audience.id);
 
     return homework;
+};
+
+
+/**
+ * Init lesson
+ * @returns {Lesson}
+ */
+model.initLesson = function (timeFromCalendar, selectedDate) {
+    var lesson = new Lesson();
+
+    lesson.audience = {}; //sets the default audience to undefined
+    lesson.subject = model.subjects.first();
+    lesson.audienceType = lesson.audience.type;
+    lesson.color = DEFAULT_ITEM_COLOR;
+    lesson.state = DEFAULT_STATE;
+    lesson.title = lang.translate('diary.lesson.label');
+
+    var newItem = {};
+
+    if(timeFromCalendar) {
+        newItem = model.calendar.newItem;
+
+        // force to HH:00 -> HH:00 + 1 hour
+        newItem.beginning = newItem.beginning.minute(0).second(0);
+        newItem.date = newItem.beginning;
+
+        newItem.end = moment(newItem.beginning);
+        newItem.end.minute(0).second(0).add(1, 'hours');
+    }
+    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
+    else {
+        var itemDate = (selectedDate) ? moment(selectedDate): moment();
+
+        newItem = {
+            date: itemDate,
+            beginning: moment().minute(0).second(0),
+            end: moment().minute(0).second(0).add(1, 'hours')
+        }
+    }
+
+    lesson.newItem = newItem;
+    lesson.startTime = newItem.beginning;
+    lesson.endTime = newItem.end;
+    lesson.date = newItem.date;
+
+    return lesson;
 };
 
 

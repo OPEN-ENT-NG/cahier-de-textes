@@ -6,15 +6,12 @@
     * used to manipulate Course model
     */
     class CourseService {
-
-
-        constructor($http,$q) {
+        constructor($http,$q,constants) {
           console.log("instantiate courseService");
             this.$http = $http;
             this.$q = $q;
-            this.context = {
-                'dateFormat' : 'YYYY-MM-DD'
-            };
+            this.constants = constants;
+            this.context = {};
         }
 
 
@@ -55,8 +52,8 @@
             let url = `/directory/timetable/teacher/${structureId}/${teacherId}`;
             let config = {
                 params : {
-                    begin: begin.format(this.context.dateFormat),
-                    end: end.format(this.context.dateFormat),
+                    begin: begin.format(this.constants.CAL_DATE_PATTERN),
+                    end: end.format(this.constants.CAL_DATE_PATTERN),
                 }
             };
             return this.$http.get(url,config).then(result =>{
@@ -80,7 +77,7 @@
             return this.context.subjectPromise;
         }
     }
-    /* create singleton */
+
     AngularExtensions.addModuleConfig(function(module) {
         module.service("CourseService",CourseService);
     });

@@ -127,6 +127,792 @@ var AngularExtensions = {
     }
 };
 
+"use strict";
+
+(function () {
+  'use strict';
+
+  AngularExtensions.addModuleConfig(function (module) {
+    //controller declaration
+    module.value("constants", {
+      CAL_DATE_PATTERN: "YYYY-MM-DD"
+    });
+  });
+})();
+
+'use strict';
+
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
+
+		module.directive('diaryCalendar', directive);
+
+		function directive() {
+			return {
+				restrict: 'E',
+				templateUrl: '/diary/public/js/common/directives/calendar/calendar.template.html',
+				scope: {
+					items: '=',
+					mondayOfWeek: '=',
+					itemTemplate: '@',
+					readOnly: '=',
+					displayTemplate: '=',
+					onCreateOpenAction: '&',
+					params: '='
+				},
+
+				controller: 'DiaryCalendarController',
+				controllerAs: "DiaryCalendarCtrl"
+			};
+		}
+	});
+})();
+
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.controller("DiaryCalendarController", controller);
+
+        function controller($scope, $timeout, $window, $element) {
+            // use controllerAs practice
+            var vm = this;
+
+            /*
+             * Initilisation function
+             */
+            init();
+
+            function init() {
+                //display options
+                vm.display = {
+                    editItem: false,
+                    createItem: false,
+                    readonly: $scope.readOnly
+                };
+
+                //$scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
+
+                /**
+                 * Used to know if user clicked on calendar event
+                 * or is dragging  to prevent ng-click
+                 */
+                vm.itemMouseEvent = {
+                    lastMouseDownTime: undefined,
+                    lastMouseClientX: undefined,
+                    lastMouseClientY: undefined
+                };
+
+                bindEvents();
+            }
+
+            $scope.$watch("mondayOfWeek", function (n, o) {
+
+                if (!$scope.mondayOfWeek) {
+                    return;
+                }
+
+                var date = moment();
+
+                // create calendar objet
+                vm.calendar = new calendar.Calendar({
+                    week: moment($scope.mondayOfWeek).week(),
+                    year: moment($scope.mondayOfWeek).year()
+                });
+
+                /*
+                * //TODO no a good practice but all the code refer to model.calendar
+                * try to dissociate
+                */
+                model.calendar = vm.calendar;
+
+                vm.calendar.week = $scope.mondayOfWeek.week();
+                vm.calendar.setDate($scope.mondayOfWeek);
+
+                $scope.lastDay = moment($scope.mondayOfWeek).add(6, 'd');
+            });
+
+            /*
+            *   all events binded here
+            */
+            function bindEvents() {
+                //set items watcher
+                $scope.$watch('items', function (n, o) {
+                    vm.refreshCalendar();
+                });
+                // add event listener
+                $scope.$on('calendar.refreshItems', function () {
+                    vm.refreshCalendar();
+                });
+
+                angular.element($window).bind('resize', _.throttle(disposeItems, 50));
+            }
+
+            /*
+             * refresh calendar every items modification
+             */
+            vm.refreshCalendar = function () {
+                if (!vm.calendar) {
+                    return;
+                }
+                var date = moment();
+                vm.calendar.clearScheduleItems();
+                var scheduleItems = _.where(_.map($scope.items, function (item) {
+                    item.beginning = item.startMoment;
+                    item.end = item.endMoment;
+                    return item;
+                }), {
+                    is_periodic: false
+                });
+                vm.calendar.addScheduleItems(scheduleItems);
+                //TODO remove?
+                console.log(moment().diff(date));
+                $timeout(function () {
+                    console.log(moment().diff(date));
+                    disposeItems();
+                    console.log(moment().diff(date));
+                });
+            };
+
+            //between not supported on the current underscore version
+            vm.between = function (date, start, end) {
+                return date.isAfter(start) && date.isBefore(end);
+            };
+
+            vm.removeCollisions = function (day) {
+                _.each(day.scheduleItems, function (scheduleItem) {
+                    delete scheduleItem.calendarGutter;
+                });
+            };
+
+            //calc colisions
+            vm.calcAllCollisions = function (item, day) {
+                var calendarGutter = 0;
+                var collision = true;
+                while (collision) {
+                    collision = false;
+                    day.scheduleItems.forEach(function (scheduleItem) {
+                        /*if (scheduleItem === item) {
+                            return;
+                        }*/
+                        if (vm.between(item.beginning, scheduleItem.beginning, scheduleItem.end) || vm.between(item.end, scheduleItem.beginning, scheduleItem.end) || vm.between(scheduleItem.end, item.beginning, item.end)) {
+                            if (scheduleItem.calendarGutter === calendarGutter) {
+                                calendarGutter++;
+                                collision = true;
+                            }
+                        }
+                    });
+                }
+                item.calendarGutter = calendarGutter;
+            };
+
+            /*
+            * dispose item elements
+            */
+            function disposeItems() {
+                var nbItemsDisposed = 0;
+                //recal all collisions
+                _.each(vm.calendar.days.all, function (day) {
+                    vm.removeCollisions(day);
+                    _.each(day.scheduleItems.all, function (item) {
+                        vm.calcAllCollisions(item, day);
+                    });
+                });
+
+                _.each(vm.calendar.days.all, function (day) {
+                    _.each(day.scheduleItems.all, function (item) {
+                        disposeItem(item, day);
+                        nbItemsDisposed++;
+                    });
+                });
+            }
+
+            /*
+            * dispose on item
+            */
+            function disposeItem(item, day) {
+
+                var itemWidth = day.scheduleItems.scheduleItemWidth(item);
+                var dayWidth = $element.find('.day').width();
+
+                var beginningMinutesHeight = item.beginning.minutes() * calendar.dayHeight / 60;
+                var endMinutesHeight = item.end.minutes() * calendar.dayHeight / 60;
+                var hours = calendar.getHours(item, day);
+                var top = (hours.startTime - calendar.startOfDay) * calendar.dayHeight + beginningMinutesHeight;
+                var containerTop = "0px";
+                var containerHeight = "100%";
+
+                var scheduleItemHeight = (hours.endTime - hours.startTime) * calendar.dayHeight - beginningMinutesHeight + endMinutesHeight;
+                if (top < 0) {
+                    containerTop = Math.abs(top) - 5 + 'px';
+                    containerHeight = scheduleItemHeight + top + 5 + 'px';
+                }
+
+                item.position = {
+                    scheduleItemStyle: {
+                        width: itemWidth + '%',
+                        top: top + 'px',
+                        left: item.calendarGutter * (itemWidth * dayWidth / 100) + 'px',
+                        height: scheduleItemHeight + 'px'
+                    },
+                    containerStyle: {
+                        top: containerTop,
+                        height: containerHeight
+                    }
+                };
+            }
+
+            vm.createItem = function (day, timeslot) {
+                $scope.newItem = {};
+                var year = vm.calendar.year;
+                if (day.index < vm.calendar.firstDay.dayOfYear()) {
+                    year++;
+                }
+                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
+                $scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
+                vm.calendar.newItem = $scope.newItem;
+                $scope.onCreateOpen();
+            };
+
+            vm.closeCreateWindow = function () {
+                vm.display.createItem = false;
+                $scope.onCreateClose();
+            };
+
+            vm.updateCalendarWeek = function () {
+                //annoying new year workaround
+                if (moment(vm.calendar.dayForWeek).week() === 1 && moment(vm.calendar.dayForWeek).dayOfYear() > 7) {
+                    vm.calendar = new calendar.Calendar({
+                        week: moment(vm.calendar.dayForWeek).week(),
+                        year: moment(vm.calendar.dayForWeek).year() + 1
+                    });
+                } else if (moment(vm.calendar.dayForWeek).week() === 53 && moment(vm.calendar.dayForWeek).dayOfYear() < 7) {
+                    vm.calendar = new calendar.Calendar({
+                        week: moment(vm.calendar.dayForWeek).week(),
+                        year: moment(vm.calendar.dayForWeek).year() - 1
+                    });
+                } else {
+                    vm.calendar = new calendar.Calendar({
+                        week: moment(vm.calendar.dayForWeek).week(),
+                        year: moment(vm.calendar.dayForWeek).year()
+                    });
+                }
+                model.trigger('calendar.date-change');
+                vm.refreshCalendar();
+            };
+
+            $scope.previousTimeslots = function () {
+                calendar.startOfDay--;
+                calendar.endOfDay--;
+                vm.calendar = new calendar.Calendar({
+                    week: moment(vm.calendar.dayForWeek).week(),
+                    year: moment(vm.calendar.dayForWeek).year()
+                });
+                vm.refreshCalendar();
+            };
+
+            $scope.nextTimeslots = function () {
+                calendar.startOfDay++;
+                calendar.endOfDay++;
+                vm.calendar = new calendar.Calendar({
+                    week: moment(vm.calendar.dayForWeek).week(),
+                    year: moment(vm.calendar.dayForWeek).year()
+                });
+                vm.refreshCalendar();
+            };
+
+            $scope.onCreateOpen = function () {
+                /*if (!allowCreate) {
+                    return;
+                }*/
+
+                $scope.onCreateOpenAction();
+                //$scope.$eval(attributes.onCreateOpen);
+                vm.display = {
+                    createItem: true
+                };
+            };
+            $scope.onCreateClose = function () {
+                $scope.$eval(attributes.onCreateClose);
+            };
+
+            $scope.setMouseDownTime = function ($event) {
+                vm.itemMouseEvent.lastMouseDownTime = new Date().getTime();
+                vm.itemMouseEvent.lastMouseClientX = $event.clientX;
+                vm.itemMouseEvent.lastMouseClientY = $event.clientY;
+            };
+
+            /**
+             * Redirect to path only when user is doind a real click.
+             * If user is draging item redirect will not be called
+             * @param item Lesson being clicked or dragged
+             * @param $event
+             */
+            $scope.openOnClickSaveOnDrag = function (item, $event) {
+
+                var path = '/editLessonView/' + item.id;
+
+                // gap between days is quite important
+                var xMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;
+                // gap between minutes is tiny so y mouse move detection must be accurate
+                // so user can change lesson time slightly
+                var yMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientY - $event.clientY) > 0;
+
+                // fast click = no drag = real click
+                // or cursor did not move
+                if (!xMouseMoved && !yMouseMoved || new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime < 300) {
+                    // do not redirect to lesson view if user clicked on checkbox
+                    if (!($event.target && $event.target.type === "checkbox")) {
+                        $scope.redirect(path);
+                    }
+                } else {
+                    $timeout(vm.refreshCalendar);
+                }
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+                      'use strict';
+
+                      AngularExtensions.addModuleConfig(function (module) {
+                                            module.directive('diaryScheduleItem', function ($compile) {
+                                                                  return {
+                                                                                        restrict: 'E',
+                                                                                        require: '^diary-calendar',
+                                                                                        template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
+                                                                                        controller: function controller($scope, $element, $timeout) {
+
+                                                                                                              var vm = this;
+
+                                                                                                              $scope.item.$element = $element;
+
+                                                                                                              var parentSchedule = $element.parents('.schedule');
+                                                                                                              var scheduleItemEl = $element.children('.schedule-item');
+
+                                                                                                              scheduleItemEl.find('container').append($compile($scope.displayTemplate)($scope));
+
+                                                                                                              if ($scope.item.beginning.dayOfYear() !== $scope.item.end.dayOfYear() || $scope.item.locked) {
+                                                                                                                                    scheduleItemEl.removeAttr('resizable');
+                                                                                                                                    scheduleItemEl.removeAttr('draggable');
+                                                                                                                                    scheduleItemEl.unbind('mouseover');
+                                                                                                                                    scheduleItemEl.unbind('click');
+                                                                                                                                    scheduleItemEl.data('lock', true);
+                                                                                                              }
+
+                                                                                                              vm.getTimeFromBoundaries = function () {
+
+                                                                                                                                    var dayWidth = parentSchedule.find('.day').width();
+
+                                                                                                                                    // compute element positon added to heiht of 7 hours ao avoid negative value side effect
+                                                                                                                                    var topPos = scheduleItemEl.position().top + calendar.dayHeight * calendar.startOfDay;
+
+                                                                                                                                    var startTime = moment(); //.utc();
+                                                                                                                                    startTime.hour(Math.floor(topPos / calendar.dayHeight));
+                                                                                                                                    startTime.minute(topPos % calendar.dayHeight * 60 / calendar.dayHeight);
+
+                                                                                                                                    var endTime = moment(); //.utc();
+                                                                                                                                    endTime.hour(Math.floor((topPos + scheduleItemEl.height()) / calendar.dayHeight));
+                                                                                                                                    endTime.minute((topPos + scheduleItemEl.height()) % calendar.dayHeight * 60 / calendar.dayHeight);
+
+                                                                                                                                    startTime.year(model.calendar.year);
+                                                                                                                                    endTime.year(model.calendar.year);
+
+                                                                                                                                    var days = $element.parents('.schedule').find('.day');
+                                                                                                                                    var center = scheduleItemEl.offset().left + scheduleItemEl.width() / 2;
+                                                                                                                                    var dayWidth = days.first().width();
+                                                                                                                                    days.each(function (index, item) {
+                                                                                                                                                          var itemLeft = $(item).offset().left;
+                                                                                                                                                          if (itemLeft < center && itemLeft + dayWidth > center) {
+                                                                                                                                                                                var day = index + 1;
+                                                                                                                                                                                var week = model.calendar.week;
+                                                                                                                                                                                endTime.week(week);
+                                                                                                                                                                                startTime.week(week);
+                                                                                                                                                                                if (day === 7) {
+                                                                                                                                                                                                      day = 0;
+                                                                                                                                                                                                      endTime.week(week + 1);
+                                                                                                                                                                                                      startTime.week(week + 1);
+                                                                                                                                                                                }
+                                                                                                                                                                                endTime.day(day);
+                                                                                                                                                                                startTime.day(day);
+                                                                                                                                                          }
+                                                                                                                                    });
+                                                                                                                                    return {
+                                                                                                                                                          startTime: startTime,
+                                                                                                                                                          endTime: endTime
+                                                                                                                                    };
+                                                                                                              };
+
+                                                                                                              scheduleItemEl.on('stopResize', function () {
+                                                                                                                                    var newTime = vm.getTimeFromBoundaries();
+                                                                                                                                    $scope.item.beginning = newTime.startTime;
+                                                                                                                                    $scope.item.end = newTime.endTime;
+
+                                                                                                                                    //$scope.item.date = newTime.startTime;
+                                                                                                                                    $scope.item.startMoment = newTime.startTime;
+                                                                                                                                    $scope.item.endMoment = moment(newTime.endTime);
+
+                                                                                                                                    $scope.item.data.beginning = newTime.startTime;
+                                                                                                                                    $scope.item.data.end = newTime.endTime;
+                                                                                                                                    $scope.item.data.date = newTime.startTime;
+                                                                                                                                    $scope.item.data.startMoment = newTime.startTime;
+                                                                                                                                    $scope.item.data.endMoment = moment(newTime.endTime);
+
+                                                                                                                                    $scope.item.startTime = moment(newTime.startTime).format('HH:mm:ss');
+                                                                                                                                    $scope.item.endTime = moment(newTime.endTime).format('HH:mm:ss');
+
+                                                                                                                                    $scope.$emit('calendar.refreshItems', $scope.item);
+                                                                                                              });
+
+                                                                                                              scheduleItemEl.on('stopDrag', function () {
+
+                                                                                                                                    var newTime = vm.getTimeFromBoundaries();
+
+                                                                                                                                    //concerve same duration on drag/drop
+                                                                                                                                    var duration = $scope.item.end.diff($scope.item.beginning);
+                                                                                                                                    newTime.endTime = moment(newTime.startTime).add(duration);
+
+                                                                                                                                    $scope.item.beginning = newTime.startTime;
+                                                                                                                                    $scope.item.end = newTime.endTime;
+
+                                                                                                                                    $scope.item.date = newTime.startTime;
+                                                                                                                                    $scope.item.startMoment = newTime.startTime;
+                                                                                                                                    $scope.item.endMoment = moment(newTime.endTime);
+
+                                                                                                                                    $scope.item.data.beginning = newTime.startTime;
+                                                                                                                                    $scope.item.data.end = newTime.endTime;
+                                                                                                                                    $scope.item.data.date = newTime.startTime;
+                                                                                                                                    $scope.item.data.startMoment = newTime.startTime;
+                                                                                                                                    $scope.item.data.endMoment = moment(newTime.endTime);
+
+                                                                                                                                    $scope.item.startTime = moment(newTime.startTime).format('HH:mm:ss');
+                                                                                                                                    $scope.item.endTime = moment(newTime.endTime).format('HH:mm:ss');
+
+                                                                                                                                    $scope.$emit('calendar.refreshItems', $scope.item);
+                                                                                                              });
+                                                                                        },
+
+                                                                                        link: function link(scope, element, attributes) {}
+                                                                  };
+                                            });
+                      });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.directive('diaryTooltip', directive);
+
+        var tooltip;
+        function directive($compile) {
+            //create one unique dom element to manage the tooltips
+            if (!tooltip) {
+                tooltip = $('<div />').addClass('diarytooltip').appendTo('body');
+            }
+            return {
+                restrict: 'A',
+                link: function link(scope, element, attributes) {
+                    /*if (ui.breakpoints.tablette >= $(window).width()) {
+                        return;
+                    }*/
+                    var tooltip = $('<div class="tooltip"/>').appendTo('body');
+                    var position;
+
+                    //create throttled function show
+                    var showThrottled = _.throttle(function () {
+                        if (!attributes.diaryTooltip || attributes.diaryTooltip === 'undefined') {
+                            return;
+                        }
+                        var tip = tooltip.html($compile('<div class="arrow"></div><div class="content">' + lang.translate(attributes.diaryTooltip) + '</div> ')(scope));
+                        position = {
+                            top: parseInt(element.offset().top + element.height()),
+                            left: parseInt(element.offset().left + element.width() / 2 - tip.width() / 2)
+                        };
+                        if (position.top < 5) {
+                            position.top = 5;
+                        }
+                        if (position.left < 5) {
+                            position.left = 5;
+                        }
+
+                        tooltip.css("top", position.top);
+                        tooltip.css("left", position.left);
+
+                        tooltip.fadeIn(100);
+                    });
+                    //bind show function
+                    element.bind('mouseover', showThrottled);
+
+                    //create debounced function hide
+                    var hideDebounced = _.debounce(function () {
+                        tooltip.fadeOut(100);
+                    }, 100);
+                    //bind leave function
+                    element.bind('mouseleave', hideDebounced);
+
+                    //free on detraoy element & handlers
+                    scope.$on("$destroy", function () {
+                        if (tooltip) {
+                            tooltip.remove();
+                        }
+                        element.off();
+                    });
+                }
+            };
+        }
+    });
+})();
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /* create singleton */
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("ResizableService", ResizableService);
+    });
+
+    var ResizableService = function () {
+        function ResizableService() {
+            _classCallCheck(this, ResizableService);
+        }
+
+        _createClass(ResizableService, [{
+            key: 'resizable',
+            value: function resizable(element, params) {
+                if (!params) {
+                    params = {};
+                }
+                if (!params.lock) {
+                    params.lock = {};
+                }
+
+                if (element.length > 1) {
+                    element.each(function (index, item) {
+                        ui.extendElement.resizable($(item), params);
+                    });
+                    return;
+                }
+
+                //cursor styles to indicate resizing possibilities
+                element.on('mouseover', function (e) {
+                    element.on('mousemove', function (e) {
+                        if (element.data('resizing') || element.data('lock')) {
+                            return;
+                        }
+                        var mouse = {
+                            x: e.pageX,
+                            y: e.pageY
+                        };
+                        var resizeLimits = {
+                            horizontalRight: element.offset().left + element.width() + 15 > mouse.x && mouse.x > element.offset().left + element.width() - 15 && params.lock.horizontal === undefined && params.lock.right === undefined,
+
+                            horizontalLeft: element.offset().left + 15 > mouse.x && mouse.x > element.offset().left - 15 && params.lock.horizontal === undefined && params.lock.left === undefined,
+
+                            verticalTop: element.offset().top + 5 > mouse.y && mouse.y > element.offset().top - 15 && params.lock.vertical === undefined && params.lock.top === undefined,
+
+                            verticalBottom: element.offset().top + element.height() + 5 > mouse.y && mouse.y > element.offset().top + element.height() - 5 && params.lock.vertical === undefined && params.lock.bottom === undefined
+                        };
+
+                        var orientations = {
+                            'ns': resizeLimits.verticalTop || resizeLimits.verticalBottom,
+                            'ew': resizeLimits.horizontalLeft || resizeLimits.horizontalRight,
+                            'nwse': resizeLimits.verticalBottom && resizeLimits.horizontalRight || resizeLimits.verticalTop && resizeLimits.horizontalLeft,
+                            'nesw': resizeLimits.verticalBottom && resizeLimits.horizontalLeft || resizeLimits.verticalTop && resizeLimits.horizontalRight
+
+                        };
+
+                        var cursor = '';
+                        for (var orientation in orientations) {
+                            if (orientations[orientation]) {
+                                cursor = orientation;
+                            }
+                        }
+
+                        if (cursor) {
+                            cursor = cursor + '-resize';
+                        }
+                        element.css({
+                            cursor: cursor
+                        });
+                        element.find('[contenteditable]').css({
+                            cursor: cursor
+                        });
+                    });
+                    element.on('mouseout', function (e) {
+                        element.unbind('mousemove');
+                    });
+                });
+
+                //actual resize
+                element.on('mousedown.resize touchstart.resize', function (e) {
+                    if (element.data('lock') === true || element.data('resizing') === true) {
+                        return;
+                    }
+
+                    $('body').css({
+                        '-webkit-user-select': 'none',
+                        '-moz-user-select': 'none',
+                        'user-select': 'none'
+                    });
+                    var interrupt = false;
+                    var mouse = {
+                        y: e.pageY || e.originalEvent.touches[0].pageY,
+                        x: e.pageX || e.originalEvent.touches[0].pageX
+                    };
+                    var resizeLimits = {
+                        horizontalRight: element.offset().left + element.width() + 15 > mouse.x && mouse.x > element.offset().left + element.width() - 15 && params.lock.horizontal === undefined && params.lock.right === undefined,
+
+                        horizontalLeft: element.offset().left + 15 > mouse.x && mouse.x > element.offset().left - 15 && params.lock.horizontal === undefined && params.lock.left === undefined,
+
+                        verticalTop: element.offset().top + 5 > mouse.y && mouse.y > element.offset().top - 15 && params.lock.vertical === undefined && params.lock.top === undefined,
+
+                        verticalBottom: element.offset().top + element.height() + 5 > mouse.y && mouse.y > element.offset().top + element.height() - 5 && params.lock.vertical === undefined && params.lock.bottom === undefined
+                    };
+
+                    var initial = {
+                        pos: element.offset(),
+                        size: {
+                            width: element.width(),
+                            height: element.height()
+                        }
+                    };
+                    var parent = element.parents('.drawing-zone');
+                    var parentData = {
+                        pos: parent.offset(),
+                        size: {
+                            width: parent.width(),
+                            height: parent.height()
+                        }
+                    };
+
+                    if (resizeLimits.horizontalLeft || resizeLimits.horizontalRight || resizeLimits.verticalTop || resizeLimits.verticalBottom) {
+                        element.trigger('startResize');
+                        e.preventDefault();
+                        e.stopPropagation();
+                        element.data('resizing', true);
+                        $('.main').css({
+                            'cursor': element.css('cursor')
+                        });
+
+                        $(window).unbind('mousemove.drag touchmove.start');
+                        $(window).on('mousemove.resize touchmove.resize', function (e) {
+                            element.unbind("click");
+                            mouse = {
+                                y: e.pageY || e.originalEvent.touches[0].pageY,
+                                x: e.pageX || e.originalEvent.touches[0].pageX
+                            };
+                        });
+
+                        //animation for resizing
+                        var resize = function resize() {
+                            var newWidth = 0;
+                            var newHeight = 0;
+                            if (resizeLimits.horizontalLeft || resizeLimits.horizontalRight) {
+                                var p = element.offset();
+                                if (resizeLimits.horizontalLeft) {
+                                    var distance = initial.pos.left - mouse.x;
+                                    if (initial.pos.left - distance < parentData.pos.left) {
+                                        distance = initial.pos.left - parentData.pos.left;
+                                    }
+                                    if (params.moveWithResize !== false) {
+                                        element.offset({
+                                            left: initial.pos.left - distance,
+                                            top: p.top
+                                        });
+                                    }
+
+                                    newWidth = initial.size.width + distance;
+                                } else {
+                                    var distance = mouse.x - p.left;
+                                    if (element.offset().left + distance > parentData.pos.left + parentData.size.width) {
+                                        distance = parentData.pos.left + parentData.size.width - element.offset().left - 2;
+                                    }
+                                    newWidth = distance;
+                                }
+                                if (newWidth > 0) {
+                                    element.width(newWidth);
+                                }
+                            }
+                            if (resizeLimits.verticalTop || resizeLimits.verticalBottom) {
+
+                                var p = element.offset();
+                                if (resizeLimits.verticalTop) {
+                                    console.log("resizeLimits.verticalTop");
+                                    var distance = initial.pos.top - mouse.y;
+                                    if (initial.pos.top - distance < parentData.pos.top) {
+                                        distance = initial.pos.top - parentData.pos.top;
+                                    }
+                                    if (params.moveWithResize !== false) {
+                                        element.offset({
+                                            left: p.left,
+                                            top: initial.pos.top - distance
+                                        });
+                                    }
+
+                                    newHeight = initial.size.height + distance;
+                                } else {
+                                    console.log("!resizeLimits.verticalTop");
+                                    var distance = mouse.y - p.top;
+                                    if (element.offset().top + distance > parentData.pos.top + parent.height()) {
+                                        distance = parentData.pos.top + parentData.size.height - element.offset().top - 2;
+                                    }
+                                    newHeight = distance;
+                                }
+                                if (newHeight > 0) {
+                                    element.height(newHeight);
+                                }
+                            }
+                            element.trigger('resizing');
+                            if (!interrupt) {
+                                requestAnimationFrame(resize);
+                            }
+                        };
+                        resize();
+
+                        $(window).on('mouseup.resize touchleave.resize touchend.resize', function (e) {
+                            interrupt = true;
+                            setTimeout(function () {
+                                element.data('resizing', false);
+                                element.trigger('stopResize');
+                                if (params && typeof params.mouseUp === 'function') {
+                                    params.mouseUp(e);
+                                }
+                            }, 100);
+                            $(window).unbind('mousemove.resize touchmove.resize mouseup.resize touchleave.resize touchend.resize');
+                            $('body').unbind('mouseup.resize touchleave.resize touchend.resize');
+
+                            $('.main').css({
+                                'cursor': ''
+                            });
+                        });
+                    }
+                });
+            }
+        }]);
+
+        return ResizableService;
+    }();
+})();
+
 'use strict';
 
 /**
@@ -239,11 +1025,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.openLessonView(null, params);
             };
 
-            if ($scope.calendarLoaded) {
-                openFunc();
-            } else {
-                initialization(false, openFunc);
-            }
+            //if ($scope.calendarLoaded) {
+            openFunc();
+            /*} else {
+                initialization(false, openFunc)
+            }*/
         },
         createHomeworkView: function createHomeworkView() {
 
@@ -290,18 +1076,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
             loadHomeworkFromRoute(params);
         },
         calendarView: function calendarView(params) {
-            $scope.display.showList = false;
-
-            var mondayOfWeek = moment();
-
-            // mondayOfWeek as string date formatted YYYY-MM-DD
-            if (params.mondayOfWeek) {
-                mondayOfWeek = moment(params.mondayOfWeek);
-            } else {
-                mondayOfWeek = mondayOfWeek.weekday(0);
-            }
-
-            $scope.showCalendar(mondayOfWeek);
+            console.log(params);
+            template.open('main', 'main');
+            template.open('main-view', 'calendar');
+            template.open('daily-event-details', 'daily-event-details');
         },
         listView: function listView() {
             $scope.lesson = null;
@@ -393,51 +1171,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         template.open('main', 'main');
         template.open('main-view', 'list-view');
         $scope.$apply();
-    };
-
-    /**
-     *
-     * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
-     */
-    $scope.showCalendar = function (momentMondayOfWeek) {
-
-        $scope.display.showList = false;
-
-        if (!$scope.calendarLoaded) {
-            initialization(true);
-            return;
-        }
-
-        if (!momentMondayOfWeek) {
-            momentMondayOfWeek = moment();
-        }
-
-        momentMondayOfWeek = momentMondayOfWeek.weekday(0);
-
-        model.lessonsDropHandled = false;
-        model.homeworksDropHandled = false;
-        $scope.display.showList = false;
-
-        // need reload lessons or homeworks if week changed
-        var syncItems = momentMondayOfWeek.week() != model.calendar.week;
-
-        $scope.lesson = null;
-        $scope.homework = null;
-
-        model.calendar.week = momentMondayOfWeek.week();
-        model.calendar.setDate(momentMondayOfWeek);
-
-        template.open('main', 'main');
-        template.open('main-view', 'calendar');
-        template.open('daily-event-details', 'daily-event-details');
-        // need sync lessons and homeworks if calendar week changed
-        if (syncItems) {
-            model.lessons.syncLessons(null, validationError);
-            model.homeworks.syncHomeworks(function () {
-                $scope.showCal = !$scope.showCal;
-                $scope.$apply();
-            }, validationError);
-        }
     };
 
     /**
@@ -1143,50 +1876,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 
     /**
-     * Load related data to lessons and homeworks from database
-     * @param cb Callback function
-     * @param bShowTemplates if true loads calendar templates after data loaded
-     * might be used when
-     */
-    var initialization = function initialization(bShowTemplates, cb) {
-
-        // will force quick search panel to load (e.g: when returning to calendar view)
-        // see ng-extensions.js -> quickSearch directive
-        model.lessonsDropHandled = false;
-        model.homeworksDropHandled = false;
-
-        $scope.countdown = 4;
-
-        // auto creates diary.teacher
-        if ("ENSEIGNANT" === model.me.type) {
-            var teacher = new Teacher();
-            teacher.create(decrementCountdown(bShowTemplates, cb), validationError);
-        } else {
-            decrementCountdown(bShowTemplates, cb);
-        }
-
-        // subjects and audiences needed to fill in
-        // homeworks and lessons props
-
-        model.childs.syncChildren(function () {
-            $scope.child = model.child;
-            $scope.children = model.childs;
-            model.subjects.syncSubjects(function () {
-                model.audiences.syncAudiences(function () {
-                    decrementCountdown(bShowTemplates, cb);
-
-                    model.homeworkTypes.syncHomeworkTypes(function () {
-                        // call lessons/homework sync after audiences sync since
-                        // lesson and homework objects needs audience data to be built
-                        model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
-                        model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
-                    }, validationError);
-                }, validationError);
-            }, validationError);
-        }, validationError);
-    };
-
-    /**
      * Refresh homework load for all homeworks of current lesson
      */
     $scope.refreshHomeworkLoads = function (lesson) {
@@ -1520,47 +2209,205 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 }
 
-;"use strict";
+;'use strict';
 
 (function () {
     'use strict';
 
     AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("CalendarController", controller);
 
-        console.log("CalendarController initialized");
-        function controller($scope, $timeout, CourseService) {
-            console.log("CalendarController called");
+        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q) {
+
+            var vm = this;
+
             $timeout(init);
             /*
-            * initialisation calendar function
-            */
+             * initialisation calendar function
+             */
             function init() {
-                console.log(model.lessons.all);
-                CourseService.getMergeCourses(model.me.structures[0], model.me.userId, moment('2017-04-03')).then(function (courses) {
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
-                    console.log($scope.itemsCalendar);
+                //view controls
+                $scope.display.showList = false;
+
+                //calendar Params
+                $scope.calendarParams = {
+                    isUserTeacher: $scope.isUserTeacher
+                };
+
+                //handler calendar updates :
+                $scope.$on('calendar.refreshItems', function (_, item) {
+                    console.log("updated item", item);
+                    item.calendarUpdate();
                 });
             }
+
+            $scope.$watch('routeParams', function (n, o) {
+                console.log("routeParams changed", n);
+                var mondayOfWeek = moment();
+                // mondayOfWeek as string date formatted YYYY-MM-DD
+                if ($scope.routeParams.mondayOfWeek) {
+                    mondayOfWeek = moment($scope.routeParams.mondayOfWeek);
+                } else {
+                    mondayOfWeek = mondayOfWeek.weekday(0);
+                }
+                $scope.showCalendar(mondayOfWeek);
+            }, true);
+
+            $scope.routeParams = $routeParams;
 
             /**
              * Opens the next week view of calendar
              */
             $scope.nextWeek = function () {
-                var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
-                //TODO dont call the parent
-                $scope.$parent.goToCalendarView(nextMonday.format(CAL_DATE_PATTERN));
+                var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
+                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
             };
 
             /**
              * Opens the previous week view of calendar
              */
             $scope.previousWeek = function () {
-                var prevMonday = moment(model.calendar.firstDay).add(-7, 'day');
-                //TODO dont call the parent
-                $scope.$parent.goToCalendarView(prevMonday.format(CAL_DATE_PATTERN));
+                var nextMonday = moment($scope.mondayOfWeek).add(-7, 'd');
+                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
+            };
+
+            var validationError = function validationError(e) {
+
+                if (typeof e !== 'undefined') {
+                    console.error(e);
+                    notify.error(e.error);
+                    $scope.currentErrors.push(e);
+                    $scope.$apply();
+                }
+            };
+
+            /**
+             * Load related data to lessons and homeworks from database
+             * @param cb Callback function
+             * @param bShowTemplates if true loads calendar templates after data loaded
+             * might be used when
+             */
+            var initialization = function initialization(bShowTemplates, cb) {
+
+                // will force quick search panel to load (e.g: when returning to calendar view)
+                // see ng-extensions.js -> quickSearch directive
+                model.lessonsDropHandled = false;
+                model.homeworksDropHandled = false;
+
+                $scope.countdown = 2;
+
+                // auto creates diary.teacher
+                if ("ENSEIGNANT" === model.me.type) {
+                    var teacher = new Teacher();
+                    teacher.create(decrementCountdown(bShowTemplates, cb), validationError);
+                } else {
+                    decrementCountdown(bShowTemplates, cb);
+                }
+
+                // subjects and audiences needed to fill in
+                // homeworks and lessons props
+
+                model.childs.syncChildren(function () {
+                    $scope.child = model.child;
+                    $scope.children = model.childs;
+                    model.subjects.syncSubjects(function () {
+                        model.audiences.syncAudiences(function () {
+                            decrementCountdown(bShowTemplates, cb);
+
+                            model.homeworkTypes.syncHomeworkTypes(function () {
+                                // call lessons/homework sync after audiences sync since
+                                // lesson and homework objects needs audience data to be built
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                            }, validationError);
+                        }, validationError);
+                    }, validationError);
+                }, validationError);
+            };
+
+            var decrementCountdown = function decrementCountdown(bShowTemplates, cb) {
+                $scope.countdown--;
+                if ($scope.countdown == 0) {
+                    $scope.calendarLoaded = true;
+                    $scope.currentSchool = model.currentSchool;
+
+                    if (bShowTemplates) {
+                        showTemplates();
+                    }
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                }
+            };
+
+            /**
+             *
+             * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
+             */
+            $scope.showCalendar = function (mondayOfWeek) {
+                $scope.display.showList = false;
+
+                console.log("show calendar with ", mondayOfWeek);
+                $scope.mondayOfWeek = mondayOfWeek;
+                if (!$scope.calendarLoaded) {
+                    initialization(true);
+                    return;
+                }
+
+                if (!$scope.mondayOfWeek) {
+                    $scope.mondayOfWeek = moment();
+                }
+
+                $scope.mondayOfWeek = $scope.mondayOfWeek.weekday(0);
+
+                model.lessonsDropHandled = false;
+                model.homeworksDropHandled = false;
+                $scope.display.showList = false;
+
+                // need reload lessons or homeworks if week changed
+                var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
+
+                $scope.lesson = null;
+                $scope.homework = null;
+
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+            };
+
+            function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
+
+                var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
+                var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                //TODO paralellize
+                //TODO use structureIds
+                var p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+
+                return $q.all([p1, p2, p3]).then(function (results) {
+                    var lessons = results[0];
+                    var homeworks = results[1];
+                    var courses = results[2];
+                    //TODO not a good syntax
+                    model.lessons.all.splice(0, model.lessons.all.length);
+                    model.lessons.addRange(lessons);
+
+                    model.homeworks.all.splice(0, model.homeworks.all.length);
+                    model.homeworks.addRange(homeworks);
+
+                    $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
+                    console.log("refresh calendar : ", $scope.itemsCalendar);
+                });
+            }
+
+            var showTemplates = function showTemplates() {
+                template.open('main', 'main');
+                template.open('main-view', 'calendar');
+                template.open('create-lesson', 'create-lesson');
+                template.open('create-homework', 'create-homework');
+                template.open('daily-event-details', 'daily-event-details');
+                template.open('daily-event-item', 'daily-event-item');
+                $scope.showCal = !$scope.showCal;
+                $scope.$apply();
             };
         }
-        module.controller("CalendarController", controller);
     });
 })();
 
@@ -1833,6 +2680,325 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     });
 })();
 
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("CalendarDailyEventsController", controller);
+
+        function controller($scope) {
+
+            $scope.$watch(function () {
+                return model.calendar;
+            }, function () {
+                console.log("model calendar updated");
+                $scope.calendar = model.calendar;
+                //setDaysContent();
+            });
+            //$scope.calendar = model.calendar;
+            $scope.isUserTeacher = model.isUserTeacher();
+
+            /**
+             * Open homeworks details when homeworks info is minimized
+             * or vice versa
+             * @param day
+             * @param $event
+             */
+            $scope.toggleOpenDailyEvents = function (day, $event) {
+                if (!($event.target && $event.target.type === "checkbox")) {
+                    day.openDailyEvents = !day.openDailyEvents;
+                }
+            };
+
+            /**
+             * Redirect to homework or lesson view if homework attached to some lesson
+             * @param homework Homework being clicked/selected
+             * @param $event
+             */
+            $scope.editSelectedHomework = function (homework, $event) {
+
+                // prevent redirect on clicking on checkbox
+                if (!($event.target && $event.target.type === "checkbox")) {
+                    if (homework.lesson_id == null) {
+                        window.location = '/diary#/editHomeworkView/' + homework.id;
+                    } else {
+                        window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;
+                    }
+                }
+            };
+
+            /**
+             * Toggle show display homework panel detail of a day
+             * Note: jquery oldschool way since with angular could not fix some display problems
+             * @param day
+             */
+            $scope.toggleShowHwDetail = function (day) {
+                hideOrShowHwDetail(day, undefined, true);
+            };
+
+            /**
+             *
+             * @param day
+             * @param hideHomeworks
+             * @param unselectHomeworksOnHide
+             */
+            var hideOrShowHwDetail = function hideOrShowHwDetail(day, hideHomeworks, unselectHomeworksOnHide) {
+
+                var hwDayDetail = $('#hw-detail-' + day.index);
+
+                var isNotHidden = hwDayDetail.hasClass('show');
+
+                if (typeof hideHomeworks === 'undefined') {
+                    hideHomeworks = isNotHidden;
+                }
+
+                if (hideHomeworks) {
+                    hwDayDetail.removeClass('show');
+                } else {
+                    hwDayDetail.addClass('show');
+                }
+
+                if (hideHomeworks && unselectHomeworksOnHide) {
+                    day.dailyEvents.forEach(function (dailyEvent) {
+                        dailyEvent.selected = false;
+                    });
+                }
+            };
+
+            /**
+             * Get the maximum number of homeworks of a day for current week
+             */
+            var getMaxHomeworksPerDay = function getMaxHomeworksPerDay() {
+                var max = 0;
+
+                $scope.calendar.days.all.forEach(function (day) {
+                    if (day.dailyEvents && day.dailyEvents.length > max) {
+                        max = day.dailyEvents.length;
+                    }
+                });
+
+                return max;
+            };
+
+            // default open state of calendar grid
+            // and homework panel
+            if (!model.show) {
+                model.show = {
+                    bShowCalendar: true,
+                    bShowHomeworks: true,
+                    bShowHomeworksMinified: false
+                };
+            };
+
+            $scope.show = model.show;
+
+            /**
+             * Minify the homework panel or not
+             * If it's minified, will only show one max homework
+             * else 3
+             */
+            $scope.toggleHomeworkPanelMinized = function () {
+                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+            };
+
+            /**
+             *
+             * @param day
+             * @returns {Number|boolean}
+             */
+            $scope.showNotAllHomeworks = function (day) {
+                return day.dailyEvents && day.dailyEvents.length && !$scope.showAllHomeworks(day);
+            };
+
+            /**
+             *
+             * @param day Current day
+             * @returns {boolean} true if all homeworks of current day
+             * should be displayed in homework panel
+             */
+            $scope.showAllHomeworks = function (day) {
+
+                if (!day.dailyEvents || day.dailyEvents && day.dailyEvents.length == 0) {
+                    return false;
+                }
+
+                // calendar hidden and homework panel maximized -> show all
+                if (!model.show.bShowHomeworksMinified) {
+                    return !model.show.bShowCalendar || day.dailyEvents.length <= 1;
+                } else {
+                    return day.dailyEvents.length == 1;
+                }
+            };
+
+            $scope.show = model.show;
+
+            /**
+             * Return the homework panel height that should be set
+             * depending on calendar grid displayed state and homework panel minimized state
+             * @param bShowCalendar True if calendar grid is visible
+             * @param bShowHomeworks True if homeworks panel is visible
+             * @param bShowHomeworksMinified True if homework panel is in minimized mode (max 1 homework displayed)
+             * @returns {number} Homework panel height
+             */
+            var getHomeworkPanelHeight = function getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+
+                /**
+                 * Height of a single homework in homework panel
+                 * @type {number}
+                 */
+                var HW_HEIGHT = 40;
+                var homeworksPerDayDisplayed = 0;
+
+                if (!bShowHomeworks) {
+                    return 0;
+                }
+
+                if (!bShowCalendar) {
+                    homeworksPerDayDisplayed = getMaxHomeworksPerDay();
+                } else {
+                    homeworksPerDayDisplayed = 1;
+                }
+
+                // max homeworks per day displayed used for drag and drop directive
+                // to detect dropped day of the week area
+                model.homeworksPerDayDisplayed = homeworksPerDayDisplayed;
+
+                return homeworksPerDayDisplayed * HW_HEIGHT;
+            };
+
+            /**
+             * Display homeworks and lessons and set open state of homework panel
+             * and calendar grid
+             * @param bShowCalendar Show calendar panel
+             * @param bShowHomeworks Show homework panel
+             * @param bShowHomeworksMinified If true homework panel will be minified (max homeworks display with full detail = 1)
+             */
+            model.placeCalendarAndHomeworksPanel = function (bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+
+                /**
+                 * Calendar height
+                 * @type {number}
+                 */
+                var CAL_HEIGHT = 775;
+
+                var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
+
+                // reduce height of homework panel if requested
+                $('.homeworkpanel').css('height', newHwPanelHeight);
+
+                var prevTimeslotsBar = $('.previous-timeslots');
+                var nextTimeslotsBar = $('.next-timeslots');
+
+                // hours legend at left
+                var hoursBar = $('.timeslots');
+                var calItems = $('calendar .schedule-item-content');
+                var calGrid = $('.schedule .days');
+
+                // show/hide calendar items
+                hoursBar.css('display', bShowCalendar ? 'inherit' : 'none');
+                calItems.css('display', bShowCalendar ? 'inherit' : 'none');
+
+                // do not hide previous timeslots bar
+                // or else would make so hole/gap
+                if (bShowCalendar) {
+                    prevTimeslotsBar.removeAttr('disabled');
+                } else {
+                    prevTimeslotsBar.attr('disabled', 'disabled');
+                }
+
+                nextTimeslotsBar.css('display', bShowCalendar ? 'inherit' : 'none');
+
+                calGrid.height(bShowCalendar ? newHwPanelHeight + CAL_HEIGHT : 0);
+
+                hoursBar.css('margin-top', newHwPanelHeight);
+                $('legend.timeslots').css('margin-top', '');
+                $('legend.timeslots').css('top', newHwPanelHeight);
+                nextTimeslotsBar.css('top', CAL_HEIGHT + newHwPanelHeight);
+
+                $('.schedule-item').css('margin-top', bShowCalendar ? newHwPanelHeight : 0);
+                calGrid.height(CAL_HEIGHT + (bShowCalendar ? newHwPanelHeight : 0));
+
+                // set homework panel size with max number of homeworks
+                $('.homeworkpanel').height(newHwPanelHeight);
+                $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
+
+                // toggle buttons
+                $('.show-homeworks').css('opacity', bShowHomeworks ? 1 : 0.3);
+                $('.show-calendar-grid').css('opacity', bShowCalendar ? 1 : 0.3);
+
+                $('#minimize_hw_span').css('display', newHwPanelHeight > 0 ? 'inherit' : 'none');
+
+                if (!bShowCalendar) {
+                    model.calendar.days.all.forEach(function (day) {
+                        hideOrShowHwDetail(day, true, true);
+                    });
+                }
+
+                model.show.bShowCalendar = bShowCalendar;
+                model.show.bShowHomeworks = bShowHomeworks;
+                model.show.bShowHomeworksMinified = bShowHomeworksMinified;
+            };
+
+            function setDaysContent() {
+                console.log("setDaysContent called");
+                model.calendar.days.forEach(function (day) {
+                    day.dailyEvents = [];
+                });
+
+                $scope.ngModel.forEach(function (item) {
+                    var refDay = moment(model.calendar.dayForWeek).day(1);
+                    model.calendar.days.forEach(function (day) {
+
+                        if (item.dueDate && item.dueDate.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')) {
+                            day.dailyEvents.push(item);
+                        }
+
+                        refDay.add('day', 1);
+                    });
+                });
+
+                $scope.calendar = model.calendar;
+
+                var timeslots = $('.timeslots');
+
+                if (timeslots.length === 8) {
+                    model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                }
+                // if days timeslots are not yet positioned
+                // wait until they are to create the homework panel
+                else {
+                        var timerOccurences = 0;
+                        var timer = setInterval(function () {
+                            timeslots = $('.timeslots');
+                            if (timeslots.length === 8) {
+                                clearInterval(timer);
+                                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                            }
+                            timerOccurences++;
+                            // 5s should be far than enough to have all timeslots loaded
+                            if (timerOccurences > 50) {
+                                clearInterval(timer);
+                            }
+                        }, 100);
+                    }
+            }
+
+            model.on('calendar.date-change', function () {
+                setDaysContent();
+                $scope.$apply();
+            });
+
+            $scope.$watchCollection('ngModel', function (newVal) {
+                console.log("ngModel changed", $scope.ngModel);
+                setDaysContent();
+            });
+        }
+    });
+})();
+
 'use strict';
 
 (function () {
@@ -1845,310 +3011,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     ngModel: '='
                 },
                 restrict: 'E',
-                template: '<span id="minimize_hw_span" class="ng-scope"><ul style="padding-left: 0px !important; padding-right: 0px !important; border: 0px !important;"><li>' + '<i class="resize-homeworks-panel"   style="float: left; width: 130px;">&nbsp;</i></li></ul></span>' + '<div class="days" style="z-index: 1000; ">' + '<div class="day homeworkpanel"  ng-repeat="day in calendar.days.all" style="height: 40px;">' +
+                templateUrl: '/diary/public/js/directives/calendar-daily-events/calendar-daily-events.template.html',
+                controller: 'CalendarDailyEventsController',
 
-                // <= 3 homeworks for current day
-                // or 1 homework and homework panel minified
-                '<div class="test" ng-if="showAllHomeworks(day)">' + '<div ng-repeat="dailyEvent in day.dailyEvents">' + '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' + '</div>' + '</div>' +
-
-                // > 3 homeworks for current day
-                // or > 1 homework and homework panel minified
-                '<div class="opener" ng-if="showNotAllHomeworks(day)" ' + 'ng-click="toggleShowHwDetail(day)">' + '<span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>' + '<span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>' + '</div>' + '<div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ' + 'ng-click="toggleOpenDailyEvents(day, $event)" ' + 'ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">' + '<div ng-repeat="dailyEvent in day.dailyEvents">' + '<container template="daily-event-item" style="padding-bottom: 1px;"></container>' + '</div>' + '</div>' + '</div>' + '</div>',
                 link: function link(scope, element, attributes) {
-                    scope.calendar = model.calendar;
-                    scope.isUserTeacher = model.isUserTeacher();
-
-                    /**
-                     * Open homeworks details when homeworks info is minimized
-                     * or vice versa
-                     * @param day
-                     * @param $event
-                     */
-                    scope.toggleOpenDailyEvents = function (day, $event) {
-                        if (!($event.target && $event.target.type === "checkbox")) {
-                            day.openDailyEvents = !day.openDailyEvents;
-                        }
-                    };
-
-                    /**
-                     * Redirect to homework or lesson view if homework attached to some lesson
-                     * @param homework Homework being clicked/selected
-                     * @param $event
-                     */
-                    scope.editSelectedHomework = function (homework, $event) {
-
-                        // prevent redirect on clicking on checkbox
-                        if (!($event.target && $event.target.type === "checkbox")) {
-                            if (homework.lesson_id == null) {
-                                window.location = '/diary#/editHomeworkView/' + homework.id;
-                            } else {
-                                window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;
-                            }
-                        }
-                    };
-
-                    /**
-                     * Toggle show display homework panel detail of a day
-                     * Note: jquery oldschool way since with angular could not fix some display problems
-                     * @param day
-                     */
-                    scope.toggleShowHwDetail = function (day) {
-                        hideOrShowHwDetail(day, undefined, true);
-                    };
-
-                    /**
-                     *
-                     * @param day
-                     * @param hideHomeworks
-                     * @param unselectHomeworksOnHide
-                     */
-                    var hideOrShowHwDetail = function hideOrShowHwDetail(day, hideHomeworks, unselectHomeworksOnHide) {
-
-                        var hwDayDetail = $('#hw-detail-' + day.index);
-
-                        var isNotHidden = hwDayDetail.hasClass('show');
-
-                        if (typeof hideHomeworks === 'undefined') {
-                            hideHomeworks = isNotHidden;
-                        }
-
-                        if (hideHomeworks) {
-                            hwDayDetail.removeClass('show');
-                        } else {
-                            hwDayDetail.addClass('show');
-                        }
-
-                        if (hideHomeworks && unselectHomeworksOnHide) {
-                            day.dailyEvents.forEach(function (dailyEvent) {
-                                dailyEvent.selected = false;
-                            });
-                        }
-                    };
-
-                    /**
-                     * Get the maximum number of homeworks of a day for current week
-                     */
-                    var getMaxHomeworksPerDay = function getMaxHomeworksPerDay() {
-                        var max = 0;
-
-                        scope.calendar.days.all.forEach(function (day) {
-                            if (day.dailyEvents && day.dailyEvents.length > max) {
-                                max = day.dailyEvents.length;
-                            }
-                        });
-
-                        return max;
-                    };
-
-                    // default open state of calendar grid
-                    // and homework panel
-                    if (!model.show) {
-                        model.show = {
-                            bShowCalendar: true,
-                            bShowHomeworks: true,
-                            bShowHomeworksMinified: false
-                        };
-                    };
-
-                    scope.show = model.show;
-
-                    /**
-                     * Minify the homework panel or not
-                     * If it's minified, will only show one max homework
-                     * else 3
-                     */
-                    scope.toggleHomeworkPanelMinized = function () {
-                        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
-                    };
-
-                    /**
-                     *
-                     * @param day
-                     * @returns {Number|boolean}
-                     */
-                    scope.showNotAllHomeworks = function (day) {
-                        return day.dailyEvents && day.dailyEvents.length && !scope.showAllHomeworks(day);
-                    };
-
-                    /**
-                     *
-                     * @param day Current day
-                     * @returns {boolean} true if all homeworks of current day
-                     * should be displayed in homework panel
-                     */
-                    scope.showAllHomeworks = function (day) {
-
-                        if (!day.dailyEvents || day.dailyEvents && day.dailyEvents.length == 0) {
-                            return false;
-                        }
-
-                        // calendar hidden and homework panel maximized -> show all
-                        if (!model.show.bShowHomeworksMinified) {
-                            return !model.show.bShowCalendar || day.dailyEvents.length <= 1;
-                        } else {
-                            return day.dailyEvents.length == 1;
-                        }
-                    };
-
-                    scope.show = model.show;
-
-                    /**
-                     * Return the homework panel height that should be set
-                     * depending on calendar grid displayed state and homework panel minimized state
-                     * @param bShowCalendar True if calendar grid is visible
-                     * @param bShowHomeworks True if homeworks panel is visible
-                     * @param bShowHomeworksMinified True if homework panel is in minimized mode (max 1 homework displayed)
-                     * @returns {number} Homework panel height
-                     */
-                    var getHomeworkPanelHeight = function getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
-
-                        /**
-                         * Height of a single homework in homework panel
-                         * @type {number}
-                         */
-                        var HW_HEIGHT = 40;
-                        var homeworksPerDayDisplayed = 0;
-
-                        if (!bShowHomeworks) {
-                            return 0;
-                        }
-
-                        if (!bShowCalendar) {
-                            homeworksPerDayDisplayed = getMaxHomeworksPerDay();
-                        } else {
-                            homeworksPerDayDisplayed = 1;
-                        }
-
-                        // max homeworks per day displayed used for drag and drop directive
-                        // to detect dropped day of the week area
-                        model.homeworksPerDayDisplayed = homeworksPerDayDisplayed;
-
-                        return homeworksPerDayDisplayed * HW_HEIGHT;
-                    };
-
-                    /**
-                     * Display homeworks and lessons and set open state of homework panel
-                     * and calendar grid
-                     * @param bShowCalendar Show calendar panel
-                     * @param bShowHomeworks Show homework panel
-                     * @param bShowHomeworksMinified If true homework panel will be minified (max homeworks display with full detail = 1)
-                     */
-                    model.placeCalendarAndHomeworksPanel = function (bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
-
-                        /**
-                         * Calendar height
-                         * @type {number}
-                         */
-                        var CAL_HEIGHT = 775;
-
-                        var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
-
-                        // reduce height of homework panel if requested
-                        $('.homeworkpanel').css('height', newHwPanelHeight);
-
-                        var prevTimeslotsBar = $('.previous-timeslots');
-                        var nextTimeslotsBar = $('.next-timeslots');
-
-                        // hours legend at left
-                        var hoursBar = $('.timeslots');
-                        var calItems = $('calendar .schedule-item-content');
-                        var calGrid = $('.schedule .days');
-
-                        // show/hide calendar items
-                        hoursBar.css('display', bShowCalendar ? 'inherit' : 'none');
-                        calItems.css('display', bShowCalendar ? 'inherit' : 'none');
-
-                        // do not hide previous timeslots bar
-                        // or else would make so hole/gap
-                        if (bShowCalendar) {
-                            prevTimeslotsBar.removeAttr('disabled');
-                        } else {
-                            prevTimeslotsBar.attr('disabled', 'disabled');
-                        }
-
-                        nextTimeslotsBar.css('display', bShowCalendar ? 'inherit' : 'none');
-
-                        calGrid.height(bShowCalendar ? newHwPanelHeight + CAL_HEIGHT : 0);
-
-                        hoursBar.css('margin-top', newHwPanelHeight);
-                        $('legend.timeslots').css('margin-top', '');
-                        $('legend.timeslots').css('top', newHwPanelHeight);
-                        nextTimeslotsBar.css('top', CAL_HEIGHT + newHwPanelHeight);
-
-                        $('.schedule-item').css('margin-top', bShowCalendar ? newHwPanelHeight : 0);
-                        calGrid.height(CAL_HEIGHT + (bShowCalendar ? newHwPanelHeight : 0));
-
-                        // set homework panel size with max number of homeworks
-                        $('.homeworkpanel').height(newHwPanelHeight);
-                        $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
-
-                        // toggle buttons
-                        $('.show-homeworks').css('opacity', bShowHomeworks ? 1 : 0.3);
-                        $('.show-calendar-grid').css('opacity', bShowCalendar ? 1 : 0.3);
-
-                        $('#minimize_hw_span').css('display', newHwPanelHeight > 0 ? 'inherit' : 'none');
-
-                        if (!bShowCalendar) {
-                            model.calendar.days.all.forEach(function (day) {
-                                hideOrShowHwDetail(day, true, true);
-                            });
-                        }
-
-                        model.show.bShowCalendar = bShowCalendar;
-                        model.show.bShowHomeworks = bShowHomeworks;
-                        model.show.bShowHomeworksMinified = bShowHomeworksMinified;
-                    };
-
-                    function setDaysContent() {
-
-                        model.calendar.days.forEach(function (day) {
-                            day.dailyEvents = [];
-                        });
-                        scope.ngModel.forEach(function (item) {
-                            var refDay = moment(model.calendar.dayForWeek).day(1);
-                            model.calendar.days.forEach(function (day) {
-                                if (item.dueDate && item.dueDate.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')) {
-                                    day.dailyEvents.push(item);
-                                }
-
-                                refDay.add('day', 1);
-                            });
-                        });
-
-                        scope.calendar = model.calendar;
-
-                        var timeslots = $('.timeslots');
-
-                        if (timeslots.length === 8) {
-                            model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-                        }
-                        // if days timeslots are not yet positioned
-                        // wait until they are to create the homework panel
-                        else {
-                                var timerOccurences = 0;
-                                var timer = setInterval(function () {
-                                    timeslots = $('.timeslots');
-                                    if (timeslots.length === 8) {
-                                        clearInterval(timer);
-                                        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-                                    }
-                                    timerOccurences++;
-                                    // 5s should be far than enough to have all timeslots loaded
-                                    if (timerOccurences > 50) {
-                                        clearInterval(timer);
-                                    }
-                                }, 100);
-                            }
-                    }
-
-                    model.on('calendar.date-change', function () {
-                        setDaysContent();
-                        scope.$apply();
-                    });
-
-                    scope.$watchCollection('ngModel', function (newVal) {
-                        setDaysContent();
-                    });
 
                     $('body').on('click', function (e) {
                         if (e.target !== element[0] && element.find(e.target).length === 0) {
@@ -2159,668 +3025,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         }
                     });
                 }
-            };
-        });
-    });
-})();
-
-'use strict';
-
-(function () {
-		'use strict';
-
-		AngularExtensions.addModuleConfig(function (module) {
-
-				module.directive('diaryCalendar', function ($compile) {
-						return {
-								restrict: 'E',
-								templateUrl: '/diary/public/js/directives/calendar/calendar.template.html',
-								scope: {
-										items: '=',
-										itemTemplate: '@',
-										readOnly: '=',
-										displayTemplate: '=',
-										onCreateOpenAction: '&'
-								},
-
-								controller: 'DiaryCalendarController',
-								controllerAs: "DiaryCalendarCtrl",
-								/*
-              var refreshCalendar = function() {
-                  model.calendar.clearScheduleItems();
-                    $scope.items = _.where(_.map($scope.items, function(item) {
-                      item.beginning = item.startMoment;
-                      item.end = item.endMoment;
-                      return item;
-                  }), {
-                      is_periodic: false
-                  });
-                    model.calendar.addScheduleItems($scope.items);
-                  $scope.calendar = model.calendar;
-                  $scope.moment = moment;
-                  $scope.display.editItem = false;
-                  $scope.display.createItem = false;
-                    $scope.editItem = function(item) {
-                      $scope.calendarEditItem = item;
-                      $scope.display.editItem = true;
-                  };
-                    $scope.createItem = function(day, timeslot) {
-                      $scope.newItem = {};
-                      var year = model.calendar.year;
-                      if (day.index < model.calendar.firstDay.dayOfYear()) {
-                          year++;
-                      }
-                      $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
-                      $scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
-                      model.calendar.newItem = $scope.newItem;
-                      $scope.onCreateOpen();
-                  };
-                    $scope.closeCreateWindow = function() {
-                      $scope.display.createItem = false;
-                      $scope.onCreateClose();
-                  };
-                    $scope.updateCalendarWeek = function() {
-                      //annoying new year workaround
-                      if (moment(model.calendar.dayForWeek).week() === 1 && moment(model.calendar.dayForWeek).dayOfYear() > 7) {
-                          model.calendar = new calendar.Calendar({
-                              week: moment(model.calendar.dayForWeek).week(),
-                              year: moment(model.calendar.dayForWeek).year() + 1
-                          });
-                      } else if (moment(model.calendar.dayForWeek).week() === 53 && moment(model.calendar.dayForWeek).dayOfYear() < 7) {
-                          model.calendar = new calendar.Calendar({
-                              week: moment(model.calendar.dayForWeek).week(),
-                              year: moment(model.calendar.dayForWeek).year() - 1
-                          });
-                      } else {
-                          model.calendar = new calendar.Calendar({
-                              week: moment(model.calendar.dayForWeek).week(),
-                              year: moment(model.calendar.dayForWeek).year()
-                          });
-                      }
-                      model.trigger('calendar.date-change');
-                      refreshCalendar();
-                  };
-                    $scope.previousTimeslots = function() {
-                      calendar.startOfDay--;
-                      calendar.endOfDay--;
-                      model.calendar = new calendar.Calendar({
-                          week: moment(model.calendar.dayForWeek).week(),
-                          year: moment(model.calendar.dayForWeek).year()
-                      });
-                      refreshCalendar();
-                  };
-                    $scope.nextTimeslots = function() {
-                      calendar.startOfDay++;
-                      calendar.endOfDay++;
-                      model.calendar = new calendar.Calendar({
-                          week: moment(model.calendar.dayForWeek).week(),
-                          year: moment(model.calendar.dayForWeek).year()
-                      });
-                      refreshCalendar();
-                  };
-              };
-                calendar.setCalendar = function(cal) {
-                  model.calendar = cal;
-                    refreshCalendar();
-              };
-                $timeout(function() {
-                  refreshCalendar();
-                  $scope.$watchCollection('items', refreshCalendar);
-              }, 0);
-              $scope.refreshCalendar = refreshCalendar;
-        */
-								link: function link(scope, element, attributes) {
-										/*
-                 var allowCreate;
-                 scope.display = {};
-                 scope.display.readonly = false;
-                 attributes.$observe('createTemplate', function() {
-                     if (attributes.createTemplate) {
-                         template.open('schedule-create-template', attributes.createTemplate);
-                         allowCreate = true;
-                     }
-                     if (attributes.displayTemplate) {
-                         template.open('schedule-display-template', attributes.displayTemplate);
-                     }
-                 });
-                 attributes.$observe('readonly', function(){
-                     if(attributes.readonly && attributes.readonly !== 'false'){
-                         scope.display.readonly = true;
-                     }
-                     if(attributes.readonly && attributes.readonly == 'false'){
-                         scope.display.readonly = false;
-                     }
-                 });
-                   scope.items = scope.$eval(attributes.items);
-                 scope.onCreateOpen = function() {
-                     if (!allowCreate) {
-                         return;
-                     }
-                     scope.$eval(attributes.onCreateOpen);
-                     scope.display.createItem = true;
-                 };
-                 scope.onCreateClose = function() {
-                     scope.$eval(attributes.onCreateClose);
-                 };
-                 scope.$watch(function() {
-                     return scope.$eval(attributes.items)
-                 }, function(newVal) {
-                     scope.items = newVal;
-                 });
-          	*/
-								}
-						};
-				});
-		});
-})();
-
-'use strict';
-
-(function () {
-    'use strict';
-
-    AngularExtensions.addModuleConfig(function (module) {
-
-        module.controller("DiaryCalendarController", controller);
-
-        function controller($scope, $timeout) {
-            // use controllerAs practice
-            var vm = this;
-
-            /*
-             * Initilisation function
-             */
-            init();
-
-            function init() {
-                //display options
-                vm.display = {
-                    editItem: false,
-                    createItem: false,
-                    readonly: $scope.readOnly
-                };
-
-                $scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
-
-                // create calendar objet
-                vm.calendar = new calendar.Calendar({
-                    week: moment($scope.firstDay).week(),
-                    year: moment($scope.firstDay).year()
-                });
-
-                //set items watcher
-                $scope.$watch('items', function (n, o) {
-                    vm.refreshCalendar();
-                });
-                // add event listener
-                $scope.$on('calendar.refreshItems', function () {
-                    console.log("receive calendar refreshitems event");
-                    vm.refreshCalendar();
-                });
-
-                /**
-                 * Used to know if user clicked on calendar event
-                 * or is dragging  to prevent ng-click
-                 */
-                vm.itemMouseEvent = {
-                    lastMouseDownTime: undefined,
-                    lastMouseClientX: undefined,
-                    lastMouseClientY: undefined
-                };
-            }
-
-            /*
-             * refresh calendar every items modification
-             */
-            vm.refreshCalendar = function () {
-                console.log("refresh calendar");
-                vm.calendar.clearScheduleItems();
-
-                var scheduleItems = _.where(_.map($scope.items, function (item) {
-                    item.beginning = item.startMoment;
-                    item.end = item.endMoment;
-                    return item;
-                }), {
-                    is_periodic: false
-                });
-                vm.calendar.addScheduleItems(scheduleItems);
-                $timeout(function () {
-                    vm.disposeItems();
-                });
-            };
-
-            /*
-            * dispose item elements
-            */
-            vm.disposeItems = function () {
-                //reinit colmap id
-                console.log("disposeItems called");
-                _.each(vm.calendar.days.all, function (day) {
-                    vm.eraseColMapId(day);
-                });
-                //recal all collisions
-                _.each(vm.calendar.days.all, function (day) {
-                    //vm.calcAllCollisions(day);
-                    _.each(day.scheduleItems.all, function (item) {
-                        vm.calcAllCollisions2(item, day);
-                    });
-                });
-                //dispose each items
-                _.each(vm.calendar.days.all, function (day) {
-                    _.each(day.scheduleItems.all, function (item) {
-                        vm.disposeItem(item, day);
-                    });
-                });
-            };
-
-            /*
-            *   erase col map id
-            */
-            vm.eraseColMapId = function (day) {
-                _.each(day.scheduleItems.all, function (item) {
-                    delete item.calendarGutter;
-                    delete item.colMapId;
-                });
-            };
-
-            vm.between = function (date, start, end) {
-                return date.isAfter(start) && date.isBefore(end);
-            };
-
-            vm.calcAllCollisions2 = function (item, day) {
-                var calendarGutter = 0;
-                var collision = true;
-                while (collision) {
-                    collision = false;
-                    day.scheduleItems.forEach(function (scheduleItem) {
-                        if (scheduleItem === item) {
-                            return;
-                        }
-                        /*if ((scheduleItem.beginning.isBefore(item.end) && scheduleItem.end.isAfter(item.beginning)) ||
-                          (scheduleItem.end.isBefore(item.beginning) && scheduleItem.beginning.isAfter(item.end))) {
-                          */
-                        if (vm.between(item.beginning, scheduleItem.beginning, scheduleItem.end) || vm.between(item.end, scheduleItem.beginning, scheduleItem.end) || vm.between(scheduleItem.end, item.beginning, item.end)) {
-                            console.log("collision found : ", scheduleItem, item);
-                            if (scheduleItem.calendarGutter === calendarGutter) {
-                                calendarGutter++;
-                                collision = true;
-                            }
-                        } else {
-                            console.log("no collision found : ", scheduleItem, item);
-                        }
-                    });
-                }
-                item.calendarGutter = calendarGutter;
-            };
-
-            /*
-            * Calc all colision map
-            */
-            vm.calcAllCollisions = function (day) {
-                var collisionMap = {};
-                //erase old mapId referencies
-
-                //cal collisionMap
-                _.each(day.scheduleItems.all, function (item) {
-                    vm.getItemCollisions(collisionMap, item, day);
-                });
-
-                //set indent id
-                _.each(collisionMap, function (inCollision) {
-                    var calendarGutter = 0;
-                    // sort collision array to have decrease aparence
-                    inCollision.sort(function (itema, itemb) {
-                        return itema.startMoment.isAfter(itemb.startMoment);
-                    });
-                    _.each(inCollision, function (items) {
-                        items.calendarGutter = calendarGutter++;
-                    });
-                });
-                console.log("collisionMap", collisionMap);
-            };
-
-            /*
-            *   populate the collision map for each item
-            */
-            vm.getItemCollisions = function (collisionMap, item, day) {
-
-                if (item.colMapId !== undefined) {
-                    return;
-                }
-
-                var collisionArray = [item];
-                var colMapId = void 0;
-                //collisionArray = collisionMap[item.colMapId];
-
-                //get all collisions in an array
-                _.each(day.scheduleItems.all, function (scheduleItem) {
-                    if (scheduleItem !== item && scheduleItem.beginning < item.end && scheduleItem.end > item.beginning) {
-                        //scheduleItem.colMapId = item.colMapId;
-                        if (scheduleItem.colMapId !== undefined) {
-                            console.log("foundColMapId", scheduleItem.colMapId);
-                            colMapId = scheduleItem.colMapId;
-                        } else {
-                            collisionArray.push(scheduleItem);
-                        }
-                    }
-                });
-
-                //if not indexed
-                if (colMapId === undefined) {
-                    colMapId = Object.keys(collisionMap).length;
-                    collisionMap[colMapId] = [];
-                }
-                // set colMapId
-                collisionArray = _.map(collisionArray, function (it) {
-                    console.log("set colMapId", colMapId);
-                    it.colMapId = colMapId;
-                    return it;
-                });
-
-                collisionMap[colMapId] = collisionMap[colMapId].concat(collisionArray);
-            };
-
-            /*
-            * dispose on item
-            */
-            vm.disposeItem = function (item, day) {
-                if (!item.$element) {
-                    console.log("no element founds");
-                    return;
-                }
-                var element = item.$element;
-
-                var parentSchedule = element.parents('.schedule');
-                var scheduleItemEl = element.children('.schedule-item');
-
-                var cellWidth = element.parent().width() / 12;
-                var startDay = item.beginning.dayOfYear();
-                var endDay = item.end.dayOfYear();
-
-                var hours = calendar.getHours(item, day);
-                var itemWidth = day.scheduleItems.scheduleItemWidth(item);
-
-                var dayWidth = parentSchedule.find('.day').width();
-
-                scheduleItemEl.css({
-                    width: itemWidth + '%'
-                });
-
-                var calendarGutter = 0;
-
-                var beginningMinutesHeight = item.beginning.minutes() * calendar.dayHeight / 60;
-                var endMinutesHeight = item.end.minutes() * calendar.dayHeight / 60;
-                var top = (hours.startTime - calendar.startOfDay) * calendar.dayHeight + beginningMinutesHeight;
-                scheduleItemEl.height((hours.endTime - hours.startTime) * calendar.dayHeight - beginningMinutesHeight + endMinutesHeight + 'px');
-
-                scheduleItemEl.css({
-                    top: top + 'px',
-                    left: item.calendarGutter * (itemWidth * dayWidth / 100) + 'px'
-                });
-
-                var container = element.find('container');
-                if (top < 0) {
-                    container.css({
-                        top: Math.abs(top) - 5 + 'px'
-                    });
-                    container.height(element.children('.schedule-item').height() + top + 5);
-                } else {
-                    container.css({
-                        top: 0 + 'px'
-                    });
-                    container.css({
-                        height: '100%'
-                    });
-                }
-            };
-
-            /*
-             *   edit item
-             *  TODO unused??
-             */
-            /*$scope.editItem = function(item) {
-                $scope.calendarEditItem = item;
-                vm.display.editItem = true;
-            };*/
-
-            vm.createItem = function (day, timeslot) {
-                $scope.newItem = {};
-                var year = vm.calendar.year;
-                if (day.index < vm.calendar.firstDay.dayOfYear()) {
-                    year++;
-                }
-                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
-                $scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
-                vm.calendar.newItem = $scope.newItem;
-                $scope.onCreateOpen();
-            };
-
-            vm.closeCreateWindow = function () {
-                vm.display.createItem = false;
-                $scope.onCreateClose();
-            };
-
-            vm.updateCalendarWeek = function () {
-                //annoying new year workaround
-                if (moment(vm.calendar.dayForWeek).week() === 1 && moment(vm.calendar.dayForWeek).dayOfYear() > 7) {
-                    vm.calendar = new calendar.Calendar({
-                        week: moment(vm.calendar.dayForWeek).week(),
-                        year: moment(vm.calendar.dayForWeek).year() + 1
-                    });
-                } else if (moment(vm.calendar.dayForWeek).week() === 53 && moment(vm.calendar.dayForWeek).dayOfYear() < 7) {
-                    vm.calendar = new calendar.Calendar({
-                        week: moment(vm.calendar.dayForWeek).week(),
-                        year: moment(vm.calendar.dayForWeek).year() - 1
-                    });
-                } else {
-                    vm.calendar = new calendar.Calendar({
-                        week: moment(vm.calendar.dayForWeek).week(),
-                        year: moment(vm.calendar.dayForWeek).year()
-                    });
-                }
-                model.trigger('calendar.date-change');
-                vm.refreshCalendar();
-            };
-
-            $scope.previousTimeslots = function () {
-                calendar.startOfDay--;
-                calendar.endOfDay--;
-                vm.calendar = new calendar.Calendar({
-                    week: moment(vm.calendar.dayForWeek).week(),
-                    year: moment(vm.calendar.dayForWeek).year()
-                });
-                vm.refreshCalendar();
-            };
-
-            $scope.nextTimeslots = function () {
-                calendar.startOfDay++;
-                calendar.endOfDay++;
-                vm.calendar = new calendar.Calendar({
-                    week: moment(vm.calendar.dayForWeek).week(),
-                    year: moment(vm.calendar.dayForWeek).year()
-                });
-                vm.refreshCalendar();
-            };
-
-            $scope.onCreateOpen = function () {
-                /*if (!allowCreate) {
-                    return;
-                }*/
-
-                $scope.onCreateOpenAction();
-                //$scope.$eval(attributes.onCreateOpen);
-                vm.display = {
-                    createItem: true
-                };
-            };
-            $scope.onCreateClose = function () {
-                $scope.$eval(attributes.onCreateClose);
-            };
-
-            $scope.setMouseDownTime = function ($event) {
-                vm.itemMouseEvent.lastMouseDownTime = new Date().getTime();
-                vm.itemMouseEvent.lastMouseClientX = $event.clientX;
-                vm.itemMouseEvent.lastMouseClientY = $event.clientY;
-            };
-
-            /**
-             * Redirect to path only when user is doind a real click.
-             * If user is draging item redirect will not be called
-             * @param item Lesson being clicked or dragged
-             * @param $event
-             */
-            $scope.openOnClickSaveOnDrag = function (item, $event) {
-
-                return;
-                console.log("openOnClickSaveOnDrag called");
-                var path = '/editLessonView/' + item.id;
-
-                // gap between days is quite important
-                var xMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;
-                // gap between minutes is tiny so y mouse move detection must be accurate
-                // so user can change lesson time slightly
-                var yMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientY - $event.clientY) > 0;
-
-                // fast click = no drag = real click
-                // or cursor did not move
-                if (!xMouseMoved && !yMouseMoved || new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime < 300) {
-                    // do not redirect to lesson view if user clicked on checkbox
-                    if (!($event.target && $event.target.type === "checkbox")) {
-                        $scope.redirect(path);
-                    }
-                } else {
-                    $timeout(vm.refreshCalendar);
-                }
-            };
-        }
-    });
-})();
-
-'use strict';
-
-(function () {
-    'use strict';
-
-    AngularExtensions.addModuleConfig(function (module) {
-        module.directive('diaryScheduleItem', function ($compile) {
-            return {
-                restrict: 'E',
-                require: '^diary-calendar',
-                template: '<div class="schedule-item" resizable horizontal-resize-lock draggable>\n                                <container template="schedule-display-template" class="absolute"></container>\n                            </div>',
-                controller: function controller($scope, $element, $timeout) {
-
-                    console.log("new controller");
-                    var vm = this;
-
-                    $scope.item.$element = $element;
-                    console.log("element : ", $scope.item.$element);
-
-                    var parentSchedule = $element.parents('.schedule');
-                    var scheduleItemEl = $element.children('.schedule-item');
-                    scheduleItemEl.find('container').append($compile($scope.displayTemplate)($scope));
-
-                    var dayWidth = parentSchedule.find('.day').width();
-
-                    if ($scope.item.beginning.dayOfYear() !== $scope.item.end.dayOfYear() || $scope.item.locked) {
-                        scheduleItemEl.removeAttr('resizable');
-                        scheduleItemEl.removeAttr('draggable');
-                        scheduleItemEl.unbind('mouseover');
-                        scheduleItemEl.unbind('click');
-                        scheduleItemEl.data('lock', true);
-                    }
-
-                    vm.getTimeFromBoundaries = function () {
-                        console.log("getTimeFromBoundaries");
-                        // compute element positon added to heiht of 7 hours ao avoid negative value side effect
-                        var topPos = scheduleItemEl.position().top + calendar.dayHeight * calendar.startOfDay;
-                        var startTime = moment(); //.utc();
-                        startTime.hour(Math.floor(topPos / calendar.dayHeight));
-                        startTime.minute(topPos % calendar.dayHeight * 60 / calendar.dayHeight);
-
-                        var endTime = moment(); //.utc();
-                        endTime.hour(Math.floor((topPos + scheduleItemEl.height()) / calendar.dayHeight));
-                        endTime.minute((topPos + scheduleItemEl.height()) % calendar.dayHeight * 60 / calendar.dayHeight);
-
-                        startTime.year(model.calendar.year);
-                        endTime.year(model.calendar.year);
-
-                        var days = $element.parents('.schedule').find('.day');
-                        var center = scheduleItemEl.offset().left + scheduleItemEl.width() / 2;
-                        var dayWidth = days.first().width();
-                        days.each(function (index, item) {
-                            var itemLeft = $(item).offset().left;
-                            if (itemLeft < center && itemLeft + dayWidth > center) {
-                                var day = index + 1;
-                                var week = model.calendar.week;
-                                endTime.week(week);
-                                startTime.week(week);
-                                if (day === 7) {
-                                    day = 0;
-                                    endTime.week(week + 1);
-                                    startTime.week(week + 1);
-                                }
-                                endTime.day(day);
-                                startTime.day(day);
-                            }
-                        });
-                        return {
-                            startTime: startTime,
-                            endTime: endTime
-                        };
-                    };
-
-                    scheduleItemEl.on('stopResize', function () {
-                        console.log("stopResize called");
-                        var newTime = vm.getTimeFromBoundaries();
-                        $scope.item.beginning = newTime.startTime;
-                        $scope.item.end = newTime.endTime;
-
-                        //$scope.item.date = newTime.startTime;
-                        $scope.item.startMoment = newTime.startTime;
-                        $scope.item.endMoment = moment(newTime.endTime);
-
-                        $scope.item.data.beginning = newTime.startTime;
-                        $scope.item.data.end = newTime.endTime;
-                        $scope.item.data.date = newTime.startTime;
-                        $scope.item.data.startMoment = newTime.startTime;
-                        $scope.item.data.endMoment = moment(newTime.endTime);
-
-                        $scope.item.startTime = moment(newTime.startTime).format('HH:mm:ss');
-                        $scope.item.endTime = moment(newTime.endTime).format('HH:mm:ss');
-
-                        $scope.$emit('calendar.refreshItems');
-                    });
-
-                    scheduleItemEl.on('stopDrag', function () {
-                        console.log("stopDrag called");
-                        var newTime = vm.getTimeFromBoundaries();
-                        console.log(newTime);
-                        $scope.item.beginning = newTime.startTime;
-                        $scope.item.end = newTime.endTime;
-
-                        $scope.item.date = newTime.startTime;
-                        $scope.item.startMoment = newTime.startTime;
-                        $scope.item.endMoment = moment(newTime.endTime);
-
-                        $scope.item.data.beginning = newTime.startTime;
-                        $scope.item.data.end = newTime.endTime;
-                        $scope.item.data.date = newTime.startTime;
-                        $scope.item.data.startMoment = newTime.startTime;
-                        $scope.item.data.endMoment = moment(newTime.endTime);
-
-                        console.log($scope.item.data);
-
-                        $scope.item.startTime = moment(newTime.startTime).format('HH:mm:ss');
-                        console.log(moment(newTime.startTime).format('HH:mm:ss'));
-                        $scope.item.endTime = moment(newTime.endTime).format('HH:mm:ss');
-
-                        $timeout(function () {
-                            $scope.$emit('calendar.refreshItems');
-                        });
-                    });
-                },
-
-                link: function link(scope, element, attributes) {}
             };
         });
     });
@@ -3434,8 +3638,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         });
     });
 })();
-
-"use strict";
 
 'use strict';
 
@@ -4687,6 +4889,61 @@ Teacher.prototype.create = function (cb, cbe) {
     });
 })();
 
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /*
+     * Attachement service as class
+     * used to manipulate Attachement model
+     */
+
+    var AttachementService = function () {
+        function AttachementService($http, $q, constants, UtilsService) {
+            _classCallCheck(this, AttachementService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+            this.UtilsService = UtilsService;
+        }
+
+        /*
+        *   Mapp homeworks
+        */
+
+
+        _createClass(AttachementService, [{
+            key: "mappAttachement",
+            value: function mappAttachement(attachements) {
+                return _.map(attachements, function (attachementData) {
+                    var att = new Attachment();
+                    att.id = attachementData.id;
+                    att.user_id = attachementData.user_id;
+                    att.creation_date = attachementData.creation_date;
+                    att.document_id = attachementData.document_id;
+                    att.document_label = attachementData.document_label;
+
+                    return att;
+                });
+            }
+        }]);
+
+        return AttachementService;
+    }();
+    /* create singleton */
+
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("AttachementService", AttachementService);
+    });
+})();
+
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4702,15 +4959,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     */
 
     var CourseService = function () {
-        function CourseService($http, $q) {
+        function CourseService($http, $q, constants) {
             _classCallCheck(this, CourseService);
 
             console.log("instantiate courseService");
             this.$http = $http;
             this.$q = $q;
-            this.context = {
-                'dateFormat': 'YYYY-MM-DD'
-            };
+            this.constants = constants;
+            this.context = {};
         }
 
         _createClass(CourseService, [{
@@ -4753,8 +5009,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var url = '/directory/timetable/teacher/' + structureId + '/' + teacherId;
                 var config = {
                     params: {
-                        begin: begin.format(this.context.dateFormat),
-                        end: end.format(this.context.dateFormat)
+                        begin: begin.format(this.constants.CAL_DATE_PATTERN),
+                        end: end.format(this.constants.CAL_DATE_PATTERN)
                     }
                 };
                 return this.$http.get(url, config).then(function (result) {
@@ -4782,8 +5038,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         return CourseService;
     }();
-    /* create singleton */
-
 
     AngularExtensions.addModuleConfig(function (module) {
         module.service("CourseService", CourseService);
@@ -4800,68 +5054,220 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     'use strict';
 
     /*
-    * Lesson service as class
-    * used to manipulate Lesson model
+    * Homework service as class
+    * used to manipulate Homework model
     */
 
+    var HomeworkService = function () {
+        function HomeworkService($http, $q, constants) {
+            _classCallCheck(this, HomeworkService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+        }
+
+        /*
+        * get homeworks
+        */
+
+
+        _createClass(HomeworkService, [{
+            key: 'getHomeworks',
+            value: function getHomeworks(userStructuresIds, mondayOfWeek, isUserParent, childId) {
+                var _this = this;
+
+                var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+                var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+                var urlGetHomeworks = '/diary/homework/' + userStructuresIds + '/' + start + '/' + end + '/';
+
+                if (isUserParent && childId) {
+                    urlGetHomeworks += childId;
+                } else {
+                    urlGetHomeworks += '%20';
+                }
+
+                return this.$http.get(urlGetHomeworks).then(function (result) {
+                    return _this.mappHomework(result.data);
+                });
+            }
+
+            /*
+            *   Mapp homeworks
+            */
+
+        }, {
+            key: 'mappHomework',
+            value: function mappHomework(homeworks) {
+                return _.map(homeworks, function (sqlHomework) {
+                    var homework = {
+                        //for share directive you must have _id
+                        _id: sqlHomework.id,
+                        id: sqlHomework.id,
+                        description: sqlHomework.homework_description,
+                        audienceId: sqlHomework.audience_id,
+                        audience: model.audiences.findWhere({ id: sqlHomework.audience_id }),
+                        subject: model.subjects.findWhere({ id: sqlHomework.subject_id }),
+                        subjectId: sqlHomework.subject_id,
+                        subjectLabel: sqlHomework.subject_label,
+                        type: model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
+                        typeId: sqlHomework.homework_type_id,
+                        typeLabel: sqlHomework.homework_type_label,
+                        teacherId: sqlHomework.teacher_id,
+                        structureId: sqlHomework.structureId,
+                        audienceType: sqlHomework.audience_type,
+                        audienceLabel: sqlHomework.audience_label,
+                        // TODO delete dueDate? (seems redondant info vs date field)
+                        dueDate: moment(sqlHomework.homework_due_date),
+                        date: moment(sqlHomework.homework_due_date),
+                        title: sqlHomework.homework_title,
+                        color: sqlHomework.homework_color,
+                        startMoment: moment(sqlHomework.homework_due_date),
+                        endMoment: moment(sqlHomework.homework_due_date),
+                        state: sqlHomework.homework_state,
+                        is_periodic: false,
+                        lesson_id: sqlHomework.lesson_id
+                    };
+
+                    if (sqlHomework.attachments) {
+                        homework.attachments = _.map(JSON.parse(sqlHomework.attachments), jsonToJsAttachment);
+                    }
+
+                    if ('group' === homework.audienceType) {
+                        homework.audienceTypeLabel = lang.translate('diary.audience.group');
+                    } else {
+                        homework.audienceTypeLabel = lang.translate('diary.audience.class');
+                    }
+
+                    return homework;
+                });
+            }
+        }]);
+
+        return HomeworkService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("HomeworkService", HomeworkService);
+    });
+})();
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /*
+     * Lesson service as class
+     * used to manipulate Lesson model
+     */
+
     var LessonService = function () {
-        function LessonService($http, $q) {
+        function LessonService($http, $q, constants, UtilsService, AttachementService) {
             _classCallCheck(this, LessonService);
 
             this.$http = $http;
             this.$q = $q;
-            this.context = {
-                'dateFormat': 'YYYY-MM-DD'
-            };
+            this.constants = constants;
+            this.UtilsService = UtilsService;
+            this.AttachementService = AttachementService;
         }
 
-        /**
-         * Init lesson
-         * @returns {Lesson}
-         */
-
-
         _createClass(LessonService, [{
-            key: 'initLesson',
-            value: function initLesson(calendarNewItem, selectedDate) {
-                var lesson = new Lesson();
+            key: 'getLessons',
+            value: function getLessons(userStructuresIds, mondayOfWeek, isUserParent, childId) {
+                var _this = this;
 
-                lesson.audience = {}; //sets the default audience to undefined
-                lesson.subject = model.subjects.first();
-                lesson.audienceType = lesson.audience.type;
-                lesson.color = DEFAULT_ITEM_COLOR;
-                lesson.state = DEFAULT_STATE;
-                lesson.title = lang.translate('diary.lesson.label');
+                var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+                var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
 
-                var newItem = {};
+                var urlGetHomeworks = '/diary/lesson/' + userStructuresIds + '/' + start + '/' + end + '/';
 
-                if (calendarNewItem) {
-                    newItem = calendarNewItem;
-
-                    // force to HH:00 -> HH:00 + 1 hour
-                    newItem.beginning = newItem.beginning.minute(0).second(0);
-                    newItem.date = newItem.beginning;
-
-                    newItem.end = moment(newItem.beginning);
-                    newItem.end.minute(0).second(0).add(1, 'hours');
+                if (isUserParent && childId) {
+                    urlGetHomeworks += childId;
+                } else {
+                    urlGetHomeworks += '%20';
                 }
-                // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
-                else {
-                        var itemDate = selectedDate ? moment(selectedDate) : moment();
 
-                        newItem = {
-                            date: itemDate,
-                            beginning: moment().minute(0).second(0),
-                            end: moment().minute(0).second(0).add(1, 'hours')
-                        };
+                return this.$http.get(urlGetHomeworks).then(function (result) {
+                    return _this.mappLesson(result.data);
+                });
+            }
+
+            /*
+            *   Mapp homeworks
+            */
+
+        }, {
+            key: 'mappLesson',
+            value: function mappLesson(lessons) {
+                var _this2 = this;
+
+                return _.map(lessons, function (lessonData) {
+                    var lessonHomeworks = [];
+
+                    // only initialize homeworks attached to lesson
+                    // with only id
+                    if (lessonData.homework_ids) {
+                        for (var i = 0; i < lessonData.homework_ids.length; i++) {
+                            var homework = new Homework();
+                            homework.id = lessonData.homework_ids[i];
+                            homework.lesson_id = parseInt(lessonData.lesson_id);
+                            homework.loaded = false; // means full lessonData from sql not loaded
+                            lessonHomeworks.push(homework);
+                        }
                     }
 
-                lesson.newItem = newItem;
-                lesson.startTime = newItem.beginning;
-                lesson.endTime = newItem.end;
-                lesson.date = newItem.date;
+                    var lesson = {
+                        //for share directive you must have _id
+                        _id: lessonData.lesson_id,
+                        id: lessonData.lesson_id,
+                        title: lessonData.lesson_title,
+                        audience: model.audiences.findWhere({ id: lessonData.audience_id }),
+                        audienceId: lessonData.audience_id,
+                        audienceLabel: lessonData.audience_label,
+                        audienceType: lessonData.audience_type,
+                        description: lessonData.lesson_description,
+                        subject: model.subjects.findWhere({ id: lessonData.subject_id }),
+                        subjectId: lessonData.subject_id,
+                        subjectLabel: lessonData.subject_label,
+                        teacherId: lessonData.teacher_display_name,
+                        structureId: lessonData.school_id,
+                        date: moment(lessonData.lesson_date),
+                        startTime: lessonData.lesson_start_time,
+                        endTime: lessonData.lesson_end_time,
+                        color: lessonData.lesson_color,
+                        room: lessonData.lesson_room,
+                        annotations: lessonData.lesson_annotation,
+                        startMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_start_time),
+                        endMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_end_time),
+                        state: lessonData.lesson_state,
+                        is_periodic: false,
+                        homeworks: lessonHomeworks,
+                        tooltipText: '',
+                        locked: !model.canEdit() ? true : false
+                    };
 
-                return lesson;
+                    if ('group' === lesson.audienceType) {
+                        lesson.audienceTypeLabel = lang.translate('diary.audience.group');
+                    } else {
+                        lesson.audienceTypeLabel = lang.translate('diary.audience.class');
+                    }
+
+                    if (lessonData.attachments) {
+                        lesson.attachments = AttachementService.mappAttachement(JSON.parse(lessonData.attachments));
+                    }
+
+                    var tooltip = _this2.UtilsService.getResponsiveLessonTooltipText(lesson);
+
+                    lesson.tooltipText = tooltip;
+                    return lesson;
+                });
             }
         }]);
 
@@ -4877,49 +5283,76 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 "use strict";
 
-"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
     'use strict';
 
-    AngularExtensions.addModuleConfig(function (module) {
+    /*
+     * Utils service as class
+     * used to manipulate Utils model
+     */
 
-        console.log("CalendarController initialized");
-        function controller($scope, $timeout, CourseService) {
-            console.log("CalendarController called");
+    var UtilsService = function () {
+        function UtilsService($http, $q, constants) {
+            _classCallCheck(this, UtilsService);
 
-            $timeout(init);
+            this.constants = constants;
+        }
 
-            function init() {
-                console.log(model.lessons.all);
-                CourseService.getMergeCourses(model.me.structures[0], model.me.userId, moment('2017-04-03')).then(function (courses) {
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
-                    /*$scope.itemsCalendar = [{
-                      "obj1" : "obj2"
-                    }];*/
-                    console.log($scope.itemsCalendar);
+        _createClass(UtilsService, [{
+            key: "getUserStructuresIdsAsString",
+            value: function getUserStructuresIdsAsString() {
+                var structureIds = "";
+
+                model.me.structures.forEach(function (structureId) {
+                    structureIds += structureId + ":";
                 });
+
+                return structureIds;
             }
 
             /**
-             * Opens the next week view of calendar
+             * Set lesson tooltip text depending on screen resolution.
+             * Tricky responsive must be linked to additional.css behaviour
+             * @param lesson
              */
-            $scope.nextWeek = function () {
-                var nextMonday = moment(model.calendar.firstDay).add(7, 'day');
-                //TODO dont call the parent
-                $scope.$parent.goToCalendarView(nextMonday.format(CAL_DATE_PATTERN));
-            };
 
-            /**
-             * Opens the previous week view of calendar
-             */
-            $scope.previousWeek = function () {
-                var prevMonday = moment(model.calendar.firstDay).add(-7, 'day');
-                //TODO dont call the parent
-                $scope.$parent.goToCalendarView(prevMonday.format(CAL_DATE_PATTERN));
-            };
-        }
-        module.controller("CalendarController", controller);
+        }, {
+            key: "getResponsiveLessonTooltipText",
+            value: function getResponsiveLessonTooltipText(lesson) {
+                var tooltipText = lesson.title + ' (' + lang.translate(lesson.state) + ')';
+                var screenWidth = window.innerWidth;
+
+                // < 900 px display room
+                if (screenWidth < 900 && lesson.room) {
+                    tooltipText += '<br>' + lesson.room;
+                }
+
+                // < 650 px display hour start and hour end
+                if (screenWidth < 650) {
+                    tooltipText += '<br>' + [[lesson.startMoment.format('HH')]] + 'h' + [[lesson.startMoment.format('mm')]];
+                    tooltipText += ' -> ' + [[lesson.endMoment.format('HH')]] + 'h' + [[lesson.endMoment.format('mm')]];
+                }
+
+                // < 600 px display subjectlabel
+                if (screenWidth < 650 && lesson.subjectLabel) {
+                    tooltipText += '<br>' + lesson.subjectLabel;
+                }
+
+                tooltipText = tooltipText.trim();
+
+                return tooltipText;
+            }
+        }]);
+
+        return UtilsService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("UtilsService", UtilsService);
     });
 })();
 
@@ -5212,12 +5645,15 @@ var getUserStructuresIdsAsString = function getUserStructuresIdsAsString() {
 };
 
 model.build = function () {
+
     calendar.startOfDay = 8;
     calendar.endOfDay = 19;
     calendar.dayHeight = 65;
-    model.calendar = new calendar.Calendar({
+    console.log("dont build !");
+    /*model.calendar = new calendar.Calendar({
         week: moment().week()
     });
+    */
 
     // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
     // note: model.calendar.startOfDay does not work in console.
@@ -5233,6 +5669,8 @@ model.build = function () {
     this.collection(Lesson, {
         loading: false,
         syncLessons: function syncLessons(cb, cbe) {
+            console.warn("deprecated");
+            return;
             var that = this;
             if (that.loading) return;
 
@@ -5487,7 +5925,8 @@ model.build = function () {
      * @param lesson Sql diary.lesson row
      */
     sqlToJsLesson = function sqlToJsLesson(data) {
-
+        console.warn("deprecated");
+        return;
         var lessonHomeworks = new Array();
 
         // only initialize homeworks attached to lesson
@@ -5549,6 +5988,8 @@ model.build = function () {
     };
 
     jsonToJsAttachment = function jsonToJsAttachment(data) {
+        console.warn("deprecated");
+        return;
         var att = new Attachment();
         att.id = data.id;
         att.user_id = data.user_id;
@@ -5575,7 +6016,8 @@ model.build = function () {
      * @param lesson
      */
     getResponsiveLessonTooltipText = function getResponsiveLessonTooltipText(lesson) {
-
+        console.warn("deprecated use utils service");
+        return;
         var tooltipText = lesson.title + ' (' + lang.translate(lesson.state) + ')';
         var screenWidth = window.innerWidth;
 
@@ -5779,6 +6221,51 @@ model.initHomework = function (dueDate, lesson) {
     model.loadHomeworksLoad(homework, moment(homework.date).format(DATE_FORMAT), homework.audience.id);
 
     return homework;
+};
+
+/**
+ * Init lesson
+ * @returns {Lesson}
+ */
+model.initLesson = function (timeFromCalendar, selectedDate) {
+    var lesson = new Lesson();
+
+    lesson.audience = {}; //sets the default audience to undefined
+    lesson.subject = model.subjects.first();
+    lesson.audienceType = lesson.audience.type;
+    lesson.color = DEFAULT_ITEM_COLOR;
+    lesson.state = DEFAULT_STATE;
+    lesson.title = lang.translate('diary.lesson.label');
+
+    var newItem = {};
+
+    if (timeFromCalendar) {
+        newItem = model.calendar.newItem;
+
+        // force to HH:00 -> HH:00 + 1 hour
+        newItem.beginning = newItem.beginning.minute(0).second(0);
+        newItem.date = newItem.beginning;
+
+        newItem.end = moment(newItem.beginning);
+        newItem.end.minute(0).second(0).add(1, 'hours');
+    }
+    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
+    else {
+            var itemDate = selectedDate ? moment(selectedDate) : moment();
+
+            newItem = {
+                date: itemDate,
+                beginning: moment().minute(0).second(0),
+                end: moment().minute(0).second(0).add(1, 'hours')
+            };
+        }
+
+    lesson.newItem = newItem;
+    lesson.startTime = newItem.beginning;
+    lesson.endTime = newItem.end;
+    lesson.date = newItem.date;
+
+    return lesson;
 };
 
 /**

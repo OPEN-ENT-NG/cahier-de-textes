@@ -5,7 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout) {
+        function controller($scope,$timeout,$window,$element) {
             // use controllerAs practice
             var vm = this;
 
@@ -22,23 +22,7 @@
                     readonly: $scope.readOnly
                 };
 
-                $scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
-
-                // create calendar objet
-                vm.calendar = new calendar.Calendar({
-                    week: moment($scope.firstDay).week(),
-                    year: moment($scope.firstDay).year()
-                });
-
-                //set items watcher
-                $scope.$watch('items', function(n, o) {
-                    vm.refreshCalendar();
-                });
-                // add event listener
-                $scope.$on('calendar.refreshItems',function(){
-                    console.log("receive calendar refreshitems event");
-                    vm.refreshCalendar();
-                });
+                //$scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
 
                 /**
                  * Used to know if user clicked on calendar event
@@ -49,15 +33,63 @@
                     lastMouseClientX: undefined,
                     lastMouseClientY: undefined
                 };
+
+                bindEvents();
+            }
+
+            $scope.$watch("mondayOfWeek",function(n,o){
+
+                if (!$scope.mondayOfWeek){
+                    return;
+                }
+
+                var date = moment();
+
+                // create calendar objet
+                vm.calendar = new calendar.Calendar({
+                    week: moment($scope.mondayOfWeek).week(),
+                    year: moment($scope.mondayOfWeek).year()
+                });                
+
+                /*
+                * //TODO no a good practice but all the code refer to model.calendar
+                * try to dissociate
+                */
+                model.calendar = vm.calendar;
+
+
+                vm.calendar.week = $scope.mondayOfWeek.week();
+                vm.calendar.setDate($scope.mondayOfWeek);
+
+                $scope.lastDay = moment($scope.mondayOfWeek).add(6,'d');
+
+            });
+
+            /*
+            *   all events binded here
+            */
+            function bindEvents(){
+                //set items watcher
+                $scope.$watch('items', function(n, o) {
+                    vm.refreshCalendar();
+                });
+                // add event listener
+                $scope.$on('calendar.refreshItems',function(){
+                    vm.refreshCalendar();
+                });
+
+                angular.element($window).bind('resize', _.throttle(disposeItems,50));
             }
 
             /*
              * refresh calendar every items modification
              */
             vm.refreshCalendar = function() {
-                console.log("refresh calendar");
+                if(!vm.calendar){
+                    return;
+                }
+                var date = moment();
                 vm.calendar.clearScheduleItems();
-
                 let scheduleItems = _.where(_.map($scope.items, function(item) {
                     item.beginning = item.startMoment;
                     item.end = item.endMoment;
@@ -66,71 +98,43 @@
                     is_periodic: false
                 });
                 vm.calendar.addScheduleItems(scheduleItems);
+                //TODO remove?
+                console.log(moment().diff(date));
                 $timeout(function(){
-                    vm.disposeItems();
+                    console.log(moment().diff(date));
+                    disposeItems();
+                    console.log(moment().diff(date));
                 });
             };
 
-            /*
-            * dispose item elements
-            */
-            vm.disposeItems = function(){
-                //reinit colmap id
-                console.log("disposeItems called");
-                _.each(vm.calendar.days.all,(day)=>{
-                    vm.eraseColMapId(day);
-                });
-                //recal all collisions
-                _.each(vm.calendar.days.all,(day)=>{
-                    //vm.calcAllCollisions(day);
-                    _.each(day.scheduleItems.all, (item) => {
-                        vm.calcAllCollisions2(item,day);
-                    });
-                });
-                //dispose each items
-                _.each(vm.calendar.days.all,(day)=>{
-                    _.each(day.scheduleItems.all, (item) => {
-                        vm.disposeItem(item,day);
-                    });
-                });
-            };
-
-            /*
-            *   erase col map id
-            */
-            vm.eraseColMapId = function(day){
-                _.each(day.scheduleItems.all,(item) =>{
-                    delete item.calendarGutter;
-                    delete item.colMapId;
-                });
-            };
-
+            //between not supported on the current underscore version
             vm.between=function(date,start,end){
                 return date.isAfter(start) && date.isBefore(end);
             };
 
-            vm.calcAllCollisions2 = function(item,day){
+            vm.removeCollisions = function(day){
+                _.each(day.scheduleItems,(scheduleItem)=>{
+                    delete scheduleItem.calendarGutter ;
+                });
+            };
+
+            //calc colisions
+            vm.calcAllCollisions = function(item,day){
                 var calendarGutter = 0;
                 var collision = true;
                 while (collision) {
                     collision = false;
                     day.scheduleItems.forEach(function(scheduleItem) {
-                        if (scheduleItem === item) {
+                        /*if (scheduleItem === item) {
                             return;
-                        }
-                        /*if ((scheduleItem.beginning.isBefore(item.end) && scheduleItem.end.isAfter(item.beginning)) ||
-                          (scheduleItem.end.isBefore(item.beginning) && scheduleItem.beginning.isAfter(item.end))) {
-                          */
-                          if( vm.between(item.beginning,scheduleItem.beginning,scheduleItem.end) ||
+                        }*/
+                      if( vm.between(item.beginning,scheduleItem.beginning,scheduleItem.end) ||
                               vm.between(item.end,scheduleItem.beginning,scheduleItem.end) ||
                               vm.between(scheduleItem.end,item.beginning,item.end)){
-                              console.log("collision found : ", scheduleItem,item);
                             if (scheduleItem.calendarGutter === calendarGutter) {
                                 calendarGutter++;
                                 collision = true;
                             }
-                        }else{
-                            console.log("no collision found : ", scheduleItem,item);
                         }
                     });
                 }
@@ -138,136 +142,60 @@
             };
 
             /*
-            * Calc all colision map
+            * dispose item elements
             */
-            vm.calcAllCollisions = function(day){
-                let collisionMap = {};
-                //erase old mapId referencies
-
-                //cal collisionMap
-                _.each(day.scheduleItems.all,(item) =>{
-                    vm.getItemCollisions(collisionMap,item,day);
-                });
-
-                //set indent id
-                _.each(collisionMap,(inCollision) => {
-                    var calendarGutter = 0;
-                    // sort collision array to have decrease aparence
-                    inCollision.sort(function(itema,itemb){
-                        return itema.startMoment.isAfter(itemb.startMoment);
-                    });
-                    _.each(inCollision,function(items){
-                        items.calendarGutter=calendarGutter++;
+            function disposeItems(){
+                let nbItemsDisposed=0;
+                //recal all collisions
+                _.each(vm.calendar.days.all,(day)=>{
+                    vm.removeCollisions(day);
+                    _.each(day.scheduleItems.all, (item) => {
+                        vm.calcAllCollisions(item,day);
                     });
                 });
-                console.log("collisionMap",collisionMap);
-            };
 
-            /*
-            *   populate the collision map for each item
-            */
-            vm.getItemCollisions = function(collisionMap,item,day){
-
-                if(item.colMapId !== undefined){
-                    return;
-                }
-
-                var collisionArray = [item];
-                let colMapId;
-                //collisionArray = collisionMap[item.colMapId];
-
-                //get all collisions in an array
-                _.each(day.scheduleItems.all,(scheduleItem) =>{
-                    if (scheduleItem!==item && scheduleItem.beginning < item.end && scheduleItem.end > item.beginning) {
-                        //scheduleItem.colMapId = item.colMapId;
-                        if(scheduleItem.colMapId !== undefined){
-                            console.log("foundColMapId",scheduleItem.colMapId);
-                            colMapId = scheduleItem.colMapId;
-                        }else{
-                            collisionArray.push(scheduleItem);
-                        }
-                    }
+                _.each(vm.calendar.days.all,(day)=>{
+                    _.each(day.scheduleItems.all, (item) => {
+                        disposeItem(item,day);
+                        nbItemsDisposed++;
+                    });
                 });
-
-                //if not indexed
-                if(colMapId === undefined){
-                    colMapId = Object.keys(collisionMap).length;
-                    collisionMap[colMapId]=[];
-                }
-                // set colMapId
-                collisionArray = _.map(collisionArray, (it) => {
-                    console.log("set colMapId",colMapId);
-                    it.colMapId = colMapId;
-                    return it;
-                });
-
-                collisionMap[colMapId] = collisionMap[colMapId].concat(collisionArray);
-            };
-
+            }
 
             /*
             * dispose on item
             */
-            vm.disposeItem = function(item,day){
-                if (!item.$element){
-                    console.log("no element founds");
-                    return ;
-                }
-                var element = item.$element;
+            function disposeItem(item,day){
 
-                var parentSchedule = element.parents('.schedule');
-                var scheduleItemEl = element.children('.schedule-item');
-
-                var cellWidth = element.parent().width() / 12;
-                var startDay = item.beginning.dayOfYear();
-                var endDay = item.end.dayOfYear();
-
-                var hours = calendar.getHours(item, day);
                 var itemWidth = day.scheduleItems.scheduleItemWidth(item);
-
-                var dayWidth = parentSchedule.find('.day').width();
-
-                scheduleItemEl.css({
-                    width: itemWidth + '%'
-                });
-
-                var calendarGutter = 0;
+                var dayWidth = $element.find('.day').width();
 
                 var beginningMinutesHeight = item.beginning.minutes() * calendar.dayHeight / 60;
                 var endMinutesHeight = item.end.minutes() * calendar.dayHeight / 60;
+                var hours = calendar.getHours(item, day);
                 var top = (hours.startTime - calendar.startOfDay) * calendar.dayHeight + beginningMinutesHeight;
-                scheduleItemEl.height(((hours.endTime - hours.startTime) * calendar.dayHeight - beginningMinutesHeight + endMinutesHeight) + 'px');
+                var containerTop = "0px";
+                var containerHeight ="100%";
 
-                scheduleItemEl.css({
-                    top: top + 'px',
-                    left: (item.calendarGutter * (itemWidth * dayWidth / 100)) + 'px'
-                });
-
-                var container = element.find('container');
+                var scheduleItemHeight = ((hours.endTime - hours.startTime) * calendar.dayHeight - beginningMinutesHeight + endMinutesHeight);
                 if (top < 0) {
-                    container.css({
-                        top: (Math.abs(top) - 5) + 'px'
-                    });
-                    container.height(element.children('.schedule-item').height() + top + 5);
-                } else {
-                    container.css({
-                        top: 0 + 'px'
-                    });
-                    container.css({
-                        height: '100%'
-                    });
+                    containerTop =  (Math.abs(top) - 5) + 'px';
+                    containerHeight = scheduleItemHeight + top + 5 + 'px';
                 }
-            };
 
-
-            /*
-             *   edit item
-             *  TODO unused??
-             */
-            /*$scope.editItem = function(item) {
-                $scope.calendarEditItem = item;
-                vm.display.editItem = true;
-            };*/
+                item.position = {
+                    scheduleItemStyle : {
+                        width : itemWidth + '%',
+                        top: top + 'px',
+                        left: (item.calendarGutter * (itemWidth * dayWidth / 100)) + 'px',
+                        height : scheduleItemHeight + 'px'
+                    },
+                    containerStyle : {
+                        top : containerTop,
+                        height : containerHeight
+                    }
+                };
+            }
 
             vm.createItem = function(day, timeslot) {
                 $scope.newItem = {};
@@ -358,8 +286,6 @@
              */
             $scope.openOnClickSaveOnDrag = function(item, $event) {
 
-                return ;
-                console.log("openOnClickSaveOnDrag called");
                 var path = '/editLessonView/' + item.id;
 
                 // gap between days is quite important

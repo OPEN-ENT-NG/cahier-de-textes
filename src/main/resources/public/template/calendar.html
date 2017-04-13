@@ -24,8 +24,8 @@
             </div>
         </div>
     </h2>
-        <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()" tooltip="diary.icon.show.list"></i>
-        <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()" tooltip="diary.icon.show.calendar"></i>
+        <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()" diary-tooltip="diary.icon.show.list"></i>
+        <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()" diary-tooltip="diary.icon.show.calendar"></i>
     </div>
 
     <div>
@@ -33,10 +33,10 @@
             <filters style="padding-bottom: 0.8em;">
                 <ul>
                     <li>
-                        <i id="toggleCalendar" class="[[(display.hideCalendar == false) ? 'filter2 diary selected' : 'filter2 diary' ]]" ng-click="toggleCalendar()" tooltip="diary.icon.show.calendargrid"></i>
-                        <i id="toggleHomeworkPanel" class="[[(display.hideHomeworkPanel == false) ? 'filter2 homework selected' : 'filter2 homework' ]]" ng-click="toggleHomeworkPanel()" tooltip="diary.icon.show.homeworkpanel"></i>
-                        <button ng-click="previousWeek(); " tooltip="diary.calendar.previousweek">&#8592;</button>
-                        <button ng-click="nextWeek();" tooltip="diary.calendar.nextweek">&#8594;</button>
+                        <i id="toggleCalendar" class="[[(display.hideCalendar == false) ? 'filter2 diary selected' : 'filter2 diary' ]]" ng-click="toggleCalendar()" diary-tooltip="diary.icon.show.calendargrid"></i>
+                        <i id="toggleHomeworkPanel" class="[[(display.hideHomeworkPanel == false) ? 'filter2 homework selected' : 'filter2 homework' ]]" ng-click="toggleHomeworkPanel()" diary-tooltip="diary.icon.show.homeworkpanel"></i>
+                        <button ng-click="previousWeek(); " diary-tooltip="diary.calendar.previousweek">&#8592;</button>
+                        <button ng-click="nextWeek();" diary-tooltip="diary.calendar.nextweek">&#8594;</button>
                     </li>
                 </ul>
             </filters>
@@ -56,14 +56,18 @@
                           items="itemsCalendar"></diary-calendar>
                       -->
 
-                          <diary-calendar ng-if="isUserTeacher"
+                          <diary-calendar
+                                    ng-if="isUserTeacher"
                                     id="calendar"
                                     class="twelve cell"
                                     display-template="'<item-calendar></item-calendar>'"
                                     create-template="create-lesson"
                                     read-only="false"
                                     on-create-open-action="redirect('/createLessonView/timeFromCalendar')"
-                                    items="itemsCalendar"></diary-calendar>
+                                    params="calendarParams"
+                                    monday-of-week="mondayOfWeek"
+                                    items="itemsCalendar">
+                         </diary-calendar>
 
 
                 <diary-calendar ng-if="!isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all" readonly="true"></diary-calendar>

@@ -26,6 +26,7 @@ First you need to have ```node```,```npm```,```brunch```,```bower```, ```ncp```
 3. run [fiddler](http://www.telerik.com/fiddler) proxy load the [fiddler script](./fiddler.script.txt)
 4. in fidler active the CORS option from the rule menu
 5. go to [http://localhost:3333/diary](http://localhost:3333/diary)
+6. its possible that you have to refresh your browser, the auto log isnt optimal
 
 #### Where i am?
 The brunch light server run the compiled source from ```../dist``` folder, and provide map files to be able to debug.
@@ -50,6 +51,14 @@ we use the [fb flo](https://code.facebook.com/projects/297401870435287/fb-flo/) 
 brunch is already configured. you just have to install the fb flo [chrome extention](https://chrome.google.com/webstore/detail/fb-flo/ahkfhobdidabddlalamkkiafpipdfchp)
 
 insure that your fiddler is closed, (he take the same port), run your brunch server, go to chrome, active the console F12, go to the ```flo``` tab, and click on the Activate for this site.
+
+#### Mock server
+For some mock calls we use swagger. If you want to use it, first install swagger :
+
+```
+npm install swagger```
+
+
 
 _**tips**_
 

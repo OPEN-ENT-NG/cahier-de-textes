@@ -111,11 +111,12 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
                 $scope.openLessonView(null, params);
             };
 
-            if ($scope.calendarLoaded) {
+
+            //if ($scope.calendarLoaded) {
                 openFunc();
-            } else {
+            /*} else {
                 initialization(false, openFunc)
-            }
+            }*/
         },
         createHomeworkView: function () {
 
@@ -162,18 +163,10 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
             loadHomeworkFromRoute(params);
         },
         calendarView: function (params) {
-            $scope.display.showList = false;
-
-            var mondayOfWeek = moment();
-
-            // mondayOfWeek as string date formatted YYYY-MM-DD
-            if (params.mondayOfWeek) {
-                mondayOfWeek = moment(params.mondayOfWeek);
-            } else {
-                mondayOfWeek = mondayOfWeek.weekday(0);
-            }
-
-            $scope.showCalendar(mondayOfWeek);
+            console.log(params);
+            template.open('main', 'main');
+            template.open('main-view', 'calendar');
+            template.open('daily-event-details', 'daily-event-details');
         },
         listView: function(){
             $scope.lesson = null;
@@ -276,50 +269,6 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         $scope.$apply();
     };
 
-    /**
-     *
-     * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
-     */
-    $scope.showCalendar = function(momentMondayOfWeek) {
-
-        $scope.display.showList = false;
-
-        if (!$scope.calendarLoaded) {
-            initialization(true);
-            return;
-        }
-
-        if (!momentMondayOfWeek) {
-            momentMondayOfWeek = moment();
-        }
-
-        momentMondayOfWeek = momentMondayOfWeek.weekday(0);
-
-        model.lessonsDropHandled = false;
-        model.homeworksDropHandled = false;
-        $scope.display.showList = false;
-
-        // need reload lessons or homeworks if week changed
-        var syncItems = momentMondayOfWeek.week() != model.calendar.week;
-
-        $scope.lesson = null;
-        $scope.homework = null;
-
-        model.calendar.week = momentMondayOfWeek.week();
-        model.calendar.setDate(momentMondayOfWeek);
-
-        template.open('main', 'main');
-        template.open('main-view', 'calendar');
-        template.open('daily-event-details', 'daily-event-details');
-        // need sync lessons and homeworks if calendar week changed
-        if (syncItems) {
-            model.lessons.syncLessons(null, validationError);
-            model.homeworks.syncHomeworks(function () {
-                $scope.showCal = !$scope.showCal;
-                $scope.$apply();
-            }, validationError);
-        }
-    };
 
     /**
      *
@@ -1042,51 +991,6 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         }, function (e) {
             validationError(e);
         });
-    };
-
-
-    /**
-     * Load related data to lessons and homeworks from database
-     * @param cb Callback function
-     * @param bShowTemplates if true loads calendar templates after data loaded
-     * might be used when
-     */
-    var initialization = function (bShowTemplates, cb) {
-
-        // will force quick search panel to load (e.g: when returning to calendar view)
-        // see ng-extensions.js -> quickSearch directive
-        model.lessonsDropHandled = false;
-        model.homeworksDropHandled = false;
-
-        $scope.countdown = 4;
-
-        // auto creates diary.teacher
-        if("ENSEIGNANT" === model.me.type) {
-            var teacher = new Teacher();
-            teacher.create(decrementCountdown(bShowTemplates, cb), validationError);
-        } else {
-            decrementCountdown(bShowTemplates, cb)
-        }
-
-        // subjects and audiences needed to fill in
-        // homeworks and lessons props
-
-        model.childs.syncChildren(function () {
-            $scope.child = model.child;
-            $scope.children = model.childs;
-            model.subjects.syncSubjects(function () {
-                model.audiences.syncAudiences(function () {
-                    decrementCountdown(bShowTemplates, cb);
-
-                    model.homeworkTypes.syncHomeworkTypes(function () {
-                        // call lessons/homework sync after audiences sync since
-                        // lesson and homework objects needs audience data to be built
-                        model.lessons.syncLessons(decrementCountdown(bShowTemplates, cb), validationError);
-                        model.homeworks.syncHomeworks(decrementCountdown(bShowTemplates, validationError));
-                    }, validationError);
-                }, validationError);
-            }, validationError);
-        }, validationError);
     };
 
 

@@ -8,11 +8,6 @@ ul {
 }
 
 
-.main{
-  /*
-  background-color: red !important;
-  */
-}
 
 ul li i.icon {
     font-size: 55px;
@@ -85,31 +80,6 @@ div.test .green {
     color: #46bfaf;
 }
 
-.tooltip-detail {
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip-detail .tooltiptext-detail {
-    visibility: hidden;
-    width: 120px;
-    background-color: #FF8500;
-    color: #fff;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    position: absolute;
-    top: 100%;
-    left: 100px;
-    opacity: 0;
-    transition: opacity 1s;
-}
-
-.tooltip-detail:hover .tooltiptext-detail {
-    visibility: visible;
-    opacity: 1;
-}
-
 .homework-content {
     height: 32px;
     border: solid 2px;
@@ -121,12 +91,6 @@ div.test .green {
     text-align: left;
 }
 
-/*
-Override marging for homeworks display
-*/
-.schedule-item {
-    margin-top: 120px;
-}
 
 section .homework-detail {
     margin-top: -1px;
@@ -1050,11 +1014,45 @@ i.external-link:before{
     content:'\e8aa';
 }
 
-/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/styles.scss */
-.main {
-  /*
-  background-color: red !important;
-*/ }
+/* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip.hidden {
+  display: none; }
+
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail {
+  position: relative;
+  display: inline-block; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail .tooltiptext-detail {
+  visibility: hidden;
+  width: 120px;
+  background-color: #FF8500;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  top: 100%;
+  left: 100px;
+  opacity: 0;
+  transition: opacity 1s; }
+
+/* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail:hover .tooltiptext-detail {
+  visibility: visible;
+  opacity: 1; }
+
+/*
+Override marging for homeworks display
+*/
+/* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.schedule-item {
+  margin-top: 40px; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+[resizable] {
+  transition: none !important; }
 
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
 .diary-item-calendar {
@@ -1067,25 +1065,25 @@ i.external-link:before{
     border-color: rgba(0, 0, 0, 0.5);
     border-style: dashed;
     border-width: 1px; }
-  /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  /* line 15, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
   .diary-item-calendar .diary-item-calendar-container .item-line {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    padding-bottom: 0px !important;
+    padding-bottom: 0 !important;
     overflow: hidden; }
-    /* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    /* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
     .diary-item-calendar .diary-item-calendar-container .item-line .hour {
       white-space: nowrap;
       overflow: hidden; }
-    /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
     .diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox {
       float: right;
       margin-left: auto;
       overflow: hidden;
       white-space: nowrap;
       min-width: 1em; }
-    /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
     .diary-item-calendar .diary-item-calendar-container .item-line .rom {
       white-space: nowrap;
       margin-left: 0.5em;

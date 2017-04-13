@@ -1,5 +1,5 @@
 <div class="calendar-current-week">
-	  <i18n>calendar.weekfrom</i18n> [[DiaryCalendarCtrl.calendar.firstDay.format('DD/MM/YYYY')]] <i18n>calendar.weekto</i18n> [[DiaryCalendarCtrl.calendar.lastDay.format('DD/MM/YYYY')]]
+	  <i18n>calendar.weekfrom</i18n> [[mondayOfWeek.format('DD/MM/YYYY')]] <i18n>calendar.weekto</i18n> [[lastDay.format('DD/MM/YYYY')]]
 </div>
 <div class="week-switcher">
 	<date-picker-icon ng-model="DiaryCalendarCtrl.calendar.dayForWeek" ng-change="DiaryCalendarCtrl.updateCalendarWeek()" class="cell"></date-picker-icon>
@@ -17,17 +17,15 @@
 			<div class="hidden-schedule-items before" ng-if="day.scheduleItems.beforeCalendar() > 0">
 				+ [[day.scheduleItems.beforeCalendar()]]
 			</div>
- 
 			<div ng-if="display.readonly" class="timeslots">
 				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot"></div>
 			</div>
 			<div ng-if="!display.readonly" class="timeslots">
 				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="DiaryCalendarCtrl.createItem(day, timeslot)"></div>
 			</div>
-
 			<div class="schedule-items">
 				<div ng-repeat="item in day.scheduleItems.all">
-					<diary-schedule-item item="item" day="day"></diary-schedule-item>
+					<diary-schedule-item item="item" ng-init="item.domId='item_'+$parent.$index + '_' + $index" id="[[item.domId]]" day="day"></diary-schedule-item>
 				</div>
 			</div>
 			<div class="hidden-schedule-items after" ng-if="day.scheduleItems.afterCalendar() > 0">
