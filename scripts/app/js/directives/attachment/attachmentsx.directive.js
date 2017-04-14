@@ -33,11 +33,7 @@
                  */
                 var syncSelectedDocumentsFromItemAttachments = function(){
 
-                    var theScope = getMediaLibraryScope();
-
-                    console.log('TheScope');
-                    console.log(theScope);
-
+                    var theScope = getMediaLibraryScope();                   
 
                     theScope.documents.forEach(function(document){
                         document.selected = hasAttachmentInItem(document._id);

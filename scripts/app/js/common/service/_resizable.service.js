@@ -179,7 +179,6 @@
 
                             var p = element.offset();
                             if (resizeLimits.verticalTop) {
-                                console.log("resizeLimits.verticalTop");
                                 var distance = initial.pos.top - mouse.y;
                                 if (initial.pos.top - distance < parentData.pos.top) {
                                     distance = initial.pos.top - parentData.pos.top;
@@ -193,7 +192,7 @@
 
                                 newHeight = initial.size.height + distance;
                             } else {
-                                console.log("!resizeLimits.verticalTop");
+                                
                                 var distance = mouse.y - p.top;
                                 if (element.offset().top + distance > parentData.pos.top + parent.height()) {
                                     distance = (parentData.pos.top + parentData.size.height) - element.offset().top - 2;

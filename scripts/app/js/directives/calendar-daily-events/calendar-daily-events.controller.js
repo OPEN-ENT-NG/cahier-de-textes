@@ -208,7 +208,7 @@
              * Display homeworks and lessons and set open state of homework panel
              * and calendar grid
              */
-            function placeCalendarAndHomeworksPanel() {                
+            function placeCalendarAndHomeworksPanel() {
                 var bShowCalendar = $scope.bShowCalendar;
                 var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
@@ -276,7 +276,6 @@
 
 
             function setDaysContent() {
-                console.log("setDaysContent called");
                 model.calendar.days.forEach(function(day) {
                     day.dailyEvents = [];
                 });
@@ -326,8 +325,7 @@
                 $scope.$apply();
             });
 
-            $scope.$watchCollection('ngModel', function(newVal) {
-                console.log("ngModel changed",$scope.ngModel);
+            $scope.$watchCollection('ngModel', function(newVal) {                
                 setDaysContent();
             });
         }

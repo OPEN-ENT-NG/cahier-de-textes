@@ -162,8 +162,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params);
         },
-        calendarView: function (params) {
-            console.log(params);
+        calendarView: function (params) {            
             template.open('main', 'main');
             template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');

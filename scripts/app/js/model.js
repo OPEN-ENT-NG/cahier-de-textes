@@ -311,7 +311,6 @@ model.build = function () {
     calendar.startOfDay=8;
     calendar.endOfDay=19;
     calendar.dayHeight = 65;
-    console.log("dont build !");
     /*model.calendar = new calendar.Calendar({
         week: moment().week()
     });
@@ -374,8 +373,7 @@ model.build = function () {
 
             if (datas) {
                 this.all = _.union(this.all, datas);
-            }
-            console.log(model.lessons);
+            }            
         }, behaviours: 'diary'
     });
 

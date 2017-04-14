@@ -14,7 +14,7 @@
              * initialisation calendar function
              */
             function init() {
-                console.log("init controls");
+                console.log("init CalendarController");
                 //view controls
                 $scope.display.showList = false;
                 //calendarDailyEvent directive options
@@ -28,14 +28,13 @@
                 };
 
                 //handler calendar updates :
-                $scope.$on('calendar.refreshItems', (_, item) => {
-                    console.log("updated item", item);
+                $scope.$on('calendar.refreshItems', (_, item) => {                    
                     item.calendarUpdate();
                 });
             }
 
             $scope.$watch('routeParams', function(n, o) {
-                console.log("routeParams changed", n);
+
                 var mondayOfWeek = moment();
                 // mondayOfWeek as string date formatted YYYY-MM-DD
                 if ($scope.routeParams.mondayOfWeek) {
@@ -147,7 +146,6 @@
             $scope.showCalendar = function(mondayOfWeek) {
                 $scope.display.showList = false;
 
-                console.log("show calendar with ", mondayOfWeek);
                 $scope.mondayOfWeek = mondayOfWeek;
                 if (!$scope.calendarLoaded) {
                     initialization(true);
@@ -197,7 +195,6 @@
                     model.homeworks.addRange(homeworks);
 
                     $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
-                    console.log("refresh calendar : ",$scope.itemsCalendar);
                 });
             }
 
