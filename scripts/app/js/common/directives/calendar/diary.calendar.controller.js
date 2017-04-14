@@ -5,7 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout,$window,$element) {
+        function controller($scope,$timeout,$window,$element,$location) {
             // use controllerAs practice
             var vm = this;
 
@@ -49,7 +49,7 @@
                 vm.calendar = new calendar.Calendar({
                     week: moment($scope.mondayOfWeek).week(),
                     year: moment($scope.mondayOfWeek).year()
-                });                
+                });
 
                 /*
                 * //TODO no a good practice but all the code refer to model.calendar
@@ -276,6 +276,10 @@
                 vm.itemMouseEvent.lastMouseDownTime = new Date().getTime();
                 vm.itemMouseEvent.lastMouseClientX = $event.clientX;
                 vm.itemMouseEvent.lastMouseClientY = $event.clientY;
+            };
+
+            $scope.redirect = function (path) {
+                    $location.path(path);
             };
 
             /**

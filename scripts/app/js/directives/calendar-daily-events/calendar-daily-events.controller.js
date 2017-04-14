@@ -7,15 +7,38 @@
 
         function controller($scope) {
 
-            $scope.$watch(()=>{
-                return model.calendar;
-            },()=>{
-                console.log("model calendar updated");
-                $scope.calendar = model.calendar;
-                //setDaysContent();
-            });
-            //$scope.calendar = model.calendar;
-            $scope.isUserTeacher = model.isUserTeacher();
+            init();
+
+            function init(){
+                $scope.isUserTeacher = model.isUserTeacher();
+
+                // default open state of calendar grid
+                // and homework panel
+                //TODO remove and delegate to calendar controler
+
+                handlers();
+            }
+
+            /*
+            * bind events behaviours
+            */
+            function handlers(){
+                //watch calendar recreation
+                $scope.$watch(()=>{
+                    return model.calendar;
+                },()=>{
+                    $scope.calendar = model.calendar;
+                    placeCalendarAndHomeworksPanel();
+                });
+
+                //watch toggle options
+                $scope.$watch(()=>{
+                    return ""+$scope.bShowCalendar +$scope.bShowHomeworks+$scope.bShowHomeworksMinified;
+                },()=>{
+                    placeCalendarAndHomeworksPanel();
+                });
+            }
+
 
             /**
              * Open homeworks details when homeworks info is minimized
@@ -35,10 +58,9 @@
              * @param $event
              */
             $scope.editSelectedHomework = function(homework, $event) {
-
                 // prevent redirect on clicking on checkbox
                 if (!($event.target && $event.target.type === "checkbox")) {
-                    if (homework.lesson_id == null) {
+                    if (!homework.lesson_id) {
                         window.location = '/diary#/editHomeworkView/' + homework.id;
                     } else {
                         window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;
@@ -62,7 +84,9 @@
              * @param unselectHomeworksOnHide
              */
             var hideOrShowHwDetail = function(day, hideHomeworks, unselectHomeworksOnHide) {
-
+                if (!day.dailyEvents){
+                    return;
+                }
                 var hwDayDetail = $('#hw-detail-' + day.index);
 
                 var isNotHidden = hwDayDetail.hasClass('show');
@@ -100,18 +124,10 @@
                 return max;
             };
 
-            // default open state of calendar grid
-            // and homework panel
-            if (!model.show) {
-                model.show = {
-                    bShowCalendar: true,
-                    bShowHomeworks: true,
-                    bShowHomeworksMinified: false
-                }
-            };
 
 
-            $scope.show = model.show;
+
+            //$scope.show = model.show;
 
             /**
              * Minify the homework panel or not
@@ -119,7 +135,7 @@
              * else 3
              */
             $scope.toggleHomeworkPanelMinized = function() {
-                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+                placeCalendarAndHomeworksPanel();
             };
 
             /**
@@ -144,14 +160,13 @@
                 }
 
                 // calendar hidden and homework panel maximized -> show all
-                if (!model.show.bShowHomeworksMinified) {
-                    return !model.show.bShowCalendar || (day.dailyEvents.length <= 1);
+                if (!$scope.bShowHomeworksMinified) {
+                    return !$scope.bShowCalendar || (day.dailyEvents.length <= 1);
                 } else {
                     return day.dailyEvents.length == 1;
                 }
             };
 
-            $scope.show = model.show;
 
 
             /**
@@ -159,10 +174,9 @@
              * depending on calendar grid displayed state and homework panel minimized state
              * @param bShowCalendar True if calendar grid is visible
              * @param bShowHomeworks True if homeworks panel is visible
-             * @param bShowHomeworksMinified True if homework panel is in minimized mode (max 1 homework displayed)
              * @returns {number} Homework panel height
              */
-            var getHomeworkPanelHeight = function(bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+            var getHomeworkPanelHeight = function(bShowCalendar, bShowHomeworks) {
 
                 /**
                  * Height of a single homework in homework panel
@@ -193,12 +207,11 @@
             /**
              * Display homeworks and lessons and set open state of homework panel
              * and calendar grid
-             * @param bShowCalendar Show calendar panel
-             * @param bShowHomeworks Show homework panel
-             * @param bShowHomeworksMinified If true homework panel will be minified (max homeworks display with full detail = 1)
              */
-            model.placeCalendarAndHomeworksPanel = function(bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
-
+            function placeCalendarAndHomeworksPanel() {                
+                var bShowCalendar = $scope.bShowCalendar;
+                var bShowHomeworks = $scope.bShowHomeworks;
+                var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
                 /**
                  * Calendar height
                  * @type {number}
@@ -259,11 +272,7 @@
                     });
                 }
 
-                model.show.bShowCalendar = bShowCalendar;
-                model.show.bShowHomeworks = bShowHomeworks;
-                model.show.bShowHomeworksMinified = bShowHomeworksMinified;
-
-            };
+            }
 
 
             function setDaysContent() {
@@ -275,7 +284,7 @@
 
                 $scope.ngModel.forEach(function(item) {
                     var refDay = moment(model.calendar.dayForWeek).day(1);
-                    model.calendar.days.forEach(function(day) {                        
+                    model.calendar.days.forEach(function(day) {
 
                         if (item.dueDate && item.dueDate.format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')) {
                             day.dailyEvents.push(item);
@@ -290,7 +299,7 @@
                 var timeslots = $('.timeslots');
 
                 if (timeslots.length === 8) {
-                    model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                    placeCalendarAndHomeworksPanel();
                 }
                 // if days timeslots are not yet positioned
                 // wait until they are to create the homework panel
@@ -301,7 +310,7 @@
                             timeslots = $('.timeslots');
                             if (timeslots.length === 8) {
                                 clearInterval(timer);
-                                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                                placeCalendarAndHomeworksPanel();
                             }
                             timerOccurences++;
                             // 5s should be far than enough to have all timeslots loaded

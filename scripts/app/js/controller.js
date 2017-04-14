@@ -126,11 +126,11 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
                 $scope.openHomeworkView(null);
             };
 
-            if ($scope.calendarLoaded) {
+            //if ($scope.calendarLoaded) {
                 openFunc();
-            } else {
-                initialization(false, openFunc)
-            }
+            //} else {
+            //    initialization(false, openFunc)
+            //}
         },
         editLessonView: function(params) {
 
@@ -1174,37 +1174,18 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         $scope.setChildFilter(child, refreshCalendarCurrentWeek);
     };
 
-    /**
-     * Display or hide the homework panel
-     * in calendar view
-     */
-    $scope.toggleHomeworkPanel = function () {
-
-        $scope.display.hideHomeworkPanel = model.show.bShowHomeworks;
-        model.show.bShowHomeworks = !model.show.bShowHomeworks;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-    };
-
-    /**
-     * Display/hide calendar
-     */
-    $scope.toggleCalendar = function () {
-
-        $scope.display.hideCalendar = model.show.bShowCalendar;
-        model.show.bShowCalendar = !model.show.bShowCalendar;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-    };
-
 
     /**
      * Minify the homework panel or not
      * If it's minified, will only show one max homework
      * else 3
      */
-    $scope.toggleHomeworkPanelMinified = function(){
+     //TODO unused?
+  /*  $scope.toggleHomeworkPanelMinified = function(){
         $scope.display.bShowHomeworksMinified = model.show.bShowHomeworksMinified;
         model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
     };
+    */
 
     $scope.toggleFilterOnHomework = function () {
         $scope.searchForm.displayHomework = model.searchForm.displayHomework;

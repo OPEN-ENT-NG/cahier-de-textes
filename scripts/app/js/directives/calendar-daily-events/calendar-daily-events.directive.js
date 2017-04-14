@@ -1,21 +1,24 @@
 (function() {
-	'use strict';
+    'use strict';
 
-	AngularExtensions.addModuleConfig(function(module){
-    module.directive('calendarDailyEvents', function(){
+    AngularExtensions.addModuleConfig(function(module) {
+        module.directive('calendarDailyEvents', function() {
             return {
                 scope: {
-                    ngModel: '='
+                    ngModel: '=',
+                    bShowCalendar : '=',
+                    bShowHomeworks : '=',
+                    bShowHomeworksMinified : '='
                 },
                 restrict: 'E',
-				templateUrl : '/diary/public/js/directives/calendar-daily-events/calendar-daily-events.template.html',
-                controller : 'CalendarDailyEventsController',
+                templateUrl: '/diary/public/js/directives/calendar-daily-events/calendar-daily-events.template.html',
+                controller: 'CalendarDailyEventsController',
 
-                link: function(scope, element, attributes){
+                link: function(scope, element, attributes) {
 
-                    $('body').on('click', function(e){
-                        if(e.target !== element[0] && element.find(e.target).length === 0){
-                            model.calendar.days.forEach(function(day){
+                    $('body').on('click', function(e) {
+                        if (e.target !== element[0] && element.find(e.target).length === 0) {
+                            model.calendar.days.forEach(function(day) {
                                 day.openDailyEvents = false;
                             });
                             scope.$apply();
@@ -24,6 +27,6 @@
                 }
             };
         });
-	});
+    });
 
 })();

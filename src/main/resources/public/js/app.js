@@ -155,6 +155,7 @@ var AngularExtensions = {
 				templateUrl: '/diary/public/js/common/directives/calendar/calendar.template.html',
 				scope: {
 					items: '=',
+					hideItems: '=',
 					mondayOfWeek: '=',
 					itemTemplate: '@',
 					readOnly: '=',
@@ -179,7 +180,7 @@ var AngularExtensions = {
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope, $timeout, $window, $element) {
+        function controller($scope, $timeout, $window, $element, $location) {
             // use controllerAs practice
             var vm = this;
 
@@ -445,6 +446,10 @@ var AngularExtensions = {
                 vm.itemMouseEvent.lastMouseDownTime = new Date().getTime();
                 vm.itemMouseEvent.lastMouseClientX = $event.clientX;
                 vm.itemMouseEvent.lastMouseClientY = $event.clientY;
+            };
+
+            $scope.redirect = function (path) {
+                $location.path(path);
             };
 
             /**
@@ -1039,11 +1044,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.openHomeworkView(null);
             };
 
-            if ($scope.calendarLoaded) {
-                openFunc();
-            } else {
-                initialization(false, openFunc);
-            }
+            //if ($scope.calendarLoaded) {
+            openFunc();
+            //} else {
+            //    initialization(false, openFunc)
+            //}
         },
         editLessonView: function editLessonView(params) {
 
@@ -2049,35 +2054,16 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 
     /**
-     * Display or hide the homework panel
-     * in calendar view
-     */
-    $scope.toggleHomeworkPanel = function () {
-
-        $scope.display.hideHomeworkPanel = model.show.bShowHomeworks;
-        model.show.bShowHomeworks = !model.show.bShowHomeworks;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-    };
-
-    /**
-     * Display/hide calendar
-     */
-    $scope.toggleCalendar = function () {
-
-        $scope.display.hideCalendar = model.show.bShowCalendar;
-        model.show.bShowCalendar = !model.show.bShowCalendar;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
-    };
-
-    /**
      * Minify the homework panel or not
      * If it's minified, will only show one max homework
      * else 3
      */
-    $scope.toggleHomeworkPanelMinified = function () {
-        $scope.display.bShowHomeworksMinified = model.show.bShowHomeworksMinified;
-        model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
-    };
+    //TODO unused?
+    /*  $scope.toggleHomeworkPanelMinified = function(){
+          $scope.display.bShowHomeworksMinified = model.show.bShowHomeworksMinified;
+          model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+      };
+      */
 
     $scope.toggleFilterOnHomework = function () {
         $scope.searchForm.displayHomework = model.searchForm.displayHomework;
@@ -2209,7 +2195,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 }
 
-;'use strict';
+;"use strict";
 
 (function () {
     'use strict';
@@ -2227,9 +2213,14 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * initialisation calendar function
              */
             function init() {
+                console.log("init controls");
                 //view controls
                 $scope.display.showList = false;
-
+                //calendarDailyEvent directive options
+                $scope.display.bShowCalendar = true;
+                $scope.display.bShowHomeworks = true;
+                $scope.display.bShowHomeworksMinified = false;
+                $scope.showCal = false;
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -2406,6 +2397,21 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 template.open('daily-event-item', 'daily-event-item');
                 $scope.showCal = !$scope.showCal;
                 $scope.$apply();
+            };
+
+            /**
+             * Display or hide the homework panel
+             * in calendar view
+             */
+            $scope.toggleHomeworkPanel = function () {
+                $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+            };
+
+            /**
+             * Display/hide calendar
+             */
+            $scope.toggleCalendar = function () {
+                $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
             };
         }
     });
@@ -2691,15 +2697,37 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
         function controller($scope) {
 
-            $scope.$watch(function () {
-                return model.calendar;
-            }, function () {
-                console.log("model calendar updated");
-                $scope.calendar = model.calendar;
-                //setDaysContent();
-            });
-            //$scope.calendar = model.calendar;
-            $scope.isUserTeacher = model.isUserTeacher();
+            init();
+
+            function init() {
+                $scope.isUserTeacher = model.isUserTeacher();
+
+                // default open state of calendar grid
+                // and homework panel
+                //TODO remove and delegate to calendar controler
+
+                handlers();
+            }
+
+            /*
+            * bind events behaviours
+            */
+            function handlers() {
+                //watch calendar recreation
+                $scope.$watch(function () {
+                    return model.calendar;
+                }, function () {
+                    $scope.calendar = model.calendar;
+                    placeCalendarAndHomeworksPanel();
+                });
+
+                //watch toggle options
+                $scope.$watch(function () {
+                    return "" + $scope.bShowCalendar + $scope.bShowHomeworks + $scope.bShowHomeworksMinified;
+                }, function () {
+                    placeCalendarAndHomeworksPanel();
+                });
+            }
 
             /**
              * Open homeworks details when homeworks info is minimized
@@ -2719,10 +2747,9 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * @param $event
              */
             $scope.editSelectedHomework = function (homework, $event) {
-
                 // prevent redirect on clicking on checkbox
                 if (!($event.target && $event.target.type === "checkbox")) {
-                    if (homework.lesson_id == null) {
+                    if (!homework.lesson_id) {
                         window.location = '/diary#/editHomeworkView/' + homework.id;
                     } else {
                         window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;
@@ -2746,7 +2773,9 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * @param unselectHomeworksOnHide
              */
             var hideOrShowHwDetail = function hideOrShowHwDetail(day, hideHomeworks, unselectHomeworksOnHide) {
-
+                if (!day.dailyEvents) {
+                    return;
+                }
                 var hwDayDetail = $('#hw-detail-' + day.index);
 
                 var isNotHidden = hwDayDetail.hasClass('show');
@@ -2783,17 +2812,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 return max;
             };
 
-            // default open state of calendar grid
-            // and homework panel
-            if (!model.show) {
-                model.show = {
-                    bShowCalendar: true,
-                    bShowHomeworks: true,
-                    bShowHomeworksMinified: false
-                };
-            };
-
-            $scope.show = model.show;
+            //$scope.show = model.show;
 
             /**
              * Minify the homework panel or not
@@ -2801,7 +2820,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * else 3
              */
             $scope.toggleHomeworkPanelMinized = function () {
-                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, !model.show.bShowHomeworksMinified);
+                placeCalendarAndHomeworksPanel();
             };
 
             /**
@@ -2826,24 +2845,21 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 }
 
                 // calendar hidden and homework panel maximized -> show all
-                if (!model.show.bShowHomeworksMinified) {
-                    return !model.show.bShowCalendar || day.dailyEvents.length <= 1;
+                if (!$scope.bShowHomeworksMinified) {
+                    return !$scope.bShowCalendar || day.dailyEvents.length <= 1;
                 } else {
                     return day.dailyEvents.length == 1;
                 }
             };
-
-            $scope.show = model.show;
 
             /**
              * Return the homework panel height that should be set
              * depending on calendar grid displayed state and homework panel minimized state
              * @param bShowCalendar True if calendar grid is visible
              * @param bShowHomeworks True if homeworks panel is visible
-             * @param bShowHomeworksMinified True if homework panel is in minimized mode (max 1 homework displayed)
              * @returns {number} Homework panel height
              */
-            var getHomeworkPanelHeight = function getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
+            var getHomeworkPanelHeight = function getHomeworkPanelHeight(bShowCalendar, bShowHomeworks) {
 
                 /**
                  * Height of a single homework in homework panel
@@ -2872,12 +2888,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
             /**
              * Display homeworks and lessons and set open state of homework panel
              * and calendar grid
-             * @param bShowCalendar Show calendar panel
-             * @param bShowHomeworks Show homework panel
-             * @param bShowHomeworksMinified If true homework panel will be minified (max homeworks display with full detail = 1)
              */
-            model.placeCalendarAndHomeworksPanel = function (bShowCalendar, bShowHomeworks, bShowHomeworksMinified) {
-
+            function placeCalendarAndHomeworksPanel() {
+                var bShowCalendar = $scope.bShowCalendar;
+                var bShowHomeworks = $scope.bShowHomeworks;
+                var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
                 /**
                  * Calendar height
                  * @type {number}
@@ -2936,11 +2951,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         hideOrShowHwDetail(day, true, true);
                     });
                 }
-
-                model.show.bShowCalendar = bShowCalendar;
-                model.show.bShowHomeworks = bShowHomeworks;
-                model.show.bShowHomeworksMinified = bShowHomeworksMinified;
-            };
+            }
 
             function setDaysContent() {
                 console.log("setDaysContent called");
@@ -2965,7 +2976,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 var timeslots = $('.timeslots');
 
                 if (timeslots.length === 8) {
-                    model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                    placeCalendarAndHomeworksPanel();
                 }
                 // if days timeslots are not yet positioned
                 // wait until they are to create the homework panel
@@ -2975,7 +2986,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                             timeslots = $('.timeslots');
                             if (timeslots.length === 8) {
                                 clearInterval(timer);
-                                model.placeCalendarAndHomeworksPanel(model.show.bShowCalendar, model.show.bShowHomeworks, model.show.bShowHomeworksMinified);
+                                placeCalendarAndHomeworksPanel();
                             }
                             timerOccurences++;
                             // 5s should be far than enough to have all timeslots loaded
@@ -3008,7 +3019,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         module.directive('calendarDailyEvents', function () {
             return {
                 scope: {
-                    ngModel: '='
+                    ngModel: '=',
+                    bShowCalendar: '=',
+                    bShowHomeworks: '=',
+                    bShowHomeworksMinified: '='
                 },
                 restrict: 'E',
                 templateUrl: '/diary/public/js/directives/calendar-daily-events/calendar-daily-events.template.html',

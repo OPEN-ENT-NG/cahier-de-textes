@@ -14,9 +14,14 @@
              * initialisation calendar function
              */
             function init() {
+                console.log("init controls");
                 //view controls
                 $scope.display.showList = false;
-
+                //calendarDailyEvent directive options
+                $scope.display.bShowCalendar = true;
+                $scope.display.bShowHomeworks = true;
+                $scope.display.bShowHomeworksMinified = false;
+                $scope.showCal = false;
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -206,6 +211,23 @@
                 $scope.showCal = !$scope.showCal;
                 $scope.$apply();
             };
+
+            /**
+             * Display or hide the homework panel
+             * in calendar view
+             */
+            $scope.toggleHomeworkPanel = function () {
+                $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+            };
+
+            /**
+             * Display/hide calendar
+             */
+            $scope.toggleCalendar = function () {
+                $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
+            };
+
+
         }
     });
 

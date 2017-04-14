@@ -17,15 +17,15 @@
 			<div class="hidden-schedule-items before" ng-if="day.scheduleItems.beforeCalendar() > 0">
 				+ [[day.scheduleItems.beforeCalendar()]]
 			</div>
-			<div ng-if="display.readonly" class="timeslots">
+			<div ng-if="display.readonly" class="timeslots" >
 				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot"></div>
 			</div>
 			<div ng-if="!display.readonly" class="timeslots">
 				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="DiaryCalendarCtrl.createItem(day, timeslot)"></div>
 			</div>
-			<div class="schedule-items">
-				<div ng-repeat="item in day.scheduleItems.all">
-					<diary-schedule-item item="item" ng-init="item.domId='item_'+$parent.$index + '_' + $index" id="[[item.domId]]" day="day"></diary-schedule-item>
+			<div class="schedule-items" >
+				<div ng-repeat="item in day.scheduleItems.all" >
+					<diary-schedule-item item="item" ng-if="!hideItems" ng-init="item.domId='item_'+$parent.$index + '_' + $index" id="[[item.domId]]" day="day"></diary-schedule-item>
 				</div>
 			</div>
 			<div class="hidden-schedule-items after" ng-if="day.scheduleItems.afterCalendar() > 0">
