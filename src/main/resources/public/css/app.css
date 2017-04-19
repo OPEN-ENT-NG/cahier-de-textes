@@ -1046,28 +1046,65 @@ i.external-link:before{
 /*
 Override marging for homeworks display
 */
-/* line 7, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar.decale .schedule-item, diary-calendar.decale .timeslots {
-  margin-top: 40px; }
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container calendar-daily-events {
+  display: none; }
+  /* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+  .diary-container calendar-daily-events .days .day {
+    height: auto;
+    min-height: 100px; }
 
-/* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar.decale legend.timeslots {
-  margin-top: 100px; }
+/* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .timeslots {
+  display: none; }
 
-/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar.decale .next-timeslots {
-  bottom: -20px; }
-
-/* line 19, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar .schedule .days {
-  height: auto; }
+/* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-calendar .timeslots {
+  display: initial; }
 
 /* line 26, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar .schedule-item {
-  margin-top: 0px; }
+.diary-container.diary-show-calendar .homeworkpanel {
+  padding: 0px !important; }
 
 /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
-diary-calendar [resizable] {
+.diary-container.diary-show-calendar calendar-daily-events .days .day {
+  height: 40px;
+  min-height: 40px; }
+
+/* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks:not(.diary-show-calendar) .daily-events {
+  display: none; }
+
+/* line 43, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks calendar-daily-events {
+  display: initial; }
+
+/* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .schedule-item {
+  margin-top: 40px; }
+
+/* line 51, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .day .timeslots .timeslot:first-child {
+  margin-top: 40px; }
+
+/* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks legend.timeslots {
+  margin-top: 100px; }
+
+/* line 59, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .next-timeslots {
+  bottom: -20px; }
+
+/* line 64, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .schedule .days {
+  height: auto; }
+
+/* line 71, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .schedule-item {
+  margin-top: 0px; }
+
+/* line 76, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container [resizable] {
   transition: none !important; }
 
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */

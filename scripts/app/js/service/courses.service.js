@@ -40,6 +40,7 @@
                 course.calendarType = "shadow";
                 course.locked=true;
                 course.is_periodic =false;
+                course.notShowOnCollision=true;
             });
             return courses;
         }

@@ -29,12 +29,16 @@
     </div>
 
     <div>
-        <div class="row">
+        <div class="row diary-container"
+            ng-class="{'diary-show-homeworks' : display.bShowHomeworks,'diary-show-calendar' : display.bShowCalendar}">
             <filters style="padding-bottom: 0.8em;">
                 <ul>
                     <li>
-                        <i id="toggleCalendar" class="[[(display.bShowCalendar ) ? 'filter2 diary selected' : 'filter2 diary' ]]" ng-click="toggleCalendar()" diary-tooltip="diary.icon.show.calendargrid"></i>
-                        <i id="toggleHomeworkPanel" class="[[(display.bShowHomeworks ) ? 'filter2 homework selected' : 'filter2 homework' ]]" ng-click="toggleHomeworkPanel()" diary-tooltip="diary.icon.show.homeworkpanel"></i>
+                        <i  class="filter2 diary " ng-class="{'selected':display.bShowCalendar}" ng-click="toggleCalendar()" diary-tooltip="diary.icon.show.calendargrid"></i>
+                        <i
+                            ng-class="{'selected':display.bShowHomeworks}"
+                            class="filter2 homework "
+                            ng-click="toggleHomeworkPanel()" diary-tooltip="diary.icon.show.homeworkpanel"></i>
                         <button ng-click="previousWeek(); " diary-tooltip="diary.calendar.previousweek">&#8592;</button>
                         <button ng-click="nextWeek();" diary-tooltip="diary.calendar.nextweek">&#8594;</button>
                     </li>
@@ -43,7 +47,6 @@
             <calendar-daily-events
               for="calendar"
               b-show-calendar = "display.bShowCalendar"
-              b-show-homeworks = "display.bShowHomeworks"
               b-show-homeworks-minified = "display.bShowHomeworksMinified"
               ng-model="homeworks.all"
               ng-if="!display.hideHomeworkPanel"
@@ -54,7 +57,7 @@
                 <diary-calendar ng-if="isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all"></diary-calendar>
                 <diary-calendar ng-if="!isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all" readonly="true"></diary-calendar>
             </div>
-            <div class="row" ng-if="showCal">
+            <div class="row " ng-if="showCal" >
                 <!--
                     <diary-calendar ng-if="isUserTeacher"
                           id="calendar"
@@ -64,17 +67,15 @@
                           on-create-open="redirect('/createLessonView/timeFromCalendar')"
                           items="itemsCalendar"></diary-calendar>
                       -->
-
                           <diary-calendar
                                     ng-if="isUserTeacher"
                                     id="calendar"
-                                    class="twelve cell decale"
+                                    class="twelve cell"
                                     display-template="'<item-calendar></item-calendar>'"
                                     create-template="create-lesson"
                                     read-only="false"
                                     on-create-open-action="redirect('/createLessonView/timeFromCalendar')"
                                     params="calendarParams"
-                                    hide-items="!display.bShowCalendar"
                                     monday-of-week="mondayOfWeek"
                                     items="itemsCalendar">
 

@@ -212,25 +212,17 @@
 
               console.log("placeCalendarAndHomeworksPanel called");
                 var bShowCalendar = $scope.bShowCalendar;
-                var bShowHomeworks = $scope.bShowHomeworks;
+                //var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
 
 
-
-                if(bShowHomeworks){
-                    $("diary-calendar").addClass("decale");
-                    console.log("set day decaled");
-                }else{
-                    $("diary-calendar").removeClass("decale");
-                    console.log("remove day decaled");
-                }
 
                 /**
                  * Calendar height
                  * @type {number}
                  */
 
-                 return;
+                return;
                 const CAL_HEIGHT = 775;
 
                 var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
@@ -271,7 +263,7 @@
 
                 // set homework panel size with max number of homeworks
 
-                $('.homeworkpanel').css('height', newHwPanelHeight +"px");
+                //$('.homeworkpanel').css('height', newHwPanelHeight +"px");
                 $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
 
                 // toggle buttons

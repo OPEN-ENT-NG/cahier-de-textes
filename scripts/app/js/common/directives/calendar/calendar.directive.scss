@@ -2,11 +2,56 @@
 Override marging for homeworks display
 */
 
-diary-calendar{
-  &.decale{
-    .schedule-item, .timeslots{
+.diary-container{
+
+
+
+  calendar-daily-events{
+    display : none;
+
+    .days .day {
+      height:auto;
+      min-height: 100px;
+    }
+  }
+
+  .timeslots{
+    display: none;
+  }
+
+  &.diary-show-calendar{
+    .timeslots{
+      display: initial;
+    }
+    .homeworkpanel{
+      padding: 0px !important;
+    }
+
+    calendar-daily-events{
+      .days .day {
+        height:40px;
+        min-height:40px;
+      }
+    }
+  }
+  &.diary-show-homeworks{
+    &:not(.diary-show-calendar){
+      .daily-events{
+        display: none;
+      }
+    }
+    calendar-daily-events{
+      display : initial;
+    }
+
+    .schedule-item {
         margin-top: 40px;
     }
+
+    .day .timeslots .timeslot:first-child{
+      margin-top: 40px;
+    }
+
 
     legend.timeslots{
         margin-top: 100px;

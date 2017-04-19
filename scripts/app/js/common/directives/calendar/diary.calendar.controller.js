@@ -20,9 +20,7 @@
                     editItem: false,
                     createItem: false,
                     readonly: $scope.readOnly
-                };
-
-                //$scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
+                };                
 
                 /**
                  * Used to know if user clicked on calendar event
@@ -98,12 +96,8 @@
                     is_periodic: false
                 });
                 vm.calendar.addScheduleItems(scheduleItems);
-                //TODO remove?
-                console.log(moment().diff(date));
                 $timeout(function(){
-                    console.log(moment().diff(date));
                     disposeItems();
-                    console.log(moment().diff(date));
                 });
             };
 
@@ -134,6 +128,8 @@
                             if (scheduleItem.calendarGutter === calendarGutter) {
                                 calendarGutter++;
                                 collision = true;
+                                //scheduleItem.hasCollision=true;
+                                item.hasCollision=true;
                             }
                         }
                     });
@@ -141,11 +137,12 @@
                 item.calendarGutter = calendarGutter;
             };
 
+
+
             /*
             * dispose item elements
             */
             function disposeItems(){
-                let nbItemsDisposed=0;
                 //recal all collisions
                 _.each(vm.calendar.days.all,(day)=>{
                     vm.removeCollisions(day);
@@ -154,20 +151,39 @@
                     });
                 });
 
+
+
                 _.each(vm.calendar.days.all,(day)=>{
                     _.each(day.scheduleItems.all, (item) => {
                         disposeItem(item,day);
-                        nbItemsDisposed++;
                     });
                 });
             }
 
+
+
+            function getWidth(scheduleItem,day){
+
+                var concurrentItems = _.filter(day.scheduleItems.all,(item)=>{
+                    return item.beginning.unix() < scheduleItem.end.unix() && item.end.unix() > scheduleItem.beginning.unix() ;
+                });
+
+				var maxGutter = 0;
+				_.forEach(concurrentItems, function(item){
+					if(item.calendarGutter && item.calendarGutter > maxGutter && !item.notShowOnCollision){
+						maxGutter = item.calendarGutter;
+					}
+				});
+				maxGutter++;
+
+				return Math.floor(99 / maxGutter);
+            }
             /*
             * dispose on item
             */
             function disposeItem(item,day){
 
-                var itemWidth = day.scheduleItems.scheduleItemWidth(item);
+                var itemWidth = getWidth(item,day);
                 var dayWidth = $element.find('.day').width();
 
                 var beginningMinutesHeight = item.beginning.minutes() * calendar.dayHeight / 60;
@@ -183,12 +199,15 @@
                     containerHeight = scheduleItemHeight + top + 5 + 'px';
                 }
 
+                let display = item.notShowOnCollision && item.hasCollision ? "none" : 'initial';
+
                 item.position = {
                     scheduleItemStyle : {
                         width : itemWidth + '%',
                         top: top + 'px',
                         left: (item.calendarGutter * (itemWidth * dayWidth / 100)) + 'px',
-                        height : scheduleItemHeight + 'px'
+                        height : scheduleItemHeight + 'px',
+                        display :display
                     },
                     containerStyle : {
                         top : containerTop,
@@ -317,8 +336,9 @@
                     $scope.newItem = {};
                     var year = vm.calendar.year;
                     console.log("item",item);
-                    $scope.newItem.beginning = moment(item.start);//moment().utc().year(year).dayOfYear(item.index).hour(item.start);
-                    $scope.newItem.end = moment(item.end);//moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                    $scope.newItem.beginning = moment(item.startMoment);//moment().utc().year(year).dayOfYear(item.index).hour(item.start);
+                    $scope.newItem.end = moment(item.endMoment);//moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                    console.log("$scope.newItem",$scope.newItem);
                     vm.calendar.newItem = $scope.newItem;
                     $scope.onCreateOpen();
                 //};

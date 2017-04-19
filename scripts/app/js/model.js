@@ -373,7 +373,7 @@ model.build = function () {
 
             if (datas) {
                 this.all = _.union(this.all, datas);
-            }            
+            }
         }, behaviours: 'diary'
     });
 
@@ -925,9 +925,10 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         // force to HH:00 -> HH:00 + 1 hour
         newItem.beginning = newItem.beginning.minute(0).second(0);
         newItem.date = newItem.beginning;
-
-        newItem.end = moment(newItem.beginning);
-        newItem.end.minute(0).second(0).add(1, 'hours');
+        if (!newItem.beginning.isBefore(newItem.end)){
+          newItem.end = moment(newItem.beginning);
+          newItem.end.minute(0).second(0).add(1, 'hours');          
+        }
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {

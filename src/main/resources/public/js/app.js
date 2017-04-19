@@ -197,8 +197,6 @@ var AngularExtensions = {
                     readonly: $scope.readOnly
                 };
 
-                //$scope.firstDay = !$scope.firstDay ? moment() : $scope.firstDay;
-
                 /**
                  * Used to know if user clicked on calendar event
                  * or is dragging  to prevent ng-click
@@ -271,12 +269,8 @@ var AngularExtensions = {
                     is_periodic: false
                 });
                 vm.calendar.addScheduleItems(scheduleItems);
-                //TODO remove?
-                console.log(moment().diff(date));
                 $timeout(function () {
-                    console.log(moment().diff(date));
                     disposeItems();
-                    console.log(moment().diff(date));
                 });
             };
 
@@ -305,6 +299,8 @@ var AngularExtensions = {
                             if (scheduleItem.calendarGutter === calendarGutter) {
                                 calendarGutter++;
                                 collision = true;
+                                //scheduleItem.hasCollision=true;
+                                item.hasCollision = true;
                             }
                         }
                     });
@@ -316,7 +312,6 @@ var AngularExtensions = {
             * dispose item elements
             */
             function disposeItems() {
-                var nbItemsDisposed = 0;
                 //recal all collisions
                 _.each(vm.calendar.days.all, function (day) {
                     vm.removeCollisions(day);
@@ -328,17 +323,32 @@ var AngularExtensions = {
                 _.each(vm.calendar.days.all, function (day) {
                     _.each(day.scheduleItems.all, function (item) {
                         disposeItem(item, day);
-                        nbItemsDisposed++;
                     });
                 });
             }
 
+            function getWidth(scheduleItem, day) {
+
+                var concurrentItems = _.filter(day.scheduleItems.all, function (item) {
+                    return item.beginning.unix() < scheduleItem.end.unix() && item.end.unix() > scheduleItem.beginning.unix();
+                });
+
+                var maxGutter = 0;
+                _.forEach(concurrentItems, function (item) {
+                    if (item.calendarGutter && item.calendarGutter > maxGutter && !item.notShowOnCollision) {
+                        maxGutter = item.calendarGutter;
+                    }
+                });
+                maxGutter++;
+
+                return Math.floor(99 / maxGutter);
+            }
             /*
             * dispose on item
             */
             function disposeItem(item, day) {
 
-                var itemWidth = day.scheduleItems.scheduleItemWidth(item);
+                var itemWidth = getWidth(item, day);
                 var dayWidth = $element.find('.day').width();
 
                 var beginningMinutesHeight = item.beginning.minutes() * calendar.dayHeight / 60;
@@ -354,12 +364,15 @@ var AngularExtensions = {
                     containerHeight = scheduleItemHeight + top + 5 + 'px';
                 }
 
+                var display = item.notShowOnCollision && item.hasCollision ? "none" : 'initial';
+
                 item.position = {
                     scheduleItemStyle: {
                         width: itemWidth + '%',
                         top: top + 'px',
                         left: item.calendarGutter * (itemWidth * dayWidth / 100) + 'px',
-                        height: scheduleItemHeight + 'px'
+                        height: scheduleItemHeight + 'px',
+                        display: display
                     },
                     containerStyle: {
                         top: containerTop,
@@ -485,8 +498,9 @@ var AngularExtensions = {
                 $scope.newItem = {};
                 var year = vm.calendar.year;
                 console.log("item", item);
-                $scope.newItem.beginning = moment(item.start); //moment().utc().year(year).dayOfYear(item.index).hour(item.start);
-                $scope.newItem.end = moment(item.end); //moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                $scope.newItem.beginning = moment(item.startMoment); //moment().utc().year(year).dayOfYear(item.index).hour(item.start);
+                $scope.newItem.end = moment(item.endMoment); //moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                console.log("$scope.newItem", $scope.newItem);
                 vm.calendar.newItem = $scope.newItem;
                 $scope.onCreateOpen();
                 //};
@@ -2175,6 +2189,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              */
             $scope.toggleHomeworkPanel = function () {
                 $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+
+                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+                    $scope.display.bShowCalendar = true;
+                }
             };
 
             /**
@@ -2182,6 +2200,9 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              */
             $scope.toggleCalendar = function () {
                 $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
+                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+                    $scope.display.bShowHomeworks = true;
+                }
             };
         }
     });
@@ -2660,16 +2681,8 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 console.log("placeCalendarAndHomeworksPanel called");
                 var bShowCalendar = $scope.bShowCalendar;
-                var bShowHomeworks = $scope.bShowHomeworks;
+                //var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
-
-                if (bShowHomeworks) {
-                    $("diary-calendar").addClass("decale");
-                    console.log("set day decaled");
-                } else {
-                    $("diary-calendar").removeClass("decale");
-                    console.log("remove day decaled");
-                }
 
                 /**
                  * Calendar height
@@ -2717,7 +2730,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 // set homework panel size with max number of homeworks
 
-                $('.homeworkpanel').css('height', newHwPanelHeight + "px");
+                //$('.homeworkpanel').css('height', newHwPanelHeight +"px");
                 $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
 
                 // toggle buttons
@@ -4788,6 +4801,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     course.calendarType = "shadow";
                     course.locked = true;
                     course.is_periodic = false;
+                    course.notShowOnCollision = true;
                 });
                 return courses;
             }
@@ -6034,9 +6048,10 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         // force to HH:00 -> HH:00 + 1 hour
         newItem.beginning = newItem.beginning.minute(0).second(0);
         newItem.date = newItem.beginning;
-
-        newItem.end = moment(newItem.beginning);
-        newItem.end.minute(0).second(0).add(1, 'hours');
+        if (!newItem.beginning.isBefore(newItem.end)) {
+            newItem.end = moment(newItem.beginning);
+            newItem.end.minute(0).second(0).add(1, 'hours');
+        }
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {

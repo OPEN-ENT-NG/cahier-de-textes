@@ -28,7 +28,7 @@
                 };
 
                 //handler calendar updates :
-                $scope.$on('calendar.refreshItems', (_, item) => {                    
+                $scope.$on('calendar.refreshItems', (_, item) => {
                     item.calendarUpdate();
                 });
             }
@@ -215,6 +215,10 @@
              */
             $scope.toggleHomeworkPanel = function () {
                 $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+
+                if (  !$scope.display.bShowHomeworks && !$scope.display.bShowCalendar){
+                  $scope.display.bShowCalendar =true;
+                }
             };
 
             /**
@@ -222,6 +226,9 @@
              */
             $scope.toggleCalendar = function () {
                 $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
+                if (  !$scope.display.bShowHomeworks && !$scope.display.bShowCalendar){
+                  $scope.display.bShowHomeworks =true;
+                }
             };
 
 
