@@ -310,6 +310,23 @@
                 }
             };
 
+
+
+            $scope.createNewtemFromSchedule = function(item) {
+                //vm.createItem = function(day, timeslot) {
+                    $scope.newItem = {};
+                    var year = vm.calendar.year;
+                    console.log("item",item);
+                    $scope.newItem.beginning = moment(item.start);//moment().utc().year(year).dayOfYear(item.index).hour(item.start);
+                    $scope.newItem.end = moment(item.end);//moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                    vm.calendar.newItem = $scope.newItem;
+                    $scope.onCreateOpen();
+                //};
+
+            };
+
+
+
         }
 
     });

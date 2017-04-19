@@ -4,7 +4,7 @@
   "//removed not yet supported uglify-js-brunch": "^1.7.8",
   "devDependencies": {
     "css-brunch": "^1.7.0",
-    
+    "fb-flo-brunch": "^1.7.22",
     "sass-brunch": "^1.8.11",
     "clean-css-brunch": "^1.7.2",
     "ng-annotate-brunch": "^1.7.2",

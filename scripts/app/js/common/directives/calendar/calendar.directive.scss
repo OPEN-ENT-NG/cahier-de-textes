@@ -1,10 +1,35 @@
 /*
 Override marging for homeworks display
 */
-.schedule-item {
-    margin-top: 40px;
-}
 
-[resizable]{
-  transition: none !important;
+diary-calendar{
+  &.decale{
+    .schedule-item, .timeslots{
+        margin-top: 40px;
+    }
+
+    legend.timeslots{
+        margin-top: 100px;
+    }
+    .next-timeslots{
+        bottom: -20px;
+
+    }
+  }
+  .schedule .days{
+    height: auto;
+  }
+
+
+
+
+  .schedule-item {
+      margin-top: 0px;
+  }
+
+
+  [resizable]{
+    transition: none !important;
+  }
+
 }

@@ -2,12 +2,13 @@
 
 <div class="diary-item-calendar schedule-item-content"
      ng-style="{'background-color': item.color}"
-     ng-class="{'diary-schedule' :item.type==='schedule' }"
+     ng-class="{'diary-schedule' :item.calendarType==='shadow' }"
      diary-tooltip="[[item.tooltipText]]">
      <!-- #######################
           ######## lessons part
           ########################-->
     <div ng-click="openOnClickSaveOnDrag(item, $event)"
+        ng-if="item.calendarType!=='shadow'"
         ng-mouseDown="setMouseDownTime($event)"
 
         class="diary-item-calendar-container">
@@ -37,13 +38,15 @@
             <span id="subjectlabel" class="subjectlabel" >[[item.subjectLabel]]&nbsp;</span>
         </div>
     </div>
-    <!-- #######################
-         ######## schedule part
-         ########################
+    <!--
+        #######################
+        ######## schedule part
+        ########################
      -->
 
     <div
-        ng-if="item.type==='sdchedule'"
+        ng-click="createNewtemFromSchedule(item)"
+        ng-if="item.calendarType==='shadow'"
         class="diary-item-calendar-container">
         <div class="item-line">
             <!-- Hour Start -->

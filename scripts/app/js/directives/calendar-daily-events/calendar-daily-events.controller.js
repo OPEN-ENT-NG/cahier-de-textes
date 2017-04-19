@@ -209,19 +209,33 @@
              * and calendar grid
              */
             function placeCalendarAndHomeworksPanel() {
+
+              console.log("placeCalendarAndHomeworksPanel called");
                 var bShowCalendar = $scope.bShowCalendar;
                 var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
+
+
+
+                if(bShowHomeworks){
+                    $("diary-calendar").addClass("decale");
+                    console.log("set day decaled");
+                }else{
+                    $("diary-calendar").removeClass("decale");
+                    console.log("remove day decaled");
+                }
+
                 /**
                  * Calendar height
                  * @type {number}
                  */
+
+                 return;
                 const CAL_HEIGHT = 775;
 
                 var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
 
                 // reduce height of homework panel if requested
-                $('.homeworkpanel').css('height', newHwPanelHeight);
 
                 var prevTimeslotsBar = $('.previous-timeslots');
                 var nextTimeslotsBar = $('.next-timeslots');
@@ -249,14 +263,15 @@
 
                 hoursBar.css('margin-top', newHwPanelHeight);
                 $('legend.timeslots').css('margin-top', '');
-                $('legend.timeslots').css('top', newHwPanelHeight);
+                $('legend.timeslots').css('top', newHwPanelHeight+"px");
                 nextTimeslotsBar.css('top', CAL_HEIGHT + newHwPanelHeight);
 
                 $('.schedule-item').css('margin-top', bShowCalendar ? newHwPanelHeight : 0);
                 calGrid.height(CAL_HEIGHT + (bShowCalendar ? newHwPanelHeight : 0));
 
                 // set homework panel size with max number of homeworks
-                $('.homeworkpanel').height(newHwPanelHeight);
+
+                $('.homeworkpanel').css('height', newHwPanelHeight +"px");
                 $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
 
                 // toggle buttons
@@ -325,7 +340,7 @@
                 $scope.$apply();
             });
 
-            $scope.$watchCollection('ngModel', function(newVal) {                
+            $scope.$watchCollection('ngModel', function(newVal) {
                 setDaysContent();
             });
         }

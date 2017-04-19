@@ -479,6 +479,18 @@ var AngularExtensions = {
                     $timeout(vm.refreshCalendar);
                 }
             };
+
+            $scope.createNewtemFromSchedule = function (item) {
+                //vm.createItem = function(day, timeslot) {
+                $scope.newItem = {};
+                var year = vm.calendar.year;
+                console.log("item", item);
+                $scope.newItem.beginning = moment(item.start); //moment().utc().year(year).dayOfYear(item.index).hour(item.start);
+                $scope.newItem.end = moment(item.end); //moment().utc().year(year).dayOfYear(item.index).hour(item.end);
+                vm.calendar.newItem = $scope.newItem;
+                $scope.onCreateOpen();
+                //};
+            };
         }
     });
 })();
@@ -2645,19 +2657,31 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * and calendar grid
              */
             function placeCalendarAndHomeworksPanel() {
+
+                console.log("placeCalendarAndHomeworksPanel called");
                 var bShowCalendar = $scope.bShowCalendar;
                 var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
+
+                if (bShowHomeworks) {
+                    $("diary-calendar").addClass("decale");
+                    console.log("set day decaled");
+                } else {
+                    $("diary-calendar").removeClass("decale");
+                    console.log("remove day decaled");
+                }
+
                 /**
                  * Calendar height
                  * @type {number}
                  */
+
+                return;
                 var CAL_HEIGHT = 775;
 
                 var newHwPanelHeight = getHomeworkPanelHeight(bShowCalendar, bShowHomeworks, bShowHomeworksMinified);
 
                 // reduce height of homework panel if requested
-                $('.homeworkpanel').css('height', newHwPanelHeight);
 
                 var prevTimeslotsBar = $('.previous-timeslots');
                 var nextTimeslotsBar = $('.next-timeslots');
@@ -2685,14 +2709,15 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 hoursBar.css('margin-top', newHwPanelHeight);
                 $('legend.timeslots').css('margin-top', '');
-                $('legend.timeslots').css('top', newHwPanelHeight);
+                $('legend.timeslots').css('top', newHwPanelHeight + "px");
                 nextTimeslotsBar.css('top', CAL_HEIGHT + newHwPanelHeight);
 
                 $('.schedule-item').css('margin-top', bShowCalendar ? newHwPanelHeight : 0);
                 calGrid.height(CAL_HEIGHT + (bShowCalendar ? newHwPanelHeight : 0));
 
                 // set homework panel size with max number of homeworks
-                $('.homeworkpanel').height(newHwPanelHeight);
+
+                $('.homeworkpanel').css('height', newHwPanelHeight + "px");
                 $('.homeworkpanel').css('display', bShowHomeworks ? 'inherit' : 'none');
 
                 // toggle buttons
@@ -4760,8 +4785,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     course.startTime = moment(course.startDate).format('HH:mm:ss');
                     course.endTime = moment(course.endDate).format('HH:mm:ss');
-
-                    course.type = "schedule";
+                    course.calendarType = "shadow";
+                    course.locked = true;
                     course.is_periodic = false;
                 });
                 return courses;

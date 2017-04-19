@@ -48,7 +48,7 @@
               ng-model="homeworks.all"
               ng-if="!display.hideHomeworkPanel"
               on-create-open="redirect('/createHomeworkView')"
-              style="z-index: 1000; margin-top: -8px;">
+              style="z-index: 1000; margin-top: 8px;">
             </calendar-daily-events>
             <div class="row" ng-if="! showCal">
                 <diary-calendar ng-if="isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all"></diary-calendar>
@@ -68,7 +68,7 @@
                           <diary-calendar
                                     ng-if="isUserTeacher"
                                     id="calendar"
-                                    class="twelve cell"
+                                    class="twelve cell decale"
                                     display-template="'<item-calendar></item-calendar>'"
                                     create-template="create-lesson"
                                     read-only="false"
@@ -77,6 +77,7 @@
                                     hide-items="!display.bShowCalendar"
                                     monday-of-week="mondayOfWeek"
                                     items="itemsCalendar">
+
                          </diary-calendar>
 
 

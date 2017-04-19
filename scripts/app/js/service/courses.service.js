@@ -6,7 +6,7 @@
     * used to manipulate Course model
     */
     class CourseService {
-        constructor($http,$q,constants) {          
+        constructor($http,$q,constants) {
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
@@ -37,8 +37,8 @@
 
                 course.startTime = moment(course.startDate).format('HH:mm:ss');
                 course.endTime = moment(course.endDate).format('HH:mm:ss');
-
-                course.type = "schedule";
+                course.calendarType = "shadow";
+                course.locked=true;
                 course.is_periodic =false;
             });
             return courses;
