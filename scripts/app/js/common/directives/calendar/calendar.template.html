@@ -5,7 +5,7 @@
 	<date-picker-icon ng-model="DiaryCalendarCtrl.calendar.dayForWeek" ng-change="DiaryCalendarCtrl.updateCalendarWeek()" class="cell"></date-picker-icon>
 </div>
 <div class="schedule" drawing-zone>
-	<legend class="timeslots" ng-if="!hideItems">
+	<legend class="timeslots">
 		<div ng-repeat="timeslot in DiaryCalendarCtrl.calendar.timeSlots.all"  class="timeslot">
 			[[timeslot.beginning]]h00 - [[timeslot.end]]h00
 		</div>
@@ -18,14 +18,13 @@
 				+ [[day.scheduleItems.beforeCalendar()]]
 			</div>
 
-			<div ng-if="display.readonly && !hideItems" class="timeslots" >
-				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot"></div>
+			<div ng-if="!display.readonly" class="timeslots">
+				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="display.readonly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
+
+				</div>
 			</div>
-			<div ng-if="!display.readonly && !hideItems" class="timeslots">
-				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="DiaryCalendarCtrl.createItem(day, timeslot)"></div>
-			</div>
-		
-			<div class="schedule-items && !hideItems" >
+
+			<div class="schedule-items" >
 				<div ng-repeat="item in day.scheduleItems.all" >
 					<diary-schedule-item item="item"  ng-init="item.domId='item_'+$parent.$index + '_' + $index" id="[[item.domId]]" day="day"></diary-schedule-item>
 				</div>

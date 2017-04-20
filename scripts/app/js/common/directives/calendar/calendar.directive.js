@@ -11,13 +11,13 @@
 						templateUrl: '/diary/public/js/common/directives/calendar/calendar.template.html',
 						scope : {
 							items : '=',
-							hideItems : '=',
 							mondayOfWeek : '=',
 							itemTemplate : '@',
 							readOnly : '=',
 							displayTemplate : '=',
 							onCreateOpenAction :  '&',
-							params : '='
+							params : '=',
+							templateSlotItem : '='
 						},
 
 		        controller: 'DiaryCalendarController',

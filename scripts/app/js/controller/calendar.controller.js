@@ -43,7 +43,7 @@
                     if (model.mondayOfWeek){
                         mondayOfWeek = model.mondayOfWeek;
                     }else{
-                        mondayOfWeek = mondayOfWeek.weekday(0);                
+                        mondayOfWeek = mondayOfWeek.weekday(0);
                     }
                 }
                 model.mondayOfWeek = mondayOfWeek;
@@ -60,7 +60,7 @@
                 var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
                 $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
             };
-
+            
             /**
              * Opens the previous week view of calendar
              */
