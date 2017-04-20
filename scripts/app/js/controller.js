@@ -965,7 +965,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         }
 
         var postHomeworkSave = function () {
-            $scope.showCal = !$scope.showCal;
+            //$scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
             $scope.$apply();
@@ -1037,7 +1037,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
         template.open('daily-event-item', 'daily-event-item');
-        $scope.showCal = !$scope.showCal;
+        //$scope.showCal = !$scope.showCal;
         $scope.$apply();
     };
 

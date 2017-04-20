@@ -8,7 +8,7 @@
         module.directive('quickSearch', function () {
             return {
                 restrict: "E",
-                templateUrl: "diary/public/template/quick-search.html",
+                templateUrl: "/diary/public/js/directives/quick-search/quick-search.html",
                 scope: {
                     ngModel: '=',
                     /**

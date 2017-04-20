@@ -4,7 +4,9 @@ Override marging for homeworks display
 
 .diary-container{
 
-
+  button.previous-timeslots,button.next-timeslots{
+        left : -3px;
+    }
 
   calendar-daily-events{
     display : none;

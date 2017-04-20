@@ -21,7 +21,7 @@
                 $scope.display.bShowCalendar = true;
                 $scope.display.bShowHomeworks = true;
                 $scope.display.bShowHomeworksMinified = false;
-                $scope.showCal = false;
+                //$scope.showCal = false;
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -40,8 +40,13 @@
                 if ($scope.routeParams.mondayOfWeek) {
                     mondayOfWeek = moment($scope.routeParams.mondayOfWeek);
                 } else {
-                    mondayOfWeek = mondayOfWeek.weekday(0);
+                    if (model.mondayOfWeek){
+                        mondayOfWeek = model.mondayOfWeek;
+                    }else{
+                        mondayOfWeek = mondayOfWeek.weekday(0);                
+                    }
                 }
+                model.mondayOfWeek = mondayOfWeek;
                 $scope.showCalendar(mondayOfWeek);
 
             }, true);
@@ -205,7 +210,7 @@
                 template.open('create-homework', 'create-homework');
                 template.open('daily-event-details', 'daily-event-details');
                 template.open('daily-event-item', 'daily-event-item');
-                $scope.showCal = !$scope.showCal;
+                //$scope.showCal = !$scope.showCal;
                 $scope.$apply();
             };
 

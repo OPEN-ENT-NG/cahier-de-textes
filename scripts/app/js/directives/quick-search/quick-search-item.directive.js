@@ -9,7 +9,7 @@
         module.directive('quickSearchItem', function () {
             return {
                 restrict: "E",
-                templateUrl: "diary/public/template/quick-search-item.html",
+                templateUrl: "/diary/public/js/directives/quick-search/quick-search-item.html",
                 scope: false,
                 link: function (scope, element) {
 

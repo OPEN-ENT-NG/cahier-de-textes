@@ -1648,7 +1648,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         }
 
         var postHomeworkSave = function postHomeworkSave() {
-            $scope.showCal = !$scope.showCal;
+            //$scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({ id: $scope.homework.audience.id });
             $scope.$apply();
@@ -1717,7 +1717,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
         template.open('daily-event-item', 'daily-event-item');
-        $scope.showCal = !$scope.showCal;
+        //$scope.showCal = !$scope.showCal;
         $scope.$apply();
     };
 
@@ -2015,7 +2015,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.display.bShowCalendar = true;
                 $scope.display.bShowHomeworks = true;
                 $scope.display.bShowHomeworksMinified = false;
-                $scope.showCal = false;
+                //$scope.showCal = false;
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -2034,8 +2034,13 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 if ($scope.routeParams.mondayOfWeek) {
                     mondayOfWeek = moment($scope.routeParams.mondayOfWeek);
                 } else {
-                    mondayOfWeek = mondayOfWeek.weekday(0);
+                    if (model.mondayOfWeek) {
+                        mondayOfWeek = model.mondayOfWeek;
+                    } else {
+                        mondayOfWeek = mondayOfWeek.weekday(0);
+                    }
                 }
+                model.mondayOfWeek = mondayOfWeek;
                 $scope.showCalendar(mondayOfWeek);
             }, true);
 
@@ -2187,7 +2192,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 template.open('create-homework', 'create-homework');
                 template.open('daily-event-details', 'daily-event-details');
                 template.open('daily-event-item', 'daily-event-item');
-                $scope.showCal = !$scope.showCal;
+                //$scope.showCal = !$scope.showCal;
                 $scope.$apply();
             };
 
@@ -2971,7 +2976,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         module.directive('quickSearchItem', function () {
             return {
                 restrict: "E",
-                templateUrl: "diary/public/template/quick-search-item.html",
+                templateUrl: "/diary/public/js/directives/quick-search/quick-search-item.html",
                 scope: false,
                 link: function link(scope, element) {
 
@@ -3014,7 +3019,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         module.directive('quickSearch', function () {
             return {
                 restrict: "E",
-                templateUrl: "diary/public/template/quick-search.html",
+                templateUrl: "/diary/public/js/directives/quick-search/quick-search.html",
                 scope: {
                     ngModel: '=',
                     /**

@@ -3,6 +3,8 @@
     flex-direction: column;
     box-sizing: border-box;
 
+    
+
     &.diary-schedule {
         background-color: rgba(0,0,0,0.15);
         border-color: rgba(0,0,0,0.5);
@@ -22,6 +24,7 @@
             .hour {
                 white-space: nowrap;
                 overflow: hidden;
+                width : 40px;
             }
 
             .item-checkbox {
@@ -30,12 +33,14 @@
                 overflow: hidden;
                 white-space: nowrap;
                 min-width: 1em;
+                margin-right:3px;
             }
 
             .rom {
                 white-space: nowrap;
                 margin-left: 0.5em;
                 overflow: hidden;
+
                 text-overflow: ellipsis;
             }
         }
