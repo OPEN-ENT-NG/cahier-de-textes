@@ -53,10 +53,12 @@
               on-create-open="redirect('/createHomeworkView')"
               style="z-index: 1000; margin-top: 8px;">
             </calendar-daily-events>
+            <!--
             <div class="row" ng-if="! showCal">
                 <diary-calendar ng-if="isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all"></diary-calendar>
                 <diary-calendar ng-if="!isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all" readonly="true"></diary-calendar>
             </div>
+              -->
             <div class="row " ng-if="showCal" >
                 <!--
                     <diary-calendar ng-if="isUserTeacher"
@@ -81,9 +83,9 @@
 
                          </diary-calendar>
 
-
+                <!--
                 <diary-calendar ng-if="!isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all" readonly="true"></diary-calendar>
-
+            -->
             </div>
         </div>
     </div>

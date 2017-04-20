@@ -64,7 +64,7 @@
             <!-- 1 - End Hour -->
             <span id="hour-end" class="hour">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
             <!-- 2 - CLASSE -->
-            <span  class="room">[[item.audienceLabel]]</span>
+            <span  class="room">[[item.classes | arraytostring]]</span>
             <!-- 1 - ICONE BROUILLON -->
             <span id="state" ng-if="[[item.state]]=='draft'" class="item-checkbox">
                 <i class="icon pencil"></i>
@@ -72,7 +72,7 @@
         </div>
 
         <div>
-            <span id="subjectlabel" class="subjectlabel" >[[item.subjectLabel]]&nbsp;</span>
+            <span id="subjectlabel" class="subjectlabel" >[[item.subject.subjectLabel]]&nbsp;</span>
         </div>
     </div>
 

@@ -27,7 +27,18 @@ model.canEdit = function () {
 
 
 model.getCourseService = function(){
-    return angular.injector(['ng','app']).get("CourseService");
+    if (!model.courseService){
+      model.courseService = angular.injector(['ng','app']).get("CourseService");
+    }
+    return model.courseService;
+};
+
+
+model.getLessonsService = function(){
+    if (!model.lessonService){
+      model.lessonService = angular.injector(['ng','app']).get("LessonService");
+    }
+    return model.lessonService;
 };
 
 
@@ -681,12 +692,12 @@ model.build = function () {
     /**
      * On window resize compute lesson tooltips (responsive design)
      */
-    window.addEventListener('resize', function(event){
+    /*window.addEventListener('resize', function(event){
 
         model.lessons.forEach(function (lesson) {
             lesson.tooltipText = getResponsiveLessonTooltipText(lesson);
         });
-    });
+    });*/
 
     /**
      * Set lesson tooltip text depending on screen resolution.
@@ -927,7 +938,7 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         newItem.date = newItem.beginning;
         if (!newItem.beginning.isBefore(newItem.end)){
           newItem.end = moment(newItem.beginning);
-          newItem.end.minute(0).second(0).add(1, 'hours');          
+          newItem.end.minute(0).second(0).add(1, 'hours');
         }
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->

@@ -6,6 +6,7 @@
         module.controller("DiaryCalendarController", controller);
 
         function controller($scope,$timeout,$window,$element,$location) {
+            console.log("init DiaryCalendarController");
             // use controllerAs practice
             var vm = this;
 
@@ -20,7 +21,7 @@
                     editItem: false,
                     createItem: false,
                     readonly: $scope.readOnly
-                };                
+                };
 
                 /**
                  * Used to know if user clicked on calendar event
@@ -76,7 +77,9 @@
                     vm.refreshCalendar();
                 });
 
-                angular.element($window).bind('resize', _.throttle(disposeItems,50));
+                angular.element($window).bind('resize', _.throttle(()=>{
+                    $scope.$apply(()=>{disposeItems();});
+                },50));
             }
 
             /*
@@ -144,6 +147,9 @@
             */
             function disposeItems(){
                 //recal all collisions
+                if (!vm.calendar){
+                  return;
+                }
                 _.each(vm.calendar.days.all,(day)=>{
                     vm.removeCollisions(day);
                     _.each(day.scheduleItems.all, (item) => {

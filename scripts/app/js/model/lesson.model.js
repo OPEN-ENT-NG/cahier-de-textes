@@ -269,7 +269,7 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
     var load = function () {
         http().get('/diary/lesson/' + lesson.id)
             .done(function (data) {
-                lesson.updateData(sqlToJsLesson(data));
+                lesson.updateData(model.getLessonsService().mapLesson(data));
 
                 if (loadHomeworks) {
                     model.loadHomeworksForLesson(lesson, cb, cbe);

@@ -181,6 +181,7 @@ var AngularExtensions = {
         module.controller("DiaryCalendarController", controller);
 
         function controller($scope, $timeout, $window, $element, $location) {
+            console.log("init DiaryCalendarController");
             // use controllerAs practice
             var vm = this;
 
@@ -249,7 +250,11 @@ var AngularExtensions = {
                     vm.refreshCalendar();
                 });
 
-                angular.element($window).bind('resize', _.throttle(disposeItems, 50));
+                angular.element($window).bind('resize', _.throttle(function () {
+                    $scope.$apply(function () {
+                        disposeItems();
+                    });
+                }, 50));
             }
 
             /*
@@ -313,6 +318,9 @@ var AngularExtensions = {
             */
             function disposeItems() {
                 //recal all collisions
+                if (!vm.calendar) {
+                    return;
+                }
                 _.each(vm.calendar.days.all, function (day) {
                     vm.removeCollisions(day);
                     _.each(day.scheduleItems.all, function (item) {
@@ -3677,6 +3685,32 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
 'use strict';
 
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
+		module.filter('arraytostring', filter);
+
+		function filter() {
+			return function (item) {
+				// return the current `item`, but call `toUpperCase()` on it
+
+				if (!item) {
+					return "";
+				}
+				var result = "";
+				_.each(item, function (it) {
+					result += it + ",";
+				});
+				result = result.substring(0, result.length - 1);
+				return result;
+			};
+		}
+	});
+})();
+
+'use strict';
+
 /**
  * Model of attachment from
  * table diary.attachment (DB)
@@ -4265,7 +4299,7 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
     var load = function load() {
         http().get('/diary/lesson/' + lesson.id).done(function (data) {
-            lesson.updateData(sqlToJsLesson(data));
+            lesson.updateData(model.getLessonsService().mapLesson(data));
 
             if (loadHomeworks) {
                 model.loadHomeworksForLesson(lesson, cb, cbe);
@@ -5000,79 +5034,89 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 return this.$http.get(urlGetHomeworks).then(function (result) {
-                    return _this.mappLesson(result.data);
+                    return _this.mappLessons(result.data);
                 });
             }
 
             /*
-            *   Mapp homeworks
+            *   Map lesson
             */
 
         }, {
-            key: 'mappLesson',
-            value: function mappLesson(lessons) {
+            key: 'mappLessons',
+            value: function mappLessons(lessons) {
                 var _this2 = this;
 
                 return _.map(lessons, function (lessonData) {
-                    var lessonHomeworks = [];
-
-                    // only initialize homeworks attached to lesson
-                    // with only id
-                    if (lessonData.homework_ids) {
-                        for (var i = 0; i < lessonData.homework_ids.length; i++) {
-                            var homework = new Homework();
-                            homework.id = lessonData.homework_ids[i];
-                            homework.lesson_id = parseInt(lessonData.lesson_id);
-                            homework.loaded = false; // means full lessonData from sql not loaded
-                            lessonHomeworks.push(homework);
-                        }
-                    }
-
-                    var lesson = {
-                        //for share directive you must have _id
-                        _id: lessonData.lesson_id,
-                        id: lessonData.lesson_id,
-                        title: lessonData.lesson_title,
-                        audience: model.audiences.findWhere({ id: lessonData.audience_id }),
-                        audienceId: lessonData.audience_id,
-                        audienceLabel: lessonData.audience_label,
-                        audienceType: lessonData.audience_type,
-                        description: lessonData.lesson_description,
-                        subject: model.subjects.findWhere({ id: lessonData.subject_id }),
-                        subjectId: lessonData.subject_id,
-                        subjectLabel: lessonData.subject_label,
-                        teacherId: lessonData.teacher_display_name,
-                        structureId: lessonData.school_id,
-                        date: moment(lessonData.lesson_date),
-                        startTime: lessonData.lesson_start_time,
-                        endTime: lessonData.lesson_end_time,
-                        color: lessonData.lesson_color,
-                        room: lessonData.lesson_room,
-                        annotations: lessonData.lesson_annotation,
-                        startMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_start_time),
-                        endMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_end_time),
-                        state: lessonData.lesson_state,
-                        is_periodic: false,
-                        homeworks: lessonHomeworks,
-                        tooltipText: '',
-                        locked: !model.canEdit() ? true : false
-                    };
-
-                    if ('group' === lesson.audienceType) {
-                        lesson.audienceTypeLabel = lang.translate('diary.audience.group');
-                    } else {
-                        lesson.audienceTypeLabel = lang.translate('diary.audience.class');
-                    }
-
-                    if (lessonData.attachments) {
-                        lesson.attachments = AttachementService.mappAttachement(JSON.parse(lessonData.attachments));
-                    }
-
-                    var tooltip = _this2.UtilsService.getResponsiveLessonTooltipText(lesson);
-
-                    lesson.tooltipText = tooltip;
-                    return lesson;
+                    return _this2.mapLesson(lessonData);
                 });
+            }
+
+            /*
+            *  Map one lesson
+            */
+
+        }, {
+            key: 'mapLesson',
+            value: function mapLesson(lessonData) {
+                var lessonHomeworks = [];
+
+                // only initialize homeworks attached to lesson
+                // with only id
+                if (lessonData.homework_ids) {
+                    for (var i = 0; i < lessonData.homework_ids.length; i++) {
+                        var homework = new Homework();
+                        homework.id = lessonData.homework_ids[i];
+                        homework.lesson_id = parseInt(lessonData.lesson_id);
+                        homework.loaded = false; // means full lessonData from sql not loaded
+                        lessonHomeworks.push(homework);
+                    }
+                }
+
+                var lesson = {
+                    //for share directive you must have _id
+                    _id: lessonData.lesson_id,
+                    id: lessonData.lesson_id,
+                    title: lessonData.lesson_title,
+                    audience: model.audiences.findWhere({ id: lessonData.audience_id }),
+                    audienceId: lessonData.audience_id,
+                    audienceLabel: lessonData.audience_label,
+                    audienceType: lessonData.audience_type,
+                    description: lessonData.lesson_description,
+                    subject: model.subjects.findWhere({ id: lessonData.subject_id }),
+                    subjectId: lessonData.subject_id,
+                    subjectLabel: lessonData.subject_label,
+                    teacherId: lessonData.teacher_display_name,
+                    structureId: lessonData.school_id,
+                    date: moment(lessonData.lesson_date),
+                    startTime: lessonData.lesson_start_time,
+                    endTime: lessonData.lesson_end_time,
+                    color: lessonData.lesson_color,
+                    room: lessonData.lesson_room,
+                    annotations: lessonData.lesson_annotation,
+                    startMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_start_time),
+                    endMoment: moment(lessonData.lesson_date.split(' ')[0] + ' ' + lessonData.lesson_end_time),
+                    state: lessonData.lesson_state,
+                    is_periodic: false,
+                    homeworks: lessonHomeworks,
+                    tooltipText: '',
+                    locked: !model.canEdit() ? true : false
+                };
+
+                if ('group' === lesson.audienceType) {
+                    lesson.audienceTypeLabel = lang.translate('diary.audience.group');
+                } else {
+                    lesson.audienceTypeLabel = lang.translate('diary.audience.class');
+                }
+
+                if (lessonData.attachments) {
+                    lesson.attachments = AttachementService.mappAttachement(JSON.parse(lessonData.attachments));
+                }
+
+                var tooltip = this.UtilsService.getResponsiveLessonTooltipText(lesson);
+
+                lesson.tooltipText = tooltip;
+                return lesson;
             }
         }]);
 
@@ -5188,7 +5232,17 @@ model.canEdit = function () {
 };
 
 model.getCourseService = function () {
-    return angular.injector(['ng', 'app']).get("CourseService");
+    if (!model.courseService) {
+        model.courseService = angular.injector(['ng', 'app']).get("CourseService");
+    }
+    return model.courseService;
+};
+
+model.getLessonsService = function () {
+    if (!model.lessonService) {
+        model.lessonService = angular.injector(['ng', 'app']).get("LessonService");
+    }
+    return model.lessonService;
 };
 
 /**
@@ -5806,12 +5860,11 @@ model.build = function () {
     /**
      * On window resize compute lesson tooltips (responsive design)
      */
-    window.addEventListener('resize', function (event) {
-
-        model.lessons.forEach(function (lesson) {
+    /*window.addEventListener('resize', function(event){
+          model.lessons.forEach(function (lesson) {
             lesson.tooltipText = getResponsiveLessonTooltipText(lesson);
         });
-    });
+    });*/
 
     /**
      * Set lesson tooltip text depending on screen resolution.
