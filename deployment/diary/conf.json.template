@@ -5,7 +5,7 @@
         "port" : 8054,
         "app-name" : "Diary",
     	"app-address" : "/diary",
-    	"app-icon" : "Diary-large",
+    	"app-icon" : "cahier-textes-large",
         "host": "${host}",
         "ssl" : $ssl,
         "auto-redeploy": false,

@@ -34,6 +34,8 @@
                         timeslot.css('border-radius', '');
                     });
 
+ 
+
                     timeslot.on('drop', function($event) {
                         $event.preventDefault();
                         console.log(scope);
@@ -85,6 +87,9 @@
                             console.error(error);
                         });
                     });
+
+
+
 
                 }
             };

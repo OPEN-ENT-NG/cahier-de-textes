@@ -1,7 +1,7 @@
 module.exports = config:
   plugins:
     git_digest:
-      always_run:true    
+      always_run:true
     afterBrunch: [
       'ncp ../dist/view/diary.html ../src/main/resources/view/diary.html',
       'ncp ../dist/ ../src/main/resources/public'
@@ -17,9 +17,7 @@ module.exports = config:
       /^app/.test(path) and not /.*(?:\.js$|\.scss$|\.txt$|\.css$)/.test(path)
   files:
     javascripts:
-      joinTo:
-        'js/vendor.js': (path) ->
-            /^(bower_components|vendor)/.test(path)
+      joinTo:        
         'js/behaviours.js': (path) ->
           /behaviours\.js$/.test(path)
         'js/app.js': (path) ->

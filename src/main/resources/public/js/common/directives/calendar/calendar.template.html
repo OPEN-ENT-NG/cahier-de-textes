@@ -19,7 +19,8 @@
 			</div>
 
 			<div ng-if="!display.readonly" class="timeslots">
-				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="display.readonly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
+				[[display.readonly]]
+				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="!display.readonly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
 
 				</div>
 			</div>
