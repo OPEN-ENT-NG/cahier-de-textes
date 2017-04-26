@@ -68,7 +68,13 @@
                             scope.ngModel = existingSubject;
                         }
                     };
+										scope.$watch('lesson.audience.structureId',function(){
+											if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId){
+												console.log("set new school_id");
+												scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+											}
 
+										});
                     var initSuggestedSubjects = function() {
                         scope.suggestedSubjects = new Array();
 

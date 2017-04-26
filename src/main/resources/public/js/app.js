@@ -395,8 +395,8 @@ var AngularExtensions = {
                 if (day.index < vm.calendar.firstDay.dayOfYear()) {
                     year++;
                 }
-                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
-                $scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
+                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start).minute(0).second(0);
+                $scope.newItem.end = moment($scope.newItem.beginning).add(1, 'h');
                 vm.calendar.newItem = $scope.newItem;
                 $scope.onCreateOpen();
             };
@@ -514,6 +514,7 @@ var AngularExtensions = {
                 //};
             };
         }
+        controller.$inject = ["$scope", "$timeout", "$window", "$element", "$location"];
     });
 })();
 
@@ -523,12 +524,12 @@ var AngularExtensions = {
                       'use strict';
 
                       AngularExtensions.addModuleConfig(function (module) {
-                                            module.directive('diaryScheduleItem', function ($compile) {
+                                            module.directive('diaryScheduleItem', ["$compile", function ($compile) {
                                                                   return {
                                                                                         restrict: 'E',
                                                                                         require: '^diary-calendar',
                                                                                         template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
-                                                                                        controller: function controller($scope, $element, $timeout) {
+                                                                                        controller: ["$scope", "$element", "$timeout", function controller($scope, $element, $timeout) {
 
                                                                                                               var vm = this;
 
@@ -637,11 +638,11 @@ var AngularExtensions = {
 
                                                                                                                                     $scope.$emit('calendar.refreshItems', $scope.item);
                                                                                                               });
-                                                                                        },
+                                                                                        }],
 
                                                                                         link: function link(scope, element, attributes) {}
                                                                   };
-                                            });
+                                            }]);
                       });
 })();
 
@@ -711,6 +712,7 @@ var AngularExtensions = {
                 }
             };
         }
+        directive.$inject = ["$compile"];
     });
 })();
 
@@ -2218,6 +2220,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 }
             };
         }
+        controller.$inject = ["$scope", "$timeout", "CourseService", "$routeParams", "constants", "$location", "HomeworkService", "UtilsService", "LessonService", "$q"];
     });
 })();
 
@@ -2811,6 +2814,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 setDaysContent();
             });
         }
+        controller.$inject = ["$scope"];
     });
 })();
 
@@ -3621,7 +3625,12 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                             scope.ngModel = existingSubject;
                         }
                     };
-
+                    scope.$watch('lesson.audience.structureId', function () {
+                        if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
+                            console.log("set new school_id");
+                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+                        }
+                    });
                     var initSuggestedSubjects = function initSuggestedSubjects() {
                         scope.suggestedSubjects = new Array();
 
@@ -4794,7 +4803,7 @@ Teacher.prototype.create = function (cb, cbe) {
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(function ($routeProvider) {
+        module.config(["$routeProvider", function ($routeProvider) {
             $routeProvider
             // go to create new lesson view
             .when('/createLessonView/:timeFromCalendar', {
@@ -4824,7 +4833,7 @@ Teacher.prototype.create = function (cb, cbe) {
             .otherwise({
                 action: 'calendarView'
             });
-        });
+        }]);
     });
 })();
 
@@ -6556,5 +6565,3 @@ var sansAccent = function sansAccent(str) {
     return str;
 };
 
-
-//# sourceMappingURL=app.js.map

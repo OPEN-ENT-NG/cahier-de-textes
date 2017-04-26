@@ -228,8 +228,8 @@
                 if (day.index < vm.calendar.firstDay.dayOfYear()) {
                     year++;
                 }
-                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start);
-                $scope.newItem.end = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.end);
+                $scope.newItem.beginning = moment().utc().year(year).dayOfYear(day.index).hour(timeslot.start).minute(0).second(0);
+                $scope.newItem.end = moment($scope.newItem.beginning).add(1,'h') ;
                 vm.calendar.newItem = $scope.newItem;
                 $scope.onCreateOpen();
             };
@@ -242,7 +242,7 @@
             vm.updateCalendarWeek = function() {
                 //annoying new year workaround
                 if (moment(vm.calendar.dayForWeek).week() === 1 && moment(vm.calendar.dayForWeek).dayOfYear() > 7) {
-                    vm.calendar = new calendar.Calendar({
+                    vm.calendar = new calendar.Calendar({ 
                         week: moment(vm.calendar.dayForWeek).week(),
                         year: moment(vm.calendar.dayForWeek).year() + 1
                     });
