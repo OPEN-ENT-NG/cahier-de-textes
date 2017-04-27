@@ -33,6 +33,17 @@
                 });
             }
 
+            //watch delete or add
+            $scope.$watch(()=>{
+                if (model && model.lessons && model.lessons.all){
+                    return model.lessons.all.length;
+                }else{
+                    return 0;
+                }
+            }, () =>{                
+                $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+            });
+
             $scope.$watch('routeParams', function(n, o) {
 
                 var mondayOfWeek = moment();
@@ -60,7 +71,7 @@
                 var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
                 $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
             };
-            
+
             /**
              * Opens the previous week view of calendar
              */
@@ -184,14 +195,14 @@
 
                 var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
                 var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
-                //TODO paralellize
+
                 //TODO use structureIds
                 var p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
 
                 return $q.all([p1, p2, p3]).then(results => {
                     let lessons = results[0];
                     let homeworks = results[1];
-                    let courses = results[2];
+                    $scope.courses = results[2];
                     //TODO not a good syntax
                     model.lessons.all.splice(0, model.lessons.all.length);
                     model.lessons.addRange(lessons);
@@ -199,7 +210,7 @@
                     model.homeworks.all.splice(0, model.homeworks.all.length);
                     model.homeworks.addRange(homeworks);
 
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
+                    $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
                 });
             }
 

@@ -502,7 +502,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
                         deleteHomeworks();
                     } else {
                         postDelete();
-                    }
+                    }                    
                 },
                 // calback error function
                 function (cbe) {

@@ -514,7 +514,6 @@ var AngularExtensions = {
                 //};
             };
         }
-        controller.$inject = ["$scope", "$timeout", "$window", "$element", "$location"];
     });
 })();
 
@@ -524,12 +523,12 @@ var AngularExtensions = {
                       'use strict';
 
                       AngularExtensions.addModuleConfig(function (module) {
-                                            module.directive('diaryScheduleItem', ["$compile", function ($compile) {
+                                            module.directive('diaryScheduleItem', function ($compile) {
                                                                   return {
                                                                                         restrict: 'E',
                                                                                         require: '^diary-calendar',
                                                                                         template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
-                                                                                        controller: ["$scope", "$element", "$timeout", function controller($scope, $element, $timeout) {
+                                                                                        controller: function controller($scope, $element, $timeout) {
 
                                                                                                               var vm = this;
 
@@ -638,11 +637,11 @@ var AngularExtensions = {
 
                                                                                                                                     $scope.$emit('calendar.refreshItems', $scope.item);
                                                                                                               });
-                                                                                        }],
+                                                                                        },
 
                                                                                         link: function link(scope, element, attributes) {}
                                                                   };
-                                            }]);
+                                            });
                       });
 })();
 
@@ -712,7 +711,6 @@ var AngularExtensions = {
                 }
             };
         }
-        directive.$inject = ["$compile"];
     });
 })();
 
@@ -2029,6 +2027,17 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 });
             }
 
+            //watch delete or add
+            $scope.$watch(function () {
+                if (model && model.lessons && model.lessons.all) {
+                    return model.lessons.all.length;
+                } else {
+                    return 0;
+                }
+            }, function () {
+                $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+            });
+
             $scope.$watch('routeParams', function (n, o) {
 
                 var mondayOfWeek = moment();
@@ -2168,14 +2177,14 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
                 var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
-                //TODO paralellize
+
                 //TODO use structureIds
                 var p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
 
                 return $q.all([p1, p2, p3]).then(function (results) {
                     var lessons = results[0];
                     var homeworks = results[1];
-                    var courses = results[2];
+                    $scope.courses = results[2];
                     //TODO not a good syntax
                     model.lessons.all.splice(0, model.lessons.all.length);
                     model.lessons.addRange(lessons);
@@ -2183,7 +2192,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     model.homeworks.all.splice(0, model.homeworks.all.length);
                     model.homeworks.addRange(homeworks);
 
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat(courses);
+                    $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
                 });
             }
 
@@ -2220,7 +2229,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 }
             };
         }
-        controller.$inject = ["$scope", "$timeout", "CourseService", "$routeParams", "constants", "$location", "HomeworkService", "UtilsService", "LessonService", "$q"];
     });
 })();
 
@@ -2814,7 +2822,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 setDaysContent();
             });
         }
-        controller.$inject = ["$scope"];
     });
 })();
 
@@ -2981,9 +2988,8 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 restrict: "A",
                 scope: false,
                 link: function link(scope, element) {
-                    console.log("init diaryTimeslotItem");
+
                     var timeslot = element;
-                    console.log("element : ", element);
 
                     //var timeslots = element.parent('.days').find('.timeslot');
                     var timeslotsPerDay = $('.days .timeslot').length / 7;
@@ -3007,7 +3013,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                     timeslot.on('drop', function ($event) {
                         $event.preventDefault();
-                        console.log(scope);
+
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson
@@ -4803,7 +4809,7 @@ Teacher.prototype.create = function (cb, cbe) {
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(["$routeProvider", function ($routeProvider) {
+        module.config(function ($routeProvider) {
             $routeProvider
             // go to create new lesson view
             .when('/createLessonView/:timeFromCalendar', {
@@ -4833,7 +4839,7 @@ Teacher.prototype.create = function (cb, cbe) {
             .otherwise({
                 action: 'calendarView'
             });
-        }]);
+        });
     });
 })();
 
@@ -6565,3 +6571,5 @@ var sansAccent = function sansAccent(str) {
     return str;
 };
 
+
+//# sourceMappingURL=app.js.map

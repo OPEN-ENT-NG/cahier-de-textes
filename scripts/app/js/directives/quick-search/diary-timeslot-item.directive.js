@@ -10,9 +10,9 @@
                 restrict: "A",
                 scope: false,
                 link: function(scope, element) {
-                    console.log("init diaryTimeslotItem");
+
                     var timeslot = element;
-                    console.log("element : ", element);
+
 
                     //var timeslots = element.parent('.days').find('.timeslot');
                     var timeslotsPerDay = $('.days .timeslot').length / 7;
@@ -34,11 +34,11 @@
                         timeslot.css('border-radius', '');
                     });
 
- 
+
 
                     timeslot.on('drop', function($event) {
                         $event.preventDefault();
-                        console.log(scope);
+
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson
@@ -87,9 +87,6 @@
                             console.error(error);
                         });
                     });
-
-
-
 
                 }
             };

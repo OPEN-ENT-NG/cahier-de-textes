@@ -1,7 +1,6 @@
 {
   "name": "diary-app",
   "overrides": {},
-  "dependencies": {
-    "jquery": "3.2.1"
+  "dependencies": {    
   }
 }
