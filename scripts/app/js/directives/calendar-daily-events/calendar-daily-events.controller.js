@@ -209,8 +209,7 @@
              * and calendar grid
              */
             function placeCalendarAndHomeworksPanel() {
-
-              console.log("placeCalendarAndHomeworksPanel called");
+              
                 var bShowCalendar = $scope.bShowCalendar;
                 //var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;

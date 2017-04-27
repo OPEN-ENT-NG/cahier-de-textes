@@ -13,8 +13,7 @@
             /*
              * initialisation calendar function
              */
-            function init() {
-                console.log("init CalendarController");
+            function init() {                
                 //view controls
                 $scope.display.showList = false;
                 //calendarDailyEvent directive options
@@ -40,7 +39,7 @@
                 }else{
                     return 0;
                 }
-            }, () =>{                
+            }, () =>{
                 $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
             });
 

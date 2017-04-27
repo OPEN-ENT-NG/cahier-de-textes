@@ -5,8 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout,$window,$element,$location) {
-            console.log("init DiaryCalendarController");
+        function controller($scope,$timeout,$window,$element,$location) {            
             // use controllerAs practice
             var vm = this;
 
@@ -242,7 +241,7 @@
             vm.updateCalendarWeek = function() {
                 //annoying new year workaround
                 if (moment(vm.calendar.dayForWeek).week() === 1 && moment(vm.calendar.dayForWeek).dayOfYear() > 7) {
-                    vm.calendar = new calendar.Calendar({ 
+                    vm.calendar = new calendar.Calendar({
                         week: moment(vm.calendar.dayForWeek).week(),
                         year: moment(vm.calendar.dayForWeek).year() + 1
                     });

@@ -181,7 +181,6 @@ var AngularExtensions = {
         module.controller("DiaryCalendarController", controller);
 
         function controller($scope, $timeout, $window, $element, $location) {
-            console.log("init DiaryCalendarController");
             // use controllerAs practice
             var vm = this;
 
@@ -1990,7 +1989,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 }
 
-;"use strict";
+;'use strict';
 
 (function () {
     'use strict';
@@ -2008,7 +2007,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              * initialisation calendar function
              */
             function init() {
-                console.log("init CalendarController");
                 //view controls
                 $scope.display.showList = false;
                 //calendarDailyEvent directive options
@@ -2703,7 +2701,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
              */
             function placeCalendarAndHomeworksPanel() {
 
-                console.log("placeCalendarAndHomeworksPanel called");
                 var bShowCalendar = $scope.bShowCalendar;
                 //var bShowHomeworks = $scope.bShowHomeworks;
                 var bShowHomeworksMinified = $scope.bShowHomeworksMinified;
