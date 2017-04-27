@@ -2992,8 +2992,8 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     var timeslot = element;
 
                     //var timeslots = element.parent('.days').find('.timeslot');
-                    var timeslotsPerDay = $('.days .timeslot').length / 7;
-                    var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+
+
                     // allow drag
                     timeslot.on('dragover', function ($event) {
                         event.preventDefault();
@@ -3013,7 +3013,8 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                     timeslot.on('drop', function ($event) {
                         $event.preventDefault();
-
+                        var timeslotsPerDay = $('.days .timeslot').length / 7;
+                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson

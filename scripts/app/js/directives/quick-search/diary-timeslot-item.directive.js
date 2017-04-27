@@ -15,8 +15,8 @@
 
 
                     //var timeslots = element.parent('.days').find('.timeslot');
-                    var timeslotsPerDay = $('.days .timeslot').length / 7;
-                    var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+
+ 
                     // allow drag
                     timeslot.on('dragover', function($event) {
                         event.preventDefault();
@@ -38,7 +38,8 @@
 
                     timeslot.on('drop', function($event) {
                         $event.preventDefault();
-
+                        var timeslotsPerDay = $('.days .timeslot').length / 7;
+                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson
