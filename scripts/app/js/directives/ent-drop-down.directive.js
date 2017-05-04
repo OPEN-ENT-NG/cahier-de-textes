@@ -71,13 +71,13 @@
 												scope.isPlaceholder = scope.selected[scope.property] === undefined;
 												scope.display = scope.selected[scope.property];
 
-												if (scope.lesson && scope.lesson.id) {
+												if (scope.lesson && scope.lesson.id && scope.lesson.endTime) {
 														if (scope.lesson.homeworks.all.length > 0) {
 																scope.$parent.refreshHomeworkLoads(scope.lesson);
 														}
 
 														scope.lesson.previousLessonsLoaded = false;
-														scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
+														//scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
 												}
 
 												if (scope.homework && scope.homework.audience) {

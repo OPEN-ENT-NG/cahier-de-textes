@@ -140,7 +140,7 @@
                         scope.displaySearch = false;
                         if (scope.lesson) {
                             scope.lesson.previousLessonsLoaded = false;
-                            scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
+                            //scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                         }
                     };
 

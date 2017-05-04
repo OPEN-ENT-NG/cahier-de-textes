@@ -25,23 +25,6 @@ model.canEdit = function () {
     return model.me.type == "ENSEIGNANT";
 };
 
-
-model.getCourseService = function(){
-    if (!model.courseService){
-      model.courseService = angular.injector(['ng','app']).get("CourseService");
-    }
-    return model.courseService;
-};
-
-
-model.getLessonsService = function(){
-    if (!model.lessonService){
-      model.lessonService = angular.injector(['ng','app']).get("LessonService");
-    }
-    return model.lessonService;
-};
-
-
 /**
  * Says whether or not current user is a teacher
  * @returns {*|boolean}
@@ -391,6 +374,9 @@ model.build = function () {
     this.collection(Subject, {
         loading: false,
         syncSubjects: function (cb, cbe) {
+            console.warn("deprecated");
+            return ;
+
             this.all = [];
             var that = this;
             if (that.loading)
@@ -437,6 +423,8 @@ model.build = function () {
     this.collection(Audience, {
         loading: false,
         syncAudiences: function (cb, cbe) {
+            console.warn("deprecated");
+            return;
             this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
@@ -445,7 +433,23 @@ model.build = function () {
 
             model.currentSchool = model.me.structures[0];
             that.loading = true;
-            model.me.structures.forEach(function (structureId) {
+
+            model.getAudienceService().getAudiences(model.me.structures).then((audiences)=>{
+                this.addRange(structureData.classes);
+                // TODO get groups
+                nbStructures--;
+                if (nbStructures === 0) {
+                    this.trigger('sync');
+                    this.trigger('change');
+                    if(typeof cb === 'function'){
+                        cb();
+                    }
+                }
+
+                that.loading = false;
+            });
+
+            /*model.me.structures.forEach(function (structureId) {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {
                     structureData.classes = _.map(structureData.classes, function (audience) {
                         audience.structureId = structureId;
@@ -472,7 +476,7 @@ model.build = function () {
                     }
                     that.loading = false;
                 });
-            });
+            });*/
         }
     });
 
@@ -810,6 +814,8 @@ model.build = function () {
 
     /** Converts sql pedagogic item to js data */
     sqlToJsPedagogicItem = function (data) {
+        console.warn("deprecated");
+        return ;
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
@@ -934,12 +940,26 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         newItem = model.calendar.newItem;
 
         // force to HH:00 -> HH:00 + 1 hour
-        newItem.beginning = newItem.beginning.minute(0).second(0);
+        newItem.beginning = newItem.beginning.second(0);
         newItem.date = newItem.beginning;
         if (!newItem.beginning.isBefore(newItem.end)){
           newItem.end = moment(newItem.beginning);
           newItem.end.minute(0).second(0).add(1, 'hours');
         }
+        if (newItem.audience){
+            lesson.audience = newItem.audience;
+            lesson.audienceType = lesson.audience.type;
+        }
+
+        if (newItem.room){
+            lesson.room = newItem.room;
+        }
+
+        if (newItem.subject){
+            lesson.subject = newItem.subject;
+        }
+        //init datas
+        console.log("initialisation item " ,newItem);
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {
@@ -949,7 +969,7 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
             date: itemDate,
             beginning: moment().minute(0).second(0),
             end: moment().minute(0).second(0).add(1, 'hours')
-        }
+        };
     }
 
     lesson.newItem = newItem;
@@ -971,117 +991,121 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
  */
 model.getPreviousLessonsFromLesson = function (lesson, useDeltaStep, cb, cbe) {
 
-    if (useDeltaStep) {
-        if (lesson.allPreviousLessonsLoaded) {
-            return;
-        }
-    } else if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
-        return;
-    }
-
-    if (!useDeltaStep) {
-        lesson.allPreviousLessonsLoaded = false;
-    }
-
-    var defaultCount = 6;
-
-    var idx_start = 0;
-    var idx_end = idx_start + defaultCount;
-
-    if (useDeltaStep) {
-        idx_start += defaultCount;
-        idx_end += defaultCount;
-    }
-
-    var params = {};
-
-    params.offset = idx_start;
-    params.limit = idx_end;
-
-    if (lesson.id) {
-        params.excludeLessonId = lesson.id;
-    }
-
-    // tricky way to detect if string date or moment date ...
-    // 12:00:00
-    if (lesson.endTime.length === 8) {
-        params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + lesson.endTime;
-    } else {
-        params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + moment(lesson.endTime).format("HH:mm");
-    }
-
-    var clonedLessonMoment = moment(new Date(lesson.date));
-    //params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
-    params.subject = lesson.subject.id;
-    params.audienceId = lesson.audience.id;
-    params.returnType = 'lesson'; // will allow get lessons first, then homeworks later
-    params.homeworkLinkedToLesson = "true";
-    params.sortOrder = "DESC";
-
-    if (!lesson.previousLessons) {
-        lesson.previousLessons = new Array();
-    }
-    lesson.previousLessonsDisplayed = new Array();
-
-    lesson.previousLessonsLoading = true;
-    http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
-
-        // all lessons loaded
-        if (items.length < defaultCount) {
-            lesson.allPreviousLessonsLoaded = true;
-        }
-
-        var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
-
-        var groupByItemType = _.groupBy(previousLessonsAndHomeworks, 'type_item');
-
-        var previousLessons = groupByItemType.lesson;
-
-        if (previousLessons) {
-            var previousLessonIds = new Array();
-
-            previousLessons.forEach(function (lesson) {
-                previousLessonIds.push(lesson.id);
-            });
+    console.warn("deprecated");
+    return;
 
 
-            // load linked homeworks of previous lessons
-            var paramsHomeworks = {};
-            paramsHomeworks.returnType = 'homework';
-            paramsHomeworks.homeworkLessonIds = previousLessonIds;
-
-            http().postJson('/diary/pedagogicItems/list', paramsHomeworks).done(function (items2) {
-
-                var previousHomeworks = _.map(items2, sqlToJsPedagogicItem);
-
-                previousLessons.forEach(function (lesson) {
-                    lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
-                });
-
-                lesson.previousLessons = lesson.previousLessons.concat(previousLessons);
-                lesson.previousLessonsLoaded = true;
-                lesson.previousLessonsLoading = false;
-                lesson.previousLessonsDisplayed = lesson.previousLessons;
-
-                if (typeof cb === 'function') {
-                    cb();
-                }
-            });
-        } else {
-            lesson.previousLessons = new Array();
-            lesson.previousLessonsLoaded = true;
-            lesson.previousLessonsLoading = false;
-            lesson.previousLessonsDisplayed = lesson.previousLessons;
-            if (typeof cb === 'function') {
-                cb();
-            }
-        }
-
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
-    });
+    // if (useDeltaStep) {
+    //     if (lesson.allPreviousLessonsLoaded) {
+    //         return;
+    //     }
+    // }/* else if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
+    //     return;
+    // }*/
+    //
+    // if (!useDeltaStep) {
+    //     lesson.allPreviousLessonsLoaded = false;
+    // }
+    //
+    // var defaultCount = 6;
+    //
+    // var idx_start = 0;
+    // var idx_end = idx_start + defaultCount;
+    //
+    // if (useDeltaStep) {
+    //     idx_start += defaultCount;
+    //     idx_end += defaultCount;
+    // }
+    //
+    // var params = {};
+    //
+    // params.offset = idx_start;
+    // params.limit = idx_end;
+    //
+    // if (lesson.id) {
+    //     params.excludeLessonId = lesson.id;
+    // }
+    //
+    // // tricky way to detect if string date or moment date ...
+    // // 12:00:00
+    // if (lesson.endTime.length === 8) {
+    //     params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + lesson.endTime;
+    // } else {
+    //     params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + moment(lesson.endTime).format("HH:mm");
+    // }
+    //
+    // var clonedLessonMoment = moment(new Date(lesson.date));
+    // //params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
+    // params.subject = lesson.subject.id;
+    // params.audienceId = lesson.audience.id;
+    // params.returnType = 'lesson'; // will allow get lessons first, then homeworks later
+    // params.homeworkLinkedToLesson = "true";
+    // params.sortOrder = "DESC";
+    //
+    // if (!lesson.previousLessons) {
+    //     lesson.previousLessons = new Array();
+    // }
+    // lesson.previousLessonsDisplayed = new Array();
+    //
+    // lesson.previousLessonsLoading = true;
+    // http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
+    //
+    //     // all lessons loaded
+    //     if (items.length < defaultCount) {
+    //         lesson.allPreviousLessonsLoaded = true;
+    //     }
+    //
+    //     var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
+    //
+    //     var groupByItemType = _.groupBy(previousLessonsAndHomeworks, 'type_item');
+    //
+    //     var previousLessons = groupByItemType.lesson;
+    //
+    //     if (previousLessons) {
+    //         var previousLessonIds = new Array();
+    //
+    //         previousLessons.forEach(function (lesson) {
+    //             previousLessonIds.push(lesson.id);
+    //         });
+    //
+    //
+    //         // load linked homeworks of previous lessons
+    //         var paramsHomeworks = {};
+    //         paramsHomeworks.returnType = 'homework';
+    //         paramsHomeworks.homeworkLessonIds = previousLessonIds;
+    //
+    //         http().postJson('/diary/pedagogicItems/list', paramsHomeworks).done(function (items2) {
+    //
+    //             var previousHomeworks = _.map(items2, sqlToJsPedagogicItem);
+    //
+    //             previousLessons.forEach(function (lesson) {
+    //                 lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
+    //             });
+    //
+    //             lesson.previousLessons = lesson.previousLessons.concat(previousLessons);
+    //             lesson.previousLessonsLoaded = true;
+    //             lesson.previousLessonsLoading = false;
+    //             lesson.previousLessonsDisplayed = lesson.previousLessons;
+    //
+    //             if (typeof cb === 'function') {
+    //                 cb();
+    //             }
+    //         });
+    //     } else {
+    //         lesson.previousLessons = new Array();
+    //         lesson.previousLessonsLoaded = true;
+    //         lesson.previousLessonsLoading = false;
+    //         lesson.previousLessonsDisplayed = lesson.previousLessons;
+    //         if (typeof cb === 'function') {
+    //             cb();
+    //         }
+    //     }
+    //
+    // }).error(function (e) {
+    //     if (typeof cbe === 'function') {
+    //         cbe(model.parseError(e));
+    //     }
+    // });
 };
 
 
@@ -1282,6 +1306,9 @@ model.createSubject = function(label, cb, cbe){
  * @returns {*}
  */
 var sansAccent = function (str) {
+  if (!str){
+    return;
+  }
     var accent = [
         /[\300-\306]/g, /[\340-\346]/g, // A, a
         /[\310-\313]/g, /[\350-\353]/g, // E, e

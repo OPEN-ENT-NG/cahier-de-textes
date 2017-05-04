@@ -66,7 +66,7 @@
 
                     <!--
                     <diary-calendar ng-if="!isUserTeacher" id="calendar" class="twelve cell" display-template="display-calendar-item" create-template="create-lesson" on-create-open="redirect('/createLessonView/timeFromCalendar')" items="lessons.all" readonly="true"></diary-calendar>
-                -->
+                    -->
                 </div>
             </div>
         </div>
@@ -74,8 +74,8 @@
 
     <!-- quick search panel -->
     <div ng-if="isUserTeacher">
-        <quick-search item-type="lessontype" class="quick-search lessontype"></quick-search>
-        <quick-search item-type="homeworktype" class="quick-search homeworktype"></quick-search>
+        <quick-search item-type="lesson" class="quick-search lessontype"></quick-search>
+        <quick-search item-type="homework" class="quick-search homeworktype"></quick-search>
     </div>
 
     <!-- action panel displayed if at least one lesson or homework selected -->

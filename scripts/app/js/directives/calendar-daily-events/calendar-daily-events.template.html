@@ -12,7 +12,7 @@
         // <= 3 homeworks for current day
         // or 1 homework and homework panel minified
         -->
-        <div class="test" ng-if="showAllHomeworks(day)">
+        <div class="" ng-if="showAllHomeworks(day)">
             <div ng-repeat="dailyEvent in day.dailyEvents">
                 <container template="daily-event-item" style="padding-bottom: 1px;"></container>
             </div>
@@ -25,7 +25,7 @@
             <span id="dailyeventlongtitle"><i18n>daily.event</i18n></span>
             <span id="dailyeventshorttitle">TAF ([[day.dailyEvents.length]])</span>
         </div>
-        <div class="test daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">
+        <div class=" daily-events" style="z-index: 1000;" id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">
             <div ng-repeat="dailyEvent in day.dailyEvents">
                 <container template="daily-event-item" style="padding-bottom: 1px;"></container>
             </div>

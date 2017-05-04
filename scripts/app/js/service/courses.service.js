@@ -6,18 +6,21 @@
     * used to manipulate Course model
     */
     class CourseService {
-        constructor($http,$q,constants) {
+        constructor($http,$q,constants,SubjectService) {
+
+           console.log("create new CourseService");
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
             this.context = {};
+            this.SubjectService = SubjectService;
         }
 
 
         getMergeCourses(structureId, teacherId, firstDayOfWeek){
             return this.$q.all([
                     this.getScheduleCourses(structureId, teacherId, firstDayOfWeek),
-                    this.getSubjects(structureId)
+                    this.SubjectService.getStructureSubjectsAsMap(structureId)
                 ]).then(results =>{
                     let courses = results[0];
                     let subjects = results[1];
@@ -49,11 +52,12 @@
             let begin = moment(firstDayOfWeek);
             let end = moment(firstDayOfWeek).add(6, 'd');
 
-            let url = `/directory/timetable/teacher/${structureId}/${teacherId}`;
+            let url = `/directory/timetable/courses/teacher/${structureId}`;
             let config = {
                 params : {
                     begin: begin.format(this.constants.CAL_DATE_PATTERN),
                     end: end.format(this.constants.CAL_DATE_PATTERN),
+                    teacherId : teacherId
                 }
             };
             return this.$http.get(url,config).then(result =>{
@@ -61,21 +65,6 @@
             });
         }
 
-        getSubjects(structureId){
-            if (!this.context.subjectPromise){
-                var url = `/directory/timetable/subjects/${structureId}`;
-                this.context.subjectPromise = this.$http.get(url).then(result =>{
-                    //create a indexed array
-                    let subjects = result.data;
-                    let results = {};
-                    _.each(subjects,subject=>{
-                        results[subject.subjectId] = subject;
-                    });
-                    return results;
-                });
-            }
-            return this.context.subjectPromise;
-        }
     }
 
     AngularExtensions.addModuleConfig(function(module) {

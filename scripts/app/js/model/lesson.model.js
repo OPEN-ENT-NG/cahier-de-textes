@@ -269,7 +269,7 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
     var load = function () {
         http().get('/diary/lesson/' + lesson.id)
             .done(function (data) {
-                lesson.updateData(model.getLessonsService().mapLesson(data));
+                lesson.updateData(model.LessonService.mapLesson(data));
 
                 if (loadHomeworks) {
                     model.loadHomeworksForLesson(lesson, cb, cbe);
@@ -290,7 +290,7 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
     if (model.audiences.all.length === 0) {
         model.audiences.syncAudiences(
             function () {
-                model.subjects.syncSubjects(load)
+                model.subjects.syncSubjects(load);
             });
     } else {
         load();

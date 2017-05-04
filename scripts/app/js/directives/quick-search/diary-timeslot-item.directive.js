@@ -5,7 +5,7 @@
 
         module.directive('diaryTimeslotItem', directive);
 
-        function directive() {
+        function directive(AudienceService,$rootScope) {
             return {
                 restrict: "A",
                 scope: false,
@@ -13,30 +13,35 @@
 
                     var timeslot = element;
 
+                    let dragCounter = 0;
 
-                    //var timeslots = element.parent('.days').find('.timeslot');
-
- 
-                    // allow drag
                     timeslot.on('dragover', function($event) {
                         event.preventDefault();
                     });
 
-                    timeslot.on('dragenter', function(event) {
-                        timeslot.css('border', 'blue 2px dashed');
-                        timeslot.css('border-radius', '3px');
-                        //timeslot.css('background-color', 'blue');
-                    });
-
-                    timeslot.on('dragleave', function(event) {
-                        //timeslot.css('background-color', '');
-                        timeslot.css('border', '');
-                        timeslot.css('border-radius', '');
-                    });
+                    timeslot.bind('dragenter', onenter);
+                    function onenter(event) {
+                        dragCounter ++;
+                        timeslot.addClass("dragin");
+                        //event.preventDefault();
+                        return false;
+                    }
 
 
+                    timeslot.bind('dragleave',onleave);
+                    function onleave (event) {
+                        dragCounter--;
+                        if(dragCounter === 0){
+                            timeslot.removeClass("dragin");
+                        }
+                   }
 
                     timeslot.on('drop', function($event) {
+                        console.log($event);
+
+                        let scheduleItem = scope.$parent.item;
+                        console.log("scheduleItem",scheduleItem);
+
                         $event.preventDefault();
                         var timeslotsPerDay = $('.days .timeslot').length / 7;
                         var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
@@ -52,6 +57,7 @@
 
                         var newLesson = new Lesson();
                         newLesson.id = pedagogicItemOfTheDay.id;
+
                         var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
                         var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
                         var newLessonEndTime = newLessonStartTime + 1;
@@ -59,7 +65,6 @@
                         newLesson.load(false, function() {
                             // will force new lesson to be created in DB
                             newLesson.id = null;
-
                             // startTime and end format from db is "HH:MM:SS" as text type
                             // for lesson save startTime need to be moment time type with date
                             newLesson.date = moment(newLesson.date);
@@ -79,11 +84,36 @@
 
                             newLesson.state = 'draft';
 
-                            newLesson.save(function(data) {
-                                window.location = '/diary#/editLessonView/' + newLesson.id;
-                            }, function(error) {
-                                console.error(error);
-                            });
+                            if (scheduleItem){
+                                newLesson.date = moment(scheduleItem.startDate);
+                                newLesson.startTime=moment(scheduleItem.startDate);
+                                newLesson.startMoment=moment(scheduleItem.startDate);
+                                newLesson.endTime=moment(scheduleItem.endDate);
+                                newLesson.endMoment=moment(scheduleItem.endDate);
+                                console.log(newLesson.startTime);
+                                AudienceService.getAudiencesAsMap(model.me.structures).then(function (audienceMap) {
+                                    //get audience
+                                    if (scheduleItem.data && scheduleItem.data.classes && scheduleItem.data.classes.length > 0) {
+                                        newLesson.audience = audienceMap[scheduleItem.data.classes[0]];
+
+                                    }
+                                    //get room
+                                    if (scheduleItem.data && scheduleItem.data.roomLabels && scheduleItem.data.roomLabels.length > 0) {
+                                        newLesson.room = scheduleItem.data.roomLabels[0];
+                                    }
+                                });
+
+                                model.newLesson =newLesson;
+
+                                window.location = '/diary#/createLessonView/timeFromCalendar' ;
+                            }else{
+
+                                newLesson.save(function(data) {
+                                    window.location = '/diary#/editLessonView/' + newLesson.id;
+                                }, function(error) {
+                                    console.error(error);
+                                });
+                            }
                         }, function(error) {
                             console.error(error);
                         });

@@ -4,7 +4,8 @@
     AngularExtensions.addModuleConfig(function(module) {
       //controller declaration
       module.value("constants",{
-        CAL_DATE_PATTERN : "YYYY-MM-DD"
+        CAL_DATE_PATTERN : "YYYY-MM-DD",
+        LONG_DATE_PATTERN : 'YYYY-MM-DD hh:mm:ss'
       });
 
 

@@ -85,8 +85,7 @@
                 [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
         </span>
         </div>
-    <div class="row">
-        <!--<editor ng-model="homework.description"></editor>-->
+    <div class="row">        
 
         <editor ng-if="!homeworkDescriptionIsReadOnly" ng-model="homework.description"></editor>
         <button ng-if="!homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">

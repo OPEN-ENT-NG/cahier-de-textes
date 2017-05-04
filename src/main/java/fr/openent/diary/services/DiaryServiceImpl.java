@@ -137,7 +137,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void listSubjects(final List<String> schoolIds, final String teacherId, final Handler<Either<String, JsonArray>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT s.id as id, s.subject_label as label, s.school_id ")
+        query.append("SELECT s.id as id, s.subject_label as label, s.school_id , s.original_subject_id as originalSubjectId ")
         .append(" FROM diary.subject as s ")
         .append(" WHERE s.school_id in")
         .append(sql.listPrepared(schoolIds.toArray()));
@@ -191,7 +191,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonArray parameters = new JsonArray();
 
         StringBuilder queryLessons = new StringBuilder();
-        queryLessons.append("SELECT distinct 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, l.id as lesson_id,")
+        queryLessons.append("SELECT distinct 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, s.original_subject_id as originalSubjectId, l.id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room,")
                 .append(" l.lesson_color as color, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
                 .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, ")
@@ -204,7 +204,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
 
         StringBuilder queryHomeworks = new StringBuilder();
-        queryHomeworks.append("SELECT distinct 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject, h.lesson_id as lesson_id,")
+        queryHomeworks.append("SELECT distinct 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject,  s.original_subject_id as originalSubjectId, h.lesson_id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room,")
                 .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null::time as start_time, null::time as end_time,")
                 .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type")
@@ -415,7 +415,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
 
         StringBuilder sb = new StringBuilder("");
-        sb.append(" match (u:User {id : {id}}) where HEAD(u.profiles) = 'Teacher' and has(u.subjectTaught) return u.subjectTaught; ");
+        sb.append(" match (u:User {id : {id}})-[TEACHES]->(s:Subject) return s.label, s.id ;");
 
         JsonObject params = new JsonObject().putString("id", teacherId);
         neo.execute(sb.toString(), params, new Handler<Message<JsonObject>>() {
@@ -439,12 +439,13 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                     if (result.size() > 0) {
                                         for (int i = 0; i < result.size(); i++) {
                                             JsonObject jo = result.get(i);
-                                            final String subjectTaught = jo.getString("subjectTaught");
-
+                                            final String subjectTaught = jo.getString("s.label");
+                                            final String originalSubjectId = jo.getString("s.id");
                                             JsonObject joSubject = new JsonObject();
                                             joSubject.putString("subject_label", subjectTaught);
                                             joSubject.putString("school_id", schoolId);
                                             joSubject.putString("teacher_id", teacherId);
+                                            joSubject.putString("original_subject_id", originalSubjectId);
                                             joSubject.putNumber("id", nextId);
 
                                             subjectLabels.add(joSubject);

@@ -5,7 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout,$window,$element,$location) {            
+        function controller($scope,$timeout,$window,$element,$location,AudienceService, SubjectService ) {
             // use controllerAs practice
             var vm = this;
 
@@ -98,9 +98,7 @@
                     is_periodic: false
                 });
                 vm.calendar.addScheduleItems(scheduleItems);
-                $timeout(function(){
-                    disposeItems();
-                });
+                disposeItems();
             };
 
             //between not supported on the current underscore version
@@ -118,24 +116,27 @@
             vm.calcAllCollisions = function(item,day){
                 var calendarGutter = 0;
                 var collision = true;
+                var count = 0;
                 while (collision) {
+                    count++;
                     collision = false;
                     day.scheduleItems.forEach(function(scheduleItem) {
-                        /*if (scheduleItem === item) {
-                            return;
-                        }*/
-                      if( vm.between(item.beginning,scheduleItem.beginning,scheduleItem.end) ||
+                      if( scheduleItem !=item && (
+                          vm.between(item.beginning,scheduleItem.beginning,scheduleItem.end) ||
                               vm.between(item.end,scheduleItem.beginning,scheduleItem.end) ||
-                              vm.between(scheduleItem.end,item.beginning,item.end)){
+                              vm.between(scheduleItem.end,item.beginning,item.end) ||
+                              (scheduleItem.end.isSame(item.end) && scheduleItem.beginning.isSame(item.beginning))
+                          )
+                          ) {
                             if (scheduleItem.calendarGutter === calendarGutter) {
                                 calendarGutter++;
                                 collision = true;
-                                //scheduleItem.hasCollision=true;
                                 item.hasCollision=true;
                             }
                         }
                     });
                 }
+
                 item.calendarGutter = calendarGutter;
             };
 
@@ -145,7 +146,7 @@
             * dispose item elements
             */
             function disposeItems(){
-                //recal all collisions
+                //recal all collisions                
                 if (!vm.calendar){
                   return;
                 }
@@ -170,7 +171,7 @@
             function getWidth(scheduleItem,day){
 
                 var concurrentItems = _.filter(day.scheduleItems.all,(item)=>{
-                    return item.beginning.unix() < scheduleItem.end.unix() && item.end.unix() > scheduleItem.beginning.unix() ;
+                    return item.beginning.unix() <= scheduleItem.end.unix() && item.end.unix() >= scheduleItem.beginning.unix() ;
                 });
 
 				var maxGutter = 0;
@@ -303,7 +304,7 @@
             };
 
             $scope.redirect = function (path) {
-                    $location.path(path);
+                $location.path(path);
             };
 
             /**
@@ -330,27 +331,49 @@
                         $scope.redirect(path);
                     }
                 }else{
-                    $timeout(vm.refreshCalendar);
+                    //$timeout(vm.refreshCalendar);
                 }
             };
 
 
-
+            //TODO remove from here
             $scope.createNewtemFromSchedule = function(item) {
-                //vm.createItem = function(day, timeslot) {
-                    $scope.newItem = {};
-                    var year = vm.calendar.year;
-                    console.log("item",item);
-                    $scope.newItem.beginning = moment(item.startMoment);//moment().utc().year(year).dayOfYear(item.index).hour(item.start);
-                    $scope.newItem.end = moment(item.endMoment);//moment().utc().year(year).dayOfYear(item.index).hour(item.end);
-                    console.log("$scope.newItem",$scope.newItem);
+                $scope.newItem = {};
+                var year = vm.calendar.year;
+
+                //set beginning
+                $scope.newItem.beginning = moment(item.startMoment);
+                $scope.newItem.end = moment(item.endMoment);
+
+
+                AudienceService.getAudiencesAsMap(model.me.structures).then((audienceMap)=>{
+                    //get audience
+                    if(item.data && item.data.classes && item.data.classes.length>0){
+                        $scope.newItem.audience = audienceMap[item.data.classes[0]];
+                        console.log("found audience",$scope.newItem.audience);
+                    }
+                    //get room
+                    if(item.data && item.data.roomLabels && item.data.roomLabels.length>0){
+                        $scope.newItem.room = item.data.roomLabels[0];
+                        console.log("found room",$scope.newItem.room);
+                    }
+                    //get subject
+                    if (item.data && item.data.subject && item.data.subject.subjectId){
+                        $scope.newItem.subject = _.find(model.subjects.all,(subject)=>{
+                            return subject.originalsubjectid === item.data.subject.subjectId;
+                        });
+                        console.log("subject found : ",$scope.newItem.subject);
+                        if (!$scope.newItem.subject){
+                          console.log("add subject to be created");
+                          item.data.subject.teacher_id = model.me.userId;
+                          $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
+                        }
+                    }
                     vm.calendar.newItem = $scope.newItem;
                     $scope.onCreateOpen();
-                //};
 
+                });
             };
-
-
 
         }
 

@@ -7,6 +7,11 @@ ul {
     padding-right: 15px;
 }
 
+div.week-switcher{
+  top: 20px;
+  position: relative;
+  left: 40px;
+}
 
 
 ul li i.icon {
@@ -1122,32 +1127,52 @@ Override marging for homeworks display
     border-color: rgba(0, 0, 0, 0.5);
     border-style: dashed;
     border-width: 1px; }
-  /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
-  .diary-item-calendar .diary-item-calendar-container .item-line {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    padding-bottom: 0 !important;
-    overflow: hidden; }
-    /* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
-    .diary-item-calendar .diary-item-calendar-container .item-line .hour {
-      white-space: nowrap;
-      overflow: hidden;
-      width: 40px; }
-    /* line 30, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
-    .diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox {
-      float: right;
-      margin-left: auto;
-      overflow: hidden;
-      white-space: nowrap;
-      min-width: 1em;
-      margin-right: 3px; }
-    /* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
-    .diary-item-calendar .diary-item-calendar-container .item-line .rom {
-      white-space: nowrap;
-      margin-left: 0.5em;
-      overflow: hidden;
-      text-overflow: ellipsis; }
+  /* line 15, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  .diary-item-calendar .diary-item-calendar-container {
+    height: 100%; }
+    /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    .diary-item-calendar .diary-item-calendar-container .item-line {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      padding-bottom: 0 !important;
+      overflow: hidden; }
+      /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .hour {
+        white-space: nowrap;
+        overflow: hidden;
+        width: 40px; }
+      /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox {
+        float: right;
+        margin-left: auto;
+        overflow: hidden;
+        white-space: nowrap;
+        min-width: 1em;
+        margin-right: 3px; }
+      /* line 40, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .rom {
+        white-space: nowrap;
+        margin-left: 0.5em;
+        overflow: hidden;
+        text-overflow: ellipsis; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+[diary-timeslot-item].dragin {
+  border: blue 2px dashed !important;
+  border-radius: 7px; }
+
+/* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+div.schedule .schedule-items .schedule-item .schedule-item-content {
+  padding: 0px;
+  box-sizing: border-box; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+  div.schedule .schedule-items .schedule-item .schedule-item-content > div {
+    padding: 5px;
+    box-sizing: border-box; }
+    /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+    div.schedule .schedule-items .schedule-item .schedule-item-content > div.dragin {
+      padding: 3px; }
 
 
 /*# sourceMappingURL=app.css.map*/

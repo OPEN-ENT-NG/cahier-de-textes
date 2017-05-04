@@ -45,6 +45,7 @@ Subject.prototype.toJSON = function () {
         id: this.id,
         school_id: this.school_id,
         subject_label: this.label,
-        teacher_id: this.teacher_id
-    }
+        teacher_id: this.teacher_id,
+        original_subject_id:this.originalsubjectid
+    };
 };

@@ -13,8 +13,10 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window,CourseService) {
+function DiaryController($scope, template, model, route, $location, $window,CourseService,AudienceService,LessonService) {
 
+    model.CourseService = CourseService;
+    model.LessonService = LessonService;
 
     $scope.currentErrors = [];
 
@@ -102,62 +104,49 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
     $scope.selectedDueDate = undefined; // date selected in list view. It can allow to init homework on a different due_date.
 
+    initAudiences();
     route({
         createLessonView: function (params) {
-            var openFunc = function () {
+
                 $scope.lesson = null;
                 $scope.lessonDescriptionIsReadOnly = false;
                 $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.openLessonView(null, params);
-            };
-
-
-            //if ($scope.calendarLoaded) {
-                openFunc();
-            /*} else {
-                initialization(false, openFunc)
-            }*/
         },
         createHomeworkView: function () {
-
-            var openFunc = function () {
-                $scope.homework = null;
-                $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.openHomeworkView(null);
-            };
-
-            //if ($scope.calendarLoaded) {
-                openFunc();
-            //} else {
-            //    initialization(false, openFunc)
-            //}
+            $scope.homework = null;
+            $scope.homeworkDescriptionIsReadOnly = false;
+            $scope.openHomeworkView(null);
         },
         editLessonView: function(params) {
+            template.open('main', 'main');
+            template.open('main-view', 'create-lesson');
+            return;
 
-            if(!params.idLesson){
-                $scope.goToMainView(notify.error('daily.lesson.id.notspecified'));
-                return;
-            }
-
-            var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
-
-            if (lesson != null) {
-                $scope.lessonDescriptionIsReadOnly = false;
-                $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.openLessonView(lesson, params);
-            }
-            // case when viewing homework and lesson not in current week
-            else {
-                lesson = new Lesson();
-                lesson.id = parseInt(params.idLesson);
-
-                // TODO cache loaded lesson to avoid db re-sync it each time
-                lesson.load(true, function(){
-                    $scope.openLessonView(lesson, params);
-                }, function(cbe){
-                    notify.error(cbe.message);
-                });
-            }
+            // if(!params.idLesson){
+            //     $scope.goToMainView(notify.error('daily.lesson.id.notspecified'));
+            //     return;
+            // }
+            //
+            // var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
+            //
+            // if (lesson != null) {
+            //     $scope.lessonDescriptionIsReadOnly = false;
+            //     $scope.homeworkDescriptionIsReadOnly = false;
+            //     $scope.openLessonView(lesson, params);
+            // }
+            // // case when viewing homework and lesson not in current week
+            // else {
+            //     lesson = new Lesson();
+            //     lesson.id = parseInt(params.idLesson);
+            //
+            //     // TODO cache loaded lesson to avoid db re-sync it each time
+            //     lesson.load(true, function(){
+            //         $scope.openLessonView(lesson, params);
+            //     }, function(cbe){
+            //         notify.error(cbe.message);
+            //     });
+            // }
         },
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params);
@@ -170,8 +159,8 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         listView: function(){
             $scope.lesson = null;
             $scope.homework = null;
-            $scope.pedagogicLessonsSelected 	= new Array();
-            $scope.pedagogicHomeworksSelected 	= new Array();
+            $scope.pedagogicLessonsSelected 	= [];
+            $scope.pedagogicHomeworksSelected 	= [];
             $scope.showList();
         },
         mainView: function(){
@@ -193,7 +182,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         else {
             $scope.lessonDescriptionIsReadOnly = true;
         }
-    }
+    };
 
 
 	/**
@@ -217,7 +206,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 			editor.show();
 			btnApercu.show();
 		}
-    }
+  };
 
     /**
      * Permet d'afficher un aperçu de la description d'une leçon en readonly
@@ -229,7 +218,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         else {
             $scope.lessonDescriptionIsReadOnly = true;
         }
-    }
+    };
 
     /**
      * Permet d'afficher un aperçu de la description d'un TAF en readonly
@@ -241,7 +230,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         else {
             $scope.homeworkDescriptionIsReadOnly = true;
         }
-    }
+    };
 
 
     // Navigation
@@ -347,13 +336,17 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
                 template.open('main-view', 'create-lesson');
             }
         };
-
+        if (model.newLesson){
+            lesson = model.newLesson;
+            model.newLesson = null;
+            template.open('main-view', 'create-lesson');
+        }
         // open existing lesson for edit
         if (lesson) {
             if (!$scope.lesson) {
                 $scope.lesson = new Lesson();
             }
-            $scope.lesson.updateData(lesson);
+            //$scope.lesson.updateData(lesson);
             $scope.lesson.previousLessonsLoaded = false; // will force reload
             $scope.newItem = {
                 date: moment($scope.lesson.date),
@@ -502,7 +495,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
                         deleteHomeworks();
                     } else {
                         postDelete();
-                    }                    
+                    }
                 },
                 // calback error function
                 function (cbe) {
@@ -714,6 +707,8 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
      * @param cb Callback function
      */
     $scope.loadHomeworksForCurrentLesson = function (cb) {
+        console.warn("deprecated");
+        return;
 
         // lesson not yet created do not retrieve homeworks
         if(!$scope.lesson.id){
@@ -959,6 +954,8 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
 
     $scope.createOrUpdateHomework = function (goToMainView, cb) {
+        console.warn("deprecated");
+        return;
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
@@ -1037,8 +1034,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         template.open('create-homework', 'create-homework');
         template.open('daily-event-details', 'daily-event-details');
         template.open('daily-event-item', 'daily-event-item');
-        //$scope.showCal = !$scope.showCal;
-        $scope.$apply();
+        //$scope.$apply();
     };
 
     /**
@@ -1200,9 +1196,11 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.isUserTeacher, $scope.openListView, validationError);
     };
 
+    /*
     $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
         model.getPreviousLessonsFromLesson(currentLesson, true, function(){$scope.$apply()}, validationError);
     };
+    */
 
     /**
      * Load previous lessons data from current lesson being edited
@@ -1299,6 +1297,8 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
     };
 
     $scope.displayPreviousLessonsTabAndLoad = function (lesson) {
+        console.warn("deprecated");
+        return;
         $scope.tabs.createLesson = 'previouslessons';
         $scope.loadPreviousLessonsFromLesson(lesson);
     };
@@ -1308,8 +1308,30 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
      * By default number of previous lessons is 3.
      * Will increase displayed previous lesson by 3.
      */
+     //TODO remove
     $scope.showMorePreviousLessons = function (lesson) {
+        console.log("error not used");
+        return;
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
     };
+
+
+    function initAudiences(){
+            console.log("init audiences");
+            model.audiences.all = [];
+            //var nbStructures = model.me.structures.length;
+
+            model.currentSchool = model.me.structures[0];
+
+            AudienceService.getAudiences(model.me.structures).then((audiences)=>{
+                console.log("add audiences : ",audiences);
+                model.audiences.addRange(audiences);
+                    model.audiences.trigger('sync');
+                    model.audiences.trigger('change');
+                    if(typeof cb === 'function'){
+                        cb();
+                    }
+            });
+    }
 }

@@ -5,7 +5,7 @@
         //controller declaration
         module.controller("CalendarController", controller);
 
-        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q) {
+        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService) {
 
             var vm = this;
 
@@ -13,7 +13,7 @@
             /*
              * initialisation calendar function
              */
-            function init() {                
+            function init() {
                 //view controls
                 $scope.display.showList = false;
                 //calendarDailyEvent directive options
@@ -119,10 +119,12 @@
                 model.childs.syncChildren(function() {
                     $scope.child = model.child;
                     $scope.children = model.childs;
-                    model.subjects.syncSubjects(function() {
-                        model.audiences.syncAudiences(function() {
+                    SubjectService.getCustomSubjects(model.me.structures[0],model.isUserTeacher()).then((subjects)=>{
+                        model.subjects.all=[];
+                        model.subjects.addRange(subjects);
+                    }).then(()=>{
+                        //model.audiences.syncAudiences(function() {
                             decrementCountdown(bShowTemplates, cb);
-
                             model.homeworkTypes.syncHomeworkTypes(function() {
                                 // call lessons/homework sync after audiences sync since
                                 // lesson and homework objects needs audience data to be built
@@ -132,10 +134,9 @@
                                     model.child ? model.child.id : undefined);
 
                             }, validationError);
+                        //}, validationError);
                         }, validationError);
-                    }, validationError);
-                }, validationError);
-
+                    });
             };
 
 
@@ -221,7 +222,7 @@
                 template.open('daily-event-details', 'daily-event-details');
                 template.open('daily-event-item', 'daily-event-item');
                 //$scope.showCal = !$scope.showCal;
-                $scope.$apply();
+                //$scope.$apply();
             };
 
             /**

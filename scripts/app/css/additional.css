@@ -7,6 +7,11 @@ ul {
     padding-right: 15px;
 }
 
+div.week-switcher{
+  top: 20px;
+  position: relative;
+  left: 40px;
+}
 
 
 ul li i.icon {

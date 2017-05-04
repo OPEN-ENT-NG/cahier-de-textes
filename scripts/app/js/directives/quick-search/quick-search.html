@@ -36,7 +36,7 @@
     </div>
 
     <!-- Results -->
-    <div  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDaysDisplayed" style="padding-left: 5px; padding-right: 5px">
+    <div  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDaysDisplayed track by $index" style="padding-left: 5px; padding-right: 5px">
        <quick-search-item></quick-search-item>
     </div>
 
