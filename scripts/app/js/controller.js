@@ -338,7 +338,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         };
         if (model.newLesson){
             lesson = model.newLesson;
-            model.newLesson = null;
+            //model.newLesson = null;
             template.open('main-view', 'create-lesson');
         }
         // open existing lesson for edit

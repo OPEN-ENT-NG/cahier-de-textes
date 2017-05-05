@@ -16,11 +16,16 @@
             function init() {
                 //existing lesson
                 if ($routeParams.idLesson) {
+                    model.newLesson = null;
                     loadExistingLesson();
-                } else {
+                } else if(model.newLesson){
+                    createNewLessonFromPedagogicItem();
+                }else {
                     //new lesson
                     loadNewLesson();
                 }
+
+                $scope.data.tabSelected = 'lesson';
 
                 //add watch on selection
                 $scope.$watch('lesson.audience',()=>{
@@ -36,6 +41,14 @@
                 });
             }
 
+
+
+            function createNewLessonFromPedagogicItem (){
+                $scope.lesson = model.newLesson;
+                model.newLesson=null;
+                $scope.newItem = $scope.lesson.newItem;
+            }
+
             /*
             * load existing lesson
             */
@@ -49,12 +62,10 @@
                 $scope.lesson = lesson;
                 lesson.load(true, function() {
 
-                $scope.data.tabSelected = 'lesson';
                 $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
                 $scope.tabs.showAnnotations = false;
 
                 // open existing lesson for edit
-
 
                 $scope.lesson.previousLessonsLoaded = false; // will force reload
                 $scope.newItem = {
@@ -71,9 +82,7 @@
 
                         model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
                     });
-                    //openLessonTemplates();
                 });
-
 
                 }, function(cbe) {
                     notify.error(cbe.message);
