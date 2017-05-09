@@ -136,7 +136,13 @@ var AngularExtensions = {
     //controller declaration
     module.value("constants", {
       CAL_DATE_PATTERN: "YYYY-MM-DD",
-      LONG_DATE_PATTERN: 'YYYY-MM-DD hh:mm:ss'
+      LONG_DATE_PATTERN: 'YYYY-MM-DD hh:mm:ss',
+      RIGHTS: {
+        CREATE_LESSON: 'diary.createLesson',
+        VIEW: 'diary.view',
+        CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
+        CREATE_FREE_HOMEWORK: 'diary.createFreeHomework'
+      }
     });
   });
 })();
@@ -748,10 +754,12 @@ var CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window, CourseService, AudienceService, LessonService) {
+function DiaryController($scope, template, model, route, $location, $window, CourseService, AudienceService, LessonService, SecureService, constants) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
+
+    $scope.RIGHTS = constants.RIGHTS;
 
     $scope.currentErrors = [];
 
@@ -853,33 +861,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         },
         editLessonView: function editLessonView(params) {
             template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
-            return;
-
-            // if(!params.idLesson){
-            //     $scope.goToMainView(notify.error('daily.lesson.id.notspecified'));
-            //     return;
-            // }
-            //
-            // var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
-            //
-            // if (lesson != null) {
-            //     $scope.lessonDescriptionIsReadOnly = false;
-            //     $scope.homeworkDescriptionIsReadOnly = false;
-            //     $scope.openLessonView(lesson, params);
-            // }
-            // // case when viewing homework and lesson not in current week
-            // else {
-            //     lesson = new Lesson();
-            //     lesson.id = parseInt(params.idLesson);
-            //
-            //     // TODO cache loaded lesson to avoid db re-sync it each time
-            //     lesson.load(true, function(){
-            //         $scope.openLessonView(lesson, params);
-            //     }, function(cbe){
-            //         notify.error(cbe.message);
-            //     });
-            // }
+            if (SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)) {
+                template.open('main-view', 'create-lesson');
+            } else {
+                template.open('main-view', 'view-lesson');
+            }
         },
         editHomeworkView: function editHomeworkView(params) {
             loadHomeworkFromRoute(params);
@@ -3890,6 +3876,64 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
       };
     });
   });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.directive('secure', directive);
+
+        function directive(SecureService) {
+            return {
+                restrict: "A",
+                scope: {
+                    right: '='
+                },
+                link: function link(scope, element) {
+                    SecureService.hasRight(scope.right);
+                }
+            };
+        }
+    });
+})();
+
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    var SecureService = function () {
+        function SecureService() {
+            _classCallCheck(this, SecureService);
+        }
+
+        _createClass(SecureService, [{
+            key: "hasRight",
+            value: function hasRight(right) {
+                var result = false;
+                _.each(model.me.authorizedActions, function (authorizedAction) {
+                    if (authorizedAction.displayName === right) {
+                        result = true;
+                    }
+                });
+                return result;
+            }
+        }]);
+
+        return SecureService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("SecureService", SecureService);
+    });
 })();
 
 'use strict';

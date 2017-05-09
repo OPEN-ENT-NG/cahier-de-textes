@@ -13,10 +13,12 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window,CourseService,AudienceService,LessonService) {
+function DiaryController($scope, template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
+
+    $scope.RIGHTS = constants.RIGHTS;
 
     $scope.currentErrors = [];
 
@@ -120,33 +122,11 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         },
         editLessonView: function(params) {
             template.open('main', 'main');
-            template.open('main-view', 'create-lesson');
-            return;
-
-            // if(!params.idLesson){
-            //     $scope.goToMainView(notify.error('daily.lesson.id.notspecified'));
-            //     return;
-            // }
-            //
-            // var lesson = model.lessons.findWhere({id: parseInt(params.idLesson)});
-            //
-            // if (lesson != null) {
-            //     $scope.lessonDescriptionIsReadOnly = false;
-            //     $scope.homeworkDescriptionIsReadOnly = false;
-            //     $scope.openLessonView(lesson, params);
-            // }
-            // // case when viewing homework and lesson not in current week
-            // else {
-            //     lesson = new Lesson();
-            //     lesson.id = parseInt(params.idLesson);
-            //
-            //     // TODO cache loaded lesson to avoid db re-sync it each time
-            //     lesson.load(true, function(){
-            //         $scope.openLessonView(lesson, params);
-            //     }, function(cbe){
-            //         notify.error(cbe.message);
-            //     });
-            // }
+            if (SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)){
+              template.open('main-view', 'create-lesson');
+            }else{
+                template.open('main-view', 'view-lesson');
+            }
         },
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params);
@@ -171,8 +151,6 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
             }
         }
     });
-
-
 
 
     $scope.setLessonDescriptionMode = function(homeworkId) {
@@ -1322,7 +1300,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
             model.currentSchool = model.me.structures[0];
 
-            AudienceService.getAudiences(model.me.structures).then((audiences)=>{                
+            AudienceService.getAudiences(model.me.structures).then((audiences)=>{
                 model.audiences.addRange(audiences);
                     model.audiences.trigger('sync');
                     model.audiences.trigger('change');
