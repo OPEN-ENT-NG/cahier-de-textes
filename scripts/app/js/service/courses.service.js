@@ -6,9 +6,7 @@
     * used to manipulate Course model
     */
     class CourseService {
-        constructor($http,$q,constants,SubjectService) {
-
-           console.log("create new CourseService");
+        constructor($http,$q,constants,SubjectService) {           
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;

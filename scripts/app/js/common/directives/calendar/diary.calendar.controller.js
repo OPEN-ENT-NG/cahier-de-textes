@@ -146,7 +146,7 @@
             * dispose item elements
             */
             function disposeItems(){
-                //recal all collisions                
+                //recal all collisions
                 if (!vm.calendar){
                   return;
                 }
@@ -350,21 +350,17 @@
                     //get audience
                     if(item.data && item.data.classes && item.data.classes.length>0){
                         $scope.newItem.audience = audienceMap[item.data.classes[0]];
-                        console.log("found audience",$scope.newItem.audience);
                     }
                     //get room
                     if(item.data && item.data.roomLabels && item.data.roomLabels.length>0){
                         $scope.newItem.room = item.data.roomLabels[0];
-                        console.log("found room",$scope.newItem.room);
                     }
                     //get subject
                     if (item.data && item.data.subject && item.data.subject.subjectId){
                         $scope.newItem.subject = _.find(model.subjects.all,(subject)=>{
                             return subject.originalsubjectid === item.data.subject.subjectId;
                         });
-                        console.log("subject found : ",$scope.newItem.subject);
-                        if (!$scope.newItem.subject){
-                          console.log("add subject to be created");
+                        if (!$scope.newItem.subject){                          
                           item.data.subject.teacher_id = model.me.userId;
                           $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
                         }

@@ -81,7 +81,7 @@
 												}
 
 												if (scope.homework && scope.homework.audience) {
-														scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
+														scope.$parent.showHomeworksLoad(scope.homework, null, null);
 												}
 										}
 								});

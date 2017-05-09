@@ -15,7 +15,7 @@
 
                     var angElement = angular.element(element);
 
-                    angElement.on('drag', function(){
+                    angElement.on('drag', function(event){                                                      
                         angElement.css('opacity', 0.9);
                     });
 
@@ -35,7 +35,7 @@
                         }
                     };
                 }
-            }
+            };
         });
 	});
 

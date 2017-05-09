@@ -314,7 +314,7 @@ var AngularExtensions = {
             * dispose item elements
             */
             function disposeItems() {
-                //recal all collisions                
+                //recal all collisions
                 if (!vm.calendar) {
                     return;
                 }
@@ -511,21 +511,17 @@ var AngularExtensions = {
                     //get audience
                     if (item.data && item.data.classes && item.data.classes.length > 0) {
                         $scope.newItem.audience = audienceMap[item.data.classes[0]];
-                        console.log("found audience", $scope.newItem.audience);
                     }
                     //get room
                     if (item.data && item.data.roomLabels && item.data.roomLabels.length > 0) {
                         $scope.newItem.room = item.data.roomLabels[0];
-                        console.log("found room", $scope.newItem.room);
                     }
                     //get subject
                     if (item.data && item.data.subject && item.data.subject.subjectId) {
                         $scope.newItem.subject = _.find(model.subjects.all, function (subject) {
                             return subject.originalsubjectid === item.data.subject.subjectId;
                         });
-                        console.log("subject found : ", $scope.newItem.subject);
                         if (!$scope.newItem.subject) {
-                            console.log("add subject to be created");
                             item.data.subject.teacher_id = model.me.userId;
                             $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
                         }
@@ -1660,8 +1656,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 
     $scope.createOrUpdateHomework = function (goToMainView, cb) {
-        console.warn("deprecated");
-        return;
+
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
@@ -1959,7 +1954,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
      */
     $scope.showHomeworksLoad = function (homework, forcedDate, callback) {
 
-        var cb = function cb() {};
+        var cb; //= function (){};
 
         if (callback) {
             if (typeof callback === 'function') {
@@ -2014,14 +2009,12 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     };
 
     function initAudiences() {
-        console.log("init audiences");
         model.audiences.all = [];
         //var nbStructures = model.me.structures.length;
 
         model.currentSchool = model.me.structures[0];
 
         AudienceService.getAudiences(model.me.structures).then(function (audiences) {
-            console.log("add audiences : ", audiences);
             model.audiences.addRange(audiences);
             model.audiences.trigger('sync');
             model.audiences.trigger('change');
@@ -2275,7 +2268,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     });
 })();
 
-"use strict";
+'use strict';
 
 (function () {
     'use strict';
@@ -2285,8 +2278,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         module.controller("EditLessonController", controller);
 
         function controller($scope, $routeParams, PedagogicItemService, constants) {
-
-            console.log("init controller editLesson Controller");
 
             var vm = this;
 
@@ -2323,9 +2314,33 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
             function createNewLessonFromPedagogicItem() {
                 $scope.lesson = model.newLesson;
                 model.newLesson = null;
-                $scope.newItem = $scope.lesson.newItem;
+                //$scope.newItem = $scope.lesson.newItem;
+                populateExistingLesson();
             }
 
+            function populateExistingLesson() {
+                $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
+                $scope.tabs.showAnnotations = false;
+
+                // open existing lesson for edit
+
+                $scope.lesson.previousLessonsLoaded = false; // will force reload
+                $scope.newItem = {
+                    date: moment($scope.lesson.date),
+                    beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
+                    end: $scope.lesson.endMoment //moment($scope.lesson.end)
+                };
+
+                $scope.loadHomeworksForCurrentLesson(function () {
+                    $scope.lesson.homeworks.forEach(function (homework) {
+                        if ($scope.lesson.homeworks.length || $routeParams.idHomework && $routeParams.idHomework == homework.id) {
+                            homework.expanded = true;
+                        }
+
+                        model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
+                    });
+                });
+            }
             /*
             * load existing lesson
             */
@@ -2338,28 +2353,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.homeworkDescriptionIsReadOnly = false;
                 $scope.lesson = lesson;
                 lesson.load(true, function () {
-
-                    $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
-                    $scope.tabs.showAnnotations = false;
-
-                    // open existing lesson for edit
-
-                    $scope.lesson.previousLessonsLoaded = false; // will force reload
-                    $scope.newItem = {
-                        date: moment($scope.lesson.date),
-                        beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
-                        end: $scope.lesson.endMoment //moment($scope.lesson.end)
-                    };
-
-                    $scope.loadHomeworksForCurrentLesson(function () {
-                        $scope.lesson.homeworks.forEach(function (homework) {
-                            if ($scope.lesson.homeworks.length || $routeParams.idHomework && $routeParams.idHomework == homework.id) {
-                                homework.expanded = true;
-                            }
-
-                            model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
-                        });
-                    });
+                    populateExistingLesson();
                 }, function (cbe) {
                     notify.error(cbe.message);
                 });
@@ -2440,7 +2434,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
             };
 
             $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
-                console.log("run on scroll refresh");
                 if (currentLesson.allPreviousLessonsLoaded || currentLesson.previousLessonsLoading) {
                     return;
                 }
@@ -3251,7 +3244,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 														}
 
 														if (scope.homework && scope.homework.audience) {
-																scope.$parent.showHomeworksLoad(scope.homework, null, scope.$apply);
+																scope.$parent.showHomeworksLoad(scope.homework, null, null);
 														}
 												}
 										});
@@ -3307,6 +3300,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                     timeslot.bind('dragenter', onenter);
                     function onenter(event) {
+
                         dragCounter++;
                         timeslot.addClass("dragin");
                         //event.preventDefault();
@@ -3315,6 +3309,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                     timeslot.bind('dragleave', onleave);
                     function onleave(event) {
+
                         dragCounter--;
                         if (dragCounter === 0) {
                             timeslot.removeClass("dragin");
@@ -3322,10 +3317,8 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     }
 
                     timeslot.on('drop', function ($event) {
-                        console.log($event);
 
                         var scheduleItem = scope.$parent.item;
-                        console.log("scheduleItem", scheduleItem);
 
                         $event.preventDefault();
                         var timeslotsPerDay = $('.days .timeslot').length / 7;
@@ -3375,7 +3368,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                                 newLesson.startMoment = moment(scheduleItem.startDate);
                                 newLesson.endTime = moment(scheduleItem.endDate);
                                 newLesson.endMoment = moment(scheduleItem.endDate);
-                                console.log(newLesson.startTime);
                                 AudienceService.getAudiencesAsMap(model.me.structures).then(function (audienceMap) {
                                     //get audience
                                     if (scheduleItem.data && scheduleItem.data.classes && scheduleItem.data.classes.length > 0) {
@@ -3427,7 +3419,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                     var angElement = angular.element(element);
 
-                    angElement.on('drag', function () {
+                    angElement.on('drag', function (event) {
                         angElement.css('opacity', 0.9);
                     });
 
@@ -3452,7 +3444,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
     });
 })();
 
-"use strict";
+'use strict';
 
 (function () {
     'use strict';
@@ -3462,9 +3454,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         module.controller("QuickSearchController", controller);
 
         function controller($scope, PedagogicItemService) {
-            console.log("create QuickSearchController");
             var vm = this;
-
             /**
              * Number of items displayed by default
              * @type {number}
@@ -3664,36 +3654,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.quickSearchPedagogicDaysDisplayed.length = 0;
 
                 $scope.performPedagogicItemSearch(params, model.isUserTeacher());
-                /*
-                model.performPedagogicItemSearch(params, model.isUserTeacher(),
-                    // callback
-                    function() {
-                        $scope.isFirstSearch = false;
-                        $scope.quickSearchPedagogicDays = isQuickSearchLesson ? model.pedagogicDaysQuickSearchLesson : model.pedagogicDaysQuickSearchHomework;
-                        $scope.displayNoResultsText = ($scope.quickSearchPedagogicDays.length == 0);
-                          var idxSearchPedagogicItem = 0;
-                        $scope.quickSearchPedagogicDaysDisplayed = new Array();
-                          // count number of displayed items
-                        $scope.quickSearchPedagogicDays.forEach(function(pedagogicDay) {
-                              pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItemOfTheDay) {
-                                if ((pedagogicItemDisplayedIdxStart <= idxSearchPedagogicItem) && (idxSearchPedagogicItem <= pedagogicItemDisplayedIdxEnd)) {
-                                    $scope.quickSearchPedagogicDaysDisplayed.push(pedagogicItemOfTheDay);
-                                }
-                                idxSearchPedagogicItem++;
-                            });
-                        });
-                          // enable/disable next/previous items arrow buttons
-                        $scope.isPreviousPedagogicDaysDisplayed = isPreviousPedagogicDaysDisplayed();
-                        $scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed(idxSearchPedagogicItem);
-                        $scope.$apply();
-                    },
-                    // callback on error
-                    function(cbe) {
-                        console.error('Callback errors');
-                        console.log(cbe);
-                        notify.error(cbe.message);
-                    }
-                );*/
             };
 
             /*
@@ -3997,12 +3957,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     };
                     scope.$watch('lesson.audience.structureId', function () {
                         if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
-                            console.log("set new school_id");
                             scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
                         }
                     });
                     var initSuggestedSubjects = function initSuggestedSubjects() {
-                        scope.suggestedSubjects = new Array();
+                        scope.suggestedSubjects = [];
 
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
@@ -5316,7 +5275,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         function AudienceService($http, $q, constants) {
             _classCallCheck(this, AudienceService);
 
-            console.log("create new AudienceService");
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
@@ -5422,7 +5380,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         function CourseService($http, $q, constants, SubjectService) {
             _classCallCheck(this, CourseService);
 
-            console.log("create new CourseService");
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
@@ -6017,6 +5974,7 @@ function Audience() {}
 function HomeworksLoad() {}
 function HomeworkType() {}
 
+model.homeworksPerDayDisplayed = 1;
 /**
  * Says whether or not current user can edit an homework
  * @returns {*|boolean}
@@ -6922,8 +6880,6 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         if (newItem.subject) {
             lesson.subject = newItem.subject;
         }
-        //init datas
-        console.log("initialisation item ", newItem);
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {

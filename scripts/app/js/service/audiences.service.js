@@ -7,9 +7,7 @@
     */
     class AudienceService {
 
-        constructor($http,$q,constants) {
-
-           console.log("create new AudienceService");
+        constructor($http,$q,constants) {           
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;

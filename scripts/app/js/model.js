@@ -16,7 +16,7 @@ function HomeworksLoad(){}
 function HomeworkType(){}
 
 
-
+model.homeworksPerDayDisplayed = 1;
 /**
  * Says whether or not current user can edit an homework
  * @returns {*|boolean}
@@ -958,8 +958,7 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         if (newItem.subject){
             lesson.subject = newItem.subject;
         }
-        //init datas
-        console.log("initialisation item " ,newItem);
+                
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {

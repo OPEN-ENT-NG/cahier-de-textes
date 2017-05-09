@@ -6,9 +6,7 @@
         module.controller("QuickSearchController", controller);
 
         function controller($scope, PedagogicItemService) {
-            console.log("create QuickSearchController");
             var vm = this;
-
             /**
              * Number of items displayed by default
              * @type {number}
@@ -214,40 +212,7 @@
 
 
                 $scope.performPedagogicItemSearch(params,model.isUserTeacher());
-                /*
-                model.performPedagogicItemSearch(params, model.isUserTeacher(),
-                    // callback
-                    function() {
-                        $scope.isFirstSearch = false;
-                        $scope.quickSearchPedagogicDays = isQuickSearchLesson ? model.pedagogicDaysQuickSearchLesson : model.pedagogicDaysQuickSearchHomework;
-                        $scope.displayNoResultsText = ($scope.quickSearchPedagogicDays.length == 0);
-
-                        var idxSearchPedagogicItem = 0;
-                        $scope.quickSearchPedagogicDaysDisplayed = new Array();
-
-                        // count number of displayed items
-                        $scope.quickSearchPedagogicDays.forEach(function(pedagogicDay) {
-
-                            pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItemOfTheDay) {
-                                if ((pedagogicItemDisplayedIdxStart <= idxSearchPedagogicItem) && (idxSearchPedagogicItem <= pedagogicItemDisplayedIdxEnd)) {
-                                    $scope.quickSearchPedagogicDaysDisplayed.push(pedagogicItemOfTheDay);
-                                }
-                                idxSearchPedagogicItem++;
-                            });
-                        });
-
-                        // enable/disable next/previous items arrow buttons
-                        $scope.isPreviousPedagogicDaysDisplayed = isPreviousPedagogicDaysDisplayed();
-                        $scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed(idxSearchPedagogicItem);
-                        $scope.$apply();
-                    },
-                    // callback on error
-                    function(cbe) {
-                        console.error('Callback errors');
-                        console.log(cbe);
-                        notify.error(cbe.message);
-                    }
-                );*/
+                 
             };
 
             /*
@@ -343,7 +308,7 @@
                     // enable/disable next/previous items arrow buttons
                     $scope.isPreviousPedagogicDaysDisplayed = isPreviousPedagogicDaysDisplayed();
                     $scope.isNextPedagogicDaysDisplayed = isNextPedagogicDaysDisplayed(idxSearchPedagogicItem);
-                    
+
                 });
 
             };

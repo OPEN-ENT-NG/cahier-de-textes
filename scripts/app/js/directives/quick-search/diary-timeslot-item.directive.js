@@ -21,6 +21,7 @@
 
                     timeslot.bind('dragenter', onenter);
                     function onenter(event) {
+
                         dragCounter ++;
                         timeslot.addClass("dragin");
                         //event.preventDefault();
@@ -30,17 +31,18 @@
 
                     timeslot.bind('dragleave',onleave);
                     function onleave (event) {
+
                         dragCounter--;
                         if(dragCounter === 0){
                             timeslot.removeClass("dragin");
                         }
                    }
 
+
+
                     timeslot.on('drop', function($event) {
-                        console.log($event);
 
                         let scheduleItem = scope.$parent.item;
-                        console.log("scheduleItem",scheduleItem);
 
                         $event.preventDefault();
                         var timeslotsPerDay = $('.days .timeslot').length / 7;
@@ -89,8 +91,7 @@
                                 newLesson.startTime=moment(scheduleItem.startDate);
                                 newLesson.startMoment=moment(scheduleItem.startDate);
                                 newLesson.endTime=moment(scheduleItem.endDate);
-                                newLesson.endMoment=moment(scheduleItem.endDate);
-                                console.log(newLesson.startTime);
+                                newLesson.endMoment=moment(scheduleItem.endDate);                                
                                 AudienceService.getAudiencesAsMap(model.me.structures).then(function (audienceMap) {
                                     //get audience
                                     if (scheduleItem.data && scheduleItem.data.classes && scheduleItem.data.classes.length > 0) {

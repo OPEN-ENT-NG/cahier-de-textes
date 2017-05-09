@@ -954,8 +954,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
 
     $scope.createOrUpdateHomework = function (goToMainView, cb) {
-        console.warn("deprecated");
-        return;
+
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
@@ -1262,7 +1261,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
      */
     $scope.showHomeworksLoad = function (homework, forcedDate, callback) {
 
-        var cb = function (){};
+        var cb ;//= function (){};
 
         if (callback){
             if (typeof callback === 'function') {
@@ -1318,14 +1317,12 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
 
     function initAudiences(){
-            console.log("init audiences");
             model.audiences.all = [];
             //var nbStructures = model.me.structures.length;
 
             model.currentSchool = model.me.structures[0];
 
-            AudienceService.getAudiences(model.me.structures).then((audiences)=>{
-                console.log("add audiences : ",audiences);
+            AudienceService.getAudiences(model.me.structures).then((audiences)=>{                
                 model.audiences.addRange(audiences);
                     model.audiences.trigger('sync');
                     model.audiences.trigger('change');

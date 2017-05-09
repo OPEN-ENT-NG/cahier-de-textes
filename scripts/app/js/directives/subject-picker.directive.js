@@ -1,8 +1,8 @@
 (function() {
-	'use strict';
+    'use strict';
 
-	AngularExtensions.addModuleConfig(function(module){
-    module.directive('subjectPicker', function () {
+    AngularExtensions.addModuleConfig(function(module) {
+        module.directive('subjectPicker', function() {
             return {
                 scope: {
                     ngModel: '=',
@@ -14,10 +14,10 @@
                 replace: true,
                 restrict: 'E',
                 templateUrl: 'diary/public/template/subject-picker.html',
-                link: function (scope, element) {
+                link: function(scope, element) {
 
 
-                    var sortBySubjectLabel = function (a, b) {
+                    var sortBySubjectLabel = function(a, b) {
                         if (a.label > b.label)
                             return 1;
                         if (a.label < b.label)
@@ -35,15 +35,15 @@
                     // containing base subject collection + current ones being created by used
                     var subjects = new Array();
 
-                    model.subjects.all.forEach(function (subject) {
+                    model.subjects.all.forEach(function(subject) {
                         subjects.push(subject);
                     });
 
                     subjects.sort(sortBySubjectLabel);
 
-                    var setNewSubject = function (subjectLabel) {
+                    var setNewSubject = function(subjectLabel) {
 
-                        if(!subjectLabel){
+                        if (!subjectLabel) {
                             return;
                         }
 
@@ -68,15 +68,14 @@
                             scope.ngModel = existingSubject;
                         }
                     };
-										scope.$watch('lesson.audience.structureId',function(){
-											if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId){
-												console.log("set new school_id");
-												scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
-											}
+                    scope.$watch('lesson.audience.structureId', function() {
+                        if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
+                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+                        }
 
-										});
+                    });
                     var initSuggestedSubjects = function() {
-                        scope.suggestedSubjects = new Array();
+                        scope.suggestedSubjects = [];
 
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
@@ -85,16 +84,16 @@
 
                     initSuggestedSubjects();
 
-                    scope.goToSearchMode = function(){
+                    scope.goToSearchMode = function() {
                         scope.displaySearch = true;
                         scope.search = '';
                         initSuggestedSubjects();
                     };
 
-                    scope.isSelected = function (subject) {
+                    scope.isSelected = function(subject) {
 
-                        if(scope.ngModel && subject){
-                            if(scope.ngModel.id){
+                        if (scope.ngModel && subject) {
+                            if (scope.ngModel.id) {
                                 return scope.ngModel.id === subject.id;
                             }
                             // subject may not have id if it's new one
@@ -109,7 +108,7 @@
                     /**
                      * Search subject from input by user
                      */
-                    scope.searchSubject = function (event) {
+                    scope.searchSubject = function(event) {
 
                         if (event.type === 'keydown' && event.keyCode === 9) {
                             scope.displaySearch = false;
@@ -135,7 +134,7 @@
                         }
                     };
 
-                    scope.selectSubject = function (subject) {
+                    scope.selectSubject = function(subject) {
                         scope.ngModel = subject;
                         scope.displaySearch = false;
                         if (scope.lesson) {
@@ -144,7 +143,7 @@
                         }
                     };
 
-                    $(element.context.ownerDocument).click(function (event) {
+                    $(element.context.ownerDocument).click(function(event) {
                         if (!$(event.target).is("item-suggest") && !$(event.target).is("#remove-subject") && !$(event.target).is("#input-subject")) {
                             scope.displaySearch = false;
 
@@ -158,6 +157,6 @@
                 }
             }
         });
-	});
+    });
 
 })();

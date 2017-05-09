@@ -7,8 +7,6 @@
 
         function controller($scope, $routeParams,PedagogicItemService,constants) {
 
-            console.log("init controller editLesson Controller");
-
             var vm = this;
 
             init();
@@ -46,22 +44,11 @@
             function createNewLessonFromPedagogicItem (){
                 $scope.lesson = model.newLesson;
                 model.newLesson=null;
-                $scope.newItem = $scope.lesson.newItem;
+                //$scope.newItem = $scope.lesson.newItem;
+                populateExistingLesson();
             }
 
-            /*
-            * load existing lesson
-            */
-            function loadExistingLesson() {
-                let lesson = new Lesson();
-                model.lesson = lesson;
-                lesson.id = parseInt($routeParams.idLesson);
-
-                $scope.lessonDescriptionIsReadOnly = false;
-                $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.lesson = lesson;
-                lesson.load(true, function() {
-
+            function populateExistingLesson(){
                 $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
                 $scope.tabs.showAnnotations = false;
 
@@ -84,6 +71,20 @@
                     });
                 });
 
+            }
+            /*
+            * load existing lesson
+            */
+            function loadExistingLesson() {
+                let lesson = new Lesson();
+                model.lesson = lesson;
+                lesson.id = parseInt($routeParams.idLesson);
+
+                $scope.lessonDescriptionIsReadOnly = false;
+                $scope.homeworkDescriptionIsReadOnly = false;
+                $scope.lesson = lesson;
+                lesson.load(true, ()=> {
+                    populateExistingLesson();
                 }, function(cbe) {
                     notify.error(cbe.message);
                 });
@@ -170,8 +171,7 @@
                 });
             };
 
-            $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
-                console.log("run on scroll refresh");
+            $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {                
                 if (currentLesson.allPreviousLessonsLoaded || currentLesson.previousLessonsLoading){
                     return;
                 }
