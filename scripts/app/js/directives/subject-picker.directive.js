@@ -79,11 +79,6 @@
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
                         }
-
-                        if (!scope.ngModel && scope.lesson.subjectLabel){
-                                setNewSubject(scope.lesson.subjectLabel);
-                        }
-
                     };
 
                     initSuggestedSubjects();

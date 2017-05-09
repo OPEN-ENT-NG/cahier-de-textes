@@ -3968,10 +3968,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
                         }
-
-                        if (!scope.ngModel && scope.lesson.subjectLabel) {
-                            setNewSubject(scope.lesson.subjectLabel);
-                        }
                     };
 
                     initSuggestedSubjects();
@@ -5671,6 +5667,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     tooltipText: '',
                     locked: !model.canEdit() ? true : false
                 };
+                lesson.subject = new Subject();
+                lesson.subject.label = lessonData.subject_label;
+                lesson.subject.id = lessonData.subject_id;
+                lesson.subject.teacher_id = lessonData.teacher_display_name;
 
                 if ('group' === lesson.audienceType) {
                     lesson.audienceTypeLabel = lang.translate('diary.audience.group');

@@ -93,6 +93,10 @@
                 tooltipText: '',
                 locked: (!model.canEdit()) ? true : false
             };
+            lesson.subject = new Subject();
+            lesson.subject.label = lessonData.subject_label;
+            lesson.subject.id = lessonData.subject_id;            
+            lesson.subject.teacher_id = lessonData.teacher_display_name;
 
             if('group' === lesson.audienceType){
                 lesson.audienceTypeLabel = lang.translate('diary.audience.group');
