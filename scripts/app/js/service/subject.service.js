@@ -57,7 +57,7 @@
             if (isTeacher) {
                 urlGetSubjects = '/diary/subject/initorlist';
             }else{
-                urlGetSubjects = '/diary/subject/list/' + UtilsService.getUserStructuresIdsAsString();
+                urlGetSubjects = '/diary/subject/list/' + this.UtilsService.getUserStructuresIdsAsString();
             }
 
             return this.$http.get(urlGetSubjects).then((result)=>{

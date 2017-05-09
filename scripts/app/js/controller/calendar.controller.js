@@ -119,10 +119,10 @@
                 model.childs.syncChildren(function() {
                     $scope.child = model.child;
                     $scope.children = model.childs;
-                    SubjectService.getCustomSubjects(model.me.structures[0],model.isUserTeacher()).then((subjects)=>{
+                    SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects)=>{
                         model.subjects.all=[];
                         if(subjects){
-                          model.subjects.addRange(subjects);                          
+                          model.subjects.addRange(subjects);
                         }
                     }).then(()=>{
                         //model.audiences.syncAudiences(function() {
@@ -198,8 +198,12 @@
                 var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
                 var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
 
-                //TODO use structureIds
-                var p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                //dont load courses if is not at teacher
+                var p3 = $q.when([]);
+                if (model.isUserTeacher()){
+                    //TODO use structureIds
+                    p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                }
 
                 return $q.all([p1, p2, p3]).then(results => {
                     let lessons = results[0];

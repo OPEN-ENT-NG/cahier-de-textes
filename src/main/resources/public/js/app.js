@@ -2146,7 +2146,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 model.childs.syncChildren(function () {
                     $scope.child = model.child;
                     $scope.children = model.childs;
-                    SubjectService.getCustomSubjects(model.me.structures[0], model.isUserTeacher()).then(function (subjects) {
+                    SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
                         model.subjects.all = [];
                         if (subjects) {
                             model.subjects.addRange(subjects);
@@ -2216,8 +2216,12 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
                 var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
 
-                //TODO use structureIds
-                var p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                //dont load courses if is not at teacher
+                var p3 = $q.when([]);
+                if (model.isUserTeacher()) {
+                    //TODO use structureIds
+                    p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                }
 
                 return $q.all([p1, p2, p3]).then(function (results) {
                     var lessons = results[0];
@@ -5852,7 +5856,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (isTeacher) {
                     urlGetSubjects = '/diary/subject/initorlist';
                 } else {
-                    urlGetSubjects = '/diary/subject/list/' + UtilsService.getUserStructuresIdsAsString();
+                    urlGetSubjects = '/diary/subject/list/' + this.UtilsService.getUserStructuresIdsAsString();
                 }
 
                 return this.$http.get(urlGetSubjects).then(function (result) {
