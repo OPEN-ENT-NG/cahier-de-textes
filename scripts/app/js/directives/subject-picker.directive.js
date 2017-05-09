@@ -29,11 +29,11 @@
                     scope.displaySearch = false;
 
                     // init suggested subjects with all subjects
-                    scope.suggestedSubjects = new Array();
+                    scope.suggestedSubjects = [];
 
                     // custom subject collection
                     // containing base subject collection + current ones being created by used
-                    var subjects = new Array();
+                    var subjects = [];
 
                     model.subjects.all.forEach(function(subject) {
                         subjects.push(subject);
@@ -69,10 +69,9 @@
                         }
                     };
                     scope.$watch('lesson.audience.structureId', function() {
-                        if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
+                        if (scope.ngModel && scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
                             scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
                         }
-
                     });
                     var initSuggestedSubjects = function() {
                         scope.suggestedSubjects = [];
@@ -80,6 +79,11 @@
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
                         }
+
+                        if (!scope.ngModel && scope.lesson.subjectLabel){
+                                setNewSubject(scope.lesson.subjectLabel);
+                        }
+
                     };
 
                     initSuggestedSubjects();
@@ -139,7 +143,6 @@
                         scope.displaySearch = false;
                         if (scope.lesson) {
                             scope.lesson.previousLessonsLoaded = false;
-                            //scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                         }
                     };
 

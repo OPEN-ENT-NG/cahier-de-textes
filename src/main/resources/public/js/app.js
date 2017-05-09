@@ -2148,7 +2148,9 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     $scope.children = model.childs;
                     SubjectService.getCustomSubjects(model.me.structures[0], model.isUserTeacher()).then(function (subjects) {
                         model.subjects.all = [];
-                        model.subjects.addRange(subjects);
+                        if (subjects) {
+                            model.subjects.addRange(subjects);
+                        }
                     }).then(function () {
                         //model.audiences.syncAudiences(function() {
                         decrementCountdown(bShowTemplates, cb);
@@ -3916,11 +3918,11 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     scope.displaySearch = false;
 
                     // init suggested subjects with all subjects
-                    scope.suggestedSubjects = new Array();
+                    scope.suggestedSubjects = [];
 
                     // custom subject collection
                     // containing base subject collection + current ones being created by used
-                    var subjects = new Array();
+                    var subjects = [];
 
                     model.subjects.all.forEach(function (subject) {
                         subjects.push(subject);
@@ -3956,7 +3958,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         }
                     };
                     scope.$watch('lesson.audience.structureId', function () {
-                        if (scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
+                        if (scope.ngModel && scope.lesson && scope.lesson.audience && scope.lesson.audience.structureId) {
                             scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
                         }
                     });
@@ -3965,6 +3967,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
+                        }
+
+                        if (!scope.ngModel && scope.lesson.subjectLabel) {
+                            setNewSubject(scope.lesson.subjectLabel);
                         }
                     };
 
@@ -4024,7 +4030,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         scope.displaySearch = false;
                         if (scope.lesson) {
                             scope.lesson.previousLessonsLoaded = false;
-                            //scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
                         }
                     };
 

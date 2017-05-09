@@ -121,7 +121,9 @@
                     $scope.children = model.childs;
                     SubjectService.getCustomSubjects(model.me.structures[0],model.isUserTeacher()).then((subjects)=>{
                         model.subjects.all=[];
-                        model.subjects.addRange(subjects);
+                        if(subjects){
+                          model.subjects.addRange(subjects);                          
+                        }
                     }).then(()=>{
                         //model.audiences.syncAudiences(function() {
                             decrementCountdown(bShowTemplates, cb);
