@@ -6790,8 +6790,7 @@ model.build = function () {
 
     /** Converts sql pedagogic item to js data */
     sqlToJsPedagogicItem = function sqlToJsPedagogicItem(data) {
-        console.warn("deprecated");
-        return;
+        //TODO use service
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
@@ -7204,6 +7203,9 @@ model.initSubjects = function () {
 
     model.pedagogicDays.forEach(function (pedagogicDay) {
         pedagogicDay.pedagogicItemsOfTheDay.forEach(function (pedagogicItem) {
+            if (!pedagogicItem) {
+                return;
+            }
             var subjectName = pedagogicItem.subject;
             if (!_.contains(subjects, subjectName)) {
                 subjects.push(subjectName);

@@ -814,8 +814,7 @@ model.build = function () {
 
     /** Converts sql pedagogic item to js data */
     sqlToJsPedagogicItem = function (data) {
-        console.warn("deprecated");
-        return ;
+        //TODO use service
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
@@ -958,7 +957,7 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         if (newItem.subject){
             lesson.subject = newItem.subject;
         }
-                
+
     }
     // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
     else {
@@ -1236,6 +1235,9 @@ model.initSubjects = function () {
 
     model.pedagogicDays.forEach(function(pedagogicDay) {
         pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItem) {
+          if (!pedagogicItem){
+            return;
+          }
             var subjectName = pedagogicItem.subject;
             if (!_.contains(subjects, subjectName)) {
                 subjects.push(subjectName);
