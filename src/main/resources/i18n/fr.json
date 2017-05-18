@@ -155,5 +155,12 @@
   "diary.attachments.delete": "Supprimer la pièce jointe",
   "diary.attachments.download": "Télécharger la pièce jointe",
   "description.see": "aperçu",
-  "description.edit": "éditer"
+  "description.edit": "éditer",
+  "diary.model.week.title" : "Semaine Modèle",
+  "diary.model.week.choice.a" : "Positionner comme semaine modèle A",
+  "diary.model.week.choice.b" : "Positionner comme semaine modèle B",
+  "diary.model.week.invert" : "Inverser semaine modèle A et B",
+  "diary.actual" : "Actuel",
+  "diary.model.week.invert.effective" : "L'inversion de semaine A et B est effective",
+  "diary.model.week.choice.effective" : "La semaine courante a été séléctionnée pour être la semaine modèle "
 }

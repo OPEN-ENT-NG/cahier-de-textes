@@ -19,7 +19,9 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import java.awt.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.entcore.common.sql.SqlResult.*;
 
@@ -163,8 +165,26 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getAllHomeworksForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getHomeworks(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, handler);
+    public void getAllHomeworksForParent(final String userId, final String childId,final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+
+
+        diaryService.listGroupsFromChild(Arrays.asList(childId), new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                        String groupId  = ((Map<String,String>)result).get("groupId");
+                        memberIds.add(groupId);
+                    }
+                    getHomeworks(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, handler);
+                } else {
+                    log.error("Teacher couldn't be retrieved or created.");
+                    handler.handle(event.left());
+                }
+            }
+        });
+
+
     }
 
     @Override

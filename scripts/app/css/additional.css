@@ -1,3 +1,6 @@
+.right{
+  float:right;
+}
 ul {
     list-style-type: none;
     margin-top: 0;

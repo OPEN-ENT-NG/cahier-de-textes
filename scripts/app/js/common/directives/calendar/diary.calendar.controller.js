@@ -5,7 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout,$window,$element,$location,AudienceService, SubjectService ) {
+        function controller($scope,$timeout,$window,$element,$location,AudienceService, SubjectService, SecureService,constants ) {
             // use controllerAs practice
             var vm = this;
 
@@ -19,8 +19,9 @@
                 vm.display = {
                     editItem: false,
                     createItem: false,
-                    readonly: $scope.readOnly
+                    readonly: false//!SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)
                 };
+
 
                 /**
                  * Used to know if user clicked on calendar event
@@ -139,6 +140,8 @@
 
                 item.calendarGutter = calendarGutter;
             };
+
+
 
 
 
@@ -355,14 +358,28 @@
                     if(item.data && item.data.roomLabels && item.data.roomLabels.length>0){
                         $scope.newItem.room = item.data.roomLabels[0];
                     }
-                    //get subject
-                    if (item.data && item.data.subject && item.data.subject.subjectId){
-                        $scope.newItem.subject = _.find(model.subjects.all,(subject)=>{
-                            return subject.originalsubjectid === item.data.subject.subjectId;
-                        });
-                        if (!$scope.newItem.subject){                          
-                          item.data.subject.teacher_id = model.me.userId;
-                          $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
+
+
+                    if (item.data && item.data.subject){
+                        //when the item comme from modelweek, the subject is already the good subject
+                        //but if not, we need to grab the good subject object with the good id
+                        // from EDT-UDT
+                        if ( item.data.subject.subjectId){
+                            $scope.newItem.subject = _.find(model.subjects.all,(subject)=>{
+                                return subject.originalsubjectid === item.data.subject.subjectId;
+                            });
+                            if (!$scope.newItem.subject){
+
+                              item.data.subject.teacher_id = model.me.userId;
+
+                              $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
+
+                            }
+                        }else{
+                            //data from modelweek
+                            if ( item.data.subject.id){
+                                $scope.newItem.subject = item.data.subject;                                
+                            }
                         }
                     }
                     vm.calendar.newItem = $scope.newItem;

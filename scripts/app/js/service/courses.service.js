@@ -6,7 +6,7 @@
     * used to manipulate Course model
     */
     class CourseService {
-        constructor($http,$q,constants,SubjectService) {           
+        constructor($http,$q,constants,SubjectService) {
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
@@ -26,22 +26,26 @@
              });
         }
 
+        mappCourse(course){
+          course.date = moment(course.startDate);
+          course.date.week(model.calendar.week);
+          //course.beginning = moment(course.startDate);
+          //course.end = moment(course.endDate);
+          course.startMoment = moment(course.startDate);
+          course.endMoment = moment(course.endDate);
+
+          course.startTime = moment(course.startDate).format('HH:mm:ss');
+          course.endTime = moment(course.endDate).format('HH:mm:ss');
+          course.calendarType = "shadow";
+          course.locked=true;
+          course.is_periodic =false;
+          course.notShowOnCollision=true;
+        }
+
         mappingCourses(courses,subjects){
             _.each(courses,course =>{
                 course.subject = subjects[course.subjectId];
-                course.date = moment(course.startDate);
-                course.date.week(model.calendar.week);
-                //course.beginning = moment(course.startDate);
-                //course.end = moment(course.endDate);
-                course.startMoment = moment(course.startDate);
-                course.endMoment = moment(course.endDate);
-
-                course.startTime = moment(course.startDate).format('HH:mm:ss');
-                course.endTime = moment(course.endDate).format('HH:mm:ss');
-                course.calendarType = "shadow";
-                course.locked=true;
-                course.is_periodic =false;
-                course.notShowOnCollision=true;
+                this.mappCourse(course);
             });
             return courses;
         }

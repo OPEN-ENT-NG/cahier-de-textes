@@ -1,5 +1,7 @@
 package fr.openent.diary.utils;
 
+import org.vertx.java.core.json.impl.Json;
+
 /**
  * Created by a629001 on 13/04/2016.
  * Basic utility classs for string objects
@@ -26,5 +28,13 @@ public class StringUtils {
      */
     public static boolean isValidIdentifier(String uuid) {
         return uuid != null && uuid.matches(UUID_REGEX);
+    }
+
+    public static String encodeJson(Object obj){
+        if (obj == null){
+            return "";
+        }else{
+            return Json.encode(obj);
+        }
     }
 }

@@ -73,7 +73,7 @@
 
             result.id = null;
             result.school_id = subject.school_id;
-            result.label = subject.subjectLabel;
+            result.label = subject.subjectLabel;            
             result.originalsubjectid = subject.subjectId;
             result.teacher_id = subject.teacher_id;
             return result;

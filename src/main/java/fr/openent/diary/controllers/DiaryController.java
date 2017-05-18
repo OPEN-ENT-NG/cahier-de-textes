@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.model.ModelWeek;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
@@ -26,6 +27,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Json;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
@@ -354,4 +356,6 @@ public class DiaryController extends BaseController {
             }
         );
     }
+
+
 }

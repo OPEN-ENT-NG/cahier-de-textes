@@ -27,13 +27,13 @@
 
                 //add watch on selection
                 $scope.$watch('lesson.audience',()=>{
-                    if($scope.lesson.previousLessons){
+                    if($scope.lesson && $scope.lesson.previousLessons){
                         $scope.loadPreviousLessonsFromLesson($scope.lesson);
                     }
                 });
                 //add watch on selection
                 $scope.$watch('lesson.subject',()=>{
-                    if ($scope.lesson.previousLessons){
+                    if ($scope.lesson && $scope.lesson.previousLessons){
                         $scope.loadPreviousLessonsFromLesson($scope.lesson);
                     }
                 });
@@ -171,7 +171,7 @@
                 });
             };
 
-            $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {                
+            $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
                 if (currentLesson.allPreviousLessonsLoaded || currentLesson.previousLessonsLoading){
                     return;
                 }

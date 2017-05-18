@@ -4,6 +4,7 @@ import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.collections.Joiner;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -19,6 +20,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
@@ -499,6 +501,14 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         query.append(" UNION ");
         query.append(" match (mg:ManualGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) where s.id={id} return mg.id as groupId, mg.name as groupName ");
         JsonObject params = new JsonObject().putString("id", schoolId).putString("id", schoolId);
+        neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler){
+        StringBuilder query = new StringBuilder("");
+        query.append("MATCH (n:User) - [IN] -> (g:Group) where n.id IN {id} RETURN g.id as groupId ");
+        JsonObject params = new JsonObject().putArray("id",new JsonArray(childIds.toArray()));
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 }

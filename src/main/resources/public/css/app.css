@@ -1,3 +1,6 @@
+.right{
+  float:right;
+}
 ul {
     list-style-type: none;
     margin-top: 0;
@@ -1018,6 +1021,27 @@ div.theopener {
 i.external-link:before{
     content:'\e8aa';
 }
+
+/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+.select-list select-list {
+  margin-left: 30px; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  .select-list select-list.button .selected-value {
+    border-bottom: none; }
+  /* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  .select-list select-list.button opt {
+    padding: 6px 10px; }
+    /* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+    .select-list select-list.button opt i {
+      padding-right: 6px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.reservation:before {
+  content: "\e80e"; }
+
+/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.arrows-cw:before {
+  content: "\e874"; }
 
 /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
 .tooltip.hidden {

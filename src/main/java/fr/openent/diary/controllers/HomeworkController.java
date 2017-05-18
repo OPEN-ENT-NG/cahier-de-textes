@@ -66,6 +66,7 @@ public class HomeworkController extends ControllerHelper {
         actionsForAutomaticSharing = new ArrayList<String>(Arrays.asList(sharing_action_read, sharing_action_list, sharing_action_list_by_lesson));
     }
 
+
     @Get("/homework/:id")
     @ApiDoc("Get a homework using its identifier")
     @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
@@ -137,7 +138,7 @@ public class HomeworkController extends ControllerHelper {
                             if (user.getGroupsIds() != null) {
                                 memberIds.addAll(user.getGroupsIds());
                             }
-                            homeworkService.getAllHomeworksForParent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForParent(user.getUserId(), childId,Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
                             homeworkService.getAllHomeworksForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));

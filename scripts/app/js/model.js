@@ -843,7 +843,7 @@ model.build = function () {
             item.dayOfWeek = moment(data.day).format("dddd");
         }
         return item;
-    }
+    };
 };
 
 /**

@@ -13,6 +13,8 @@ public final class DateUtils {
 
     public final static String DATE_FORMAT ="yyyy-MM-dd";
     public final static String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
+    public final static String DATE_FORMAT_SQL = "yyyy-MM-dd HH:mm:ss";
+
 
     private DateUtils()  {}
 
@@ -39,5 +41,21 @@ public final class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 0);
 
         return cal.getTime();
+    }
+
+    public static String formatDateSql(Date dateToParse) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_SQL);
+        return dateFormat.format(dateToParse);
+    }
+
+    public static Date parseDateSql(String dateToParse) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_SQL);
+        return dateFormat.parse(dateToParse);
+    }
+
+
+    public static String formatDate(Date dateToParse) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        return dateFormat.format(dateToParse);
     }
 }

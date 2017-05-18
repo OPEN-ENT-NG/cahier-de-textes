@@ -57,4 +57,12 @@ public interface DiaryService {
      * @param handler
      */
     void listGroups(final String schoolId, final Handler<Either<String, JsonArray>> handler);
+
+
+    /**
+     * get all groups id from a user
+     * @param childIds
+     * @param handler
+     */
+    void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler);
 }

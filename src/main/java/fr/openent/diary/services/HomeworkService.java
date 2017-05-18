@@ -36,7 +36,7 @@ public interface HomeworkService {
      * @param endDate ending date of the period from which to retrieve the homework.
      * @param handler
      */
-    void getAllHomeworksForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllHomeworksForParent(final String userId,  final String childId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
     /**
      * Retrieves all homework for a Student's context.

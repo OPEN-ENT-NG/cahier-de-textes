@@ -136,12 +136,14 @@ var AngularExtensions = {
     //controller declaration
     module.value("constants", {
       CAL_DATE_PATTERN: "YYYY-MM-DD",
+      CAL_DATE_PATTERN_NG: "dd-MM-yyyy",
       LONG_DATE_PATTERN: 'YYYY-MM-DD hh:mm:ss',
       RIGHTS: {
         CREATE_LESSON: 'diary.createLesson',
         VIEW: 'diary.view',
         CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
-        CREATE_FREE_HOMEWORK: 'diary.createFreeHomework'
+        CREATE_FREE_HOMEWORK: 'diary.createFreeHomework',
+        MANAGE_MODEL_WEEK: 'diary.manageModelWeek'
       }
     });
   });
@@ -187,7 +189,7 @@ var AngularExtensions = {
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope, $timeout, $window, $element, $location, AudienceService, SubjectService) {
+        function controller($scope, $timeout, $window, $element, $location, AudienceService, SubjectService, SecureService, constants) {
             // use controllerAs practice
             var vm = this;
 
@@ -201,7 +203,7 @@ var AngularExtensions = {
                 vm.display = {
                     editItem: false,
                     createItem: false,
-                    readonly: $scope.readOnly
+                    readonly: false //!SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)
                 };
 
                 /**
@@ -522,14 +524,26 @@ var AngularExtensions = {
                     if (item.data && item.data.roomLabels && item.data.roomLabels.length > 0) {
                         $scope.newItem.room = item.data.roomLabels[0];
                     }
-                    //get subject
-                    if (item.data && item.data.subject && item.data.subject.subjectId) {
-                        $scope.newItem.subject = _.find(model.subjects.all, function (subject) {
-                            return subject.originalsubjectid === item.data.subject.subjectId;
-                        });
-                        if (!$scope.newItem.subject) {
-                            item.data.subject.teacher_id = model.me.userId;
-                            $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
+
+                    if (item.data && item.data.subject) {
+                        //when the item comme from modelweek, the subject is already the good subject
+                        //but if not, we need to grab the good subject object with the good id
+                        // from EDT-UDT
+                        if (item.data.subject.subjectId) {
+                            $scope.newItem.subject = _.find(model.subjects.all, function (subject) {
+                                return subject.originalsubjectid === item.data.subject.subjectId;
+                            });
+                            if (!$scope.newItem.subject) {
+
+                                item.data.subject.teacher_id = model.me.userId;
+
+                                $scope.newItem.subject = SubjectService.mapToDiarySubject(item.data.subject);
+                            }
+                        } else {
+                            //data from modelweek
+                            if (item.data.subject.id) {
+                                $scope.newItem.subject = item.data.subject;
+                            }
                         }
                     }
                     vm.calendar.newItem = $scope.newItem;
@@ -758,7 +772,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
-
+    $scope.constants = constants;
     $scope.RIGHTS = constants.RIGHTS;
 
     $scope.currentErrors = [];
@@ -1830,24 +1844,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         }
     };
 
-    $scope.setChildFilter = function (child, cb) {
-        $scope.children.forEach(function (theChild) {
-            theChild.selected = theChild.id === child.id;
-        });
-
-        child.selected = true;
-        $scope.child = child;
-        model.child = child;
-
-        if (typeof cb === 'function') {
-            cb();
-        }
-    };
-
-    $scope.showCalendarForChild = function (child) {
-        $scope.setChildFilter(child, refreshCalendarCurrentWeek);
-    };
-
     /**
      * Minify the homework panel or not
      * If it's minified, will only show one max homework
@@ -2020,7 +2016,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         //controller declaration
         module.controller("CalendarController", controller);
 
-        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService) {
+        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService, ModelWeekService, SecureService) {
 
             var vm = this;
 
@@ -2204,25 +2200,56 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
+                var p4 = $q.when([]);
                 if (model.isUserTeacher()) {
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        p4 = ModelWeekService.getModelWeeks();
+                    }
                 }
 
-                return $q.all([p1, p2, p3]).then(function (results) {
+                return $q.all([p1, p2, p3, p4]).then(function (results) {
                     var lessons = results[0];
                     var homeworks = results[1];
                     $scope.courses = results[2];
-                    //TODO not a good syntax
-                    model.lessons.all.splice(0, model.lessons.all.length);
-                    model.lessons.addRange(lessons);
+                    $scope.modelWeeks = results[3];
 
-                    model.homeworks.all.splice(0, model.homeworks.all.length);
-                    model.homeworks.addRange(homeworks);
+                    var p = void 0;
+                    if (!$scope.courses || $scope.courses.length === 0) {
+                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
+                            $scope.courses = modelCourses;
+                        });
+                    } else {
+                        p = $q.when();
+                    }
 
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+                    p.then(function () {
+                        model.lessons.all.splice(0, model.lessons.all.length);
+                        model.lessons.addRange(lessons);
+                        model.homeworks.all.splice(0, model.homeworks.all.length);
+                        model.homeworks.addRange(homeworks);
+                        $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+                    });
                 });
             }
+
+            $scope.setChildFilter = function (child, cb) {
+
+                $scope.children.forEach(function (theChild) {
+                    theChild.selected = theChild.id === child.id;
+                });
+
+                child.selected = true;
+                $scope.child = child;
+                model.child = child;
+
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+            };
+
+            $scope.showCalendarForChild = function (child) {
+                $scope.setChildFilter(child);
+            };
 
             var showTemplates = function showTemplates() {
                 template.open('main', 'main');
@@ -2231,8 +2258,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 template.open('create-homework', 'create-homework');
                 template.open('daily-event-details', 'daily-event-details');
                 template.open('daily-event-item', 'daily-event-item');
-                //$scope.showCal = !$scope.showCal;
-                //$scope.$apply();
             };
 
             /**
@@ -2255,6 +2280,22 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
                     $scope.display.bShowHomeworks = true;
                 }
+            };
+
+            $scope.setModel = function (alias) {
+                ModelWeekService.setModelWeek(alias, $scope.mondayOfWeek).then(function (modelWeek) {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                });
+
+                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
+            };
+
+            $scope.invert = function () {
+                ModelWeekService.invertModelsWeek().then(function () {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined).then(function () {
+                        notify.info('diary.model.week.invert.effective');
+                    });
+                });
             };
         }
     });
@@ -2291,13 +2332,13 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
                 //add watch on selection
                 $scope.$watch('lesson.audience', function () {
-                    if ($scope.lesson.previousLessons) {
+                    if ($scope.lesson && $scope.lesson.previousLessons) {
                         $scope.loadPreviousLessonsFromLesson($scope.lesson);
                     }
                 });
                 //add watch on selection
                 $scope.$watch('lesson.subject', function () {
-                    if ($scope.lesson.previousLessons) {
+                    if ($scope.lesson && $scope.lesson.previousLessons) {
                         $scope.loadPreviousLessonsFromLesson($scope.lesson);
                     }
                 });
@@ -3890,11 +3931,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         function directive(SecureService) {
             return {
                 restrict: "A",
-                scope: {
-                    right: '='
-                },
-                link: function link(scope, element) {
-                    SecureService.hasRight(scope.right);
+                link: function link(scope, elem, attrs) {
+                    if (!SecureService.hasRight(attrs.secure)) {
+                        elem[0].remove();
+                    }
                 }
             };
         }
@@ -5448,23 +5488,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
+            key: 'mappCourse',
+            value: function mappCourse(course) {
+                course.date = moment(course.startDate);
+                course.date.week(model.calendar.week);
+                //course.beginning = moment(course.startDate);
+                //course.end = moment(course.endDate);
+                course.startMoment = moment(course.startDate);
+                course.endMoment = moment(course.endDate);
+
+                course.startTime = moment(course.startDate).format('HH:mm:ss');
+                course.endTime = moment(course.endDate).format('HH:mm:ss');
+                course.calendarType = "shadow";
+                course.locked = true;
+                course.is_periodic = false;
+                course.notShowOnCollision = true;
+            }
+        }, {
             key: 'mappingCourses',
             value: function mappingCourses(courses, subjects) {
+                var _this2 = this;
+
                 _.each(courses, function (course) {
                     course.subject = subjects[course.subjectId];
-                    course.date = moment(course.startDate);
-                    course.date.week(model.calendar.week);
-                    //course.beginning = moment(course.startDate);
-                    //course.end = moment(course.endDate);
-                    course.startMoment = moment(course.startDate);
-                    course.endMoment = moment(course.endDate);
-
-                    course.startTime = moment(course.startDate).format('HH:mm:ss');
-                    course.endTime = moment(course.endDate).format('HH:mm:ss');
-                    course.calendarType = "shadow";
-                    course.locked = true;
-                    course.is_periodic = false;
-                    course.notShowOnCollision = true;
+                    _this2.mappCourse(course);
                 });
                 return courses;
             }
@@ -5744,6 +5791,101 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
         module.service("LessonService", LessonService);
+    });
+})();
+
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    var ModelWeekService = function () {
+        function ModelWeekService($http, $q, constants, CourseService) {
+            _classCallCheck(this, ModelWeekService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+            this.CourseService = CourseService;
+        }
+
+        _createClass(ModelWeekService, [{
+            key: "setModelWeek",
+            value: function setModelWeek(alias, date) {
+                var dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
+                var url = "/diary/modelweek/" + alias + "/" + dateParam;
+                return this.$http.post(url);
+            }
+        }, {
+            key: "getModelWeeks",
+            value: function getModelWeeks() {
+                var url = "/diary/modelweek/list";
+                return this.$http.get(url).then(function (result) {
+                    var modelWeeks = result.data;
+                    _.each(modelWeeks, function (modelWeek) {
+                        modelWeek.startDate = moment(modelWeek.startDate).toDate();
+                        modelWeek.endDate = moment(modelWeek.endDate).toDate();
+                    });
+
+                    var transformedResult = {
+                        "A": _.findWhere(modelWeeks, { "weekAlias": "A" }),
+                        "B": _.findWhere(modelWeeks, { "weekAlias": "B" })
+                    };
+                    return transformedResult;
+                });
+            }
+        }, {
+            key: "invertModelsWeek",
+            value: function invertModelsWeek() {
+                var url = "/diary/modelweek/invert";
+                return this.$http.post(url).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: "getCoursesModel",
+            value: function getCoursesModel(date) {
+                var _this = this;
+
+                var dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
+                var url = "/diary/modelweek/items/" + dateParam;
+
+                return this.$http.get(url).then(function (result) {
+                    var courses = result.data;
+                    if (!courses) {
+                        courses = [];
+                    }
+                    _this.mappModelWeekToCourse(courses);
+                    return courses;
+                });
+            }
+        }, {
+            key: "mappModelWeekToCourse",
+            value: function mappModelWeekToCourse(courses) {
+                var _this2 = this;
+
+                _.each(courses, function (course) {
+                    course.startDate = moment(course.startDate);
+                    course.endDate = moment(course.endDate);
+                    _this2.CourseService.mappCourse(course);
+                    course.subject = model.subjects.findWhere({ id: course.subjectId });
+                    course.subject.subjectLabel = course.subjectLabel;
+                    course.subjectId = course.subjectId;
+                });
+
+                return courses;
+            }
+        }]);
+
+        return ModelWeekService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("ModelWeekService", ModelWeekService);
     });
 })();
 

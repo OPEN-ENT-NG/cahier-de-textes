@@ -5,7 +5,7 @@
         //controller declaration
         module.controller("CalendarController", controller);
 
-        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService) {
+        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService,ModelWeekService, SecureService) {
 
             var vm = this;
 
@@ -193,6 +193,8 @@
                     model.child ? model.child.id : undefined);
             };
 
+
+
             function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
 
                 var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
@@ -200,25 +202,58 @@
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
+                var p4 = $q.when([]);
                 if (model.isUserTeacher()){
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)){
+                        p4 = ModelWeekService.getModelWeeks();
+                    }
                 }
 
-                return $q.all([p1, p2, p3]).then(results => {
+                return $q.all([p1, p2, p3,p4]).then(results => {
                     let lessons = results[0];
                     let homeworks = results[1];
                     $scope.courses = results[2];
-                    //TODO not a good syntax
-                    model.lessons.all.splice(0, model.lessons.all.length);
-                    model.lessons.addRange(lessons);
+                    $scope.modelWeeks = results[3];
 
-                    model.homeworks.all.splice(0, model.homeworks.all.length);
-                    model.homeworks.addRange(homeworks);
+                    let p;
+                    if (!$scope.courses || $scope.courses.length === 0){
+                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses)=>{
+                            $scope.courses = modelCourses;
+                        });
+                    }else{
+                        p = $q.when();
+                    }
 
-                    $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+                    p.then(()=>{
+                        model.lessons.all.splice(0, model.lessons.all.length);
+                        model.lessons.addRange(lessons);
+                        model.homeworks.all.splice(0, model.homeworks.all.length);
+                        model.homeworks.addRange(homeworks);
+                        $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+                    });
                 });
             }
+
+
+            $scope.setChildFilter = function(child, cb){
+
+                $scope.children.forEach(function(theChild){
+                    theChild.selected = (theChild.id === child.id);
+                });
+
+                child.selected = true;
+                $scope.child = child;
+                model.child = child;
+
+                 refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+            };
+
+            $scope.showCalendarForChild = function (child) {
+                $scope.setChildFilter(child);
+            };
+
 
             var showTemplates = function() {
                 template.open('main', 'main');
@@ -227,8 +262,6 @@
                 template.open('create-homework', 'create-homework');
                 template.open('daily-event-details', 'daily-event-details');
                 template.open('daily-event-item', 'daily-event-item');
-                //$scope.showCal = !$scope.showCal;
-                //$scope.$apply();
             };
 
             /**
@@ -253,6 +286,27 @@
                 }
             };
 
+            $scope.setModel = function(alias) {
+                ModelWeekService.setModelWeek(alias,$scope.mondayOfWeek).then((modelWeek)=>{
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(),
+                        $scope.mondayOfWeek,
+                        model.isUserParent,
+                        model.child ? model.child.id : undefined);
+                });
+
+                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
+            };
+
+            $scope.invert = function() {
+                ModelWeekService.invertModelsWeek().then(()=>{
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(),
+                        $scope.mondayOfWeek,
+                        model.isUserParent,
+                        model.child ? model.child.id : undefined).then(()=>{
+                            notify.info('diary.model.week.invert.effective');
+                        });
+                });
+            };
 
         }
     });

@@ -8,12 +8,11 @@
         function directive(SecureService) {
             return {
                 restrict: "A",
-                scope: {
-                    right : '='
+                link : function(scope,elem,attrs){
+                    if(!SecureService.hasRight(attrs.secure)){
+                        elem[0].remove();
+                     }
                 },
-                link: function(scope, element) {
-                    SecureService.hasRight(scope.right);
-                }
             };
         }
     });

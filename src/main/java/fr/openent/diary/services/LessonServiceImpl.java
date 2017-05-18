@@ -53,6 +53,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
 
+
+
     /**
      * Retrieves all lessons for a context.
      * @param ctx User context (student/teacher/none)
@@ -84,6 +86,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, ")
+                    .append(" s.original_subject_id as original_subject_id , ")
                     .append(" att.attachments, ")
                     .append(homeworkAggregate.toString())
                     .append(" FROM diary.lesson AS l")
@@ -107,10 +110,11 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     parameters.add(Sql.parseId(schoolId));
                 }
             }
-                    query.append(" AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
-                    .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
-                    .append(" WHERE l.id = ls.resource_id")
-                    .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
+
+            query.append(" AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
+            .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
+            .append(" WHERE l.id = ls.resource_id")
+            .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
 
 
             for (String memberId: memberIds) {
@@ -150,8 +154,24 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
     @Override
-    public void getAllLessonsForParent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, handler);
+    public void getAllLessonsForParent(final String userId, final String childId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+
+        diaryService.listGroupsFromChild(Arrays.asList(childId), new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                        String groupId  = ((Map <String,String>)result).get("groupId");
+                        memberIds.add(groupId);
+                    }
+                    getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, handler);
+                } else {
+                    log.error("Teacher couldn't be retrieved or created.");
+                    handler.handle(event.left());
+                }
+            }
+        });
+
     }
 
     @Override

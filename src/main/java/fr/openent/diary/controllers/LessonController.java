@@ -123,7 +123,7 @@ public class LessonController extends ControllerHelper {
                             if (user.getGroupsIds() != null) {
                                 memberIds.addAll(user.getGroupsIds());
                             }
-                            lessonService.getAllLessonsForParent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForParent(user.getUserId(),childId, Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                             break;
                         default:
                             lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
