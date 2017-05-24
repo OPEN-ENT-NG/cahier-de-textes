@@ -1,3 +1,8 @@
+
+ng-include{
+  display: block;
+}
+
 .right{
   float:right;
 }
@@ -1022,16 +1027,20 @@ i.external-link:before{
     content:'\e8aa';
 }
 
-/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+.quick-search.progressiontype {
+  top: 442px; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
 .select-list select-list {
   margin-left: 30px; }
-  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  /* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
   .select-list select-list.button .selected-value {
     border-bottom: none; }
-  /* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
   .select-list select-list.button opt {
     padding: 6px 10px; }
-    /* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+    /* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
     .select-list select-list.button opt i {
       padding-right: 6px; }
 
@@ -1042,6 +1051,48 @@ i.external-link:before{
 /* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .arrows-cw:before {
   content: "\e874"; }
+
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.cog:before {
+  content: "\e854"; }
+
+/* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.left-open:before {
+  content: "\e87b"; }
+
+/* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.left:before {
+  content: "\e84c"; }
+
+/* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.pencil::before {
+  content: '\e858'; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar {
+  width: 8px;
+  background-color: #fffdfd; }
+
+/**  STYLE 11 */
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid #e4e1e1; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: linear-gradient(left, #fff, #e4e4e4);
+  border: 1px solid #c3c2c2; }
+
+/* line 21, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb:hover {
+  background: #fff; }
+
+/* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(left, #22ADD4, #1E98BA); }
 
 /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
 .tooltip.hidden {
@@ -1140,6 +1191,10 @@ Override marging for homeworks display
 .diary-container [resizable] {
   transition: none !important; }
 
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/sortable-list/sortable.scss */
+[diary-sortable-element].animated {
+  transition: margin 0.2s; }
+
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
 .diary-item-calendar {
   display: flex;
@@ -1197,6 +1252,242 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
     /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
     div.schedule .schedule-items .schedule-item .schedule-item-content > div.dragin {
       padding: 3px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.progression-manager {
+  width: 100%; }
+  /* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .search-row {
+    padding: 8px 25px; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager form {
+    position: relative; }
+    /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager form .edit-button {
+      padding: 5px;
+      right: 5px;
+      position: absolute;
+      cursor: pointer;
+      z-index: 1;
+      font-size: 1.5em; }
+  /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework > div {
+    margin-top: 15px; }
+  /* line 21, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework i {
+    color: rgba(1, 1, 1, 0.5);
+    padding-left: 15px; }
+  /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework .homework-title {
+    font-weight: bold; }
+  /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework .homework-type {
+    font-size: 0.95em;
+    font-style: italic; }
+  /* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-icon-homeworks {
+    color: #7bbcf0; }
+  /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .create-content {
+    position: absolute;
+    right: 0px;
+    top: -50px; }
+  /* line 43, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-day-container .pedagogic-day-card {
+    display: flex;
+    align-items: stretch; }
+    /* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card div {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column; }
+    /* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .thumbnail {
+      width: 25%;
+      font-size: 0.75em;
+      overflow: hidden;
+      text-align: center;
+      padding: 0px; }
+    /* line 62, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .summary {
+      margin: 0px;
+      align-self: center;
+      text-align: left;
+      padding: 0px 5px;
+      width: 60%;
+      font-size: 0.85em; }
+    /* line 70, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .indicator {
+      align-self: center;
+      text-align: right;
+      width: 15%;
+      text-align: center;
+      padding: 0px; }
+
+/* line 81, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.content-not-found {
+  font-size: 2em;
+  color: #2a9cc8;
+  text-align: center;
+  vertical-align: middle; }
+  /* line 86, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found div {
+    padding: 10px 100px;
+    line-height: 1.5em; }
+  /* line 90, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found i {
+    position: relative;
+    top: 10px;
+    font-size: 2.2em;
+    margin-right: 10px; }
+  /* line 96, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found button {
+    margin: 15px auto;
+    float: none; }
+
+/* line 102, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.new-progression {
+  margin: 0px 0px 15px 15px;
+  background-color: #7bbcf0;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 3px; }
+  /* line 109, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression .row {
+    margin-top: 15px; }
+  /* line 112, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression div.six.cell, .new-progression div.twelve.cell {
+    padding: 5px 10px; }
+    /* line 113, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression div.six.cell label, .new-progression div.twelve.cell label {
+      text-decoration: underline; }
+  /* line 118, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression textarea {
+    border-radius: 3px;
+    background-color: #7bbcf0; }
+    /* line 121, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7); }
+    /* line 124, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea {
+      color: white; }
+    /* line 127, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea:focus {
+      outline: none;
+      border-left: 1px solid #DDD;
+      border-right: 1px solid #DDD;
+      border-top: 1px solid #DDD;
+      border-bottom: 2px solid #FF8500; }
+  /* line 135, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression input {
+    width: 100%; }
+    /* line 137, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression input::placeholder {
+      color: rgba(255, 255, 255, 0.7); }
+    /* line 141, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression input[type=text] {
+      color: white; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .search-progression {
+  background-color: #ddd; }
+  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .search-progression button {
+    width: 26px;
+    height: 26px;
+    padding: 0px;
+    margin-right: 5px; }
+    /* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .progressiontype .search-progression button i {
+      font-size: 1.6em;
+      padding: 0px; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .search-progression input {
+    width: calc(100% - 45px); }
+
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .content {
+  float: left;
+  height: 422px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 8px; }
+  /* line 26, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content.content-lesson {
+    height: 378px; }
+  /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content a:hover article {
+    border-left: 4px solid #FF8500; }
+  /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content a article {
+    transition: border-left 0.1s;
+    padding: 10px; }
+
+/* line 42, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .pedagogic-day-card {
+  position: relative;
+  height: 42px; }
+  /* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card:hover {
+    opacity: 0.8; }
+  /* line 48, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card .thumbnail {
+    box-sizing: border-box;
+    padding: 6px 0px;
+    font-size: 0.8em;
+    width: 22px; }
+  /* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card .summary {
+    padding: 9px 4px 9px 6px;
+    color: white;
+    font-size: 0.75em;
+    width: calc(100% - 22px); }
+
+/* line 63, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.contener-slide {
+  position: relative;
+  float: left;
+  width: 100%;
+  overflow: hidden;
+  height: 432px; }
+  /* line 69, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .contener-slide .slide {
+    top: 0px;
+    transition: left .3s;
+    position: absolute;
+    float: left;
+    left: 0%;
+    width: 100%; }
+    /* line 76, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .contener-slide .slide.left-slide {
+      left: -100%; }
+    /* line 79, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .contener-slide .slide.right-slide {
+      left: 100%; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel.quick-search {
+  z-index: 0; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .sum-selected > span:first-child {
+  max-width: calc(100% - 40px);
+  overflow: hidden;
+  display: block;
+  white-space: nowrap; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .sum-selected > span:nth-child(2) {
+  position: absolute;
+  display: block;
+  top: 8px;
+  right: 2px; }
+
+/* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .right-panel .quick-search-results {
+  width: 100%;
+  margin-top: 10px; }
 
 
 /*# sourceMappingURL=app.css.map*/

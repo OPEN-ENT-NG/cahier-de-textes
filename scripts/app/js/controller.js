@@ -13,7 +13,7 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants) {
+function DiaryController($scope, $rootScope,template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
@@ -30,6 +30,9 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         createLesson: 'lesson'
     };
 
+    $rootScope.redirect = function (path) {
+        $location.path(path);
+    };
     $scope.lessonDescriptionIsReadOnly = false;
     $scope.homeworkDescriptionIsReadOnly = false;
 
@@ -108,8 +111,10 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
 
     initAudiences();
     route({
+        progressionManagerView: function (params) {
+            template.open('main', 'progression-manager');
+        },
         createLessonView: function (params) {
-
                 $scope.lesson = null;
                 $scope.lessonDescriptionIsReadOnly = false;
                 $scope.homeworkDescriptionIsReadOnly = false;
@@ -502,15 +507,15 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
         }
 
         if (selectedLesson) {
-            $scope.redirect('/editLessonView/' + selectedLesson.id + '/');
+            $rootScope.redirect('/editLessonView/' + selectedLesson.id + '/');
         } else if (selectedHomework) {
             // open lesson view if homework is attached to a lesson
             if (selectedHomework.lesson_id) {
                 // set default tab to homework tab
                 $scope.tabs.createLesson = 'homeworks';
-                $scope.redirect('/editLessonView/' + selectedHomework.lesson_id + '/' + selectedHomework.id);
+                $rootScope.redirect('/editLessonView/' + selectedHomework.lesson_id + '/' + selectedHomework.id);
             } else {
-                $scope.redirect('/editHomeworkView/' + selectedHomework.id);
+                $rootScope.redirect('/editHomeworkView/' + selectedHomework.id);
             }
         }
     };
@@ -1028,9 +1033,7 @@ function DiaryController($scope, template, model, route, $location, $window,Cour
     };
 
 
-    $scope.redirect = function (path) {
-        $location.path(path);
-    };
+
 
     $scope.getPedagogicItemSelectedCount = function () {
         return $scope.getSelectedPedagogicItems('lesson').length + $scope.getSelectedPedagogicItems('homework').length;

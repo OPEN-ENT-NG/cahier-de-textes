@@ -5,8 +5,10 @@
         //controller declaration
         module.controller("QuickSearchController", controller);
 
-        function controller($scope, PedagogicItemService) {
+        function controller($scope,$rootScope, PedagogicItemService) {
             var vm = this;
+
+            let id = Date.now();
             /**
              * Number of items displayed by default
              * @type {number}
@@ -81,6 +83,15 @@
                 $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
             }
 
+            $scope.$on('rightpanel.open',function(_,rightpanelid){
+                if (id !== rightpanelid && $scope.panelVisible){
+                    $scope.setPanelVisible(false,{
+                        target : {
+                            type : "text"
+                        }
+                    });
+                }
+            });
 
             $scope.setPanelVisible = function(isVisible, $event) {
                 if (!$event.target || $event.target.type !== "text") {
@@ -110,6 +121,8 @@
                     if (isVisible) {
                         $('#mainDiaryContainer').width('84%');
                         $('.quick-search').width('16%');
+                        $rootScope.$broadcast('rightpanel.open',id);
+
                     } else {
                         $('#mainDiaryContainer').width('97%');
                         $('.quick-search').width('2%');
@@ -212,7 +225,7 @@
 
 
                 $scope.performPedagogicItemSearch(params,model.isUserTeacher());
-                 
+
             };
 
             /*

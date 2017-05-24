@@ -161,6 +161,8 @@
   "diary.model.week.choice.b" : "Positionner comme semaine modèle B",
   "diary.model.week.invert" : "Inverser semaine modèle A et B",
   "diary.actual" : "Actuel",
-  "diary.model.week.invert.effective" : "L'inversion de semaine A et B est effective",
-  "diary.model.week.choice.effective" : "La semaine courante a été séléctionnée pour être la semaine modèle "
+  "diary.model.week.invert.effective" : "Les semaines modèle A et B ont été inversées",
+  "diary.model.week.choice.effective" : "La semaine courante a été séléctionnée pour être la semaine modèle ",
+
+  "progression.title" : "Progressions"
 }

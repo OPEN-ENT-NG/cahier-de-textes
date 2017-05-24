@@ -1,5 +1,5 @@
 module.exports = config:
-  plugins:  
+  plugins:
     afterBrunch: [
       'node ./after-brunch.js'
     ]

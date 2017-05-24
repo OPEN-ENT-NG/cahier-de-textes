@@ -6,6 +6,10 @@
         module.config(function($routeProvider) {
             $routeProvider
                 // go to create new lesson view
+                .when('/progressionManagerView', {
+                    action: 'progressionManagerView'
+                })
+                // go to create new lesson view
                 .when('/createLessonView/:timeFromCalendar', {
                     action: 'createLessonView'
                 })

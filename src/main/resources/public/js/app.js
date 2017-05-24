@@ -189,7 +189,7 @@ var AngularExtensions = {
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope, $timeout, $window, $element, $location, AudienceService, SubjectService, SecureService, constants) {
+        function controller($scope, $rootScope, $timeout, $window, $element, $location, AudienceService, SubjectService, SecureService, constants) {
             // use controllerAs practice
             var vm = this;
 
@@ -474,10 +474,6 @@ var AngularExtensions = {
                 vm.itemMouseEvent.lastMouseClientY = $event.clientY;
             };
 
-            $scope.redirect = function (path) {
-                $location.path(path);
-            };
-
             /**
              * Redirect to path only when user is doind a real click.
              * If user is draging item redirect will not be called
@@ -499,7 +495,7 @@ var AngularExtensions = {
                 if (!xMouseMoved && !yMouseMoved || new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime < 300) {
                     // do not redirect to lesson view if user clicked on checkbox
                     if (!($event.target && $event.target.type === "checkbox")) {
-                        $scope.redirect(path);
+                        $rootScope.redirect(path);
                     }
                 } else {
                     //$timeout(vm.refreshCalendar);
@@ -688,6 +684,120 @@ var AngularExtensions = {
     'use strict';
 
     AngularExtensions.addModuleConfig(function (module) {
+        module.directive('diarySortableList', sortableDirective);
+        module.directive('diarySortableElement', sortableElementDirective);
+
+        function sortableDirective($compile) {
+            return {
+                restrict: 'A',
+                controller: function controller() {},
+                compile: function compile(element, attributes, transclude) {
+                    var initialHtml = element.html();
+                    return function (scope, element, attributes) {
+                        scope.updateElementsOrder = function (el) {
+
+                            var sortables = element.find('[diary-sortable-element]');
+                            //sortables.removeClass('animated');
+
+                            var elements = _.sortBy(sortables, function (el) {
+                                return $(el).offset().top;
+                            });
+
+                            _.each(elements, function (item, index) {
+                                var itemScope = angular.element(item).scope();
+                                if (index !== itemScope.ngModel) {
+                                    itemScope.ngModel = index;
+                                }
+                            });
+                            sortables.attr('style', '');
+                            scope.$apply();
+                        };
+                    };
+                }
+            };
+        }
+
+        function sortableElementDirective($parse, $timeout) {
+            return {
+                scope: {
+                    ngModel: '=',
+                    ngChange: '&'
+                },
+                require: '^diarySortableList',
+                template: '<div ng-transclude></div>',
+                transclude: true,
+                link: function link(scope, element, attributes) {
+                    var sortables;
+                    var oldValNgModel = void 0;
+
+                    ui.extendElement.draggable(element, {
+                        lock: {
+                            horizontal: true
+                        },
+                        mouseUp: function mouseUp() {
+                            scope.$parent.updateElementsOrder(element);
+
+                            element.on('click', function () {
+                                scope.$parent.$eval(attributes.ngClick);
+                            });
+
+                            if (typeof scope.ngChange === 'function') {
+                                scope.ngChange();
+                            }
+                        },
+                        startDrag: function startDrag() {
+                            sortables = element.parents('[diary-sortable-list]').find('[diary-sortable-element]');
+                            sortables.attr('style', '');
+                            setTimeout(function () {
+                                sortables.addClass('animated');
+                            }, 20);
+                            element.css({
+                                'z-index': 1000
+                            });
+                            element.width(element.outerWidth());
+                        },
+                        tick: function tick() {
+                            var moved = [];
+                            sortables.each(function (index, sortable) {
+                                if (element[0] === sortable) {
+                                    return;
+                                }
+                                var sortableTopDistance = $(sortable).offset().top - parseInt($(sortable).css('margin-top'));
+                                if (element.offset().top + element.height() / 2 > sortableTopDistance && element.offset().top + element.height() / 2 < sortableTopDistance + $(sortable).height()) {
+                                    $(sortable).css({
+                                        'margin-top': element.height()
+                                    });
+                                    moved.push(sortable);
+                                }
+                                //first widget case
+                                if (element.offset().top + element.height() / 2 - 2 < sortableTopDistance && index === 0) {
+                                    $(sortable).css({
+                                        'margin-top': element.height()
+                                    });
+                                    moved.push(sortable);
+                                }
+                            });
+                            sortables.each(function (index, sortable) {
+                                if (moved.indexOf(sortable) === -1) {
+                                    $(sortable).css({
+                                        'margin-top': 0 + 'px'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
 
         module.directive('diaryTooltip', directive);
 
@@ -768,7 +878,7 @@ var CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, template, model, route, $location, $window, CourseService, AudienceService, LessonService, SecureService, constants) {
+function DiaryController($scope, $rootScope, template, model, route, $location, $window, CourseService, AudienceService, LessonService, SecureService, constants) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
@@ -785,6 +895,9 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         createLesson: 'lesson'
     };
 
+    $rootScope.redirect = function (path) {
+        $location.path(path);
+    };
     $scope.lessonDescriptionIsReadOnly = false;
     $scope.homeworkDescriptionIsReadOnly = false;
 
@@ -861,8 +974,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
     initAudiences();
     route({
+        progressionManagerView: function progressionManagerView(params) {
+            template.open('main', 'progression-manager');
+        },
         createLessonView: function createLessonView(params) {
-
             $scope.lesson = null;
             $scope.lessonDescriptionIsReadOnly = false;
             $scope.homeworkDescriptionIsReadOnly = false;
@@ -1241,15 +1356,15 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         }
 
         if (selectedLesson) {
-            $scope.redirect('/editLessonView/' + selectedLesson.id + '/');
+            $rootScope.redirect('/editLessonView/' + selectedLesson.id + '/');
         } else if (selectedHomework) {
             // open lesson view if homework is attached to a lesson
             if (selectedHomework.lesson_id) {
                 // set default tab to homework tab
                 $scope.tabs.createLesson = 'homeworks';
-                $scope.redirect('/editLessonView/' + selectedHomework.lesson_id + '/' + selectedHomework.id);
+                $rootScope.redirect('/editLessonView/' + selectedHomework.lesson_id + '/' + selectedHomework.id);
             } else {
-                $scope.redirect('/editHomeworkView/' + selectedHomework.id);
+                $rootScope.redirect('/editHomeworkView/' + selectedHomework.id);
             }
         }
     };
@@ -1744,10 +1859,6 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
 
     $scope.addHomeworkToLesson = function (lesson) {
         lesson.addHomework(lesson);
-    };
-
-    $scope.redirect = function (path) {
-        $location.path(path);
     };
 
     $scope.getPedagogicItemSelectedCount = function () {
@@ -2296,6 +2407,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                         notify.info('diary.model.week.invert.effective');
                     });
                 });
+            };
+
+            $scope.redirect = function (path) {
+                $location.path(path);
             };
         }
     });
@@ -3486,8 +3601,10 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
         //controller declaration
         module.controller("QuickSearchController", controller);
 
-        function controller($scope, PedagogicItemService) {
+        function controller($scope, $rootScope, PedagogicItemService) {
             var vm = this;
+
+            var id = Date.now();
             /**
              * Number of items displayed by default
              * @type {number}
@@ -3562,6 +3679,16 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                 $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
             }
 
+            $scope.$on('rightpanel.open', function (_, rightpanelid) {
+                if (id !== rightpanelid && $scope.panelVisible) {
+                    $scope.setPanelVisible(false, {
+                        target: {
+                            type: "text"
+                        }
+                    });
+                }
+            });
+
             $scope.setPanelVisible = function (isVisible, $event) {
                 if (!$event.target || $event.target.type !== "text") {
 
@@ -3590,6 +3717,7 @@ function DiaryController($scope, template, model, route, $location, $window, Cou
                     if (isVisible) {
                         $('#mainDiaryContainer').width('84%');
                         $('.quick-search').width('16%');
+                        $rootScope.$broadcast('rightpanel.open', id);
                     } else {
                         $('#mainDiaryContainer').width('97%');
                         $('.quick-search').width('2%');
@@ -4231,6 +4359,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				});
 				result = result.substring(0, result.length - 1);
 				return result;
+			};
+		}
+	});
+})();
+
+'use strict';
+
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
+		module.filter('maxChar', filter);
+
+		function filter() {
+			return function (item, maxChar) {
+				if (!item) {
+					return item;
+				}
+
+				var dynamicMaxChar = maxChar;
+
+				if (item.indexOf('</div>') < dynamicMaxChar) {
+					dynamicMaxChar = item.indexOf('</div>');
+				}
+				if (item.length < dynamicMaxChar) {
+					return item;
+				} else {
+					return item.substring(0, dynamicMaxChar) + " ...";
+				}
 			};
 		}
 	});
@@ -5256,9 +5413,285 @@ Teacher.prototype.create = function (cb, cbe) {
     'use strict';
 
     AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("ProgressionManagerController", controller);
+
+        function controller($scope, $rootScope) {
+            var vm = this;
+
+            vm.edit = function () {
+                vm.originalProgressionItem = angular.copy(vm.selectedProgressionItem);
+                vm.selectedProgressionItem.edit = true;
+            };
+
+            vm.hasProgressItem = function () {
+                console.log(!!vm.selectedProgressionItem);
+                return vm.selectedProgressionItem === undefined;
+            };
+            vm.cancel = function () {
+                if (vm.selectedProgressionItem.id) {
+                    vm.selectedProgressionItem.title = vm.originalProgressionItem.title;
+                    vm.selectedProgressionItem.level = vm.originalProgressionItem.level;
+                    vm.selectedProgressionItem.description = vm.originalProgressionItem.description;
+                    vm.originalProgressionItem = null;
+                    vm.selectedProgressionItem.edit = false;
+                } else {
+                    vm.selectedProgressionItem = undefined;
+                }
+            };
+            vm.setNewProgression = function () {
+                /*vm.subViewRight ='/diary/public/js/progression/manager/creation-progression-form.template.html';*/
+                vm.selectedProgressionItem = {
+                    edit: true
+                };
+            };
+
+            vm.selectProgression = function (progressionItem) {
+                vm.selectedProgressionItem = progressionItem;
+                progressionItem.edit = false;
+                /*vm.subViewRight ='/diary/public/js/progression/manager/progression-lessons-list.template.html';*/
+            };
+
+            vm.progressionItems = [{
+                id: 1,
+                level: 'seconde',
+                title: 'Physique',
+                description: 'La physique quantique c\'est super cool ',
+                lessonItems: [{
+                    attachments: null,
+                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
+                    audience_label: "6 B",
+                    audience_type: "class",
+                    homework_ids: null,
+                    lesson_annotation: "",
+                    lesson_color: "#CECEF6",
+                    lesson_date: "2017-05-09 00:00:00.000000+0200",
+                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    lesson_end_time: "13:12:00",
+                    lesson_id: 58,
+                    lesson_room: "amphithe",
+                    lesson_start_time: "08:42:00",
+                    lesson_state: "published",
+                    lesson_title: "Scéance 1",
+                    original_subject_id: "32905-1493304352092",
+                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    subject_id: "3",
+                    subject_label: "THEATRE",
+                    teacher_display_name: "Mia BARBIER",
+                    homeworks: [{
+                        attachments: null,
+                        audience_id: "21a3cf28-44fd-49be-ad09-5da6fe0d10dd",
+                        audience_label: "6 A",
+                        audience_type: "class",
+                        homework_color: "#CECEF6",
+                        homework_description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                        homework_due_date: "2017-05-10 00:00:00.000000+0200",
+                        homework_state: "published",
+                        homework_title: "Devoir Maison",
+                        homework_type_id: 1,
+                        homework_type_label: "Devoir Maison",
+                        id: 20,
+                        lesson_id: 57,
+                        school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                        subject_id: "1",
+                        subject_label: "ANGLAIS LV1"
+                    }, {
+                        attachments: null,
+                        audience_id: "21a3cf28-44fd-49be-ad09-5da6fe0d10dd",
+                        audience_label: "6 A",
+                        audience_type: "class",
+                        homework_color: "#CECEF6",
+                        homework_description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                        homework_due_date: "2017-05-10 00:00:00.000000+0200",
+                        homework_state: "published",
+                        homework_title: "Devoir Maison",
+                        homework_type_id: 1,
+                        homework_type_label: "Devoir Maison",
+                        id: 20,
+                        lesson_id: 57,
+                        school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                        subject_id: "1",
+                        subject_label: "ANGLAIS LV1"
+                    }]
+                }, {
+                    attachments: null,
+                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
+                    audience_label: "6 B",
+                    audience_type: "class",
+                    homework_ids: null,
+                    lesson_annotation: "",
+                    lesson_color: "#CECEF6",
+                    lesson_date: "2017-05-09 00:00:00.000000+0200",
+                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    lesson_end_time: "13:12:00",
+                    lesson_id: 58,
+                    lesson_room: "amphithe",
+                    lesson_start_time: "08:42:00",
+                    lesson_state: "published",
+                    lesson_title: "Sceance2",
+                    original_subject_id: "32905-1493304352092",
+                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    subject_id: "3",
+                    subject_label: "THEATRE",
+                    teacher_display_name: "Mia BARBIER"
+                }, {
+                    attachments: null,
+                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
+                    audience_label: "6 B",
+                    audience_type: "class",
+                    homework_ids: null,
+                    lesson_annotation: "",
+                    lesson_color: "#CECEF6",
+                    lesson_date: "2017-05-09 00:00:00.000000+0200",
+                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    lesson_end_time: "13:12:00",
+                    lesson_id: 58,
+                    lesson_room: "amphithe",
+                    lesson_start_time: "08:42:00",
+                    lesson_state: "published",
+                    lesson_title: "Sceance3",
+                    original_subject_id: "32905-1493304352092",
+                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    subject_id: "3",
+                    subject_label: "THEATRE",
+                    teacher_display_name: "Mia BARBIER"
+                }]
+            }, {
+                id: 2,
+                level: 'seconde',
+                title: 'Physique quantique',
+                description: 'La physique quantique c\'est super cool ',
+                lessonItems: [{
+                    attachments: null,
+                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
+                    audience_label: "6 B",
+                    audience_type: "class",
+                    homework_ids: null,
+                    lesson_annotation: "",
+                    lesson_color: "#CECEF6",
+                    lesson_date: "2017-05-09 00:00:00.000000+0200",
+                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    lesson_end_time: "13:12:00",
+                    lesson_id: 58,
+                    lesson_room: "amphithe",
+                    lesson_start_time: "08:42:00",
+                    lesson_state: "published",
+                    lesson_title: "Séance ceci est ma sceamce",
+                    original_subject_id: "32905-1493304352092",
+                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    subject_id: "3",
+                    subject_label: "THEATRE",
+                    teacher_display_name: "Mia BARBIER"
+                }]
+            }];
+
+            vm.saveProgression = function (item) {
+                vm.progressionItems.push(item);
+            };
+
+            vm.saveOrder = function () {
+                console.log("save order");
+            };
+        }
+    });
+})();
+
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("ProgressionRightPanelController", controller);
+
+        function controller($scope, $location) {
+            var vm = this;
+            vm.array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+            $scope.redirect = function (path) {
+                $location.path(path);
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("RightPanelController", controller);
+
+        function controller($scope, $rootScope) {
+            var id = Date.now();
+
+            $scope.panelVisible = false;
+
+            $scope.toggle = function () {
+                if (!$scope.panelVisible) {
+                    $scope.$parent.$$childTail.panelVisible = false;
+                    $scope.$parent.$$childHead.panelVisible = false;
+                    $rootScope.$broadcast('rightpanel.open', id);
+                }
+                $scope.panelVisible = !$scope.panelVisible;
+
+                if ($scope.panelVisible) {
+                    $('#mainDiaryContainer').width('84%');
+                    $('.quick-search').width('16%');
+                } else {
+                    $('#mainDiaryContainer').width('97%');
+                    $('.quick-search').width('2%');
+                }
+            };
+
+            $scope.$on('rightpanel.open', function (_, rightpanelid) {
+                if (id !== rightpanelid && $scope.panelVisible) {
+                    $scope.toggle();
+                }
+            });
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+  'use strict';
+
+  AngularExtensions.addModuleConfig(function (module) {
+    /**
+         * Directive to perform a quick search among lessons and homeworks
+         */
+    module.directive('rightPanel', function () {
+      return {
+        restrict: "E",
+        templateUrl: "/diary/public/js/progression/right-panel/right-panel.html",
+        scope: {
+          label: '@',
+          contentUrl: '='
+        },
+        controller: 'RightPanelController'
+      };
+    });
+  });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
 
         module.config(function ($routeProvider) {
             $routeProvider
+            // go to create new lesson view
+            .when('/progressionManagerView', {
+                action: 'progressionManagerView'
+            })
             // go to create new lesson view
             .when('/createLessonView/:timeFromCalendar', {
                 action: 'createLessonView'

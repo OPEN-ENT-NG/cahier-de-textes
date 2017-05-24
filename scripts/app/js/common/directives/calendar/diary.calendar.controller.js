@@ -5,7 +5,7 @@
 
         module.controller("DiaryCalendarController", controller);
 
-        function controller($scope,$timeout,$window,$element,$location,AudienceService, SubjectService, SecureService,constants ) {
+        function controller($scope,$rootScope,$timeout,$window,$element,$location,AudienceService, SubjectService, SecureService,constants ) {
             // use controllerAs practice
             var vm = this;
 
@@ -306,9 +306,6 @@
                 vm.itemMouseEvent.lastMouseClientY = $event.clientY;
             };
 
-            $scope.redirect = function (path) {
-                $location.path(path);
-            };
 
             /**
              * Redirect to path only when user is doind a real click.
@@ -331,7 +328,7 @@
                 if ((!xMouseMoved && !yMouseMoved) || (new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime) < 300) {
                     // do not redirect to lesson view if user clicked on checkbox
                     if (!($event.target && $event.target.type === "checkbox")) {
-                        $scope.redirect(path);
+                        $rootScope.redirect(path);
                     }
                 }else{
                     //$timeout(vm.refreshCalendar);
@@ -378,7 +375,7 @@
                         }else{
                             //data from modelweek
                             if ( item.data.subject.id){
-                                $scope.newItem.subject = item.data.subject;                                
+                                $scope.newItem.subject = item.data.subject;
                             }
                         }
                     }

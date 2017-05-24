@@ -85,6 +85,9 @@
     <div ng-if="isUserTeacher">
         <quick-search item-type="lesson" class="quick-search lessontype"></quick-search>
         <quick-search item-type="homework" class="quick-search homeworktype"></quick-search>
+        <right-panel label='progression.title'
+            content-url="'/diary/public/js/progression/right-panel/content/main-progression-right-panel.template.html'"
+            class="quick-search progressiontype"></quick-search>
     </div>
 
     <!-- action panel displayed if at least one lesson or homework selected -->

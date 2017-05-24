@@ -308,7 +308,13 @@
                 });
             };
 
+            $scope.redirect = function (path) {
+              $location.path(path);
+            };
+
         }
+
+
     });
 
 
