@@ -1,0 +1,70 @@
+<div>
+
+    <div class="create-content" ng-if="progressionManagerCtrl.selectedProgressionItem.id">
+        <button>
+             + Ajouter un contenu
+        </button>
+    </div>
+
+    <div ng-include="'/diary/public/js/progression/manager/creation-progression-form.template.html'"></div>
+
+    <ul diary-sortable-list>
+        <li diary-sortable-element ng-model="lesson.orderIndex"
+                ng-change="progressionManagerCtrl.saveOrder()"
+                ng-repeat="lesson in progressionManagerCtrl.selectedProgressionItem.lessonItems | orderBy:'orderIndex'">
+            <article class="notification progression-article">
+                <div class="row hover-orange" >
+                    <div class="cell one" >&nbsp;</div>
+                    <div class="cell three" >
+                        <label>[[lesson.subject_label]]</label>
+                    </div>
+                    <div class="cell six">
+                        <label>[[lesson.lesson_title]]</label>
+                    </div>
+                    <div class="cell right-magnet">
+                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier"
+                        ng-class="{'down-open' : lesson.expanded, 'up-open':!lesson.expanded}"></i>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="one cell" style="padding: 5px 0px 0px 20px">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="pedagogicItem.selected"/>
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="ten cell">
+                        <p ng-bind-html="lesson.lesson_description | maxChar:30" ng-if="!lesson.expanded"></p>
+                        <p ng-bind-html="lesson.lesson_description" ng-if="!!lesson.expanded"></p>
+                    </div>
+                    <div class="one cell right progression-icon-homeworks" ng-if="lesson.homeworks.length>0">
+                        [[lesson.homeworks.length]]
+                        <i class="day-card-icon rack2 table-cell-left"></i>
+                    </div>
+                </div>
+                <div class="progression-homework" ng-if="lesson.expanded">
+                    <div class="row" ng-repeat="homework in lesson.homeworks">
+                        <div class="cell one" ><i class="day-card-icon rack2 table-cell-left"></i></div>
+                        <div class="cell ten" >
+                            <div class="homework-title">
+                                <label>[[homework.homework_title]]</label>
+                                <i ng-click="homework.expanded=!homework.expanded" diary-tooltip="Déplier"
+                                    ng-class="{'down-open' : homework.expanded, 'up-open':!homework.expanded}"></i>
+                            </div>
+                            <div class="homework-type">
+                                <label>[[homework.homework_type_label]]</label>
+                            </div>
+                            <div class="homework-description">
+                                <p ng-bind-html="homework.homework_description | maxChar:30" ng-if="!homework.expanded"></p>
+                                <p ng-bind-html="homework.homework_description" ng-if="!!homework.expanded"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </li>
+        <p ng-if="filteredDays.length === 0" class="row info tuto">
+            <i18n>diary.filter.no.result</i18n>
+        </p>
+    </ul>
+</div>

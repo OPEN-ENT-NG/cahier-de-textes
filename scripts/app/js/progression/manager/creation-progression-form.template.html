@@ -1,0 +1,58 @@
+<div class="new-progression">
+    <!-- level + title -->
+    <form name="progressionform">
+        <div class="edit-button" ng-click="progressionManagerCtrl.edit()">
+            <i class="icon pencil"></i>
+        </div>
+        <div class="row">
+            <div class="six cell" style="white-space: nowrap;">
+                <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
+          *<input type="text"
+            i18n-placeholder="title"
+            ng-model="progressionManagerCtrl.selectedProgressionItem.title"
+               placeholder="title" required>
+        </span>
+                <span ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
+          <label>Titre</label> : [[progressionManagerCtrl.selectedProgressionItem.title]]
+        </span>
+            </div>
+            <div class="six cell">
+                <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit">
+          <input type="text"
+            i18n-placeholder="level"
+            ng-model="progressionManagerCtrl.selectedProgressionItem.level"
+            placeholder="level">
+        </span>
+                <span ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
+          <label>Niveau</label> : [[progressionManagerCtrl.selectedProgressionItem.level]]
+        </span>
+            </div>
+        </div>
+        <!-- description -->
+        <div class="row">
+            <div class="twelve cell">
+                <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit">
+          <textarea
+            i18n-placeholder="description"
+            ng-model="progressionManagerCtrl.selectedProgressionItem.description"
+               placeholder="description"></textarea>
+        </span>
+                <div ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
+                    <label>Description</label> :
+                    <p>
+                        [[progressionManagerCtrl.selectedProgressionItem.description]]
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- button -->
+        <div class="row" ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
+            <button class="cancel" type="button" ng-click="progressionManagerCtrl.cancel()">
+                  <i18n><span class="no-style ng-scope">Annuler</span></i18n>
+              </button>
+            <button ng-click="progressionManagerCtrl.saveProgression(progressionManagerCtrl.selectedProgressionItem)" ng-disabled="progressionform.$invalid || !progressionform.$dirty ">
+                Enregistrer
+          </button>
+        </div>
+    </form>
+</div>

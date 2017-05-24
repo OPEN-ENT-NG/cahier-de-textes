@@ -1,0 +1,11 @@
+<!-- minified quick search panel -->
+<div class="right-panel">
+    <div ng-click="toggle()"  class="quick-search-label-minified" ng-show="!panelVisible">
+        [[label]]
+    </div>
+
+    <!-- maximized quick search panel -->
+    <div class="quick-search-results" ng-show="panelVisible">        
+        <ng-include src="contentUrl"></ng-include>
+    </div>
+</div>

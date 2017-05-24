@@ -1,0 +1,33 @@
+<div>
+    <div>
+    <a href="#" ng-click="progressionRightPanelCtrl.selected='main'" class="pedagogic-day-card selected">
+
+            <div class="thumbnail thumb-selected">
+                <i class="day-card-icon left-open cahier-textes2 table-cell-left"></i>
+            </div>
+            <div class="summary sum-selected">
+
+                <span>Seconde - Algèbre</span>
+                <span class="right">
+                    1<i class="day-card-icon card-icon-selected cahier-textes2 table-cell-left"></i>
+                </span>
+
+            </div>
+
+    </a>
+    </div>
+    <div class="content content-lesson scrollbar-fine">
+        <a href="" ng-repeat="index in progressionRightPanelCtrl.array">
+            <article class="twelve cell">
+                <div>
+                    Produit en stock
+                    <div class="right">
+                        [[index]]
+                        <!--card-icon-selected-->
+                        <i class="day-card-icon  rack2 table-cell-left"></i>
+                    </div>
+                </div>
+            </article>
+        </a>
+    </div>
+</div>
