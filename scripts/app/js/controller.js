@@ -111,6 +111,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
     initAudiences();
     route({
+        progressionEditLesson:function(params){
+          template.open('main', 'progression-edit-lesson');
+        },
         progressionManagerView: function (params) {
             template.open('main', 'progression-manager');
         },

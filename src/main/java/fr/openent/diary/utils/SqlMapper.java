@@ -1,16 +1,19 @@
 package fr.openent.diary.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -22,7 +25,6 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -33,14 +35,19 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 public class SqlMapper<T> {
 
+    public static ObjectMapper mapper = new ObjectMapper();
 
+    static{
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSSZ"));
+    }
 
     private Class clazz;
     private Sql sql;
     private Map<String,String> keyMap = new HashMap<>();
-    private ObjectMapper mapper = new ObjectMapper();
     private String databaseTableSc;
-
     private final static Logger log = LoggerFactory.getLogger(SqlMapper.class);
 
     public SqlMapper(Class clazz,String databaseTableSc, Sql sql){
@@ -52,12 +59,52 @@ public class SqlMapper<T> {
             String fieldName = field.getName().toString();
             keyMap.put(fieldName.toLowerCase(), fieldName);
         }
-
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSSZ");
-        mapper.setDateFormat(df);
     }
+
+    public static <T> void mappRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<T>> handler){
+        RequestUtils.bodyToJson(request, new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject json) {
+                HandlerResponse<T> response = new HandlerResponse<T>();
+                try{
+                    if (json!=null){
+                        response.setResult((T)mapper.readValue(json.toString(), clazz));
+                    }else{
+                        response.setMessage("request body cannot be null");
+                    }
+                }catch (Exception e) {
+                    response.setMessage(e.getMessage());
+                }
+                handler.handle(response);
+            }
+        });
+    }
+
+
+    public static <T> void mappListRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<List<T>>> handler){
+        RequestUtils.bodyToJsonArray(request, new Handler<JsonArray>() {
+            @Override
+            public void handle(JsonArray json) {
+                HandlerResponse<List<T>> response = new HandlerResponse<List<T>>();
+                try{
+                    if (json!=null){
+                        List<T> result = new ArrayList<T>();
+                        //JsonArray array = (JsonArray) json;
+                        for (Object obj : json.toList()){
+                            result.add((T)mapper.convertValue(obj, clazz));
+                        }
+                        response.setResult(result);
+                    }else{
+                        response.setMessage("request body cannot be null");
+                    }
+                }catch (Exception e) {
+                    response.setMessage(e.getMessage());
+                }
+                handler.handle(response);
+            }
+        });
+    }
+
     public T decode(String str){
         T result = null;
         try {
@@ -98,24 +145,29 @@ public class SqlMapper<T> {
             @Override
             public void handle(Message<JsonObject> event) {
                 HandlerResponse<List<T>> resultHandler = new HandlerResponse<List<T>>();
-                if ("ok".equals(event.body().getString("status"))){
+                try{
+                    if ("ok".equals(event.body().getString("status"))){
 
-                    List<Object> fields = rewriteKey(event.body().getArray("fields").toList());
+                        List<Object> fields = rewriteKey(event.body().getArray("fields").toList());
 
-                    event.body().putArray("fields", new JsonArray(fields));
+                        event.body().putArray("fields", new JsonArray(fields));
 
-                    Either<String, JsonArray> resultJson = SqlResult.validResult(event);
+                        Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
 
-                    List<T> result = new ArrayList<T>();
-                    for (Object obj : ((JsonArray) (((Either.Right) resultJson).getValue()))){
-                        result.add(decode(obj.toString()));
+                        List<T> result = new ArrayList<T>();
+                        for (Object obj : ((JsonArray) (((Either.Right) resultJson).getValue()))){
+                            result.add(decode(obj.toString()));
+                        }
+                        resultHandler.setResult(result);
+                    }else{
+                        resultHandler.setMessage(event.body().getString("message"));
                     }
-                    resultHandler.setResult(result);
-                }else{
-                    resultHandler.setMessage(event.body().getString("message"));
+                    handler.handle(resultHandler);
+                }catch(Exception e){
+                    handler.handle(new HandlerResponse<List<T>>(e.getMessage()));
                 }
-                handler.handle(resultHandler);
+
             }
         };
 

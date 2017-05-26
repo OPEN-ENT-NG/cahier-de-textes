@@ -974,6 +974,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     initAudiences();
     route({
+        progressionEditLesson: function progressionEditLesson(params) {
+            template.open('main', 'progression-edit-lesson');
+        },
         progressionManagerView: function progressionManagerView(params) {
             template.open('main', 'progression-manager');
         },
@@ -4381,7 +4384,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				var dynamicMaxChar = maxChar;
 
 				if (item.indexOf('</div>') < dynamicMaxChar) {
-					dynamicMaxChar = item.indexOf('</div>');
+					dynamicMaxChar = item.indexOf('</div>') + 6;
 				}
 				if (item.length < dynamicMaxChar) {
 					return item;
@@ -5440,7 +5443,6 @@ Teacher.prototype.create = function (cb, cbe) {
                 }
             };
             vm.setNewProgression = function () {
-                /*vm.subViewRight ='/diary/public/js/progression/manager/creation-progression-form.template.html';*/
                 vm.selectedProgressionItem = {
                     edit: true
                 };
@@ -5449,7 +5451,14 @@ Teacher.prototype.create = function (cb, cbe) {
             vm.selectProgression = function (progressionItem) {
                 vm.selectedProgressionItem = progressionItem;
                 progressionItem.edit = false;
-                /*vm.subViewRight ='/diary/public/js/progression/manager/progression-lessons-list.template.html';*/
+            };
+
+            vm.addNewLesson = function () {
+                $rootScope.redirect('/progressionEditLesson/' + vm.selectedProgressionItem.id + '/new');
+            };
+
+            vm.editLesson = function (id) {
+                $rootScope.redirect('/progressionEditLesson/' + vm.selectedProgressionItem.id + '/' + id);
             };
 
             vm.progressionItems = [{
@@ -5458,103 +5467,69 @@ Teacher.prototype.create = function (cb, cbe) {
                 title: 'Physique',
                 description: 'La physique quantique c\'est super cool ',
                 lessonItems: [{
-                    attachments: null,
-                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
-                    audience_label: "6 B",
-                    audience_type: "class",
-                    homework_ids: null,
-                    lesson_annotation: "",
-                    lesson_color: "#CECEF6",
-                    lesson_date: "2017-05-09 00:00:00.000000+0200",
-                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    lesson_end_time: "13:12:00",
-                    lesson_id: 58,
-                    lesson_room: "amphithe",
-                    lesson_start_time: "08:42:00",
-                    lesson_state: "published",
-                    lesson_title: "Scéance 1",
+                    id: 1,
+                    type: 'progression',
+                    title: "Scéance 1",
+                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({ id: "3" }),
                     original_subject_id: "32905-1493304352092",
-                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    subject_id: "3",
-                    subject_label: "THEATRE",
-                    teacher_display_name: "Mia BARBIER",
+                    subjectId: "3",
+                    subjectLabel: 'THEATRE',
+                    teacherName: "Mia BARBIER",
+                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    color: "#CECEF6",
+                    annotation: "",
+                    orderIndex: 1,
+                    attachments: [],
                     homeworks: [{
-                        attachments: null,
-                        audience_id: "21a3cf28-44fd-49be-ad09-5da6fe0d10dd",
-                        audience_label: "6 A",
-                        audience_type: "class",
-                        homework_color: "#CECEF6",
-                        homework_description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        homework_due_date: "2017-05-10 00:00:00.000000+0200",
-                        homework_state: "published",
-                        homework_title: "Devoir Maison",
-                        homework_type_id: 1,
-                        homework_type_label: "Devoir Maison",
-                        id: 20,
-                        lesson_id: 57,
-                        school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                        subject_id: "1",
-                        subject_label: "ANGLAIS LV1"
+                        id: 'id',
+                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                        type: model.homeworkTypes.findWhere({ id: 1 }),
+                        typeId: 1,
+                        typeLabel: "Devoir Maison",
+                        title: "Physique devoir 1",
+                        attachments: [],
+                        structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
                     }, {
-                        attachments: null,
-                        audience_id: "21a3cf28-44fd-49be-ad09-5da6fe0d10dd",
-                        audience_label: "6 A",
-                        audience_type: "class",
-                        homework_color: "#CECEF6",
-                        homework_description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        homework_due_date: "2017-05-10 00:00:00.000000+0200",
-                        homework_state: "published",
-                        homework_title: "Devoir Maison",
-                        homework_type_id: 1,
-                        homework_type_label: "Devoir Maison",
-                        id: 20,
-                        lesson_id: 57,
-                        school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                        subject_id: "1",
-                        subject_label: "ANGLAIS LV1"
+                        id: 'id',
+                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                        type: model.homeworkTypes.findWhere({ id: 1 }),
+                        typeId: 1,
+                        typeLabel: "Devoir Maison",
+                        title: "Devoir Maison",
+                        attachments: [],
+                        structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
                     }]
                 }, {
-                    attachments: null,
-                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
-                    audience_label: "6 B",
-                    audience_type: "class",
-                    homework_ids: null,
-                    lesson_annotation: "",
-                    lesson_color: "#CECEF6",
-                    lesson_date: "2017-05-09 00:00:00.000000+0200",
-                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    lesson_end_time: "13:12:00",
-                    lesson_id: 58,
-                    lesson_room: "amphithe",
-                    lesson_start_time: "08:42:00",
-                    lesson_state: "published",
-                    lesson_title: "Sceance2",
+                    id: 1,
+                    type: 'progression',
+                    title: "Scéance 1",
+                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({ id: "3" }),
                     original_subject_id: "32905-1493304352092",
-                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    subject_id: "3",
-                    subject_label: "THEATRE",
-                    teacher_display_name: "Mia BARBIER"
+                    subjectId: "3",
+                    subjectLabel: 'THEATRE',
+                    teacherName: "Mia BARBIER",
+                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    color: "#CECEF6",
+                    annotation: "",
+                    orderIndex: 2,
+                    attachments: []
                 }, {
-                    attachments: null,
-                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
-                    audience_label: "6 B",
-                    audience_type: "class",
-                    homework_ids: null,
-                    lesson_annotation: "",
-                    lesson_color: "#CECEF6",
-                    lesson_date: "2017-05-09 00:00:00.000000+0200",
-                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    lesson_end_time: "13:12:00",
-                    lesson_id: 58,
-                    lesson_room: "amphithe",
-                    lesson_start_time: "08:42:00",
-                    lesson_state: "published",
-                    lesson_title: "Sceance3",
+                    id: 1,
+                    type: 'progression',
+                    title: "Scéance 1",
+                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({ id: "3" }),
                     original_subject_id: "32905-1493304352092",
-                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    subject_id: "3",
-                    subject_label: "THEATRE",
-                    teacher_display_name: "Mia BARBIER"
+                    subjectId: "3",
+                    subjectLabel: 'THEATRE',
+                    teacherName: "Mia BARBIER",
+                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    color: "#CECEF6",
+                    annotation: "",
+                    orderIndex: 3,
+                    attachments: []
                 }]
             }, {
                 id: 2,
@@ -5562,26 +5537,20 @@ Teacher.prototype.create = function (cb, cbe) {
                 title: 'Physique quantique',
                 description: 'La physique quantique c\'est super cool ',
                 lessonItems: [{
-                    attachments: null,
-                    audience_id: "36c1c9a3-529c-46fa-8cd6-bde332f8a496",
-                    audience_label: "6 B",
-                    audience_type: "class",
-                    homework_ids: null,
-                    lesson_annotation: "",
-                    lesson_color: "#CECEF6",
-                    lesson_date: "2017-05-09 00:00:00.000000+0200",
-                    lesson_description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    lesson_end_time: "13:12:00",
-                    lesson_id: 58,
-                    lesson_room: "amphithe",
-                    lesson_start_time: "08:42:00",
-                    lesson_state: "published",
-                    lesson_title: "Séance ceci est ma sceamce",
+                    id: 1,
+                    type: 'progression',
+                    title: "Scéance 1",
+                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({ id: "3" }),
                     original_subject_id: "32905-1493304352092",
-                    school_id: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    subject_id: "3",
-                    subject_label: "THEATRE",
-                    teacher_display_name: "Mia BARBIER"
+                    subjectId: "3",
+                    subjectLabel: 'THEATRE',
+                    teacherName: "Mia BARBIER",
+                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    color: "#CECEF6",
+                    annotation: "",
+                    orderIndex: 1,
+                    attachments: []
                 }]
             }];
 
@@ -5593,6 +5562,149 @@ Teacher.prototype.create = function (cb, cbe) {
                 console.log("save order");
             };
         }
+    });
+})();
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /*
+    * Progression service as class
+    * used to manipulate Progression model
+    */
+
+    var ProgressionService = function () {
+        function ProgressionService($http, $q, constants) {
+            _classCallCheck(this, ProgressionService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+        }
+
+        _createClass(ProgressionService, [{
+            key: 'getProgressions',
+            value: function getProgressions() {
+                var _this = this;
+
+                var url = '/diary/progression';
+                return this.$http.get(url).then(function (result) {
+                    var progressions = result.data;
+                    _.each(progressions, function (progression) {
+                        progression.lessons = _.map(progression.lessons, _this.mapApiToLesson);
+                    });
+                    return progressions;
+                });
+            }
+        }, {
+            key: 'saveProgression',
+            value: function saveProgression(progression) {
+                var progressionLight = angular.copy(progression);
+                delete progressionLight.lessonItems;
+                var url = '/diary/progression';
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: progressionLight
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'saveLessonProgression',
+            value: function saveLessonProgression(lesson) {
+                var url = '/diary/progression/lesson';
+
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: this.mapLessonToApi(lesson)
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getLessonsProgression',
+            value: function getLessonsProgression(progressionId) {
+                var _this2 = this;
+
+                var url = '/diary/progression/' + progressionId + '/lessons';
+
+                return this.$http.get(url).then(function (result) {
+                    return _.map(result.data, _this2.mapApiToLesson);
+                });
+            }
+        }, {
+            key: 'getLessonProgression',
+            value: function getLessonProgression(lessonId) {
+                var _this3 = this;
+
+                var url = '/diary/progression/lesson/' + lessonId;
+
+                return this.$http.get(url).then(function (result) {
+                    return _this3.mapApiToLesson(result.data);
+                });
+            }
+        }, {
+            key: 'saveLessonOrder',
+            value: function saveLessonOrder(progression) {
+                var url = '/diary/progression/lesson/order';
+
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: this.extractOrderInformations(progression)
+                });
+            }
+        }, {
+            key: 'mapApiToLesson',
+            value: function mapApiToLesson(apiLesson) {
+                var lesson = angular.copy(apiLesson);
+                lesson.subject = JSON.parse(lesson.subject);
+                lesson.attachments = JSON.parse(lesson.attachments);
+                lesson.homeworks = JSON.parse(lesson.homeworks);
+                _.each(lesson.homeworks, function (homework) {
+                    homework.attachments = JSON.parse(homework.attachments);
+                });
+                return lesson;
+            }
+        }, {
+            key: 'mapLessonToApi',
+            value: function mapLessonToApi(lesson) {
+                var lessonApi = angular.copy(lesson);
+                _.each(lessonApi.homeworks, function (homework) {
+                    homework.attachments = JSON.stringify(homework.attachments);
+                });
+                lessonApi.homeworks = JSON.stringify(lessonApi.homeworks);
+                lessonApi.attachments = JSON.stringify(lessonApi.attachments);
+                lessonApi.subject = JSON.stringify(lessonApi.subject);
+                return lessonApi;
+            }
+        }, {
+            key: 'extractOrderInformations',
+            value: function extractOrderInformations(progression) {
+                var lessonsOrder = [];
+                _.each(progression.lessons, function (lesson) {
+                    lessonsOrder.push({
+                        id: lesson.id,
+                        orderIndex: lesson.orderIndex
+                    });
+                });
+                return lessonsOrder;
+            }
+        }]);
+
+        return ProgressionService;
+    }();
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("ProgressionService", ProgressionService);
     });
 })();
 
@@ -5691,6 +5803,8 @@ Teacher.prototype.create = function (cb, cbe) {
             // go to create new lesson view
             .when('/progressionManagerView', {
                 action: 'progressionManagerView'
+            }).when('/progressionEditLesson/:progressionId/:editProgressionLessonId', {
+                action: 'editLessonView'
             })
             // go to create new lesson view
             .when('/createLessonView/:timeFromCalendar', {

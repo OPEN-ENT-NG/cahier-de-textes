@@ -9,6 +9,9 @@
                 .when('/progressionManagerView', {
                     action: 'progressionManagerView'
                 })
+                .when('/progressionEditLesson/:progressionId/:editProgressionLessonId', {
+                    action: 'editLessonView'
+                })
                 // go to create new lesson view
                 .when('/createLessonView/:timeFromCalendar', {
                     action: 'createLessonView'

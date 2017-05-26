@@ -13,7 +13,7 @@
 			 let dynamicMaxChar = maxChar;
 
 			 if (item.indexOf('</div>') < dynamicMaxChar){
-				 dynamicMaxChar = item.indexOf('</div>');
+				 dynamicMaxChar = item.indexOf('</div>') + 6;				 
 			 }
 			 if (item.length < dynamicMaxChar){
 				 return item;

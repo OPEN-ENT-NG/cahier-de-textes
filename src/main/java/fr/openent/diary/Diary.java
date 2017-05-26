@@ -1,9 +1,6 @@
 package fr.openent.diary;
 
-import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.controllers.HomeworkController;
-import fr.openent.diary.controllers.LessonController;
-import fr.openent.diary.controllers.ModelWeekController;
+import fr.openent.diary.controllers.*;
 import fr.openent.diary.services.*;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -32,9 +29,11 @@ public class Diary extends BaseServer {
         final LessonService lessonService = new LessonServiceImpl(diaryService, audienceService);
         final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService, audienceService);
         final ModelWeekServiceImpl modelWeekService = new ModelWeekServiceImpl(lessonService);
+        final ProgressionServiceImpl progressionService = new ProgressionServiceImpl();
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
         addController(new ModelWeekController(modelWeekService));
+        addController(new ProgressionController(progressionService));
         SqlConf confLesson = SqlConfs.createConf(LessonController.class.getName());
         confLesson.setTable(LESSON_TABLE);
         confLesson.setShareTable(LESSON_SHARE_TABLE);
