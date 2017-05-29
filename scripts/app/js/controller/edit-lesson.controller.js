@@ -5,7 +5,7 @@
         //controller declaration
         module.controller("EditLessonController", controller);
 
-        function controller($scope, $routeParams,PedagogicItemService,constants) {
+        function controller($scope, $routeParams,PedagogicItemService,constants,$q,SubjectService) {
 
             var vm = this;
 
@@ -13,33 +13,52 @@
 
             function init() {
                 //existing lesson
-                if ($routeParams.idLesson) {
-                    model.newLesson = null;
-                    loadExistingLesson();
-                } else if(model.newLesson){
-                    createNewLessonFromPedagogicItem();
-                }else {
-                    //new lesson
-                    loadNewLesson();
-                }
-
-                $scope.data.tabSelected = 'lesson';
-
-                //add watch on selection
-                $scope.$watch('lesson.audience',()=>{
-                    if($scope.lesson && $scope.lesson.previousLessons){
-                        $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                loadSubjects().then(()=>{
+                    if ($routeParams.idLesson) {
+                        model.newLesson = null;
+                        loadExistingLesson();
+                    } else if(model.newLesson){
+                        createNewLessonFromPedagogicItem();
+                    }else if ($routeParams.progressionId){
+                        //show the EditProgressionLessonController
+                        loadNewLesson();
+                        return ;
+                    }else{
+                        //new lesson
+                        loadNewLesson();
                     }
-                });
-                //add watch on selection
-                $scope.$watch('lesson.subject',()=>{
-                    if ($scope.lesson && $scope.lesson.previousLessons){
-                        $scope.loadPreviousLessonsFromLesson($scope.lesson);
-                    }
+
+                    $scope.data.tabSelected = 'lesson';
+
+                    //add watch on selection
+                    $scope.$watch('lesson.audience',()=>{
+                        if($scope.lesson && $scope.lesson.previousLessons){
+                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        }
+                    });
+                    //add watch on selection
+                    $scope.$watch('lesson.subject',()=>{
+                        if ($scope.lesson && $scope.lesson.previousLessons){
+                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        }
+                    });
                 });
             }
 
 
+            function loadSubjects(){
+                if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){
+                    console.log("no subjects founds");
+                    return SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects)=>{
+                        model.subjects.all=[];
+                        if(subjects){
+                          model.subjects.addRange(subjects);
+                        }
+                    });
+                }else{
+                    return $q.when();
+                }
+            }
 
             function createNewLessonFromPedagogicItem (){
                 $scope.lesson = model.newLesson;

@@ -2428,7 +2428,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         //controller declaration
         module.controller("EditLessonController", controller);
 
-        function controller($scope, $routeParams, PedagogicItemService, constants) {
+        function controller($scope, $routeParams, PedagogicItemService, constants, $q, SubjectService) {
 
             var vm = this;
 
@@ -2436,30 +2436,50 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
             function init() {
                 //existing lesson
-                if ($routeParams.idLesson) {
-                    model.newLesson = null;
-                    loadExistingLesson();
-                } else if (model.newLesson) {
-                    createNewLessonFromPedagogicItem();
+                loadSubjects().then(function () {
+                    if ($routeParams.idLesson) {
+                        model.newLesson = null;
+                        loadExistingLesson();
+                    } else if (model.newLesson) {
+                        createNewLessonFromPedagogicItem();
+                    } else if ($routeParams.progressionId) {
+                        //show the EditProgressionLessonController
+                        loadNewLesson();
+                        return;
+                    } else {
+                        //new lesson
+                        loadNewLesson();
+                    }
+
+                    $scope.data.tabSelected = 'lesson';
+
+                    //add watch on selection
+                    $scope.$watch('lesson.audience', function () {
+                        if ($scope.lesson && $scope.lesson.previousLessons) {
+                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        }
+                    });
+                    //add watch on selection
+                    $scope.$watch('lesson.subject', function () {
+                        if ($scope.lesson && $scope.lesson.previousLessons) {
+                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        }
+                    });
+                });
+            }
+
+            function loadSubjects() {
+                if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0) {
+                    console.log("no subjects founds");
+                    return SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
+                        model.subjects.all = [];
+                        if (subjects) {
+                            model.subjects.addRange(subjects);
+                        }
+                    });
                 } else {
-                    //new lesson
-                    loadNewLesson();
+                    return $q.when();
                 }
-
-                $scope.data.tabSelected = 'lesson';
-
-                //add watch on selection
-                $scope.$watch('lesson.audience', function () {
-                    if ($scope.lesson && $scope.lesson.previousLessons) {
-                        $scope.loadPreviousLessonsFromLesson($scope.lesson);
-                    }
-                });
-                //add watch on selection
-                $scope.$watch('lesson.subject', function () {
-                    if ($scope.lesson && $scope.lesson.previousLessons) {
-                        $scope.loadPreviousLessonsFromLesson($scope.lesson);
-                    }
-                });
             }
 
             function createNewLessonFromPedagogicItem() {
@@ -2680,6 +2700,28 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         }
                     }
                 });
+            };
+        }
+    });
+})();
+
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("EditProgressionLessonController", controller);
+
+        function controller($scope, $routeParams, constants, $rootScope) {
+            var vm = this;
+            console.log("initForProgressionLesson");
+            $scope.data.tabSelected = 'lesson';
+            vm.isProgressionLesson = true;
+
+            vm.cancel = function () {
+                $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
             };
         }
     });
@@ -5419,8 +5461,12 @@ Teacher.prototype.create = function (cb, cbe) {
         //controller declaration
         module.controller("ProgressionManagerController", controller);
 
-        function controller($scope, $rootScope) {
+        function controller($scope, $rootScope, ProgressionService, $timeout, $routeParams) {
             var vm = this;
+            function init() {
+                vm.loadProgressions();
+            }
+            $timeout(init);
 
             vm.edit = function () {
                 vm.originalProgressionItem = angular.copy(vm.selectedProgressionItem);
@@ -5449,6 +5495,7 @@ Teacher.prototype.create = function (cb, cbe) {
             };
 
             vm.selectProgression = function (progressionItem) {
+                $rootScope.redirect('/progressionManagerView/' + progressionItem.id);
                 vm.selectedProgressionItem = progressionItem;
                 progressionItem.edit = false;
             };
@@ -5461,105 +5508,142 @@ Teacher.prototype.create = function (cb, cbe) {
                 $rootScope.redirect('/progressionEditLesson/' + vm.selectedProgressionItem.id + '/' + id);
             };
 
+            vm.loadProgressions = function () {
+                ProgressionService.getProgressions().then(function (progressions) {
+                    vm.progressionItems = progressions;
+                    if ($routeParams.selectedProgressionId !== 'none') {
+                        var progressionToLoad = _.findWhere(vm.progressionItems, { id: parseInt($routeParams.selectedProgressionId) });
+                        if (progressionToLoad) {
+                            vm.selectProgression(progressionToLoad);
+                        }
+                    }
+                });
+            };
+
+            vm.loadLessonsFromProgression = function (progression) {
+                progression.lessonItems = null;
+                ProgressionService.getLessonsProgression(progressions.id).then(function (lessons) {
+                    progression.lessonItems = lessons;
+                });
+            };
+
+            vm.saveLesson = function (lesson) {
+                ProgressionService.saveLessonProgression(lesson).then(function (newLesson) {
+                    lesson.id = newLesson.id;
+                });
+            };
+
+            /*
             vm.progressionItems = [{
-                id: 1,
+                id : 1,
                 level: 'seconde',
                 title: 'Physique',
                 description: 'La physique quantique c\'est super cool ',
                 lessonItems: [{
-                    id: 1,
-                    type: 'progression',
+                    id : 1,
+                    type : 'progression',
                     title: "Scéance 1",
-                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({ id: "3" }),
+                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({id: "3"}),
                     original_subject_id: "32905-1493304352092",
                     subjectId: "3",
                     subjectLabel: 'THEATRE',
-                    teacherName: "Mia BARBIER",
-                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    teacherName : "Mia BARBIER",
+                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
                     color: "#CECEF6",
                     annotation: "",
-                    orderIndex: 1,
-                    attachments: [],
+                    orderIndex : 1,
+                    attachments : [],
                     homeworks: [{
-                        id: 'id',
+                        id : 'id',
                         description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
                         type: model.homeworkTypes.findWhere({ id: 1 }),
                         typeId: 1,
                         typeLabel: "Devoir Maison",
                         title: "Physique devoir 1",
                         attachments: [],
-                        structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
-                    }, {
-                        id: 'id',
+                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
+                    },{
+                        id : 'id',
                         description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
                         type: model.homeworkTypes.findWhere({ id: 1 }),
                         typeId: 1,
                         typeLabel: "Devoir Maison",
                         title: "Devoir Maison",
                         attachments: [],
-                        structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
+                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
                     }]
                 }, {
-                    id: 1,
-                    type: 'progression',
+                    id : 1,
+                    type : 'progression',
                     title: "Scéance 1",
-                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({ id: "3" }),
+                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({id: "3"}),
                     original_subject_id: "32905-1493304352092",
                     subjectId: "3",
                     subjectLabel: 'THEATRE',
-                    teacherName: "Mia BARBIER",
-                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    teacherName : "Mia BARBIER",
+                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
                     color: "#CECEF6",
                     annotation: "",
-                    orderIndex: 2,
-                    attachments: []
-                }, {
-                    id: 1,
-                    type: 'progression',
+                    orderIndex : 2,
+                    attachments : [],
+                },{
+                    id : 1,
+                    type : 'progression',
                     title: "Scéance 1",
-                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({ id: "3" }),
+                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({id: "3"}),
                     original_subject_id: "32905-1493304352092",
                     subjectId: "3",
                     subjectLabel: 'THEATRE',
-                    teacherName: "Mia BARBIER",
-                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    teacherName : "Mia BARBIER",
+                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
                     color: "#CECEF6",
                     annotation: "",
-                    orderIndex: 3,
-                    attachments: []
+                    orderIndex : 3,
+                    attachments : [],
                 }]
-            }, {
-                id: 2,
+            },{
+                id : 2,
                 level: 'seconde',
                 title: 'Physique quantique',
                 description: 'La physique quantique c\'est super cool ',
-                lessonItems: [{
-                    id: 1,
-                    type: 'progression',
+                lessonItems: [ {
+                    id : 1,
+                    type : 'progression',
                     title: "Scéance 1",
-                    description: "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({ id: "3" }),
+                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
+                    subject: model.subjects.findWhere({id: "3"}),
                     original_subject_id: "32905-1493304352092",
                     subjectId: "3",
                     subjectLabel: 'THEATRE',
-                    teacherName: "Mia BARBIER",
-                    structureId: "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
+                    teacherName : "Mia BARBIER",
+                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
                     color: "#CECEF6",
                     annotation: "",
-                    orderIndex: 1,
-                    attachments: []
+                    orderIndex : 1,
+                    attachments : [],
                 }]
             }];
+            */
 
-            vm.saveProgression = function (item) {
-                vm.progressionItems.push(item);
+            vm.saveProgression = function (progression) {
+                ProgressionService.saveProgression(progression).then(function (newProgression) {
+                    if (!progression.id) {
+                        vm.progressionItems.push(newProgression);
+                    } else {
+                        var oldProgressionItems = _.findWhere(vm.progressionItems, { 'id': newProgression.id });
+                        if (oldProgressionItems) {
+                            vm.progressionItems[vm.progressionItems.indexOf(oldProgressionItems)] = newProgression;
+                        }
+                    }
+                    vm.selectedProgressionItem = newProgression;
+                });
             };
 
-            vm.saveOrder = function () {
-                console.log("save order");
+            vm.saveOrder = function (progression) {
+                ProgressionService.saveLessonOrder(progression);
             };
         }
     });
@@ -5719,7 +5803,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         function controller($scope, $location) {
             var vm = this;
-            vm.array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
             $scope.redirect = function (path) {
                 $location.path(path);
@@ -5801,7 +5884,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         module.config(function ($routeProvider) {
             $routeProvider
             // go to create new lesson view
-            .when('/progressionManagerView', {
+            .when('/progressionManagerView/:selectedProgressionId', {
                 action: 'progressionManagerView'
             }).when('/progressionEditLesson/:progressionId/:editProgressionLessonId', {
                 action: 'editLessonView'

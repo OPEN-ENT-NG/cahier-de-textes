@@ -56,7 +56,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
             if (progression.getId() == null) {
                 progressionMapper.insert(progression, handler);
             } else {
-                progressionMapper.insert(progression, handler);
+                progressionMapper.update(progression, handler);
             }
 
         } catch (Throwable e) {

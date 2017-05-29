@@ -6,7 +6,7 @@
         module.config(function($routeProvider) {
             $routeProvider
                 // go to create new lesson view
-                .when('/progressionManagerView', {
+                .when('/progressionManagerView/:selectedProgressionId', {
                     action: 'progressionManagerView'
                 })
                 .when('/progressionEditLesson/:progressionId/:editProgressionLessonId', {

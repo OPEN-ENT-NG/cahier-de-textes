@@ -5,8 +5,12 @@
         //controller declaration
         module.controller("ProgressionManagerController", controller);
 
-        function controller($scope, $rootScope) {
+        function controller($scope, $rootScope,ProgressionService,$timeout,$routeParams) {
             let vm = this;
+            function init(){
+                vm.loadProgressions();
+            }
+            $timeout(init);
 
             vm.edit = function(){
                 vm.originalProgressionItem = angular.copy(vm.selectedProgressionItem);
@@ -35,6 +39,7 @@
             };
 
             vm.selectProgression = function(progressionItem){
+                $rootScope.redirect('/progressionManagerView/'+progressionItem.id );
                 vm.selectedProgressionItem=progressionItem;
                 progressionItem.edit=false;
             };
@@ -47,10 +52,36 @@
                 $rootScope.redirect('/progressionEditLesson/'+vm.selectedProgressionItem.id+'/'+id );
             };
 
+            vm.loadProgressions = function(){
+                ProgressionService.getProgressions().then((progressions)=>{
+                    vm.progressionItems = progressions;
+                    if ($routeParams.selectedProgressionId !== 'none'){
+                        let progressionToLoad = _.findWhere(vm.progressionItems,{id :parseInt($routeParams.selectedProgressionId)});
+                        if (progressionToLoad){
+                            vm.selectProgression(progressionToLoad);
+                        }
+                    }
+                });
+            };
+
+            vm.loadLessonsFromProgression = function(progression){
+                progression.lessonItems = null;
+                ProgressionService.getLessonsProgression(progressions.id).then((lessons) =>{
+                    progression.lessonItems = lessons;
+                });
+            };
+
+            vm.saveLesson = function(lesson){
+                ProgressionService.saveLessonProgression(lesson).then((newLesson)=>{
+                    lesson.id = newLesson.id;
+                });
+            };
+
+            /*
             vm.progressionItems = [{
                 id : 1,
                 level: 'seconde',
-                title: 'Physique',                
+                title: 'Physique',
                 description: 'La physique quantique c\'est super cool ',
                 lessonItems: [{
                     id : 1,
@@ -139,13 +170,24 @@
                     attachments : [],
                 }]
             }];
+            */
 
-            vm.saveProgression = function(item){
-                vm.progressionItems.push(item);
+            vm.saveProgression = function(progression){
+                ProgressionService.saveProgression(progression).then((newProgression)=>{
+                    if (!progression.id){
+                        vm.progressionItems.push(newProgression);
+                    }else{
+                        let oldProgressionItems=_.findWhere(vm.progressionItems,{'id':newProgression.id});
+                        if (oldProgressionItems){
+                            vm.progressionItems[vm.progressionItems.indexOf(oldProgressionItems)] = newProgression;
+                        }
+                    }
+                    vm.selectedProgressionItem = newProgression;
+                });
             };
 
-            vm.saveOrder = function(){
-                    console.log("save order");
+            vm.saveOrder = function(progression){
+                ProgressionService.saveLessonOrder(progression);
             };
         }
     });
