@@ -7,10 +7,15 @@
 
         function controller($scope, $routeParams,constants,$rootScope) {
             let vm  = this;
-            console.log("initForProgressionLesson");
-            $scope.data.tabSelected = 'lesson';
-            vm.isProgressionLesson = true;
 
+            init();
+            function init(){
+              console.log("initForProgressionLesson");
+              if ($routeParams.progressionId){
+                $scope.data.tabSelected = 'lesson';
+                vm.isProgressionLesson = true;
+              }
+            }
 
             vm.cancel = function(){
               $rootScope.redirect('/progressionManagerView/'+$routeParams.progressionId);

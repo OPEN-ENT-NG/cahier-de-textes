@@ -273,8 +273,6 @@
                             }
                             lesson.previousLessonsLoaded = true;
                             lesson.previousLessonsLoading = false;
-                            //lesson.previousLessonsDisplayed = lesson.previousLessons;
-
                             if (typeof cb === 'function') {
                                 cb();
                             }
@@ -283,8 +281,7 @@
                     } else {
                         lesson.previousLessons = [];
                         lesson.previousLessonsLoaded = true;
-                        lesson.previousLessonsLoading = false;
-                        //lesson.previousLessonsDisplayed = lesson.previousLessons;
+                        lesson.previousLessonsLoading = false;                        
                         if (typeof cb === 'function') {
                             cb();
                         }
@@ -293,7 +290,11 @@
                 });
             };
 
-
+            $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
+                $scope.createOrUpdateLesson(goMainView, function(){
+                    $scope.publishLessonAndGoCalendarView(lesson, isPublish);
+                });
+            };
         }
     });
 

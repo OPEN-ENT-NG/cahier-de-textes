@@ -183,8 +183,8 @@
                 // need reload lessons or homeworks if week changed
                 var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
 
-                $scope.lesson = null;
-                $scope.homework = null;
+                //$scope.lesson = null;
+                //$scope.homework = null;
 
 
                 refreshDatas(UtilsService.getUserStructuresIdsAsString(),
