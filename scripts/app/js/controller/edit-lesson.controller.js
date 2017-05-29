@@ -32,14 +32,14 @@
 
                     //add watch on selection
                     $scope.$watch('lesson.audience',()=>{
-                        if($scope.lesson && $scope.lesson.previousLessons){
-                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        if(vm.lesson && vm.lesson.previousLessons){
+                            $scope.loadPreviousLessonsFromLesson(vm.lesson);
                         }
                     });
                     //add watch on selection
                     $scope.$watch('lesson.subject',()=>{
-                        if ($scope.lesson && $scope.lesson.previousLessons){
-                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        if (vm.lesson && vm.lesson.previousLessons){
+                            $scope.loadPreviousLessonsFromLesson(vm.lesson);
                         }
                     });
                 });
@@ -61,9 +61,9 @@
             }
 
             function createNewLessonFromPedagogicItem (){
-                $scope.lesson = model.newLesson;
+                vm.lesson = model.newLesson;
                 model.newLesson=null;
-                //$scope.newItem = $scope.lesson.newItem;
+                //$scope.newItem = vm.lesson.newItem;
                 populateExistingLesson();
             }
 
@@ -73,20 +73,20 @@
 
                 // open existing lesson for edit
 
-                $scope.lesson.previousLessonsLoaded = false; // will force reload
+                vm.lesson.previousLessonsLoaded = false; // will force reload
                 $scope.newItem = {
-                    date: moment($scope.lesson.date),
-                    beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
-                    end: $scope.lesson.endMoment //moment($scope.lesson.end)
+                    date: moment(vm.lesson.date),
+                    beginning: vm.lesson.startMoment, //moment(vm.lesson.beginning),
+                    end: vm.lesson.endMoment //moment(vm.lesson.end)
                 };
 
                 $scope.loadHomeworksForCurrentLesson(function() {
-                    $scope.lesson.homeworks.forEach(function(homework) {
-                        if ($scope.lesson.homeworks.length || ($routeParams.idHomework && $routeParams.idHomework == homework.id)) {
+                    vm.lesson.homeworks.forEach(function(homework) {
+                        if (vm.lesson.homeworks.length || ($routeParams.idHomework && $routeParams.idHomework == homework.id)) {
                             homework.expanded = true;
                         }
 
-                        model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
+                        model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), vm.lesson.audience.id);
                     });
                 });
 
@@ -101,7 +101,7 @@
 
                 $scope.lessonDescriptionIsReadOnly = false;
                 $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.lesson = lesson;
+                vm.lesson = lesson;
                 lesson.load(true, ()=> {
                     populateExistingLesson();
                 }, function(cbe) {
@@ -112,8 +112,8 @@
             function loadNewLesson(){
                 var selectedDate = $scope.selectedDateInTheFuture();
 
-                $scope.lesson = model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
-                $scope.newItem = $scope.lesson.newItem;
+                vm.lesson = model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
+                $scope.newItem = vm.lesson.newItem;
             }
             /**
              * Load homeworks for current lesson being edited
@@ -122,14 +122,14 @@
             $scope.loadHomeworksForCurrentLesson = function(cb) {
 
                 // lesson not yet created do not retrieve homeworks
-                if (!$scope.lesson.id) {
+                if (!vm.lesson.id) {
                     return;
                 }
 
                 var needSqlSync = false;
 
                 // if homeworks ever retrieved from db don't do it again!
-                $scope.lesson.homeworks.forEach(function(homework) {
+                vm.lesson.homeworks.forEach(function(homework) {
                     if (!homework.loaded) {
                         needSqlSync = true;
                     }
@@ -137,7 +137,7 @@
 
                 // only reload homeworks if necessary
                 if (needSqlSync) {
-                    model.loadHomeworksForLesson($scope.lesson,
+                    model.loadHomeworksForLesson(vm.lesson,
 
                         function() {
                             if (typeof cb !== 'undefined') {
@@ -168,18 +168,18 @@
 
                 $scope.currentErrors = [];
 
-                $scope.lesson.startTime = $scope.newItem.beginning;
-                $scope.lesson.endTime = $scope.newItem.end;
-                $scope.lesson.date = $scope.newItem.date;
+                vm.lesson.startTime = $scope.newItem.beginning;
+                vm.lesson.endTime = $scope.newItem.end;
+                vm.lesson.date = $scope.newItem.date;
 
-                $scope.lesson.save(function() {
+                vm.lesson.save(function() {
                     notify.info('lesson.saved');
-                    $scope.lesson.audience = model.audiences.findWhere({
-                        id: $scope.lesson.audience.id
+                    vm.lesson.audience = model.audiences.findWhere({
+                        id: vm.lesson.audience.id
                     });
                     if (goMainView) {
                         $scope.goToMainView();
-                        $scope.lesson = null;
+                        vm.lesson = null;
                         $scope.homework = null;
                     }
                     if (typeof cb === 'function') {
@@ -281,7 +281,7 @@
                     } else {
                         lesson.previousLessons = [];
                         lesson.previousLessonsLoaded = true;
-                        lesson.previousLessonsLoading = false;                        
+                        lesson.previousLessonsLoading = false;
                         if (typeof cb === 'function') {
                             cb();
                         }

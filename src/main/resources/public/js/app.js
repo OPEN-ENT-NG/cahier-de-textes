@@ -2335,14 +2335,14 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                     //add watch on selection
                     $scope.$watch('lesson.audience', function () {
-                        if ($scope.lesson && $scope.lesson.previousLessons) {
-                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        if (vm.lesson && vm.lesson.previousLessons) {
+                            $scope.loadPreviousLessonsFromLesson(vm.lesson);
                         }
                     });
                     //add watch on selection
                     $scope.$watch('lesson.subject', function () {
-                        if ($scope.lesson && $scope.lesson.previousLessons) {
-                            $scope.loadPreviousLessonsFromLesson($scope.lesson);
+                        if (vm.lesson && vm.lesson.previousLessons) {
+                            $scope.loadPreviousLessonsFromLesson(vm.lesson);
                         }
                     });
                 });
@@ -2363,9 +2363,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             }
 
             function createNewLessonFromPedagogicItem() {
-                $scope.lesson = model.newLesson;
+                vm.lesson = model.newLesson;
                 model.newLesson = null;
-                //$scope.newItem = $scope.lesson.newItem;
+                //$scope.newItem = vm.lesson.newItem;
                 populateExistingLesson();
             }
 
@@ -2375,20 +2375,20 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                 // open existing lesson for edit
 
-                $scope.lesson.previousLessonsLoaded = false; // will force reload
+                vm.lesson.previousLessonsLoaded = false; // will force reload
                 $scope.newItem = {
-                    date: moment($scope.lesson.date),
-                    beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
-                    end: $scope.lesson.endMoment //moment($scope.lesson.end)
+                    date: moment(vm.lesson.date),
+                    beginning: vm.lesson.startMoment, //moment(vm.lesson.beginning),
+                    end: vm.lesson.endMoment //moment(vm.lesson.end)
                 };
 
                 $scope.loadHomeworksForCurrentLesson(function () {
-                    $scope.lesson.homeworks.forEach(function (homework) {
-                        if ($scope.lesson.homeworks.length || $routeParams.idHomework && $routeParams.idHomework == homework.id) {
+                    vm.lesson.homeworks.forEach(function (homework) {
+                        if (vm.lesson.homeworks.length || $routeParams.idHomework && $routeParams.idHomework == homework.id) {
                             homework.expanded = true;
                         }
 
-                        model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
+                        model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), vm.lesson.audience.id);
                     });
                 });
             }
@@ -2402,7 +2402,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                 $scope.lessonDescriptionIsReadOnly = false;
                 $scope.homeworkDescriptionIsReadOnly = false;
-                $scope.lesson = lesson;
+                vm.lesson = lesson;
                 lesson.load(true, function () {
                     populateExistingLesson();
                 }, function (cbe) {
@@ -2413,8 +2413,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             function loadNewLesson() {
                 var selectedDate = $scope.selectedDateInTheFuture();
 
-                $scope.lesson = model.initLesson("timeFromCalendar" === $routeParams.timeFromCalendar, selectedDate);
-                $scope.newItem = $scope.lesson.newItem;
+                vm.lesson = model.initLesson("timeFromCalendar" === $routeParams.timeFromCalendar, selectedDate);
+                $scope.newItem = vm.lesson.newItem;
             }
             /**
              * Load homeworks for current lesson being edited
@@ -2423,14 +2423,14 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             $scope.loadHomeworksForCurrentLesson = function (cb) {
 
                 // lesson not yet created do not retrieve homeworks
-                if (!$scope.lesson.id) {
+                if (!vm.lesson.id) {
                     return;
                 }
 
                 var needSqlSync = false;
 
                 // if homeworks ever retrieved from db don't do it again!
-                $scope.lesson.homeworks.forEach(function (homework) {
+                vm.lesson.homeworks.forEach(function (homework) {
                     if (!homework.loaded) {
                         needSqlSync = true;
                     }
@@ -2438,7 +2438,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                 // only reload homeworks if necessary
                 if (needSqlSync) {
-                    model.loadHomeworksForLesson($scope.lesson, function () {
+                    model.loadHomeworksForLesson(vm.lesson, function () {
                         if (typeof cb !== 'undefined') {
                             cb();
                         }
@@ -2462,18 +2462,18 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                 $scope.currentErrors = [];
 
-                $scope.lesson.startTime = $scope.newItem.beginning;
-                $scope.lesson.endTime = $scope.newItem.end;
-                $scope.lesson.date = $scope.newItem.date;
+                vm.lesson.startTime = $scope.newItem.beginning;
+                vm.lesson.endTime = $scope.newItem.end;
+                vm.lesson.date = $scope.newItem.date;
 
-                $scope.lesson.save(function () {
+                vm.lesson.save(function () {
                     notify.info('lesson.saved');
-                    $scope.lesson.audience = model.audiences.findWhere({
-                        id: $scope.lesson.audience.id
+                    vm.lesson.audience = model.audiences.findWhere({
+                        id: vm.lesson.audience.id
                     });
                     if (goMainView) {
                         $scope.goToMainView();
-                        $scope.lesson = null;
+                        vm.lesson = null;
                         $scope.homework = null;
                     }
                     if (typeof cb === 'function') {
@@ -2597,10 +2597,11 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         //controller declaration
         module.controller("EditProgressionLessonController", controller);
 
-        function controller($scope, $routeParams, constants, $rootScope) {
+        function controller($scope, $routeParams, constants, $rootScope, ProgressionService) {
             var vm = this;
 
             init();
+
             function init() {
                 console.log("initForProgressionLesson");
                 if ($routeParams.progressionId) {
@@ -2612,6 +2613,26 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             vm.cancel = function () {
                 $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
             };
+
+            vm.saveLesson = function (lesson) {
+                if (!lesson.progressionId) {
+                    lesson.progressionId = $routeParams.progressionId;
+                }
+                ProgressionService.saveLessonProgression(lesson).then(function (newLesson) {
+                    lesson.id = newLesson.id;
+                    $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
+                });
+            };
+
+            vm.addHomework = function (lesson) {
+                if (!lesson.homeworks) {
+                    lesson.homeworks = [];
+                }
+                var homework = model.initHomework();
+                lesson.homeworks.push(homework);
+            };
+
+            vm.loadLesson = function (lessonId) {};
         }
     });
 })();
@@ -4311,17 +4332,38 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!item) {
 					return item;
 				}
+				if (!item.indexOf) {
+					item = item.toString();
+				}
+
+				item = item.replace(/<\/?[^>]+(>|$)/g, "");
 
 				var dynamicMaxChar = maxChar;
 
-				if (item.indexOf('</div>') < dynamicMaxChar) {
-					dynamicMaxChar = item.indexOf('</div>') + 6;
-				}
+				/*if (item.indexOf('</div>') < dynamicMaxChar){
+     dynamicMaxChar = item.indexOf('</div>') + 6;
+    }*/
 				if (item.length < dynamicMaxChar) {
 					return item;
 				} else {
 					return item.substring(0, dynamicMaxChar) + " ...";
 				}
+			};
+		}
+	});
+})();
+
+'use strict';
+
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
+		module.filter('trusthtml', filter);
+
+		function filter($sce) {
+			return function (text) {
+				return $sce.trustAsHtml(text);
 			};
 		}
 	});
@@ -5363,7 +5405,6 @@ Teacher.prototype.create = function (cb, cbe) {
             };
 
             vm.hasProgressItem = function () {
-                console.log(!!vm.selectedProgressionItem);
                 return vm.selectedProgressionItem === undefined;
             };
             vm.cancel = function () {
@@ -5387,6 +5428,7 @@ Teacher.prototype.create = function (cb, cbe) {
                 $rootScope.redirect('/progressionManagerView/' + progressionItem.id);
                 vm.selectedProgressionItem = progressionItem;
                 progressionItem.edit = false;
+                vm.loadLessonsFromProgression(vm.selectedProgressionItem);
             };
 
             vm.addNewLesson = function () {
@@ -5411,7 +5453,7 @@ Teacher.prototype.create = function (cb, cbe) {
 
             vm.loadLessonsFromProgression = function (progression) {
                 progression.lessonItems = null;
-                ProgressionService.getLessonsProgression(progressions.id).then(function (lessons) {
+                ProgressionService.getLessonsProgression(progression.id).then(function (lessons) {
                     progression.lessonItems = lessons;
                 });
             };
@@ -5553,12 +5595,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     */
 
     var ProgressionService = function () {
-        function ProgressionService($http, $q, constants) {
+        function ProgressionService($http, $q, constants, $sce) {
             _classCallCheck(this, ProgressionService);
 
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
+            this.$sce = $sce;
+            console.log(this.$sce);
         }
 
         _createClass(ProgressionService, [{
@@ -5610,7 +5654,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var url = '/diary/progression/' + progressionId + '/lessons';
 
                 return this.$http.get(url).then(function (result) {
-                    return _.map(result.data, _this2.mapApiToLesson);
+                    return _.map(result.data, function (lesson) {
+                        return _this2.mapApiToLesson(lesson);
+                    });
                 });
             }
         }, {
@@ -5638,26 +5684,72 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'mapApiToLesson',
             value: function mapApiToLesson(apiLesson) {
-                var lesson = angular.copy(apiLesson);
+                var _this4 = this;
+
+                var lesson = apiLesson; //angular.copy(apiLesson);
                 lesson.subject = JSON.parse(lesson.subject);
-                lesson.attachments = JSON.parse(lesson.attachments);
+                lesson.description = this.$sce.trustAsHtml(lesson.description);
+                //lesson.attachments = JSON.parse(lesson.attachments);
                 lesson.homeworks = JSON.parse(lesson.homeworks);
                 _.each(lesson.homeworks, function (homework) {
-                    homework.attachments = JSON.parse(homework.attachments);
+                    homework.description = _this4.$sce.trustAsHtml(homework.description);
                 });
+
                 return lesson;
+            }
+        }, {
+            key: 'mapHomeworkToApi',
+            value: function mapHomeworkToApi(homework) {
+                var result = {
+                    title: homework.title,
+                    type: JSON.stringify({
+                        id: homework.type.id,
+                        label: homework.type.label,
+                        structureId: homework.type.structureId,
+                        category: homework.type.category
+                    }),
+                    description: homework.description,
+                    color: homework.color,
+                    state: homework.state
+                };
+                return result;
+            }
+        }, {
+            key: 'mapAttachementsToApi',
+            value: function mapAttachementsToApi(attachment) {
+                return attachment;
             }
         }, {
             key: 'mapLessonToApi',
             value: function mapLessonToApi(lesson) {
-                var lessonApi = angular.copy(lesson);
-                _.each(lessonApi.homeworks, function (homework) {
-                    homework.attachments = JSON.stringify(homework.attachments);
-                });
-                lessonApi.homeworks = JSON.stringify(lessonApi.homeworks);
-                lessonApi.attachments = JSON.stringify(lessonApi.attachments);
-                lessonApi.subject = JSON.stringify(lessonApi.subject);
-                return lessonApi;
+                //let lessonApi = lesson;//angular.copy(lesson);
+                var result = {
+                    id: lesson.id,
+                    title: lesson.title,
+                    description: lesson.description,
+                    subjectLabel: lesson.subject.subject_label,
+                    color: lesson.color,
+                    annotation: lesson.annotations,
+                    orderIndex: lesson.orderIndex,
+                    subject: lesson.subject,
+                    progressionId: lesson.progressionId,
+                    homeworks: lesson.homeworks && lesson.homeworks.all ? _.map(lesson.homeworks.all, this.mapHomeworkToApi) : []
+                };
+                /*if (result.homeworks.length > 0){
+                    _.each(result.homeworks,(homework)=>{
+                        if (homework.attachments){
+                            homework.attachments = JSON.stringify(homework.attachments);
+                        }
+                    });
+                }*/
+                if (result.homeworks) {
+                    result.homeworks = JSON.stringify(result.homeworks);
+                }
+                /*if (result.attachments){
+                    result.attachments = JSON.stringify(result.attachments);
+                }*/
+                result.subject = JSON.stringify(result.subject);
+                return result;
             }
         }, {
             key: 'extractOrderInformations',

@@ -34,8 +34,9 @@
                         </label>
                     </div>
                     <div class="ten cell">
-                        <p ng-bind-html="lesson.description | maxChar:60" ng-if="!lesson.expanded"></p>
-                        <p ng-bind-html="lesson.description" ng-if="!!lesson.expanded"></p>
+
+                        <p ng-bind-html="lesson.description | maxChar:60  " ng-if="!lesson.expanded"></p>
+                        <p ng-bind-html="lesson.description" ng-if="lesson.expanded"></p>
                     </div>
                     <div class="one cell right progression-icon-homeworks" ng-if="lesson.homeworks.length>0">
                         [[lesson.homeworks.length]]

@@ -17,8 +17,7 @@
                 vm.selectedProgressionItem.edit=true;
             };
 
-            vm.hasProgressItem = function(){
-                console.log(!!vm.selectedProgressionItem);
+            vm.hasProgressItem = function(){                
                 return vm.selectedProgressionItem === undefined;
             };
             vm.cancel = function(){
@@ -42,6 +41,7 @@
                 $rootScope.redirect('/progressionManagerView/'+progressionItem.id );
                 vm.selectedProgressionItem=progressionItem;
                 progressionItem.edit=false;
+                vm.loadLessonsFromProgression(vm.selectedProgressionItem);
             };
 
             vm.addNewLesson = function(){
@@ -51,6 +51,8 @@
             vm.editLesson = function(id){
                 $rootScope.redirect('/progressionEditLesson/'+vm.selectedProgressionItem.id+'/'+id );
             };
+
+
 
             vm.loadProgressions = function(){
                 ProgressionService.getProgressions().then((progressions)=>{
@@ -66,7 +68,7 @@
 
             vm.loadLessonsFromProgression = function(progression){
                 progression.lessonItems = null;
-                ProgressionService.getLessonsProgression(progressions.id).then((lessons) =>{
+                ProgressionService.getLessonsProgression(progression.id).then((lessons) =>{
                     progression.lessonItems = lessons;
                 });
             };

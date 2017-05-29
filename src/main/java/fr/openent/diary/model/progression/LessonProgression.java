@@ -8,12 +8,15 @@ import java.util.Date;
 public class LessonProgression {
 
     private Long id;
+    //REMOVE?
     private String type;
     private String title;
     private String description;
     private String subjectLabel;
+    //REMOVE?
     private String teacherName;
     private String color;
+    //CHANGE with s
     private String annotation;
     private Long orderIndex;
     private String teacherId;

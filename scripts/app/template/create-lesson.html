@@ -5,24 +5,24 @@
                 <h1 class="float-left margintopimportant">
                     <a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;-&nbsp;<i18n>diary.lesson.label</i18n>
                 </h1>
-                <h1 ng-if="lesson.state == 'draft' && !editProgressionLessonCtrl.isProgressionLesson" class="itemstate-red">(Brouillon)</h1>
-                <h1 ng-if="lesson.state == 'published' && !editProgressionLessonCtrl.isProgressionLesson" class="itemstate-green">(Publié)</h1>
+                <h1 ng-if="editLessonCtrl.lesson.state == 'draft' && !editProgressionLessonCtrl.isProgressionLesson" class="itemstate-red">(Brouillon)</h1>
+                <h1 ng-if="editLessonCtrl.lesson.state == 'published' && !editProgressionLessonCtrl.isProgressionLesson" class="itemstate-green">(Publié)</h1>
             </span>
             <span class="float-right">
                 <div class="row lessonHomeworkBtn">
                     <nav ng-if="!editProgressionLessonCtrl.isProgressionLesson">
                         <!-- publishes the current lesson ang go back to calendar view -->
-                        <button ng-if="lesson.id && lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, true)">
+                        <button ng-if="editLessonCtrl.lesson.id && editLessonCtrl.lesson.state == 'draft'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(editLessonCtrl.lesson, true)">
                             <i18n>daily.item.publish</i18n>
                         </button>
 
                         <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
-                        <button ng-if="lesson.id && lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(lesson, false)">
+                        <button ng-if="editLessonCtrl.lesson.id && editLessonCtrl.lesson.state == 'published'" class="right-magnet" type="submit"  data-ng-click="lessonform.$valid && publishLessonAndGoCalendarView(editLessonCtrl.lesson, false)">
                             <i18n>daily.item.unpublish</i18n>
                         </button>
 
                         <!-- save & publish lesson in create mode -->
-                        <button ng-if="lesson.id == null" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createAndPublishLesson(lesson, true, true)">
+                        <button ng-if="editLessonCtrl.lesson.id == null" class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createAndPublishLesson(editLessonCtrl.lesson, true, true)">
                             <i18n>daily.item.publish</i18n>
                         </button>
 
@@ -39,7 +39,7 @@
                     <nav ng-if="editProgressionLessonCtrl.isProgressionLesson">
 
                         <!-- save lesson in draft mode -->
-                        <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && createOrUpdateLesson(true)">
+                        <button class="right-magnet" type="submit" data-ng-click="lessonform.$valid && editProgressionLessonCtrl.saveLesson(editLessonCtrl.lesson)">
                             <i18n>save</i18n>
                         </button>
 
@@ -55,10 +55,10 @@
         <form name="lessonform">
             <div class="row">
                 <div class="cell" style="width: 21em">
-                    <subject-picker ng-model="lesson.subject" lesson="lesson"></subject-picker>
+                    <subject-picker ng-model="editLessonCtrl.lesson.subject" lesson="editLessonCtrl.lesson"></subject-picker>
                 </div>
                 <div class="three cell" ng-if="!editProgressionLessonCtrl.isProgressionLesson">
-                    <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="lesson.audience" property="name" school="currentSchool" lesson="lesson" homework="">
+                    <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="editLessonCtrl.lesson.audience" property="name" school="currentSchool" lesson="editLessonCtrl.lesson" homework="">
                     </ent-dropdown>
                 </div>
             </div>
@@ -69,9 +69,9 @@
                         <i18n>create.lesson.tabs.lesson</i18n>
                     </headerHomeworkLesson>
                     <headerHomeworkLesson data-ng-class="{'selected': data.tabSelected === 'homeworks'}" data-ng-click="data.tabSelected = 'homeworks'">
-                        <i18n>create.lesson.tabs.homeworks</i18n>
+                        <i18n>create.lesson.tabs.homeworks</i18n> ([[editLessonCtrl.lesson.homeworks.length()]])
                     </headerHomeworkLesson>
-                    <headerHomeworkLesson ng-if="!editProgressionLessonCtrl.isProgressionLesson" data-ng-class="{'selected': data.tabSelected === 'previouslessons'}" data-ng-click="data.tabSelected = 'previouslessons'; loadPreviousLessonsFromLesson(lesson)">
+                    <headerHomeworkLesson ng-if="!editProgressionLessonCtrl.isProgressionLesson" data-ng-class="{'selected': data.tabSelected === 'previouslessons'}" data-ng-click="data.tabSelected = 'previouslessons'; loadPreviousLessonsFromLesson(editLessonCtrl.lesson)">
                         <i18n>create.lesson.tabs.previouslessons</i18n>
                     </headerHomeworkLesson>
                 </div>
@@ -85,11 +85,11 @@
                 <div ng-switch="data.tabSelected">
                     <article ng-switch-when="lesson">
                         <div class="row">
-                            <input type="text" i18n-placeholder="title" ng-model="lesson.title" maxlength="50" required class="six cell" />
+                            <input type="text" i18n-placeholder="title" ng-model="editLessonCtrl.lesson.title" maxlength="50" required class="six cell" />
 
-                            <!--ng-model="lesson.teacher"-->
+                            <!--ng-model="editLessonCtrl.lesson.teacher"-->
                             <div class="cell float-right" style="margin-right: 20%;">
-                                Couleur de séance : <input type="color" ng-model="lesson.color">
+                                Couleur de séance : <input type="color" ng-model="editLessonCtrl.lesson.color">
                             </div>
 
                         </div>
@@ -113,17 +113,17 @@
                             </div>
                             <div class="two cell">
                                 <label class="cell five"><i18n>room</i18n></label>
-                                <input type="text" i18n-placeholder="room" ng-model="lesson.room" maxlength="8" class="cell six" />
+                                <input type="text" i18n-placeholder="room" ng-model="editLessonCtrl.lesson.room" maxlength="8" class="cell six" />
                             </div>
 
                         </div>
                         <div class="row">
-                            <editor ng-if="!lessonDescriptionIsReadOnly" ng-model="lesson.description"></editor>
+                            <editor ng-if="!lessonDescriptionIsReadOnly" ng-model="editLessonCtrl.lesson.description"></editor>
                             <button ng-if="!lessonDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setLessonDescriptionMode()">
                                 <i18n>description.see</i18n>
                             </button>
                             <!-- see lesson.description in readonly -->
-                            <div ng-if="lessonDescriptionIsReadOnly" bind-html="lesson.description" class="lessonHomeworkDescription"></div>
+                            <div ng-if="lessonDescriptionIsReadOnly" bind-html="editLessonCtrl.lesson.description" class="lessonHomeworkDescription"></div>
                             <button ng-if="lessonDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setLessonDescriptionMode()">
                                 <i18n>description.edit</i18n>
                             </button>
@@ -137,7 +137,7 @@
                                     <i18n>annotations.title</i18n>
                                 </h2>
                                 <div class="toggle">
-                                    <editor ng-model="lesson.annotations"></editor>
+                                    <editor ng-model="editLessonCtrl.lesson.annotations"></editor>
                                 </div>
                             </article>
                         </div>
@@ -147,11 +147,14 @@
                     <div ng-switch-when="homeworks">
                         <div ng-if="isLessonHomeworkEditable" class="row addHomeworkToLessonBtn">
                             <!-- add homework to lesson -->
-                            <button type="submit" data-ng-click="addHomeworkToLesson(lesson)">
-                            <i18n>homework.add</i18n>
-                        </button>
+                            <button type="submit" data-ng-click="addHomeworkToLesson(editLessonCtrl.lesson)" ng-if="!editProgressionLessonCtrl.isProgressionLesson">
+                                <i18n>homework.add</i18n>
+                            </button>
+                            <button type="submit" data-ng-click="editProgressionLessonCtrl.addHomework(editLessonCtrl.lesson)" ng-if="editProgressionLessonCtrl.isProgressionLesson">
+                                <i18n>homework.add</i18n>
+                            </button>
                         </div>
-                        <article class="row" ng-repeat="homework in lesson.homeworks.all track by $index">
+                        <article class="row" ng-repeat="homework in editLessonCtrl.lesson.homeworks.all track by $index">
 
                             <!-- minimized view -->
                             <div class="row" ng-click="toggleShowHomeworkInLesson(homework)">
@@ -172,10 +175,17 @@
 
                             <div ng-show="homework.expanded">
                                 <div class="row">
-                                    <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
-                                    <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" />
+                                    <div class="cell six">
+                                        <input ng-if="!isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" readonly/>
+                                        <input ng-if="isLessonHomeworkEditable" type="text" ng-model="homework.title" i18n-placeholder="title" maxlength="50" class="six cell" />
+                                    </div>
+                                    <div class="cell six" ng-if="editProgressionLessonCtrl.isProgressionLesson">
+                                        <label class="three cell"><i18n>homework.type</i18n></label>
+                                        <select ng-if="!isLessonHomeworkEditable" class="seven cell" ng-options="type as type.label for type in homeworkTypes.all" ng-model="homework.type" disabled></select>
+                                        <select ng-if="isLessonHomeworkEditable" class="seven cell" ng-options="type as type.label for type in homeworkTypes.all" ng-model="homework.type"></select>
+                                    </div>
                                 </div>
-                                <div class="row" >
+                                <div class="row" ng-if="!editProgressionLessonCtrl.isProgressionLesson">
                                     <div class="four cell">
                                         <label class="four cell"><i18n>homework.date</i18n></label>
                                         <input ng-if="!isLessonHomeworkEditable" type="text" class="five cell" value="[[formatDate(homework.dueDate)]]" readonly/>
@@ -184,11 +194,10 @@
                                     <div class="five cell">
                                         <label class="three cell"><i18n>homework.type</i18n></label>
                                         <select ng-if="!isLessonHomeworkEditable" class="seven cell" ng-options="type as type.label for type in homeworkTypes.all" ng-model="homework.type" disabled></select>
-
                                         <select ng-if="isLessonHomeworkEditable" class="seven cell" ng-options="type as type.label for type in homeworkTypes.all" ng-model="homework.type"></select>
                                     </div>
                                 </div>
-                                <div>
+                                <div ng-if="!editProgressionLessonCtrl.isProgressionLesson">
                                     <label class="cell space-right"><i18n>homework.load</i18n></label>
                                     <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
                                 <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
@@ -225,11 +234,11 @@
 
                     <!-- PREVIOUS LESSONS CREATED -->
                     <div ng-switch-when="previouslessons">
-                        <article ng-show="!lesson.previousLessons || lesson.previousLessons.length === 0">
+                        <article ng-show="!editLessonCtrl.lesson.previousLessons || editLessonCtrl.lesson.previousLessons.length === 0">
                             <i18n>daily.lesson.nopreviouslesson</i18n>
                         </article>
 
-                        <article class="row" ng-repeat="pedagogicItem in lesson.previousLessons" overflow-y="scroll" bottom-scroll="loadMorePreviousLessonsFromLesson(lesson)">
+                        <article class="row" ng-repeat="pedagogicItem in editLessonCtrl.lesson.previousLessons" overflow-y="scroll" bottom-scroll="loadMorePreviousLessonsFromLesson(editLessonCtrl.lesson)">
                             <div class="prev-lesson-summary" ng-click="goToItemDetail(pedagogicItem, true)">
                                 [[pedagogicItem.dayOfWeek]] [[pedagogicItem.dayFormatted]] - [[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]] - [[pedagogicItem.subject]] - [[pedagogicItem.audience]]
                                 <i class="external-link"></i>
@@ -271,7 +280,7 @@
                             <br>
                         </article>
 
-                        <article ng-if="lesson.previousLessonsLoading">
+                        <article ng-if="editLessonCtrl.lesson.previousLessonsLoading">
                             <h1 class="reduce-block-eight nomargin" style="text-align: center;"><i18n><span class="no-style ng-scope">Chargement ...</span></i18n></h1>
                         </article>
                     </div>

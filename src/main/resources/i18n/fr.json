@@ -50,7 +50,7 @@
   "diary.homework.create": "Créer un travail à faire",
   "annotations.title": "Annotations",
   "create.lesson.tabs.lesson": "Séance",
-  "create.lesson.tabs.homeworks": "Travail à faire ([[lesson.homeworks.length()]])",
+  "create.lesson.tabs.homeworks": "Travail à faire",
   "create.lesson.tabs.previouslessons": "Séances précédentes",
   "audience.type.class": "Classe",
   "audience.type.group": "Groupe",

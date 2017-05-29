@@ -307,7 +307,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         }
     };
 
-    
+
     $scope.openHomeworkView = function(homework, params){
 
         if (homework) {
@@ -917,14 +917,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.show(moment(model.calendar.firstDay));
     };
 
-
-
     $scope.addHomeworkToLesson = function(lesson){
         lesson.addHomework(lesson);
     };
-
-
-
 
     $scope.getPedagogicItemSelectedCount = function () {
         return $scope.getSelectedPedagogicItems('lesson').length + $scope.getSelectedPedagogicItems('homework').length;
