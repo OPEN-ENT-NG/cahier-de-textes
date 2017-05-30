@@ -15,8 +15,6 @@
                 restrict: 'E',
                 templateUrl: 'diary/public/template/subject-picker.html',
                 link: function(scope, element) {
-
-
                     var sortBySubjectLabel = function(a, b) {
                         if (a.label > b.label)
                             return 1;
@@ -35,11 +33,12 @@
                     // containing base subject collection + current ones being created by used
                     var subjects = [];
 
-                    model.subjects.all.forEach(function(subject) {
+                    /*model.subjects.all.forEach(function(subject) {
                         subjects.push(subject);
                     });
 
                     subjects.sort(sortBySubjectLabel);
+                    */
 
                     var setNewSubject = function(subjectLabel) {
 
@@ -76,13 +75,25 @@
                     var initSuggestedSubjects = function() {
                         scope.suggestedSubjects = [];
 
+                        subjects = [];
+
+                        model.subjects.all.forEach(function(subject) {
+                            subjects.push(subject);
+                        });
+
+                        subjects.sort(sortBySubjectLabel);
+
                         for (var i = 0; i < subjects.length; i++) {
                             scope.suggestedSubjects.push(subjects[i]);
                         }
                     };
 
-                    initSuggestedSubjects();
 
+                    scope.$watch(()=>{
+                        return model.subjects ? model.subjects.length() : undefined;
+                    },()=>{
+                        initSuggestedSubjects();
+                    });
                     scope.goToSearchMode = function() {
                         scope.displaySearch = true;
                         scope.search = '';
@@ -153,7 +164,7 @@
                         }
                     });
                 }
-            }
+            };
         });
     });
 

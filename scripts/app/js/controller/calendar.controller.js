@@ -5,7 +5,7 @@
         //controller declaration
         module.controller("CalendarController", controller);
 
-        function controller($scope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService,ModelWeekService, SecureService) {
+        function controller($scope, $rootScope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService,ModelWeekService, SecureService) {
 
             var vm = this;
 
@@ -80,16 +80,6 @@
             };
 
 
-            var validationError = function(e) {
-
-                if (typeof e !== 'undefined') {
-                    console.error(e);
-                    notify.error(e.error);
-                    $scope.currentErrors.push(e);
-                    $scope.$apply();
-                }
-            };
-
             /**
              * Load related data to lessons and homeworks from database
              * @param cb Callback function
@@ -108,7 +98,7 @@
                 // auto creates diary.teacher
                 if ("ENSEIGNANT" === model.me.type) {
                     var teacher = new Teacher();
-                    teacher.create(decrementCountdown(bShowTemplates, cb), validationError);
+                    teacher.create(decrementCountdown(bShowTemplates, cb), $rootScope.validationError);
                 } else {
                     decrementCountdown(bShowTemplates, cb);
                 }
@@ -125,7 +115,6 @@
                           model.subjects.addRange(subjects);
                         }
                     }).then(()=>{
-                        //model.audiences.syncAudiences(function() {
                             decrementCountdown(bShowTemplates, cb);
                             model.homeworkTypes.syncHomeworkTypes(function() {
                                 // call lessons/homework sync after audiences sync since
@@ -135,9 +124,8 @@
                                     model.isUserParent,
                                     model.child ? model.child.id : undefined);
 
-                            }, validationError);
-                        //}, validationError);
-                        }, validationError);
+                            }, $rootScope.validationError);
+                        }, $rootScope.validationError);
                     });
             };
 

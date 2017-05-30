@@ -13,18 +13,18 @@
                placeholder="title" required>
         </span>
                 <span ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
-          <label>Titre</label> : [[progressionManagerCtrl.selectedProgressionItem.title]]
+          <label><i18n>title</i18n></label> : [[progressionManagerCtrl.selectedProgressionItem.title]]
         </span>
             </div>
             <div class="six cell">
                 <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit">
           <input type="text"
-            i18n-placeholder="level"
+            i18n-placeholder="progression.level"
             ng-model="progressionManagerCtrl.selectedProgressionItem.level"
-            placeholder="level">
+            placeholder="progression.level">
         </span>
                 <span ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
-          <label>Niveau</label> : [[progressionManagerCtrl.selectedProgressionItem.level]]
+          <label><i18n>progression.level</i18n></label> : [[progressionManagerCtrl.selectedProgressionItem.level]]
         </span>
             </div>
         </div>
@@ -36,9 +36,9 @@
             i18n-placeholder="description"
             ng-model="progressionManagerCtrl.selectedProgressionItem.description"
                placeholder="description"></textarea>
-        </span>
+            </span>
                 <div ng-if="!progressionManagerCtrl.selectedProgressionItem.edit">
-                    <label>Description</label> :
+                    <label><i18n>progression.description</i18n></label> :
                     <p>
                         [[progressionManagerCtrl.selectedProgressionItem.description]]
                     </p>
@@ -48,17 +48,17 @@
         <!-- button -->
         <div class="row" ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
           <button class="cancel" type="button"
-                  confirm-click="Etes vous sur de vouloir supprimer cette progression"
-                  confirm-yes="Supprimer"
-                  confirm-cancel="Annuler"
+                  confirm-click="[['progression.confirm.delete.progression'|translate]]"
+                  confirm-yes="[['diary.delete' | translate]]"
+                  confirm-cancel="[['cancel'|translate]]"
                   confirmed-click="progressionManagerCtrl.removeProgression()">
-                <i18n><span class="no-style ng-scope">Supprimer</span></i18n>
+                <i18n><span class="no-style ng-scope">[['diary.delete' | translate]]</span></i18n>
             </button>
             <button class="cancel" type="button" ng-click="progressionManagerCtrl.cancel()">
-                  <i18n><span class="no-style ng-scope">Annuler</span></i18n>
+                  <i18n><span class="no-style ng-scope">[['cancel'|translate]]</span></i18n>
               </button>
             <button ng-click="progressionManagerCtrl.saveProgression(progressionManagerCtrl.selectedProgressionItem)" ng-disabled="progressionform.$invalid || !progressionform.$dirty ">
-                Enregistrer
+                [['save'|translate]]
           </button>
         </div>
     </form>

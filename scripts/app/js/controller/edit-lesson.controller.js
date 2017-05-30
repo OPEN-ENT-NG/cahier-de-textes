@@ -5,7 +5,7 @@
         //controller declaration
         module.controller("EditLessonController", controller);
 
-        function controller($scope, $routeParams,PedagogicItemService,constants,$q,SubjectService) {
+        function controller($scope, $rootScope, $routeParams,PedagogicItemService,constants,$q,SubjectService) {
 
             var vm = this;
 
@@ -13,7 +13,12 @@
 
             function init() {
                 //existing lesson
-                loadSubjects().then(()=>{
+                $q.all([
+                    //need subjects
+                    loadSubjects(),
+                    //need homework types
+                    loadHomeworkTypes()
+                ]).then(()=>{
                     if ($routeParams.idLesson) {
                         model.newLesson = null;
                         loadExistingLesson();
@@ -45,6 +50,15 @@
                 });
             }
 
+            function loadHomeworkTypes(){
+                if (!model.homeworkTypes || !model.homeworkTypes.all || model.homeworkTypes.all.length === 0){
+                    model.homeworkTypes.syncHomeworkTypes(function() {
+                        return $q.when();
+                        }, $rootScope.validationError);
+                }else{
+                    return $q.when();
+                }
+            }
 
             function loadSubjects(){
                 if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){
@@ -146,7 +160,7 @@
                             $scope.$apply();
                         },
                         function(e) {
-                            validationError(e);
+                            $rootScope.validationError(e);
                         });
                 } else {
                     if (typeof cb !== 'undefined') {
@@ -186,7 +200,7 @@
                         cb();
                     }
                 }, function(e) {
-                    validationError(e);
+                    $rootScope.validationError(e);
                 });
             };
 

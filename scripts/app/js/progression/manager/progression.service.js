@@ -29,6 +29,7 @@
         saveProgression(progression){
             let progressionLight = angular.copy(progression);
             delete progressionLight.lessonItems;
+            delete progressionLight.nbLessons;
             let url = `/diary/progression`;
             return this.$http({
                 url : url,
@@ -112,8 +113,7 @@
             if (lesson.description){
                 lesson.descriptionTrusted = this.$sce.trustAsHtml(lesson.description);
             }
-
-            //lesson.attachments = JSON.parse(lesson.attachments);
+            
 
             lesson.homeworks = JSON.parse(lesson.homeworks);
             _.each(lesson.homeworks,(homework)=>{
@@ -135,7 +135,7 @@
             return attachment;
         }
         mapLessonToApi(lesson){
-            //let lessonApi = lesson;//angular.copy(lesson);
+
             let result  = {
                 id : lesson.id,
                 title : lesson.title,
@@ -147,21 +147,12 @@
                 subject : lesson.subject,
                 progressionId : lesson.progressionId,
                 homeworks : lesson.homeworks && lesson.homeworks.all ? _.map(lesson.homeworks.all,this.mapHomeworkToApi) : [],
-                //attachments : lesson.attachments && lesson.attachments.all ? _.map(lesson.attachments.all,this.mapAttachementsToApi) : []
             };
-            /*if (result.homeworks.length > 0){
-                _.each(result.homeworks,(homework)=>{
-                    if (homework.attachments){
-                        homework.attachments = JSON.stringify(homework.attachments);
-                    }
-                });
-            }*/
+
             if (lesson.homeworks){
                 result.homeworks = JSON.stringify(_.map(lesson.homeworks.all,this.mapObject));
             }
-            /*if (result.attachments){
-                result.attachments = JSON.stringify(result.attachments);
-            }*/
+
             result.subject = JSON.stringify(result.subject.data);
             return result;
         }

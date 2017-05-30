@@ -23,8 +23,9 @@
         overflow-y: auto;
         overflow-x: hidden;
         padding-top: 8px;
+        width: 100%;
         &.content-lesson{
-          height: 378px;              
+          height: 378px;
         }
         a {
             &:hover {
@@ -38,7 +39,14 @@
             }
         }
     }
-
+    .lesson-item{
+      margin-left: 5px;
+      margin-right: 5px;
+      color : white;
+      &:hover{
+        opacity: 0.8;
+      }
+    }
     .pedagogic-day-card{
       position: relative;
       height: 42px;

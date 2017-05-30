@@ -13,7 +13,7 @@
 					item = item.toString();
 				}
 
-				item = item.replace(/<\/?[^>]+(>|$)/g, "");
+				item = item.replace(/<\/?[^>]+(>|$)/g, " ");
 
 			 let dynamicMaxChar = maxChar;
 

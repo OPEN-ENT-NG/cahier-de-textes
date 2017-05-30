@@ -1,10 +1,22 @@
 <div ng-controller="ProgressionRightPanelController as progressionRightPanelCtrl" >
     <div style="background-color: #ddd; padding-top: 10px; padding-left: 10px;  ">
         <label style="font-weight: bold; color: #2a9cc8;" ng-click="$parent.toggle()"  >
-              [[label]]
+              [[label | translate]]
           </label>
         <div class="search-progression">
-            <input type="text" style="background-color: white;" < translate attr="placeholder" placeholder="diary.quicksearch.zoomlabel" ng-model="search"  />
+            <input type="text"
+                style="background-color: white;"
+                translate attr="placeholder"
+                placeholder="diary.quicksearch.zoomlabel"
+                ng-if="progressionRightPanelCtrl.selected=='main'"
+                ng-model="progressionRightPanelCtrl.filterProgression"  />
+            <input type="text"
+                style="background-color: white;"
+                translate attr="placeholder"
+                placeholder="diary.quicksearch.zoomlabel"
+                ng-if="progressionRightPanelCtrl.selected!='main'"
+                ng-model="progressionRightPanelCtrl.filterLesson"  />
+
             <button class="right-magnet"  ng-click="redirect('/progressionManagerView/none')"  >
                 <i  class="day-card-icon cog"></i>
             </button>

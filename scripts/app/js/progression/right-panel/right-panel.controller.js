@@ -5,10 +5,11 @@
         //controller declaration
         module.controller("RightPanelController", controller);
 
-        function controller($scope,$rootScope) {
+        function controller($scope,$rootScope,ProgressionService) {
             let id = Date.now();
-
+            var vm = this;
             $scope.panelVisible = false;
+
 
             $scope.toggle = function(){
                 if (!$scope.panelVisible){

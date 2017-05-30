@@ -38,6 +38,15 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         return $sce.trustAsHtml(txt);
     };
 
+    $rootScope.validationError = function(e) {
+        if (typeof e !== 'undefined') {
+            notify.error(e.error);
+            $rootScope.currentErrors=[];
+            $rootScope.currentErrors.push(e);
+            $rootScope.$apply();
+        }
+    };
+
     $scope.lessonDescriptionIsReadOnly = false;
     $scope.homeworkDescriptionIsReadOnly = false;
 
@@ -239,7 +248,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         }
 
         $scope.selectedDueDate = undefined;
-        model.pedagogicDays.syncPedagogicItems($scope.openListView, validationError);
+        model.pedagogicDays.syncPedagogicItems($scope.openListView, $rootScope.validationError);
     };
 
     $scope.openListView = function () {
@@ -523,7 +532,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
         model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, publishCB(lessons, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
-            validationError(e);
+            $rootScope.validationError(e);
         });
     };
 
@@ -552,7 +561,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
         model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
-            validationError(e);
+            $rootScope.validationError(e);
         });
     };
 
@@ -613,7 +622,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
                     }
                     $scope.$apply();
                 }, function (e) {
-                    validationError(e);
+                    $rootScope.validationError(e);
                 });
         } else {
             if (typeof cb !== 'undefined') {
@@ -829,7 +838,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
                 cb();
             }
         }, function (e) {
-            validationError(e);
+            $rootScope.validationError(e);
         });
     };
 
@@ -865,7 +874,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
                 syncLessonsAndHomeworks(postHomeworkSave)
             }
         }, function (e) {
-            validationError(e);
+            $rootScope.validationError(e);
         });
     };
 
@@ -1003,17 +1012,6 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         };
     };
 
-    var validationError = function (e) {
-
-        if (typeof e !== 'undefined') {
-            console.error(e);
-            notify.error(e.error);
-            $scope.currentErrors.push(e);
-            $scope.$apply();
-        }
-    };
-
-
 
 
     /**
@@ -1039,12 +1037,12 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     };
 
     $scope.performPedagogicItemSearch = function () {
-        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.isUserTeacher, $scope.openListView, validationError);
+        model.performPedagogicItemSearch($scope.searchForm.getSearch(), $scope.isUserTeacher, $scope.openListView, $rootScope.validationError);
     };
 
     /*
     $scope.loadMorePreviousLessonsFromLesson = function (currentLesson) {
-        model.getPreviousLessonsFromLesson(currentLesson, true, function(){$scope.$apply()}, validationError);
+        model.getPreviousLessonsFromLesson(currentLesson, true, function(){$scope.$apply()}, $rootScope.validationError);
     };
     */
 
@@ -1053,7 +1051,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
      * @param currentLesson Current lesson being edited
      */
     $scope.loadPreviousLessonsFromLesson = function (currentLesson) {
-        model.getPreviousLessonsFromLesson(currentLesson, false, function(){$scope.$apply()}, validationError);
+        model.getPreviousLessonsFromLesson(currentLesson, false, function(){$scope.$apply()}, $rootScope.validationError);
     };
 
     $scope.itemTypesDisplayed = function(item){

@@ -39,7 +39,20 @@
       top : -50px;
   }
 
+  .pedagogic-item-container{
+
+    ul[diary-sortable-list]{
+      max-height : 500px;
+      overflow-y: auto;
+      width: auto;
+      padding-right: 0px;
+    }
+  }
+
   .pedagogic-day-container{
+    i{
+      padding-left: 0px;
+    }
     .pedagogic-day-card{
       display: flex;
       align-items:stretch;

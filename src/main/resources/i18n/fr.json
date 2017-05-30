@@ -164,5 +164,18 @@
   "diary.model.week.invert.effective" : "Les semaines modèle A et B ont été inversées",
   "diary.model.week.choice.effective" : "La semaine courante a été séléctionnée pour être la semaine modèle ",
 
-  "progression.title" : "Progressions"
+  "progression.title" : "Progressions",
+  "progression.confirm.delete.progression" : "Êtes-vous sûr de vouloir supprimer cette progression",
+  "progression.description" : "Description",
+  "progression.level" : "Niveau",
+  "progression.add.content" : "Ajouter du contenu",
+  "progression.content.saved" : "Le contenu a été enregistré",
+  "progression.content.deleted" : "Les contenus ont été supprimés",
+  "progression.progression.saved" : "La progression a été enregistrée",
+  "progression.progression.deleted" : "La progression a été suprimée",
+  "progression.create" : "Créer une progression",
+  "progression.help.select" : "Sélectionnez une progression en cliquant sur le panneau à votre gauche",
+  "progression.help.add" : "ou ajoutez en cliquant ici",
+  "progression.lessons.delete.confirm" : "Êtes-vous sûr de vouloir supprimer ces contenus"
+
 }

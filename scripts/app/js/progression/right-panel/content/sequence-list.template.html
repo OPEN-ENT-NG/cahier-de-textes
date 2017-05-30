@@ -1,12 +1,12 @@
 <div class="content scrollbar-fine">
-    <a href="" ng-repeat="index in progressionRightPanelCtrl.array" ng-click="progressionRightPanelCtrl.selected='detail'">
+    <a href="" ng-repeat="progression in progressionRightPanelCtrl.progressionItems | filter :{ title: progressionRightPanelCtrl.filterProgression }" ng-click="progressionRightPanelCtrl.selectProgression(progression)">
         <article class="twelve cell" >
             <div>
-                Produit en stock
+                [[progression.level]] - [[progression.title]]
                 <div class="right">
-                    [[index]]
+                    [[progression.nbLessons]]
                     <!--card-icon-selected-->
-                    <i class="day-card-icon  rack2 table-cell-left"></i>
+                    <i class="day-card-icon  cahier-textes2 table-cell-left"></i>
                 </div>
             </div>
     </article>

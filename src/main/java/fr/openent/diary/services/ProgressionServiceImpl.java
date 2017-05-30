@@ -44,7 +44,8 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 .append(" p.level as level,")
                 .append(" p.title as title,")
                 .append(" p.description as description,")
-                .append(" p.teacherId as teacherId ")
+                .append(" p.teacherId as teacherId ,")
+                .append(" (select count(*) from diary.lessonprogression where progressionId = p.id ) as nbLessons ")
                 .append(" FROM diary.progression as p")
                 .append(" WHERE p.teacherId = ?");
 

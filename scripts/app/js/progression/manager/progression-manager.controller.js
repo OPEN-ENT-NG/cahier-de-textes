@@ -76,7 +76,7 @@
             vm.saveLesson = function(lesson){
                 ProgressionService.saveLessonProgression(lesson).then((newLesson)=>{
                     lesson.id = newLesson.id;
-                    notify.info('Le contenu a été enregistré');
+                    notify.info(lang.translate('progression.content.saved'));
                 });
             };
 
@@ -84,7 +84,7 @@
                 return _.filter(vm.selectedProgressionItem.lessonItems,{'selected' : true});
             };
 
-           
+
             vm.saveProgression = function(progression){
                 ProgressionService.saveProgression(progression).then((newProgression)=>{
                     if (!progression.id){
@@ -96,7 +96,7 @@
                         }
                     }
                     vm.selectedProgressionItem = newProgression;
-                    notify.info('La progression a été enregistrée');
+                    notify.info(lang.translate('progression.progression.saved'));
                 });
             };
 
@@ -107,14 +107,14 @@
             vm.removeSelectedContent = function(){
                 ProgressionService.deleteLessons(vm.selectedContent()).then(()=>{
                     vm.loadLessonsFromProgression(vm.selectedProgressionItem);
-                    notify.info('Les contenus ont été suprrimés');
+                    notify.info(lang.translate('progression.content.deleted'));
                 });
             };
 
             vm.removeProgression = function(){
                 ProgressionService.deleteProgression(vm.selectedProgressionItem.id).then(()=>{
                     vm.selectedProgressionItem=undefined;
-                    notify.info('La progression a été supprimé');
+                    notify.info(lang.translate('progression.progression.deleted'));
                     vm.loadProgressions();
                 });
             };

@@ -1292,24 +1292,33 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
     position: absolute;
     right: 0px;
     top: -50px; }
-  /* line 43, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 44, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-item-container ul[diary-sortable-list] {
+    max-height: 500px;
+    overflow-y: auto;
+    width: auto;
+    padding-right: 0px; }
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-day-container i {
+    padding-left: 0px; }
+  /* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .progression-manager .pedagogic-day-container .pedagogic-day-card {
     display: flex;
     align-items: stretch; }
-    /* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 60, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .progression-manager .pedagogic-day-container .pedagogic-day-card div {
       height: 100%;
       display: flex;
       justify-content: center;
       flex-direction: column; }
-    /* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 67, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .progression-manager .pedagogic-day-container .pedagogic-day-card .thumbnail {
       width: 25%;
       font-size: 0.75em;
       overflow: hidden;
       text-align: center;
       padding: 0px; }
-    /* line 62, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 75, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .progression-manager .pedagogic-day-container .pedagogic-day-card .summary {
       margin: 0px;
       align-self: center;
@@ -1317,7 +1326,7 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
       padding: 0px 5px;
       width: 60%;
       font-size: 0.85em; }
-    /* line 70, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 83, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .progression-manager .pedagogic-day-container .pedagogic-day-card .indicator {
       align-self: center;
       text-align: right;
@@ -1325,67 +1334,67 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
       text-align: center;
       padding: 0px; }
 
-/* line 81, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+/* line 94, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
 .content-not-found {
   font-size: 2em;
   color: #2a9cc8;
   text-align: center;
   vertical-align: middle; }
-  /* line 86, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 99, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .content-not-found div {
     padding: 10px 100px;
     line-height: 1.5em; }
-  /* line 90, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 103, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .content-not-found i {
     position: relative;
     top: 10px;
     font-size: 2.2em;
     margin-right: 10px; }
-  /* line 96, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 109, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .content-not-found button {
     margin: 15px auto;
     float: none; }
 
-/* line 102, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+/* line 115, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
 .new-progression {
   margin: 0px 0px 15px 15px;
   background-color: #7bbcf0;
   color: white;
   padding: 10px 15px;
   border-radius: 3px; }
-  /* line 109, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 122, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .new-progression .row {
     margin-top: 15px; }
-  /* line 112, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 125, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .new-progression div.six.cell, .new-progression div.twelve.cell {
     padding: 5px 10px; }
-    /* line 113, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 126, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression div.six.cell label, .new-progression div.twelve.cell label {
       text-decoration: underline; }
-  /* line 118, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 131, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .new-progression textarea {
     border-radius: 3px;
     background-color: #7bbcf0; }
-    /* line 121, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 134, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression textarea::placeholder {
       color: rgba(255, 255, 255, 0.7); }
-    /* line 124, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 137, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression textarea {
       color: white; }
-    /* line 127, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 140, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression textarea:focus {
       outline: none;
       border-left: 1px solid #DDD;
       border-right: 1px solid #DDD;
       border-top: 1px solid #DDD;
       border-bottom: 2px solid #FF8500; }
-  /* line 135, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  /* line 148, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
   .new-progression input {
     width: 100%; }
-    /* line 137, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 150, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression input::placeholder {
       color: rgba(255, 255, 255, 0.7); }
-    /* line 141, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    /* line 154, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
     .new-progression input[type=text] {
       color: white; }
 
@@ -1412,46 +1421,56 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
   height: 422px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-top: 8px; }
-  /* line 26, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  padding-top: 8px;
+  width: 100%; }
+  /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .content.content-lesson {
     height: 378px; }
-  /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 32, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .content a:hover article {
     border-left: 4px solid #FF8500; }
-  /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .content a article {
     transition: border-left 0.1s;
     padding: 10px; }
 
 /* line 42, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .lesson-item {
+  margin-left: 5px;
+  margin-right: 5px;
+  color: white; }
+  /* line 46, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .lesson-item:hover {
+    opacity: 0.8; }
+
+/* line 50, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
 .progressiontype .pedagogic-day-card {
   position: relative;
   height: 42px; }
-  /* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .pedagogic-day-card:hover {
     opacity: 0.8; }
-  /* line 48, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .pedagogic-day-card .thumbnail {
     box-sizing: border-box;
     padding: 6px 0px;
     font-size: 0.8em;
     width: 22px; }
-  /* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 62, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .progressiontype .pedagogic-day-card .summary {
     padding: 9px 4px 9px 6px;
     color: white;
     font-size: 0.75em;
     width: calc(100% - 22px); }
 
-/* line 63, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+/* line 71, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
 .contener-slide {
   position: relative;
   float: left;
   width: 100%;
   overflow: hidden;
   height: 432px; }
-  /* line 69, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  /* line 77, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .contener-slide .slide {
     top: 0px;
     transition: left .3s;
@@ -1459,10 +1478,10 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
     float: left;
     left: 0%;
     width: 100%; }
-    /* line 76, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    /* line 84, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
     .contener-slide .slide.left-slide {
       left: -100%; }
-    /* line 79, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    /* line 87, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
     .contener-slide .slide.right-slide {
       left: 100%; }
 

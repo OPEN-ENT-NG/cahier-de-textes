@@ -2,13 +2,13 @@
 
     <div class="create-content" ng-if="progressionManagerCtrl.selectedProgressionItem.id">
         <button ng-click="progressionManagerCtrl.addNewLesson()">
-             + Ajouter un contenu
+             + <i18n>progression.add.content</i18n>
         </button>
     </div>
 
     <div ng-include="'/diary/public/js/progression/manager/creation-progression-form.template.html'"></div>
 
-    <ul diary-sortable-list>
+    <ul diary-sortable-list class="scrollbar-fine">
         <li diary-sortable-element ng-model="lesson.orderIndex"
                 ng-change="progressionManagerCtrl.saveOrder(progressionManagerCtrl.selectedProgressionItem)"
                 ng-repeat="lesson in progressionManagerCtrl.selectedProgressionItem.lessonItems | orderBy:'orderIndex'">
@@ -16,7 +16,7 @@
                 <div class="row hover-orange" >
                     <div class="cell one" >&nbsp;</div>
                     <div class="cell three" >
-                        <label>[[lesson.subjectLabel]]</label>
+                        <label>[[lesson.subject.label]]</label>
                     </div>
                     <div class="cell six">
                         <label>[[lesson.title]]</label>

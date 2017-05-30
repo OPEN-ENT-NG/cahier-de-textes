@@ -9,8 +9,12 @@ public class Progression {
     private Long id;
     private String level;
     private String title;
+
+
+
     private String description;
     private String teacherId;
+    private Long nbLessons;
 
     public String getTeacherId() {
         return teacherId;
@@ -50,5 +54,13 @@ public class Progression {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getNbLessons() {
+        return nbLessons;
+    }
+
+    public void setNbLessons(Long nbLessons) {
+        this.nbLessons = nbLessons;
     }
 }

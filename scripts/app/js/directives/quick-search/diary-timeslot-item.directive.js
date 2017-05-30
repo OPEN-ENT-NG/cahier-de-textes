@@ -41,7 +41,7 @@
 
 
                     timeslot.on('drop', function($event) {
-
+                       timeslot.removeClass("dragin");
                         let scheduleItem = scope.$parent.item;
 
                         $event.preventDefault();
@@ -91,7 +91,7 @@
                                 newLesson.startTime=moment(scheduleItem.startDate);
                                 newLesson.startMoment=moment(scheduleItem.startDate);
                                 newLesson.endTime=moment(scheduleItem.endDate);
-                                newLesson.endMoment=moment(scheduleItem.endDate);                                
+                                newLesson.endMoment=moment(scheduleItem.endDate);
                                 AudienceService.getAudiencesAsMap(model.me.structures).then(function (audienceMap) {
                                     //get audience
                                     if (scheduleItem.data && scheduleItem.data.classes && scheduleItem.data.classes.length > 0) {

@@ -1,11 +1,11 @@
-<div class="progression-manager" style="float: left; width: 97%;">
+<div class="progression-manager" style="float: left">
     <h1>
         <a href="#" ><i18n>diary.title</i18n> </a> >
         <a href="" ><i18n>progression.title</i18n> </a>
     </h1>
     <div class="row" style="min-width:1px;height:48px;">
         <button workflow="diary.createLesson" ng-click="progressionManagerCtrl.setNewProgression()">
-            Créer une progression
+            <i18n>progression.create</i18n>
         </button>
     </div>
     <div class="row search-row">
@@ -23,7 +23,7 @@
                             [[progressionItem.title]]&nbsp;
                         </div>
                         <div class="indicator" ng-class="{' sum-selected' : progressionItem === progressionManagerCtrl.selectedProgressionItem }">
-                            [[progressionItem.lessonItems.length]]<i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
+                            [[progressionItem.lessonItems ? progressionItem.lessonItems.length : progressionItem.nbLessons]]<i class="day-card-icon rack2 table-cell-left"></i>
                         </div>
                     </div>
                 </li>
@@ -36,13 +36,13 @@
                 </div>
                 <div class="content-not-found" ng-show="!progressionManagerCtrl.selectedProgressionItem">
                     <div>
-                        <i class="icon left "></i> Selectionnez une progression en cliquant sur le panneau à votre gauche
+                        <i class="icon left "></i> <i18n>progression.help.select</i18n>
                     </div>
                     <div>
-                        ou ajoutez en cliquant ici
+                        <i18n>progression.help.select</i18n>
                         <br/>
                         <button ng-click="progressionManagerCtrl.setNewProgression()">
-                            Créer une progression
+                            <i18n>progression.create</i18n>
                         </button>
                     </div>
                 </div>
