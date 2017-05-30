@@ -878,7 +878,7 @@ var CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, $rootScope, template, model, route, $location, $window, CourseService, AudienceService, LessonService, SecureService, constants) {
+function DiaryController($scope, $rootScope, template, model, route, $location, $window, CourseService, AudienceService, LessonService, SecureService, constants, $sce) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
@@ -898,6 +898,11 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     $rootScope.redirect = function (path) {
         $location.path(path);
     };
+
+    $rootScope.trusthtml = function (txt) {
+        return $sce.trustAsHtml(txt);
+    };
+
     $scope.lessonDescriptionIsReadOnly = false;
     $scope.homeworkDescriptionIsReadOnly = false;
 
@@ -1496,6 +1501,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         $scope.display.showPanel = true;
         $scope.confirmPanel.item = item;
     };
+
+    $rootScope.showConfirmPanel = $scope.showConfirmPanel;
 
     /**
      * Test in calendar view if there are one lesson
@@ -2597,17 +2604,27 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         //controller declaration
         module.controller("EditProgressionLessonController", controller);
 
-        function controller($scope, $routeParams, constants, $rootScope, ProgressionService) {
+        function controller($scope, $timeout, $routeParams, constants, $rootScope, ProgressionService) {
             var vm = this;
 
-            init();
+            $timeout(init);
 
             function init() {
                 console.log("initForProgressionLesson");
                 if ($routeParams.progressionId) {
                     $scope.data.tabSelected = 'lesson';
                     vm.isProgressionLesson = true;
+
+                    if ($routeParams.editProgressionLessonId !== 'new') {
+                        loadLesson($routeParams.editProgressionLessonId);
+                    }
                 }
+            }
+            function loadLesson(lessonId) {
+                ProgressionService.getLessonProgression(lessonId).then(function (lesson) {
+                    console.log("lesson = ", lesson);
+                    $scope.$parent.editLessonCtrl.lesson = lesson;
+                });
             }
 
             vm.cancel = function () {
@@ -3261,6 +3278,48 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             };
         });
     });
+})();
+
+'use strict';
+
+(function () {
+  'use strict';
+
+  AngularExtensions.addModuleConfig(function (module) {
+    module.directive("confirmClick", directive);
+
+    function directive($compile) {
+      return {
+        restrict: 'A',
+        link: function link(scope, element, attr) {
+          console.log("confirm click linked");
+
+          var clickAction = attr.confirmedClick;
+          var html = '\n                     <lightbox show="display" on-close="remove()">\n                       <div class="row">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />                              \n                           </div>\n                       </div>\n                     </lightbox>\n                     ';
+          var lightbox;
+          element.bind('click', function (event) {
+            scope.msg = attr.confirmClick || "Etes vous sur?";
+            scope.yes = attr.confirmYes || "Ok";
+            scope.cancel = attr.confirmCancel || "Annuler";
+            scope.display = true;
+            lightbox = $compile(html)(scope);
+            $('body').append(lightbox);
+            scope.$apply();
+          });
+          scope.remove = function () {
+            scope.display = false;
+            if (lightbox) {
+              lightbox.remove();
+            }
+          };
+          scope.confirm = function () {
+            scope.$eval(clickAction);
+            scope.remove();
+          };
+        }
+      };
+    }
+  });
 })();
 
 'use strict';
@@ -5461,103 +5520,13 @@ Teacher.prototype.create = function (cb, cbe) {
             vm.saveLesson = function (lesson) {
                 ProgressionService.saveLessonProgression(lesson).then(function (newLesson) {
                     lesson.id = newLesson.id;
+                    notify.info('Le contenu a été enregistré');
                 });
             };
 
-            /*
-            vm.progressionItems = [{
-                id : 1,
-                level: 'seconde',
-                title: 'Physique',
-                description: 'La physique quantique c\'est super cool ',
-                lessonItems: [{
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 1,
-                    attachments : [],
-                    homeworks: [{
-                        id : 'id',
-                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        type: model.homeworkTypes.findWhere({ id: 1 }),
-                        typeId: 1,
-                        typeLabel: "Devoir Maison",
-                        title: "Physique devoir 1",
-                        attachments: [],
-                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
-                    },{
-                        id : 'id',
-                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        type: model.homeworkTypes.findWhere({ id: 1 }),
-                        typeId: 1,
-                        typeLabel: "Devoir Maison",
-                        title: "Devoir Maison",
-                        attachments: [],
-                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
-                    }]
-                }, {
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 2,
-                    attachments : [],
-                },{
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 3,
-                    attachments : [],
-                }]
-            },{
-                id : 2,
-                level: 'seconde',
-                title: 'Physique quantique',
-                description: 'La physique quantique c\'est super cool ',
-                lessonItems: [ {
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 1,
-                    attachments : [],
-                }]
-            }];
-            */
+            vm.selectedContent = function () {
+                return _.filter(vm.selectedProgressionItem.lessonItems, { 'selected': true });
+            };
 
             vm.saveProgression = function (progression) {
                 ProgressionService.saveProgression(progression).then(function (newProgression) {
@@ -5570,11 +5539,31 @@ Teacher.prototype.create = function (cb, cbe) {
                         }
                     }
                     vm.selectedProgressionItem = newProgression;
+                    notify.info('La progression a été enregistrée');
                 });
             };
 
             vm.saveOrder = function (progression) {
                 ProgressionService.saveLessonOrder(progression);
+            };
+
+            vm.removeSelectedContent = function () {
+                ProgressionService.deleteLessons(vm.selectedContent()).then(function () {
+                    vm.loadLessonsFromProgression(vm.selectedProgressionItem);
+                    notify.info('Les contenus ont été suprrimés');
+                });
+            };
+
+            vm.removeProgression = function () {
+                ProgressionService.deleteProgression(vm.selectedProgressionItem.id).then(function () {
+                    vm.selectedProgressionItem = undefined;
+                    notify.info('La progression a été supprimé');
+                    vm.loadProgressions();
+                });
+            };
+
+            vm.editSelectedContent = function () {
+                vm.editLesson(vm.selectedContent()[0].id);
             };
         }
     });
@@ -5634,6 +5623,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
+            key: 'deleteProgression',
+            value: function deleteProgression(progressionId) {
+                var url = '/diary/progression/' + progressionId;
+
+                return this.$http({
+                    url: url,
+                    method: 'DELETE'
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'deleteLessons',
+            value: function deleteLessons(lessons) {
+
+                var lessonsIds = _.map(lessons, function (lesson) {
+                    return lesson.id;
+                });
+
+                var url = '/diary/progression/lessons';
+
+                return this.$http({
+                    url: url,
+                    method: 'DELETE',
+                    data: lessonsIds
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
             key: 'saveLessonProgression',
             value: function saveLessonProgression(lesson) {
                 var url = '/diary/progression/lesson';
@@ -5673,7 +5692,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'saveLessonOrder',
             value: function saveLessonOrder(progression) {
-                var url = '/diary/progression/lesson/order';
+                var url = '/diary/progression/order';
 
                 return this.$http({
                     url: url,
@@ -5688,31 +5707,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var lesson = apiLesson; //angular.copy(apiLesson);
                 lesson.subject = JSON.parse(lesson.subject);
-                lesson.description = this.$sce.trustAsHtml(lesson.description);
+                if (lesson.description) {
+                    lesson.descriptionTrusted = this.$sce.trustAsHtml(lesson.description);
+                }
+
                 //lesson.attachments = JSON.parse(lesson.attachments);
+
                 lesson.homeworks = JSON.parse(lesson.homeworks);
                 _.each(lesson.homeworks, function (homework) {
-                    homework.description = _this4.$sce.trustAsHtml(homework.description);
+                    if (homework.description) {
+                        homework.descriptionTrusted = _this4.$sce.trustAsHtml(homework.description);
+                    }
                 });
 
+                var homeworks = new Collection();
+                homeworks.all = lesson.homeworks;
+                lesson.homeworks = homeworks;
                 return lesson;
             }
         }, {
             key: 'mapHomeworkToApi',
             value: function mapHomeworkToApi(homework) {
-                var result = {
-                    title: homework.title,
-                    type: JSON.stringify({
-                        id: homework.type.id,
-                        label: homework.type.label,
-                        structureId: homework.type.structureId,
-                        category: homework.type.category
-                    }),
-                    description: homework.description,
-                    color: homework.color,
-                    state: homework.state
-                };
-                return result;
+                return JSON.stringify(homework.data);
             }
         }, {
             key: 'mapAttachementsToApi',
@@ -5742,20 +5758,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
                     });
                 }*/
-                if (result.homeworks) {
-                    result.homeworks = JSON.stringify(result.homeworks);
+                if (lesson.homeworks) {
+                    result.homeworks = JSON.stringify(_.map(lesson.homeworks.all, this.mapObject));
                 }
                 /*if (result.attachments){
                     result.attachments = JSON.stringify(result.attachments);
                 }*/
-                result.subject = JSON.stringify(result.subject);
+                result.subject = JSON.stringify(result.subject.data);
                 return result;
+            }
+        }, {
+            key: 'mapObject',
+            value: function mapObject(obj) {
+                obj.toJSON = undefined;
+                return obj;
             }
         }, {
             key: 'extractOrderInformations',
             value: function extractOrderInformations(progression) {
                 var lessonsOrder = [];
-                _.each(progression.lessons, function (lesson) {
+                _.each(progression.lessonItems, function (lesson) {
                     lessonsOrder.push({
                         id: lesson.id,
                         orderIndex: lesson.orderIndex

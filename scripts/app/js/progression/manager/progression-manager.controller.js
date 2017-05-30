@@ -17,7 +17,7 @@
                 vm.selectedProgressionItem.edit=true;
             };
 
-            vm.hasProgressItem = function(){                
+            vm.hasProgressItem = function(){
                 return vm.selectedProgressionItem === undefined;
             };
             vm.cancel = function(){
@@ -76,104 +76,15 @@
             vm.saveLesson = function(lesson){
                 ProgressionService.saveLessonProgression(lesson).then((newLesson)=>{
                     lesson.id = newLesson.id;
+                    notify.info('Le contenu a été enregistré');
                 });
             };
 
-            /*
-            vm.progressionItems = [{
-                id : 1,
-                level: 'seconde',
-                title: 'Physique',
-                description: 'La physique quantique c\'est super cool ',
-                lessonItems: [{
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 1,
-                    attachments : [],
-                    homeworks: [{
-                        id : 'id',
-                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        type: model.homeworkTypes.findWhere({ id: 1 }),
-                        typeId: 1,
-                        typeLabel: "Devoir Maison",
-                        title: "Physique devoir 1",
-                        attachments: [],
-                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
-                    },{
-                        id : 'id',
-                        description: "<div>Exercice de maths (mathématiques) Problèmes : Problèmes de mathématiques créé par anonyme avec le générateur de tests - créez votre propre test !</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                        type: model.homeworkTypes.findWhere({ id: 1 }),
-                        typeId: 1,
-                        typeLabel: "Devoir Maison",
-                        title: "Devoir Maison",
-                        attachments: [],
-                        structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c"
-                    }]
-                }, {
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 2,
-                    attachments : [],
-                },{
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 3,
-                    attachments : [],
-                }]
-            },{
-                id : 2,
-                level: 'seconde',
-                title: 'Physique quantique',
-                description: 'La physique quantique c\'est super cool ',
-                lessonItems: [ {
-                    id : 1,
-                    type : 'progression',
-                    title: "Scéance 1",
-                    description : "<div>Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div><div>​Séance ceci est ma sceamce</div>",
-                    subject: model.subjects.findWhere({id: "3"}),
-                    original_subject_id: "32905-1493304352092",
-                    subjectId: "3",
-                    subjectLabel: 'THEATRE',
-                    teacherName : "Mia BARBIER",
-                    structureId : "9a0c3006-73a2-457e-92e9-c137bdf1e19c",
-                    color: "#CECEF6",
-                    annotation: "",
-                    orderIndex : 1,
-                    attachments : [],
-                }]
-            }];
-            */
+            vm.selectedContent = function(){
+                return _.filter(vm.selectedProgressionItem.lessonItems,{'selected' : true});
+            };
 
+           
             vm.saveProgression = function(progression){
                 ProgressionService.saveProgression(progression).then((newProgression)=>{
                     if (!progression.id){
@@ -185,11 +96,31 @@
                         }
                     }
                     vm.selectedProgressionItem = newProgression;
+                    notify.info('La progression a été enregistrée');
                 });
             };
 
             vm.saveOrder = function(progression){
                 ProgressionService.saveLessonOrder(progression);
+            };
+
+            vm.removeSelectedContent = function(){
+                ProgressionService.deleteLessons(vm.selectedContent()).then(()=>{
+                    vm.loadLessonsFromProgression(vm.selectedProgressionItem);
+                    notify.info('Les contenus ont été suprrimés');
+                });
+            };
+
+            vm.removeProgression = function(){
+                ProgressionService.deleteProgression(vm.selectedProgressionItem.id).then(()=>{
+                    vm.selectedProgressionItem=undefined;
+                    notify.info('La progression a été supprimé');
+                    vm.loadProgressions();
+                });
+            };
+
+            vm.editSelectedContent = function(){
+                vm.editLesson(vm.selectedContent()[0].id);
             };
         }
     });

@@ -8,6 +8,7 @@ import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.services.ProgressionServiceImpl;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.StringUtils;
+import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
 import fr.wseduc.security.SecuredAction;
@@ -96,7 +97,70 @@ public class ProgressionController extends ControllerHelper {
         }
     }
 
+    @Delete("/progression/:progressionId")
+    public void deleteProgression(final HttpServerRequest request) {
 
+        final Long progressionId = Long.parseLong(request.params().get("progressionId"));
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if(user != null && user.getType().equals("Teacher")){
+                    progressionService.deleteProgression(progressionId, new Handler<GenericHandlerResponse>() {
+                        @Override
+                        public void handle(GenericHandlerResponse event) {
+                            if (!event.hasError()){
+                                request.response()
+                                        .putHeader("content-type", "application/json; charset=utf-8")
+                                        .end("ok");
+                            }else{
+                                badRequest(request,event.getMessage());
+                            }
+                        }
+                    });
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
+    @Delete("/progression/lessons")
+    public void deleteLesson(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if(user != null && user.getType().equals("Teacher")){
+
+                    SqlMapper.mappListRequest(request, Long.class, new Handler<HandlerResponse<List<Long>>>() {
+                        @Override
+                        public void handle(HandlerResponse<List<Long>> event) {
+                            if (event.hasError()){
+                                badRequest(request,event.getMessage());
+                                return;
+                            }
+                            progressionService.deleteLessonProgression(event.getResult(), new Handler<GenericHandlerResponse>() {
+                                @Override
+                                public void handle(GenericHandlerResponse event) {
+                                    if (!event.hasError()){
+                                        request.response()
+                                                .putHeader("content-type", "application/json; charset=utf-8")
+                                                .end("ok");
+                                    }else{
+                                        badRequest(request,event.getMessage());
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
 
     @Get("/progression/:progressionId/lessons")
     public void getLessonProgression(final HttpServerRequest request) {
@@ -126,6 +190,34 @@ public class ProgressionController extends ControllerHelper {
         });
     }
 
+
+    @Get("/progression/lesson/:lessonId")
+    public void getLesson(final HttpServerRequest request) {
+
+        final Long lessonId = Long.parseLong(request.params().get("lessonId"));
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if(user != null && user.getType().equals("Teacher")){
+                    progressionService.getLesson(user.getUserId(),lessonId, new Handler<HandlerResponse<LessonProgression>>() {
+                        @Override
+                        public void handle(HandlerResponse<LessonProgression> progressions) {
+                            if (!progressions.hasError()){
+                                request.response()
+                                        .putHeader("content-type", "application/json; charset=utf-8")
+                                        .end(StringUtils.encodeJson(progressions.getResult()));
+                            }else{
+                                badRequest(request,progressions.getMessage());
+                            }
+                        }
+                    });
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
 
     @Post("/progression/lesson")
     public void postLessonProgression(final HttpServerRequest request) {

@@ -47,6 +47,13 @@
         </div>
         <!-- button -->
         <div class="row" ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
+          <button class="cancel" type="button"
+                  confirm-click="Etes vous sur de vouloir supprimer cette progression"
+                  confirm-yes="Supprimer"
+                  confirm-cancel="Annuler"
+                  confirmed-click="progressionManagerCtrl.removeProgression()">
+                <i18n><span class="no-style ng-scope">Supprimer</span></i18n>
+            </button>
             <button class="cancel" type="button" ng-click="progressionManagerCtrl.cancel()">
                   <i18n><span class="no-style ng-scope">Annuler</span></i18n>
               </button>

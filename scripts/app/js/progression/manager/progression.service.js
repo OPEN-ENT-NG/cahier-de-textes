@@ -39,6 +39,34 @@
             });
         }
 
+        deleteProgression(progressionId){
+            let url = `/diary/progression/${progressionId}`;
+
+            return this.$http({
+                url : url,
+                method : 'DELETE'
+            }).then(result =>{
+                return result.data;
+            });
+        }
+
+        deleteLessons(lessons){
+
+          let lessonsIds = _.map(lessons, lesson =>{
+              return lesson.id;
+          });
+
+          let url = `/diary/progression/lessons`;
+
+          return this.$http({
+              url : url,
+              method : 'DELETE',
+              data : lessonsIds
+          }).then(result =>{
+              return result.data;
+          });
+        }
+
         saveLessonProgression(lesson){
             let url = `/diary/progression/lesson`;
 
@@ -69,7 +97,7 @@
         }
 
         saveLessonOrder(progression){
-            let url = `/diary/progression/lesson/order`;
+            let url = `/diary/progression/order`;
 
             return this.$http({
                 url : url,
@@ -81,31 +109,27 @@
         mapApiToLesson(apiLesson){
             let lesson = apiLesson;//angular.copy(apiLesson);
             lesson.subject = JSON.parse(lesson.subject);
-            lesson.description = this.$sce.trustAsHtml(lesson.description);
+            if (lesson.description){
+                lesson.descriptionTrusted = this.$sce.trustAsHtml(lesson.description);
+            }
+
             //lesson.attachments = JSON.parse(lesson.attachments);
+
             lesson.homeworks = JSON.parse(lesson.homeworks);
             _.each(lesson.homeworks,(homework)=>{
-                homework.description = this.$sce.trustAsHtml(homework.description);                
+                if (homework.description){
+                    homework.descriptionTrusted = this.$sce.trustAsHtml(homework.description);
+                }
             });
 
+            let homeworks = new Collection();
+            homeworks.all = lesson.homeworks;
+            lesson.homeworks=homeworks;
             return lesson;
         }
 
         mapHomeworkToApi(homework){
-            let result =  {
-                title : homework.title,
-                type : JSON.stringify({
-                    id : homework.type.id,
-                    label:homework.type.label,
-                    structureId : homework.type.structureId,
-                    category : homework.type.category
-                }),
-                description : homework.description,
-                color : homework.color,
-                state : homework.state,
-                //attachments : homework.attachments && homework.attachments.all ? _.map(homework.attachments.all,mapAttachementsToApi) : []
-            };
-            return result;
+            return JSON.stringify(homework.data);
         }
         mapAttachementsToApi(attachment){
             return attachment;
@@ -132,19 +156,24 @@
                     }
                 });
             }*/
-            if (result.homeworks){
-                result.homeworks = JSON.stringify(result.homeworks);
+            if (lesson.homeworks){
+                result.homeworks = JSON.stringify(_.map(lesson.homeworks.all,this.mapObject));
             }
             /*if (result.attachments){
                 result.attachments = JSON.stringify(result.attachments);
             }*/
-            result.subject = JSON.stringify(result.subject);
+            result.subject = JSON.stringify(result.subject.data);
             return result;
+        }
+
+        mapObject (obj){
+            obj.toJSON = undefined;
+            return obj;
         }
 
         extractOrderInformations(progression){
             let lessonsOrder=[];
-            _.each(progression.lessons,(lesson)=>{
+            _.each(progression.lessonItems,(lesson)=>{
                 lessonsOrder.push({
                     id : lesson.id,
                     orderIndex :lesson.orderIndex

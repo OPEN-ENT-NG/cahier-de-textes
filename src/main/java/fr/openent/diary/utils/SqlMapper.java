@@ -81,6 +81,27 @@ public class SqlMapper<T> {
     }
 
 
+    public static <T> Handler<Message<JsonObject>> objectMapper(final Handler<HandlerResponse<T>> handler, final Class clazz) {
+
+        return new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> event) {
+                HandlerResponse<T> resultHandler = new HandlerResponse<T>();
+                if ("ok".equals(event.body().getString("status"))){
+                    Either<String, JsonArray> resultJson = SqlResult.validResult(event);
+
+                    Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).get(0);
+                    resultHandler.setResult((T) decode(obj.toString(),clazz));
+
+                }else{
+                    resultHandler.setMessage(event.body().getString("message"));
+                }
+                handler.handle(resultHandler);
+            }
+        };
+
+    }
+
     public static <T> void mappListRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<List<T>>> handler){
         RequestUtils.bodyToJsonArray(request, new Handler<JsonArray>() {
             @Override
@@ -105,7 +126,7 @@ public class SqlMapper<T> {
         });
     }
 
-    public T decode(String str){
+    public static  <T> T decode(String str, Class clazz){
         T result = null;
         try {
             result = (T)mapper.readValue(str, clazz);
@@ -113,6 +134,24 @@ public class SqlMapper<T> {
             log.error(e.getMessage(),e);
         }
         return result;
+    }
+
+    /*public T decode(String str){
+        T result = null;
+        try {
+            result = (T)mapper.readValue(str, clazz);
+        } catch (IOException e) {
+            log.error(e.getMessage(),e);
+        }
+        return result;
+    }*/
+
+
+
+    public void executeQuery(SqlQuery query, final Handler<GenericHandlerResponse> handler){
+        List<SqlQuery> queries = new ArrayList<SqlQuery>();
+        queries.add(query);
+        executeTransactionnalQueries(queries,handler);
     }
 
     public void executeTransactionnalQueries(List<SqlQuery> queries, final Handler<GenericHandlerResponse> handler){
@@ -157,7 +196,7 @@ public class SqlMapper<T> {
 
                         List<T> result = new ArrayList<T>();
                         for (Object obj : ((JsonArray) (((Either.Right) resultJson).getValue()))){
-                            result.add(decode(obj.toString()));
+                            result.add((T) decode(obj.toString(),clazz));
                         }
                         resultHandler.setResult(result);
                     }else{
@@ -183,6 +222,9 @@ public class SqlMapper<T> {
         return rewrited;
     }
 
+
+
+
     public Handler<Message<JsonObject>> objectMapper(final Handler<HandlerResponse<T>> handler) {
 
         return new Handler<Message<JsonObject>>() {
@@ -193,7 +235,7 @@ public class SqlMapper<T> {
                     Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
                     Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).get(0);
-                    resultHandler.setResult(decode(obj.toString()));
+                    resultHandler.setResult((T) decode(obj.toString(),clazz));
 
                 }else{
                     resultHandler.setMessage(event.body().getString("message"));

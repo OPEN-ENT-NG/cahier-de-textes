@@ -13,7 +13,7 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, $rootScope,template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants) {
+function DiaryController($scope, $rootScope,template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants,$sce) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
@@ -33,6 +33,11 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     $rootScope.redirect = function (path) {
         $location.path(path);
     };
+
+    $rootScope.trusthtml = function(txt){
+        return $sce.trustAsHtml(txt);
+    };
+
     $scope.lessonDescriptionIsReadOnly = false;
     $scope.homeworkDescriptionIsReadOnly = false;
 
@@ -651,6 +656,8 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.display.showPanel = true;
         $scope.confirmPanel.item = item;
     };
+
+    $rootScope.showConfirmPanel = $scope.showConfirmPanel;
 
 
     /**

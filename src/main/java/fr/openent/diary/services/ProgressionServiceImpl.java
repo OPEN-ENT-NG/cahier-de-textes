@@ -6,6 +6,7 @@ import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.progression.LessonProgression;
 import fr.openent.diary.model.progression.OrderLesson;
 import fr.openent.diary.model.progression.Progression;
+import fr.openent.diary.model.util.CountModel;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -15,6 +16,8 @@ import org.vertx.java.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 
 
 public class ProgressionServiceImpl extends SqlCrudService {
@@ -64,6 +67,31 @@ public class ProgressionServiceImpl extends SqlCrudService {
         }
     }
 
+    public void getLesson(String teacherId,Long lessonId, Handler<HandlerResponse<LessonProgression>> handler) {
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT")
+                .append(" lp.id as id,")
+                .append(" lp.type as type,")
+                .append(" lp.title as title,")
+                .append(" lp.description as description,")
+                .append(" lp.subjectLabel as subjectLabel ,")
+                .append(" lp.teacherName as teacherName ,")
+                .append(" lp.color as color ,")
+                .append(" lp.annotation as annotation ,")
+                .append(" lp.orderIndex as orderIndex ,")
+                .append(" lp.teacherId as teacherId ,")
+                .append(" lp.homeworks as homeworks ,")
+                .append(" lp.subject as subject ,")
+                .append(" lp.attachments as attachments ,")
+                .append(" lp.progressionId as progressionId ")
+                .append(" FROM diary.lessonprogression as lp")
+                .append(" WHERE lp.teacherId = ?" )
+                .append(" and lp.id = ? " );
+
+        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).addNumber(lessonId);
+        sql.prepared(query.toString(), parameters,lessonProgressionMapper.objectMapper(handler));
+    }
 
     public void getLessonProgression(String teacherId,Long progressionId, Handler<HandlerResponse<List<LessonProgression>>> handler) {
 
@@ -97,16 +125,76 @@ public class ProgressionServiceImpl extends SqlCrudService {
     public void createOrUpdateLessonProgression(final LessonProgression lessonProgression, final Handler<HandlerResponse<LessonProgression>> handler) {
         try {
             if (lessonProgression.getId() == null) {
-                lessonProgressionMapper.insert(lessonProgression, handler);
+                getOrderIndex(lessonProgression.getProgressionId(), new Handler<HandlerResponse<CountModel>>() {
+                    @Override
+                    public void handle(HandlerResponse<CountModel> event) {
+                        try {
+                            if (event.hasError()){
+                                handler.handle(new HandlerResponse<LessonProgression>(event.getMessage()));
+                                return;
+                            }else{
+                                Long count = event.getResult().getNb();
+                                if (count == null){
+                                    count = 0L;
+                                }else{
+                                    count ++;
+                                }
+                                lessonProgression.setOrderIndex(count);
+                                lessonProgressionMapper.insert(lessonProgression, handler);
+                            }
+                        } catch (Throwable e) {
+                            handler.handle(new HandlerResponse<LessonProgression>(e.getMessage()));
+                        }
+                    }
+                });
+
             } else {
                 lessonProgressionMapper.update(lessonProgression, handler);
             }
-
         } catch (Throwable e) {
             handler.handle(new HandlerResponse<LessonProgression>(e.getMessage()));
         }
+
     }
 
+
+    public void deleteProgression(final Long progressionId,final Handler<GenericHandlerResponse> handler){
+        List<SqlQuery> queries = new ArrayList<>();
+
+        // lessons part
+        StringBuilder query = new StringBuilder();
+        query.append("DELETE FROM diary.progression ")
+                .append("  where id = ?");
+        JsonArray parameters = new JsonArray();
+        parameters.add(progressionId);
+
+        queries.add(new SqlQuery(query.toString(),parameters));
+
+        // progression part
+        StringBuilder queryProgression = new StringBuilder();
+        queryProgression.append("DELETE FROM diary.lessonprogression ")
+                .append("  where progressionid = ?");
+        JsonArray parametersProgression = new JsonArray();
+        parametersProgression.add(progressionId);
+
+        queries.add(new SqlQuery(queryProgression.toString(),parametersProgression));
+
+        lessonProgressionMapper.executeTransactionnalQueries(queries,handler);
+    }
+
+    public void deleteLessonProgression(final List<Long> lessonsIds,final Handler<GenericHandlerResponse> handler){
+
+        StringBuilder queryProgression = new StringBuilder();
+        queryProgression.append("DELETE FROM diary.lessonprogression ")
+                .append("  where id in ").append(Sql.listPrepared(lessonsIds.toArray()));
+
+        JsonArray parameters = new JsonArray();
+        for (Long id : lessonsIds) {
+            parameters.add(id);
+        }
+
+        lessonProgressionMapper.executeQuery(new SqlQuery(queryProgression.toString(),parameters),handler);
+    }
 
     public void updateOrderLessonProgression(final List<OrderLesson> orderLessons,final Handler<GenericHandlerResponse> handler){
         List<SqlQuery> queries = new ArrayList<>();
@@ -125,5 +213,22 @@ public class ProgressionServiceImpl extends SqlCrudService {
         }
 
         lessonProgressionMapper.executeTransactionnalQueries(queries,handler);
+    }
+
+
+
+    public void getOrderIndex(final Long progressionId, final Handler<HandlerResponse<CountModel>> handler){
+        StringBuilder query = new StringBuilder();
+
+
+        query.append("SELECT")
+                .append("  max(orderIndex) as nb ")
+                .append(" FROM diary.lessonprogression ")
+                .append(" WHERE progressionId = ?");
+
+
+        JsonArray parameters = new JsonArray().addNumber(progressionId);
+
+        sql.prepared(query.toString(), parameters,SqlMapper.objectMapper(handler,CountModel.class));
     }
 }

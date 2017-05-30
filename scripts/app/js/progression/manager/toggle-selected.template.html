@@ -1,0 +1,17 @@
+<!-- action panel displayed if at least one lesson or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: progressionManagerCtrl.selectedContent().length === 0 }" >
+    <div class="toggle">
+        <div class="row">
+            <button
+                confirm-click="Etes vous sur de vouloir supprimer ces elements"
+                confirm-yes="Supprimer"
+                confirm-cancel="Annuler"
+                confirmed-click="progressionManagerCtrl.removeSelectedContent()">
+                <i18n>remove</i18n>
+            </button>
+            <button ng-click="progressionManagerCtrl.editSelectedContent()" ng-class="{ disabled: progressionManagerCtrl.selectedContent().length !== 1}">
+                <i18n>edit</i18n>
+            </button>
+        </div>
+    </div>
+</section>

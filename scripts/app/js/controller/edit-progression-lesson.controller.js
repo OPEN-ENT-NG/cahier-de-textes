@@ -5,17 +5,27 @@
         //controller declaration
         module.controller("EditProgressionLessonController", controller);
 
-        function controller($scope, $routeParams, constants, $rootScope, ProgressionService) {
+        function controller($scope,$timeout, $routeParams, constants, $rootScope, ProgressionService) {
             let vm = this;
 
-            init();
+            $timeout(init);
 
             function init() {
                 console.log("initForProgressionLesson");
                 if ($routeParams.progressionId) {
                     $scope.data.tabSelected = 'lesson';
                     vm.isProgressionLesson = true;
+
+                    if ($routeParams.editProgressionLessonId!== 'new'){
+                      loadLesson($routeParams.editProgressionLessonId);
+                    }
                 }
+            }
+            function loadLesson(lessonId){
+                ProgressionService.getLessonProgression(lessonId).then((lesson)=>{
+                    console.log("lesson = ", lesson);
+                    $scope.$parent.editLessonCtrl.lesson = lesson;
+                });
             }
 
             vm.cancel = function() {

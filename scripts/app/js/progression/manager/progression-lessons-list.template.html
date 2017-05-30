@@ -10,7 +10,7 @@
 
     <ul diary-sortable-list>
         <li diary-sortable-element ng-model="lesson.orderIndex"
-                ng-change="progressionManagerCtrl.saveOrder()"
+                ng-change="progressionManagerCtrl.saveOrder(progressionManagerCtrl.selectedProgressionItem)"
                 ng-repeat="lesson in progressionManagerCtrl.selectedProgressionItem.lessonItems | orderBy:'orderIndex'">
             <article class="notification progression-article">
                 <div class="row hover-orange" >
@@ -29,14 +29,14 @@
                 <div class="row">
                     <div class="one cell" style="padding: 5px 0px 0px 20px">
                         <label class="checkbox">
-                            <input type="checkbox" ng-model="pedagogicItem.selected"/>
+                            <input type="checkbox" ng-model="lesson.selected"/>
                             <span></span>
                         </label>
                     </div>
                     <div class="ten cell">
 
                         <p ng-bind-html="lesson.description | maxChar:60  " ng-if="!lesson.expanded"></p>
-                        <p ng-bind-html="lesson.description" ng-if="lesson.expanded"></p>
+                        <p ng-bind-html="lesson.descriptionTrusted" ng-if="lesson.expanded"></p>
                     </div>
                     <div class="one cell right progression-icon-homeworks" ng-if="lesson.homeworks.length>0">
                         [[lesson.homeworks.length]]
@@ -44,9 +44,9 @@
                     </div>
                 </div>
                 <div class="progression-homework" ng-if="lesson.expanded">
-                    <div class="row" ng-repeat="homework in lesson.homeworks">
+                    <div class="row" ng-repeat="homework in lesson.homeworks.all">
                         <div class="cell one" ><i class="day-card-icon rack2 table-cell-left"></i></div>
-                        <div class="cell ten" >
+                        <div class="cell ten" ng-init="homework.expanded = false">
                             <div class="homework-title">
                                 <label>[[homework.title]]</label>
                                 <i ng-click="homework.expanded=!homework.expanded" diary-tooltip="Déplier"
@@ -57,7 +57,7 @@
                             </div>
                             <div class="homework-description">
                                 <p ng-bind-html="homework.description | maxChar:30" ng-if="!homework.expanded"></p>
-                                <p ng-bind-html="homework.description" ng-if="!!homework.expanded"></p>
+                                <p ng-bind-html="homework.descriptionTrusted" ng-if="homework.expanded"></p>
                             </div>
                         </div>
                     </div>
@@ -68,4 +68,9 @@
             <i18n>diary.filter.no.result</i18n>
         </p>
     </ul>
+
+    <div ng-include="'/diary/public/js/progression/manager/toggle-selected.template.html'">
+
+    </div>
+
 </div>
