@@ -22,7 +22,7 @@ CREATE TABLE diary.lessonprogression (
     subjectLabel character varying(60),
     teacherName  character varying(60),
     color character varying(25),
-    annotation text,
+    annotations text,
     orderIndex bigint,
     teacherId character varying(60) not null,
     homeworks text,

@@ -17,7 +17,7 @@ public class LessonProgression {
     private String teacherName;
     private String color;
     //CHANGE with s
-    private String annotation;
+    private String annotations;
     private Long orderIndex;
     private String teacherId;
 
@@ -93,12 +93,12 @@ public class LessonProgression {
         this.color = color;
     }
 
-    public String getAnnotation() {
-        return annotation;
+    public String getAnnotations() {
+        return annotations;
     }
 
-    public void setAnnotation(String annotation) {
-        this.annotation = annotation;
+    public void setAnnotations(String annotations) {
+        this.annotations = annotations;
     }
 
     public Long getOrderIndex() {

@@ -37,6 +37,7 @@
                     lesson.progressionId = $routeParams.progressionId;
                 }
                 ProgressionService.saveLessonProgression(lesson).then((newLesson) => {
+                    notify.info(lang.translate('progression.content.saved'));
                     lesson.id = newLesson.id;
                     $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
                 });

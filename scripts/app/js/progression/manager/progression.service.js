@@ -110,10 +110,11 @@
         mapApiToLesson(apiLesson){
             let lesson = apiLesson;//angular.copy(apiLesson);
             lesson.subject = JSON.parse(lesson.subject);
+            lesson.type_item = 'progression';
             if (lesson.description){
                 lesson.descriptionTrusted = this.$sce.trustAsHtml(lesson.description);
             }
-            
+
 
             lesson.homeworks = JSON.parse(lesson.homeworks);
             _.each(lesson.homeworks,(homework)=>{
@@ -126,7 +127,7 @@
             homeworks.all = lesson.homeworks;
             lesson.homeworks=homeworks;
             return lesson;
-        }
+        }        
 
         mapHomeworkToApi(homework){
             return JSON.stringify(homework.data);
@@ -142,7 +143,7 @@
                 description : lesson.description,
                 subjectLabel : lesson.subject.subject_label,
                 color : lesson.color,
-                annotation : lesson.annotations,
+                annotations : lesson.annotations,
                 orderIndex : lesson.orderIndex,
                 subject : lesson.subject,
                 progressionId : lesson.progressionId,

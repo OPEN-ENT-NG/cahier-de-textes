@@ -2637,6 +2637,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     lesson.progressionId = $routeParams.progressionId;
                 }
                 ProgressionService.saveLessonProgression(lesson).then(function (newLesson) {
+                    notify.info(lang.translate('progression.content.saved'));
                     lesson.id = newLesson.id;
                     $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
                 });
@@ -3479,6 +3480,52 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         }
                     }
 
+                    function extractBeginEnd() {
+                        var begin = moment().startOf('year').add(scope.day.index - 1, 'd');
+                        var end = moment(begin);
+                        begin = begin.add(scope.timeslot.start, 'h');
+                        end = end.add(scope.timeslot.end, 'h');
+                        return {
+                            startDate: begin,
+                            endDate: end
+                        };
+                    }
+
+                    function initLessonFromProgression(lesson, pedagogicItemOfTheDay) {
+
+                        lesson.id = null;
+                        // startTime and end format from db is "HH:MM:SS" as text type
+                        // for lesson save startTime need to be moment time type with date
+                        lesson.title = pedagogicItemOfTheDay.title;
+                        lesson.description = pedagogicItemOfTheDay.description;
+                        lesson.color = pedagogicItemOfTheDay.color;
+                        lesson.subject = pedagogicItemOfTheDay.subject;
+                        lesson.annotations = pedagogicItemOfTheDay.annotations;
+                        lesson.type_item = 'progression';
+                        lesson.homeworks = new Collection();
+                        if (pedagogicItemOfTheDay.homeworks && pedagogicItemOfTheDay.homeworks.length > 0) {
+                            lesson.homeworks.all = _.map(pedagogicItemOfTheDay.homeworks, function (homework) {
+                                var hw = new Homework();
+                                _.each(Object.keys(homework), function (key) {
+                                    hw[key] = homework[key];
+                                });
+                                return hw;
+                            });
+                        }
+
+                        var timeslotDates = extractBeginEnd();
+
+                        lesson.date = moment(timeslotDates.startDate);
+                        lesson.startTime = moment(timeslotDates.startDate);
+                        lesson.startMoment = moment(timeslotDates.startDate);
+                        lesson.endTime = moment(timeslotDates.endDate);
+                        lesson.endMoment = moment(timeslotDates.endDate);
+
+                        model.newLesson = lesson;
+                        console.log(model.newLesson);
+                        window.location = '/diary#/createLessonView/timeFromCalendar';
+                    }
+
                     timeslot.on('drop', function ($event) {
                         timeslot.removeClass("dragin");
                         var scheduleItem = scope.$parent.item;
@@ -3491,8 +3538,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         // duplicate dragged lesson
                         var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
 
-                        // do not drop if item type is not a lesson
-                        if (pedagogicItemOfTheDay.type_item !== 'lesson') {
+                        if (pedagogicItemOfTheDay.type_item !== 'lesson' && pedagogicItemOfTheDay.type_item !== 'progression') {
                             return;
                         }
 
@@ -3502,6 +3548,12 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
                         var newLessonStartTime = model.startOfDay + index % timeslotsPerDay;
                         var newLessonEndTime = newLessonStartTime + 1;
+
+                        // do not drop if item type is not a lesson
+                        if (pedagogicItemOfTheDay.type_item === 'progression') {
+                            initLessonFromProgression(newLesson, pedagogicItemOfTheDay);
+                            return;
+                        }
 
                         newLesson.load(false, function () {
                             // will force new lesson to be created in DB
@@ -5735,6 +5787,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var lesson = apiLesson; //angular.copy(apiLesson);
                 lesson.subject = JSON.parse(lesson.subject);
+                lesson.type_item = 'progression';
                 if (lesson.description) {
                     lesson.descriptionTrusted = this.$sce.trustAsHtml(lesson.description);
                 }
@@ -5771,7 +5824,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     description: lesson.description,
                     subjectLabel: lesson.subject.subject_label,
                     color: lesson.color,
-                    annotation: lesson.annotations,
+                    annotations: lesson.annotations,
                     orderIndex: lesson.orderIndex,
                     subject: lesson.subject,
                     progressionId: lesson.progressionId,
