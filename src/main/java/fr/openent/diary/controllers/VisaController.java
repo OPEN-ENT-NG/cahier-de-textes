@@ -1,12 +1,15 @@
 package fr.openent.diary.controllers;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.ModelWeek;
+import fr.openent.diary.model.visa.ResultVisaList;
 import fr.openent.diary.model.visa.VisaFilters;
 import fr.openent.diary.services.VisaServiceImpl;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 
 import org.entcore.common.controller.ControllerHelper;
@@ -55,12 +58,28 @@ public class VisaController extends ControllerHelper {
 
 
     @Get("/visa/filters/:structureId")
-    @ResourceFilter(AdmlOfStructure.class)
+    @SecuredAction(value = "diary.manageVisa", type = ActionType.AUTHENTICATED)
+    public void getFilters(final HttpServerRequest request) {
+
+        String structureId = request.params().get("structureId");
+        this.visaService.getFilters(structureId, GenericHandlerResponse.<VisaFilters>handler(request));
+
+    }
+
+    @Get("/visa/agregs")
+    @SecuredAction(value = "diary.manageVisa", type = ActionType.AUTHENTICATED)
     public void modelweek(final HttpServerRequest request) {
 
         String structureId = request.params().get("structureId");
-
-        this.visaService.getFilters(structureId, GenericHandlerResponse.<VisaFilters>handler(request));
+        String teacherId = request.params().get("teacherId");
+        String audienceId = request.params().get("audienceId");
+        String subjectId = request.params().get("subjectId");
+        Boolean showTodoOnly=Boolean.TRUE;
+        String showTodoOnlyTxt = request.params().get("showTodoOnly");
+        if (showTodoOnlyTxt!=null && showTodoOnlyTxt.equals("false")){
+            showTodoOnly = Boolean.FALSE;
+        }
+        this.visaService.getAllAgregatedVisas(structureId,teacherId,audienceId,subjectId,showTodoOnly,GenericHandlerResponse.<List<ResultVisaList>>handler(request));
 
     }
 }
