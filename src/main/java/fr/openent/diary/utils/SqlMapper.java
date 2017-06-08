@@ -102,6 +102,39 @@ public class SqlMapper<T> {
 
     }
 
+    public static <T> Handler<Message<JsonObject>> listMapper(final Handler<HandlerResponse<List<T>>> handler, final Class clazz) {
+
+        return new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> event) {
+                HandlerResponse<List<T>> resultHandler = new HandlerResponse<List<T>>();
+                try{
+                    if ("ok".equals(event.body().getString("status"))){
+
+                        List<Object> fields = rewriteKey(event.body().getArray("fields").toList(),clazz);
+
+                        event.body().putArray("fields", new JsonArray(fields));
+
+                        Either<String, JsonArray> resultJson = SqlResult.validResult(event);
+
+                        List<T> result = new ArrayList<T>();
+                        for (Object obj : ((JsonArray) (((Either.Right) resultJson).getValue()))){
+                            result.add((T) decode(obj.toString(),clazz));
+                        }
+                        resultHandler.setResult(result);
+                    }else{
+                        resultHandler.setMessage(event.body().getString("message"));
+                    }
+                    handler.handle(resultHandler);
+                }catch(Exception e){
+                    handler.handle(new HandlerResponse<List<T>>(e.getMessage()));
+                }
+
+            }
+        };
+
+    }
+
     public static <T> void mappListRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<List<T>>> handler){
         RequestUtils.bodyToJsonArray(request, new Handler<JsonArray>() {
             @Override
@@ -212,6 +245,24 @@ public class SqlMapper<T> {
 
     }
 
+    private static List<Object> rewriteKey(List<String> fields,Class clazz)  {
+        List<Object> rewrited = new ArrayList<>();
+
+        Map<String,String> keyMap = new HashMap<>();
+        Field[] classFields = clazz.getDeclaredFields();
+        for( Field field : classFields ){
+            String fieldName = field.getName().toString();
+            keyMap.put(fieldName.toLowerCase(), fieldName);
+        }
+
+        for (String field : fields){
+            rewrited.add(keyMap.get(field));
+        }
+
+        return rewrited;
+    }
+
+
     private List<Object> rewriteKey(List<String> fields)  {
         List<Object> rewrited = new ArrayList<>();
 
@@ -221,7 +272,6 @@ public class SqlMapper<T> {
 
         return rewrited;
     }
-
 
 
 

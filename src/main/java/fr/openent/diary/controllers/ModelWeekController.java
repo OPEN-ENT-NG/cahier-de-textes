@@ -36,18 +36,7 @@ public class ModelWeekController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if(user != null && user.getType().equals("Teacher")){
-                    modelWeekService.getModelWeeks(user.getUserId(), new Handler<HandlerResponse<List<ModelWeek>>>() {
-                        @Override
-                        public void handle(HandlerResponse<List<ModelWeek>> modelWeeks) {
-                            if (!modelWeeks.hasError()){
-                                request.response()
-                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                        .end(StringUtils.encodeJson(modelWeeks.getResult()));
-                            }else{
-                                badRequest(request,"modelweek request validation error");
-                            }
-                        }
-                    });
+                    modelWeekService.getModelWeeks(user.getUserId(), GenericHandlerResponse.<List<ModelWeek>>handler(request));
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -66,18 +55,7 @@ public class ModelWeekController extends ControllerHelper {
                 @Override
                 public void handle(final UserInfos user) {
                     if(user != null && user.getType().equals("Teacher")){
-                        modelWeekService.getAllsItemsModel(user,date, new Handler<HandlerResponse<List<LessonAsModel>>>() {
-                            @Override
-                            public void handle(HandlerResponse<List<LessonAsModel>> lessonAsModels) {
-                                if (!lessonAsModels.hasError()){
-                                    request.response()
-                                            .putHeader("content-type", "application/json; charset=utf-8")
-                                            .end(StringUtils.encodeJson(lessonAsModels.getResult()));
-                                }else{
-                                    badRequest(request,"modelweek request validation error");
-                                }
-                            }
-                        });
+                        modelWeekService.getAllsItemsModel(user,date, GenericHandlerResponse.<List<LessonAsModel>>handler(request));
                     } else {
                         unauthorized(request, "No user found in session.");
                     }
@@ -98,16 +76,7 @@ public class ModelWeekController extends ControllerHelper {
                 @Override
                 public void handle(final UserInfos user) {
                     if(user != null && user.getType().equals("Teacher")){
-                        modelWeekService.invertModelWeek(user.getUserId(), new Handler<GenericHandlerResponse>() {
-                            @Override
-                            public void handle(GenericHandlerResponse event) {
-                                if (event.hasError()){
-                                    badRequest(request,event.getMessage());
-                                }else{
-                                    Renders.renderJson(request, new JsonObject().putString("status","ok"));
-                                }
-                            }
-                        });
+                        modelWeekService.invertModelWeek(user.getUserId(),GenericHandlerResponse.genericHandle(request) );
                     } else {
                         unauthorized(request, "No user found in session.");
                     }
@@ -134,18 +103,7 @@ public class ModelWeekController extends ControllerHelper {
                 @Override
                 public void handle(final UserInfos user) {
                     if(user != null && user.getType().equals("Teacher")){
-                        modelWeekService.createOrUpdateModelWeek(user.getUserId(), weekAlias, date, new Handler<HandlerResponse<ModelWeek>>() {
-                            @Override
-                            public void handle(HandlerResponse<ModelWeek> event) {
-                                if (event.hasError()){
-                                    badRequest(request,event.getMessage());
-                                }else{
-                                    request.response()
-                                            .putHeader("content-type", "application/json; charset=utf-8")
-                                            .end(StringUtils.encodeJson(event.getResult()));
-                                }
-                            }
-                        });
+                        modelWeekService.createOrUpdateModelWeek(user.getUserId(), weekAlias, date,GenericHandlerResponse.<ModelWeek>handler(request));
                     } else {
                         unauthorized(request, "No user found in session.");
                     }

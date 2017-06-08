@@ -30,10 +30,12 @@ public class Diary extends BaseServer {
         final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService, audienceService);
         final ModelWeekServiceImpl modelWeekService = new ModelWeekServiceImpl(lessonService);
         final ProgressionServiceImpl progressionService = new ProgressionServiceImpl();
+        final VisaServiceImpl visaService = new VisaServiceImpl();
 
         addController(new DiaryController(diaryService, lessonService, homeworkService));
         addController(new ModelWeekController(modelWeekService));
         addController(new ProgressionController(progressionService));
+        addController(new VisaController(visaService));
         SqlConf confLesson = SqlConfs.createConf(LessonController.class.getName());
         confLesson.setTable(LESSON_TABLE);
         confLesson.setShareTable(LESSON_SHARE_TABLE);

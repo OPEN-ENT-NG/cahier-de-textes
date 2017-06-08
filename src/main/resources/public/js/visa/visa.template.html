@@ -9,46 +9,39 @@
             <search-drop-down
                 items = "visaManagerCtrl.items"
                 place-holder ="Professeur"
-                model="visaManagerCtrl.teacher"
+                selected-item="visaManagerCtrl.filter.teacher"
                 show-expression="item.name"
             ></search-drop-down>
         </div>
         <div class="cell three">
             <span class="label">Matière : </span>
-            <ent-dropdown
+            <diary-drop-down
                 placeholder="select.group.or.class"
-                list="audiences.all"
-                selected="homework.audience"
-                property="name"
-                school="currentSchool"
-                lesson=""
-                homework="homework">
-            </ent-dropdown>
+                list="visaManagerCtrl.filters.subjects"
+                selected="visaManagerCtrl.filter.subject"
+                property="value">
+            </diary-drop-down>
         </div>
         <div class="cell two">
             <span class="label">Classe : </span>
-            <ent-dropdown placeholder="select.group.or.class"
-                list="audiences.all"
-                selected="homework.audience"
-                property="name"
-                school="currentSchool"
-                lesson=""
-                homework="homework">
-            </ent-dropdown>
+            <diary-drop-down
+                placeholder="select.group.or.class"
+                list="visaManagerCtrl.filters.audiences"
+                selected="visaManagerCtrl.filter.audience"
+                property="value">
+            </diary-drop-down>
         </div>
         <div class="cell two">
             <span class="label">Statut : </span>
-            <ent-dropdown placeholder="select.group.or.class"
-                list="audiences.all"
-                selected="homework.audience"
-                property="name"
-                school="currentSchool"
-                lesson=""
-                homework="homework">
-            </ent-dropdown>
+            <diary-drop-down
+                placeholder="select.group.or.class"
+                list="visaManagerCtrl.filters.states"
+                selected="visaManagerCtrl.filter.state"
+                property="value">
+            </diary-drop-down>
         </div>
         <div class="cell two">
-            <button>rechercher</button>
+            <button ng-click="visaManagerCtrl.search()">rechercher</button>
         </div>
 
     <div class="visa-tab">

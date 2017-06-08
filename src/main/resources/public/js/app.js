@@ -3331,6 +3331,51 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 'use strict';
 
 (function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.directive('diaryDropDown', function () {
+            return {
+                restrict: "E",
+                templateUrl: "diary/public/js/directives/diary-drop-down/diary-drop-down.template.html",
+                scope: {
+                    placeholder: "@",
+                    list: "=",
+                    selected: "=",
+                    property: "@"
+                },
+                controller: function controller($scope) {
+                    $scope.selectItem = function (item) {
+                        if ($scope.list) {
+                            $scope.list.map(function (e) {
+                                e.selected = false;
+                            });
+                            item.selected = true;
+                            $scope.selected = item;
+                            $scope.listVisible = false;
+                        }
+                    };
+                },
+                link: function link(scope, element, attr) {
+
+                    $(document).bind('click', function (event) {
+                        var isClickedElementChildOfPopup = element.find(event.target).length > 0;
+
+                        if (isClickedElementChildOfPopup) return;
+
+                        scope.$apply(function () {
+                            scope.listVisible = false;
+                        });
+                    });
+                }
+            };
+        });
+    });
+})();
+
+'use strict';
+
+(function () {
 		'use strict';
 
 		AngularExtensions.addModuleConfig(function (module) {
@@ -4135,7 +4180,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 scope: {
                     items: '=',
                     showExpression: '@',
-                    model: '=',
+                    selectedItem: '=',
                     placeHolder: '@',
                     freeField: '='
                 },
@@ -7014,6 +7059,51 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /*
+     * Visa service as class
+     * used to manipulate Visa model
+     */
+
+    var VisaService = function () {
+        function VisaService($http, $q, constants) {
+            _classCallCheck(this, VisaService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+        }
+
+        _createClass(VisaService, [{
+            key: "getFilters",
+            value: function getFilters(userStructuresId) {
+
+                var urlGetHomeworks = "/diary/visa/filters/" + userStructuresId;
+
+                return this.$http.get(urlGetHomeworks).then(function (result) {
+                    return result.data;
+                });
+            }
+        }]);
+
+        return VisaService;
+    }();
+    /* create singleton */
+
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("VisaService", VisaService);
+    });
+})();
+
+'use strict';
+
 (function () {
     'use strict';
 
@@ -7021,10 +7111,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         //controller declaration
         module.controller("VisaManagerController", controller);
 
-        function controller($scope, $rootScope, $routeParams, $timeout) {
+        function controller($scope, $rootScope, $routeParams, VisaService) {
             var vm = this;
-            console.log("visa ctrl");
+
             vm.items = [{ name: 'teacher1' }, { name: 'teacher2' }];
+            init();
+            function init() {
+                VisaService.getFilters(model.me.structures[0]).then(function (filters) {
+                    vm.filters = filters;
+                    vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') }, { key: 'DID', value: lang.translate('diary.visa.state.did') }, { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
+                });
+            }
+
+            vm.search = function () {
+                console.log(vm.filter);
+            };
         }
     });
 })();

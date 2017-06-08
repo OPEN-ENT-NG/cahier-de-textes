@@ -13,7 +13,7 @@
                 scope: {
                     items: '=',
                     showExpression : '@',
-                    model: '=',
+                    selectedItem: '=',
                     placeHolder : '@',
                     freeField : '='
                 },
