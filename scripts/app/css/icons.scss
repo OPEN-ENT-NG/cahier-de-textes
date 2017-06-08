@@ -1,3 +1,14 @@
+button.diary-ico-button{
+  i {
+    background-color: transparent !important;
+    font-size: 32px;
+    padding: 0px !important;
+    box-shadow: initial !important;
+  }
+  padding : 8px 8px 0px 8px;
+  line-height: 24px; 
+}
+
 .reservation:before {
     content: "\e80e";
 }
@@ -21,4 +32,8 @@
 
 .pencil::before{
   content:'\e858'
+}
+
+.grades::before{
+  content : '\e614'
 }

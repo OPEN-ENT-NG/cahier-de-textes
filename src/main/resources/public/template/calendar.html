@@ -10,6 +10,12 @@
                 <button workflow="diary.createFreeHomework" ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
                 <i18n>diary.homework.create</i18n>
             </button>
+            <!-- TODO i18n -->
+            <button diary-tooltip="'manage visa'" class="diary-ico-button" ng-click="redirect('/manageVisaView/none')">
+                <i secure="[[RIGHTS.MANAGE_VISA]]" class="grades" style="margin-left:10px"></i>
+                <span>Gérer les visas</span>
+            </button>
+
             <div class="select-list" secure="[[RIGHTS.MANAGE_MODEL_WEEK]]">
                 <select-list display="diary.model.week.title" placeholder="diary.model.week.title" display-as="diary.model.week.title" class="button">
                     <opt value="font" ng-click="setModel('A')">

@@ -12,7 +12,8 @@
           VIEW : 'diary.view',
           CREATE_HOMEWORK_FOR_LESSON : 'createHomeworkForLesson',
           CREATE_FREE_HOMEWORK : 'diary.createFreeHomework',
-          MANAGE_MODEL_WEEK : 'diary.manageModelWeek'
+          MANAGE_MODEL_WEEK : 'diary.manageModelWeek',
+          MANAGE_VISA : 'diary.manageVisa'
         }
       });
 

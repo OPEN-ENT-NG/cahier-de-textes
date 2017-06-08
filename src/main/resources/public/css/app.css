@@ -1045,28 +1045,43 @@ i.external-link:before{
       padding-right: 6px; }
 
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+button.diary-ico-button {
+  padding: 8px 8px 0px 8px;
+  line-height: 24px; }
+  /* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+  button.diary-ico-button i {
+    background-color: transparent !important;
+    font-size: 32px;
+    padding: 0px !important;
+    box-shadow: initial !important; }
+
+/* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .reservation:before {
   content: "\e80e"; }
 
-/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+/* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .arrows-cw:before {
   content: "\e874"; }
 
-/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .cog:before {
   content: "\e854"; }
 
-/* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+/* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .left-open:before {
   content: "\e87b"; }
 
-/* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+/* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .left:before {
   content: "\e84c"; }
 
-/* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+/* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 .pencil::before {
   content: '\e858'; }
+
+/* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.grades::before {
+  content: '\e614'; }
 
 /* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
 .scrollbar-fine::-webkit-scrollbar {
@@ -1252,6 +1267,44 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
     /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
     div.schedule .schedule-items .schedule-item .schedule-item-content > div.dragin {
       padding: 3px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+.seach-drop-down {
+  position: relative; }
+  /* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .highlighted {
+    font-weight: bold;
+    color: #4bafd5; }
+  /* line 7, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .result {
+    position: absolute;
+    background-color: #2a9cc8;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 45px;
+    cursor: text; }
+    /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+    .seach-drop-down .result:hover {
+      opacity: 0.9; }
+  /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down input, .seach-drop-down .drop-down {
+    width: 100%; }
+  /* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .drop-down {
+    height: auto;
+    border: solid 1px #2a9cc8; }
+    /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+    .seach-drop-down .drop-down ul {
+      border-left: 0px solid transparent !important;
+      background: white; }
+      /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+      .seach-drop-down .drop-down ul li {
+        color: #2a9cc8; }
+      /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+      .seach-drop-down .drop-down ul li:hover {
+        background: #F0F0F0;
+        padding-right: 2px;
+        opacity: 0.8; }
 
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
 .progression-manager {
@@ -1507,6 +1560,51 @@ right-panel .sum-selected > span:nth-child(2) {
 right-panel .right-panel .quick-search-results {
   width: 100%;
   margin-top: 10px; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters > div {
+  padding: 5px 10px; }
+  /* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-filters > div .label {
+    line-height: 30px; }
+
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters button {
+  margin-top: 22px; }
+
+/* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters ent-dropdown {
+  padding-left: 0px; }
+
+/* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-tab-header {
+  font-size: 1.4em;
+  background-color: #00a4d3;
+  color: white;
+  padding: 10px 20px; }
+  /* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-tab .visa-tab-header .checkbox span {
+    height: 20px;
+    background-color: white; }
+    /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    .visa-manager .visa-tab .visa-tab-header .checkbox span:before {
+      margin-right: 0px; }
+
+/* line 34, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-tab-content {
+  margin: 10px 0px; }
+  /* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-tab .visa-tab-content .visa-lesson {
+    padding: 0px; }
+    /* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    .visa-manager .visa-tab .visa-tab-content .visa-lesson .visa-lesson-header {
+      background-color: #00a4d3;
+      color: white;
+      padding: 10px 20px; }
+
+/* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-lesson-content div {
+  padding: 10px 15px; }
 
 
 /*# sourceMappingURL=app.css.map*/

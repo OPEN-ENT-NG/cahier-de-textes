@@ -1,0 +1,99 @@
+<div class="visa-manager"  >
+    <h1>
+        <a href="#" ><i18n>diary.title</i18n> </a> >
+        <a href="" ><i18n>via.title</i18n> </a>
+    </h1>
+    <div class="row visa-filters">
+        <div class="cell three" ng-if="visaManagerCtrl.items">
+            <div class="label" >Enseignant :  </div>
+            <search-drop-down
+                items = "visaManagerCtrl.items"
+                place-holder ="Professeur"
+                model="visaManagerCtrl.teacher"
+                show-expression="item.name"
+            ></search-drop-down>
+        </div>
+        <div class="cell three">
+            <span class="label">Matière : </span>
+            <ent-dropdown
+                placeholder="select.group.or.class"
+                list="audiences.all"
+                selected="homework.audience"
+                property="name"
+                school="currentSchool"
+                lesson=""
+                homework="homework">
+            </ent-dropdown>
+        </div>
+        <div class="cell two">
+            <span class="label">Classe : </span>
+            <ent-dropdown placeholder="select.group.or.class"
+                list="audiences.all"
+                selected="homework.audience"
+                property="name"
+                school="currentSchool"
+                lesson=""
+                homework="homework">
+            </ent-dropdown>
+        </div>
+        <div class="cell two">
+            <span class="label">Statut : </span>
+            <ent-dropdown placeholder="select.group.or.class"
+                list="audiences.all"
+                selected="homework.audience"
+                property="name"
+                school="currentSchool"
+                lesson=""
+                homework="homework">
+            </ent-dropdown>
+        </div>
+        <div class="cell two">
+            <button>rechercher</button>
+        </div>
+
+    <div class="visa-tab">
+        <div class="row visa-tab-header">
+            <div class="cell five">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="lesson.selected"/>
+                    <span></span>
+                </label>
+            </div>
+            <div class="cell five">
+                Liste des scéances
+            </div>
+        </div>
+        <div class="row visa-tab-content">
+            <article class="row visa-lesson">
+                <div class="row visa-lesson-header">
+                    <div class="cell three teacher">
+                        teacher
+                    </div>
+                    <div class="cell three subject">
+                        subject
+                    </div>
+                    <div class="cell three audience">
+                        classe
+                    </div>
+                </div>
+                <div class="row visa-lesson-content">
+                    <div class="cell one">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="lesson.selected"/>
+                            <span></span>
+                        </label>
+                    </div>
+                    <div class="cell four">
+                        Visa
+                    </div>
+                    <div class="cell three">
+                        state
+                    </div>
+                    <div class="cell four">
+                        nb sceance
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>

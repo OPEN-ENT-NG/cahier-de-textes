@@ -5,6 +5,10 @@
 
         module.config(function($routeProvider) {
             $routeProvider
+                // manage visa
+                .when('/manageVisaView/:teacherId', {
+                    action: 'manageVisaView'
+                })
                 // go to create new lesson view
                 .when('/progressionManagerView/:selectedProgressionId', {
                     action: 'progressionManagerView'

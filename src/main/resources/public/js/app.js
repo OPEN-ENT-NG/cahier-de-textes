@@ -143,7 +143,8 @@ var AngularExtensions = {
         VIEW: 'diary.view',
         CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
         CREATE_FREE_HOMEWORK: 'diary.createFreeHomework',
-        MANAGE_MODEL_WEEK: 'diary.manageModelWeek'
+        MANAGE_MODEL_WEEK: 'diary.manageModelWeek',
+        MANAGE_VISA: 'diary.manageVisa'
       }
     });
   });
@@ -988,6 +989,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     initAudiences();
     route({
+        manageVisaView: function manageVisaView(params) {
+            template.open('main', 'visa-manager');
+        },
         progressionEditLesson: function progressionEditLesson(params) {
             template.open('main', 'progression-edit-lesson');
         },
@@ -4121,6 +4125,104 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     AngularExtensions.addModuleConfig(function (module) {
 
+        /**
+         * Directive for result items
+         */
+        module.directive('searchDropDown', function () {
+            return {
+                restrict: "E",
+                templateUrl: "/diary/public/js/directives/search-drop-down/search-drop-down.template.html",
+                scope: {
+                    items: '=',
+                    showExpression: '@',
+                    model: '=',
+                    placeHolder: '@',
+                    freeField: '='
+                },
+                controller: 'SearchDropDownController'
+            };
+        });
+
+        module.controller("SearchDropDownController", controller);
+
+        function controller($scope, $sce, $timeout) {
+
+            $scope.showDropDown = false;
+            if (!$scope.showExpression) {
+                $scope.showExpression = 'item';
+            }
+
+            $scope.$watch('items', init);
+            $scope.$watch('searchFilter', init);
+
+            function init() {
+                $scope.itemsToShow = $scope.items.map(function (item) {
+                    var result = "";
+                    var value = eval($scope.showExpression);
+                    var hightlightedText = highlight(value, $scope.searchFilter);
+                    return {
+                        text: value,
+                        hightlightedText: hightlightedText,
+                        item: item
+                    };
+                });
+
+                $scope.itemsToShow = $scope.itemsToShow.filter(function (e) {
+                    if (!e.text || !$scope.searchFilter) {
+                        return true;
+                    }
+                    return e.text.toLowerCase().indexOf($scope.searchFilter.toLowerCase()) > -1;
+                });
+                console.log($scope.itemsToShow);
+            }
+
+            function highlight(text, phrase) {
+                if (phrase) text = text.replace(new RegExp('(' + phrase + ')', 'gi'), '<span class="highlighted">$1</span>');
+                return text;
+            }
+            $scope.eraseSelected = function ($event) {
+                $scope.selectedItem = undefined;
+                angular.element($event.target).parent().parent().find('input')[0].focus();
+            };
+            $scope.selectItem = function (option) {
+                $scope.searchFilter = undefined;
+                $scope.selectedItem = option;
+                $scope.showDropDown = false;
+            };
+            $scope.blur = function () {
+                $timeout(function () {
+                    $scope.showDropDown = false;
+                });
+            };
+            $scope.enter = function (keyEvent) {
+
+                if (keyEvent.which === 13) {
+                    if (!$scope.searchFilter) {
+                        return;
+                    }
+                    var item = $scope.itemsToShow.find(function (e) {
+                        return e.text.toLowerCase() === $scope.searchFilter.toLowerCase();
+                    });
+                    if (item) {
+                        $scope.selectItem(item);
+                    }
+                }
+            };
+            $scope.change = function () {
+                $scope.showDropDown = $scope.searchFilter.length > 0;
+                $scope.selectedItem = undefined;
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
         module.directive('secure', directive);
 
         function directive(SecureService) {
@@ -4439,6 +4541,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			};
 		}
 	});
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.filter('highlight', filter);
+
+        function filter($sce) {
+            return function (text, phrase) {
+                if (phrase) text = text.replace(new RegExp('(' + phrase + ')', 'gi'), '<span class="highlighted">$1</span>');
+                return $sce.trustAsHtml(text);
+            };
+        }
+    });
 })();
 
 'use strict';
@@ -5991,6 +6110,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         module.config(function ($routeProvider) {
             $routeProvider
+            // manage visa
+            .when('/manageVisaView/:teacherId', {
+                action: 'manageVisaView'
+            })
             // go to create new lesson view
             .when('/progressionManagerView/:selectedProgressionId', {
                 action: 'progressionManagerView'
@@ -6886,6 +7009,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
         module.service("UtilsService", UtilsService);
+    });
+})();
+
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("VisaManagerController", controller);
+
+        function controller($scope, $rootScope, $routeParams, $timeout) {
+            var vm = this;
+            console.log("visa ctrl");
+            vm.items = [{ name: 'teacher1' }, { name: 'teacher2' }];
+        }
     });
 })();
 

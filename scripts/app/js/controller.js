@@ -125,6 +125,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
     initAudiences();
     route({
+        manageVisaView: function (params) {
+            template.open('main', 'visa-manager');
+        },
         progressionEditLesson:function(params){
           template.open('main', 'progression-edit-lesson');
         },
