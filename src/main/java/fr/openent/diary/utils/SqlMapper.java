@@ -316,7 +316,7 @@ public class SqlMapper<T> {
     }
 
     public void insert(final T obj, final Handler<HandlerResponse<T>> handler) throws Exception {
-        prepareInsertStatement(obj, new Handler<HandlerResponse<SqlQuery>>() {
+        prepareInsertStatementWithSequence(obj, new Handler<HandlerResponse<SqlQuery>>() {
             @Override
             public void handle(HandlerResponse<SqlQuery> event) {
                 HandlerResponse<T> resultHandler = new HandlerResponse<T>(event.getMessage());
@@ -379,7 +379,7 @@ public class SqlMapper<T> {
         return new JsonObject(result);
     }
 
-    public void prepareInsertStatement(final T obj,   final Handler<HandlerResponse<SqlQuery>> handler ) throws Exception{
+    public void prepareInsertStatementWithSequence(final T obj, final Handler<HandlerResponse<SqlQuery>> handler ) throws Exception{
 
         Long id = getId(obj);
         //if we already have the object id dont active sequence
@@ -409,6 +409,11 @@ public class SqlMapper<T> {
                 }
             }
         });
+    }
+
+
+    public SqlQuery prepareInsertStatement(final T obj) throws Exception{
+        return new SqlQuery(databaseTableSc,objectToJson(obj));
     }
 
     public SqlQuery prepareUpdateStatement(T obj) throws Exception {

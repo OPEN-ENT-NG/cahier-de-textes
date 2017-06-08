@@ -6,7 +6,9 @@ import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.ModelWeek;
 import fr.openent.diary.model.visa.ResultVisaList;
 import fr.openent.diary.model.visa.VisaFilters;
+import fr.openent.diary.model.visa.VisaModel;
 import fr.openent.diary.services.VisaServiceImpl;
+import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -68,7 +70,7 @@ public class VisaController extends ControllerHelper {
 
     @Get("/visa/agregs")
     @SecuredAction(value = "diary.manageVisa", type = ActionType.AUTHENTICATED)
-    public void modelweek(final HttpServerRequest request) {
+    public void getAgregs(final HttpServerRequest request) {
 
         String structureId = request.params().get("structureId");
         String teacherId = request.params().get("teacherId");
@@ -82,4 +84,24 @@ public class VisaController extends ControllerHelper {
         this.visaService.getAllAgregatedVisas(structureId,teacherId,audienceId,subjectId,showTodoOnly,GenericHandlerResponse.<List<ResultVisaList>>handler(request));
 
     }
+
+
+    @Post("/visa/apply")
+    @SecuredAction(value = "diary.manageVisa", type = ActionType.AUTHENTICATED)
+    public void applyVisa(final HttpServerRequest request) {
+
+        SqlMapper.mappListRequest(request, VisaModel.class, new Handler<HandlerResponse<List<VisaModel>>>() {
+            @Override
+            public void handle(HandlerResponse<List<VisaModel>> event) {
+                if (event.hasError()){
+                    badRequest(request,event.getMessage());
+                }else{
+                    visaService.applyVisas(event.getResult(),GenericHandlerResponse.genericHandle(request));
+                }
+
+            }
+        });
+
+    }
+
 }

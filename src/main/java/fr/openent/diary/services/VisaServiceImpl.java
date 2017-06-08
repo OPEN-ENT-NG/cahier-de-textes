@@ -10,6 +10,7 @@ import fr.openent.diary.model.util.CountModel;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.ResultVisaList;
 import fr.openent.diary.model.visa.VisaFilters;
+import fr.openent.diary.model.visa.VisaModel;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -25,7 +26,7 @@ public class VisaServiceImpl extends SqlCrudService {
     private final static String PROGRESION_DATABASE_TABLE = "lesson";
     //private final static String PROGRESION_DATABASE_TABLE_SC ="diary.lesson";
 
-    //private final SqlMapper<String> progressionMapper = new SqlMapper<>(Progression.class,PROGRESION_DATABASE_TABLE_SC,sql);
+    private final SqlMapper<VisaModel> visaMapper = new SqlMapper<>(Progression.class,"diary.visa",sql);
 
 
     public VisaServiceImpl() {
@@ -196,8 +197,102 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, ResultVisaList.class));
     }
 
-    public void applyVisa(String teacherName, String audienceName, String subjectName, final Handler<GenericHandlerResponse> handler) {
+    public void applyVisas(final List<VisaModel> visas, final Handler<GenericHandlerResponse> handler) {
+        try {
+            final List<SqlQuery> queries = new ArrayList<>();
+            for (final VisaModel visa : visas){
+                //queries.addAll(applyVisaPrepareQuery(visa));
 
+                visaMapper.prepareInsertStatementWithSequence(visa, new Handler<HandlerResponse<SqlQuery>>() {
+                    @Override
+                    public void handle(HandlerResponse<SqlQuery> event) {
+                        queries.add(event.getResult());
+                        queries.add(createInsertLessonVisa(visa));
+
+                        //all queries are created
+                        if (queries.size() == (visas.size() * 2)){
+                            visaMapper.executeTransactionnalQueries(queries,handler);
+                        }
+                    }
+                });
+
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    private SqlQuery createInsertLessonVisa(VisaModel visa) {
+        validateVisa(visa);
+
+        StringBuilder query = new StringBuilder();
+        JsonArray parameters = new JsonArray();
+        //.addString(structureId);
+
+        parameters.addNumber(visa.getId());
+        parameters.addString(visa.getStructureId());
+        parameters.addString(visa.getAudienceId());
+        parameters.addString(visa.getSubjectId());
+        parameters.addString(visa.getTeacherId());
+
+        parameters.addNumber(visa.getId());
+        parameters.addString(visa.getStructureId());
+        parameters.addString(visa.getAudienceId());
+        parameters.addString(visa.getSubjectId());
+        parameters.addString(visa.getTeacherId());
+
+        query.append(" INSERT INTO diary.visa_lesson ")
+                .append(" select distinct l2.id as lesson_id , ? as school_id ")
+                .append(" from diary.lesson l2 ")
+                .append("  where not exists (select 1 from diary.visa_lesson v where v.lesson_id = l2.id) ")
+                .append(" and l2.school_id = ? ")
+                .append(" and l2.audience_id = ? ")
+                .append(" and l2.subject_id = ? ")
+                .append(" and l2.teacher_id = ? ")
+                .append(" union ")
+                .append(" select l2.id ,  ? as school_id ")
+                .append(" from diary.lesson l2 ")
+                .append(" join diary.visa_lesson vl on vl.lesson_id = l2.id ")
+                .append(" join diary.visa v on v.id = vl.visa_id ")
+                .append(" where l2.modified > v.dateCreate ")
+                .append(" and l2.school_id = ? ")
+                .append(" and l2.audience_id = ? ")
+                .append(" and l2.subject_id = ? ")
+                .append(" and l2.teacher_id = ? ");
+        return new SqlQuery(query.toString(),parameters);
+    }
+
+    private void validateVisa (VisaModel visa){
+        if (visa.getStructureId()==null || visa.getStructureId().isEmpty()){
+            throw new RuntimeException("tructureId cant be null");
+        }
+        if (visa.getAudienceId()==null || visa.getAudienceId().isEmpty()){
+            throw new RuntimeException("audienceId cant be null");
+        }
+        if (visa.getAudienceName()==null || visa.getAudienceName().isEmpty()){
+            throw new RuntimeException("audienceName cant be null");
+        }
+        if (visa.getTeacherId()==null || visa.getTeacherId().isEmpty()){
+            throw new RuntimeException("teacherId cant be null");
+        }
+        if (visa.getTeacherName()==null || visa.getTeacherName().isEmpty()){
+            throw new RuntimeException("teacherName cant be null");
+        }
+        if (visa.getSubjectId()==null || visa.getSubjectId().isEmpty()){
+            throw new RuntimeException("subjectId cant be null");
+        }
+        if (visa.getSubjectName()==null || visa.getSubjectName().isEmpty()){
+            throw new RuntimeException("subjectName cant be null");
+        }
+        if (visa.getOwnerId()==null || visa.getOwnerId().isEmpty()){
+            throw new RuntimeException("ownerId cant be null");
+        }
+        if (visa.getOwnerName()==null || visa.getOwnerName().isEmpty()){
+            throw new RuntimeException("ownerName cant be null");
+        }
+    }
+
+
 
 }

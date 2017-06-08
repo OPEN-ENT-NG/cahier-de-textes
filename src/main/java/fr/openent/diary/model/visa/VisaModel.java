@@ -7,8 +7,12 @@ import java.util.Date;
  */
 public class VisaModel {
     private Long id;
+
+
+
     private String comment;
-    private Date dateCreate;
+    private Date dateCreate = new Date();
+    private String structureId;
     private String teacherId;
     private String teacherName;
     private String subjectId;
@@ -19,13 +23,7 @@ public class VisaModel {
     private String ownerName;
     private String ownerType;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getComment() {
         return comment;
@@ -114,4 +112,21 @@ public class VisaModel {
     public void setOwnerType(String ownerType) {
         this.ownerType = ownerType;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getStructureId() {
+        return structureId;
+    }
+
+    public void setStructureId(String structureId) {
+        this.structureId = structureId;
+    }
+
 }

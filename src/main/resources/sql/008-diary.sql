@@ -1,10 +1,12 @@
 DROP TABLE IF EXISTS diary.visa;
-
+DROP TABLE IF EXISTS diary.visa_lesson;
 CREATE TABLE diary.visa (
     id bigserial,
 
     comment text,
     dateCreate date,
+
+    structureId character varying(60) not null,
 
     teacherId character varying(60) not null,
     teacherName character varying(60),
