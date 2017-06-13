@@ -5,7 +5,6 @@ DROP TABLE IF EXISTS diary.lesson;
 DROP TABLE IF EXISTS diary.teacher;
 DROP TABLE IF EXISTS diary.audience;
 DROP TABLE IF EXISTS diary.subject;
-DROP TABLE IF EXISTS diary.modelweek;
 
 CREATE TYPE diary.resource_state AS ENUM ('draft', 'published');
 
@@ -173,17 +172,7 @@ CREATE TABLE diary.homework_shares
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE diary.modelweek (
-    id bigserial,
-    weekAlias character varying(37),
-    teacherId character varying(37),
-    beginDate date,
-    endDate date,
-    pair boolean,
-    PRIMARY KEY (id),
-    CONSTRAINT teacher_id_FK FOREIGN KEY (teacherId)
-        REFERENCES diary.teacher(id) ON DELETE CASCADE
-);
+
 
 
 CREATE OR REPLACE FUNCTION diary.insert_groups_members() RETURNS trigger AS $$
