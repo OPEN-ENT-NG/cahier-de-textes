@@ -1,6 +1,13 @@
 package fr.openent.diary.utils;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.vertx.java.core.json.impl.Json;
+
+import java.text.SimpleDateFormat;
 
 /**
  * Created by a629001 on 13/04/2016.
@@ -11,6 +18,14 @@ import org.vertx.java.core.json.impl.Json;
  */
 public class StringUtils {
 
+    public static ObjectMapper mapper = new ObjectMapper();
+
+    static{
+        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS   "));
+    }
 
     /**
      * UUID version 4 pattern
@@ -34,7 +49,11 @@ public class StringUtils {
         if (obj == null){
             return "";
         }else{
-            return Json.encode(obj);
+            try {
+                return mapper.writeValueAsString(obj);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
