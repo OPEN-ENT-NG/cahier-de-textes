@@ -1,0 +1,19 @@
+<!-- action panel displayed if at least one lesson or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: visaManagerCtrl.selectedContent().length === 0 }" >
+    <div class="toggle">
+        <div class="row">
+            <button
+                confirm-popup
+                confirm-class="popup-viser"
+                confirm-template="/diary/public/js/visa/popup-valid/popup-valid.template.html" >
+                viser
+            </button>
+            <button ng-click="visaManagerCtrl.showSelected()">
+                consulter les sceances à viser
+            </button>
+            <button ng-click="visaManagerCtrl.pdf()">
+                Generer le pdf
+            </button>
+        </div>
+    </div>
+</section>

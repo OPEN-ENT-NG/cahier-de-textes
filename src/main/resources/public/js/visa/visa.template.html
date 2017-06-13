@@ -7,10 +7,10 @@
         <div class="cell three" ng-if="visaManagerCtrl.items">
             <div class="label" >Enseignant :  </div>
             <search-drop-down
-                items = "visaManagerCtrl.items"
+                items = "visaManagerCtrl.filters.teachers"
                 place-holder ="Professeur"
                 selected-item="visaManagerCtrl.filter.teacher"
-                show-expression="item.name"
+                show-expression="item.value"
             ></search-drop-down>
         </div>
         <div class="cell three">
@@ -43,50 +43,10 @@
         <div class="cell two">
             <button ng-click="visaManagerCtrl.search()">rechercher</button>
         </div>
-
-    <div class="visa-tab">
-        <div class="row visa-tab-header">
-            <div class="cell five">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="lesson.selected"/>
-                    <span></span>
-                </label>
-            </div>
-            <div class="cell five">
-                Liste des scéances
-            </div>
-        </div>
-        <div class="row visa-tab-content">
-            <article class="row visa-lesson">
-                <div class="row visa-lesson-header">
-                    <div class="cell three teacher">
-                        teacher
-                    </div>
-                    <div class="cell three subject">
-                        subject
-                    </div>
-                    <div class="cell three audience">
-                        classe
-                    </div>
-                </div>
-                <div class="row visa-lesson-content">
-                    <div class="cell one">
-                        <label class="checkbox">
-                            <input type="checkbox" ng-model="lesson.selected"/>
-                            <span></span>
-                        </label>
-                    </div>
-                    <div class="cell four">
-                        Visa
-                    </div>
-                    <div class="cell three">
-                        state
-                    </div>
-                    <div class="cell four">
-                        nb sceance
-                    </div>
-                </div>
-            </article>
-        </div>
     </div>
+    <div ng-include="'/diary/public/js/visa/visa-list.template.html'"
+        ng-if="visaManagerCtrl.agregatedVisa.length > 0"></div>
+    <div ng-include="'/diary/public/js/visa/visa-list-empty-instructions.template.html'"
+        ng-if="!visaManagerCtrl.agregatedVisa.length"></div>
+        <div ng-include="'/diary/public/js/visa/toggle-selected.template.html'"></div>
 </div>

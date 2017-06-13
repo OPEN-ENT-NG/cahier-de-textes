@@ -1,5 +1,7 @@
 package fr.openent.diary.model.visa;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,18 +15,38 @@ public class ResultVisaList {
     private String subjectName;
     private String audienceId;
     private String audienceName;
+    private String structureId;
 
-    private Long nbDirty;
+    public String getStructureId() {
+        return structureId;
+    }
+
+    public void setStructureId(String structureId) {
+        this.structureId = structureId;
+    }
+
+    public Date getLastDateUpdate() {
+        return lastDateUpdate;
+    }
+
+    public void setLastDateUpdate(Date lastDateUpdate) {
+        this.lastDateUpdate = lastDateUpdate;
+    }
+
+    private Date lastDateUpdate;
     private Long nbTotal;
     private Long nbNotVised;
 
-    public Long getNbDirty() {
-        return nbDirty;
+    private List<VisaModel> visas = new ArrayList<>();
+
+    public List<VisaModel> getVisas() {
+        return visas;
     }
 
-    public void setNbDirty(Long nbDirty) {
-        this.nbDirty = nbDirty;
+    public void setVisas(List<VisaModel> visas) {
+        this.visas = visas;
     }
+
 
     public Long getNbTotal() {
         return nbTotal;

@@ -119,7 +119,8 @@ public class SqlMapper<T> {
 
                         List<T> result = new ArrayList<T>();
                         for (Object obj : ((JsonArray) (((Either.Right) resultJson).getValue()))){
-                            result.add((T) decode(obj.toString(),clazz));
+                            T finalObjet =  (T) decode(obj.toString(),clazz);
+                            result.add(finalObjet);
                         }
                         resultHandler.setResult(result);
                     }else{
@@ -133,6 +134,29 @@ public class SqlMapper<T> {
             }
         };
 
+
+
+    }
+
+    public static <T> void checkError(GenericHandlerResponse response, Handler<HandlerResponse<T>> handler){
+        if (response.hasError()){
+            HandlerResponse<T> responseError = new HandlerResponse<>();
+            responseError.setMessage(response.getMessage());
+            handler.handle(responseError);
+            throw new RuntimeException(response.getMessage());
+        }
+    }
+
+    public static <T> void error(Throwable t,  Handler<HandlerResponse<T>> handler){
+            HandlerResponse<T> responseError = new HandlerResponse<>();
+            responseError.setMessage(t.getMessage());
+            handler.handle(responseError);
+    }
+
+    public static void genericError(Throwable t,  Handler<GenericHandlerResponse> handler){
+        GenericHandlerResponse  responseError = new GenericHandlerResponse (t.getMessage());
+
+        handler.handle(responseError);
     }
 
     public static <T> void mappListRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<List<T>>> handler){
@@ -165,6 +189,7 @@ public class SqlMapper<T> {
             result = (T)mapper.readValue(str, clazz);
         } catch (IOException e) {
             log.error(e.getMessage(),e);
+            throw new RuntimeException(e);
         }
         return result;
     }

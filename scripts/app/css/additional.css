@@ -3,6 +3,9 @@ ng-include{
   display: block;
 }
 
+.center{
+  text-align: center;
+}
 .right{
   float:right;
 }

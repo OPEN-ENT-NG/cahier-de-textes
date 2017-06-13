@@ -48,6 +48,7 @@
         <!-- button -->
         <div class="row" ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
           <button class="cancel" type="button"
+                  confirm-popup
                   confirm-click="[['progression.confirm.delete.progression'|translate]]"
                   confirm-yes="[['diary.delete' | translate]]"
                   confirm-cancel="[['cancel'|translate]]"

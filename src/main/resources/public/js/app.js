@@ -3292,7 +3292,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
   'use strict';
 
   AngularExtensions.addModuleConfig(function (module) {
-    module.directive("confirmClick", directive);
+    module.directive("confirmPopup", directive);
 
     function directive($compile) {
       return {
@@ -3301,15 +3301,18 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
           console.log("confirm click linked");
 
           var clickAction = attr.confirmedClick;
-          var html = '\n                     <lightbox show="display" on-close="remove()">\n                       <div class="row">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />                              \n                           </div>\n                       </div>\n                     </lightbox>\n                     ';
+          var html = '\n                     <lightbox show="display" on-close="remove()">\n                       <div class="row" ng-if="!confirmTemplate">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />\n                           </div>\n                       </div>\n                       <div class="row" ng-if="confirmTemplate">\n                          <div ng-include="confirmTemplate">\n                          </div>\n                       </div>\n                     </lightbox>\n                     ';
           var lightbox;
           element.bind('click', function (event) {
             scope.msg = attr.confirmClick || "Etes vous sur?";
             scope.yes = attr.confirmYes || "Ok";
+            scope.confirmClass = attr.confirmClass || "";
+            scope.confirmTemplate = attr.confirmTemplate;
             scope.cancel = attr.confirmCancel || "Annuler";
             scope.display = true;
             lightbox = $compile(html)(scope);
             $('body').append(lightbox);
+            lightbox.addClass(scope.confirmClass);
             scope.$apply();
           });
           scope.remove = function () {
@@ -4237,6 +4240,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             $scope.blur = function () {
                 $timeout(function () {
                     $scope.showDropDown = false;
+                    $scope.searchFilter = undefined;
                 });
             };
             $scope.enter = function (keyEvent) {
@@ -7057,7 +7061,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     });
 })();
 
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -7081,12 +7085,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
 
         _createClass(VisaService, [{
-            key: "getFilters",
+            key: 'getFilters',
             value: function getFilters(userStructuresId) {
 
-                var urlGetHomeworks = "/diary/visa/filters/" + userStructuresId;
+                var url = '/diary/visa/filters/' + userStructuresId;
 
-                return this.$http.get(urlGetHomeworks).then(function (result) {
+                return this.$http.get(url).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getAgregatedVisas',
+            value: function getAgregatedVisas(structureId, filter) {
+                var url = '/diary/visa/agregs';
+                return this.$http({
+                    url: url,
+                    method: 'GET',
+                    params: {
+                        structureId: structureId,
+                        teacherId: filter.teacher ? filter.teacher.key : undefined,
+                        audienceId: filter.audience ? filter.audience.key : undefined,
+                        subjectId: filter.subject ? filter.subject.key : undefined,
+                        showTodoOnly: filter.state ? filter.state.key = "TODO" ? true : undefined : undefined
+                    }
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'applyVisa',
+            value: function applyVisa(_applyVisa) {
+                var url = '/diary/visa/apply';
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: _applyVisa
+                }).then(function (result) {
                     return result.data;
                 });
             }
@@ -7119,13 +7153,68 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             function init() {
                 VisaService.getFilters(model.me.structures[0]).then(function (filters) {
                     vm.filters = filters;
-                    vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') }, { key: 'DID', value: lang.translate('diary.visa.state.did') }, { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
+                    vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') },
+                    //{ key :'DID', value  :lang.translate('diary.visa.state.did')},
+                    { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
                 });
             }
 
             vm.search = function () {
-                console.log(vm.filter);
+                VisaService.getAgregatedVisas(model.me.structures[0], vm.filter).then(function (result) {
+                    vm.agregatedVisa = result;
+                    console.log(vm.agregatedVisa);
+                });
             };
+
+            vm.selectedContent = function () {
+                if (!vm.agregatedVisa) {
+                    return [];
+                }
+                return vm.agregatedVisa.filter(function (e) {
+                    return e.selected;
+                });
+            };
+
+            vm.calcRecapSelected = function () {
+                vm.recap = {
+                    nbLesson: vm.getNbLesson(),
+                    nbTeacher: vm.getNbProps("teacherId"),
+                    nbSubject: vm.getNbProps("subjectId"),
+                    nbAudience: vm.getNbProps("audienceId")
+                };
+                console.log("recap", vm.recap);
+            };
+
+            vm.getNbLesson = function () {
+                return vm.selectedContent().reduce(function (acc, e) {
+                    return acc + e.nbNotVised + (e.visas[0] ? e.visas[0].nbDirty : 0);
+                }, 0);
+            };
+
+            vm.getNbProps = function (props) {
+                var map = {};
+                vm.selectedContent().map(function (e) {
+                    map[e[props]] = true;
+                });
+                return Object.keys(map).length;
+            };
+
+            vm.applyVisa = function (withLock) {
+                var applyVisa = {
+                    comment: vm.comment,
+                    resultVisaList: vm.selectedContent(),
+                    ownerId: model.me.userId,
+                    ownerName: model.me.username,
+                    ownerType: 'director'
+                };
+                VisaService.applyVisa(applyVisa).then(function () {
+                    vm.search();
+                });
+            };
+
+            vm.showSelected = function () {};
+
+            vm.pdf = function () {};
         }
     });
 })();

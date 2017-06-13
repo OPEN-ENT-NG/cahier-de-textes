@@ -4,6 +4,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.ModelWeek;
+import fr.openent.diary.model.visa.ApplyVisaModel;
 import fr.openent.diary.model.visa.ResultVisaList;
 import fr.openent.diary.model.visa.VisaFilters;
 import fr.openent.diary.model.visa.VisaModel;
@@ -76,12 +77,8 @@ public class VisaController extends ControllerHelper {
         String teacherId = request.params().get("teacherId");
         String audienceId = request.params().get("audienceId");
         String subjectId = request.params().get("subjectId");
-        Boolean showTodoOnly=Boolean.TRUE;
-        String showTodoOnlyTxt = request.params().get("showTodoOnly");
-        if (showTodoOnlyTxt!=null && showTodoOnlyTxt.equals("false")){
-            showTodoOnly = Boolean.FALSE;
-        }
-        this.visaService.getAllAgregatedVisas(structureId,teacherId,audienceId,subjectId,showTodoOnly,GenericHandlerResponse.<List<ResultVisaList>>handler(request));
+
+        this.visaService.getAllAgregatedVisas(structureId,teacherId,audienceId,subjectId,GenericHandlerResponse.<List<ResultVisaList>>handler(request));
 
     }
 
@@ -90,16 +87,17 @@ public class VisaController extends ControllerHelper {
     @SecuredAction(value = "diary.manageVisa", type = ActionType.AUTHENTICATED)
     public void applyVisa(final HttpServerRequest request) {
 
-        SqlMapper.mappListRequest(request, VisaModel.class, new Handler<HandlerResponse<List<VisaModel>>>() {
+        SqlMapper.mappRequest(request, ApplyVisaModel.class, new Handler<HandlerResponse<ApplyVisaModel>>() {
             @Override
-            public void handle(HandlerResponse<List<VisaModel>> event) {
+            public void handle(HandlerResponse<ApplyVisaModel> event) {
                 if (event.hasError()){
                     badRequest(request,event.getMessage());
                 }else{
                     visaService.applyVisas(event.getResult(),GenericHandlerResponse.genericHandle(request));
                 }
-
             }
+
+
         });
 
     }

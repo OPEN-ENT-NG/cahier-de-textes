@@ -2,7 +2,7 @@
   'use strict';
 
     AngularExtensions.addModuleConfig(function(module) {
-        module.directive("confirmClick",directive);
+        module.directive("confirmPopup",directive);
 
         function directive($compile){
           return {
@@ -13,12 +13,16 @@
                    var clickAction = attr.confirmedClick;
                    var html =  `
                      <lightbox show="display" on-close="remove()">
-                       <div class="row">
+                       <div class="row" ng-if="!confirmTemplate">
                           <h2> [[msg]] </h2>
                            <div class="row">
                                <button class="right-magnet " ng-click="confirm()">[[yes]]</button>
-                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />                              
+                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />
                            </div>
+                       </div>
+                       <div class="row" ng-if="confirmTemplate">
+                          <div ng-include="confirmTemplate">
+                          </div>
                        </div>
                      </lightbox>
                      `;
@@ -26,10 +30,13 @@
                    element.bind('click',function (event) {
                      scope.msg = attr.confirmClick || "Etes vous sur?";
                      scope.yes = attr.confirmYes || "Ok";
+                     scope.confirmClass = attr.confirmClass || "";
+                     scope.confirmTemplate = attr.confirmTemplate ;
                      scope.cancel = attr.confirmCancel || "Annuler";
                       scope.display = true;
                       lightbox = $compile(html)(scope);
                       $('body').append(lightbox);
+                      lightbox.addClass(scope.confirmClass);
                       scope.$apply();
                    });
                    scope.remove = function(){

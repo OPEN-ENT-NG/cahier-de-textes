@@ -1,14 +1,13 @@
 package fr.openent.diary.model.visa;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by A664240 on 08/06/2017.
  */
 public class VisaModel {
     private Long id;
-
-
 
     private String comment;
     private Date dateCreate = new Date();
@@ -22,8 +21,24 @@ public class VisaModel {
     private String ownerId;
     private String ownerName;
     private String ownerType;
+    private Date lastModifiedLesson;
+    private Long nbDirty;
 
+    public Long getNbDirty() {
+        return nbDirty;
+    }
 
+    public void setNbDirty(Long nbDirty) {
+        this.nbDirty = nbDirty;
+    }
+
+    public Date getLastModifiedLesson() {
+        return lastModifiedLesson;
+    }
+
+    public void setLastModifiedLesson(Date lastModifiedLesson) {
+        this.lastModifiedLesson = lastModifiedLesson;
+    }
 
     public String getComment() {
         return comment;

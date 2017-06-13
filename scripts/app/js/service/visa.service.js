@@ -16,11 +16,39 @@
 
         getFilters(userStructuresId) {
 
-            var urlGetHomeworks = `/diary/visa/filters/${userStructuresId}`;
+            let url = `/diary/visa/filters/${userStructuresId}`;
 
-            return this.$http.get(urlGetHomeworks).then((result)=>{
+            return this.$http.get(url).then((result)=>{
                 return result.data;
             });
+        }
+
+        getAgregatedVisas(structureId, filter){
+            let url = `/diary/visa/agregs`;
+            return this.$http({
+                url : url,
+                method : 'GET',
+                params : {
+                    structureId : structureId,
+                    teacherId: filter.teacher ? filter.teacher.key : undefined,
+                    audienceId: filter.audience ? filter.audience.key : undefined,
+                    subjectId: filter.subject ? filter.subject.key : undefined,
+                    showTodoOnly : filter.state ? (filter.state.key = "TODO" ? true : undefined): undefined
+                }
+            }).then((result)=>{
+                return result.data;
+            });
+        }
+
+        applyVisa(applyVisa){
+          let url = `/diary/visa/apply`;
+          return this.$http({
+              url : url,
+              method : 'POST',
+              data : applyVisa
+          }).then((result)=>{
+              return result.data;
+          });
         }
 
     }

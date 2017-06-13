@@ -3,6 +3,9 @@ ng-include{
   display: block;
 }
 
+.center{
+  text-align: center;
+}
 .right{
   float:right;
 }
@@ -1691,49 +1694,113 @@ right-panel .right-panel .quick-search-results {
   width: 100%;
   margin-top: 10px; }
 
-/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+lightbox.popup-viser section.lightbox i {
+  color: white; }
+
+/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+lightbox.popup-viser section.lightbox div.content {
+  padding: 0px; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .header {
+    background-color: #00a4d3;
+    color: white;
+    text-align: center;
+    font-size: 1.8em;
+    padding: 25px 0px; }
+  /* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .viser-content {
+    padding: 15px; }
+  /* line 19, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .controls {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around; }
+
+/* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa i {
+  position: relative;
+  left: 5px;
+  top: -2px; }
+
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .ok {
+  color: #16cc16;
+  font-weight: bold; }
+
+/* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .dirty {
+  color: red;
+  font-weight: bold; }
+
+/* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .owner {
+  font-style: italic; }
+
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .dateCreate {
+  margin-top: 20px; }
+
+/* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .date {
+  text-align: right;
+  padding-right: 10px; }
+
+/* line 30, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa-filters > div {
   padding: 5px 10px; }
-  /* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  /* line 32, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
   .visa-manager .visa-filters > div .label {
     line-height: 30px; }
 
-/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+/* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa-filters button {
   margin-top: 22px; }
 
-/* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+/* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa-filters ent-dropdown {
   padding-left: 0px; }
 
-/* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+/* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab button {
+  float: none;
+  display: inline; }
+
+/* line 49, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .external-link {
+  font-size: 22px;
+  margin-left: 20px;
+  color: #FF8500; }
+
+/* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa-tab .visa-tab-header {
   font-size: 1.4em;
   background-color: #00a4d3;
   color: white;
   padding: 10px 20px; }
-  /* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  /* line 60, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
   .visa-manager .visa-tab .visa-tab-header .checkbox span {
     height: 20px;
     background-color: white; }
-    /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    /* line 63, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
     .visa-manager .visa-tab .visa-tab-header .checkbox span:before {
       margin-right: 0px; }
 
-/* line 34, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+/* line 70, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa-tab .visa-tab-content {
   margin: 10px 0px; }
-  /* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  /* line 73, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
   .visa-manager .visa-tab .visa-tab-content .visa-lesson {
     padding: 0px; }
-    /* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    /* line 75, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
     .visa-manager .visa-tab .visa-tab-content .visa-lesson .visa-lesson-header {
       background-color: #00a4d3;
       color: white;
       padding: 10px 20px; }
 
-/* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
-.visa-manager .visa-tab .visa-lesson-content div {
+/* line 83, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-lesson-content > div {
   padding: 10px 15px; }
 
 

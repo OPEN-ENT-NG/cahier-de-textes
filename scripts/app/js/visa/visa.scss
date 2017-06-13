@@ -1,4 +1,31 @@
 .visa-manager{
+
+  .visa{
+    i{
+      position:relative;
+      left : 5px;
+      top : -2px;
+    }
+    .ok {
+      color : #16cc16;
+      font-weight: bold;
+    }
+    .dirty{
+      color : red;
+      font-weight: bold;
+    }
+    .owner{
+      font-style: italic;
+    }
+    .dateCreate{
+      margin-top:20px;
+    }
+    .date{
+      text-align: right;
+      padding-right: 10px;
+    }
+  }
+
   .visa-filters{
     &>div{
       padding: 5px 10px;
@@ -15,6 +42,15 @@
   }
 
   .visa-tab{
+    button{
+      float : none;
+          display: inline;
+    }
+    .external-link{
+      font-size: 22px;
+      margin-left: 20px;
+      color : #FF8500;
+    }
     .visa-tab-header{
       font-size: 1.4em;
       background-color: #00a4d3;
@@ -44,7 +80,7 @@
       }
     }
     .visa-lesson-content{
-      div {
+      &>div {
         padding: 10px 15px;
       }
     }

@@ -1,0 +1,23 @@
+<div ng-init="visaManagerCtrl.calcRecapSelected()">
+  <div class="row header">
+    Viser les cahiers de textes sélectionnés
+  </div>
+  <div class="viser-content">
+    <div>
+      Vous êtes sur le point de viser
+        <strong>[[visaManagerCtrl.recap.nbLesson]]</strong>scéances pour
+        <strong>[[visaManagerCtrl.recap.nbTeacher]]</strong> enseignant,
+        <strong>[[visaManagerCtrl.recap.nbSubject]]</strong> matière et
+        <strong>[[visaManagerCtrl.recap.nbAudience]]</strong> classes
+    </div>
+    <div class="comment-box" ng-init="visaManagerCtrl.comment=''">
+      <p> Commentaire : </p>
+      <textarea ng-model="visaManagerCtrl.comment"></textarea>
+    </div>
+    <div class="controls">
+      <button ng-click="visaManagerCtrl.pdf()">Générer PDF</button>
+      <button ng-click="visaManagerCtrl.applyVisa(false) ; remove()">Viser sans Verrouiller</button>
+      <button ng-click="visaManagerCtrl.applyVisa(true)">Viser et Verrouiller</button>
+    </div>
+  </div>
+</div>

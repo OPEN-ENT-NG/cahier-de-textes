@@ -70,6 +70,7 @@
             $scope.blur = function(){
                 $timeout(()=>{
                     $scope.showDropDown = false;
+                    $scope.searchFilter =undefined;
                 });
             };
             $scope.enter = function(keyEvent){
