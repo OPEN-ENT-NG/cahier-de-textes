@@ -158,10 +158,13 @@ public class ModelWeekServiceImpl extends SqlCrudService {
             public void handle(HandlerResponse<List<ModelWeek>> event) {
                 final HandlerResponse<List<LessonAsModel>> response = new HandlerResponse<List<LessonAsModel>>();
                 ModelWeek refWeek = null;
-
+                response.setResult(new ArrayList<LessonAsModel>());
                 //if the week is pair take A alias, else the B
                 String aliasRef = (new DateTime(date).getWeekOfWeekyear() % 2) == 0 ? "A" :"B";
-
+                if(event.getResult()==null || event.getResult().size()==0){
+                    handler.handle(response);
+                    return;
+                }
                 for (ModelWeek modelWeek : event.getResult()){
                     if (modelWeek.getWeekAlias().equals(aliasRef)){
                         refWeek = modelWeek;
@@ -171,8 +174,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
 
                 if (refWeek == null){
                     handler.handle(response);
-                }else{
-
+                    return;
                 }
                 lessonService.getAllLessonsForTeacher(user.getUserId(),
                         user.getStructures(),
