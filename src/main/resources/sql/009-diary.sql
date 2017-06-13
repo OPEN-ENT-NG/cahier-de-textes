@@ -11,3 +11,4 @@ CREATE TABLE diary.modelweek (
     CONSTRAINT teacher_id_FK FOREIGN KEY (teacherId)
         REFERENCES diary.teacher(id) ON DELETE CASCADE
 );
+
