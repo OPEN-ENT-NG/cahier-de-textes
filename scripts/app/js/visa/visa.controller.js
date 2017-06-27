@@ -109,7 +109,7 @@
                     resultVisaList: vm.createLightVisas(agregVisas),
                     ownerId : model.me.userId,
                     ownerName : model.me.username,
-                    ownerType : SecureService.hasRight(contants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
+                    ownerType : SecureService.hasRight(constants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
                 };
                 VisaService.applyVisa(applyVisa,lock).then(()=>{
                     vm.closeAllPopup();

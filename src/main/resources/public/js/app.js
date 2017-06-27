@@ -557,7 +557,6 @@ var AngularExtensions = {
                 });
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "$timeout", "$window", "$element", "$location", "AudienceService", "SubjectService", "SecureService", "constants"];
     });
 })();
 
@@ -567,12 +566,12 @@ var AngularExtensions = {
                       'use strict';
 
                       AngularExtensions.addModuleConfig(function (module) {
-                                            module.directive('diaryScheduleItem', ["$compile", function ($compile) {
+                                            module.directive('diaryScheduleItem', function ($compile) {
                                                                   return {
                                                                                         restrict: 'E',
                                                                                         require: '^diary-calendar',
                                                                                         template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
-                                                                                        controller: ["$scope", "$element", "$timeout", function controller($scope, $element, $timeout) {
+                                                                                        controller: function controller($scope, $element, $timeout) {
 
                                                                                                               var vm = this;
 
@@ -681,11 +680,11 @@ var AngularExtensions = {
 
                                                                                                                                     $scope.$emit('calendar.refreshItems', $scope.item);
                                                                                                               });
-                                                                                        }],
+                                                                                        },
 
                                                                                         link: function link(scope, element, attributes) {}
                                                                   };
-                                            }]);
+                                            });
                       });
 })();
 
@@ -791,7 +790,6 @@ var AngularExtensions = {
                 }
             };
         }
-        directive.$inject = ["$compile"];
     });
 })();
 
@@ -820,7 +818,6 @@ var AngularExtensions = {
 
             };
         }
-        directive.$inject = ["$compile", "$timeout"];
     });
 })();
 
@@ -862,7 +859,6 @@ var AngularExtensions = {
                 }
             };
         }
-        sortableDirective.$inject = ["$compile"];
 
         function sortableElementDirective($parse, $timeout) {
             return {
@@ -936,7 +932,6 @@ var AngularExtensions = {
                 }
             };
         }
-        sortableElementDirective.$inject = ["$parse", "$timeout"];
     });
 })();
 
@@ -1006,7 +1001,6 @@ var AngularExtensions = {
                 }
             };
         }
-        directive.$inject = ["$compile"];
     });
 })();
 
@@ -2495,7 +2489,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $location.path(path);
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "$timeout", "CourseService", "$routeParams", "constants", "$location", "HomeworkService", "UtilsService", "LessonService", "$q", "SubjectService", "ModelWeekService", "SecureService"];
     });
 })();
 
@@ -2799,7 +2792,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 });
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "$routeParams", "PedagogicItemService", "constants", "$q", "SubjectService"];
     });
 })();
 
@@ -2860,7 +2852,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
             vm.loadLesson = function (lessonId) {};
         }
-        controller.$inject = ["$scope", "$timeout", "$routeParams", "constants", "$rootScope", "ProgressionService"];
     });
 })();
 
@@ -3453,7 +3444,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 setDaysContent();
             });
         }
-        controller.$inject = ["$scope"];
     });
 })();
 
@@ -3544,7 +3534,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         }
       };
     }
-    directive.$inject = ["$compile"];
   });
 })();
 
@@ -3565,7 +3554,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     property: "@",
                     nullable: "="
                 },
-                controller: ["$scope", function controller($scope) {
+                controller: function controller($scope) {
                     $scope.selectItem = function (item) {
                         if ($scope.list) {
                             $scope.list.map(function (e) {
@@ -3578,7 +3567,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                             $scope.listVisible = false;
                         }
                     };
-                }],
+                },
                 link: function link(scope, element, attr) {
 
                     $(document).bind('click', function (event) {
@@ -3655,7 +3644,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         }
-        controller.$inject = ["$scope", "SecureService", "VisaService", "constants"];
     });
 })();
 
@@ -3947,7 +3935,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         }
-        directive.$inject = ["AudienceService", "$rootScope"];
     });
 })();
 
@@ -4421,7 +4408,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 model.homeworksDropHandled = true;
             }
         }
-        controller.$inject = ["$scope", "$rootScope", "PedagogicItemService"];
     });
 })();
 
@@ -4550,7 +4536,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $scope.selectedItem = undefined;
             };
         }
-        controller.$inject = ["$scope", "$sce", "$timeout"];
     });
 })();
 
@@ -4573,7 +4558,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         }
-        directive.$inject = ["SecureService"];
     });
 })();
 
@@ -4628,7 +4612,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     hideIfSolo: "=",
                     isHidden: "="
                 },
-                controller: ["$scope", function controller($scope) {
+                controller: function controller($scope) {
                     $scope.structureList = [];
                     var i = 0;
                     model.me.structures.forEach(function (structure) {
@@ -4641,7 +4625,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         $scope.structure = $scope.structureList[0];
                     }
                     $scope.isHidden = $scope.hideIfSolo && $scope.structureList.length === 1;
-                }]
+                }
             };
         });
     });
@@ -4931,7 +4915,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return $sce.trustAsHtml(text);
             };
         }
-        filter.$inject = ["$sce"];
     });
 })();
 
@@ -5024,7 +5007,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return $sce.trustAsHtml(text);
 			};
 		}
-		filter.$inject = ["$sce"];
 	});
 })();
 
@@ -5050,7 +5032,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, key);
             };
         }
-        controller.$inject = ["$scope", "HistoryService"];
     });
 })();
 
@@ -5061,7 +5042,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(["$httpProvider", function ($httpProvider) {
+        module.config(function ($httpProvider) {
             $httpProvider.interceptors.push(['$q', '$location', function ($q, $location) {
 
                 function parseError(e) {
@@ -5083,7 +5064,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 };
             }]);
-        }]);
+        });
     });
 })();
 
@@ -6194,7 +6175,6 @@ Teacher.prototype.create = function (cb, cbe) {
                 vm.editLesson(vm.selectedContent()[0].id);
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "ProgressionService", "$timeout", "$routeParams"];
     });
 })();
 
@@ -6466,7 +6446,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             };
         }
-        controller.$inject = ["$scope", "$location", "ProgressionService"];
     });
 })();
 
@@ -6507,7 +6486,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             });
         }
-        controller.$inject = ["$scope", "$rootScope", "ProgressionService"];
     });
 })();
 
@@ -6541,7 +6519,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(["$routeProvider", function ($routeProvider) {
+        module.config(function ($routeProvider) {
             $routeProvider
             //show history
             .when('/showHistoryView', {
@@ -6587,7 +6565,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             .otherwise({
                 action: 'calendarView'
             });
-        }]);
+        });
     });
 })();
 
@@ -7793,7 +7771,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "VisaService", "$timeout"];
     });
 })();
 
@@ -7898,7 +7875,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     resultVisaList: vm.createLightVisas(agregVisas),
                     ownerId: model.me.userId,
                     ownerName: model.me.username,
-                    ownerType: SecureService.hasRight(contants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
+                    ownerType: SecureService.hasRight(constants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
                 };
                 VisaService.applyVisa(applyVisa, lock).then(function () {
                     vm.closeAllPopup();
@@ -7941,7 +7918,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 VisaService.getPdfForVisa(vm.createLightVisas(vm.currentAgregVisas));
             };
         }
-        controller.$inject = ["$scope", "$rootScope", "$routeParams", "VisaService", "$window", "$timeout", "SecureService", "constants"];
     });
 })();
 
@@ -9239,3 +9215,5 @@ var sansAccent = function sansAccent(str) {
     return str;
 };
 
+
+//# sourceMappingURL=app.js.map

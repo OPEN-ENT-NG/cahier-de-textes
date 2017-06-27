@@ -1,1 +1,2087 @@
-lightbox,ng-include{display:block}.center,ul li i.icon{text-align:center}i.cahier-textes2::before,i.pencil::before,i.rack2::before{font-family:generic-icons;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background-image:none}.homework-content,div.test .green,div.test .orange,div.test .pink,div.test .purple{background-color:#fff}.show-homeworks::before,.show-lessons::before,i.pencil::before,i.rack2::before{background-image:none}.pedagogic-item-card i.icon.lock-alt{top:-20px;position:relative;left:-16px;font-size:40px}.button-icon{font-size:1.2em;color:#2a9cc8;cursor:pointer}.button-icon:hover{color:#FF8500}.right{float:right}.datepicker{z-index:1000000!important}ul{list-style-type:none;margin-top:0;width:99%;border-left:5px solid transparent!important;padding-left:10px;padding-right:15px}div.week-switcher{top:20px;position:relative;left:40px}ul li i.icon{font-size:55px;line-height:55px}i.rack2::before{content:"\e80d"}i.cahier-textes2::before{content:"\e86f"}.table-cell,.table-cell-left{display:table-cell;vertical-align:top}.table-cell-left{padding-right:10px}.cell-no-float{box-sizing:border-box;float:none;display:block;position:relative}.lesson_homework,.resize-homeworks-panel{float:left;vertical-align:middle!important}i.pencil::before{content:"\e858"}.show-homeworks::before,i.homework::before{content:"\e80d"}div.days div div{padding-bottom:1px}div.test .pink{color:#b930a2}div.test .orange{color:#FF8500}div.test .purple{color:#763294}div.test .green{color:#46bfaf}.homework-content{height:32px;border:2px solid;border-radius:5px;padding-left:5px;font-size:12px;line-height:12px;text-align:left}section .homework-detail{margin-top:-1px;border:1px solid #4bafd5;padding:6px}.show-homeworks,.show-lessons{padding-top:7px;padding-right:7px}.show-homeworks::before{font-family:generic-icons;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.show-calendar-grid::before,.show-lessons::before{content:"\e86f";font-family:generic-icons;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.show-homeworks{opacity:.3;color:#46bfaf}.show-homeworks.selected{opacity:.7}.show-lessons{opacity:.3;color:#763294}.show-lessons.selected{opacity:.7}.lessonTeacher{margin-left:100px}.lessonHomeworkDescription{min-height:250px;height:auto;padding:10px;background:#fff;border:1px dashed #4bafd5!important;margin-top:10px;margin-bottom:20px}div.notification{border-color:#2a9cc8;border-style:solid;border-width:1px;margin-bottom:5px}.show-calendar-grid::before{background-image:none}.show-calendar-grid{opacity:.3;color:#FF8500;padding-top:7px}.resize-homeworks-panel{background-color:transparent!important}calendar-daily-events .days .day{width:calc(100% / 7 - (130px)/ 7)!important;background:#ddd!important}calendar-daily-events{padding-left:0!important;top:111px!important}.search-form-box{padding:10px 10px 20px 15px;width:75%;margin-bottom:20px;border:none;display:inline-block}.lesson_homework{font-size:50px;color:#4bafd5;margin-left:-25px;background-color:transparent!important}.lesson_homework.expanded::before{content:"▾"}.lesson_homework::before{content:"▸"}.homework-delimitation{border:.1px solid #a5b6bb!important;padding:0!important}.trash:before{font-size:18px!important;padding-right:10px}.lessonHomeworkBtn{margin-top:10px}.tabs headerHomeworkLesson.selected{border:none;border-bottom:2px solid #4bafd5;color:#4bafd5;text-transform:uppercase}.tabs headerHomeworkLesson{color:#555;font-size:20px;background:0 0;margin-right:10px;-webkit-transition:border-bottom 250ms ease;transition:border-bottom 250ms ease;display:inline-block;padding:6px}.tabs headerHomeworkLesson:hover{border-bottom:2px solid #4bafd5}.tabs>*{text-align:initial}.lessonHeader{font-size:20px;font-weight:700;margin:20px}.lessonInfosGrey{font-size:18px;color:grey;margin:20px}.lessonInfosBlack{font-size:18px;font-weight:700;margin-right:20px}.rowHeader{margin:5px}section .homeworkInfos{margin-top:38px;border:1px solid;padding:6px}.float-right{float:right}.float-left{float:left}.margintopimportant{margin-top:10px!important}.itemstate-red{padding-left:20px;float:left;color:red}.itemstate-green{padding-left:20px;float:left;color:green}.childFilter{color:#a5b6bb;border-color:grey;box-shadow:1px 2px 3px 1px;padding:10px;margin:10px 12px 10px 10px}.childFilter.selected,.childFilter:hover{background-color:#4bafd5;cursor:pointer;color:#fff;box-shadow:1px 2px 3px 1px}.homeworksDayLoad{border-radius:3px;border-style:solid;border-width:1px;margin:4px;font-size:16px;padding:3px 8px}.homeworksDayLoad.red{background-color:tomato}.homeworksDayLoad.yellow{background-color:khaki}.homeworksDayLoad.green{background-color:#32cd32}.showMoreLessonsBar{text-align:center;border:none;box-shadow:none;color:#FF8500;background:#F0F0F0;line-height:30px;width:300px;padding:2px 10px}i.arrow-down::before,i.arrow-up::before,i.check-selected::before{font-family:generic-icons;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background-image:none}.showMoreLessonsBar:hover{color:#FFF;background-color:#FF8500}.bootstrap-tagsinput .tag{margin-right:2px;color:#fff}.item-remove [data-role=remove]{margin-left:8px;font-size:28px;font-weight:700;cursor:pointer}.item-remove [data-role=remove]:after{content:"x";padding:0 2px;color:#FF8500}.custom-tagsinput .autocompletelist{margin-top:-10px;width:100%;padding:2px 0;border:1px solid #2a9cc8;background-color:#fff;position:absolute;top:100%;z-index:1000;right:auto;color:#2a9cc8}.item-suggest{padding-left:10px;width:100%;line-height:40px;height:31px;vertical-align:middle;white-space:nowrap;cursor:pointer;box-sizing:border-box}.item-suggest.selected{color:#fff;background-color:#2875c7}.item-suggest:hover{background-color:#F0F0F0}.item-display{border:1px solid #2a9cc8;color:#2a9cc8;width:100%;float:left;font-size:24px;border-radius:3px;padding:3px}i.arrow-down,i.arrow-up{font-size:25px;height:20px;width:25px;display:block;float:right!important;font-weight:900}.tabs section{border-color:#4bafd5!important}i.arrow-down::before{content:"\e841"}i.arrow-up{color:#FF8500}i.arrow-up::before{content:"\e840"}i.check-selected{height:20px;width:25px;display:block;float:right!important;color:#2cc123;font-size:18px;font-weight:900;padding-top:5px}.day-card-icon,.filter2,.summary{display:inline-block}i.check-selected::before{content:"\e871"}div.pedagogic-day-container{box-sizing:border-box;width:25%;float:left}.pedagogic-day-card{box-sizing:border-box;border:1px solid #2a9cc8;box-shadow:0 1px 3px;color:#2a9cc8;width:99%;height:55px;float:left;font-size:24px;background-color:#fff;margin-bottom:5px}.summary,.thumbnail{height:100%;box-sizing:border-box}.pedagogic-day-card .selected{color:#fff;background-color:#2a9cc8;border:0}.thumbnail{color:#2a9cc8;width:25%;float:left;font-size:45px;font-style:bold;padding:14px;text-transform:capitalize;border-right:1px}.thumb-selected{color:#fff;background-color:#2a9cc8;text-transform:capitalize}.card-icon-selected,.sum-selected{background-color:#7bbcf0;color:#fff}.summary{color:#2a9cc8;width:75%;padding:15px 0 0 15px;font-size:30px}.day-card-icon{font-size:26px;line-height:24px;text-align:center;padding:0 0 0 5px}div.pedagogic-item-container{box-sizing:border-box;width:75%;float:left}.pedagogic-item-card{box-sizing:border-box;width:99%;float:right;max-height:500px;overflow-y:auto;overflow-x:hidden}.prev-lesson-summary{background-color:#2a9cc8;color:#fff;padding-left:5px}.down-open:hover,.hover-orange:hover,.prev-lesson-summary:hover{color:#FF8351}.filter2{height:40px;font-size:30px;font-style:normal;line-height:48px;text-align:center;width:50px!important;border-radius:2px;box-shadow:none;background:#AAA;color:#fff;float:left!important;margin-bottom:5px;margin-right:3px}i.diary::before,i.homework::before{font-family:generic-icons;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background-image:none;color:#fff}.filter2.diary.selected{box-shadow:0 2px 3px rgba(0,0,0,.26) inset;background-color:#763294}.filter2.homework.selected{box-shadow:0 2px 3px rgba(0,0,0,.26) inset;background-color:#46bfaf}.subjects{display:inline;background-color:#f9f9f9;border:1px solid;border-radius:2px;font-size:16px;padding:2px}.subjects:focus{background-color:#f9f9f9;border-bottom:2px solid #FF8500;outline:0}i.diary::before{content:"\e86f"}ent-dropdown{float:left;display:block;width:100%;padding-left:10px}ent-dropdown div{width:100%;float:left;box-sizing:border-box}ent-dropdown div.dropdown-display{float:left;width:100%;background:#fff;height:31px;cursor:pointer;color:#2a9cc8;border:1px solid #2a9cc8;box-sizing:border-box;border-radius:3px;margin-bottom:10px}ent-dropdown div.dropdown-display>*{float:left;height:100%;height:31px;line-height:31px!important;display:inline-block;vertical-align:middle}ent-dropdown div.dropdown-display span{font-size:24px;width:100%;position:relative;box-sizing:border-box;padding-right:34px;padding-left:10px}ent-dropdown div.dropdown-display span.placeholder{color:#aaa;font-size:20px}#placeholder{font-size:17px!important}ent-dropdown div.dropdown-display i{position:relative;width:14px;margin-left:-28px;margin-right:4px;font-size:24px;font-weight:700;padding-right:10px;text-align:right}ent-dropdown div.dropdown-list{float:left;width:100%;z-index:1000;position:relative;transform:scale(1,0);transition:transform ease 250ms;color:#2a9cc8;margin-top:-10px}ent-dropdown div.dropdown-list-content{position:absolute;z-index:2;cursor:pointer;background:#fff;box-sizing:border-box;border:1px solid #2a9cc8}ent-dropdown div.subtitle{float:left;width:100%;padding:0 10px;z-index:2;cursor:none;background:#fff;color:#9fbcc8}ent-dropdown div.item-list{float:left;width:100%;padding:0 10px;font-size:14px}ent-dropdown div.item-list:hover{background:#F0F0F0}ent-dropdown div.item-list.selected{background:#2875c7;color:#FF8500;font-weight:700}ent-dropdown span.audience-item{height:31px;line-height:40px!important;display:inline-block;vertical-align:middle;float:left;width:100%;position:relative;padding-right:30px;box-sizing:border-box;color:inherit}ent-dropdown div.item-list i{float:left;width:20px;margin-left:-20px;display:none}ent-dropdown div.item-list.selected i{display:inline-block}ent-dropdown div.search-link{float:left;width:100%;padding:0 0 0 10px;z-index:2;background:#fff;color:#9fbcc8}ent-dropdown div.show>div.dropdown-list{transform:scale(1,1)}@media (max-width:900px){.schedule-item-content #room{display:none}}@media (max-width:650px){.schedule-item-content #hour-end,.schedule-item-content #hour-start,.schedule-item-content input{display:none}}@media (max-width:600px){.schedule-item-content #subjectlabel{display:none}}@media (max-width:700px){#subjectlabelhwpanel{display:none}}@media (max-width:1065px){#dailyeventlongtitle{display:none}#dailyeventshorttitle{display:block}}@media (min-width:1065px){#dailyeventlongtitle{display:block}#dailyeventshorttitle{display:none}}@media (max-width:550px){.schedule-item-content{font-size:1em}}@media (max-width:650px){.homework-title{display:none}}.schedule .timeslot{height:65px!important;line-height:65px!important}.quick-search{width:2%;z-index:10000;background:0 0;position:relative;float:left}.quick-search-label-minified{color:#6495ed;background-color:#ddd;width:120px;margin-left:15px;text-align:center;border-radius:15px 15px 0 0;transform:rotate(90deg);transform-origin:left}.quick-search-label-minified:hover{background-color:#ccc;color:#f9f9f9}.row.down-open:hover,.row.up-open:hover{color:#ff4500!important}.quick-search-card{font-size:14px!important;margin-bottom:5px!important}.quick-search-card:hover{background-color:#e2e8ff}.quick-search.lessontype{top:365px}.quick-search.homeworktype{top:220px}.quick-search-showmore{text-align:center;color:orange}.quick-search-showmore::before{font-size:30px!important}.quick-search-noresults{font-size:small;text-align:justify;margin:10px}.quick-search-results{border:1px solid #d3d3d3;position:absolute;background-color:#fff}.space-right{padding-right:30px}i.remove-small{color:#FF8500!important}div.theopener{color:#fff;background-color:#FF8500;cursor:pointer;width:20px;height:20px;text-align:center;line-height:20px;display:inline-block;vertical-align:middle;font-size:24px;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.26);border-radius:25px}.headerLessonStudentView{margin-top:20px;margin-bottom:30px}.addHomeworkToLessonBtn{margin-bottom:10px}.hidden{display:none}.itemPreview:hover{background-color:#78daff}i.external-link:before{content:'\e8aa'}.quick-search.progressiontype{top:442px}.select-list select-list{margin-left:5px}.select-list select-list.button .selected-value{border-bottom:none}.select-list select-list.button opt{padding:6px 10px}.select-list select-list.button opt i{padding-right:6px}button.diary-ico-button{padding:8px 8px 0;line-height:24px}button.diary-ico-button i{background-color:transparent!important;font-size:32px;padding:0!important;box-shadow:initial!important}.pdf .header,.pdf .lesson .lesson-header{background-color:#c4c5c6;text-align:center}.reservation:before{content:"\e80e"}.arrows-cw:before{content:"\e874"}.cog:before{content:"\e854"}.left-open:before{content:"\e87b"}.left:before{content:"\e84c"}.pencil::before{content:'\e858'}.lock-alt::before{content:'\e860'}.grades::before{content:'\e614'}.history::before{content:'\e844'}.user::before{content:'\e870'}.users::before{content:'\e822'}.file-pdf::before{content:'\e857'}.cancel-circled::before{content:'\e848'}.pdf{font-family:Verdana;font-size:1em;padding:25px;color:#737373}.pdf .header{padding:25px;font-size:1.5em;border-radius:5px;margin-bottom:20px}.pdf .lesson{border:1px solid #c4c5c6;margin-bottom:15px;padding:0;border-radius:5px}.pdf .lesson .lesson-header{padding:4px;font-size:1.1em}.pdf .lesson .lesson-content{padding:5px;margin-bottom:5px}.pdf .lesson .lesson-content .lesson-title{font-size:1.05em}.pdf .lesson .lesson-content .lesson-description{padding-top:3px;font-size:.95em}lightbox{position:absolute}lightbox.fullscreen section.lightbox{z-index:100000;padding:10px;width:100%}lightbox.fullscreen section.lightbox .content{box-sizing:border-box;width:100%;height:100%;margin:0;z-index:100}.radiobutton{margin-bottom:-5px;-webkit-appearance:none;width:25px;height:25px;border:2px solid #4bafd5;border-radius:50%;outline:0}.radiobutton:before{cursor:pointer;content:'';display:block;width:15px;height:15px;margin:15% auto;border-radius:50%;transition:background .3s ease}.radiobutton:checked:before{background:#4bafd5}.scrollbar-fine::-webkit-scrollbar{width:8px;background-color:#fffdfd}.scrollbar-fine::-webkit-scrollbar-track{border-radius:10px;background:rgba(0,0,0,.1);border:1px solid #e4e1e1}.scrollbar-fine::-webkit-scrollbar-thumb{border-radius:10px;background:linear-gradient(left,#fff,#e4e4e4);border:1px solid #c3c2c2}.scrollbar-fine::-webkit-scrollbar-thumb:hover{background:#fff}.scrollbar-fine::-webkit-scrollbar-thumb:active{background:linear-gradient(left,#22ADD4,#1E98BA)}.tooltip.hidden{display:none}.tooltip-detail{position:relative;display:inline-block}.diary-container .timeslots,.diary-container calendar-daily-events{display:none}.tooltip-detail .tooltiptext-detail{visibility:hidden;width:120px;background-color:#FF8500;color:#fff;text-align:center;padding:5px 0;border-radius:6px;position:absolute;top:100%;left:100px;opacity:0;transition:opacity 1s}.tooltip-detail:hover .tooltiptext-detail{visibility:visible;opacity:1}.diary-container button.next-timeslots,.diary-container button.previous-timeslots{left:-3px}.diary-container calendar-daily-events .days .day{height:auto;min-height:100px}.diary-container.diary-show-calendar .timeslots{display:initial}.diary-container.diary-show-calendar .homeworkpanel{padding:0!important}.diary-container.diary-show-calendar calendar-daily-events .days .day{height:40px;min-height:40px}.diary-container.diary-show-homeworks:not(.diary-show-calendar) .daily-events{display:none}.diary-container.diary-show-homeworks calendar-daily-events{display:initial}.diary-container.diary-show-homeworks .day .timeslots .timeslot:first-child,.diary-container.diary-show-homeworks .schedule-item{margin-top:40px}.diary-container.diary-show-homeworks legend.timeslots{margin-top:100px}.diary-container.diary-show-homeworks .next-timeslots{bottom:-20px}.diary-container .schedule .days{height:auto}.diary-container .schedule-item{margin-top:0}.diary-container [resizable]{transition:none!important}[diary-sortable-element].animated{transition:margin .2s}diary-drop-down{float:left;display:block;width:100%}diary-drop-down .dropdown-display>span{overflow:hidden}diary-drop-down div{width:100%;float:left;box-sizing:border-box}diary-drop-down div.dropdown-display{float:left;width:100%;background:#fff;height:31px;cursor:pointer;color:#2a9cc8;border:1px solid #2a9cc8;box-sizing:border-box;border-radius:3px;margin-bottom:10px}diary-drop-down div.dropdown-display>*{float:left;height:100%;height:31px;line-height:31px!important;display:inline-block;vertical-align:middle}diary-drop-down div.dropdown-display span{font-size:24px;width:100%;position:relative;box-sizing:border-box;padding-right:34px;padding-left:10px}diary-drop-down div.dropdown-display span.placeholder{color:#aaa;font-size:20px}diary-drop-down #placeholder{font-size:17px!important;overflow:hidden}diary-drop-down div.dropdown-display i{position:relative;width:14px;margin-left:-28px;margin-right:4px;font-size:24px;font-weight:700;padding-right:10px;text-align:right}diary-drop-down div.dropdown-list{float:left;width:100%;z-index:1001;position:relative;transform:scale(1,0);transition:transform ease 250ms;color:#2a9cc8;margin-top:-10px}diary-drop-down div.dropdown-list-content{max-height:350px;overflow:auto;position:absolute;z-index:2;cursor:pointer;background:#fff;box-sizing:border-box;border:1px solid #2a9cc8}diary-drop-down div.subtitle{float:left;width:100%;padding:0 10px;z-index:2;cursor:none;background:#fff;color:#9fbcc8}diary-drop-down div.item-list{float:left;width:100%;padding:0 10px;font-size:14px}diary-drop-down div.item-list:hover{background:#F0F0F0}diary-drop-down div.item-list.selected{background:#2875c7;color:#FF8500;font-weight:700}diary-drop-down span.audience-item{height:31px;line-height:40px!important;display:inline-block;vertical-align:middle;float:left;width:100%;position:relative;padding-right:30px;box-sizing:border-box;color:inherit}diary-drop-down div.item-list i{float:left;width:20px;margin-left:-20px;display:none}diary-drop-down div.item-list.selected i{display:inline-block}diary-drop-down div.search-link{float:left;width:100%;padding:0 0 0 10px;z-index:2;background:#fff;color:#9fbcc8}diary-drop-down div.show>div.dropdown-list{transform:scale(1,1)}diary-multi-calendar-filter .cell{padding:10px 15px}diary-multi-calendar-filter .cell label{line-height:45px}.diary-item-calendar{display:flex;flex-direction:column;box-sizing:border-box}.diary-item-calendar.diary-schedule{background-color:rgba(0,0,0,.15);border-color:rgba(0,0,0,.5);border-style:dashed;border-width:1px}.diary-item-calendar .diary-item-calendar-container{height:100%}.diary-item-calendar .diary-item-calendar-container .item-line{display:flex;flex-direction:row;flex-wrap:nowrap;padding-bottom:0!important;overflow:hidden}.diary-item-calendar .diary-item-calendar-container .item-line .hour{white-space:nowrap;overflow:hidden;width:40px}.diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox{float:right;margin-left:auto;overflow:hidden;white-space:nowrap;min-width:1em;margin-right:3px}.diary-item-calendar .diary-item-calendar-container .item-line .rom{white-space:nowrap;margin-left:.5em;overflow:hidden;text-overflow:ellipsis}[diary-timeslot-item].dragin{border:2px dashed #00f!important;border-radius:7px}div.schedule .schedule-items .schedule-item .schedule-item-content{padding:0;box-sizing:border-box}div.schedule .schedule-items .schedule-item .schedule-item-content>div{padding:5px;box-sizing:border-box}div.schedule .schedule-items .schedule-item .schedule-item-content>div.dragin{padding:3px}.seach-drop-down{position:relative}.seach-drop-down .highlighted{font-weight:700;color:#4bafd5}.seach-drop-down .result{position:absolute;background-color:#2a9cc8;color:#fff;padding:2px 10px;border-radius:45px;cursor:text}.seach-drop-down .result:hover{opacity:.9}.progressiontype .lesson-item:hover,.progressiontype .pedagogic-day-card:hover{opacity:.8}.seach-drop-down .drop-down,.seach-drop-down input{width:100%}.seach-drop-down .drop-down{max-height:350px;height:auto;overflow:auto;border:1px solid #2a9cc8;background-color:#fff}.seach-drop-down .drop-down ul{border-left:0 solid transparent!important;background:#fff}.seach-drop-down .drop-down ul li{color:#2a9cc8}.seach-drop-down .drop-down ul li:hover{background:#F0F0F0;padding-right:2px;opacity:.8}.new-progression,.new-progression textarea{border-radius:3px;background-color:#7bbcf0}.page-history{white-space:nowrap}.page-history .notification{display:flex;padding:0;margin-left:10px;margin-bottom:15px}.page-history .notification label{font-weight:700;text-transform:capitalize;font-variant:small-caps;font-size:1.3em;letter-spacing:.05em}.page-history .notification .download{color:#4bafd5;cursor:pointer}.page-history .notification>div{height:80px!important;display:flex;flex-direction:column;justify-content:center;align-content:space-around;padding:0 10px}.page-history .notification>div:nth-child(1){width:80px}.page-history .notification>div:nth-child(2){width:calc(100% - (80px+80px))}.page-history .notification>div:nth-child(3){width:80px}.page-history .notification .history-detail-icon i{padding-right:0}.page-history .filter{margin-bottom:25px;margin-left:10px}.page-history .thumbnail{font-size:1em;width:70%}.page-history .summary{display:flex;flex-direction:row;justify-content:flex-end;width:30%;font-size:1em}.page-history .summary i{margin-left:10px;position:relative;top:-15px;font-size:1em}.progression-manager{width:100%}.progression-manager .search-row{padding:8px 25px}.progression-manager form{position:relative}.progression-manager form .edit-button{padding:5px;right:5px;position:absolute;cursor:pointer;z-index:1;font-size:1.5em}.progression-manager .progression-homework>div{margin-top:15px}.progression-manager .progression-homework i{color:rgba(1,1,1,.5);padding-left:15px}.progression-manager .progression-homework .homework-title{font-weight:700}.progression-manager .progression-homework .homework-type{font-size:.95em;font-style:italic}.progression-manager .progression-icon-homeworks{color:#7bbcf0}.progression-manager .create-content{position:absolute;right:0;top:-50px}.progression-manager .pedagogic-item-container ul[diary-sortable-list]{max-height:500px;overflow-y:auto;width:auto;padding-right:0}.progression-manager .pedagogic-day-container i{padding-left:0}.progression-manager .pedagogic-day-container .pedagogic-day-card{display:flex;align-items:stretch}.progression-manager .pedagogic-day-container .pedagogic-day-card div{height:100%;display:flex;justify-content:center;flex-direction:column}.progression-manager .pedagogic-day-container .pedagogic-day-card .thumbnail{width:25%;font-size:.75em;overflow:hidden;text-align:center;padding:0}.progression-manager .pedagogic-day-container .pedagogic-day-card .summary{margin:0;align-self:center;text-align:left;padding:0 5px;width:60%;font-size:.85em}.progression-manager .pedagogic-day-container .pedagogic-day-card .indicator{align-self:center;width:15%;text-align:center;padding:0}.content-not-found{font-size:2em;color:#2a9cc8;text-align:center;vertical-align:middle}.content-not-found div{padding:10px 100px;line-height:1.5em}.content-not-found i{position:relative;top:10px;font-size:2.2em;margin-right:10px}.content-not-found button{margin:15px auto;float:none}.new-progression{margin:0 0 15px 15px;color:#fff;padding:10px 15px}.new-progression .row{margin-top:15px}.new-progression div.six.cell,.new-progression div.twelve.cell{padding:5px 10px}.new-progression div.six.cell label,.new-progression div.twelve.cell label{text-decoration:underline}.new-progression textarea::placeholder{color:rgba(255,255,255,.7)}.new-progression textarea{color:#fff}.new-progression textarea:focus{outline:0;border-left:1px solid #DDD;border-right:1px solid #DDD;border-top:1px solid #DDD;border-bottom:2px solid #FF8500}.new-progression input{width:100%}.new-progression input::placeholder{color:rgba(255,255,255,.7)}.new-progression input[type=text]{color:#fff}.progressiontype .search-progression{background-color:#ddd}.progressiontype .search-progression button{width:26px;height:26px;padding:0;margin-right:5px}.progressiontype .search-progression button i{font-size:1.6em;padding:0}.progressiontype .search-progression input{width:calc(100% - 45px)}.progressiontype .content{float:left;height:422px;overflow-y:auto;overflow-x:hidden;padding-top:8px;width:100%}.progressiontype .content.content-lesson{height:378px}.progressiontype .content a:hover article{border-left:4px solid #FF8500}.progressiontype .content a article{transition:border-left .1s;padding:10px}.progressiontype .lesson-item{margin-left:5px;margin-right:5px;color:#fff}.progressiontype .pedagogic-day-card{position:relative;height:42px}.progressiontype .pedagogic-day-card .thumbnail{box-sizing:border-box;padding:6px 0;font-size:.8em;width:22px}.progressiontype .pedagogic-day-card .summary{padding:9px 4px 9px 6px;color:#fff;font-size:.75em;width:calc(100% - 22px)}.contener-slide{position:relative;float:left;width:100%;overflow:hidden;height:432px}.contener-slide .slide{top:0;transition:left .3s;position:absolute;float:left;left:0;width:100%}.contener-slide .slide.left-slide{left:-100%}.contener-slide .slide.right-slide{left:100%}right-panel.quick-search{z-index:0}right-panel .sum-selected>span:first-child{max-width:calc(100% - 40px);overflow:hidden;display:block;white-space:nowrap}right-panel .sum-selected>span:nth-child(2){position:absolute;display:block;top:8px;right:2px}right-panel .right-panel .quick-search-results{width:100%;margin-top:10px}.habilitation>div.row>div.cell{padding:15px}.habilitation .teacher-list article{padding-right:50px}.habilitation .teacher-list article i{position:absolute;right:25px}lightbox.popup-viser section.lightbox i{color:#fff}lightbox.popup-viser section.lightbox div.content{padding:0}lightbox.popup-viser section.lightbox div.content .header{background-color:#00a4d3;color:#fff;text-align:center;font-size:1.8em;padding:25px 0}lightbox.popup-viser section.lightbox div.content .viser-content{padding:15px}lightbox.popup-viser section.lightbox div.content .controls{margin-top:10px;display:flex;flex-direction:row;justify-content:space-around}.popup-visa-lesson-list .item-description{margin:0 25px 0 0;padding-top:10px}.popup-visa-lesson-list .prev-lesson-summary{margin-right:-15px;margin-left:-15px;padding:10px 20px}.popup-visa-lesson-list .right-magnet{margin-right:20px;margin-top:-4px}.popup-visa-lesson-list .left-magnet{margin-top:-4px;margin-right:10px}.popup-visa-lesson-list .item-detail{float:left;margin-top:15px}.popup-visa-lesson-list .alf{width:50%;box-sizing:border-box}.popup-visa-lesson-list .alf.homework-visa-detail>div{margin-bottom:20px;padding-bottom:10px;border-bottom:solid #2a9cc8 1px}.popup-visa-lesson-list .alf.homework-visa-detail>div:hover{opacity:.7}.popup-visa-lesson-list .alf.homework-visa-detail>div:last-child{margin-bottom:0;border-bottom:none}.popup-visa-lesson-list .full{width:100%}.popup-visa-lesson-list .lesson-list{overflow-y:auto}.visa-manager .visa-right-button{position:absolute;right:10px;top:0}.visa-manager .visa-right-button button{padding:5px 10px;margin:0}.visa-manager .visa-right-button button i{margin-right:10px;font-size:1.4em}.visa-manager .visa i{position:relative;left:5px;top:-2px}.visa-manager .visa .ok{color:#16cc16;font-weight:700}.visa-manager .visa .dirty{color:red;font-weight:700}.visa-manager .visa .owner{font-style:italic}.visa-manager .visa .dateCreate{margin-top:20px}.visa-manager .visa .date{text-align:right;padding-right:10px}.visa-manager .visa-filters>div{padding:5px 10px}.visa-manager .visa-filters>div .label{line-height:30px}.visa-manager .visa-filters button{margin-top:22px}.visa-manager .visa-filters ent-dropdown{padding-left:0}.visa-manager .visa-tab button{float:none;display:inline}.visa-manager .visa-tab .external-link{font-size:22px;margin-left:20px;color:#FF8500}.visa-manager .visa-tab .visa-tab-header{font-size:1.4em;background-color:#00a4d3;color:#fff;padding:10px 20px}.visa-manager .visa-tab .visa-tab-header .checkbox span{height:20px;background-color:#fff}.visa-manager .visa-tab .visa-tab-header .checkbox span:before{margin-right:0}.visa-manager .visa-tab .visa-tab-content{margin:10px 0}.visa-manager .visa-tab .visa-tab-content .visa-lesson{padding:0}.visa-manager .visa-tab .visa-tab-content .visa-lesson .visa-lesson-header{background-color:#00a4d3;color:#fff;padding:10px 20px}.visa-manager .visa-tab .visa-lesson-content>div{padding:10px 15px}
+
+ng-include{
+  display: block;
+}
+.pedagogic-item-card i.icon.lock-alt {
+    top: -20px;
+    position: relative;
+    left: -16px;
+    font-size: 40px;
+}
+
+.button-icon{
+  font-size: 1.2em;
+  color: #2a9cc8;
+  cursor: pointer;
+
+}
+.button-icon:hover{
+  color:#FF8500;
+}
+
+lightbox{
+  display : block;
+}
+.center{
+  text-align: center;
+}
+.right{
+  float:right;
+}
+
+.datepicker{
+     z-index: 1000000 !important;
+  }
+ul {
+    list-style-type: none;
+    margin-top: 0;
+    width: 99%;
+    border-left: 5px solid transparent !important;
+    padding-left: 10px;
+    padding-right: 15px;
+}
+
+div.week-switcher{
+  top: 20px;
+  position: relative;
+  left: 40px;
+}
+
+
+ul li i.icon {
+    font-size: 55px;
+    line-height: 55px;
+    text-align: center;
+}
+
+i.rack2::before {
+    content: "\e80d";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+i.cahier-textes2::before {
+    content: "\e86f";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.table-cell, .table-cell-left{
+    display: table-cell;
+    vertical-align: top;
+}
+
+.table-cell-left {
+    padding-right: 10px;
+}
+
+.cell-no-float {
+    box-sizing: border-box;
+    float: none;
+    display: block;
+    position: relative;
+}
+
+i.pencil::before {
+    content: "\e858";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+div.days div div {
+    padding-bottom: 1px;
+}
+
+
+div.test .pink {
+    background-color: white;
+    color: #b930a2;
+}
+
+div.test .orange {
+    background-color: white;
+    color: #FF8500;
+}
+
+div.test .purple {
+    background-color: white;
+    color: #763294;
+}
+
+div.test .green {
+    background-color: white;
+    color: #46bfaf;
+}
+
+.homework-content {
+    height: 32px;
+    border: solid 2px;
+    background-color: white;
+    border-radius: 5px;
+    padding-left: 5px;
+    font-size: 12px;
+    line-height: 12px;
+    text-align: left;
+}
+
+
+section .homework-detail {
+    margin-top: -1px;
+    border: 1px solid #4bafd5;
+    padding: 6px;
+}
+
+.show-homeworks::before {
+    content: "\e80d";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-homeworks {
+    opacity: 0.3;
+    color: #46bfaf;
+    padding-top: 7px;
+    padding-right: 7px;
+}
+
+.show-homeworks.selected {
+    opacity: 0.7;
+}
+
+.show-lessons::before {
+    content: "\e86f";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-lessons {
+    opacity: 0.3;
+    color: #763294;
+    padding-top: 7px;
+    padding-right: 7px;
+}
+
+.show-lessons.selected {
+    opacity: 0.7;
+}
+
+.lessonTeacher {
+    margin-left: 100px;
+}
+
+.lessonHomeworkDescription {
+    min-height: 250px;
+    height: auto;
+    padding: 10px;
+    background: #fff;
+    border: 1px dashed #4bafd5 !important;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+div.notification {
+    border-color: #2a9cc8;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    margin-bottom: 5px;
+}
+
+.show-calendar-grid::before {
+    content: "\e86f";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+.show-calendar-grid {
+    opacity: 0.3;
+    color: #FF8500;
+    padding-top: 7px;
+}
+
+
+.resize-homeworks-panel {
+    float: left;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+
+calendar-daily-events .days .day {
+    width: calc(100% / 7 - (130px) / 7) !important;
+    background: #ddd !important;
+}
+
+calendar-daily-events {
+    padding-left: 0px !important;
+    top: 111px !important;
+}
+
+.search-form-box {
+    padding: 10px 10px 20px 15px;
+    width: 75%;
+    margin-bottom: 20px;
+    border: none;
+    display: inline-block;
+}
+
+.lesson_homework {
+    font-size: 50px;
+    color: #4bafd5;
+    float: left;
+    margin-left: -25px;
+    vertical-align: middle !important;
+    background-color: transparent !important;
+}
+
+.lesson_homework.expanded::before {
+    content: "▾";
+}
+
+.lesson_homework::before {
+    content: "▸";
+}
+
+.homework-delimitation {
+    border: solid 0.1px #a5b6bb !important;
+    padding: 0px !important;
+}
+
+.trash:before {
+    font-size: 18px !important;
+    padding-right: 10px;
+}
+
+.lessonHomeworkBtn{
+    margin-top: 10px;
+}
+
+.tabs headerHomeworkLesson.selected {
+    border: none;
+    /*border-left: 1px solid #4bafd5;
+    border-top: 1px solid #4bafd5;
+    border-right: 1px solid #4bafd5;*/
+    border-bottom: 2px solid #4bafd5;
+    color: #4bafd5;
+    text-transform: uppercase;
+}
+.tabs headerHomeworkLesson.selected {
+    /*background: #fff;*/
+}
+
+.tabs headerHomeworkLesson {
+    color: #555;
+    font-size: 20px;
+    /*font-weight: bold;*/
+    background: transparent;
+    margin-right: 10px;
+    -webkit-transition: border-bottom 250ms ease;
+    transition: border-bottom 250ms ease;
+    /*border-bottom: 1px solid #000;*/
+}
+
+.tabs headerHomeworkLesson {
+    display: inline-block;
+    padding: 6px;
+    /*background: #eee;*/
+}
+
+.tabs headerHomeworkLesson:hover {
+    border-bottom: 2px solid #4bafd5;
+}
+
+.tabs>* {
+    text-align: initial;
+}
+
+.lessonHeader{
+    font-size: 20px;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.lessonInfosGrey{
+    font-size: 18px;
+    color: #808080;
+    margin: 20px;
+}
+
+.lessonInfosBlack{
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.rowHeader{
+    margin: 5px;
+}
+
+section .homeworkInfos {
+    margin-top: 38px;
+    border: 1px solid;
+    padding: 6px;
+}
+
+.float-right{
+    float: right;
+}
+
+.float-left{
+    float: left;
+}
+
+.margintopimportant{
+    margin-top:10px !important;
+}
+
+.itemstate-red{
+    padding-left: 20px;
+    float: left;
+    color: red;
+}
+
+.itemstate-green{
+    padding-left: 20px;
+    float: left;
+    color: green;
+}
+
+.childFilter {
+    color: #a5b6bb;
+    border-color: grey;
+    box-shadow: 1px 2px 3px 1px;
+    padding: 10px;
+    margin: 10px;
+    margin-right: 12px;
+}
+
+.childFilter.selected {
+    background-color: #4bafd5;
+    cursor: pointer;
+    color: white;
+    box-shadow: 1px 2px 3px 1px;
+}
+
+.childFilter:hover {
+    background-color: #4bafd5;
+    cursor: pointer;
+    color: white;
+    box-shadow: 1px 2px 3px 1px;
+}
+
+.homeworksDayLoad {
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    margin: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+    font-size: 16px;
+}
+
+.homeworksDayLoad.red {
+    background-color: tomato;
+}
+
+.homeworksDayLoad.yellow {
+    background-color: khaki;
+}
+
+.homeworksDayLoad.green {
+    background-color: limegreen;
+}
+
+.showMoreLessonsBar {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: center;
+    border: none;
+    box-shadow: none;
+    color: #FF8500;
+    background: #F0F0F0;
+    line-height: 30px;
+    width: 300px;
+}
+
+.showMoreLessonsBar:hover {
+    color: #FFFFFF;
+    background-color: #FF8500;
+}
+
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white;
+}
+
+
+.item-remove [data-role="remove"] {
+    margin-left: 8px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.item-remove [data-role="remove"]:after {
+    content: "x";
+    padding: 0px 2px;
+    color: #FF8500;
+}
+
+.custom-tagsinput .autocompletelist {
+    margin-top: -10px;
+    width: 100%;
+    padding: 2px 0;
+    border: solid 1px #2a9cc8;
+    background-color: white;
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+    right: auto;
+    color: #2a9cc8;
+}
+
+.item-suggest {
+    padding-left: 10px;
+    width: 100%;
+    line-height: 40px;
+    height: 31px;
+    vertical-align: middle;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.item-suggest.selected {
+    color: white;
+    background-color: #2875c7;
+}
+
+.item-suggest:hover{
+    background-color: #F0F0F0;
+}
+
+
+
+.item-display {
+    border: 1px solid #2a9cc8;
+    color: #2a9cc8;
+    width: 100%;
+    float: left;
+    font-size:24px;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+.tabs section {
+    border-color: #4bafd5 !important;
+}
+
+i.arrow-down {
+    height: 20px;
+    width: 25px;
+    display: block;
+    float: right !important;
+    /*color: #FF8500;*/
+    font-size: 25px;
+    font-weight: 900;
+}
+
+i.arrow-down::before {
+    content: "\e841";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+i.arrow-up{
+    height: 20px;
+    width: 25px;
+    display: block;
+    float: right !important;
+    color: #FF8500;
+    font-size: 25px;
+    font-weight: 900;
+}
+
+i.arrow-up::before {
+    content: "\e840";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+i.check-selected {
+    height: 20px;
+    width: 25px;
+    display: block;
+    float: right !important;
+    color: #2cc123;
+    font-size: 18px;
+    font-weight: 900;
+    padding-top: 5px;
+}
+
+i.check-selected::before {
+    content: "\e871";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+}
+
+div.pedagogic-day-container {
+    box-sizing: border-box;
+    width: 25%;
+    float:left;
+}
+
+.pedagogic-day-card {
+    box-sizing: border-box;
+    border: 1px solid #2a9cc8;
+    box-shadow: 0 1px 3px;
+    color: #2a9cc8;
+    width: 99%;
+    height: 55px;
+    float: left;
+    font-size:24px;
+    background-color: white;
+    margin-bottom: 5px;
+}
+
+.pedagogic-day-card .selected{
+    color: white;
+    background-color: #2a9cc8;
+    border-style: none;
+    border: 0px;
+}
+
+.thumbnail{
+    box-sizing: border-box;
+    color: #2a9cc8;
+    width: 25%;
+    height: 100%;
+    float: left;
+    font-size:45px;
+    font-style: bold;
+    padding: 14px;
+    text-transform: capitalize;
+    border-right : 1px;
+}
+
+.thumb-selected{
+    color: white;
+    background-color: #2a9cc8;
+    text-transform: capitalize;
+}
+
+.summary{
+    color: #2a9cc8;
+    width: 75%;
+    height: 100%;
+    padding:  15px 0px 0px 15px;
+    font-size: 30px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.sum-selected{
+    color: white;
+    background-color: #7bbcf0;
+}
+
+.day-card-icon {
+    font-size: 26px;
+    line-height: 24px;
+    text-align: center;
+    display: inline-block;
+    padding:  0px 0px 0px 5px;
+}
+
+.card-icon-selected{
+    color: white;
+    background-color: #7bbcf0;
+}
+
+div.pedagogic-item-container {
+    box-sizing: border-box;
+    width: 75%;
+    float:left;
+}
+
+.pedagogic-item-card {
+    box-sizing: border-box;
+    width: 99%;
+    float: right;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+.prev-lesson-summary {
+     background-color: #2a9cc8;
+     color: white;
+     padding-left: 5px;
+}
+
+.prev-lesson-summary:hover {
+    color: #FF8351;
+}
+
+.hover-orange:hover{
+    color: #FF8351;
+}
+
+.down-open:hover{
+    color: #FF8351;
+}
+
+.filter2 {
+    height: 40px;
+    font-size : 30px;
+    font-style: normal;
+    line-height: 48px;
+    text-align: center;
+    width: 50px !important;
+    display: inline-block;
+    border-radius: 2px;
+    box-shadow: none;
+    background: #AAA;
+    color : #fff;
+    float: left !important;
+    margin-bottom: 5px;
+    margin-right: 3px;
+}
+
+.filter2.diary.selected {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+    background-color: #763294;
+}
+
+.filter2.homework.selected {
+    box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+    background-color: #46bfaf;
+}
+
+.subjects {
+    display : inline;
+    background-color: #f9f9f9;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 16px;
+    padding: 2px;
+}
+
+.subjects:focus {
+    background-color: #f9f9f9;
+    border-bottom: 2px solid #FF8500;
+    outline: 0;
+}
+
+i.homework::before {
+    content: "\e80d";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+    color : #fff;
+}
+
+i.diary::before {
+    content: "\e86f";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+    color : #fff;
+}
+
+ent-dropdown {
+    float: left;
+    display: block;
+    width: 100%;
+    padding-left: 10px;
+}
+
+ent-dropdown div {
+    width: 100%;
+    float: left;
+    box-sizing: border-box;
+}
+
+ent-dropdown div.dropdown-display {
+    float:left;
+    width:100%;
+    background: white;
+    height: 31px;
+    cursor: pointer;
+    color: #2a9cc8;
+    border: solid 1px #2a9cc8;
+    box-sizing: border-box;
+    border-radius: 3px;
+    margin-bottom : 10px;
+}
+ent-dropdown div.dropdown-display > * {
+    float:left;
+    height:100%;
+    height:31px;
+    line-height:31px !important;
+    display:inline-block;
+    vertical-align:middle;
+}
+ent-dropdown div.dropdown-display span {
+    font-size: 24px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    padding-right: 34px;
+    padding-left: 10px;
+}
+ent-dropdown div.dropdown-display span.placeholder {
+    color: #aaaaaa;
+    font-size: 20px;
+}
+
+#placeholder{
+    font-size: 17px !important;
+}
+
+ent-dropdown div.dropdown-display i {
+    position: relative;
+    width:14px;
+    margin-left: -28px;
+    margin-right: 4px;
+    font-size: 24px;
+    font-weight: bold;
+    padding-right: 10px;
+    text-align: right;
+}
+ent-dropdown div.dropdown-list {
+    float: left;
+    width: 100%;
+    z-index: 1000;
+    position: relative;
+    transform: scale(1, 0);
+    transition: transform ease 250ms;
+    color: #2a9cc8;
+    margin-top: -10px;
+}
+ent-dropdown div.dropdown-list-content {
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+    background: white;
+    box-sizing: border-box;
+    border: solid 1px #2a9cc8;
+}
+ent-dropdown div.subtitle {
+    float: left;
+    width: 100%;
+    padding: 0 10px;
+    z-index: 2;
+    cursor: none;
+    background: white;
+    color: #9fbcc8;
+}
+ent-dropdown div.item-list {
+    float: left;
+    width: 100%;
+    padding: 0 10px;
+    font-size: 14px;
+}
+ent-dropdown div.item-list:hover {
+    background: #F0F0F0;
+}
+ent-dropdown div.item-list.selected {
+    background: #2875c7;
+    color: #FF8500;
+    font-weight: bold;
+}
+ent-dropdown span.audience-item {
+    height: 31px;
+    line-height: 40px !important;
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    width: 100%;
+    position: relative;
+    padding-right: 30px;
+    box-sizing: border-box;
+    color: inherit;
+}
+ent-dropdown div.item-list i {
+    float: left;
+    width:20px;
+    margin-left: -20px;
+    display: none;
+}
+ent-dropdown div.item-list.selected i {
+    display: inline-block;
+}
+ent-dropdown div.search-link {
+    float: left;
+    width: 100%;
+    padding: 0 0 0 10px;
+    z-index: 2;
+    background: white;
+    color: #9fbcc8;
+}
+ent-dropdown div.show>div.dropdown-list {
+    transform: scale(1, 1);
+}
+
+/*
+    Priorité d'affichage
+    1 - Icône de brouillon - 300px
+    2 - Classe - 300px
+    3 - Salle - 600px
+    4 - Matière - 600px
+    5 - Case à cocher de sélection(1) - 800px
+    6 - Horaire - 800px
+
+*/
+/* Responsive text for lesson must be synced with model.js -> setLessonTooltipText  with responsive tooltip ! */
+/**
+ Hide room when screen res < 900 px
+ */
+@media  (max-width: 900px) {
+    .schedule-item-content #room {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-start {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content #hour-end {
+        display: none;
+    }
+}
+
+@media  (max-width: 650px) {
+    .schedule-item-content input {
+        display: none;
+    }
+}
+
+@media  (max-width: 600px) {
+    .schedule-item-content #subjectlabel {
+        display: none;
+    }
+}
+
+@media  (max-width: 700px) {
+    #subjectlabelhwpanel {
+        display: none;
+    }
+}
+
+@media  (max-width: 1065px) {
+    #dailyeventlongtitle {
+        display: none;
+    }
+
+    #dailyeventshorttitle {
+        display: block;
+    }
+}
+
+@media (min-width: 1065px) {
+    #dailyeventlongtitle {
+        display: block;
+    }
+
+    #dailyeventshorttitle {
+        display: none;
+    }
+}
+
+@media  (max-width: 550px) {
+    .schedule-item-content {
+        font-size: 1em;
+    }
+}
+
+@media  (max-width: 650px) {
+    .homework-title {
+        display: none;
+    }
+}
+
+.schedule .timeslot {
+    height: 65px !important;
+    line-height: 65px !important;
+}
+
+.quick-search {
+    width: 2%;
+    z-index: 10000;
+    background: transparent;
+    position: relative;
+    float: left;
+}
+
+/* */
+.quick-search-label-minified {
+    color: cornflowerblue;
+    background-color: #ddd;
+    width: 120px;
+    margin-left: 15px;
+    text-align: center;
+    border-radius: 15px 15px 0px 0px;
+    transform: rotate(90deg);
+    transform-origin: left;
+}
+
+.quick-search-label-minified:hover {
+    background-color: #ccc;
+    color: #f9f9f9;
+}
+
+.row.up-open:hover{
+    color: orangered !important;
+}
+
+.row.down-open:hover{
+    color: orangered !important;
+}
+
+
+.quick-search-card{
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+}
+
+.quick-search-card:hover{
+    background-color: #e2e8ff;
+}
+
+
+.quick-search.lessontype {
+    top: 365px;
+}
+
+.quick-search.homeworktype {
+    top: 220px;
+}
+
+.quick-search-showmore {
+    text-align: center;
+    color: orange;
+}
+
+.quick-search-showmore::before {
+    font-size: 30px !important;
+}
+
+.quick-search-noresults {
+    font-size: small;
+    text-align: justify;
+    margin: 10px;
+}
+
+.quick-search-results {
+    border: 1px solid lightgrey;
+    position: absolute;
+    background-color: white;
+}
+
+.space-right {
+    padding-right: 30px;
+}
+
+i.remove-small {
+    color: #FF8500 !important;
+}
+
+div.theopener {
+    color: white;
+    background-color: #FF8500;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 25px;
+    font-size: 24px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.26);
+    border-radius: 25px;
+}
+
+.headerLessonStudentView {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.addHomeworkToLessonBtn {
+    margin-bottom: 10px;
+}
+
+.hidden {
+	display: none;
+}
+
+.itemPreview:hover {
+    background-color: #78daff;
+}
+
+i.external-link:before{
+    content:'\e8aa';
+}
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+.quick-search.progressiontype {
+  top: 442px; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+.select-list select-list {
+  margin-left: 5px; }
+  /* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  .select-list select-list.button .selected-value {
+    border-bottom: none; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  .select-list select-list.button opt {
+    padding: 6px 10px; }
+    /* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+    .select-list select-list.button opt i {
+      padding-right: 6px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+button.diary-ico-button {
+  padding: 8px 8px 0px 8px;
+  line-height: 24px; }
+  /* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+  button.diary-ico-button i {
+    background-color: transparent !important;
+    font-size: 32px;
+    padding: 0px !important;
+    box-shadow: initial !important; }
+
+/* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.reservation:before {
+  content: "\e80e"; }
+
+/* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.arrows-cw:before {
+  content: "\e874"; }
+
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.cog:before {
+  content: "\e854"; }
+
+/* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.left-open:before {
+  content: "\e87b"; }
+
+/* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.left:before {
+  content: "\e84c"; }
+
+/* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.pencil::before {
+  content: '\e858'; }
+
+/* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.lock-alt::before {
+  content: '\e860'; }
+
+/* line 41, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.grades::before {
+  content: '\e614'; }
+
+/* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.history::before {
+  content: '\e844'; }
+
+/* line 49, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.user::before {
+  content: '\e870'; }
+
+/* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.users::before {
+  content: '\e822'; }
+
+/* line 57, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.file-pdf::before {
+  content: '\e857'; }
+
+/* line 61, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
+.cancel-circled::before {
+  content: '\e848'; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+.pdf {
+  font-family: 'Verdana';
+  font-size: 1em;
+  padding: 25px;
+  color: #737373; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+  .pdf .header {
+    text-align: center;
+    background-color: #c4c5c6;
+    padding: 25px;
+    font-size: 1.5em;
+    border-radius: 5px;
+    margin-bottom: 20px; }
+  /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+  .pdf .lesson {
+    padding: 10px 0px;
+    border: 1px solid #c4c5c6;
+    margin-bottom: 15px;
+    padding: 0px;
+    border-radius: 5px; }
+    /* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+    .pdf .lesson .lesson-header {
+      background-color: #c4c5c6;
+      padding: 4px;
+      text-align: center;
+      font-size: 1.1em; }
+    /* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+    .pdf .lesson .lesson-content {
+      padding: 5px;
+      margin-bottom: 5px; }
+      /* line 32, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+      .pdf .lesson .lesson-content .lesson-title {
+        font-size: 1.05em; }
+      /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pdf.scss */
+      .pdf .lesson .lesson-content .lesson-description {
+        padding-top: 3px;
+        font-size: 0.95em; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/popup.scss */
+lightbox {
+  position: absolute; }
+  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/popup.scss */
+  lightbox.fullscreen section.lightbox {
+    z-index: 100000;
+    padding: 10px;
+    width: 100%; }
+    /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/popup.scss */
+    lightbox.fullscreen section.lightbox .content {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      z-index: 100; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/radio-button.scss */
+.radiobutton {
+  margin-bottom: -5px;
+  -webkit-appearance: none;
+  width: 25px;
+  height: 25px;
+  border: 2px solid #4bafd5;
+  border-radius: 50%;
+  outline: none; }
+  /* line 10, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/radio-button.scss */
+  .radiobutton:before {
+    cursor: pointer;
+    content: '';
+    display: block;
+    width: 15px;
+    height: 15px;
+    margin: 15% auto;
+    border-radius: 50%;
+    transition: background 0.3s ease; }
+  /* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/radio-button.scss */
+  .radiobutton:checked:before {
+    background: #4bafd5; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar {
+  width: 8px;
+  background-color: #fffdfd; }
+
+/**  STYLE 11 */
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px solid #e4e1e1; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: linear-gradient(left, #fff, #e4e4e4);
+  border: 1px solid #c3c2c2; }
+
+/* line 21, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb:hover {
+  background: #fff; }
+
+/* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/scrollbar.scss */
+.scrollbar-fine::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(left, #22ADD4, #1E98BA); }
+
+/* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip.hidden {
+  display: none; }
+
+/* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail {
+  position: relative;
+  display: inline-block; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail .tooltiptext-detail {
+  visibility: hidden;
+  width: 120px;
+  background-color: #FF8500;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  top: 100%;
+  left: 100px;
+  opacity: 0;
+  transition: opacity 1s; }
+
+/* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/tooltip.scss */
+.tooltip-detail:hover .tooltiptext-detail {
+  visibility: visible;
+  opacity: 1; }
+
+/*
+Override marging for homeworks display
+*/
+/* line 7, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container button.previous-timeslots, .diary-container button.next-timeslots {
+  left: -3px; }
+
+/* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container calendar-daily-events {
+  display: none; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+  .diary-container calendar-daily-events .days .day {
+    height: auto;
+    min-height: 100px; }
+
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .timeslots {
+  display: none; }
+
+/* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-calendar .timeslots {
+  display: initial; }
+
+/* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-calendar .homeworkpanel {
+  padding: 0px !important; }
+
+/* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-calendar calendar-daily-events .days .day {
+  height: 40px;
+  min-height: 40px; }
+
+/* line 41, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks:not(.diary-show-calendar) .daily-events {
+  display: none; }
+
+/* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks calendar-daily-events {
+  display: initial; }
+
+/* line 49, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .schedule-item {
+  margin-top: 40px; }
+
+/* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .day .timeslots .timeslot:first-child {
+  margin-top: 40px; }
+
+/* line 58, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks legend.timeslots {
+  margin-top: 100px; }
+
+/* line 61, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container.diary-show-homeworks .next-timeslots {
+  bottom: -20px; }
+
+/* line 66, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .schedule .days {
+  height: auto; }
+
+/* line 73, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container .schedule-item {
+  margin-top: 0px; }
+
+/* line 78, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/calendar/calendar.directive.scss */
+.diary-container [resizable] {
+  transition: none !important; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/common/directives/sortable-list/sortable.scss */
+[diary-sortable-element].animated {
+  transition: margin 0.2s; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+diary-drop-down {
+  float: left;
+  display: block;
+  width: 100%; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down .dropdown-display > span {
+    overflow: hidden; }
+  /* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div {
+    width: 100%;
+    float: left;
+    box-sizing: border-box; }
+  /* line 15, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-display {
+    float: left;
+    width: 100%;
+    background: white;
+    height: 31px;
+    cursor: pointer;
+    color: #2a9cc8;
+    border: solid 1px #2a9cc8;
+    box-sizing: border-box;
+    border-radius: 3px;
+    margin-bottom: 10px; }
+  /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-display > * {
+    float: left;
+    height: 100%;
+    height: 31px;
+    line-height: 31px !important;
+    display: inline-block;
+    vertical-align: middle; }
+  /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-display span {
+    font-size: 24px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    padding-right: 34px;
+    padding-left: 10px; }
+  /* line 43, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-display span.placeholder {
+    color: #aaaaaa;
+    font-size: 20px; }
+  /* line 48, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down #placeholder {
+    font-size: 17px !important;
+    overflow: hidden; }
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-display i {
+    position: relative;
+    width: 14px;
+    margin-left: -28px;
+    margin-right: 4px;
+    font-size: 24px;
+    font-weight: bold;
+    padding-right: 10px;
+    text-align: right; }
+  /* line 63, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-list {
+    float: left;
+    width: 100%;
+    z-index: 1001;
+    position: relative;
+    transform: scale(1, 0);
+    transition: transform ease 250ms;
+    color: #2a9cc8;
+    margin-top: -10px; }
+  /* line 73, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.dropdown-list-content {
+    max-height: 350px;
+    overflow: auto;
+    position: absolute;
+    z-index: 2;
+    cursor: pointer;
+    background: white;
+    box-sizing: border-box;
+    border: solid 1px #2a9cc8; }
+  /* line 83, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.subtitle {
+    float: left;
+    width: 100%;
+    padding: 0 10px;
+    z-index: 2;
+    cursor: none;
+    background: white;
+    color: #9fbcc8; }
+  /* line 92, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.item-list {
+    float: left;
+    width: 100%;
+    padding: 0 10px;
+    font-size: 14px; }
+  /* line 98, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.item-list:hover {
+    background: #F0F0F0; }
+  /* line 101, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.item-list.selected {
+    background: #2875c7;
+    color: #FF8500;
+    font-weight: bold; }
+  /* line 106, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down span.audience-item {
+    height: 31px;
+    line-height: 40px !important;
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    width: 100%;
+    position: relative;
+    padding-right: 30px;
+    box-sizing: border-box;
+    color: inherit; }
+  /* line 118, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.item-list i {
+    float: left;
+    width: 20px;
+    margin-left: -20px;
+    display: none; }
+  /* line 124, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.item-list.selected i {
+    display: inline-block; }
+  /* line 127, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.search-link {
+    float: left;
+    width: 100%;
+    padding: 0 0 0 10px;
+    z-index: 2;
+    background: white;
+    color: #9fbcc8; }
+  /* line 135, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-drop-down/diary-drop-down.scss */
+  diary-drop-down div.show > div.dropdown-list {
+    transform: scale(1, 1); }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-multi-calendar-filter/diary-multi-calendar-filter.scss */
+diary-multi-calendar-filter .cell {
+  padding: 10px 15px; }
+  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/diary-multi-calendar-filter/diary-multi-calendar-filter.scss */
+  diary-multi-calendar-filter .cell label {
+    line-height: 45px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+.diary-item-calendar {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  .diary-item-calendar.diary-schedule {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.5);
+    border-style: dashed;
+    border-width: 1px; }
+  /* line 15, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+  .diary-item-calendar .diary-item-calendar-container {
+    height: 100%; }
+    /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+    .diary-item-calendar .diary-item-calendar-container .item-line {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      padding-bottom: 0 !important;
+      overflow: hidden; }
+      /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .hour {
+        white-space: nowrap;
+        overflow: hidden;
+        width: 40px; }
+      /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .item-checkbox {
+        float: right;
+        margin-left: auto;
+        overflow: hidden;
+        white-space: nowrap;
+        min-width: 1em;
+        margin-right: 3px; }
+      /* line 40, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/item-calendar/item-calendar.scss */
+      .diary-item-calendar .diary-item-calendar-container .item-line .rom {
+        white-space: nowrap;
+        margin-left: 0.5em;
+        overflow: hidden;
+        text-overflow: ellipsis; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+[diary-timeslot-item].dragin {
+  border: blue 2px dashed !important;
+  border-radius: 7px; }
+
+/* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+div.schedule .schedule-items .schedule-item .schedule-item-content {
+  padding: 0px;
+  box-sizing: border-box; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+  div.schedule .schedule-items .schedule-item .schedule-item-content > div {
+    padding: 5px;
+    box-sizing: border-box; }
+    /* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/quick-search/drag.scss */
+    div.schedule .schedule-items .schedule-item .schedule-item-content > div.dragin {
+      padding: 3px; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+.seach-drop-down {
+  position: relative; }
+  /* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .highlighted {
+    font-weight: bold;
+    color: #4bafd5; }
+  /* line 7, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .result {
+    position: absolute;
+    background-color: #2a9cc8;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 45px;
+    cursor: text; }
+    /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+    .seach-drop-down .result:hover {
+      opacity: 0.9; }
+  /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down input, .seach-drop-down .drop-down {
+    width: 100%; }
+  /* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+  .seach-drop-down .drop-down {
+    max-height: 350px;
+    height: auto;
+    overflow: auto;
+    border: solid 1px #2a9cc8;
+    background-color: white; }
+    /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+    .seach-drop-down .drop-down ul {
+      border-left: 0px solid transparent !important;
+      background: white; }
+      /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+      .seach-drop-down .drop-down ul li {
+        color: #2a9cc8; }
+      /* line 34, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/directives/search-drop-down/search-drop-down.scss */
+      .seach-drop-down .drop-down ul li:hover {
+        background: #F0F0F0;
+        padding-right: 2px;
+        opacity: 0.8; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+.page-history {
+  white-space: nowrap; }
+  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+  .page-history .notification {
+    display: flex;
+    padding: 0;
+    margin-left: 10px;
+    margin-bottom: 15px; }
+    /* line 10, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+    .page-history .notification label {
+      font-weight: bold;
+      text-transform: capitalize;
+      font-variant: small-caps;
+      font-size: 1.3em;
+      letter-spacing: 0.05em; }
+    /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+    .page-history .notification .download {
+      color: #4bafd5;
+      cursor: pointer; }
+    /* line 23, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+    .page-history .notification > div {
+      height: 80px !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: space-around;
+      padding: 0 10px; }
+      /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+      .page-history .notification > div:nth-child(1) {
+        width: 80px; }
+      /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+      .page-history .notification > div:nth-child(2) {
+        width: calc(100% - (80px+80px)); }
+      /* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+      .page-history .notification > div:nth-child(3) {
+        width: 80px; }
+    /* line 45, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+    .page-history .notification .history-detail-icon i {
+      padding-right: 0; }
+  /* line 51, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+  .page-history .filter {
+    margin-bottom: 25px;
+    margin-left: 10px; }
+  /* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+  .page-history .thumbnail {
+    font-size: 1em;
+    width: 70%; }
+  /* line 61, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+  .page-history .summary {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 30%;
+    font-size: 1em; }
+    /* line 68, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/history/history.scss */
+    .page-history .summary i {
+      margin-left: 10px;
+      position: relative;
+      top: -15px;
+      font-size: 1em; }
+
+/* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.progression-manager {
+  width: 100%; }
+  /* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .search-row {
+    padding: 8px 25px; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager form {
+    position: relative; }
+    /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager form .edit-button {
+      padding: 5px;
+      right: 5px;
+      position: absolute;
+      cursor: pointer;
+      z-index: 1;
+      font-size: 1.5em; }
+  /* line 18, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework > div {
+    margin-top: 15px; }
+  /* line 21, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework i {
+    color: rgba(1, 1, 1, 0.5);
+    padding-left: 15px; }
+  /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework .homework-title {
+    font-weight: bold; }
+  /* line 28, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-homework .homework-type {
+    font-size: 0.95em;
+    font-style: italic; }
+  /* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .progression-icon-homeworks {
+    color: #7bbcf0; }
+  /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .create-content {
+    position: absolute;
+    right: 0px;
+    top: -50px; }
+  /* line 44, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-item-container ul[diary-sortable-list] {
+    max-height: 500px;
+    overflow-y: auto;
+    width: auto;
+    padding-right: 0px; }
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-day-container i {
+    padding-left: 0px; }
+  /* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .progression-manager .pedagogic-day-container .pedagogic-day-card {
+    display: flex;
+    align-items: stretch; }
+    /* line 60, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card div {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      flex-direction: column; }
+    /* line 67, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .thumbnail {
+      width: 25%;
+      font-size: 0.75em;
+      overflow: hidden;
+      text-align: center;
+      padding: 0px; }
+    /* line 75, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .summary {
+      margin: 0px;
+      align-self: center;
+      text-align: left;
+      padding: 0px 5px;
+      width: 60%;
+      font-size: 0.85em; }
+    /* line 83, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .progression-manager .pedagogic-day-container .pedagogic-day-card .indicator {
+      align-self: center;
+      text-align: right;
+      width: 15%;
+      text-align: center;
+      padding: 0px; }
+
+/* line 94, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.content-not-found {
+  font-size: 2em;
+  color: #2a9cc8;
+  text-align: center;
+  vertical-align: middle; }
+  /* line 99, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found div {
+    padding: 10px 100px;
+    line-height: 1.5em; }
+  /* line 103, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found i {
+    position: relative;
+    top: 10px;
+    font-size: 2.2em;
+    margin-right: 10px; }
+  /* line 109, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .content-not-found button {
+    margin: 15px auto;
+    float: none; }
+
+/* line 115, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+.new-progression {
+  margin: 0px 0px 15px 15px;
+  background-color: #7bbcf0;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 3px; }
+  /* line 122, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression .row {
+    margin-top: 15px; }
+  /* line 125, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression div.six.cell, .new-progression div.twelve.cell {
+    padding: 5px 10px; }
+    /* line 126, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression div.six.cell label, .new-progression div.twelve.cell label {
+      text-decoration: underline; }
+  /* line 131, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression textarea {
+    border-radius: 3px;
+    background-color: #7bbcf0; }
+    /* line 134, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7); }
+    /* line 137, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea {
+      color: white; }
+    /* line 140, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression textarea:focus {
+      outline: none;
+      border-left: 1px solid #DDD;
+      border-right: 1px solid #DDD;
+      border-top: 1px solid #DDD;
+      border-bottom: 2px solid #FF8500; }
+  /* line 148, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+  .new-progression input {
+    width: 100%; }
+    /* line 150, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression input::placeholder {
+      color: rgba(255, 255, 255, 0.7); }
+    /* line 154, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/manager/progressions.scss */
+    .new-progression input[type=text] {
+      color: white; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .search-progression {
+  background-color: #ddd; }
+  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .search-progression button {
+    width: 26px;
+    height: 26px;
+    padding: 0px;
+    margin-right: 5px; }
+    /* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .progressiontype .search-progression button i {
+      font-size: 1.6em;
+      padding: 0px; }
+  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .search-progression input {
+    width: calc(100% - 45px); }
+
+/* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .content {
+  float: left;
+  height: 422px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 8px;
+  width: 100%; }
+  /* line 27, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content.content-lesson {
+    height: 378px; }
+  /* line 32, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content a:hover article {
+    border-left: 4px solid #FF8500; }
+  /* line 36, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .content a article {
+    transition: border-left 0.1s;
+    padding: 10px; }
+
+/* line 42, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .lesson-item {
+  margin-left: 5px;
+  margin-right: 5px;
+  color: white; }
+  /* line 46, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .lesson-item:hover {
+    opacity: 0.8; }
+
+/* line 50, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.progressiontype .pedagogic-day-card {
+  position: relative;
+  height: 42px; }
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card:hover {
+    opacity: 0.8; }
+  /* line 56, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card .thumbnail {
+    box-sizing: border-box;
+    padding: 6px 0px;
+    font-size: 0.8em;
+    width: 22px; }
+  /* line 62, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .progressiontype .pedagogic-day-card .summary {
+    padding: 9px 4px 9px 6px;
+    color: white;
+    font-size: 0.75em;
+    width: calc(100% - 22px); }
+
+/* line 71, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+.contener-slide {
+  position: relative;
+  float: left;
+  width: 100%;
+  overflow: hidden;
+  height: 432px; }
+  /* line 77, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+  .contener-slide .slide {
+    top: 0px;
+    transition: left .3s;
+    position: absolute;
+    float: left;
+    left: 0%;
+    width: 100%; }
+    /* line 84, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .contener-slide .slide.left-slide {
+      left: -100%; }
+    /* line 87, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
+    .contener-slide .slide.right-slide {
+      left: 100%; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel.quick-search {
+  z-index: 0; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .sum-selected > span:first-child {
+  max-width: calc(100% - 40px);
+  overflow: hidden;
+  display: block;
+  white-space: nowrap; }
+
+/* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .sum-selected > span:nth-child(2) {
+  position: absolute;
+  display: block;
+  top: 8px;
+  right: 2px; }
+
+/* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/right-pan.scss */
+right-panel .right-panel .quick-search-results {
+  width: 100%;
+  margin-top: 10px; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/inspector-habilitations/popup-visa-habilitation.scss */
+.habilitation > div.row > div.cell {
+  padding: 15px; }
+
+/* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/inspector-habilitations/popup-visa-habilitation.scss */
+.habilitation .teacher-list article {
+  padding-right: 50px; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/inspector-habilitations/popup-visa-habilitation.scss */
+  .habilitation .teacher-list article i {
+    position: absolute;
+    right: 25px; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+lightbox.popup-viser section.lightbox i {
+  color: white; }
+
+/* line 5, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+lightbox.popup-viser section.lightbox div.content {
+  padding: 0px; }
+  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .header {
+    background-color: #00a4d3;
+    color: white;
+    text-align: center;
+    font-size: 1.8em;
+    padding: 25px 0px; }
+  /* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .viser-content {
+    padding: 15px; }
+  /* line 19, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/popup-valid/popup-valid.scss */
+  lightbox.popup-viser section.lightbox div.content .controls {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around; }
+
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .item-description {
+  margin: 0px;
+  margin-right: 25px;
+  padding-top: 10px; }
+
+/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .prev-lesson-summary {
+  margin-right: -15px;
+  margin-left: -15px;
+  padding: 10px 20px; }
+
+/* line 13, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .right-magnet {
+  margin-right: 20px;
+  margin-top: -4px; }
+
+/* line 17, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .left-magnet {
+  margin-top: -4px;
+  margin-right: 10px; }
+
+/* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .item-detail {
+  float: left;
+  margin-top: 15px; }
+
+/* line 26, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .alf {
+  width: 50%;
+  box-sizing: border-box; }
+  /* line 30, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+  .popup-visa-lesson-list .alf.homework-visa-detail > div {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: solid #2a9cc8 1px; }
+    /* line 34, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+    .popup-visa-lesson-list .alf.homework-visa-detail > div:hover {
+      opacity: 0.7; }
+    /* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+    .popup-visa-lesson-list .alf.homework-visa-detail > div:last-child {
+      margin-bottom: 0px;
+      border-bottom: none; }
+
+/* line 47, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .full {
+  width: 100%; }
+
+/* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa-lesson-list/visa-lesson-list.scss */
+.popup-visa-lesson-list .lesson-list {
+  overflow-y: auto; }
+
+/* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-right-button {
+  position: absolute;
+  right: 10px;
+  top: 0px; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-right-button button {
+    padding: 5px 10px;
+    margin: 0px; }
+    /* line 9, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    .visa-manager .visa-right-button button i {
+      margin-right: 10px;
+      font-size: 1.4em; }
+
+/* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa i {
+  position: relative;
+  left: 5px;
+  top: -2px; }
+
+/* line 21, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .ok {
+  color: #16cc16;
+  font-weight: bold; }
+
+/* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .dirty {
+  color: red;
+  font-weight: bold; }
+
+/* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .owner {
+  font-style: italic; }
+
+/* line 32, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .dateCreate {
+  margin-top: 20px; }
+
+/* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa .date {
+  text-align: right;
+  padding-right: 10px; }
+
+/* line 42, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters > div {
+  padding: 5px 10px; }
+  /* line 44, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-filters > div .label {
+    line-height: 30px; }
+
+/* line 48, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters button {
+  margin-top: 22px; }
+
+/* line 51, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-filters ent-dropdown {
+  padding-left: 0px; }
+
+/* line 57, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab button {
+  float: none;
+  display: inline; }
+
+/* line 61, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .external-link {
+  font-size: 22px;
+  margin-left: 20px;
+  color: #FF8500; }
+
+/* line 66, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-tab-header {
+  font-size: 1.4em;
+  background-color: #00a4d3;
+  color: white;
+  padding: 10px 20px; }
+  /* line 72, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-tab .visa-tab-header .checkbox span {
+    height: 20px;
+    background-color: white; }
+    /* line 75, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    .visa-manager .visa-tab .visa-tab-header .checkbox span:before {
+      margin-right: 0px; }
+
+/* line 82, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-tab-content {
+  margin: 10px 0px; }
+  /* line 85, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+  .visa-manager .visa-tab .visa-tab-content .visa-lesson {
+    padding: 0px; }
+    /* line 87, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+    .visa-manager .visa-tab .visa-tab-content .visa-lesson .visa-lesson-header {
+      background-color: #00a4d3;
+      color: white;
+      padding: 10px 20px; }
+
+/* line 95, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
+.visa-manager .visa-tab .visa-lesson-content > div {
+  padding: 10px 15px; }
+
+
+/*# sourceMappingURL=app.css.map*/

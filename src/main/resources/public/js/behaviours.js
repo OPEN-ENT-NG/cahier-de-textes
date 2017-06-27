@@ -216,3 +216,5 @@ Behaviours.register('diary', {
 	loadResources: function loadResources(callback) {}
 });
 
+
+//# sourceMappingURL=behaviours.js.map
