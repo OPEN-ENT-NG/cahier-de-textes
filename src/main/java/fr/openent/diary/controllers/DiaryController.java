@@ -1,11 +1,11 @@
 package fr.openent.diary.controllers;
 
-import fr.openent.diary.model.ModelWeek;
+import fr.openent.diary.model.GenericHandlerResponse;
+import fr.openent.diary.model.visa.VisaFilters;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
-import fr.openent.diary.utils.Audience;
-import fr.openent.diary.utils.CriteriaSearchType;
+import fr.openent.diary.model.general.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
@@ -20,18 +20,25 @@ import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.entcore.common.utils.StringUtils;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.json.impl.Json;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 import org.vertx.java.platform.Container;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -356,6 +363,4 @@ public class DiaryController extends BaseController {
             }
         );
     }
-
-
 }

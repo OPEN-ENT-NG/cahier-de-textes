@@ -20,8 +20,11 @@
   }
 
   .drop-down{
-    height: auto;
+    max-height: 350px;
+    height:auto;
+    overflow: auto;
     border: solid 1px #2a9cc8;
+    background-color: white;
     ul {
       border-left: 0px solid transparent !important;
       background: white;

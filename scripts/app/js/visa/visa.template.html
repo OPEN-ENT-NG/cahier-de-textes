@@ -1,11 +1,23 @@
 <div class="visa-manager"  >
     <h1>
         <a href="#" ><i18n>diary.title</i18n> </a> >
-        <a href="" ><i18n>via.title</i18n> </a>
+        <a href="" ><i18n>diary.visa.title</i18n> </a>
+
     </h1>
+    <div class="visa-right-button">
+
+      <button
+          secure="[[RIGHTS.MANAGE_INSPECTOR]]"
+           class="diary-ico-button"
+          confirm-popup
+          confirm-class="fullscreen popup-visa-habilitation"
+      confirm-template="/diary/public/js/visa/inspector-habilitations/habilitations.template.html" >
+          <i class="icon lock-alt" ></i>Gérer les habilitations
+      </button>
+    </div>
     <div class="row visa-filters">
         <div class="cell three" ng-if="visaManagerCtrl.items">
-            <div class="label" >Enseignant :  </div>
+            <div class="label" ><i18n>enseignant</i18n> :  </div>
             <search-drop-down
                 items = "visaManagerCtrl.filters.teachers"
                 place-holder ="Professeur"
@@ -13,26 +25,28 @@
                 show-expression="item.value"
             ></search-drop-down>
         </div>
-        <div class="cell three">
-            <span class="label">Matière : </span>
+        <div class="cell three" secure="[[RIGHTS.VISA_ADMIN]]">
+            <span class="label"><i18n>subject</i18n> : </span>
             <diary-drop-down
                 placeholder="select.group.or.class"
                 list="visaManagerCtrl.filters.subjects"
                 selected="visaManagerCtrl.filter.subject"
+                nullable="true"
                 property="value">
             </diary-drop-down>
         </div>
-        <div class="cell two">
-            <span class="label">Classe : </span>
+        <div class="cell two" secure="[[RIGHTS.VISA_ADMIN]]">
+            <span class="label"><i18n>audience.type.class</i18n> : </span>
             <diary-drop-down
                 placeholder="select.group.or.class"
                 list="visaManagerCtrl.filters.audiences"
                 selected="visaManagerCtrl.filter.audience"
+                nullable="true"
                 property="value">
             </diary-drop-down>
         </div>
         <div class="cell two">
-            <span class="label">Statut : </span>
+            <span class="label"><i18n>status</i18n> : </span>
             <diary-drop-down
                 placeholder="select.group.or.class"
                 list="visaManagerCtrl.filters.states"
@@ -41,12 +55,17 @@
             </diary-drop-down>
         </div>
         <div class="cell two">
-            <button ng-click="visaManagerCtrl.search()">rechercher</button>
+            <button ng-click="visaManagerCtrl.search()"
+            ng-disabled="!visaManagerCtrl.searchAvailable()"
+            ><span diary-tooltip="[[visaManagerCtrl.searchAvailable() ? 'search' : 'diary.visa.select.filter']]"><i18n>search</i18n></span></button>
         </div>
     </div>
-    <div ng-include="'/diary/public/js/visa/visa-list.template.html'"
-        ng-if="visaManagerCtrl.agregatedVisa.length > 0"></div>
-    <div ng-include="'/diary/public/js/visa/visa-list-empty-instructions.template.html'"
-        ng-if="!visaManagerCtrl.agregatedVisa.length"></div>
-        <div ng-include="'/diary/public/js/visa/toggle-selected.template.html'"></div>
+    <div ng-if="visaManagerCtrl.agregatedVisa.length > 0">
+        <div ng-include="'/diary/public/js/visa/visa-list.template.html'"></div>
+    </div>
+    <div ng-if="!visaManagerCtrl.agregatedVisa || visaManagerCtrl.agregatedVisa.length === 0">
+        <div ng-include="'/diary/public/js/visa/visa-list-empty-instructions.template.html'"></div>
+    </div>
+    <div ng-include="'/diary/public/js/visa/toggle-selected.template.html'"></div>
+
 </div>

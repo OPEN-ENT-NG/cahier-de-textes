@@ -1,9 +1,12 @@
 package fr.openent.diary.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.wseduc.webutils.Either;
@@ -15,6 +18,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
@@ -23,6 +27,7 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -35,9 +40,16 @@ import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 public class SqlMapper<T> {
 
-    public static ObjectMapper mapper = new ObjectMapper();
+    public static ObjectMapper mapper = new ObjectMapper(){{
+            registerModule(new SimpleModule("MultiDateModule"){{
+                addDeserializer(Date.class, new MultiDateSerializer());
+                }
+            });
+        }
+    };
 
     static{
+
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -133,30 +145,6 @@ public class SqlMapper<T> {
 
             }
         };
-
-
-
-    }
-
-    public static <T> void checkError(GenericHandlerResponse response, Handler<HandlerResponse<T>> handler){
-        if (response.hasError()){
-            HandlerResponse<T> responseError = new HandlerResponse<>();
-            responseError.setMessage(response.getMessage());
-            handler.handle(responseError);
-            throw new RuntimeException(response.getMessage());
-        }
-    }
-
-    public static <T> void error(Throwable t,  Handler<HandlerResponse<T>> handler){
-            HandlerResponse<T> responseError = new HandlerResponse<>();
-            responseError.setMessage(t.getMessage());
-            handler.handle(responseError);
-    }
-
-    public static void genericError(Throwable t,  Handler<GenericHandlerResponse> handler){
-        GenericHandlerResponse  responseError = new GenericHandlerResponse (t.getMessage());
-
-        handler.handle(responseError);
     }
 
     public static <T> void mappListRequest(final HttpServerRequest request, final Class clazz , final Handler<HandlerResponse<List<T>>> handler){
@@ -192,6 +180,16 @@ public class SqlMapper<T> {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    public static String encode(Object obj){
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(),e);
+            throw new RuntimeException(e);
+        }
+
     }
 
     /*public T decode(String str){
@@ -382,10 +380,17 @@ public class SqlMapper<T> {
         return (Long)method.invoke(obj);
     }
 
-    private JsonObject objectToJson(T obj) throws Exception {
-
-        Map<String, Object> result = new HashMap<String, Object>();
+    public static JsonElement objectToJson(Object obj,SimpleDateFormat dateFormat) throws Exception {
+        if (obj instanceof  ArrayList){
+            JsonArray jsonArray = new JsonArray();
+            for (Object e : (ArrayList) obj){
+                ((JsonArray)jsonArray).addElement(objectToJson(e,dateFormat));
+            }
+            return jsonArray;
+        }
+        //Map<String, Object> result = new HashMap<String, Object>();
         BeanInfo info = Introspector.getBeanInfo(obj.getClass());
+        JsonObject result = new JsonObject();
         for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
             Method reader = pd.getReadMethod();
             if (reader != null) {
@@ -394,14 +399,21 @@ public class SqlMapper<T> {
                 if (key.equals("class") || value == null ) {
                     continue;
                 }
-                if (value instanceof Date) {
-                    value = DateUtils.formatDateSql((Date) value);
+                if (value instanceof ArrayList){
+                    result.putArray(key,(JsonArray) objectToJson(value,dateFormat));
+                    continue;
                 }
-                result.put(key, value);
+                if (value instanceof Date) {
+                    value = dateFormat.format((Date) value);
+                }
+                result.putValue(key, value);
+
             }
         }
-
-        return new JsonObject(result);
+        return result;
+    }
+    public static JsonElement objectToJson(Object obj) throws Exception {
+        return objectToJson(obj,DateUtils.getSimpleDateFormatSql());
     }
 
     public void prepareInsertStatementWithSequence(final T obj, final Handler<HandlerResponse<SqlQuery>> handler ) throws Exception{
@@ -410,7 +422,7 @@ public class SqlMapper<T> {
         //if we already have the object id dont active sequence
         if (id != null){
             HandlerResponse<SqlQuery> response = new HandlerResponse<SqlQuery>();
-            response.setResult(new SqlQuery(databaseTableSc,objectToJson(obj)));
+            response.setResult(new SqlQuery(databaseTableSc,(JsonObject)objectToJson(obj)));
             return;
         }
 
@@ -424,7 +436,7 @@ public class SqlMapper<T> {
                 }else{
                     try{
                         setId(obj,eventSequence.getResult());
-                        response.setResult(new SqlQuery(databaseTableSc,objectToJson(obj)));
+                        response.setResult(new SqlQuery(databaseTableSc,(JsonObject) objectToJson(obj)));
                         handler.handle(response);
 
                     }catch (Exception e){
@@ -438,7 +450,7 @@ public class SqlMapper<T> {
 
 
     public SqlQuery prepareInsertStatement(final T obj) throws Exception{
-        return new SqlQuery(databaseTableSc,objectToJson(obj));
+        return new SqlQuery(databaseTableSc,(JsonObject)objectToJson(obj));
     }
 
     public SqlQuery prepareUpdateStatement(T obj) throws Exception {
@@ -499,6 +511,4 @@ public class SqlMapper<T> {
             }
         }));
     }
-
-
 }

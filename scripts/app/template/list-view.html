@@ -26,19 +26,15 @@
     <button ng-click="redirect('/createHomeworkView')" ng-if="isUserTeacher">
         <i18n>diary.homework.create</i18n>
     </button>
-    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()"
-       tooltip="diary.icon.show.list"></i>
-    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()"
-       tooltip="diary.icon.show.calendar"></i>
+    <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()" tooltip="diary.icon.show.list"></i>
+    <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()" tooltip="diary.icon.show.calendar"></i>
     <hr />
 </div>
 
 <div ng-model="searchForm" class="search-form-box">
-    <i class="[[(searchForm.displayLesson == false) ? 'filter2 diary' : 'filter2 diary selected' ]]"
-       ng-click="toggleFilterOnLesson()" tooltip="diary.icon.show.lessons"></i>
+    <i class="[[(searchForm.displayLesson == false) ? 'filter2 diary' : 'filter2 diary selected' ]]" ng-click="toggleFilterOnLesson()" tooltip="diary.icon.show.lessons"></i>
 
-    <i class="[[(searchForm.displayHomework == false) ? 'filter2 homework' : 'filter2 homework selected' ]]"
-       ng-click="toggleFilterOnHomework()" tooltip="diary.icon.show.homeworks"></i>
+    <i class="[[(searchForm.displayHomework == false) ? 'filter2 homework' : 'filter2 homework selected' ]]" ng-click="toggleFilterOnHomework()" tooltip="diary.icon.show.homeworks"></i>
 
     <p style="padding-left: 20px; display:inline;">
         <label style="vertical-align:center">Période du </label>
@@ -52,7 +48,7 @@
             <option value="" translate content="diary.filter.all.subjects"></option>
         </select>
     </p>
-    <input type="hidden" ng-model="searchForm.audienceId"/>
+    <input type="hidden" ng-model="searchForm.audienceId" />
 </div>
 
 
@@ -69,9 +65,9 @@
                     <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="selectDay(day)">
                         <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.shortName]]</div>
                         <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">
-                            [[day.shortDate]]&nbsp;
-                            [[day.nbHomeworks]]<i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
-                            [[day.nbLessons]]<i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                            [[day.shortDate]]&nbsp; [[day.nbHomeworks]]
+                            <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbLessons]]
+                            <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
                         </div>
                     </div>
                 </li>
@@ -104,9 +100,15 @@
                                 </div>
                                 <div class="row">
                                     <div class="one cell" style="padding: 5px 0px 0px 20px">
-                                        <label class="checkbox" ng-if="isUserTeacher">
+                                        <label class="checkbox" ng-if="isUserTeacher && !pedagogicItem.locked">
                                             <input type="checkbox" ng-model="pedagogicItem.selected" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" />
                                             <span></span>
+                                        </label>
+                                        <label class="checkbox" ng-if="isUserTeacher && pedagogicItem.locked">
+                                            <!-- TODO Traduction -->
+                                            <i class="icon lock-alt"
+                                                diary-tooltip="Un visa a vérouillé cette séance"
+                                            ></i>
                                         </label>
                                     </div>
 
@@ -121,12 +123,12 @@
                                                 <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
                                                 [[pedagogicItem.title]]
                                             </em>
-											<span ng-show="!pedagogicItem.expanded_description">
+                                            <span ng-show="!pedagogicItem.expanded_description">
 												 <span bind-html="pedagogicItem.preview_description"></span>
-											</span>
-											<span ng-show="pedagogicItem.expanded_description">
+                                            </span>
+                                            <span ng-show="pedagogicItem.expanded_description">
 												 <span bind-html="pedagogicItem.description"></span>
-											</span>
+                                            </span>
                                             <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
                                         </div>
                                     </div>
@@ -154,18 +156,18 @@
             <button ng-click="showConfirmPanel('confirm-delete')">
                 <i18n>remove</i18n>
             </button>
-            <button ng-click="editSelectedItem()"  ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}"  >
+            <button ng-click="editSelectedItem()" ng-class="{ disabled: !isOneHomeworkOrLessonStriclySelected()}">
                 <i18n>edit</i18n>
             </button>
-            <!-- not implemented yet so always disabled 
+            <!-- not implemented yet so always disabled
             <button ng-click="shareSelectedLessons()" ng-class="{ disabled: lessons.selection().length >= 0 }">
                 <i18n>share</i18n>
             </button>-->
 
-            <button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0" >
+            <button ng-click="openShareLessonPanel()" ng-show="getSelectedPedagogicItems('homework').length === 0">
                 <i18n>share</i18n>
             </button>
-            <button ng-click="openShareHomeworkPanel()" ng-show="getSelectedPedagogicItems('lesson').length === 0" >
+            <button ng-click="openShareHomeworkPanel()" ng-show="getSelectedPedagogicItems('lesson').length === 0">
                 <i18n>share</i18n>
             </button>
 

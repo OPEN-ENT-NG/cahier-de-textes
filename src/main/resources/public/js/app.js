@@ -143,8 +143,15 @@ var AngularExtensions = {
         VIEW: 'diary.view',
         CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
         CREATE_FREE_HOMEWORK: 'diary.createFreeHomework',
-        MANAGE_MODEL_WEEK: 'diary.manageModelWeek',
-        MANAGE_VISA: 'diary.manageVisa'
+
+        MANAGE_MODEL_WEEK: 'diary.manageModelWeek.update',
+        MANAGE_HISTORY: 'diary.manageHistory.apply',
+        SHOW_HISTORY: 'diary.showHistory.filters',
+        VISA_APPLY_VISA: "diary.visa.applyvisa",
+        VISA_INSPECTOR: "diary.visa.inspect.filters",
+        VISA_ADMIN: "diary.visa.admin.filters",
+        MANAGE_INSPECTOR: "diary.manageInspect.apply",
+        SHOW_OTHER_TEACHER: "diary.view.otherteacher"
       }
     });
   });
@@ -466,7 +473,9 @@ var AngularExtensions = {
                 };
             };
             $scope.onCreateClose = function () {
-                $scope.$eval(attributes.onCreateClose);
+                if (attributes) {
+                    $scope.$eval(attributes.onCreateClose);
+                }
             };
 
             $scope.setMouseDownTime = function ($event) {
@@ -483,7 +492,7 @@ var AngularExtensions = {
              */
             $scope.openOnClickSaveOnDrag = function (item, $event) {
 
-                var path = '/editLessonView/' + item.id;
+                var path = item.locked ? '/showLessonView/' + item.id : '/editLessonView/' + item.id;
 
                 // gap between days is quite important
                 var xMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;
@@ -548,6 +557,7 @@ var AngularExtensions = {
                 });
             };
         }
+        controller.$inject = ["$scope", "$rootScope", "$timeout", "$window", "$element", "$location", "AudienceService", "SubjectService", "SecureService", "constants"];
     });
 })();
 
@@ -557,12 +567,12 @@ var AngularExtensions = {
                       'use strict';
 
                       AngularExtensions.addModuleConfig(function (module) {
-                                            module.directive('diaryScheduleItem', function ($compile) {
+                                            module.directive('diaryScheduleItem', ["$compile", function ($compile) {
                                                                   return {
                                                                                         restrict: 'E',
                                                                                         require: '^diary-calendar',
                                                                                         template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
-                                                                                        controller: function controller($scope, $element, $timeout) {
+                                                                                        controller: ["$scope", "$element", "$timeout", function controller($scope, $element, $timeout) {
 
                                                                                                               var vm = this;
 
@@ -671,12 +681,147 @@ var AngularExtensions = {
 
                                                                                                                                     $scope.$emit('calendar.refreshItems', $scope.item);
                                                                                                               });
-                                                                                        },
+                                                                                        }],
 
                                                                                         link: function link(scope, element, attributes) {}
                                                                   };
-                                            });
+                                            }]);
                       });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.directive('diaryDatePicker', directive);
+
+        function directive($compile) {
+            return {
+                scope: {
+                    minDate: '=',
+                    ngModel: '=',
+                    ngChange: '&',
+                    nullable: '='
+                },
+                transclude: true,
+                replace: true,
+                restrict: 'E',
+                template: '<input ng-transclude type="text" data-date-format="dd/mm/yyyy"  />',
+                link: function link(scope, element, attributes) {
+
+                    scope.$watch('ngModel', function (newVal) {
+                        if (scope.nullable && !scope.ngModel) {
+                            return;
+                        }
+                        element.val(moment(scope.ngModel).format('DD/MM/YYYY'));
+                        if (element.datepicker) element.datepicker('setValue', moment(scope.ngModel).format('DD/MM/YYYY'));
+                    });
+
+                    if (scope.minDate) {
+                        scope.$watch('minDate', function (newVal) {
+                            setNewDate();
+                        });
+                    }
+
+                    function setNewDate() {
+                        var minDate = scope.minDate;
+                        var date = element.val().split('/');
+                        var temp = date[0];
+                        date[0] = date[1];
+                        date[1] = temp;
+                        date = date.join('/');
+                        scope.ngModel = new Date(date);
+                        if (scope.nullable && scope.ngModel == 'Invalid Date') {
+                            scope.ngModel = undefined;
+                            return;
+                        }
+                        if (scope.ngModel < minDate) {
+                            scope.ngModel = minDate;
+                            element.val(moment(minDate).format('DD/MM/YYYY'));
+                        }
+
+                        scope.$apply('ngModel');
+                        scope.$parent.$eval(scope.ngChange);
+                        scope.$parent.$apply();
+                    }
+
+                    loader.asyncLoad('/' + infraPrefix + '/public/js/bootstrap-datepicker.js', function () {
+                        element.datepicker({
+                            dates: {
+                                months: moment.months(),
+                                monthsShort: moment.monthsShort(),
+                                days: moment.weekdays(),
+                                daysShort: moment.weekdaysShort(),
+                                daysMin: moment.weekdaysMin()
+                            },
+                            weekStart: 1
+                        }).on('changeDate', function () {
+                            setTimeout(setNewDate, 10);
+                            $(this).datepicker('hide');
+                        });
+                        element.datepicker('hide');
+                    });
+
+                    var hideFunction = function hideFunction(e) {
+                        if (e.originalEvent && (element[0] === e.originalEvent.target || $('.datepicker').find(e.originalEvent.target).length !== 0)) {
+                            return;
+                        }
+                        element.datepicker('hide');
+                    };
+
+                    $('body, lightbox').on('click', hideFunction);
+                    $('body, lightbox').on('focusin', hideFunction);
+
+                    element.on('focus', function () {
+                        var that = this;
+                        $(this).parents('form').on('submit', function () {
+                            $(that).datepicker('hide');
+                        });
+                        element.datepicker('show');
+                    });
+
+                    element.on('change', setNewDate);
+
+                    element.on('$destroy', function () {
+                        element.datepicker('hide');
+                    });
+                }
+            };
+        }
+        directive.$inject = ["$compile"];
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        module.directive('onFinishRender', directive);
+
+        var tooltip;
+        function directive($compile, $timeout) {
+            return {
+                restrict: 'A',
+                link: function link(scope, element, attr) {
+                    if (scope.$last === true) {
+                        element.ready(function () {
+                            $timeout(function () {
+                                scope.$eval(attr.onFinishRender);
+                            }, 50);
+                        });
+                    }
+                }
+
+            };
+        }
+        directive.$inject = ["$compile", "$timeout"];
+    });
 })();
 
 'use strict';
@@ -717,6 +862,7 @@ var AngularExtensions = {
                 }
             };
         }
+        sortableDirective.$inject = ["$compile"];
 
         function sortableElementDirective($parse, $timeout) {
             return {
@@ -790,6 +936,7 @@ var AngularExtensions = {
                 }
             };
         }
+        sortableElementDirective.$inject = ["$parse", "$timeout"];
     });
 })();
 
@@ -834,7 +981,7 @@ var AngularExtensions = {
                             position.left = 5;
                         }
 
-                        tooltip.css("top", position.top);
+                        tooltip.css("top", position.top + 15);
                         tooltip.css("left", position.left);
 
                         tooltip.fadeIn(100);
@@ -859,6 +1006,7 @@ var AngularExtensions = {
                 }
             };
         }
+        directive.$inject = ["$compile"];
     });
 })();
 
@@ -989,6 +1137,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     initAudiences();
     route({
+        showHistoryView: function showHistoryView(params) {
+            template.open('main', 'show-history');
+        },
         manageVisaView: function manageVisaView(params) {
             template.open('main', 'visa-manager');
         },
@@ -1021,6 +1172,10 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             } else {
                 template.open('main-view', 'view-lesson');
             }
+        },
+        showLessonView: function showLessonView(params) {
+            template.open('main', 'main');
+            template.open('main-view', 'view-lesson');
         },
         editHomeworkView: function editHomeworkView(params) {
             loadHomeworkFromRoute(params);
@@ -1131,7 +1286,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         var url = "";
 
         if (pedagogicItem.type_item === 'lesson') {
-            url = "/editLessonView/" + pedagogicItem.id + "/";
+
+            url = pedagogicItem.locked ? "/showLessonView/" + pedagogicItem.id + "/" : "/editLessonView/" + pedagogicItem.id + "/";
         } else {
             // open lesson view if homework is attached to a lesson
             if (pedagogicItem.lesson_id) {
@@ -2034,7 +2190,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $scope.display.bShowCalendar = true;
                 $scope.display.bShowHomeworks = true;
                 $scope.display.bShowHomeworksMinified = false;
-                //$scope.showCal = false;
+
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -2044,6 +2200,40 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $scope.$on('calendar.refreshItems', function (_, item) {
                     item.calendarUpdate();
                 });
+
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
+
+                    if (!model.filters) {
+                        model.filters = {};
+                    }
+
+                    vm.teacher = model.filters.teacher;
+                    vm.audience = model.filters.audience;
+
+                    $scope.$watch(function () {
+                        return vm.teacher;
+                    }, function (n, o) {
+                        if (n !== o && n) {
+
+                            $timeout(function () {
+                                model.filters.teacher = vm.teacher;
+                                model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                            });
+                        }
+                    });
+                    $scope.$watch(function () {
+                        return vm.audience;
+                    }, function (n, o) {
+                        if (n !== o && n) {
+                            $timeout(function () {
+                                model.filters.teacher = vm.teacher;
+                                model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                            });
+                        }
+                    });
+                }
             }
 
             //watch delete or add
@@ -2058,7 +2248,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             });
 
             $scope.$watch('routeParams', function (n, o) {
-
+                if ($location.path().indexOf("calendarView") === -1 && $location.path() !== "") {
+                    return;
+                }
                 var mondayOfWeek = moment();
                 // mondayOfWeek as string date formatted YYYY-MM-DD
                 if ($scope.routeParams.mondayOfWeek) {
@@ -2178,17 +2370,26 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 // need reload lessons or homeworks if week changed
                 var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
 
-                //$scope.lesson = null;
-                //$scope.homework = null;
-
 
                 refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
             };
 
             function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
-
-                var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
-                var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                var p1;
+                var p2;
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
+                    var teacherItem = vm.teacher ? vm.teacher.item : undefined;
+                    if (!teacherItem && !vm.audience) {
+                        p1 = $q.when([]);
+                        p2 = $q.when([]);
+                    } else {
+                        p1 = LessonService.getOtherLessons([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
+                        p2 = HomeworkService.getOtherHomeworks([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
+                    }
+                } else {
+                    p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
+                    p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                }
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
@@ -2208,7 +2409,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     $scope.modelWeeks = results[3];
 
                     var p = void 0;
-                    if (!$scope.courses || $scope.courses.length === 0) {
+                    if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
                         p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
                             $scope.courses = modelCourses;
                         });
@@ -2294,6 +2495,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $location.path(path);
             };
         }
+        controller.$inject = ["$scope", "$rootScope", "$timeout", "CourseService", "$routeParams", "constants", "$location", "HomeworkService", "UtilsService", "LessonService", "$q", "SubjectService", "ModelWeekService", "SecureService"];
     });
 })();
 
@@ -2597,6 +2799,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 });
             };
         }
+        controller.$inject = ["$scope", "$rootScope", "$routeParams", "PedagogicItemService", "constants", "$q", "SubjectService"];
     });
 })();
 
@@ -2657,6 +2860,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
             vm.loadLesson = function (lessonId) {};
         }
+        controller.$inject = ["$scope", "$timeout", "$routeParams", "constants", "$rootScope", "ProgressionService"];
     });
 })();
 
@@ -3249,6 +3453,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 setDaysContent();
             });
         }
+        controller.$inject = ["$scope"];
     });
 })();
 
@@ -3295,13 +3500,19 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     module.directive("confirmPopup", directive);
 
     function directive($compile) {
+      var zIndex = 100000;
       return {
         restrict: 'A',
+        /*controller : function($scope){
+          setTimeout(()=>{
+            $scope.apply
+          });
+        },*/
         link: function link(scope, element, attr) {
           console.log("confirm click linked");
-
+          zIndex++;
           var clickAction = attr.confirmedClick;
-          var html = '\n                     <lightbox show="display" on-close="remove()">\n                       <div class="row" ng-if="!confirmTemplate">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />\n                           </div>\n                       </div>\n                       <div class="row" ng-if="confirmTemplate">\n                          <div ng-include="confirmTemplate">\n                          </div>\n                       </div>\n                     </lightbox>\n                     ';
+          var html = ' \n                     <lightbox show="display" class="' + scope.confirmClass + '" on-close="remove()" style="z-index : ' + zIndex + '" >\n                       <div class="row" ng-if="!confirmTemplate">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />\n                           </div>\n                       </div>\n                       <div class="row" ng-if="confirmTemplate">\n                          <div ng-include="confirmTemplate">\n                          </div>\n                       </div>\n                     </lightbox>\n                     ';
           var lightbox;
           element.bind('click', function (event) {
             scope.msg = attr.confirmClick || "Etes vous sur?";
@@ -3310,10 +3521,15 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             scope.confirmTemplate = attr.confirmTemplate;
             scope.cancel = attr.confirmCancel || "Annuler";
             scope.display = true;
+
             lightbox = $compile(html)(scope);
             $('body').append(lightbox);
+
             lightbox.addClass(scope.confirmClass);
             scope.$apply();
+          });
+          scope.$on('closeallpop', function () {
+            scope.remove();
           });
           scope.remove = function () {
             scope.display = false;
@@ -3328,6 +3544,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         }
       };
     }
+    directive.$inject = ["$compile"];
   });
 })();
 
@@ -3345,20 +3562,23 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     placeholder: "@",
                     list: "=",
                     selected: "=",
-                    property: "@"
+                    property: "@",
+                    nullable: "="
                 },
-                controller: function controller($scope) {
+                controller: ["$scope", function controller($scope) {
                     $scope.selectItem = function (item) {
                         if ($scope.list) {
                             $scope.list.map(function (e) {
                                 e.selected = false;
                             });
-                            item.selected = true;
+                            if (item) {
+                                item.selected = true;
+                            }
                             $scope.selected = item;
                             $scope.listVisible = false;
                         }
                     };
-                },
+                }],
                 link: function link(scope, element, attr) {
 
                     $(document).bind('click', function (event) {
@@ -3373,6 +3593,69 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         });
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
+        /**
+         * Directive for result items
+         */
+        module.directive('diaryMultiCalendarFilter', function () {
+            return {
+                restrict: "E",
+                templateUrl: "/diary/public/js/directives/diary-multi-calendar-filter/diary-multi-calendar-filter.template.html",
+                scope: {
+                    structure: '=',
+                    audience: '=',
+                    teacher: '='
+                },
+                controller: 'diaryMultiCalendarFilterController as diaryMultiCalendarFilterCtrl'
+            };
+        });
+
+        module.controller("diaryMultiCalendarFilterController", controller);
+
+        function controller($scope, SecureService, VisaService, constants) {
+
+            var vm = this;
+            $scope.RIGHTS = constants.RIGHTS;
+            vm.filters = {};
+            $scope.$watch("audience", function (n, o) {
+                if (n) {
+                    $scope.teacher = undefined;
+                }
+            });
+            $scope.$watch("teacher", function (n, o) {
+                if (n) {
+                    $scope.audience = undefined;
+                }
+            });
+            $scope.$watch("structure", function (n, o) {
+                if (n !== o && n) {
+                    vm.getFilters(n.id);
+                }
+            });
+
+            vm.getFilters = function (structureId) {
+
+                if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)) {
+                    VisaService.getFilters(structureId).then(function (filters) {
+                        vm.filters = filters;
+                    });
+                } else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)) {
+                    VisaService.getInspectorFilters(structureId, model.me.userId).then(function (filters) {
+                        vm.filters = filters;
+                    });
+                }
+            };
+        }
+        controller.$inject = ["$scope", "SecureService", "VisaService", "constants"];
     });
 })();
 
@@ -3664,6 +3947,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         }
+        directive.$inject = ["AudienceService", "$rootScope"];
     });
 })();
 
@@ -4137,6 +4421,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 model.homeworksDropHandled = true;
             }
         }
+        controller.$inject = ["$scope", "$rootScope", "PedagogicItemService"];
     });
 })();
 
@@ -4204,6 +4489,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             $scope.$watch('searchFilter', init);
 
             function init() {
+                if (!$scope.items) {
+                    return;
+                }
                 $scope.itemsToShow = $scope.items.map(function (item) {
                     var result = "";
                     var value = eval($scope.showExpression);
@@ -4262,6 +4550,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 $scope.selectedItem = undefined;
             };
         }
+        controller.$inject = ["$scope", "$sce", "$timeout"];
     });
 })();
 
@@ -4284,6 +4573,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                 }
             };
         }
+        directive.$inject = ["SecureService"];
     });
 })();
 
@@ -4305,6 +4595,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "hasRight",
             value: function hasRight(right) {
                 var result = false;
+                console.log("secure find right : ", right);
                 _.each(model.me.authorizedActions, function (authorizedAction) {
                     if (authorizedAction.displayName === right) {
                         result = true;
@@ -4319,6 +4610,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
         module.service("SecureService", SecureService);
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.directive('structureDropDown', function () {
+            return {
+                restrict: "E",
+                template: '\n                <diary-drop-down\n                    ng-if="!(hideIfSolo && structureList.length === 1)"\n                    placeholder="select.structure"\n                    list="structureList"\n                    selected="structure"\n                    nullable="false"\n                    property="name">\n                </diary-drop-down>\n                ',
+                scope: {
+                    structure: "=",
+                    hideIfSolo: "=",
+                    isHidden: "="
+                },
+                controller: ["$scope", function controller($scope) {
+                    $scope.structureList = [];
+                    var i = 0;
+                    model.me.structures.forEach(function (structure) {
+                        $scope.structureList.push({
+                            id: structure,
+                            name: model.me.structureNames[i++]
+                        });
+                    });
+                    if (!$scope.structure) {
+                        $scope.structure = $scope.structureList[0];
+                    }
+                    $scope.isHidden = $scope.hideIfSolo && $scope.structureList.length === 1;
+                }]
+            };
+        });
     });
 })();
 
@@ -4606,6 +4931,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return $sce.trustAsHtml(text);
             };
         }
+        filter.$inject = ["$sce"];
     });
 })();
 
@@ -4649,6 +4975,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	'use strict';
 
 	AngularExtensions.addModuleConfig(function (module) {
+		module.filter('sameDate', filter);
+
+		function filter() {
+			return function (items, properties) {
+				var d = properties[Object.keys(properties)[0]];
+				if (!d) {
+					return items;
+				}
+				var valueCompare = moment(d);
+				var result = items.filter(function (item) {
+					var valueItem = moment(item[Object.keys(item)[0]]);
+					return valueItem.isSame(valueCompare, 'd');
+				});
+				console.log(result);
+				return result;
+			};
+		}
+	});
+})();
+
+'use strict';
+
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
 		module.filter('translate', filter);
 
 		function filter() {
@@ -4672,7 +5024,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return $sce.trustAsHtml(text);
 			};
 		}
+		filter.$inject = ["$sce"];
 	});
+})();
+
+"use strict";
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("HistoryController", controller);
+
+        function controller($scope, HistoryService) {
+            var vm = this;
+            init();
+            function init() {
+                HistoryService.getFilters(model.me.structures[0]).then(function (histories) {
+                    vm.yearHistories = histories;
+                });
+            }
+
+            vm.loadpdf = function (key) {
+                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, key);
+            };
+        }
+        controller.$inject = ["$scope", "HistoryService"];
+    });
 })();
 
 'use strict';
@@ -4682,7 +5061,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(function ($httpProvider) {
+        module.config(["$httpProvider", function ($httpProvider) {
             $httpProvider.interceptors.push(['$q', '$location', function ($q, $location) {
 
                 function parseError(e) {
@@ -4697,8 +5076,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return {
                     'responseError': function responseError(response) {
                         if (response.status === 400) {
-                            console.warn("error execution request");
-                            console.warn(response);
                             var error = parseError(response.data);
                             notify.error(error.error);
                         }
@@ -4706,7 +5083,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 };
             }]);
-        });
+        }]);
     });
 })();
 
@@ -5297,9 +5674,13 @@ Lesson.prototype.deleteList = function (lessons, cb, cbe) {
 Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
     var lesson = this;
+    var url = '/diary/lesson/';
+    if (model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)) {
+        url = '/diary/lesson/external/';
+    }
 
     var load = function load() {
-        http().get('/diary/lesson/' + lesson.id).done(function (data) {
+        http().get(url + lesson.id).done(function (data) {
             lesson.updateData(model.LessonService.mapLesson(data));
 
             if (loadHomeworks) {
@@ -5813,6 +6194,7 @@ Teacher.prototype.create = function (cb, cbe) {
                 vm.editLesson(vm.selectedContent()[0].id);
             };
         }
+        controller.$inject = ["$scope", "$rootScope", "ProgressionService", "$timeout", "$routeParams"];
     });
 })();
 
@@ -6084,6 +6466,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             };
         }
+        controller.$inject = ["$scope", "$location", "ProgressionService"];
     });
 })();
 
@@ -6124,6 +6507,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             });
         }
+        controller.$inject = ["$scope", "$rootScope", "ProgressionService"];
     });
 })();
 
@@ -6157,8 +6541,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
 
-        module.config(function ($routeProvider) {
+        module.config(["$routeProvider", function ($routeProvider) {
             $routeProvider
+            //show history
+            .when('/showHistoryView', {
+                action: 'showHistoryView'
+            })
             // manage visa
             .when('/manageVisaView/:teacherId', {
                 action: 'manageVisaView'
@@ -6178,6 +6566,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 action: 'createHomeworkView'
             }).when('/editLessonView/:idLesson', {
                 action: 'editLessonView'
+            }).when('/showLessonView/:idLesson', {
+                action: 'showLessonView'
             })
             // opens lesson and set default tab view to homeworks one
             .when('/editLessonView/:idLesson/:idHomework', {
@@ -6197,7 +6587,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             .otherwise({
                 action: 'calendarView'
             });
-        });
+        }]);
     });
 })();
 
@@ -6463,6 +6853,85 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     'use strict';
 
     /*
+     * History service as class
+     * used to manipulate History model
+     */
+
+    var HistoryService = function () {
+        function HistoryService($http, $q, constants) {
+            _classCallCheck(this, HistoryService);
+
+            this.$http = $http;
+            this.$q = $q;
+            this.constants = constants;
+        }
+
+        _createClass(HistoryService, [{
+            key: 'getFilters',
+            value: function getFilters(structureId) {
+                var url = '/diary/history/filters';
+
+                return this.$http({
+                    method: 'GET',
+                    url: url,
+                    params: {
+                        structureId: structureId
+                    }
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getPdfArchive',
+            value: function getPdfArchive(yearLabel, type, key) {
+                var url = '/diary/history/pdf';
+
+                var params = {
+                    yearLabel: yearLabel
+                };
+
+                if (type === 'teacher') {
+                    params.teacherId = key;
+                } else {
+                    params.audienceId = key;
+                }
+
+                this.$http({
+                    url: url,
+                    method: "GET",
+                    params: params,
+                    responseType: 'arraybuffer'
+                }).success(function (data, status, headers, config) {
+                    var blob = new Blob([data], { type: " application/pdf" });
+                    var date = moment().format("YYYY-MM-DD_HH-mm-ss");
+                    var fileName = 'ent-archive-generation_' + yearLabel + '_' + date + '.pdf';
+                    saveAs(blob, fileName);
+                }).error(function (data, status, headers, config) {
+                    //upload failed
+                });
+            }
+        }]);
+
+        return HistoryService;
+    }();
+    /* create singleton */
+
+
+    AngularExtensions.addModuleConfig(function (module) {
+        module.service("HistoryService", HistoryService);
+    });
+})();
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+(function () {
+    'use strict';
+
+    /*
     * Homework service as class
     * used to manipulate Homework model
     */
@@ -6499,6 +6968,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 return this.$http.get(urlGetHomeworks).then(function (result) {
                     return _this.mappHomework(result.data);
+                });
+            }
+        }, {
+            key: 'getOtherHomeworks',
+            value: function getOtherHomeworks(userStructuresIds, mondayOfWeek, teacher, audience) {
+                var _this2 = this;
+
+                var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+                var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+                var type = teacher ? "teacher" : "audience";
+                var id = teacher ? teacher.key : audience.key;
+
+                var urlGetHomeworks = '/diary/homework/external/' + userStructuresIds + '/' + start + '/' + end + '/' + type + '/' + id;
+
+                return this.$http.get(urlGetHomeworks).then(function (result) {
+                    return _this2.mappHomework(result.data);
                 });
             }
 
@@ -6595,16 +7081,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
                 var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
 
-                var urlGetHomeworks = '/diary/lesson/' + userStructuresIds + '/' + start + '/' + end + '/';
+                var urlGetLessons = '/diary/lesson/' + userStructuresIds + '/' + start + '/' + end + '/';
 
                 if (isUserParent && childId) {
-                    urlGetHomeworks += childId;
+                    urlGetLessons += childId;
                 } else {
-                    urlGetHomeworks += '%20';
+                    urlGetLessons += '%20';
                 }
 
-                return this.$http.get(urlGetHomeworks).then(function (result) {
+                return this.$http.get(urlGetLessons).then(function (result) {
                     return _this.mappLessons(result.data);
+                });
+            }
+        }, {
+            key: 'getOtherLessons',
+            value: function getOtherLessons(userStructuresIds, mondayOfWeek, teacher, audience) {
+                var _this2 = this;
+
+                var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+                var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+                var type = teacher ? "teacher" : "audience";
+                var id = teacher ? teacher.key : audience.key;
+
+                var urlGetLessons = '/diary/lesson/external/' + userStructuresIds + '/' + start + '/' + end + '/' + type + '/' + id;
+
+                return this.$http.get(urlGetLessons).then(function (result) {
+                    return _this2.mappLessons(result.data);
                 });
             }
 
@@ -6615,10 +7118,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'mappLessons',
             value: function mappLessons(lessons) {
-                var _this2 = this;
+                var _this3 = this;
 
                 return _.map(lessons, function (lessonData) {
-                    return _this2.mapLesson(lessonData);
+                    return _this3.mapLesson(lessonData);
                 });
             }
 
@@ -6670,7 +7173,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     is_periodic: false,
                     homeworks: lessonHomeworks,
                     tooltipText: '',
-                    locked: !model.canEdit() ? true : false
+                    locked: !model.canEdit() ? true : lessonData.locked
                 };
                 lesson.subject = new Subject();
                 lesson.subject.label = lessonData.subject_label;
@@ -7086,10 +7589,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         _createClass(VisaService, [{
             key: 'getFilters',
-            value: function getFilters(userStructuresId) {
+            value: function getFilters(structureId) {
 
-                var url = '/diary/visa/filters/' + userStructuresId;
+                var url = '/diary/visa/filters/' + structureId;
 
+                return this.$http.get(url).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getInspectorFilters',
+            value: function getInspectorFilters(structureId, inspectorId) {
+                var url = '/diary/visa/filtersinspector/' + structureId + '/' + inspectorId;
                 return this.$http.get(url).then(function (result) {
                     return result.data;
                 });
@@ -7106,7 +7617,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         teacherId: filter.teacher ? filter.teacher.key : undefined,
                         audienceId: filter.audience ? filter.audience.key : undefined,
                         subjectId: filter.subject ? filter.subject.key : undefined,
-                        showTodoOnly: filter.state ? filter.state.key = "TODO" ? true : undefined : undefined
+                        todoOnly: filter.state ? filter.state.key == "TODO" ? true : undefined : undefined
                     }
                 }).then(function (result) {
                     return result.data;
@@ -7114,12 +7625,74 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: 'applyVisa',
-            value: function applyVisa(_applyVisa) {
-                var url = '/diary/visa/apply';
+            value: function applyVisa(_applyVisa, lock) {
+                var url = '/diary/visa/apply/' + lock;
                 return this.$http({
                     url: url,
                     method: 'POST',
                     data: _applyVisa
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getLessonForVisa',
+            value: function getLessonForVisa(resultVisaList) {
+                var url = '/diary/visa/lessons';
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: resultVisaList
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getPdfForVisa',
+            value: function getPdfForVisa(resultVisaList) {
+                var url = '/diary/visa/pdf';
+                this.$http({
+                    url: url,
+                    method: "POST",
+                    data: resultVisaList,
+                    responseType: 'arraybuffer'
+                }).success(function (data, status, headers, config) {
+                    var blob = new Blob([data], { type: " application/pdf" });
+                    var date = moment().format("YYYY-MM-DD_HH-mm-ss");
+                    var fileName = 'ent-visa-generation_' + date + '.pdf';
+                    saveAs(blob, fileName);
+                }).error(function (data, status, headers, config) {
+                    //upload failed
+                });
+            }
+        }, {
+            key: 'applyInspectorRight',
+            value: function applyInspectorRight(structureId, inspectorId, teachers) {
+                var url = '/diary/inspect/right/' + structureId + '/' + inspectorId;
+                return this.$http({
+                    url: url,
+                    method: "POST",
+                    data: teachers
+                });
+            }
+        }, {
+            key: 'getInspectTeachers',
+            value: function getInspectTeachers(structureId, inspectorId) {
+                var url = '/diary/inspect/getTeacher/' + structureId + '/' + inspectorId;
+                return this.$http({
+                    url: url,
+                    method: 'GET'
+                }).then(function (result) {
+                    return result.data;
+                });
+            }
+        }, {
+            key: 'getInspectorList',
+            value: function getInspectorList() {
+                var url = '/diary/inspect/getInspectors';
+                return this.$http({
+                    url: url,
+                    method: 'GET'
                 }).then(function (result) {
                     return result.data;
                 });
@@ -7143,26 +7716,135 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     AngularExtensions.addModuleConfig(function (module) {
         //controller declaration
+        module.controller("HabilitationController", controller);
+
+        function controller($scope, $rootScope, VisaService, $timeout) {
+            var vm = this;
+
+            function init() {
+                vm.filter = {};
+                vm.getInspector(model.me.structures[0]);
+                vm.rended = true;
+
+                //watch change inspector
+                $scope.$watch(function () {
+                    return vm.filter.inspector;
+                }, function (n, o) {
+                    if (o !== n && n) {
+                        vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
+                    }
+                });
+
+                //watch change teacher
+                $scope.$watch(function () {
+                    return vm.filter.teacher;
+                }, function (n, o) {
+                    if (o !== n && n) {
+                        vm.selectTeacher(n.item);
+                        vm.filter.teacher = undefined;
+                    }
+                });
+            }
+            $timeout(init);
+
+            vm.selectTeacher = function (teacher) {
+                var existantTeacher = _.findWhere(vm.selectedTeachers, { 'key': teacher.key });
+                if (!existantTeacher) {
+                    vm.selectedTeachers.push(teacher);
+                    vm.dirty = true;
+                }
+            };
+
+            vm.getInspector = function (structureId) {
+                vm.filter.teacher = undefined;
+                VisaService.getInspectorList().then(function (inspectors) {
+                    vm.filters = {
+                        inspectors: inspectors
+                    };
+                });
+                vm.dirty = true;
+            };
+            vm.removeTeacher = function (teacher) {
+                vm.selectedTeachers = _.filter(vm.selectedTeachers, function (t) {
+                    return t.key !== teacher.key;
+                });
+                vm.dirty = true;
+            };
+            vm.cancel = function () {
+                vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
+            };
+
+            vm.getInspectTeachers = function (structureId, inspectorId) {
+                vm.filters.teachers = undefined;
+                vm.selectedTeachers = undefined;
+                vm.filter.teacher = undefined;
+                vm.dirty = false;
+                VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then(function (result) {
+                    //console.log(result);
+                    vm.filters.teachers = result.availableTeachers;
+                    vm.selectedTeachers = result.onInspectorTeachers;
+                });
+            };
+
+            vm.save = function () {
+                VisaService.applyInspectorRight(vm.structure.id, vm.filter.inspector.key, vm.selectedTeachers).then(function () {
+                    vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
+                    vm.dirty = false;
+                });
+            };
+        }
+        controller.$inject = ["$scope", "$rootScope", "VisaService", "$timeout"];
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
         module.controller("VisaManagerController", controller);
 
-        function controller($scope, $rootScope, $routeParams, VisaService) {
+        function controller($scope, $rootScope, $routeParams, VisaService, $window, $timeout, SecureService, constants) {
             var vm = this;
 
             vm.items = [{ name: 'teacher1' }, { name: 'teacher2' }];
             init();
             function init() {
-                VisaService.getFilters(model.me.structures[0]).then(function (filters) {
-                    vm.filters = filters;
-                    vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') },
-                    //{ key :'DID', value  :lang.translate('diary.visa.state.did')},
-                    { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
-                });
+                if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)) {
+                    VisaService.getFilters(model.me.structures[0]).then(function (filters) {
+                        vm.filters = filters;
+                        vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') }, { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
+                        vm.filter = {
+                            state: vm.filters.states[0]
+                        };
+                    });
+                } else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)) {
+                    VisaService.getInspectorFilters(model.me.structures[0], model.me.userId).then(function (filters) {
+                        vm.filters = filters;
+                        vm.filters.states = [{ key: 'TODO', value: lang.translate('diary.visa.state.todo') }, { key: 'ALL', value: lang.translate('diary.visa.state.all') }];
+                        vm.filter = {
+                            state: vm.filters.states[0]
+                        };
+                    });
+                }
             }
 
+            vm.listLessonHeight = function () {
+                vm.lessonHeight = $('.popup-visa-lesson-list .content').innerHeight() - $('.popup-visa-lesson-list .forheigth > h1').outerHeight() - $($('.popup-visa-lesson-list .forheigth > div')[0]).outerHeight() - 50 + 'px';
+                setTimeout(function () {
+                    vm.listLessonHeight();
+                    $scope.apply();
+                }, 500);
+            };
+
+            vm.searchAvailable = function () {
+                return vm.filter && (vm.filter.teacher || vm.filter.subject || vm.filter.audience);
+            };
             vm.search = function () {
                 VisaService.getAgregatedVisas(model.me.structures[0], vm.filter).then(function (result) {
                     vm.agregatedVisa = result;
-                    console.log(vm.agregatedVisa);
                 });
             };
 
@@ -7177,49 +7859,93 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             vm.calcRecapSelected = function () {
                 vm.recap = {
-                    nbLesson: vm.getNbLesson(),
-                    nbTeacher: vm.getNbProps("teacherId"),
-                    nbSubject: vm.getNbProps("subjectId"),
-                    nbAudience: vm.getNbProps("audienceId")
+                    nbLesson: vm.getNbLesson(vm.currentAgregVisas),
+                    nbTeacher: vm.getNbProps(vm.currentAgregVisas, "teacherId"),
+                    nbSubject: vm.getNbProps(vm.currentAgregVisas, "subjectId"),
+                    nbAudience: vm.getNbProps(vm.currentAgregVisas, "audienceId")
                 };
-                console.log("recap", vm.recap);
             };
 
-            vm.getNbLesson = function () {
-                return vm.selectedContent().reduce(function (acc, e) {
+            vm.getNbLesson = function (agregVisas) {
+                return agregVisas.reduce(function (acc, e) {
                     return acc + e.nbNotVised + (e.visas[0] ? e.visas[0].nbDirty : 0);
                 }, 0);
             };
 
-            vm.getNbProps = function (props) {
+            vm.getNbProps = function (agregVisas, props) {
                 var map = {};
-                vm.selectedContent().map(function (e) {
+                agregVisas.map(function (e) {
                     map[e[props]] = true;
                 });
                 return Object.keys(map).length;
             };
 
-            vm.applyVisa = function (withLock) {
-                var applyVisa = {
-                    comment: vm.comment,
-                    resultVisaList: vm.selectedContent(),
-                    ownerId: model.me.userId,
-                    ownerName: model.me.username,
-                    ownerType: 'director'
-                };
-                VisaService.applyVisa(applyVisa).then(function () {
-                    vm.search();
+            vm.createLightVisas = function (agregVisas) {
+                return _.map(agregVisas, function (e) {
+                    var result = angular.copy(e);
+                    delete result.visas;
+                    return result;
                 });
             };
 
-            vm.showSelected = function () {};
+            vm.applyVisa = function (withLock) {
+                applyVisa(vm.currentAgregVisas, withLock);
+            };
 
-            vm.pdf = function () {};
+            function applyVisa(agregVisas, lock) {
+                var applyVisa = {
+                    comment: vm.comment,
+                    resultVisaList: vm.createLightVisas(agregVisas),
+                    ownerId: model.me.userId,
+                    ownerName: model.me.username,
+                    ownerType: SecureService.hasRight(contants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
+                };
+                VisaService.applyVisa(applyVisa, lock).then(function () {
+                    vm.closeAllPopup();
+                    vm.search();
+                    //notify.info(lang.translate('progression.progression.saved'));
+                    notify.info(lang.translate("diary.visa.notify.saved"));
+                });
+            }
+
+            vm.closeAllPopup = function () {
+                $rootScope.$broadcast('closeallpop');
+            };
+
+            vm.showDetailVisa = function (agregVisa) {
+                vm.currentAgregVisas = [agregVisa];
+                VisaService.getLessonForVisa(vm.currentAgregVisas).then(function (lessons) {
+                    vm.selectedLessons = lessons;
+                });
+            };
+            vm.initSelectContent = function () {
+                vm.currentAgregVisas = vm.selectedContent();
+            };
+
+            vm.showSelected = function () {
+                vm.currentAgregVisas = vm.selectedContent();
+                VisaService.getLessonForVisa(vm.createLightVisas(vm.currentAgregVisas)).then(function (lessons) {
+                    vm.selectedLessons = lessons;
+                });
+            };
+
+            vm.checkAll = function (checkAll) {
+                vm.agregatedVisa.map(function (e) {
+                    if (e.nbNotVised + (e.visas[0] ? e.visas[0].nbDirty : 0) > 0) {
+                        e.selected = checkAll;
+                    }
+                });
+            };
+
+            vm.pdf = function () {
+                VisaService.getPdfForVisa(vm.createLightVisas(vm.currentAgregVisas));
+            };
         }
+        controller.$inject = ["$scope", "$rootScope", "$routeParams", "VisaService", "$window", "$timeout", "SecureService", "constants"];
     });
 })();
 
-"use strict";
+'use strict';
 
 /**
  * Default date format
@@ -7236,6 +7962,14 @@ function LessonAttachment() {}
 function Audience() {}
 function HomeworksLoad() {}
 function HomeworkType() {}
+
+model.getSecureService = function () {
+    return angular.injector(['ng', 'app']).get("SecureService");
+};
+
+model.getConstants = function () {
+    return angular.injector(['ng', 'app']).get("constants");
+};
 
 model.homeworksPerDayDisplayed = 1;
 /**
@@ -8023,6 +8757,7 @@ model.build = function () {
         item.day = data.day;
         item.turn_in = data.type_item == "lesson" ? "" : data.turn_in_type;
         item.selected = false;
+        item.locked = data.locked;
 
         if (data.day) {
             item.dayFormatted = moment(data.day).format("DD/MM/YYYY");
@@ -8504,5 +9239,3 @@ var sansAccent = function sansAccent(str) {
     return str;
 };
 
-
-//# sourceMappingURL=app.js.map

@@ -5,28 +5,56 @@
         //controller declaration
         module.controller("VisaManagerController", controller);
 
-        function controller($scope, $rootScope,$routeParams,VisaService) {
+        function controller($scope, $rootScope,$routeParams,VisaService,$window,$timeout,SecureService,constants) {
             let vm = this;
 
             vm.items = [{name : 'teacher1'},{name : 'teacher2'}];
             init();
             function init(){
-                VisaService.getFilters(model.me.structures[0]).then((filters)=>{
-                    vm.filters = filters;
-                    vm.filters.states = [
-                        { key : 'TODO', value :lang.translate('diary.visa.state.todo')},
-                        //{ key :'DID', value  :lang.translate('diary.visa.state.did')},
-                        { key :'ALL' , value :lang.translate('diary.visa.state.all')},
-                    ];
-                });
+                if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)){
+                    VisaService.getFilters(model.me.structures[0]).then((filters)=>{
+                        vm.filters = filters;
+                        vm.filters.states = [
+                            { key : 'TODO', value :lang.translate('diary.visa.state.todo')},
+                            { key :'ALL' , value :lang.translate('diary.visa.state.all')},
+                        ];
+                        vm.filter = {
+                            state : vm.filters.states[0]
+                        };
+                    });
+                }else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)){
+                    VisaService.getInspectorFilters(model.me.structures[0],model.me.userId).then((filters)=>{
+                        vm.filters = filters;
+                        vm.filters.states = [
+                            { key : 'TODO', value :lang.translate('diary.visa.state.todo')},
+                            { key :'ALL' , value :lang.translate('diary.visa.state.all')},
+                        ];
+                        vm.filter = {
+                            state : vm.filters.states[0]
+                        };
+                    });
+                }
+
             }
 
+            vm.listLessonHeight = function(){
+                vm.lessonHeight = ($('.popup-visa-lesson-list .content').innerHeight() -
+                     $('.popup-visa-lesson-list .forheigth > h1').outerHeight() -
+                    $($('.popup-visa-lesson-list .forheigth > div')[0]).outerHeight() -
+                    50 ) + 'px';
+                setTimeout(()=>{
+                    vm.listLessonHeight();
+                    $scope.apply();
+                },500);
+            };
+
+            vm.searchAvailable = function(){
+              return vm.filter && (vm.filter.teacher || vm.filter.subject || vm.filter.audience);
+            };
             vm.search = function(){
                 VisaService.getAgregatedVisas(model.me.structures[0],vm.filter).then((result)=>{
                     vm.agregatedVisa = result;
-                    console.log(vm.agregatedVisa);
                 });
-
             };
 
             vm.selectedContent = function(){
@@ -40,48 +68,89 @@
 
             vm.calcRecapSelected = function(){
                 vm.recap = {
-                    nbLesson : vm.getNbLesson(),
-                    nbTeacher : vm.getNbProps("teacherId"),
-                    nbSubject : vm.getNbProps("subjectId"),
-                    nbAudience : vm.getNbProps("audienceId")
+                    nbLesson : vm.getNbLesson(vm.currentAgregVisas),
+                    nbTeacher : vm.getNbProps(vm.currentAgregVisas,"teacherId"),
+                    nbSubject : vm.getNbProps(vm.currentAgregVisas,"subjectId"),
+                    nbAudience : vm.getNbProps(vm.currentAgregVisas,"audienceId")
                 };
-                console.log("recap",vm.recap);
             };
 
-            vm.getNbLesson = function(){
-                return vm.selectedContent().reduce((acc,e) =>{
+            vm.getNbLesson = function(agregVisas){
+                return agregVisas.reduce((acc,e) =>{
                     return acc +
                       e.nbNotVised + (e.visas[0] ? e.visas[0].nbDirty : 0);
                 },0);
             };
 
-            vm.getNbProps = function(props){
+            vm.getNbProps = function(agregVisas,props){
                 let map = {};
-                vm.selectedContent().map((e)=>{
+                agregVisas.map((e)=>{
                     map[e[props]] = true;
                 });
                 return Object.keys(map).length;
             };
 
+            vm.createLightVisas = function(agregVisas){
+                return _.map(agregVisas,(e)=>{
+                  let result = angular.copy(e);
+                  delete result.visas;
+                  return result;
+              });
+          };
+
             vm.applyVisa = function(withLock){
+                applyVisa(vm.currentAgregVisas,withLock);
+            };
+
+
+            function applyVisa(agregVisas,lock){
                 let applyVisa = {
                     comment : vm.comment,
-                    resultVisaList:vm.selectedContent(),
+                    resultVisaList: vm.createLightVisas(agregVisas),
                     ownerId : model.me.userId,
                     ownerName : model.me.username,
-                    ownerType : 'director'
+                    ownerType : SecureService.hasRight(contants.RIGHTS.VISA_ADMIN) ? 'director' : 'inspector'
                 };
-                VisaService.applyVisa(applyVisa).then(()=>{
+                VisaService.applyVisa(applyVisa,lock).then(()=>{
+                    vm.closeAllPopup();
                     vm.search();
+                    //notify.info(lang.translate('progression.progression.saved'));
+                    notify.info(lang.translate("diary.visa.notify.saved"));
                 });
+            }
+
+            vm.closeAllPopup = function(){
+                $rootScope.$broadcast('closeallpop');
+            };
+
+            vm.showDetailVisa = function(agregVisa){
+                vm.currentAgregVisas = [agregVisa];
+                VisaService.getLessonForVisa(vm.currentAgregVisas).then((lessons) =>{
+                  vm.selectedLessons = lessons;
+                });
+            };
+            vm.initSelectContent = function(){
+                vm.currentAgregVisas = vm.selectedContent();
             };
 
             vm.showSelected = function(){
-
+                vm.currentAgregVisas = vm.selectedContent();
+                VisaService.getLessonForVisa(vm.createLightVisas(vm.currentAgregVisas)).then((lessons) =>{
+                  vm.selectedLessons = lessons;
+                });
             };
 
-            vm.pdf = function(){
+            vm.checkAll = function(checkAll){
+                vm.agregatedVisa.map((e)=>{
+                    if ((e.nbNotVised + (e.visas[0] ? e.visas[0].nbDirty : 0))  > 0){
+                        e.selected = checkAll;
+                    }
+                });
+            };
 
+
+            vm.pdf = function(){
+                VisaService.getPdfForVisa(vm.createLightVisas(vm.currentAgregVisas));
             };
         }
     });

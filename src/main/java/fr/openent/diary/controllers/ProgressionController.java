@@ -11,6 +11,7 @@ import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
@@ -25,29 +26,20 @@ import java.util.List;
 public class ProgressionController extends ControllerHelper {
     private ProgressionServiceImpl progressionService;
 
+
     public ProgressionController(ProgressionServiceImpl progressionService) {
         this.progressionService = progressionService;
     }
 
     @Get("/progression")
+    @SecuredAction("diary.manageProgression.list.progression")
     public void getProgression(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
                 if(user != null && user.getType().equals("Teacher")){
-                    progressionService.getProgressions(user.getUserId(), new Handler<HandlerResponse<List<Progression>>>() {
-                        @Override
-                        public void handle(HandlerResponse<List<Progression>> progressions) {
-                            if (!progressions.hasError()){
-                                request.response()
-                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                        .end(StringUtils.encodeJson(progressions.getResult()));
-                            }else{
-                                badRequest(request,progressions.getMessage());
-                            }
-                        }
-                    });
+                    progressionService.getProgressions(user.getUserId(), GenericHandlerResponse.<List<Progression>>handler(request));
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -56,7 +48,7 @@ public class ProgressionController extends ControllerHelper {
     }
 
     @Post("/progression")
-    @SecuredAction("diary.manageProgression")
+    @SecuredAction("diary.manageProgression.update.progression")
     public void postProgression(final HttpServerRequest request) {
         try {
             UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -72,18 +64,7 @@ public class ProgressionController extends ControllerHelper {
                                 } else {
                                     Progression progression =event.getResult();
                                     progression.setTeacherId(user.getUserId());
-                                    progressionService.createOrUpdateProgression(progression, new Handler<HandlerResponse<Progression>>() {
-                                        @Override
-                                        public void handle(HandlerResponse<Progression> event) {
-                                            if (event.hasError()) {
-                                                badRequest(request, event.getMessage());
-                                            } else {
-                                                request.response()
-                                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                                        .end(StringUtils.encodeJson(event.getResult()));
-                                            }
-                                        }
-                                    });
+                                    progressionService.createOrUpdateProgression(progression, GenericHandlerResponse.<Progression>handler(request));
                                 }
                             }
                         });
@@ -98,6 +79,7 @@ public class ProgressionController extends ControllerHelper {
     }
 
     @Delete("/progression/:progressionId")
+    @SecuredAction("diary.manageProgression.delete.progression")
     public void deleteProgression(final HttpServerRequest request) {
 
         final Long progressionId = Long.parseLong(request.params().get("progressionId"));
@@ -106,18 +88,7 @@ public class ProgressionController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if(user != null && user.getType().equals("Teacher")){
-                    progressionService.deleteProgression(progressionId, new Handler<GenericHandlerResponse>() {
-                        @Override
-                        public void handle(GenericHandlerResponse event) {
-                            if (!event.hasError()){
-                                request.response()
-                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                        .end("ok");
-                            }else{
-                                badRequest(request,event.getMessage());
-                            }
-                        }
-                    });
+                    progressionService.deleteProgression(progressionId, GenericHandlerResponse.genericHandle(request));
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -126,32 +97,22 @@ public class ProgressionController extends ControllerHelper {
     }
 
     @Delete("/progression/lessons")
+    @SecuredAction("diary.manageProgression.delete.items")
     public void deleteLesson(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-                if(user != null && user.getType().equals("Teacher")){
+                if(user != null && user.getType().equals("Teacher")) {
 
                     SqlMapper.mappListRequest(request, Long.class, new Handler<HandlerResponse<List<Long>>>() {
                         @Override
                         public void handle(HandlerResponse<List<Long>> event) {
-                            if (event.hasError()){
-                                badRequest(request,event.getMessage());
+                            if (event.hasError()) {
+                                badRequest(request, event.getMessage());
                                 return;
                             }
-                            progressionService.deleteLessonProgression(event.getResult(), new Handler<GenericHandlerResponse>() {
-                                @Override
-                                public void handle(GenericHandlerResponse event) {
-                                    if (!event.hasError()){
-                                        request.response()
-                                                .putHeader("content-type", "application/json; charset=utf-8")
-                                                .end("ok");
-                                    }else{
-                                        badRequest(request,event.getMessage());
-                                    }
-                                }
-                            });
+                            progressionService.deleteLessonProgression(event.getResult(), GenericHandlerResponse.genericHandle(request));
                         }
                     });
 
@@ -163,6 +124,7 @@ public class ProgressionController extends ControllerHelper {
     }
 
     @Get("/progression/:progressionId/lessons")
+    @SecuredAction("diary.manageProgression.list.items")
     public void getLessonProgression(final HttpServerRequest request) {
 
         final Long progressionId = Long.parseLong(request.params().get("progressionId"));
@@ -170,21 +132,8 @@ public class ProgressionController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
-                if(user != null && user.getType().equals("Teacher")){
-                    progressionService.getLessonProgression(user.getUserId(),progressionId, new Handler<HandlerResponse<List<LessonProgression>>>() {
-                        @Override
-                        public void handle(HandlerResponse<List<LessonProgression>> progressions) {
-                            if (!progressions.hasError()){
-                                request.response()
-                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                        .end(StringUtils.encodeJson(progressions.getResult()));
-                            }else{
-                                badRequest(request,progressions.getMessage());
-                            }
-                        }
-                    });
-                } else {
-                    unauthorized(request, "No user found in session.");
+                if (user != null && user.getType().equals("Teacher")) {
+                    progressionService.getLessonProgression(user.getUserId(), progressionId, GenericHandlerResponse.<List<LessonProgression>>handler(request));
                 }
             }
         });
@@ -192,6 +141,7 @@ public class ProgressionController extends ControllerHelper {
 
 
     @Get("/progression/lesson/:lessonId")
+    @SecuredAction("diary.manageProgression.detail.item")
     public void getLesson(final HttpServerRequest request) {
 
         final Long lessonId = Long.parseLong(request.params().get("lessonId"));
@@ -200,18 +150,7 @@ public class ProgressionController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if(user != null && user.getType().equals("Teacher")){
-                    progressionService.getLesson(user.getUserId(),lessonId, new Handler<HandlerResponse<LessonProgression>>() {
-                        @Override
-                        public void handle(HandlerResponse<LessonProgression> progressions) {
-                            if (!progressions.hasError()){
-                                request.response()
-                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                        .end(StringUtils.encodeJson(progressions.getResult()));
-                            }else{
-                                badRequest(request,progressions.getMessage());
-                            }
-                        }
-                    });
+                    progressionService.getLesson(user.getUserId(),lessonId, GenericHandlerResponse.<LessonProgression>handler(request));
                 } else {
                     unauthorized(request, "No user found in session.");
                 }
@@ -220,6 +159,7 @@ public class ProgressionController extends ControllerHelper {
     }
 
     @Post("/progression/lesson")
+    @SecuredAction("diary.manageProgression.update.item")
     public void postLessonProgression(final HttpServerRequest request) {
         try {
             UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -235,18 +175,7 @@ public class ProgressionController extends ControllerHelper {
                                 } else {
                                     LessonProgression lessonProgression = event.getResult();
                                     lessonProgression.setTeacherId(user.getUserId());
-                                    progressionService.createOrUpdateLessonProgression(event.getResult(), new Handler<HandlerResponse<LessonProgression>>() {
-                                        @Override
-                                        public void handle(HandlerResponse<LessonProgression> event) {
-                                            if (event.hasError()) {
-                                                badRequest(request, event.getMessage());
-                                            } else {
-                                                request.response()
-                                                        .putHeader("content-type", "application/json; charset=utf-8")
-                                                        .end(StringUtils.encodeJson(event.getResult()));
-                                            }
-                                        }
-                                    });
+                                    progressionService.createOrUpdateLessonProgression(event.getResult(), GenericHandlerResponse.<LessonProgression>handler(request));
                                 }
                             }
                         });
@@ -262,6 +191,7 @@ public class ProgressionController extends ControllerHelper {
 
 
     @Post("/progression/order")
+    @SecuredAction("diary.manageProgression.order")
     public void changerOrder(final HttpServerRequest request) {
         try {
             UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -276,16 +206,7 @@ public class ProgressionController extends ControllerHelper {
                                     badRequest(request, event.getMessage());
                                 } else {
                                     List<OrderLesson> orders = event.getResult();
-                                    progressionService.updateOrderLessonProgression(orders, new Handler<GenericHandlerResponse>() {
-                                        @Override
-                                        public void handle(GenericHandlerResponse event) {
-                                            if (event.hasError()){
-                                                badRequest(request,event.getMessage());
-                                            }else{
-                                                Renders.renderJson(request, new JsonObject().putString("status","ok"));
-                                            }
-                                        }
-                                    });
+                                    progressionService.updateOrderLessonProgression(orders, GenericHandlerResponse.genericHandle(request));
                                 }
                             }
                         });

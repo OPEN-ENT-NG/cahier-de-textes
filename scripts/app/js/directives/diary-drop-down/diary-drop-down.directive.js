@@ -10,7 +10,8 @@
                     placeholder: "@",
                     list: "=",
                     selected: "=",
-                    property: "@"
+                    property: "@",
+                    nullable:"="
                 },
                 controller: function($scope) {
                     $scope.selectItem = function(item) {
@@ -18,7 +19,9 @@
                             $scope.list.map((e) => {
                                 e.selected = false;
                             });
-                            item.selected = true;
+                            if (item){
+                                item.selected = true;
+                            }                            
                             $scope.selected = item;
                             $scope.listVisible = false;
                         }

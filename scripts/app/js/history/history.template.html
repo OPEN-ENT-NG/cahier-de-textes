@@ -1,0 +1,73 @@
+<div class="page-history" ng-controller="HistoryController as historyCtrl" ng-init="historyCtrl.toogle='teacher'">
+    <h1>
+        <a href="#" ><i18n>diary.title</i18n> </a> >
+        <a href="" ><i18n>diary.history.title</i18n> </a>
+    </h1>
+    <div class="row filter">
+        <div class="cell two">
+            <input type="radio" class="radiobutton" value="teacher" name="filter" ng-model="historyCtrl.toogle" />
+            <label><i18n>enseignant</i18n></label>
+        </div>
+        <div class="cell two">
+            <input type="radio"  class="radiobutton"  value="audience" name="filter" ng-model="historyCtrl.toogle" />
+            <label><i18n>diary.audience.class</i18n></label>
+        </div>
+        <div class="cell four">
+            <input type="text"
+                style="background-color: white;"
+                translate attr="placeholder"
+                placeholder="diary.quicksearch.zoomlabel"
+                ng-model="historyCtrl.filter"  />
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="pedagogic-day-container">
+            <ul>
+                <li ng-repeat="yearItem in historyCtrl.yearHistories ">
+                    <div class="pedagogic-day-card" ng-class="{' selected' : yearItem === historyCtrl.selectedYearItem }" ng-click="historyCtrl.selectedYearItem=yearItem">
+                        <div class="thumbnail" ng-class="{' thumb-selected' : yearItem === historyCtrl.selectedYearItem }">
+                            [[yearItem.yearLabel]]
+                        </div>
+                        <div class="summary" ng-class="{' sum-selected' : yearItem === historyCtrl.selectedYearItem }">
+                            [[historyCtrl.toogle==='teacher' ? yearItem.teachers.length : yearItem.audiences.length]]
+                            <i ng-class="{'user' : historyCtrl.toogle==='teacher', 'users' : historyCtrl.toogle!=='teacher'}" class="icon user table-cell-left"></i>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="pedagogic-item-container"  ng-if="!historyCtrl.selectedYearItem">
+          <div class="row visa-tab-content">
+            <div class="content-not-found"  >
+                <div>
+                    <i class="icon left "></i>
+                    <i18n style="white-space: initial;">diary.history.help.select</i18n>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="pedagogic-item-container">
+            <ul class="scrollbar-fine">
+                <li ng-repeat="item in ((historyCtrl.toogle==='teacher' ? historyCtrl.selectedYearItem.teachers : historyCtrl.selectedYearItem.audiences) | filter : {'value' : historyCtrl.filter})">
+                    <article class="notification progression-article hover-orange ">
+
+                        <div class=" history-detail-icon sum-selected">
+                            <i ng-class="{'user' : historyCtrl.toogle==='teacher', 'users' : historyCtrl.toogle!=='teacher'}" class="icon user table-cell-left"></i>
+                        </div>
+                        <div class="">
+                            <label>[[item.value]]</label>
+                        </div>
+                        <div class="download right-magnet">
+                            <i class="icon  file-pdf table-cell-left"
+                                ng-click="historyCtrl.loadpdf(item.key)"
+                            diary-tooltip="diary.download.pdf"></i>
+                        </div>
+
+                    </article>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

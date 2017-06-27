@@ -5,6 +5,10 @@
 
         module.config(function($routeProvider) {
             $routeProvider
+                //show history
+                .when('/showHistoryView', {
+                    action: 'showHistoryView'
+                })
                 // manage visa
                 .when('/manageVisaView/:teacherId', {
                     action: 'manageVisaView'
@@ -26,6 +30,9 @@
                 })
                 .when('/editLessonView/:idLesson', {
                     action: 'editLessonView'
+                })
+                .when('/showLessonView/:idLesson', {
+                    action: 'showLessonView'
                 })
                 // opens lesson and set default tab view to homeworks one
                 .when('/editLessonView/:idLesson/:idHomework', {

@@ -11,15 +11,13 @@
 
                         if (!error.error){
                           error.error = "diary.error.unknown";
-                        }                          
+                        }
                         return error;
                     }
 
                     return {
                         'responseError': function(response) {
-                            if(response.status === 400) {
-                                console.warn("error execution request");
-                                console.warn(response);
+                            if(response.status === 400) {                                
                                 let error = parseError(response.data);
                                 notify.error(error.error);
                             }

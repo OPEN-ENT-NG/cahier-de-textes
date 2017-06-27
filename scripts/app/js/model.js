@@ -15,6 +15,13 @@ function Audience() { }
 function HomeworksLoad(){}
 function HomeworkType(){}
 
+model.getSecureService = function(){
+    return angular.injector(['ng','app']).get("SecureService");
+};
+
+model.getConstants = function(){
+    return angular.injector(['ng','app']).get("constants");
+};
 
 model.homeworksPerDayDisplayed = 1;
 /**
@@ -837,6 +844,7 @@ model.build = function () {
         item.day = data.day;
         item.turn_in = (data.type_item == "lesson") ? "" : data.turn_in_type;
         item.selected = false;
+        item.locked = data.locked;
 
         if (data.day) {
             item.dayFormatted = moment(data.day).format("DD/MM/YYYY");

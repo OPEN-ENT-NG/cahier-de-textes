@@ -1,7 +1,12 @@
 package fr.openent.diary.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.util.KeyValueModel;
+import fr.openent.diary.utils.HandlerUtils;
 import fr.openent.diary.utils.SearchCriterion;
+import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.collections.Joiner;
@@ -19,6 +24,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -195,7 +201,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder queryLessons = new StringBuilder();
         queryLessons.append("SELECT distinct 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, s.original_subject_id as originalSubjectId, l.id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, l.lesson_title as title, l.lesson_room as room,")
-                .append(" l.lesson_color as color, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
+                .append(" l.lesson_color as color, l.locked as locked, l.lesson_state as state, l.lesson_date as day, l.lesson_start_time as start_time, l.lesson_end_time as end_time,")
                 .append(" date_part('hour', l.lesson_start_time) as time_order, l.lesson_description as description, ")
                 .append(" enum_first(null::diary.homework_turn_in_type) as turn_in_type ") // have to get a random enum else the UNION won't work!
                 .append(" FROM diary.lesson AS l")
@@ -208,7 +214,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder queryHomeworks = new StringBuilder();
         queryHomeworks.append("SELECT distinct 'homework' as type_item, ht.homework_type_label as type_homework, h.id as id, s.subject_label as subject,  s.original_subject_id as originalSubjectId, h.lesson_id as lesson_id,")
                 .append(" t.teacher_display_name as teacher, a.audience_label as audience, h.homework_title as title, '' as room,")
-                .append(" h.homework_color as color, h.homework_state as state, h.homework_due_date as day, null::time as start_time, null::time as end_time,")
+                .append(" h.homework_color as color, false as locked, h.homework_state as state, h.homework_due_date as day, null::time as start_time, null::time as end_time,")
                 .append(" 0 as time_order, h.homework_description as description, h.turn_in_type as turn_in_type")
                 .append(" FROM diary.homework AS h")
                 .append(" JOIN diary.teacher as t ON t.id = h.teacher_id")
@@ -511,4 +517,33 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         JsonObject params = new JsonObject().putArray("id",new JsonArray(childIds.toArray()));
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
+
+
+
+    @Override
+    public void listGroupsFromClassId(final String schoolId, String audienceId, final Handler<HandlerResponse<List<KeyValueModel>>> handler){
+        StringBuilder query = new StringBuilder("");
+        query.append("match (g:Group)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) where s.id={id} and c.id = {audienceId} return g.id as key, g.name as value");
+        JsonObject params = new JsonObject()
+                .putString("id",schoolId)
+                .putString("audienceId",audienceId);
+        neo.execute(query.toString(), params, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> event) {
+                if ("ok".equals(event.body().getString("status"))) {
+                    try {
+                        List<KeyValueModel> groups = SqlMapper.mapper.readValue(event.body().getArray("result").toString(),new TypeReference<List<KeyValueModel>>(){});
+                        HandlerResponse<List<KeyValueModel>> response = new HandlerResponse<List<KeyValueModel>>();
+                        response.setResult(groups);
+                        handler.handle(response);
+                    } catch (IOException e) {
+                        HandlerUtils.error(e,handler);
+                    }
+                }else{
+                    handler.handle(new HandlerResponse<List<KeyValueModel>>("error on listGroupFromClassID"));
+                }
+            }
+        });
+    }
+
 }

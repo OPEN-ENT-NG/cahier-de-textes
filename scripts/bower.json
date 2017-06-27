@@ -1,6 +1,7 @@
 {
   "name": "diary-app",
   "overrides": {},
-  "dependencies": {    
+  "dependencies": {
+    "file-saver" : "https://github.com/eligrey/FileSaver.js.git"
   }
 }

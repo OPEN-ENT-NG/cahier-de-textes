@@ -6,6 +6,12 @@ package fr.openent.diary.model.util;
 public class KeyValueModel {
     private String key;
     private String value;
+    public KeyValueModel(){}
+
+    public KeyValueModel(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     public String getKey() {
         return key;

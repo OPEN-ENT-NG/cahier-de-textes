@@ -2,12 +2,12 @@
       <div class="row visa-tab-header">
           <div class="cell five">
               <label class="checkbox">
-                  <input type="checkbox" ng-model="lesson.selected"/>
+                  <input type="checkbox" ng-model="checkall" ng-click="visaManagerCtrl.checkAll(checkall)"/>
                   <span></span>
               </label>
           </div>
           <div class="cell five">
-              Liste des scéances
+              <i18n>diary.visa.lesson.list</i18n>
           </div>
       </div>
       <div class="row visa-tab-content">
@@ -26,19 +26,21 @@
               <div class="row visa-lesson-content">
                   <div class="cell one">
                       <label class="checkbox">
-                          <input type="checkbox" ng-model="visaAgreg.selected"/>
+                          <input type="checkbox"
+                            ng-disabled="visaAgreg.nbNotVised + visaAgreg.visas[0].nbDirty == 0"
+                            ng-model="visaAgreg.selected"/>
                           <span></span>
                       </label>
                   </div>
                   <div class="cell five visa" >
                       <div class="row">
                           <div class="cell four date">
-                              Date visa :
+                              <i18n>diary.visa.date</i18n> :
                           </div>
                           <div class="cell eight">
                               <span ng-click="visaAgreg.expanded=!visaAgreg.expanded"
                                   ng-if="visaAgreg.visas.length > 0"
-                                  ng-class="{'dirty' : visaAgreg.visas[0].nbDirty , 'ok' : (visaAgreg.nbNotVised + visaAgreg.visas[0].nbDirty) === 0}">
+                                  ng-class="{'dirty' : visaAgreg.visas[0].nbDirty , 'ok' : (visaAgreg.visas[0].nbDirty) === 0}">
                                   [[visaAgreg.visas[0].dateCreate | date  : constants.CAL_DATE_PATTERN_NG]]
                               </span>
                               <span ng-if="visaAgreg.visas.length > 0"  ng-click="visaAgreg.expanded=!visaAgreg.expanded" >
@@ -47,7 +49,7 @@
                               </span>
                               <span
                                   ng-if="visaAgreg.visas.length == 0">
-                                  Non visé
+                                  <i18n>diary.visa.notvise</i18n>
                               </span>
                           </div>
                       </div>
@@ -55,7 +57,7 @@
                           <div class="cell four">&nbsp;</div>
                           <div class="cell eight">
                               <div ng-repeat="visa in visaAgreg.visas" >
-                                  <div ng-if="!$first" class="dateCreate">
+                                  <div ng-if="!$first" class="dateCreate" ng-class="{'dirty' :visa.nbDirty , 'ok' : (visaAgreg.visas[0].nbDirty) === 0}">
                                       [[visa.dateCreate | date  : constants.CAL_DATE_PATTERN_NG]]
                                   </div>
                                   <div class="owner">
@@ -69,11 +71,17 @@
                       </div>
                   </div>
                   <div class="cell three">
-                      Dernière saisie : [[visaAgreg.lastDateUpdate | date  : constants.CAL_DATE_PATTERN_NG]]
+                      <i18n>diary.visa.lastupdated</i18n> : [[visaAgreg.lastDateUpdate | date  : constants.CAL_DATE_PATTERN_NG]]
                   </div>
                   <div class="cell three">
-                      Scéances a viser : [[visaAgreg.nbNotVised + visaAgreg.visas[0].nbDirty]]
-                      <i class="external-link" ng-click="visaManagerCtrl.showDetailVisa(visaAgreg)">
+                      <i18n>diary.visa.lesson.tovise</i18n> : [[visaAgreg.nbNotVised + visaAgreg.visas[0].nbDirty]]
+                      <i class="external-link"
+                        ng-if="visaAgreg.nbNotVised + visaAgreg.visas[0].nbDirty > 0"
+                        ng-click="visaManagerCtrl.showDetailVisa(visaAgreg)"
+                        confirm-popup
+                        confirm-class="fullscreen popup-visa-lesson-list"
+                        confirm-template="/diary/public/js/visa/visa-lesson-list/visa-lesson-list.template.html"
+                        >
                       </i>
                   </div>
               </div>

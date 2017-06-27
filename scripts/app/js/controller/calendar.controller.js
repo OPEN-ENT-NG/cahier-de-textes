@@ -20,7 +20,7 @@
                 $scope.display.bShowCalendar = true;
                 $scope.display.bShowHomeworks = true;
                 $scope.display.bShowHomeworksMinified = false;
-                //$scope.showCal = false;
+
                 //calendar Params
                 $scope.calendarParams = {
                     isUserTeacher: $scope.isUserTeacher
@@ -30,6 +30,45 @@
                 $scope.$on('calendar.refreshItems', (_, item) => {
                     item.calendarUpdate();
                 });
+
+
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)){
+
+                    if (!model.filters){
+                        model.filters = {};
+                    }
+
+                    vm.teacher = model.filters.teacher;
+                    vm.audience = model.filters.audience;
+
+                    $scope.$watch(()=>{return vm.teacher;},(n,o)=>{
+                        if (n!==o && n){
+
+                            $timeout(()=>{
+                                model.filters.teacher = vm.teacher;
+                                model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(),
+                                    $scope.mondayOfWeek,
+                                    model.isUserParent,
+                                    model.child ? model.child.id : undefined);
+
+                            });
+                        }
+                    });
+                    $scope.$watch(()=>{return vm.audience;},(n,o)=>{
+                        if (n!==o && n){
+                            $timeout(()=>{
+                                model.filters.teacher = vm.teacher;
+                                model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(),
+                                    $scope.mondayOfWeek,
+                                    model.isUserParent,
+                                    model.child ? model.child.id : undefined);
+                            });
+
+                        }
+                    });
+                }
             }
 
             //watch delete or add
@@ -44,7 +83,9 @@
             });
 
             $scope.$watch('routeParams', function(n, o) {
-
+                if ($location.path().indexOf("calendarView") === -1 && $location.path()!==""){
+                    return;
+                }
                 var mondayOfWeek = moment();
                 // mondayOfWeek as string date formatted YYYY-MM-DD
                 if ($scope.routeParams.mondayOfWeek) {
@@ -171,8 +212,6 @@
                 // need reload lessons or homeworks if week changed
                 var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
 
-                //$scope.lesson = null;
-                //$scope.homework = null;
 
 
                 refreshDatas(UtilsService.getUserStructuresIdsAsString(),
@@ -182,11 +221,22 @@
             };
 
 
-
             function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
-
-                var p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
-                var p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                var p1;
+                var p2;
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)){
+                    let teacherItem = vm.teacher ? vm.teacher.item : undefined;
+                    if (!teacherItem && !vm.audience){
+                        p1 = $q.when([]);
+                        p2 = $q.when([]);
+                    }else{
+                        p1 = LessonService.getOtherLessons([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
+                        p2 = HomeworkService.getOtherHomeworks([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
+                    }
+                }else{
+                    p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
+                    p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                }
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
@@ -206,7 +256,7 @@
                     $scope.modelWeeks = results[3];
 
                     let p;
-                    if (!$scope.courses || $scope.courses.length === 0){
+                    if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)){
                         p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses)=>{
                             $scope.courses = modelCourses;
                         });

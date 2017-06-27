@@ -4,7 +4,7 @@ CREATE TABLE diary.visa (
     id bigserial,
 
     comment text,
-    dateCreate date,
+    dateCreate timestamp,
 
     structureId character varying(60) not null,
 

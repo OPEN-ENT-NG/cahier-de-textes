@@ -34,6 +34,20 @@
             });
         }
 
+        getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience){
+            var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+            var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+            let type = teacher ? "teacher" : "audience";
+            let id = teacher ? teacher.key : audience.key;
+
+            var urlGetHomeworks = `/diary/homework/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
+
+            return this.$http.get(urlGetHomeworks).then((result)=>{
+                return this.mappHomework(result.data);
+            });
+        }
+
         /*
         *   Mapp homeworks
         */

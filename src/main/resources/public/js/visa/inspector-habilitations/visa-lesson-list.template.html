@@ -1,0 +1,35 @@
+<div  class="forheigth" ng-controller="HabilitationController as habilitationCtrl">
+    <h1>
+        <a href="" >Habilitation des inspecteurs </a>
+    </h1>
+    <br/>
+    <br/>
+    <div class="row">
+        <div class="cell four">
+            <structure-drop-down
+                hide-if-solo="false"
+                structure="habilitationCtrl.structure">
+            </structure-drop-down>
+        </div>
+        <div class="cell four">
+            <label>Sélectionnez l'inspecteur</label>
+            <diary-drop-down
+                placeholder="select.group.or.class"
+                list="habilitationCtrl.filters.subjects"
+                selected="habilitationCtrl.filter.subject"
+                nullable="true"
+                property="value">
+            </diary-drop-down>
+        </div>
+        <div class="cell four">
+            <label>Selectionnez un professeur pour l'ajouter</label>
+            <search-drop-down
+              items = "habilitationCtrl.filters.teachers"
+              place-holder ="Professeur"
+              selected-item="habilitationCtrl.filter.teacher"
+              show-expression="item.value"
+          ></search-drop-down>
+        </div>
+    </div>
+
+</div>

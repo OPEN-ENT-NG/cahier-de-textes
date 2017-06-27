@@ -3,7 +3,9 @@ diary-drop-down{
       float: left;
       display: block;
       width: 100%;
-
+      .dropdown-display>span{
+        overflow: hidden;
+      }
    div {
       width: 100%;
       float: left;
@@ -61,7 +63,7 @@ diary-drop-down{
    div.dropdown-list {
       float: left;
       width: 100%;
-      z-index: 1000;
+      z-index: 1001;
       position: relative;
       transform: scale(1, 0);
       transition: transform ease 250ms;
@@ -69,6 +71,8 @@ diary-drop-down{
       margin-top: -10px;
   }
    div.dropdown-list-content {
+     max-height: 350px;
+     overflow: auto;
       position: absolute;
       z-index: 2;
       cursor: pointer;

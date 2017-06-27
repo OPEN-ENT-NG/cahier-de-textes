@@ -12,3 +12,4 @@ CREATE TABLE diary.modelweek (
         REFERENCES diary.teacher(id) ON DELETE CASCADE
 );
 
+

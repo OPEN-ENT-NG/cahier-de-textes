@@ -1,7 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.*;
+import fr.openent.diary.model.general.*;
 import fr.openent.diary.utils.DateUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -73,7 +73,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
             StringBuilder homeworkAggregate = new StringBuilder();
             homeworkAggregate.append("(select json_agg(DISTINCT h.id) FILTER (WHERE h.id IS NOT NULL");
-            if (ctx != Context.TEACHER) {
+            if (ctx != Context.TEACHER || ctx == Context.EXTERNAL) {
                 homeworkAggregate.append(" AND to_timestamp(to_char(l.lesson_date, 'YYYY-MM-DD') || ' ' || to_char(l.lesson_end_time, 'hh24:mi:ss'), 'YYYY-MM-DD hh24:mi:ss') > localtimestamp ");
             }
 
@@ -85,7 +85,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
-                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, ")
+                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
                     .append(" s.original_subject_id as original_subject_id , ")
                     .append(" att.attachments, ")
                     .append(homeworkAggregate.toString())
@@ -100,7 +100,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
             parameters.add(startDate).add(endDate);
 
-            if (ctx == Context.STUDENT || ctx == Context.PARENT) {
+            if (ctx == Context.STUDENT || ctx == Context.PARENT || ctx == Context.EXTERNAL) {
                 query.append(" AND l.lesson_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
             }
 
@@ -123,7 +123,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
             parameters.add(userId);
 
-            if (ctx == Context.TEACHER) {
+            if (ctx == Context.TEACHER || ctx == Context.EXTERNAL) {
                 // retrieve lessons whose we are owner and those we have gestionnaire right on
                 query.append(" AND (l.owner = ? OR ls.action = ?) ");
                 parameters.add(userId);
@@ -142,15 +142,27 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     }
 
         /**
-         *
-         * @param schoolIds Schools the teacher belong to
-         * @param startDate
-         * @param endDate
-         * @param handler
-         */
+     *
+     * @param schoolIds Schools the teacher belong to
+     * @param startDate
+     * @param endDate
+     * @param handler
+     */
     @Override
     public void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
         getLessons(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, handler);
+    }
+
+    /**
+     *
+     * @param schoolIds Schools the inspecteur belong to
+     * @param startDate
+     * @param endDate
+     * @param handler
+     */
+    @Override
+    public void getAllLessonsForExternal(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.EXTERNAL, userId, schoolIds, memberIds, startDate, endDate, handler);
     }
 
     @Override

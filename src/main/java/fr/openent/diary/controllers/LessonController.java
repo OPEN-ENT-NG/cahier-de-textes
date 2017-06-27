@@ -1,8 +1,13 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.LessonAccessFilter;
+import fr.openent.diary.model.GenericHandlerResponse;
+import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.general.Context;
+import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.services.*;
-import fr.openent.diary.utils.Audience;
+import fr.openent.diary.model.general.Audience;
+import fr.openent.diary.utils.HandlerUtils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -24,7 +29,6 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
@@ -92,6 +96,78 @@ public class LessonController extends ControllerHelper {
         }
     }
 
+    @Get("/lesson/external/:id")
+    @ApiDoc("Get a lesson using its identifier")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getExternalLesson(final HttpServerRequest request) {
+        final String lessonId = request.params().get("id");
+
+        if (isValidLessonId(lessonId)) {
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(final UserInfos user) {
+                    if (user != null) {
+                        lessonService.retrieveLesson(lessonId, notEmptyResponseHandler(request, 201));
+                    } else {
+                        log.debug("User not found in session.");
+                        unauthorized(request, "No user found in session.");
+                    }
+                }
+            });
+        } else {
+            badRequest(request,"Invalid lesson identifier.");
+        }
+    }
+
+
+    @Get("/lesson/external/:etabIds/:startDate/:endDate/:type/:userid")
+    @ApiDoc("Get all lessons for etab")
+    @SecuredAction(value = list_lessons, type = ActionType.AUTHENTICATED)
+    public void listLessonsExternal(final HttpServerRequest request) {
+        final String[] schoolIds = request.params().get("etabIds").split(":");
+        final String startDate = request.params().get("startDate");
+        final String endDate = request.params().get("endDate");
+        final String type = request.params().get("type");
+        final String id = request.params().get("userid");
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if(user != null){
+                    // see UserInfoAdapterV1_0Json.java from entcore for user types
+                    switch (type) {
+                        case "teacher": {
+                            List<String> memberIds = new ArrayList<>();
+                            memberIds.add(id);
+                            lessonService.getAllLessonsForExternal(id, Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        }
+                        case "audience": {
+
+                            diaryService.listGroupsFromClassId(schoolIds[0], id, new Handler<HandlerResponse<List<KeyValueModel>>>() {
+                                @Override
+                                public void handle(HandlerResponse<List<KeyValueModel>> event) {
+                                    if (event.hasError()){
+                                        badRequest(request,event.getMessage());
+                                    }else{
+                                        List<String> memberIds = new ArrayList<>();
+                                        for (KeyValueModel group : event.getResult()){
+                                            memberIds.add(group.getKey());
+                                        }
+                                        lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                                    }
+
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    unauthorized(request,"No user found in session.");
+                }
+            }
+        });
+    }
+
 
     @Get("/lesson/:etabIds/:startDate/:endDate/:childId")
     @ApiDoc("Get all lessons for etab")
@@ -136,6 +212,7 @@ public class LessonController extends ControllerHelper {
             }
         });
     }
+
 
     @Post("/lesson")
     @ApiDoc("Create a lesson")

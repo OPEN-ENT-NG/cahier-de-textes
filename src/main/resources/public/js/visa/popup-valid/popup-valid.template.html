@@ -1,23 +1,24 @@
 <div ng-init="visaManagerCtrl.calcRecapSelected()">
   <div class="row header">
-    Viser les cahiers de textes sélectionnés
+    <i18n>diary.visa.apply.title</i18n>
+
   </div>
   <div class="viser-content">
     <div>
-      Vous êtes sur le point de viser
-        <strong>[[visaManagerCtrl.recap.nbLesson]]</strong>scéances pour
-        <strong>[[visaManagerCtrl.recap.nbTeacher]]</strong> enseignant,
-        <strong>[[visaManagerCtrl.recap.nbSubject]]</strong> matière et
-        <strong>[[visaManagerCtrl.recap.nbAudience]]</strong> classes
+      <i18n>diary.visa.apply.attempt</i18n>
+        <strong>[[visaManagerCtrl.recap.nbLesson]]</strong> <i18n>diary.visa.apply.statlesson</i18n>
+        <strong>[[visaManagerCtrl.recap.nbTeacher]]</strong> <i18n>diary.visa.apply.statteacher</i18n>,
+        <strong>[[visaManagerCtrl.recap.nbSubject]]</strong> <i18n>diary.visa.apply.statsubject</i18n>
+        <strong>[[visaManagerCtrl.recap.nbAudience]]</strong> <i18n>diary.visa.apply.stataudience</i18n>
     </div>
     <div class="comment-box" ng-init="visaManagerCtrl.comment=''">
-      <p> Commentaire : </p>
+      <p> <i18n>diary.visa.comment</i18n> : </p>
       <textarea ng-model="visaManagerCtrl.comment"></textarea>
     </div>
     <div class="controls">
-      <button ng-click="visaManagerCtrl.pdf()">Générer PDF</button>
-      <button ng-click="visaManagerCtrl.applyVisa(false) ; remove()">Viser sans Verrouiller</button>
-      <button ng-click="visaManagerCtrl.applyVisa(true)">Viser et Verrouiller</button>
+      <button ng-click="visaManagerCtrl.pdf()" ><i18n>diary.visa.action.generatepdf</i18n></button>
+      <button ng-click="visaManagerCtrl.applyVisa(false) ;  " ng-disabled="!visaManagerCtrl.comment" ><i18n>diary.visa.action.applywithoulock</i18n></button>
+      <button ng-click="visaManagerCtrl.applyVisa(true) ;  " ng-disabled="!visaManagerCtrl.comment"><i18n>viadiaryry.visa.action.applyandlock</i18n></button>
     </div>
   </div>
 </div>

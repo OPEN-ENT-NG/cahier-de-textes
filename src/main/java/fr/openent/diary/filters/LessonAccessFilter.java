@@ -3,7 +3,6 @@ package fr.openent.diary.filters;
 import fr.openent.diary.controllers.LessonController;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.DiaryServiceImpl;
-import fr.openent.diary.utils.Context;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Binding;
 import org.entcore.common.http.filter.ResourcesProvider;

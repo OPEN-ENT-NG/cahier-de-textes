@@ -3,10 +3,13 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.LessonAsModel;
+import fr.openent.diary.model.lessonview.HomeworkModel;
 import fr.openent.diary.model.progression.LessonProgression;
 import fr.openent.diary.model.progression.OrderLesson;
 import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.model.util.CountModel;
+import fr.openent.diary.utils.HandlerUtils;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -16,6 +19,7 @@ import org.vertx.java.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 
@@ -34,7 +38,6 @@ public class ProgressionServiceImpl extends SqlCrudService {
         super(DiaryController.DATABASE_SCHEMA, PROGRESION_DATABASE_TABLE);
 
     }
-
 
     public void getProgressions(String teacherId, Handler<HandlerResponse<List<Progression>>> handler) {
 
@@ -64,7 +67,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
             }
 
         } catch (Throwable e) {
-            handler.handle(new HandlerResponse<Progression>(e.getMessage()));
+            HandlerUtils.error(e,handler);
         }
     }
 
@@ -130,21 +133,18 @@ public class ProgressionServiceImpl extends SqlCrudService {
                     @Override
                     public void handle(HandlerResponse<CountModel> event) {
                         try {
-                            if (event.hasError()){
-                                handler.handle(new HandlerResponse<LessonProgression>(event.getMessage()));
-                                return;
+                            HandlerUtils.checkError(event,handler);
+                            Long count = event.getResult().getNb();
+                            if (count == null){
+                                count = 0L;
                             }else{
-                                Long count = event.getResult().getNb();
-                                if (count == null){
-                                    count = 0L;
-                                }else{
-                                    count ++;
-                                }
-                                lessonProgression.setOrderIndex(count);
-                                lessonProgressionMapper.insert(lessonProgression, handler);
+                                count ++;
                             }
+                            lessonProgression.setOrderIndex(count);
+                            lessonProgressionMapper.insert(lessonProgression, handler);
+
                         } catch (Throwable e) {
-                            handler.handle(new HandlerResponse<LessonProgression>(e.getMessage()));
+                            HandlerUtils.error(e,handler);
                         }
                     }
                 });
@@ -153,7 +153,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 lessonProgressionMapper.update(lessonProgression, handler);
             }
         } catch (Throwable e) {
-            handler.handle(new HandlerResponse<LessonProgression>(e.getMessage()));
+            HandlerUtils.error(e,handler);
         }
 
     }

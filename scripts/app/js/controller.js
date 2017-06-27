@@ -125,6 +125,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
     initAudiences();
     route({
+        showHistoryView:function(params){
+            template.open('main', 'show-history');
+        },
         manageVisaView: function (params) {
             template.open('main', 'visa-manager');
         },
@@ -157,6 +160,10 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             }else{
                 template.open('main-view', 'view-lesson');
             }
+        },
+        showLessonView: function(params) {
+            template.open('main', 'main');
+            template.open('main-view', 'view-lesson');
         },
         editHomeworkView: function(params) {
             loadHomeworkFromRoute(params);
@@ -275,7 +282,8 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var url = "";
 
         if (pedagogicItem.type_item === 'lesson') {
-            url = "/editLessonView/" + pedagogicItem.id + "/";
+
+            url = pedagogicItem.locked ? "/showLessonView/" + pedagogicItem.id + "/" : "/editLessonView/" + pedagogicItem.id + "/";
         } else {
             // open lesson view if homework is attached to a lesson
             if (pedagogicItem.lesson_id) {

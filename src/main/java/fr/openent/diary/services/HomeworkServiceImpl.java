@@ -1,23 +1,20 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.utils.Audience;
-import fr.openent.diary.utils.Context;
-import fr.openent.diary.utils.HomeworkType;
-import fr.openent.diary.utils.ResourceState;
+import fr.openent.diary.model.general.Audience;
+import fr.openent.diary.model.general.Context;
+import fr.openent.diary.model.general.HomeworkType;
+import fr.openent.diary.model.general.ResourceState;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
-import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
-import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

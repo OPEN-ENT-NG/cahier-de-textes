@@ -34,6 +34,9 @@
             $scope.$watch('searchFilter',init);
 
             function init() {
+              if (!$scope.items){
+                return;
+              }
                 $scope.itemsToShow = $scope.items.map((item)=>{
                     let result = "";
                     let value = eval($scope.showExpression);

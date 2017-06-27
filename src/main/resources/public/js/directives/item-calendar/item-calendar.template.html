@@ -21,7 +21,7 @@
             <span id="room" class="room">[[item.room]]</span>
 
             <!-- 5 - CHECK -->
-            <input id="itemcheckbox" ng-if="params.isUserTeacher" type="checkbox" ng-model="item.selected" class="item-checkbox"/>
+            <input id="itemcheckbox" ng-if="params.isUserTeacher && !item.locked" type="checkbox" ng-model="item.selected" class="item-checkbox"/>
         </div>
         <div class="item-line">
             <!-- 1 - End Hour -->
@@ -29,8 +29,14 @@
             <!-- 2 - CLASSE -->
             <span  class="room">[[item.audienceLabel]]</span>
             <!-- 1 - ICONE BROUILLON -->
-            <span id="state" ng-if="[[item.state]]=='draft'" class="item-checkbox">
+            <span id="state" ng-if="[[item.state]]=='draft' && !item.locked" class="item-checkbox">
                 <i class="icon pencil"></i>
+            </span>
+            <span id="state" ng-if="params.isUserTeacher && item.locked" class="item-checkbox">
+                <!-- TODO translate -->
+                <i class="icon lock-alt"
+                    diary-tooltip="Un visa a vérouillé cette séance"
+                ></i>
             </span>
         </div>
 
@@ -67,10 +73,7 @@
             <span id="hour-end" class="hour">[[item.endMoment.format('HH')]]h[[item.endMoment.format('mm')]]</span>
             <!-- 2 - CLASSE -->
             <span  class="room">[[item.classes | arraytostring]]</span>
-            <!-- 1 - ICONE BROUILLON -->
-            <span id="state" ng-if="[[item.state]]=='draft'" class="item-checkbox">
-                <i class="icon pencil"></i>
-            </span>
+
         </div>
 
         <div>

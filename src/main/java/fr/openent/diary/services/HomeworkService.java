@@ -1,8 +1,7 @@
 package fr.openent.diary.services;
 
-import fr.openent.diary.utils.Audience;
+import fr.openent.diary.model.general.Audience;
 import fr.wseduc.webutils.Either;
-import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;

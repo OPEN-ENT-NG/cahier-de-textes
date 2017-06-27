@@ -37,7 +37,7 @@
                             position.left = 5;
                         }
 
-                        tooltip.css("top",position.top);
+                        tooltip.css("top",position.top + 15);
                         tooltip.css("left",position.left);
 
                         tooltip.fadeIn(100);

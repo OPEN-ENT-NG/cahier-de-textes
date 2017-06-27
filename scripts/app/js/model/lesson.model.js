@@ -25,6 +25,7 @@ function Lesson(data) {
         this.attachments.push(attachment);
     };
 
+
     /**
      * Delete calendar references of current lesson
      */
@@ -265,9 +266,13 @@ Lesson.prototype.deleteList = function (lessons, cb, cbe) {
 Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
     var lesson = this;
+    let url = '/diary/lesson/';
+    if (model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)){
+        url = '/diary/lesson/external/';
+    }
 
     var load = function () {
-        http().get('/diary/lesson/' + lesson.id)
+        http().get(url + lesson.id)
             .done(function (data) {
                 lesson.updateData(model.LessonService.mapLesson(data));
 

@@ -43,19 +43,27 @@ public final class DateUtils {
         return cal.getTime();
     }
 
+    public static SimpleDateFormat getSimpleDateFormatSql(){
+        return new SimpleDateFormat(DATE_FORMAT_SQL);
+    }
+
+    public static SimpleDateFormat getSimpleDateFormat(){
+        return new SimpleDateFormat(DATE_FORMAT);
+    }
+
     public static String formatDateSql(Date dateToParse) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_SQL);
+        SimpleDateFormat dateFormat = getSimpleDateFormatSql();
         return dateFormat.format(dateToParse);
     }
 
     public static Date parseDateSql(String dateToParse) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_SQL);
+        SimpleDateFormat dateFormat = getSimpleDateFormatSql();
         return dateFormat.parse(dateToParse);
     }
 
 
     public static String formatDate(Date dateToParse) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat dateFormat = getSimpleDateFormat();
         return dateFormat.format(dateToParse);
     }
 }

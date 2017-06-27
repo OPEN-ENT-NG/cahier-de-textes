@@ -9,11 +9,15 @@ try {
 }catch(e){}
 
 //copy index
-ncp("../dist/index.html","../src/main/resources/view/diary.html", function (err) {
+console.log("copy file1");
+ncp("../dist/index.html","../src/main/resources/view/diary.html",{
+  stopOnErr: true,
+}, function (err) {
  if (err) {
    return console.error(err);
  }else{
    //replace digest in file
+   console.log("replace digest");
    replace({
      regex: "DIGEST",
      replacement: new Date().getTime(),
@@ -22,9 +26,10 @@ ncp("../dist/index.html","../src/main/resources/view/diary.html", function (err)
    });
    //copy folder
    ncp("../dist/" , "../src/main/resources/public", function (err) {
+     console.log("copy dist");
     if (err) {
       return console.error(err);
     }
    });
- } 
+ }
 });

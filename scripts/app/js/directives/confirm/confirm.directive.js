@@ -5,14 +5,20 @@
         module.directive("confirmPopup",directive);
 
         function directive($compile){
+          let zIndex = 100000;
           return {
             restrict : 'A',
+            /*controller : function($scope){
+              setTimeout(()=>{
+                $scope.apply
+              });
+            },*/
             link: function (scope, element, attr) {
               console.log("confirm click linked");
-
+                   zIndex++;
                    var clickAction = attr.confirmedClick;
-                   var html =  `
-                     <lightbox show="display" on-close="remove()">
+                   var html =  ` 
+                     <lightbox show="display" class="${scope.confirmClass}" on-close="remove()" style="z-index : ${zIndex}" >
                        <div class="row" ng-if="!confirmTemplate">
                           <h2> [[msg]] </h2>
                            <div class="row">
@@ -34,10 +40,15 @@
                      scope.confirmTemplate = attr.confirmTemplate ;
                      scope.cancel = attr.confirmCancel || "Annuler";
                       scope.display = true;
+
                       lightbox = $compile(html)(scope);
                       $('body').append(lightbox);
+
                       lightbox.addClass(scope.confirmClass);
                       scope.$apply();
+                   });
+                   scope.$on('closeallpop',()=>{
+                     scope.remove();
                    });
                    scope.remove = function(){
                       scope.display = false;

@@ -1,23 +1,18 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.model.GenericHandlerResponse;
-import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.LessonAsModel;
 import fr.openent.diary.model.ModelWeek;
 import fr.openent.diary.services.ModelWeekServiceImpl;
 import fr.openent.diary.utils.DateUtils;
-import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
 import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.json.impl.Json;
 
 import java.util.Date;
 import java.util.List;
@@ -30,6 +25,7 @@ public class ModelWeekController extends ControllerHelper {
     }
 
     @Get("/modelweek/list")
+    @SecuredAction("diary.manageModelWeek.list")
     public void modelweek(final HttpServerRequest request) {
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -46,6 +42,7 @@ public class ModelWeekController extends ControllerHelper {
     }
 
     @Get("/modelweek/items/:date")
+    @SecuredAction("diary.manageModelWeek.getItems")
     public void getWeekItems(final HttpServerRequest request) {
 
         try {
@@ -67,7 +64,7 @@ public class ModelWeekController extends ControllerHelper {
     }
 
     @Post("/modelweek/invert")
-    @SecuredAction("diary.manageModelWeek")
+    @SecuredAction("diary.manageModelWeek.invert")
     public void invertModelWeek(final HttpServerRequest request) {
 
         try{
@@ -88,6 +85,7 @@ public class ModelWeekController extends ControllerHelper {
     }
 
     @Post("/modelweek/:weekAlias/:date")
+    @SecuredAction("diary.manageModelWeek.update")
     public void setModelWeek(final HttpServerRequest request) {
 
         try{

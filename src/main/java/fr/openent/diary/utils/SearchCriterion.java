@@ -1,5 +1,7 @@
 package fr.openent.diary.utils;
 
+import fr.openent.diary.model.general.CriteriaSearchType;
+
 import java.util.Map;
 
 /**

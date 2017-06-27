@@ -6,7 +6,7 @@ button.diary-ico-button{
     box-shadow: initial !important;
   }
   padding : 8px 8px 0px 8px;
-  line-height: 24px; 
+  line-height: 24px;
 }
 
 .reservation:before {
@@ -34,6 +34,30 @@ button.diary-ico-button{
   content:'\e858'
 }
 
+.lock-alt::before{
+  content : '\e860'
+}
+
 .grades::before{
   content : '\e614'
+}
+
+.history::before{
+  content : '\e844'
+}
+
+.user::before{
+  content : '\e870'
+}
+
+.users::before{
+  content : '\e822'
+}
+
+.file-pdf::before{
+  content : '\e857'
+}
+
+.cancel-circled::before{
+  content : '\e848'
 }

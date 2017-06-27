@@ -5,7 +5,9 @@ import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.LessonAsModel;
 import fr.openent.diary.model.ModelWeek;
+import fr.openent.diary.model.visa.VisaFilters;
 import fr.openent.diary.utils.DateUtils;
+import fr.openent.diary.utils.HandlerUtils;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import fr.wseduc.webutils.Either;
@@ -58,29 +60,27 @@ public class ModelWeekServiceImpl extends SqlCrudService {
         getModelWeeks(teacherId, new Handler<HandlerResponse<List<ModelWeek>>>() {
             @Override
             public void handle(HandlerResponse<List<ModelWeek>> event) {
-                HandlerResponse<Boolean> result = new HandlerResponse<Boolean>();
-                if (event.hasError()){
-                    handler.handle(new HandlerResponse<ModelWeek>(result.getMessage()));
-                }else{
-                    List<ModelWeek> modelWeeks = event.getResult();
+                HandlerUtils.checkError(event,handler);
 
-                    if (modelWeeks == null || modelWeeks.isEmpty()){
-                        createModelWeek(teacherId,weekAlias,date,handler);
-                    }else{
-                        ModelWeek selectedModelWeek = null;
-                        for (ModelWeek modelWeek : modelWeeks ){
-                            if (modelWeek.getWeekAlias().equals(weekAlias)){
-                                selectedModelWeek = modelWeek;
-                                break;
-                            }
-                        }
-                        if (selectedModelWeek == null){
-                            createModelWeek(teacherId,weekAlias,date, handler);
-                        }else{
-                            updateModelWeek(selectedModelWeek,teacherId,weekAlias,date,handler);
+                List<ModelWeek> modelWeeks = event.getResult();
+
+                if (modelWeeks == null || modelWeeks.isEmpty()){
+                    createModelWeek(teacherId,weekAlias,date,handler);
+                }else{
+                    ModelWeek selectedModelWeek = null;
+                    for (ModelWeek modelWeek : modelWeeks ){
+                        if (modelWeek.getWeekAlias().equals(weekAlias)){
+                            selectedModelWeek = modelWeek;
+                            break;
                         }
                     }
+                    if (selectedModelWeek == null){
+                        createModelWeek(teacherId,weekAlias,date, handler);
+                    }else{
+                        updateModelWeek(selectedModelWeek,teacherId,weekAlias,date,handler);
+                    }
                 }
+
             }
         });
     }
@@ -96,7 +96,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
             modelWeekMapper.update(modelWeek,handler);
 
         }catch(Throwable e){
-            handler.handle(new HandlerResponse<ModelWeek>(e.getMessage()));
+            HandlerUtils.error(e,handler);
         }
     }
 
@@ -117,7 +117,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
             modelWeekMapper.insert(modelWeek,handler);
 
         }catch(Throwable e){
-            handler.handle(new HandlerResponse<ModelWeek>(e.getMessage()));
+            HandlerUtils.error(e,handler);
         }
     }
 
@@ -125,29 +125,27 @@ public class ModelWeekServiceImpl extends SqlCrudService {
         getModelWeeks(teacherId, new Handler<HandlerResponse<List<ModelWeek>>>() {
             @Override
             public void handle(HandlerResponse<List<ModelWeek>> event) {
-                GenericHandlerResponse response = new GenericHandlerResponse(event.getMessage());
-                if (!event.hasError()){
-                    try{
-                        List<ModelWeek> modelWeeks = event.getResult();
-                        //to inverse we need to have 2 model set
-                        if (modelWeeks.size() == 2) {
-                            List<SqlQuery> queries = new ArrayList<SqlQuery>();
-                            for (ModelWeek modelWeek : event.getResult()) {
-                                if (modelWeek.getWeekAlias().equals("A")) {
-                                    modelWeek.setWeekAlias("B");
-                                } else {
-                                    modelWeek.setWeekAlias("A");
-                                }
-                                queries.add(modelWeekMapper.prepareUpdateStatement(modelWeek));
+
+                HandlerUtils.checkGenericError(event,handler);
+
+                try{
+                    List<ModelWeek> modelWeeks = event.getResult();
+                    //to inverse we need to have 2 model set
+                    if (modelWeeks.size() == 2) {
+                        List<SqlQuery> queries = new ArrayList<SqlQuery>();
+                        for (ModelWeek modelWeek : event.getResult()) {
+                            if (modelWeek.getWeekAlias().equals("A")) {
+                                modelWeek.setWeekAlias("B");
+                            } else {
+                                modelWeek.setWeekAlias("A");
                             }
-                            modelWeekMapper.executeTransactionnalQueries(queries, handler);
-                            return;
+                            queries.add(modelWeekMapper.prepareUpdateStatement(modelWeek));
                         }
-                    }catch (Exception e){
-                        response.setMessage(e.getMessage());
+                        modelWeekMapper.executeTransactionnalQueries(queries, handler);
                     }
+                }catch (Exception e){
+                    HandlerUtils.<GenericHandlerResponse>genericError(e,handler);
                 }
-                handler.handle(response);
             }
         });
     }
@@ -156,13 +154,12 @@ public class ModelWeekServiceImpl extends SqlCrudService {
         getModelWeeks(user.getUserId(), new Handler<HandlerResponse<List<ModelWeek>>>() {
             @Override
             public void handle(HandlerResponse<List<ModelWeek>> event) {
-                final HandlerResponse<List<LessonAsModel>> response = new HandlerResponse<List<LessonAsModel>>();
+                HandlerUtils.checkError(event,handler);
                 ModelWeek refWeek = null;
-                response.setResult(new ArrayList<LessonAsModel>());
                 //if the week is pair take A alias, else the B
                 String aliasRef = (new DateTime(date).getWeekOfWeekyear() % 2) == 0 ? "A" :"B";
                 if(event.getResult()==null || event.getResult().size()==0){
-                    handler.handle(response);
+                    HandlerUtils.renderResponse(handler,new ArrayList<LessonAsModel>());
                     return;
                 }
                 for (ModelWeek modelWeek : event.getResult()){
@@ -171,9 +168,8 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                         break;
                     }
                 }
-
                 if (refWeek == null){
-                    handler.handle(response);
+                    HandlerUtils.renderResponse(handler,new ArrayList<LessonAsModel>());
                     return;
                 }
                 lessonService.getAllLessonsForTeacher(user.getUserId(),
@@ -187,7 +183,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                                 if (event.isRight()){
                                     mapLessonItems(event.right().getValue(),date,handler);
                                 }else{
-                                    handler.handle(response);
+                                    HandlerUtils.renderResponse(handler,new ArrayList<LessonAsModel>());
                                 }
                             }
                         });
@@ -196,10 +192,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
     }
 
     private void mapLessonItems(JsonArray value, Date date, Handler<HandlerResponse<List<LessonAsModel>>> handler) {
-        HandlerResponse<List<LessonAsModel>> result = new HandlerResponse<List<LessonAsModel>>();
         try {
-
-
             List<LessonAsModel> map = new ArrayList<>();
             for (Object jsonEl : value) {
 
@@ -246,12 +239,11 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                 map.add(lesson);
             }
 
-            result.setResult(map);
-
+            HandlerUtils.renderResponse(handler,map);
         }catch (Exception e){
-            result.setMessage(e.getMessage());
+            HandlerUtils.error(e,handler);
 
         }
-        handler.handle(result);
+
     }
 }

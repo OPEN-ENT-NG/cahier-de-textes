@@ -6,12 +6,12 @@
         class="twelve-mobile"
         placeholder="[[placeHolder]]"
         ng-model="searchFilter"
-        ng-focus="showDropDown = searchFilter.length>0;eraseSelected($event)"
+        ng-focus="showDropDown = true;eraseSelected($event)"
         ng-change="change()"
         ng-keypress="enter($event)"
         ng-blur="blur()" />
 
-    <div class="drop-down" ng-if="showDropDown && itemsToShow.length > 0">
+    <div class="drop-down scrollbar-fine" ng-if="showDropDown && itemsToShow.length > 0">
         <div>
             <ul class="ten cell right-magnet"  >
                 <li ng-repeat="option in itemsToShow" ng-mousedown="selectItem(option)" >

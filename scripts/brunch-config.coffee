@@ -15,6 +15,7 @@ module.exports = config:
   files:
     javascripts:
       joinTo:
+        'js/vendor.js': /^(bower_components|vendor)/
         'js/behaviours.js': (path) ->
           /behaviours\.js$/.test(path)
         'js/app.js': (path) ->
@@ -29,6 +30,8 @@ module.exports = config:
     stylesheets:
       joinTo:
         'css/app.css':/^(app)/
+        'css/pdf.css':
+          "app/css/pdf.scss"
       order:
         before:[
         ]

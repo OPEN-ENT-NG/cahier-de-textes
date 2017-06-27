@@ -1,11 +1,13 @@
 <div class="visa-tab center">
   <br/>
-  <h1>Aucune données n'a été trouvée</h1>
+  <h1><i18n>diary.visa.notfound</i18n></h1>
   <br/>
 
-  <h2>Sélectionnez au moins un des filtres et lancez la recherche en cliquan sur le bouton </h2>
+  <h2><i18n>diary.visa.instruction.select</i18n></h2>
   <br/>
 
-  <button ng-click="visaManagerCtrl.search()">rechercher</button>
-  
+  <button ng-click="visaManagerCtrl.search()"
+        ng-disabled="!visaManagerCtrl.searchAvailable()"
+        ><span diary-tooltip="[[visaManagerCtrl.searchAvailable() ? 'search' : 'diary.visa.select.filter']]"><i18n>search</i18n></span></button>
+
 </div>

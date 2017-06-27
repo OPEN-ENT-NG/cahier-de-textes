@@ -2,13 +2,36 @@
 ng-include{
   display: block;
 }
+.pedagogic-item-card i.icon.lock-alt {
+    top: -20px;
+    position: relative;
+    left: -16px;
+    font-size: 40px;
+}
 
+.button-icon{
+  font-size: 1.2em;
+  color: #2a9cc8;
+  cursor: pointer;
+
+}
+.button-icon:hover{
+  color:#FF8500;
+}
+
+lightbox{
+  display : block;
+}
 .center{
   text-align: center;
 }
 .right{
   float:right;
 }
+
+.datepicker{
+     z-index: 1000000 !important;
+  }
 ul {
     list-style-type: none;
     margin-top: 0;

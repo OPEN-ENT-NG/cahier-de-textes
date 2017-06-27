@@ -1,8 +1,10 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.HomeworkAccessFilter;
+import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.services.*;
-import fr.openent.diary.utils.Audience;
+import fr.openent.diary.model.general.Audience;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -32,10 +34,11 @@ import static org.entcore.common.http.response.DefaultResponseHandler.*;
  */
 public class HomeworkController extends ControllerHelper {
 
-    HomeworkService homeworkService;
-    LessonService lessonService;
-    AudienceService audienceService;
+    private HomeworkService homeworkService;
+    private LessonService lessonService;
+    private AudienceService audienceService;
     private SharedService sharedService;
+    private DiaryService diaryService;
 
     List<String> actionsForAutomaticSharing;
 
@@ -55,11 +58,11 @@ public class HomeworkController extends ControllerHelper {
 
     private final static Logger log = LoggerFactory.getLogger(HomeworkController.class);
 
-    public HomeworkController(HomeworkService homeworkService, LessonService lessonService, AudienceService audienceService) {
+    public HomeworkController(HomeworkService homeworkService, LessonService lessonService, AudienceService audienceService, DiaryService diaryService) {
         this.homeworkService = homeworkService;
         this.lessonService = lessonService;
         this.audienceService = audienceService;
-
+        this.diaryService = diaryService;
         this.sharedService = new SharedServiceImpl(HomeworkController.class.getName());
 
         //init automatic sharing actionsForAutomaticSharing
@@ -151,6 +154,57 @@ public class HomeworkController extends ControllerHelper {
             }
         });
     }
+
+
+    @Get("/homework/external/:etabIds/:startDate/:endDate/:type/:userid")
+    @ApiDoc("Get all homeworks for a school")
+    @SecuredAction(value = list_homeworks, type = ActionType.AUTHENTICATED)
+    public void listExternalHomeworks(final HttpServerRequest request) {
+
+        final String[] schoolIds = request.params().get("etabIds").split(":");
+        final String startDate = request.params().get("startDate");
+        final String endDate = request.params().get("endDate");
+        final String type = request.params().get("type");
+        final String id = request.params().get("userid");
+
+
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    switch (type) {
+                        case "teacher":
+                            List<String> memberIds = new ArrayList<>();
+                            memberIds.add(id);
+                            homeworkService.getAllHomeworksForTeacher(id, Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            break;
+                        case "audience":
+                            diaryService.listGroupsFromClassId(schoolIds[0], id, new Handler<HandlerResponse<List<KeyValueModel>>>() {
+                                @Override
+                                public void handle(HandlerResponse<List<KeyValueModel>> event) {
+                                    if (event.hasError()){
+                                        badRequest(request,event.getMessage());
+                                    }else{
+                                        List<String> memberIds = new ArrayList<>();
+                                        for (KeyValueModel group : event.getResult()){
+                                            memberIds.add(group.getKey());
+                                        }
+                                        homeworkService.getAllHomeworksForTeacher(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                                    }
+
+                                }
+                            });
+                            break;
+                }
+
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
 
     @Post("/homework")
     @ApiDoc("Create a homework")

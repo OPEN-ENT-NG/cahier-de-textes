@@ -1,5 +1,17 @@
 .visa-manager{
-
+  .visa-right-button{
+    position: absolute;
+    right: 10px;
+    top : 0px;
+    button{
+      padding: 5px 10px;
+      margin: 0px;
+      i {
+        margin-right: 10px;
+        font-size: 1.4em;
+      }
+    }
+  }
   .visa{
     i{
       position:relative;

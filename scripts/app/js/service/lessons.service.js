@@ -14,7 +14,6 @@
             this.constants = constants;
             this.UtilsService=UtilsService;
             this.AttachementService=AttachementService;
-
         }
 
         getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId) {
@@ -22,20 +21,33 @@
             var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
             var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
 
-
-            var urlGetHomeworks = `/diary/lesson/${userStructuresIds}/${start}/${end}/`;
+            var urlGetLessons = `/diary/lesson/${userStructuresIds}/${start}/${end}/`;
 
             if (isUserParent && childId) {
-                urlGetHomeworks += childId;
+                urlGetLessons += childId;
             } else {
-                urlGetHomeworks += '%20';
+                urlGetLessons += '%20';
             }
 
-            return this.$http.get(urlGetHomeworks).then((result)=>{
+            return this.$http.get(urlGetLessons).then((result)=>{
                 return this.mappLessons(result.data);
             });
         }
 
+        getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience) {
+
+            var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
+            var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+            let type = teacher ? "teacher" : "audience";
+            let id = teacher ? teacher.key : audience.key;
+
+            var urlGetLessons = `/diary/lesson/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
+
+            return this.$http.get(urlGetLessons).then((result)=>{
+                return this.mappLessons(result.data);
+            });
+        }
 
         /*
         *   Map lesson
@@ -91,7 +103,7 @@
                 is_periodic: false,
                 homeworks: lessonHomeworks,
                 tooltipText: '',
-                locked: (!model.canEdit()) ? true : false
+                locked: (!model.canEdit()) ? true : lessonData.locked
             };
             lesson.subject = new Subject();
             lesson.subject.label = lessonData.subject_label;

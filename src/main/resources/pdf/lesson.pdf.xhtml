@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <title>Export Lessons PDF</title>
+    <style type="text/css">
+
+.pdf {
+  font-family: 'Verdana';
+  font-size: 1em;
+  padding: 25px;
+  color: #737373; }
+    a{
+    color: #737373;
+    }
+  .pdf .header {
+    text-align: center;
+    background-color: #c4c5c6;
+    padding: 25px;
+    font-size: 1.5em;
+    border-radius: 5px;
+    margin-bottom: 20px; }
+
+  .pdf .lesson {
+    padding: 10px 0px;
+    border: 1px solid #c4c5c6;
+    margin-bottom: 15px;
+    padding: 0px;
+    border-radius: 5px; }
+
+    .pdf .lesson .lesson-header {
+      background-color: #c4c5c6;
+      padding: 4px;
+      text-align: center;
+      font-size: 1.1em; }
+
+    .pdf .lesson .lesson-content {
+      padding: 5px;
+      margin-bottom: 5px; }
+
+      .pdf .lesson .lesson-content .lesson-title {
+        font-size: 1.05em; }
+
+      .pdf .lesson .lesson-content .lesson-description {
+        padding-top: 3px;
+        font-size: 0.95em; }
+
+	</style>
+</head>
+
+
+<body class="pdf">
+<div class="header">
+    G&eacute;n&eacute;ration pdf du {{currentDate}} pour {{teacherNb}} professeur(s), {{nbLesson}} sc&eacute;ance(s), {{subjectNb}} mati&egrave;re(s), {{audienceNb}} classe(s)
+    {{#yearLabel}}
+    <br/><br/>
+    Année scolaire : {{yearLabel}}
+    {{/yearLabel}}
+</div >
+<div class="content">
+    {{#lessons}}
+    <div class="lesson">
+        <div class="lesson-part">
+            <div class="lesson-header">
+                {{#unicode}} {{teachername}} {{/unicode}} - {{#unicode}} {{subject}}  {{/unicode}} - {{date}} - {{starttime}} - {{endtime}} - {{#unicode}} {{audiencelabel}} {{/unicode}}
+            </div>
+            <div class="lesson-content">
+                <div class="lesson-title">
+                    <strong>Lesson : </strong>
+                    {{#unicode}}
+                        {{title}}
+                    {{/unicode}}
+                </div>
+                <div class="lesson-description">
+                    {{#unicode}}
+                        {{{description}}}
+                    {{/unicode}}
+                </div>
+            </div>
+        </div>
+        <div class="homework-part">
+            {{#homeworks}}
+            <div class="lesson-content">
+                <div class="lesson-title">
+                    <strong>Devoir : </strong>  A faire pour le {{date}}
+                </div>
+                <div class="lesson-description">
+                    {{#unicode}}
+                        {{{description}}}
+                    {{/unicode}}
+                </div>
+            </div>
+            {{/homeworks}}
+        </div>
+    </div>
+    {{/lessons}}
+</div>
+</body>
+</html>

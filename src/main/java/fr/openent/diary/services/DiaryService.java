@@ -1,5 +1,7 @@
 package fr.openent.diary.services;
 
+import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.user.UserInfos;
@@ -65,4 +67,13 @@ public interface DiaryService {
      * @param handler
      */
     void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler);
+
+
+    /**
+     * get all groups id from a audience / strucutre
+     * @param schoolId
+     * @param audienceId
+     * @param handler
+     */
+    void listGroupsFromClassId(final String schoolId, String audienceId, final Handler<HandlerResponse<List<KeyValueModel>>> handler);
 }

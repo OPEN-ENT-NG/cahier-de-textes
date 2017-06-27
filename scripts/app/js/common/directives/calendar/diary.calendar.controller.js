@@ -296,7 +296,9 @@
                 };
             };
             $scope.onCreateClose = function() {
-                $scope.$eval(attributes.onCreateClose);
+              if (attributes){
+                $scope.$eval(attributes.onCreateClose);                
+              }
             };
 
 
@@ -315,7 +317,7 @@
              */
             $scope.openOnClickSaveOnDrag = function(item, $event) {
 
-                var path = '/editLessonView/' + item.id;
+                var path = item.locked ? '/showLessonView/' + item.id : '/editLessonView/' + item.id;
 
                 // gap between days is quite important
                 var xMouseMoved = Math.abs(vm.itemMouseEvent.lastMouseClientX - $event.clientX) > 30;

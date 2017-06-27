@@ -1,4 +1,4 @@
-<div ng-controller="CalendarController">
+<div ng-controller="CalendarController as calendarController">
 
 
     <div id="mainDiaryContainer" style="float: left; width: 97%;" >
@@ -7,15 +7,20 @@
             <button workflow="diary.createLesson" ng-if="isUserTeacher" ng-click="redirect('/createLessonView/default')">
                 <i18n>diary.lesson.create</i18n>
             </button>
-                <button workflow="diary.createFreeHomework" ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
+            <button style="margin-right: 50px;" workflow="diary.createFreeHomework" ng-if="isUserTeacher" ng-click="redirect('/createHomeworkView')">
                 <i18n>diary.homework.create</i18n>
             </button>
-            <!-- TODO i18n -->
-            <button diary-tooltip="'manage visa'" class="diary-ico-button" ng-click="redirect('/manageVisaView/none')">
-                <i secure="[[RIGHTS.MANAGE_VISA]]" class="grades" style="margin-left:10px"></i>
-                <span>Gérer les visas</span>
+
+            <button secure="[[RIGHTS.VISA_APPLY_VISA]]" class="diary-ico-button" ng-click="redirect('/manageVisaView/none')">
+                <i  class="grades" style="margin-left:10px"></i>
+                <span><i18n>diary.visa.manage</i18n></span>
             </button>
 
+            <button secure="[[RIGHTS.SHOW_HISTORY]]"   class="diary-ico-button cancel" ng-click="redirect('/showHistoryView')">
+                <i  class="icon history" style="margin-left:10px"></i>
+                <!-- TODO translate -->
+                <span>Voir l'historique</span>
+            </button>
             <div class="select-list" secure="[[RIGHTS.MANAGE_MODEL_WEEK]]">
                 <select-list display="diary.model.week.title" placeholder="diary.model.week.title" display-as="diary.model.week.title" class="button">
                     <opt value="font" ng-click="setModel('A')">
@@ -38,6 +43,10 @@
                     </opt>
                 </select-list>
             </div>
+
+
+
+
             <h2 ng-if="isUserParent">
                 <div ng-if="children">
                     <div ng-if="children.all.length == 1">
@@ -57,6 +66,14 @@
             <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()" diary-tooltip="diary.icon.show.calendar"></i>
         </div>
 
+        <div class="row" secure="[[RIGHTS.SHOW_OTHER_TEACHER]]">
+            <diary-multi-calendar-filter
+                structure="calendarController.structure"
+                teacher="calendarController.teacher"
+                audience="calendarController.audience"
+            ></diary-multi-calendar-filter>
+        </div>
+        
         <div>
             <div class="row diary-container" ng-class="{'diary-show-homeworks' : display.bShowHomeworks,'diary-show-calendar' : display.bShowCalendar}">
                 <filters style="padding-bottom: 0.8em;">
