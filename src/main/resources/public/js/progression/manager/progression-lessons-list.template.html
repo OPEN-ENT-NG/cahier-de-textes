@@ -46,18 +46,15 @@
                 <div class="progression-homework" ng-if="lesson.expanded">
                     <div class="row" ng-repeat="homework in lesson.homeworks.all">
                         <div class="cell one" ><i class="day-card-icon rack2 table-cell-left"></i></div>
-                        <div class="cell ten" ng-init="homework.expanded = false">
+                        <div class="cell ten">
                             <div class="homework-title">
                                 <label>[[homework.title]]</label>
-                                <i ng-click="homework.expanded=!homework.expanded" diary-tooltip="Déplier"
-                                    ng-class="{'down-open' : homework.expanded, 'up-open':!homework.expanded}"></i>
                             </div>
                             <div class="homework-type">
                                 <label>[[homework.typeLabel]]</label>
                             </div>
                             <div class="homework-description">
-                                <p ng-bind-html="homework.description | maxChar:30" ng-if="!homework.expanded"></p>
-                                <p ng-bind-html="homework.descriptionTrusted" ng-if="homework.expanded"></p>
+                                <p ng-bind-html="homework.descriptionTrusted"></p>
                             </div>
                         </div>
                     </div>
