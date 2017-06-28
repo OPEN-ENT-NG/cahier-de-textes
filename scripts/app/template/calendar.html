@@ -73,7 +73,7 @@
                 audience="calendarController.audience"
             ></diary-multi-calendar-filter>
         </div>
-        
+
         <div>
             <div class="row diary-container" ng-class="{'diary-show-homeworks' : display.bShowHomeworks,'diary-show-calendar' : display.bShowCalendar}">
                 <filters style="padding-bottom: 0.8em;">
@@ -83,6 +83,9 @@
                             <i ng-class="{'selected':display.bShowHomeworks}" class="filter2 homework " ng-click="toggleHomeworkPanel()" diary-tooltip="diary.icon.show.homeworkpanel"></i>
                             <button ng-click="previousWeek(); " diary-tooltip="diary.calendar.previousweek">&#8592;</button>
                             <button ng-click="nextWeek();" diary-tooltip="diary.calendar.nextweek">&#8594;</button>
+                            <span class="current-week-indicator" secure="[[RIGHTS.MANAGE_MODEL_WEEK]]">
+                                Semaine modèle courrante <strong>[[currentModelWeekIndicator]]</strong>
+                            </span>
                         </li>
                     </ul>
                 </filters>

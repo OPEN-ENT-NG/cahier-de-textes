@@ -1057,16 +1057,25 @@ i.external-link:before{
 .quick-search.progressiontype {
   top: 442px; }
 
-/* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+/* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+.current-week-indicator {
+  padding-left: 35px;
+  line-height: 40px;
+  color: #4bafd5; }
+  /* line 10, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  .current-week-indicator strong {
+    color: #4bafd5; }
+
+/* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
 .select-list select-list {
   margin-left: 5px; }
-  /* line 11, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  /* line 19, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
   .select-list select-list.button .selected-value {
     border-bottom: none; }
-  /* line 14, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+  /* line 22, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
   .select-list select-list.button opt {
     padding: 6px 10px; }
-    /* line 16, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
+    /* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
     .select-list select-list.button opt i {
       padding-right: 6px; }
 

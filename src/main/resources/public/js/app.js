@@ -2392,6 +2392,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
                     if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
                         p4 = ModelWeekService.getModelWeeks();
                     }
                 }
