@@ -6,6 +6,7 @@
       module.value("constants",{
         CAL_DATE_PATTERN : "YYYY-MM-DD",
         CAL_DATE_PATTERN_NG : "dd-MM-yyyy",
+        CAL_DATE_PATTERN_SLASH : "dd/MM/yyyy",
         LONG_DATE_PATTERN : 'YYYY-MM-DD hh:mm:ss',
         RIGHTS : {
           CREATE_LESSON : 'diary.createLesson',
