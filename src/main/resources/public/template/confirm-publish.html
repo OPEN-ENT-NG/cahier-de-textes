@@ -1,5 +1,5 @@
 <div class="row">
-    <article class="twelve cell">
+    <div class="twelve cell">
         <h2 ng-if="getItemsPublishableSelectedCount(true) === 1"><i18n>daily.item.publish.confirm.one</i18n></h2>
         <h2 ng-if="getItemsPublishableSelectedCount(true) > 1">
             <i18n>daily.item.publish.confirm.multi</i18n>
@@ -16,5 +16,5 @@
 
             <button class="right-magnet cancel disabled" disabled ng-if="processingData === true"><i18n>daily.item.publishing</i18n></button>
         </div>
-    </article>
+    </div>
 </div>
