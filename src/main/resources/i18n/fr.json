@@ -209,5 +209,7 @@
   "diary.history.help.select":"Sélectionnez un historique en cliquant sur le panneau à votre gauche",
   "diary.download.pdf" : "Télécharger le pdf",
   "diary.current.week":"Semaine courrante",
-  "VALIDATION_ERROR" : "Des données obligatoires n'ont pas été renseignées"
+  "VALIDATION_ERROR" : "Des données obligatoires n'ont pas été renseignées",
+  "diary.visa.state.dirty" : "Ce visa contient des lessons qui ont été modifiés après sa création",
+  "diary.visa.state.ok" : "Date du visa"
 }
