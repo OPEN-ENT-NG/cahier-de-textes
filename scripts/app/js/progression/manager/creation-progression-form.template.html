@@ -1,12 +1,14 @@
 <div class="new-progression">
     <!-- level + title -->
     <form name="progressionform">
-        <div class="edit-button" ng-click="progressionManagerCtrl.edit()">
+        <div class="edit-button"
+            ng-if="!progressionManagerCtrl.selectedProgressionItem.edit"
+            ng-click="progressionManagerCtrl.edit()">
             <i class="icon pencil"></i>
         </div>
         <div class="row">
             <div class="six cell" style="white-space: nowrap;">
-                <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
+                <span ng-if="progressionManagerCtrl.selectedProgressionItem.edit">
           *<input type="text"
             i18n-placeholder="title"
             ng-model="progressionManagerCtrl.selectedProgressionItem.title"
@@ -48,6 +50,7 @@
         <!-- button -->
         <div class="row" ng-if="progressionManagerCtrl.selectedProgressionItem.edit==true">
           <button class="cancel" type="button"
+                  ng-if="progressionManagerCtrl.selectedProgressionItem.id"
                   confirm-popup
                   confirm-click="[['progression.confirm.delete.progression'|translate]]"
                   confirm-yes="[['diary.delete' | translate]]"
