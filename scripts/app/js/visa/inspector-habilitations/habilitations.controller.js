@@ -27,7 +27,7 @@
                     return vm.filter.teacher;
                 }, (n, o) => {
                     if (o !== n && n) {
-                        vm.selectTeacher(n.item);                        
+                        vm.selectTeacher(n.item);
                         vm.filter.teacher=undefined;
                     }
                 });
@@ -38,7 +38,7 @@
                 let existantTeacher = _.findWhere(vm.selectedTeachers,{'key' : teacher.key});
                 if (!existantTeacher){
                     vm.selectedTeachers.push(teacher);
-                    vm.dirty = true;
+                    vm.save();
                 }
             };
 
@@ -49,13 +49,12 @@
                         inspectors: inspectors
                     };
                 });
-                vm.dirty = true;
             };
             vm.removeTeacher = function (teacher) {
                 vm.selectedTeachers = _.filter(vm.selectedTeachers,(t)=>{
                     return t.key !== teacher.key;
                 });
-                vm.dirty = true;
+               vm.save();
             };
             vm.cancel = function() {
                 vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
@@ -65,7 +64,7 @@
                 vm.filters.teachers = undefined;
                 vm.selectedTeachers = undefined;
                 vm.filter.teacher = undefined;
-                vm.dirty = false;
+
                 VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then((result) => {
                     //console.log(result);
                     vm.filters.teachers = result.availableTeachers;
@@ -76,7 +75,7 @@
             vm.save = function() {
                 VisaService.applyInspectorRight(vm.structure.id, vm.filter.inspector.key, vm.selectedTeachers).then(() => {
                     vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
-                    vm.dirty = false;
+
                 });
             };
         }

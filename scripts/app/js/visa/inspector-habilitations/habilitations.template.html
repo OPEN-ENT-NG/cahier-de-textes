@@ -42,13 +42,7 @@
           ></search-drop-down>
           <br/>
 
-          <div class="teacher-list">
-              <div class="row" ng-if="habilitationCtrl.dirty">
-                  <div class="cell twelve">
-                      <button class="right" ng-click="habilitationCtrl.save()">save</button>
-                      <button  class="cancel right" ng-click="habilitationCtrl.cancel()">cancel</button>
-                  </div>
-              </div>
+          <div class="teacher-list">         
               <article ng-repeat="teacher in habilitationCtrl.selectedTeachers | orderBy : value ">
                   [[teacher.value]]
                   <i diary-tooltip="Suprimer" ng-click="habilitationCtrl.removeTeacher(teacher)" class="button-icon cancel-circled cancel-circled"></i>
