@@ -201,6 +201,8 @@
                     }
                 }, function(e) {
                     $rootScope.validationError(e);
+                    vm.errorValid = true;
+                    $scope.$apply();
                 });
             };
 

@@ -1079,6 +1079,14 @@ i.external-link:before{
     .select-list select-list.button opt i {
       padding-right: 6px; }
 
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/error.scss */
+.valid-error ent-dropdown .dropdown-display {
+  border: solid 1px #ff6556; }
+
+/* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/error.scss */
+.valid-error ent-dropdown .arrow-down {
+  color: #ff6556; }
+
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/icons.scss */
 button.diary-ico-button {
   padding: 8px 8px 0px 8px;

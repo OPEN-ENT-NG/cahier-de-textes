@@ -208,5 +208,6 @@
   "diary.history.title" : "Archives",
   "diary.history.help.select":"Sélectionnez un historique en cliquant sur le panneau à votre gauche",
   "diary.download.pdf" : "Télécharger le pdf",
-  "diary.current.week":"Semaine courrante"
+  "diary.current.week":"Semaine courrante",
+  "VALIDATION_ERROR" : "Des données obligatoires n'ont pas été renseignées"
 }

@@ -2690,6 +2690,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     }
                 }, function (e) {
                     $rootScope.validationError(e);
+                    vm.errorValid = true;
+                    $scope.$apply();
                 });
             };
 
@@ -4839,6 +4841,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
 
                     scope.$watch('ngModel', function (newVal) {
+                        console.log(newVal);
                         if (!newVal) {
                             return;
                         }
@@ -4853,9 +4856,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         });
                     });
 
+                    element.on('blur', function () {
+                        console.log(scope.ngModel);
+                        if (scope.ngModel) {
+                            element.timepicker('setTime', scope.ngModel.get('hour') + ':' + scope.ngModel.get('minute'));
+                            element.timepicker({
+                                showMeridian: false,
+                                defaultTime: 'current',
+                                minuteStep: 5
+                            });
+                        }
+                    });
+
                     element.on('change', function () {
+
                         var time = element.val().split(':');
-                        if (scope.ngModel && scope.ngModel.hour) {
+                        if (scope.ngModel && scope.ngModel.hour && element.val()) {
                             scope.ngModel.set('hour', time[0]);
                             scope.ngModel.set('minute', time[1]);
                             scope.$apply('ngModel');

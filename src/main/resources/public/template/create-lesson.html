@@ -57,9 +57,11 @@
                 <div class="cell" style="width: 21em">
                     <subject-picker ng-model="editLessonCtrl.lesson.subject" lesson="editLessonCtrl.lesson"></subject-picker>
                 </div>
-                <div class="three cell" ng-if="!editProgressionLessonCtrl.isProgressionLesson">
-                    <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="editLessonCtrl.lesson.audience" property="name" school="currentSchool" lesson="editLessonCtrl.lesson" homework="">
-                    </ent-dropdown>
+                <div class="three cell" ng-if="!editProgressionLessonCtrl.isProgressionLesson" >
+                    <span ng-class="{'valid-error' : editLessonCtrl.errorValid && !editLessonCtrl.lesson.audience.id }" >
+                        <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="editLessonCtrl.lesson.audience" property="name" school="currentSchool" lesson="editLessonCtrl.lesson" homework="">
+                        </ent-dropdown>
+                    </span>
                 </div>
             </div>
 
@@ -103,13 +105,15 @@
                             <!-- Beginning (Time: HH:mm) -->
                             <div class="three cell">
                                 <label class="cell four"><i18n>start.time</i18n></label>
-                                <time-picker ng-model="newItem.beginning" class="cell four"></time-picker>
+                                <time-picker ng-model="newItem.beginning" class="cell four" ></time-picker>
                             </div>
 
                             <!-- End (Time: HH:mm) -->
                             <div class="three cell">
                                 <label class="cell four"><i18n>end.time</i18n></label>
-                                <time-picker ng-model="newItem.end" class="cell four"></time-picker>
+                                <time-picker ng-model="newItem.end" class="cell four"
+                                    ng-class="{'valid-error' : editLessonCtrl.errorValid && !newItem.end }"
+                                ></time-picker>
                             </div>
                             <div class="two cell">
                                 <label class="cell five"><i18n>room</i18n></label>
