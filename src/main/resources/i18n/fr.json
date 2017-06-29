@@ -204,12 +204,20 @@
   "diary.visa.state.all" : " Visé et à viser",
   "diary.visa.notify.saved" : "Le visa a été enregistré",
   "status" : "Statut",
-  "select.structure":"Selectionnez une structure",
+  "select.structure":"Sélectionnez une structure",
   "diary.history.title" : "Archives",
   "diary.history.help.select":"Sélectionnez un historique en cliquant sur le panneau à votre gauche",
   "diary.download.pdf" : "Télécharger le pdf",
   "diary.current.week":"Semaine courrante",
   "VALIDATION_ERROR" : "Des données obligatoires n'ont pas été renseignées",
   "diary.visa.state.dirty" : "Ce visa contient des lessons qui ont été modifiés après sa création",
-  "diary.visa.state.ok" : "Date du visa"
+  "diary.visa.state.ok" : "Date du visa",
+  "diary.visa.inspect.title" : "Habilitation des inspecteurs ",
+  "diary.visa.inspect.description":"Cet écran vous permet de gérer la visibilité des inspecteurs sur les enseignants.",
+  "diary.visa.inspect.description2" : "S'il n'y a pas d'inspecteur il est possible que vous deviez ajouter les droits sur le compte de votre inspecteur depuis la console d'administration.",
+  "diary.visa.inspect.select" : "Sélectionnez l'inspecteur",
+  "diary.visa.inspect.select.teacher" : "Sélectionnez les proffesseurs que l'inspecteur peut inspecter",
+
+
+
 }

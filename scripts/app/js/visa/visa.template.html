@@ -20,7 +20,7 @@
             <div class="label" ><i18n>enseignant</i18n> :  </div>
             <search-drop-down
                 items = "visaManagerCtrl.filters.teachers"
-                place-holder ="Professeur"
+                place-holder ="enseignant"
                 selected-item="visaManagerCtrl.filter.teacher"
                 show-expression="item.value"
             ></search-drop-down>
@@ -28,7 +28,7 @@
         <div class="cell three" secure="[[RIGHTS.VISA_ADMIN]]">
             <span class="label"><i18n>subject</i18n> : </span>
             <diary-drop-down
-                placeholder="select.group.or.class"
+                placeholder="subject"
                 list="visaManagerCtrl.filters.subjects"
                 selected="visaManagerCtrl.filter.subject"
                 nullable="true"
@@ -48,7 +48,7 @@
         <div class="cell two">
             <span class="label"><i18n>status</i18n> : </span>
             <diary-drop-down
-                placeholder="select.group.or.class"
+                placeholder="status"
                 list="visaManagerCtrl.filters.states"
                 selected="visaManagerCtrl.filter.state"
                 property="value">
