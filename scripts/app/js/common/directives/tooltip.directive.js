@@ -37,6 +37,9 @@
                         if (position.left < 5) {
                             position.left = 5;
                         }
+                        if (position.left + (tip.width()) + 5 > $( window ).width()){
+                            position.left = position.left - ( tip.width() / 2 );
+                        }
 
                         tooltip.css("top",position.top + 15);
                         tooltip.css("left",position.left);

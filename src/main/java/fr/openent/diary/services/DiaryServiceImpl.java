@@ -242,6 +242,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                     whereLessons.append(" AND l.id != ?");
                                     parametersLessons.add(criterion.getValue());break;
 
+                case TEACHER:
+                    whereHomeworks.append(" and h.teacher_id = ? ");
+                    whereLessons.append(" AND l.teacher_id = ?");
+                    addParameterLessonsAndHomeworks(criterion.getValue(), parametersLessons, parametersHomeworks);
+                    break;
                 case HOMEWORK_LINKED_TO_LESSON:
                                     whereHomeworks.append(" and h.lesson_id IS NOT NULL "); break;
 

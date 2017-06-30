@@ -254,6 +254,7 @@ public class DiaryController extends BaseController {
                                                     teacherId.setValue(user.getUserId());
                                                     teacherId.setType(CriteriaSearchType.TEACHER);
                                                     criteria.add(teacherId);
+                                                    criteria.add(teacherId);
                                                     break;
                                                 case "Student":
                                                     groups = user.getClasses();

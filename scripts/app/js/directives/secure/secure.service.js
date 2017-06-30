@@ -9,8 +9,7 @@
         }
 
         hasRight(right){
-            let result = false;
-            console.log("secure find right : ",right);
+            let result = false;            
             _.each(model.me.authorizedActions,(authorizedAction)=>{
                 if (authorizedAction.displayName === right){
                     result=true;
