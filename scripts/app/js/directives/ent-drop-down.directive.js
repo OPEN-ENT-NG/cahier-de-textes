@@ -86,11 +86,30 @@
 										}
 								});
 
-								$(element.context.ownerDocument).click(function (event) {
+								/*$(element.context.ownerDocument).click(function (event) {
 										scope.listVisible = false;
+								});*/
+								function handler(event) {
+										var isClickedElementChildOfPopup = element
+												.find(event.target)
+												.length > 0;
+
+										if (isClickedElementChildOfPopup)
+												return;
+
+										scope.$apply(function() {
+												scope.listVisible = false;
+										});
+								}
+								$(document).bind('click',handler );
+
+								//free on detraoy element & handlers
+								scope.$on("$destroy", function() {
+										$(document).unbind('click',handler );
 								});
+
 						}
-				}
+				};
 		});
 	});
 
