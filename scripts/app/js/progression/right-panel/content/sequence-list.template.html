@@ -1,5 +1,8 @@
 <div class="content scrollbar-fine">
-    <a href="" ng-repeat="progression in progressionRightPanelCtrl.progressionItems | filter :{ title: progressionRightPanelCtrl.filterProgression }" ng-click="progressionRightPanelCtrl.selectProgression(progression)">
+    <a href=""
+      class="non-draggable"
+      ng-repeat="progression in progressionRightPanelCtrl.progressionItems | filter :{ title: progressionRightPanelCtrl.filterProgression }"
+      ng-click="progressionRightPanelCtrl.selectProgression(progression)">
         <article class="twelve cell" >
             <div>
                 [[progression.level]] - [[progression.title]]

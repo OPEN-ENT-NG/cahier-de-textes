@@ -2,6 +2,16 @@
 ng-include{
   display: block;
 }
+
+.non-draggable{
+  user-drag: none;
+user-select: none;
+-moz-user-select: none;
+-webkit-user-drag: none;
+-webkit-user-select: none;
+-ms-user-select: none;
+}
+
 .pedagogic-item-card i.icon.lock-alt {
     top: -20px;
     position: relative;
