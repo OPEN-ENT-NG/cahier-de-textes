@@ -251,7 +251,7 @@ Homework.prototype.toJSON = function () {
     };
 
     if (this.lesson_id) {
-        json.lesson_id = this.lesson_id
+        json.lesson_id = this.lesson_id;
     }
 
     if (!this.id) {

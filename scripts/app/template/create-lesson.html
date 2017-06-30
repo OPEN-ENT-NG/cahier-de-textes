@@ -228,7 +228,7 @@
                                 </div>
                                 <!-- deletes homework -->
                                 <div class="controls">
-                                    <button ng-if="isLessonHomeworkEditable" style="margin-top: 10px;" ng-click="showConfirmPanel('confirm-delete-homeworklesson', homework)">
+                                    <button ng-if="isLessonHomeworkEditable" style="margin-top: 10px;" ng-click="showConfirmPanel('confirm-delete-homeworklesson', {homework: homework, lesson : editLessonCtrl.lesson })">
                                     <i18n>diary.delete</i18n>
                                 </button>
                                 </div>

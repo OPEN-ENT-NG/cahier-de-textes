@@ -843,7 +843,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
         homework.delete(lesson, function () {
             notify.info('homework.deleted');
-            $scope.$apply();
+            //$scope.$apply();
 
             if (typeof cb === 'function') {
                 cb();
