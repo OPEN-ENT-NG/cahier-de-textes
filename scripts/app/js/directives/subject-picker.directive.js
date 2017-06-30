@@ -163,6 +163,29 @@
                             scope.$apply();
                         }
                     });
+
+
+                    // function handler(event) {
+                    //         var isClickedElementChildOfPopup = element
+                    //                 .find(event.target)
+                    //                 .length > 0;
+                    //
+                    //         if (isClickedElementChildOfPopup)
+                    //                 return;
+                    //
+                    //         scope.$apply(function() {
+                    //             scope.displaySearch = false;
+                    //             if (scope.suggestedSubjects.length === 0) {
+                    //                 setNewSubject(scope.search);
+                    //             }
+                    //         });
+                    // }
+                    // $(document).bind('click',handler );
+                    //
+                    // //free on detraoy element & handlers
+                    // scope.$on("$destroy", function() {
+                    //         $(document).unbind('click',handler );
+                    // });
                 }
             };
         });

@@ -86,9 +86,7 @@
 										}
 								});
 
-								/*$(element.context.ownerDocument).click(function (event) {
-										scope.listVisible = false;
-								});*/
+					 
 								function handler(event) {
 										var isClickedElementChildOfPopup = element
 												.find(event.target)
