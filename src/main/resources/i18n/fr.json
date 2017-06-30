@@ -217,7 +217,8 @@
   "diary.visa.inspect.description2" : "S'il n'y a pas d'inspecteur il est possible que vous deviez ajouter les droits sur le compte de votre inspecteur depuis la console d'administration.",
   "diary.visa.inspect.select" : "Sélectionnez l'inspecteur",
   "diary.visa.inspect.select.teacher" : "Sélectionnez les proffesseurs que l'inspecteur peut inspecter",
-
+  "diary.consult.last" : "Consultez l'historique des ",
+  "diary.consult.progession" : "Consultez vos  "
 
 
 }

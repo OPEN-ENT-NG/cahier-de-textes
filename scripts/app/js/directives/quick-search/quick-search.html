@@ -1,5 +1,8 @@
 <!-- minified quick search panel -->
-<div ng-click="setPanelVisible(true, $event)"  class="quick-search-label-minified" ng-show="!panelVisible">
+<div ng-click="setPanelVisible(true, $event)"  class="quick-search-label-minified" ng-show="!panelVisible"
+    diary-tooltip="[[('diary.consult.last' | translate) + ' ' + panelLabel ]]"
+    diary-tooltip-style="margin-top : -100px"
+    >
     [[panelLabel]]
 </div>
 

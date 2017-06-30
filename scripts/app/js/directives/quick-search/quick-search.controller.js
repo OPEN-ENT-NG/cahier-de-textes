@@ -80,7 +80,7 @@
                 $scope.endDate = moment().endOf('week');
                 $scope.quickSearchPedagogicDays = [];
                 $scope.itemType = isQuickSearchLesson ? 'lesson' : 'homework';
-                $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
+                $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');                
             }
 
             $scope.$on('rightpanel.open',function(_,rightpanelid){

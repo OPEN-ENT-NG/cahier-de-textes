@@ -1,6 +1,9 @@
 <!-- minified quick search panel -->
 <div class="right-panel">
-    <div ng-click="toggle()"  class="quick-search-label-minified" ng-show="!panelVisible">
+    <div ng-click="toggle()"
+        diary-tooltip="[[('diary.consult.progession' | translate) + ' ' +  (label | translate)]]"
+        diary-tooltip-style="margin-top : -100px"
+        class="quick-search-label-minified" ng-show="!panelVisible">
         [[label | translate]]
     </div>
 

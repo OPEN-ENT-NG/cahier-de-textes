@@ -25,7 +25,8 @@
                         if (!attributes.diaryTooltip || attributes.diaryTooltip === 'undefined') {
                             return;
                         }
-                        var tip = tooltip.html($compile('<div class="arrow"></div><div class="content">' + lang.translate(attributes.diaryTooltip) + '</div> ')(scope));
+                        var style=attributes.diaryTooltipStyle;
+                        var tip = tooltip.html($compile('<div class="arrow" ></div><div class="content" style="'+style+'"> ' + lang.translate(attributes.diaryTooltip) + '</div> ')(scope));
                         position = {
                             top : parseInt(element.offset().top + element.height()),
                             left : parseInt(element.offset().left + (element.width() / 2) - (tip.width() / 2))
