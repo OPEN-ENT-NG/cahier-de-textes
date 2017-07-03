@@ -80,7 +80,7 @@
                 $scope.endDate = moment().endOf('week');
                 $scope.quickSearchPedagogicDays = [];
                 $scope.itemType = isQuickSearchLesson ? 'lesson' : 'homework';
-                $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');                
+                $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
             }
 
             $scope.$on('rightpanel.open',function(_,rightpanelid){
@@ -119,12 +119,12 @@
 
                     // let enough room to display quick search panel maximized
                     if (isVisible) {
-                        $('#mainDiaryContainer').width('84%');
+                        $('.mainDiaryContainer').width('84%');
                         $('.quick-search').width('16%');
                         $rootScope.$broadcast('rightpanel.open',id);
 
                     } else {
-                        $('#mainDiaryContainer').width('97%');
+                        $('.mainDiaryContainer').width('97%');
                         $('.quick-search').width('2%');
                     }
                 }

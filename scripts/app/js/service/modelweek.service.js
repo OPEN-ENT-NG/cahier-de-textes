@@ -8,33 +8,40 @@
             this.$q = $q;
             this.constants = constants;
             this.CourseService = CourseService;
+            this.promiseGetmodelWeek = undefined;
         }
 
         setModelWeek(alias,date){
             let dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
             let url = `/diary/modelweek/${alias}/${dateParam}`;
+            this.promiseGetmodelWeek = undefined;
             return this.$http.post(url);
         }
 
         getModelWeeks(){
             let url = `/diary/modelweek/list`;
-            return this.$http.get(url).then((result)=>{
-                let modelWeeks = result.data;
-                _.each(modelWeeks,modelWeek =>{
-                    modelWeek.startDate = moment(modelWeek.startDate).toDate();
-                    modelWeek.endDate = moment(modelWeek.endDate).toDate();
+            if ( !this.promiseGetmodelWeek){
+                  this.promiseGetmodelWeek = this.$http.get(url).then((result)=>{
+                    let modelWeeks = result.data;
+                    _.each(modelWeeks,modelWeek =>{
+                        modelWeek.startDate = moment(modelWeek.startDate).toDate();
+                        modelWeek.endDate = moment(modelWeek.endDate).toDate();
+                    });
+
+                    let transformedResult = {
+                        "A" : _.findWhere(modelWeeks,{"weekAlias":"A"}),
+                        "B" : _.findWhere(modelWeeks,{"weekAlias":"B"}),
+                    };
+                    return transformedResult;
                 });
 
-                let transformedResult = {
-                    "A" : _.findWhere(modelWeeks,{"weekAlias":"A"}),
-                    "B" : _.findWhere(modelWeeks,{"weekAlias":"B"}),
-                };
-                return transformedResult;
-            });
+            }
+            return this.promiseGetmodelWeek;
         }
 
         invertModelsWeek(){
             let url = `/diary/modelweek/invert`;
+            this.promiseGetmodelWeek = undefined;
             return this.$http.post(url).then((result)=>{
                 return result.data;
             });

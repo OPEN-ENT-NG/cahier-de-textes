@@ -16,7 +16,12 @@ function HomeworksLoad(){}
 function HomeworkType(){}
 
 model.getSecureService = function(){
+
     return angular.injector(['ng','app']).get("SecureService");
+};
+
+model.getUtilsService = function(){
+    return angular.element($('html')).injector().get("UtilsService");
 };
 
 model.getConstants = function(){
@@ -180,12 +185,15 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
         // so have to delete and add modified lessons ...
         model.lessons.forEach(function(lessonModel){
             if(itemArray.ids.indexOf(lessonModel.id) != -1){
-                model.lessons.remove(lessonModel);
+                //model.lessons.remove(lessonModel);
 
                 lessonModel.changeState(isPublish);
+                lessonModel.selected=false;
+                lessonModel.tooltipText = model.getUtilsService().getResponsiveLessonTooltipText(lessonModel);
+                console.log(lessonModel.tooltipText);
                 // update tooltip text (has state label in it)
-                lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
-                updateLessons.push(lessonModel);
+                //lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
+                //updateLessons.push(lessonModel);
             }
         });
 
@@ -271,8 +279,11 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
     if (!lesson.id) {
         return;
     }
-
-    http().get('/diary/homework/list/' + lesson.id).done(function (sqlHomeworks) {
+    let url = '/diary/homework/list/';
+    if(model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)){
+        url = '/diary/homework/external/list/';
+    }
+    http().get(url + lesson.id).done(function (sqlHomeworks) {
 
         lesson.homeworks = new Collection(Homework);
 
@@ -654,6 +665,7 @@ model.build = function () {
             subjectId: data.subject_id,
             subjectLabel: data.subject_label,
             teacherId: data.teacher_display_name,
+            teacherName: data.teacher_display_name,
             structureId: data.school_id,
             date: moment(data.lesson_date),
             startTime: data.lesson_start_time,
@@ -681,9 +693,9 @@ model.build = function () {
         }
 
 
-        var tooltip = getResponsiveLessonTooltipText(lesson);
+        //var tooltip = getResponsiveLessonTooltipText(lesson);
 
-        lesson.tooltipText = tooltip;
+        //lesson.tooltipText = tooltip;
         return lesson;
     };
 

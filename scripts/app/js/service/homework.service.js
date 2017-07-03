@@ -17,10 +17,13 @@
         /*
         * get homeworks
         */
-        getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId){
+        getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate){
             var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
             var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+            if (fromDate){
+                start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                end = toDate.format(this.constants.CAL_DATE_PATTERN);
+              }
             var urlGetHomeworks = `/diary/homework/${userStructuresIds}/${start}/${end}/`;
 
             if (isUserParent && childId) {
@@ -34,10 +37,13 @@
             });
         }
 
-        getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience){
+        getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate){
             var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
             var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+            if (fromDate){
+                start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                end = toDate.format(this.constants.CAL_DATE_PATTERN);
+              }
             let type = teacher ? "teacher" : "audience";
             let id = teacher ? teacher.key : audience.key;
 

@@ -17,7 +17,7 @@
 							displayTemplate : '=',
 							onCreateOpenAction :  '&',
 							params : '=',
-							templateSlotItem : '='
+							templateSlotItem : '='							
 						},
 
 		        controller: 'DiaryCalendarController',

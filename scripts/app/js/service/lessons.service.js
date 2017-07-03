@@ -16,10 +16,15 @@
             this.AttachementService=AttachementService;
         }
 
-        getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId) {
+        getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate) {
 
             var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
             var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+            if (fromDate){
+              start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+              end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            }
 
             var urlGetLessons = `/diary/lesson/${userStructuresIds}/${start}/${end}/`;
 
@@ -34,11 +39,14 @@
             });
         }
 
-        getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience) {
+        getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate) {
 
             var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
             var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+            if (fromDate){
+              start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+              end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            }
             let type = teacher ? "teacher" : "audience";
             let id = teacher ? teacher.key : audience.key;
 
@@ -89,7 +97,7 @@
                 subject: model.subjects.findWhere({id: lessonData.subject_id}),
                 subjectId: lessonData.subject_id,
                 subjectLabel: lessonData.subject_label,
-                teacherId: lessonData.teacher_display_name,
+                teacherName: lessonData.teacher_display_name,
                 structureId: lessonData.school_id,
                 date: moment(lessonData.lesson_date),
                 startTime: lessonData.lesson_start_time,
@@ -120,9 +128,7 @@
                 lesson.attachments = AttachementService.mappAttachement(JSON.parse(lessonData.attachments));
             }
 
-            var tooltip = this.UtilsService.getResponsiveLessonTooltipText(lesson);
-
-            lesson.tooltipText = tooltip;
+            lesson.tooltipText = this.UtilsService.getResponsiveLessonTooltipText(lesson);
             return lesson;
         }
 

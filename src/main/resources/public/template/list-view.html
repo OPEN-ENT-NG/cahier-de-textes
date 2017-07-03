@@ -19,6 +19,9 @@
         </div>
     </div>
 </h2>
+
+
+
 <div class="row">
     <button ng-click="redirect('/createLessonView/default')" ng-if="isUserTeacher">
         <i18n>diary.lesson.create</i18n>
@@ -29,6 +32,14 @@
     <i class="show-list" ng-class="{ selected: display.showList === true }" ng-click="goToListView()" tooltip="diary.icon.show.list"></i>
     <i class="show-calendar" ng-class="{ selected: display.showList === false }" ng-click="goToCalendarView()" tooltip="diary.icon.show.calendar"></i>
     <hr />
+</div>
+
+<div class="row" secure="[[RIGHTS.SHOW_OTHER_TEACHER]]">
+    <diary-multi-calendar-filter
+        structure="model.filters.structure"
+        teacher="model.filters.teacher"
+        audience="model.filters.audience"
+    ></diary-multi-calendar-filter>
 </div>
 
 <div ng-model="searchForm" class="search-form-box">

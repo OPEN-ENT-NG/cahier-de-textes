@@ -2,6 +2,16 @@
 ng-include{
   display: block;
 }
+
+.non-draggable{
+  user-drag: none;
+user-select: none;
+-moz-user-select: none;
+-webkit-user-drag: none;
+-webkit-user-select: none;
+-ms-user-select: none;
+}
+
 .pedagogic-item-card i.icon.lock-alt {
     top: -20px;
     position: relative;
@@ -979,11 +989,11 @@ ent-dropdown div.show>div.dropdown-list {
 
 
 .quick-search.lessontype {
-    top: 365px;
+    top: 275px;
 }
 
 .quick-search.homeworktype {
-    top: 220px;
+    top: 130px;
 }
 
 .quick-search-showmore {
@@ -1055,7 +1065,7 @@ i.external-link:before{
 
 /* line 2, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
 .quick-search.progressiontype {
-  top: 442px; }
+  top: 351px; }
 
 /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/calendar-page.scss */
 .current-week-indicator {
@@ -1874,7 +1884,7 @@ div.schedule .schedule-items .schedule-item .schedule-item-content {
   float: left;
   width: 100%;
   overflow: hidden;
-  height: 432px; }
+  height: 402px; }
   /* line 77, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/progression/right-panel/content/progression.scss */
   .contener-slide .slide {
     top: 0px;
@@ -2028,7 +2038,7 @@ lightbox.popup-viser section.lightbox div.content {
 
 /* line 25, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */
 .visa-manager .visa .dirty {
-  color: red;
+  color: #ff8500;
   font-weight: bold; }
 
 /* line 29, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/js/visa/visa.scss */

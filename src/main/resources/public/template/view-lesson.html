@@ -19,7 +19,7 @@
 					<i18n>create.lesson.tabs.lesson</i18n>
 				</headerHomeworkLesson>
 				<headerHomeworkLesson ng-if="editLessonCtrl.lesson.homeworks.all.length > 0" data-ng-class="{'selected': data.tabSelected === 'homeworks'}" data-ng-click="data.tabSelected = 'homeworks'">
-					<i18n>create.lesson.tabs.homeworks</i18n>
+					<i18n>create.lesson.tabs.homeworks</i18n> ([[editLessonCtrl.lesson.homeworks.length()]])
 				</headerHomeworkLesson>
 
 				<headerHomeworkLesson ng-if="editLessonCtrl.lesson.homeworks.all.length == 0">
@@ -150,7 +150,7 @@
 		<div class="row lessonHomeworkBtn">
 			<nav>
 				<!-- go back to calendar view without saving -->
-				<button class="right-magnet cancel" type="button" ng-click="redirect('/mainView')">
+				<button class="right-magnet cancel" type="button" ng-click="back()">
                     <i18n>back</i18n>
                 </button>
 			</nav>

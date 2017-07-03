@@ -40,9 +40,12 @@
                           <div class="cell eight">
                               <span ng-click="visaAgreg.expanded=!visaAgreg.expanded"
                                   ng-if="visaAgreg.visas.length > 0"
-                                  ng-class="{'dirty' : visaAgreg.visas[0].nbDirty , 'ok' : (visaAgreg.visas[0].nbDirty) === 0}">
+                                  ng-class="{'dirty' : visaAgreg.visas[0].nbDirty , 'ok' : (visaAgreg.visas[0].nbDirty) === 0}"
+                                  diary-tooltip="[[(visaAgreg.visas[0].nbDirty) === 0 ? 'diary.visa.state.ok' : 'diary.visa.state.dirty' ]]"
+                                  >
                                   [[visaAgreg.visas[0].dateCreate | date  : constants.CAL_DATE_PATTERN_NG]]
                               </span>
+
                               <span ng-if="visaAgreg.visas.length > 0"  ng-click="visaAgreg.expanded=!visaAgreg.expanded" >
                                   <i ng-show="!visaAgreg.expanded"  data-tooltip="Déplier" class="down-open"></i>
                                   <i ng-show="visaAgreg.expanded"  data-tooltip="Plier" class="up-open"></i>

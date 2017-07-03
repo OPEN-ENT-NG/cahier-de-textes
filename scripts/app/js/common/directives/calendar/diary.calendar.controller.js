@@ -297,7 +297,7 @@
             };
             $scope.onCreateClose = function() {
               if (attributes){
-                $scope.$eval(attributes.onCreateClose);                
+                $scope.$eval(attributes.onCreateClose);
               }
             };
 

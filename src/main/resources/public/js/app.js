@@ -161,6 +161,538 @@ var AngularExtensions = {
 'use strict';
 
 (function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("CalendarListViewController", controller);
+
+        function controller($scope, $timeout, $q, $location, constants, SecureService, UtilsService, LessonService, HomeworkService) {
+            var vm = this;
+
+            $timeout(init);
+
+            function init() {
+                if (!model.filters.startDate) {
+                    model.filters.startDate = moment().startOf('week');
+                    model.filters.endDate = moment(model.filters.startDate).add(7, 'd');
+                }
+                vm.getDatas();
+
+                //reset filter;
+                $scope.$watch(function () {
+                    return model.filters.selectedSubject;
+                }, function (n) {
+                    if (!n) {
+                        model.filters.selectedSubject = undefined;
+                    }
+                });
+
+                $scope.$watch(function () {
+                    return model.filters.teacher;
+                }, function (n, o) {
+                    if (n !== o && n) {
+                        $timeout(vm.getDatas);
+                    }
+                });
+                $scope.$watch(function () {
+                    return model.filters.audience;
+                }, function (n, o) {
+                    if (n !== o && n) {
+                        $timeout(vm.getDatas);
+                    }
+                });
+            }
+
+            vm.getDatas = function () {
+                var p1;
+                var p2;
+                model.filters.startDate = moment(model.filters.startDate);
+                model.filters.endDate = moment(model.filters.endDate);
+                var childId = model.child ? model.child.id : undefined;
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
+                    var teacherItem = model.filters.teacher ? model.filters.teacher.item : undefined;
+
+                    if (!teacherItem && !model.filters.audience) {
+                        return;
+                    }
+
+                    p1 = LessonService.getOtherLessons([model.filters.structure.id], model.filters.startDate, teacherItem, model.filters.audience, model.filters.startDate, model.filters.endDate);
+                    p2 = HomeworkService.getOtherHomeworks([model.filters.structure.id], model.filters.startDate, teacherItem, model.filters.audience, model.filters.startDate, model.filters.endDate);
+                } else {
+                    p1 = LessonService.getLessons(UtilsService.getUserStructuresIdsAsString(), model.filters.startDate, model.isUserParent, childId, model.filters.startDate, model.filters.endDate);
+                    p2 = HomeworkService.getHomeworks(UtilsService.getUserStructuresIdsAsString(), model.filters.startDate, model.isUserParent, childId, model.filters.startDate, model.filters.endDate);
+                }
+
+                return $q.all([p1, p2]).then(function (results) {
+                    var lessons = results[0];
+                    var homeworks = results[1];
+                    vm.createStructure(lessons, homeworks);
+                    model.filters.subjects = vm.getSubjects();
+
+                    var selectedDay = model.selectedDay;
+                    if (selectedDay) {
+                        model.selectedDay = undefined;
+
+                        vm.dayItems.map(function (item) {
+                            if (item.key === selectedDay.key) {
+                                item.selected = true;
+                                model.selectedDay = item;
+                            }
+                        });
+                    }
+                    console.log(vm.dayItems);
+                });
+            };
+
+            vm.goToItemDetail = function (item) {
+
+                var id = item.item.lesson_id || item.item.id;
+                var type = void 0;
+
+                if (item.type == 'homework' && !item.item.lesson_id) {
+                    type = 'Homework';
+                } else {
+                    type = 'Lesson';
+                }
+                //item.type[0].toUpperCase() + item.type.slice(1);
+                //let action = item.item.locked || item.type === 'homework'
+                var url = void 0;
+                if (item.item.locked) {
+                    url = '/showLessonView/';
+                } else {
+                    url = '/edit' + type + 'View/';
+                }
+
+                if (item.item.lesson_id) {
+                    url = url + item.item.lesson_id + "/" + item.item.id;
+                } else {
+                    url = url + item.item.id;
+                }
+
+                $location.url(url);
+            };
+
+            vm.selectDay = function (day) {
+                vm.dayItems.map(function (day) {
+                    day.selected = false;
+                });
+                day.selected = true;
+                model.selectedDay = day;
+            };
+
+            vm.createStructure = function (lessons, homework) {
+                vm.dayItems = {};
+
+                model.lessons.all.splice(0, model.lessons.all.length);
+                model.lessons.addRange(lessons);
+                model.homeworks.all.splice(0, model.homeworks.all.length);
+                model.homeworks.addRange(homework);
+
+                vm.addArray(model.lessons.all, 'lesson');
+                vm.addArray(model.homeworks.all, 'homework');
+                vm.dayItems = vm.restructure(vm.dayItems);
+            };
+
+            vm.addArray = function (array, type) {
+                array.forEach(function (item) {
+                    var key = item.date.format('YYYY-MM-DD');
+                    if (!vm.dayItems[key]) {
+                        vm.dayItems[key] = [];
+                    }
+                    vm.dayItems[key].push({
+                        type: type,
+                        item: item,
+                        day: item.date
+                    });
+                });
+            };
+            vm.getSubjects = function () {
+                var subjectResults = {};
+                vm.dayItems.forEach(function (day) {
+                    day.items.forEach(function (item) {
+                        if (item.item.subject && item.item.subject.label) {
+                            subjectResults[item.item.subject.label] = true;
+                        }
+                    });
+                });
+
+                return Object.keys(subjectResults);
+            };
+            vm.restructure = function (map) {
+                var result = [];
+                for (var dayAsMapKey in vm.dayItems) {
+                    var items = vm.dayItems[dayAsMapKey];
+                    result.push({
+                        key: dayAsMapKey,
+                        items: items,
+                        shortName: items[0].day.format("dddd DD MMMM YYYY").substring(0, 2),
+                        shortDate: items[0].day.format("DD/MM")
+                    });
+                }
+                return result;
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("CalendarController", controller);
+
+        function controller($scope, $rootScope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService, ModelWeekService, SecureService) {
+
+            var vm = this;
+
+            $timeout(init);
+            /*
+             * initialisation calendar function
+             */
+            function init() {
+                //view controls
+                $scope.display.showList = false;
+                //calendarDailyEvent directive options
+                $scope.display.bShowCalendar = true;
+                $scope.display.bShowHomeworks = true;
+                $scope.display.bShowHomeworksMinified = false;
+                if (!model.selectedViewMode) {
+                    $scope.goToCalendarView(); //model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+                }
+                //calendar Params
+                $scope.calendarParams = {
+                    isUserTeacher: $scope.isUserTeacher
+                };
+
+                //handler calendar updates :
+                $scope.$on('calendar.refreshItems', function (_, item) {
+                    item.calendarUpdate();
+                });
+
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
+
+                    //vm.teacher = model.filters.teacher;
+                    //vm.audience = model.filters.audience;
+
+                    $scope.$watch(function () {
+                        return model.filters.teacher;
+                    }, function (n, o) {
+                        if (n !== o && n) {
+
+                            $timeout(function () {
+                                //model.filters.teacher = vm.teacher;
+                                //model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                            });
+                        }
+                    });
+                    $scope.$watch(function () {
+                        return model.filters.audience;
+                    }, function (n, o) {
+                        if (n !== o && n) {
+                            $timeout(function () {
+                                //model.filters.teacher = vm.teacher;
+                                //model.filters.audience = vm.audience;
+                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                            });
+                        }
+                    });
+                }
+            }
+
+            //watch delete or add
+            $scope.$watch(function () {
+                if (model && model.lessons && model.lessons.all) {
+                    return model.lessons.all.length;
+                } else {
+                    return 0;
+                }
+            }, function () {
+                $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+            });
+
+            $scope.$watch('routeParams', function (n, o) {
+                if ($location.path().indexOf("calendarView") === -1 && $location.path() !== "") {
+                    return;
+                }
+                var mondayOfWeek = moment();
+                // mondayOfWeek as string date formatted YYYY-MM-DD
+                if ($scope.routeParams.mondayOfWeek) {
+                    mondayOfWeek = moment($scope.routeParams.mondayOfWeek);
+                } else {
+                    if (model.mondayOfWeek) {
+                        mondayOfWeek = model.mondayOfWeek;
+                    } else {
+                        mondayOfWeek = mondayOfWeek.weekday(0);
+                    }
+                }
+                model.mondayOfWeek = mondayOfWeek;
+                $scope.showCalendar(mondayOfWeek);
+            }, true);
+
+            $scope.routeParams = $routeParams;
+
+            /**
+             * Opens the next week view of calendar
+             */
+            $scope.nextWeek = function () {
+                var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
+                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
+            };
+
+            /**
+             * Opens the previous week view of calendar
+             */
+            $scope.previousWeek = function () {
+                var nextMonday = moment($scope.mondayOfWeek).add(-7, 'd');
+                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
+            };
+
+            /**
+             * Load related data to lessons and homeworks from database
+             * @param cb Callback function
+             * @param bShowTemplates if true loads calendar templates after data loaded
+             * might be used when
+             */
+            var initialization = function initialization(bShowTemplates, cb) {
+
+                // will force quick search panel to load (e.g: when returning to calendar view)
+                // see ng-extensions.js -> quickSearch directive
+                model.lessonsDropHandled = false;
+                model.homeworksDropHandled = false;
+
+                $scope.countdown = 2;
+
+                // auto creates diary.teacher
+                if ("ENSEIGNANT" === model.me.type) {
+                    var teacher = new Teacher();
+                    teacher.create(decrementCountdown(bShowTemplates, cb), $rootScope.validationError);
+                } else {
+                    decrementCountdown(bShowTemplates, cb);
+                }
+
+                // subjects and audiences needed to fill in
+                // homeworks and lessons props
+
+                model.childs.syncChildren(function () {
+                    $scope.child = model.child;
+                    $scope.children = model.childs;
+                    SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
+                        model.subjects.all = [];
+                        if (subjects) {
+                            model.subjects.addRange(subjects);
+                        }
+                    }).then(function () {
+                        decrementCountdown(bShowTemplates, cb);
+                        model.homeworkTypes.syncHomeworkTypes(function () {
+                            // call lessons/homework sync after audiences sync since
+                            // lesson and homework objects needs audience data to be built
+                            refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                        }, $rootScope.validationError);
+                    }, $rootScope.validationError);
+                });
+            };
+
+            var decrementCountdown = function decrementCountdown(bShowTemplates, cb) {
+                $scope.countdown--;
+                if ($scope.countdown == 0) {
+                    $scope.calendarLoaded = true;
+                    $scope.currentSchool = model.currentSchool;
+
+                    if (bShowTemplates) {
+                        showTemplates();
+                    }
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                }
+            };
+
+            /**
+             *
+             * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
+             */
+            $scope.showCalendar = function (mondayOfWeek) {
+                $scope.display.showList = false;
+
+                $scope.mondayOfWeek = mondayOfWeek;
+                if (!$scope.calendarLoaded) {
+                    initialization(true);
+                    return;
+                }
+
+                if (!$scope.mondayOfWeek) {
+                    $scope.mondayOfWeek = moment();
+                }
+
+                $scope.mondayOfWeek = $scope.mondayOfWeek.weekday(0);
+
+                model.lessonsDropHandled = false;
+                model.homeworksDropHandled = false;
+                $scope.display.showList = false;
+
+                // need reload lessons or homeworks if week changed
+                var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
+
+
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+            };
+
+            function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
+                var p1;
+                var p2;
+                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
+                    var teacherItem = model.filters.teacher ? model.filters.teacher.item : undefined;
+                    if (!teacherItem && !model.filters.audience) {
+                        p1 = $q.when([]);
+                        p2 = $q.when([]);
+                    } else {
+                        p1 = LessonService.getOtherLessons([model.filters.structure.id], mondayOfWeek, teacherItem, model.filters.audience);
+                        p2 = HomeworkService.getOtherHomeworks([model.filters.structure.id], mondayOfWeek, teacherItem, model.filters.audience);
+                    }
+                } else {
+                    p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
+                    p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+                }
+
+                //dont load courses if is not at teacher
+                var p3 = $q.when([]);
+                var p4 = $q.when([]);
+                if (model.isUserTeacher()) {
+                    //TODO use structureIds
+                    p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
+                        p4 = ModelWeekService.getModelWeeks();
+                    }
+                }
+
+                return $q.all([p1, p2, p3, p4]).then(function (results) {
+                    var lessons = results[0];
+                    var homeworks = results[1];
+                    $scope.courses = results[2];
+                    $scope.modelWeeks = results[3];
+
+                    var p = void 0;
+                    if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
+                            $scope.courses = modelCourses;
+                        });
+                    } else {
+                        p = $q.when();
+                    }
+
+                    p.then(function () {
+                        model.lessons.all.splice(0, model.lessons.all.length);
+                        model.lessons.addRange(lessons);
+                        model.homeworks.all.splice(0, model.homeworks.all.length);
+                        model.homeworks.addRange(homeworks);
+                        $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+                    });
+                });
+            }
+
+            $scope.setChildFilter = function (child, cb) {
+
+                $scope.children.forEach(function (theChild) {
+                    theChild.selected = theChild.id === child.id;
+                });
+
+                child.selected = true;
+                $scope.child = child;
+                model.child = child;
+
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+            };
+
+            $scope.showCalendarForChild = function (child) {
+                $scope.setChildFilter(child);
+            };
+
+            var showTemplates = function showTemplates() {
+                template.open('main', 'main');
+                template.open('main-view', 'calendar');
+                template.open('create-lesson', 'create-lesson');
+                template.open('create-homework', 'create-homework');
+                template.open('daily-event-details', 'daily-event-details');
+                template.open('daily-event-item', 'daily-event-item');
+            };
+
+            /**
+             * Display or hide the homework panel
+             * in calendar view
+             */
+            $scope.toggleHomeworkPanel = function () {
+                $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+
+                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+                    $scope.display.bShowCalendar = true;
+                }
+            };
+
+            /**
+             * Display/hide calendar
+             */
+            $scope.toggleCalendar = function () {
+                $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
+                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+                    $scope.display.bShowHomeworks = true;
+                }
+            };
+
+            $scope.setModel = function (alias) {
+                ModelWeekService.setModelWeek(alias, $scope.mondayOfWeek).then(function (modelWeek) {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                });
+
+                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
+            };
+
+            $scope.invert = function () {
+                ModelWeekService.invertModelsWeek().then(function () {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined).then(function () {
+                        notify.info('diary.model.week.invert.effective');
+                    });
+                });
+            };
+
+            $scope.redirect = function (path) {
+                $location.path(path);
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+        //controller declaration
+        module.controller("MainCalendarPageController", controller);
+
+        function controller($scope, $timeout, $q, $location, constants, SecureService, UtilsService, LessonService, HomeworkService) {
+            $scope.goToListView = function () {
+                $location.path('/listView');
+                //model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
+            };
+
+            $scope.goToCalendarView = function () {
+                $location.path('/calendarView/' + moment($scope.mondayOfWeek).format(constants.CAL_DATE_PATTERN));
+                //model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+            };
+        }
+    });
+})();
+
+'use strict';
+
+(function () {
 	'use strict';
 
 	AngularExtensions.addModuleConfig(function (module) {
@@ -965,7 +1497,8 @@ var AngularExtensions = {
                         if (!attributes.diaryTooltip || attributes.diaryTooltip === 'undefined') {
                             return;
                         }
-                        var tip = tooltip.html($compile('<div class="arrow"></div><div class="content">' + lang.translate(attributes.diaryTooltip) + '</div> ')(scope));
+                        var style = attributes.diaryTooltipStyle;
+                        var tip = tooltip.html($compile('<div class="arrow" ></div><div class="content" style="' + style + '"> ' + lang.translate(attributes.diaryTooltip) + '</div> ')(scope));
                         position = {
                             top: parseInt(element.offset().top + element.height()),
                             left: parseInt(element.offset().left + element.width() / 2 - tip.width() / 2)
@@ -975,6 +1508,9 @@ var AngularExtensions = {
                         }
                         if (position.left < 5) {
                             position.left = 5;
+                        }
+                        if (position.left + tip.width() + 5 > $(window).width()) {
+                            position.left = position.left - tip.width() / 2;
                         }
 
                         tooltip.css("top", position.top + 15);
@@ -1028,9 +1564,12 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     model.LessonService = LessonService;
     $scope.constants = constants;
     $scope.RIGHTS = constants.RIGHTS;
+    $scope.model = model;
 
     $scope.currentErrors = [];
-
+    if (!model.filters) {
+        model.filters = {};
+    }
     $scope.data = {
         tabSelected: 'lesson'
     };
@@ -1179,13 +1718,12 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             template.open('main', 'main');
             template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');
+            model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
         },
         listView: function listView() {
-            //$scope.lesson = null;
-            $scope.homework = null;
-            $scope.pedagogicLessonsSelected = [];
-            $scope.pedagogicHomeworksSelected = [];
-            $scope.showList();
+            template.open('main', 'main');
+            template.open('main-view', 'calendar');
+            model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
         },
         mainView: function mainView() {
             if ($scope.display.showList) {
@@ -1308,6 +1846,10 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         $scope.selectedDueDate = moment(day.dayName, "dddd DD MMMM YYYY");
     };
 
+    $scope.back = function () {
+        $window.history.back();
+    };
+
     var loadHomeworkFromRoute = function loadHomeworkFromRoute(params) {
         // try find homework in current week homeworks cache
         var homework = model.homeworks.findWhere({ id: parseInt(params.idHomework) });
@@ -1374,6 +1916,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
      * @param cb
      */
     $scope.goToListView = function (cb) {
+        console.warn('reprecated');
+        return;
+        //TODO delete
         $location.path('/listView');
     };
 
@@ -1523,6 +2068,13 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         $scope.publishLessons(lessons, isPublish, notifyKey, $scope.goToMainView());
     };
 
+    $scope.publishLesson = function (lesson, isPublish) {
+        var lessons = [];
+        lessons.push(lesson);
+        var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
+        $scope.publishLessons(lessons, isPublish, notifyKey, $scope.back());
+    };
+
     /**
      * Publish lessons
      * @param lessons Array of lessons to publish or unpublish
@@ -1579,6 +2131,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     var publishCB = function publishCB(list, toPublish, notifyKey, cb) {
         list.forEach(function (item) {
             item.changeState(toPublish);
+            item.selected = false;
         });
 
         $scope.cbCount--;
@@ -1826,7 +2379,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
         homework.delete(lesson, function () {
             notify.info('homework.deleted');
-            $scope.$apply();
+            //$scope.$apply();
 
             if (typeof cb === 'function') {
                 cb();
@@ -1854,7 +2407,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             }
 
             if (goToMainView) {
-                $scope.goToMainView();
+                $scope.back();
                 $scope.lesson = null;
                 $scope.homework = null;
             }
@@ -2168,339 +2721,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     AngularExtensions.addModuleConfig(function (module) {
         //controller declaration
-        module.controller("CalendarController", controller);
-
-        function controller($scope, $rootScope, $timeout, CourseService, $routeParams, constants, $location, HomeworkService, UtilsService, LessonService, $q, SubjectService, ModelWeekService, SecureService) {
-
-            var vm = this;
-
-            $timeout(init);
-            /*
-             * initialisation calendar function
-             */
-            function init() {
-                //view controls
-                $scope.display.showList = false;
-                //calendarDailyEvent directive options
-                $scope.display.bShowCalendar = true;
-                $scope.display.bShowHomeworks = true;
-                $scope.display.bShowHomeworksMinified = false;
-
-                //calendar Params
-                $scope.calendarParams = {
-                    isUserTeacher: $scope.isUserTeacher
-                };
-
-                //handler calendar updates :
-                $scope.$on('calendar.refreshItems', function (_, item) {
-                    item.calendarUpdate();
-                });
-
-                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
-
-                    if (!model.filters) {
-                        model.filters = {};
-                    }
-
-                    vm.teacher = model.filters.teacher;
-                    vm.audience = model.filters.audience;
-
-                    $scope.$watch(function () {
-                        return vm.teacher;
-                    }, function (n, o) {
-                        if (n !== o && n) {
-
-                            $timeout(function () {
-                                model.filters.teacher = vm.teacher;
-                                model.filters.audience = vm.audience;
-                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-                            });
-                        }
-                    });
-                    $scope.$watch(function () {
-                        return vm.audience;
-                    }, function (n, o) {
-                        if (n !== o && n) {
-                            $timeout(function () {
-                                model.filters.teacher = vm.teacher;
-                                model.filters.audience = vm.audience;
-                                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-                            });
-                        }
-                    });
-                }
-            }
-
-            //watch delete or add
-            $scope.$watch(function () {
-                if (model && model.lessons && model.lessons.all) {
-                    return model.lessons.all.length;
-                } else {
-                    return 0;
-                }
-            }, function () {
-                $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
-            });
-
-            $scope.$watch('routeParams', function (n, o) {
-                if ($location.path().indexOf("calendarView") === -1 && $location.path() !== "") {
-                    return;
-                }
-                var mondayOfWeek = moment();
-                // mondayOfWeek as string date formatted YYYY-MM-DD
-                if ($scope.routeParams.mondayOfWeek) {
-                    mondayOfWeek = moment($scope.routeParams.mondayOfWeek);
-                } else {
-                    if (model.mondayOfWeek) {
-                        mondayOfWeek = model.mondayOfWeek;
-                    } else {
-                        mondayOfWeek = mondayOfWeek.weekday(0);
-                    }
-                }
-                model.mondayOfWeek = mondayOfWeek;
-                $scope.showCalendar(mondayOfWeek);
-            }, true);
-
-            $scope.routeParams = $routeParams;
-
-            /**
-             * Opens the next week view of calendar
-             */
-            $scope.nextWeek = function () {
-                var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
-                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
-            };
-
-            /**
-             * Opens the previous week view of calendar
-             */
-            $scope.previousWeek = function () {
-                var nextMonday = moment($scope.mondayOfWeek).add(-7, 'd');
-                $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
-            };
-
-            /**
-             * Load related data to lessons and homeworks from database
-             * @param cb Callback function
-             * @param bShowTemplates if true loads calendar templates after data loaded
-             * might be used when
-             */
-            var initialization = function initialization(bShowTemplates, cb) {
-
-                // will force quick search panel to load (e.g: when returning to calendar view)
-                // see ng-extensions.js -> quickSearch directive
-                model.lessonsDropHandled = false;
-                model.homeworksDropHandled = false;
-
-                $scope.countdown = 2;
-
-                // auto creates diary.teacher
-                if ("ENSEIGNANT" === model.me.type) {
-                    var teacher = new Teacher();
-                    teacher.create(decrementCountdown(bShowTemplates, cb), $rootScope.validationError);
-                } else {
-                    decrementCountdown(bShowTemplates, cb);
-                }
-
-                // subjects and audiences needed to fill in
-                // homeworks and lessons props
-
-                model.childs.syncChildren(function () {
-                    $scope.child = model.child;
-                    $scope.children = model.childs;
-                    SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
-                        model.subjects.all = [];
-                        if (subjects) {
-                            model.subjects.addRange(subjects);
-                        }
-                    }).then(function () {
-                        decrementCountdown(bShowTemplates, cb);
-                        model.homeworkTypes.syncHomeworkTypes(function () {
-                            // call lessons/homework sync after audiences sync since
-                            // lesson and homework objects needs audience data to be built
-                            refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-                        }, $rootScope.validationError);
-                    }, $rootScope.validationError);
-                });
-            };
-
-            var decrementCountdown = function decrementCountdown(bShowTemplates, cb) {
-                $scope.countdown--;
-                if ($scope.countdown == 0) {
-                    $scope.calendarLoaded = true;
-                    $scope.currentSchool = model.currentSchool;
-
-                    if (bShowTemplates) {
-                        showTemplates();
-                    }
-                    if (typeof cb === 'function') {
-                        cb();
-                    }
-                }
-            };
-
-            /**
-             *
-             * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
-             */
-            $scope.showCalendar = function (mondayOfWeek) {
-                $scope.display.showList = false;
-
-                $scope.mondayOfWeek = mondayOfWeek;
-                if (!$scope.calendarLoaded) {
-                    initialization(true);
-                    return;
-                }
-
-                if (!$scope.mondayOfWeek) {
-                    $scope.mondayOfWeek = moment();
-                }
-
-                $scope.mondayOfWeek = $scope.mondayOfWeek.weekday(0);
-
-                model.lessonsDropHandled = false;
-                model.homeworksDropHandled = false;
-                $scope.display.showList = false;
-
-                // need reload lessons or homeworks if week changed
-                var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
-
-
-                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-            };
-
-            function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
-                var p1;
-                var p2;
-                if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
-                    var teacherItem = vm.teacher ? vm.teacher.item : undefined;
-                    if (!teacherItem && !vm.audience) {
-                        p1 = $q.when([]);
-                        p2 = $q.when([]);
-                    } else {
-                        p1 = LessonService.getOtherLessons([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
-                        p2 = HomeworkService.getOtherHomeworks([vm.structure.id], mondayOfWeek, teacherItem, vm.audience);
-                    }
-                } else {
-                    p1 = LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
-                    p2 = HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
-                }
-
-                //dont load courses if is not at teacher
-                var p3 = $q.when([]);
-                var p4 = $q.when([]);
-                if (model.isUserTeacher()) {
-                    //TODO use structureIds
-                    p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
-                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
-                        p4 = ModelWeekService.getModelWeeks();
-                    }
-                }
-
-                return $q.all([p1, p2, p3, p4]).then(function (results) {
-                    var lessons = results[0];
-                    var homeworks = results[1];
-                    $scope.courses = results[2];
-                    $scope.modelWeeks = results[3];
-
-                    var p = void 0;
-                    if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
-                            $scope.courses = modelCourses;
-                        });
-                    } else {
-                        p = $q.when();
-                    }
-
-                    p.then(function () {
-                        model.lessons.all.splice(0, model.lessons.all.length);
-                        model.lessons.addRange(lessons);
-                        model.homeworks.all.splice(0, model.homeworks.all.length);
-                        model.homeworks.addRange(homeworks);
-                        $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
-                    });
-                });
-            }
-
-            $scope.setChildFilter = function (child, cb) {
-
-                $scope.children.forEach(function (theChild) {
-                    theChild.selected = theChild.id === child.id;
-                });
-
-                child.selected = true;
-                $scope.child = child;
-                model.child = child;
-
-                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
-            };
-
-            $scope.showCalendarForChild = function (child) {
-                $scope.setChildFilter(child);
-            };
-
-            var showTemplates = function showTemplates() {
-                template.open('main', 'main');
-                template.open('main-view', 'calendar');
-                template.open('create-lesson', 'create-lesson');
-                template.open('create-homework', 'create-homework');
-                template.open('daily-event-details', 'daily-event-details');
-                template.open('daily-event-item', 'daily-event-item');
-            };
-
-            /**
-             * Display or hide the homework panel
-             * in calendar view
-             */
-            $scope.toggleHomeworkPanel = function () {
-                $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
-
-                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
-                    $scope.display.bShowCalendar = true;
-                }
-            };
-
-            /**
-             * Display/hide calendar
-             */
-            $scope.toggleCalendar = function () {
-                $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
-                if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
-                    $scope.display.bShowHomeworks = true;
-                }
-            };
-
-            $scope.setModel = function (alias) {
-                ModelWeekService.setModelWeek(alias, $scope.mondayOfWeek).then(function (modelWeek) {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-                });
-
-                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
-            };
-
-            $scope.invert = function () {
-                ModelWeekService.invertModelsWeek().then(function () {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined).then(function () {
-                        notify.info('diary.model.week.invert.effective');
-                    });
-                });
-            };
-
-            $scope.redirect = function (path) {
-                $location.path(path);
-            };
-        }
-    });
-})();
-
-'use strict';
-
-(function () {
-    'use strict';
-
-    AngularExtensions.addModuleConfig(function (module) {
-        //controller declaration
         module.controller("EditLessonController", controller);
 
         function controller($scope, $rootScope, $routeParams, PedagogicItemService, constants, $q, SubjectService) {
@@ -2681,7 +2901,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         id: vm.lesson.audience.id
                     });
                     if (goMainView) {
-                        $scope.goToMainView();
+                        $scope.back();
                         vm.lesson = null;
                         $scope.homework = null;
                     }
@@ -2792,7 +3012,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
             $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
                 $scope.createOrUpdateLesson(goMainView, function () {
-                    $scope.publishLessonAndGoCalendarView(lesson, isPublish);
+                    $scope.publishLesson(lesson, isPublish);
                 });
             };
         }
@@ -3617,36 +3837,46 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         function controller($scope, SecureService, VisaService, constants) {
 
             var vm = this;
+            var promiseFilter = void 0;
             $scope.RIGHTS = constants.RIGHTS;
             vm.filters = {};
-            $scope.$watch("audience", function (n, o) {
-                if (n) {
-                    $scope.teacher = undefined;
-                }
-            });
-            $scope.$watch("teacher", function (n, o) {
-                if (n) {
-                    $scope.audience = undefined;
-                }
-            });
-            $scope.$watch("structure", function (n, o) {
-                if (n !== o && n) {
-                    vm.getFilters(n.id);
-                }
-            });
 
             vm.getFilters = function (structureId) {
-
-                if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)) {
-                    VisaService.getFilters(structureId).then(function (filters) {
-                        vm.filters = filters;
-                    });
-                } else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)) {
-                    VisaService.getInspectorFilters(structureId, model.me.userId).then(function (filters) {
+                if (!promiseFilter) {
+                    if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)) {
+                        promiseFilter = VisaService.getFilters(structureId);
+                    } else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)) {
+                        promiseFilter = VisaService.getInspectorFilters(structureId, model.me.userId);
+                    }
+                }
+                if (promiseFilter) {
+                    promiseFilter.then(function (filters) {
                         vm.filters = filters;
                     });
                 }
             };
+
+            init();
+            function init() {
+                $scope.$watch("audience", function (n, o) {
+                    if (n) {
+                        $scope.teacher = undefined;
+                    }
+                });
+                $scope.$watch("teacher", function (n, o) {
+                    if (n) {
+                        $scope.audience = undefined;
+                    }
+                });
+                $scope.$watch("structure", function (n, o) {
+                    if (n !== o && n) {
+                        vm.getFilters(n.id);
+                    }
+                });
+                if ($scope.structure) {
+                    vm.getFilters($scope.structure.id);
+                }
+            }
         }
     });
 })();
@@ -3740,8 +3970,20 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 												}
 										});
 
-										$(element.context.ownerDocument).click(function (event) {
-												scope.listVisible = false;
+										function handler(event) {
+												var isClickedElementChildOfPopup = element.find(event.target).length > 0;
+
+												if (isClickedElementChildOfPopup) return;
+
+												scope.$apply(function () {
+														scope.listVisible = false;
+												});
+										}
+										$(document).bind('click', handler);
+
+										//free on detraoy element & handlers
+										scope.$on("$destroy", function () {
+												$(document).unbind('click', handler);
 										});
 								}
 						};
@@ -4109,11 +4351,11 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                     // let enough room to display quick search panel maximized
                     if (isVisible) {
-                        $('#mainDiaryContainer').width('84%');
+                        $('.mainDiaryContainer').width('84%');
                         $('.quick-search').width('16%');
                         $rootScope.$broadcast('rightpanel.open', id);
                     } else {
-                        $('#mainDiaryContainer').width('97%');
+                        $('.mainDiaryContainer').width('97%');
                         $('.quick-search').width('2%');
                     }
                 }
@@ -4583,7 +4825,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "hasRight",
             value: function hasRight(right) {
                 var result = false;
-                console.log("secure find right : ", right);
                 _.each(model.me.authorizedActions, function (authorizedAction) {
                     if (authorizedAction.displayName === right) {
                         result = true;
@@ -4797,6 +5038,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             scope.$apply();
                         }
                     });
+
+                    // function handler(event) {
+                    //         var isClickedElementChildOfPopup = element
+                    //                 .find(event.target)
+                    //                 .length > 0;
+                    //
+                    //         if (isClickedElementChildOfPopup)
+                    //                 return;
+                    //
+                    //         scope.$apply(function() {
+                    //             scope.displaySearch = false;
+                    //             if (scope.suggestedSubjects.length === 0) {
+                    //                 setNewSubject(scope.search);
+                    //             }
+                    //         });
+                    // }
+                    // $(document).bind('click',handler );
+                    //
+                    // //free on detraoy element & handlers
+                    // scope.$on("$destroy", function() {
+                    //         $(document).unbind('click',handler );
+                    // });
                 }
             };
         });
@@ -4914,6 +5177,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				});
 				result = result.substring(0, result.length - 1);
 				return result;
+			};
+		}
+	});
+})();
+
+'use strict';
+
+(function () {
+	'use strict';
+
+	AngularExtensions.addModuleConfig(function (module) {
+		module.filter('formatHour', filter);
+
+		function filter() {
+			return function (text) {
+				if (!text) {
+					return text;
+				}
+				return text.substring(0, 5).replace(":", "h");
 			};
 		}
 	});
@@ -5606,7 +5888,6 @@ Lesson.prototype.update = function (cb, cbe) {
     var lesson = this;
 
     http().putJson(url, this).done(function () {
-
         if (typeof cb === 'function') {
             cb();
         }
@@ -6490,10 +6771,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 $scope.panelVisible = !$scope.panelVisible;
 
                 if ($scope.panelVisible) {
-                    $('#mainDiaryContainer').width('84%');
+                    $('.mainDiaryContainer').width('84%');
                     $('.quick-search').width('16%');
                 } else {
-                    $('#mainDiaryContainer').width('97%');
+                    $('.mainDiaryContainer').width('97%');
                     $('.quick-search').width('2%');
                 }
             };
@@ -6948,12 +7229,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         _createClass(HomeworkService, [{
             key: 'getHomeworks',
-            value: function getHomeworks(userStructuresIds, mondayOfWeek, isUserParent, childId) {
+            value: function getHomeworks(userStructuresIds, mondayOfWeek, isUserParent, childId, fromDate, toDate) {
                 var _this = this;
 
                 var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
                 var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+                if (fromDate) {
+                    start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                    end = toDate.format(this.constants.CAL_DATE_PATTERN);
+                }
                 var urlGetHomeworks = '/diary/homework/' + userStructuresIds + '/' + start + '/' + end + '/';
 
                 if (isUserParent && childId) {
@@ -6968,12 +7252,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: 'getOtherHomeworks',
-            value: function getOtherHomeworks(userStructuresIds, mondayOfWeek, teacher, audience) {
+            value: function getOtherHomeworks(userStructuresIds, mondayOfWeek, teacher, audience, fromDate, toDate) {
                 var _this2 = this;
 
                 var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
                 var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+                if (fromDate) {
+                    start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                    end = toDate.format(this.constants.CAL_DATE_PATTERN);
+                }
                 var type = teacher ? "teacher" : "audience";
                 var id = teacher ? teacher.key : audience.key;
 
@@ -7071,11 +7358,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         _createClass(LessonService, [{
             key: 'getLessons',
-            value: function getLessons(userStructuresIds, mondayOfWeek, isUserParent, childId) {
+            value: function getLessons(userStructuresIds, mondayOfWeek, isUserParent, childId, fromDate, toDate) {
                 var _this = this;
 
                 var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
                 var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+
+                if (fromDate) {
+                    start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                    end = toDate.format(this.constants.CAL_DATE_PATTERN);
+                }
 
                 var urlGetLessons = '/diary/lesson/' + userStructuresIds + '/' + start + '/' + end + '/';
 
@@ -7091,12 +7383,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: 'getOtherLessons',
-            value: function getOtherLessons(userStructuresIds, mondayOfWeek, teacher, audience) {
+            value: function getOtherLessons(userStructuresIds, mondayOfWeek, teacher, audience, fromDate, toDate) {
                 var _this2 = this;
 
                 var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
                 var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
-
+                if (fromDate) {
+                    start = fromDate.format(this.constants.CAL_DATE_PATTERN);
+                    end = toDate.format(this.constants.CAL_DATE_PATTERN);
+                }
                 var type = teacher ? "teacher" : "audience";
                 var id = teacher ? teacher.key : audience.key;
 
@@ -7155,7 +7450,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     subject: model.subjects.findWhere({ id: lessonData.subject_id }),
                     subjectId: lessonData.subject_id,
                     subjectLabel: lessonData.subject_label,
-                    teacherId: lessonData.teacher_display_name,
+                    teacherName: lessonData.teacher_display_name,
                     structureId: lessonData.school_id,
                     date: moment(lessonData.lesson_date),
                     startTime: lessonData.lesson_start_time,
@@ -7186,9 +7481,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     lesson.attachments = AttachementService.mappAttachement(JSON.parse(lessonData.attachments));
                 }
 
-                var tooltip = this.UtilsService.getResponsiveLessonTooltipText(lesson);
-
-                lesson.tooltipText = tooltip;
+                lesson.tooltipText = this.UtilsService.getResponsiveLessonTooltipText(lesson);
                 return lesson;
             }
         }]);
@@ -7220,6 +7513,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.$q = $q;
             this.constants = constants;
             this.CourseService = CourseService;
+            this.promiseGetmodelWeek = undefined;
         }
 
         _createClass(ModelWeekService, [{
@@ -7227,30 +7521,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function setModelWeek(alias, date) {
                 var dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
                 var url = "/diary/modelweek/" + alias + "/" + dateParam;
+                this.promiseGetmodelWeek = undefined;
                 return this.$http.post(url);
             }
         }, {
             key: "getModelWeeks",
             value: function getModelWeeks() {
                 var url = "/diary/modelweek/list";
-                return this.$http.get(url).then(function (result) {
-                    var modelWeeks = result.data;
-                    _.each(modelWeeks, function (modelWeek) {
-                        modelWeek.startDate = moment(modelWeek.startDate).toDate();
-                        modelWeek.endDate = moment(modelWeek.endDate).toDate();
-                    });
+                if (!this.promiseGetmodelWeek) {
+                    this.promiseGetmodelWeek = this.$http.get(url).then(function (result) {
+                        var modelWeeks = result.data;
+                        _.each(modelWeeks, function (modelWeek) {
+                            modelWeek.startDate = moment(modelWeek.startDate).toDate();
+                            modelWeek.endDate = moment(modelWeek.endDate).toDate();
+                        });
 
-                    var transformedResult = {
-                        "A": _.findWhere(modelWeeks, { "weekAlias": "A" }),
-                        "B": _.findWhere(modelWeeks, { "weekAlias": "B" })
-                    };
-                    return transformedResult;
-                });
+                        var transformedResult = {
+                            "A": _.findWhere(modelWeeks, { "weekAlias": "A" }),
+                            "B": _.findWhere(modelWeeks, { "weekAlias": "B" })
+                        };
+                        return transformedResult;
+                    });
+                }
+                return this.promiseGetmodelWeek;
             }
         }, {
             key: "invertModelsWeek",
             value: function invertModelsWeek() {
                 var url = "/diary/modelweek/invert";
+                this.promiseGetmodelWeek = undefined;
                 return this.$http.post(url).then(function (result) {
                     return result.data;
                 });
@@ -7747,7 +8046,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var existantTeacher = _.findWhere(vm.selectedTeachers, { 'key': teacher.key });
                 if (!existantTeacher) {
                     vm.selectedTeachers.push(teacher);
-                    vm.dirty = true;
+                    vm.save();
                 }
             };
 
@@ -7758,13 +8057,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         inspectors: inspectors
                     };
                 });
-                vm.dirty = true;
             };
             vm.removeTeacher = function (teacher) {
                 vm.selectedTeachers = _.filter(vm.selectedTeachers, function (t) {
                     return t.key !== teacher.key;
                 });
-                vm.dirty = true;
+                vm.save();
             };
             vm.cancel = function () {
                 vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
@@ -7774,7 +8072,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 vm.filters.teachers = undefined;
                 vm.selectedTeachers = undefined;
                 vm.filter.teacher = undefined;
-                vm.dirty = false;
+
                 VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then(function (result) {
                     //console.log(result);
                     vm.filters.teachers = result.availableTeachers;
@@ -7785,7 +8083,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             vm.save = function () {
                 VisaService.applyInspectorRight(vm.structure.id, vm.filter.inspector.key, vm.selectedTeachers).then(function () {
                     vm.getInspectTeachers(vm.structure.id, vm.filter.inspector.key);
-                    vm.dirty = false;
                 });
             };
         }
@@ -7958,7 +8255,12 @@ function HomeworksLoad() {}
 function HomeworkType() {}
 
 model.getSecureService = function () {
+
     return angular.injector(['ng', 'app']).get("SecureService");
+};
+
+model.getUtilsService = function () {
+    return angular.element($('html')).injector().get("UtilsService");
 };
 
 model.getConstants = function () {
@@ -8114,12 +8416,15 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
         // so have to delete and add modified lessons ...
         model.lessons.forEach(function (lessonModel) {
             if (itemArray.ids.indexOf(lessonModel.id) != -1) {
-                model.lessons.remove(lessonModel);
+                //model.lessons.remove(lessonModel);
 
                 lessonModel.changeState(isPublish);
+                lessonModel.selected = false;
+                lessonModel.tooltipText = model.getUtilsService().getResponsiveLessonTooltipText(lessonModel);
+                console.log(lessonModel.tooltipText);
                 // update tooltip text (has state label in it)
-                lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
-                updateLessons.push(lessonModel);
+                //lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
+                //updateLessons.push(lessonModel);
             }
         });
 
@@ -8198,8 +8503,11 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
     if (!lesson.id) {
         return;
     }
-
-    http().get('/diary/homework/list/' + lesson.id).done(function (sqlHomeworks) {
+    var url = '/diary/homework/list/';
+    if (model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)) {
+        url = '/diary/homework/external/list/';
+    }
+    http().get(url + lesson.id).done(function (sqlHomeworks) {
 
         lesson.homeworks = new Collection(Homework);
 
@@ -8564,6 +8872,7 @@ model.build = function () {
             subjectId: data.subject_id,
             subjectLabel: data.subject_label,
             teacherId: data.teacher_display_name,
+            teacherName: data.teacher_display_name,
             structureId: data.school_id,
             date: moment(data.lesson_date),
             startTime: data.lesson_start_time,
@@ -8590,9 +8899,9 @@ model.build = function () {
             lesson.attachments = _.map(JSON.parse(data.attachments), jsonToJsAttachment);
         }
 
-        var tooltip = getResponsiveLessonTooltipText(lesson);
+        //var tooltip = getResponsiveLessonTooltipText(lesson);
 
-        lesson.tooltipText = tooltip;
+        //lesson.tooltipText = tooltip;
         return lesson;
     };
 

@@ -167,11 +167,7 @@
                         cb();
                     }
                 }
-
             };
-
-
-
 
             /**
              * Create or update lesson to database from page fields
@@ -192,7 +188,7 @@
                         id: vm.lesson.audience.id
                     });
                     if (goMainView) {
-                        $scope.goToMainView();
+                        $scope.back();
                         vm.lesson = null;
                         $scope.homework = null;
                     }
@@ -308,7 +304,7 @@
 
             $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
                 $scope.createOrUpdateLesson(goMainView, function(){
-                    $scope.publishLessonAndGoCalendarView(lesson, isPublish);
+                    $scope.publishLesson(lesson, isPublish);
                 });
             };
         }

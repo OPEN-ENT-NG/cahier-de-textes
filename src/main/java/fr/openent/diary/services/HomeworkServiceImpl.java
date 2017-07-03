@@ -69,6 +69,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label,")
+                .append(" teacher.teacher_display_name as teacher_display_name,")
                 .append(" att.attachments ")
                 .append(" FROM diary.homework AS h")
 
@@ -76,6 +77,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
                 .append(" INNER JOIN diary.subject as s ON s.id = h.subject_id")
                 .append(" INNER JOIN diary.audience as a ON a.id = h.audience_id")
+                .append(" INNER JOIN diary.teacher as teacher ON teacher.id = h.teacher_id")
                 .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
                 .append(" FROM diary.homework_has_attachment as ha INNER JOIN diary.attachment a ON ha.attachment_id = a.id")
                 .append(" WHERE ha.homework_id = h.id) att ON TRUE");
@@ -105,20 +107,22 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(endDate.trim());
         }
 
-        if (ctx == Context.STUDENT || ctx == Context.PARENT) {
+        if (ctx == Context.STUDENT || ctx == Context.PARENT || ctx == Context.EXTERNAL) {
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 
+        if (ctx != Context.EXTERNAL){
+            query.append(" AND ((h.lesson_id IS NOT NULL AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
+                    .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
+                    .append(" WHERE l.id = ls.resource_id")
+                    .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
 
-                query.append(" AND ((h.lesson_id IS NOT NULL AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
-                .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
-                .append(" WHERE l.id = ls.resource_id")
-                .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
-
-        for (final String g : memberIds) {
-            parameters.addString(g);
+            for (final String g : memberIds) {
+                parameters.addString(g);
+            }
+            parameters.add(userId);
         }
-        parameters.add(userId);
+
 
         if (ctx == Context.TEACHER) {
             // retrieve homeworks whose lesson we are owner and those we have gestionnaire right on
@@ -127,15 +131,16 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(this.GESTIONNAIRE_RIGHT_LESSON);
         }
 
-        query.append(")) OR ( h.lesson_id IS NULL AND EXISTS (SELECT 1 FROM diary.homework_shares hs  ")
-                .append(" LEFT JOIN diary.members AS m ON (hs.member_id = m.id AND m.group_id IS NOT NULL)")
-                .append(" WHERE h.id = hs.resource_id")
-                .append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ?) ");
-
-        for (final String g : memberIds) {
-            parameters.addString(g);
+        if (ctx != Context.EXTERNAL) {
+            query.append(")) OR ( h.lesson_id IS NULL AND EXISTS (SELECT 1 FROM diary.homework_shares hs  ")
+                    .append(" LEFT JOIN diary.members AS m ON (hs.member_id = m.id AND m.group_id IS NOT NULL)")
+                    .append(" WHERE h.id = hs.resource_id")
+                    .append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ?) ");
+            for (final String g : memberIds) {
+                parameters.addString(g);
+            }
+            parameters.add(userId);
         }
-        parameters.add(userId);
 
         if (ctx == Context.TEACHER) {
             // retrieve homeworks whose we are owner and those we have gestionnaire right on
@@ -143,8 +148,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             parameters.add(userId);
             parameters.add(this.GESTIONNAIRE_RIGHT);
         }
+        if (ctx != Context.EXTERNAL) {
+            query.append(")))");
+        }
 
-        query.append(")))");
         query.append(" ORDER BY h.homework_due_date ASC, h.created ASC ");
 
         log.debug(query);
@@ -159,6 +166,11 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void getAllHomeworksForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
         getHomeworks(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, null, handler);
+    }
+
+    @Override
+    public void getExternalHomeworkByLessonId (final String userId,final String lessonId, final List<String> memberIds,Handler<Either<String, JsonArray>> handler){
+        getHomeworks(Context.EXTERNAL, userId, null, memberIds, null, null, lessonId, handler);
     }
 
     @Override

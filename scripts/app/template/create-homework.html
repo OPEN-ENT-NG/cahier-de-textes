@@ -41,7 +41,7 @@
             </button>
 
             <!-- go back to calendar view without saving -->
-            <button type="button" class="right-magnet cancel" ng-click="redirect('/mainView')"><i18n>cancel</i18n></button>
+            <button type="button" class="right-magnet cancel" ng-click="back()"><i18n>cancel</i18n></button>
         </div>
     </span>
 </div>
@@ -85,7 +85,7 @@
                 [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
         </span>
         </div>
-    <div class="row">        
+    <div class="row">
 
         <editor ng-if="!homeworkDescriptionIsReadOnly" ng-model="homework.description"></editor>
         <button ng-if="!homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">

@@ -18,8 +18,8 @@
 				+ [[day.scheduleItems.beforeCalendar()]]
 			</div>
 
-			<div ng-if="!DiaryCalendarCtrl.display.readonly" class="timeslots">				
-				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="!DiaryCalendarCtrl.display.readonly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
+			<div ng-if="!DiaryCalendarCtrl.display.readonly" class="timeslots">
+				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="!readOnly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
 
 				</div>
 			</div>

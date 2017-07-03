@@ -24,36 +24,48 @@
         function controller($scope,SecureService,VisaService,constants) {
 
             let vm = this;
+            let promiseFilter;
             $scope.RIGHTS = constants.RIGHTS;
             vm.filters = {};
-            $scope.$watch("audience",(n,o)=>{
-                if (n){
-                    $scope.teacher= undefined;
-                }
-            });
-            $scope.$watch("teacher",(n,o)=>{
-                if (n){
-                    $scope.audience= undefined;
-                }
-            });
-            $scope.$watch("structure",(n,o)=>{
-                if (n !== o && n ){
-                    vm.getFilters(n.id);
-                }
-            });
 
             vm.getFilters = function(structureId){
-
-                if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)){
-                    VisaService.getFilters(structureId).then((filters)=>{
-                        vm.filters = filters;
-                    });
-                }else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)){
-                    VisaService.getInspectorFilters(structureId,model.me.userId).then((filters)=>{
-                        vm.filters = filters;
-                    });
+                if (!promiseFilter) {
+                    if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)){
+                        promiseFilter= VisaService.getFilters(structureId);
+                    }else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)){
+                        promiseFilter = VisaService.getInspectorFilters(structureId,model.me.userId);
+                    }
+                }
+                if(promiseFilter){
+                  promiseFilter.then((filters)=>{
+                      vm.filters = filters;
+                  });
                 }
             };
+
+            init();
+            function init(){
+                $scope.$watch("audience",(n,o)=>{
+                    if (n){
+                        $scope.teacher= undefined;
+                    }
+                });
+                $scope.$watch("teacher",(n,o)=>{
+                    if (n){
+                        $scope.audience= undefined;
+                    }
+                });
+                $scope.$watch("structure",(n,o)=>{
+                    if (n !== o && n ){
+                        vm.getFilters(n.id);
+                    }
+                });
+                if ($scope.structure){
+                    vm.getFilters($scope.structure.id);
+                }
+            }
+
+
         }
 
     });

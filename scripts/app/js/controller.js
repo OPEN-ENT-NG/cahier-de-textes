@@ -19,9 +19,12 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     model.LessonService = LessonService;
     $scope.constants = constants;
     $scope.RIGHTS = constants.RIGHTS;
+    $scope.model = model;
 
     $scope.currentErrors = [];
-
+    if (!model.filters){
+        model.filters = {};
+    }
     $scope.data = {
         tabSelected: 'lesson'
     };
@@ -172,13 +175,12 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             template.open('main', 'main');
             template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');
+            model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
         },
         listView: function(){
-            //$scope.lesson = null;
-            $scope.homework = null;
-            $scope.pedagogicLessonsSelected 	= [];
-            $scope.pedagogicHomeworksSelected 	= [];
-            $scope.showList();
+            template.open('main', 'main');
+            template.open('main-view', 'calendar');
+            model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
         },
         mainView: function(){
             if ($scope.display.showList) {
@@ -310,6 +312,10 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.selectedDueDate = moment(day.dayName, "dddd DD MMMM YYYY");
     };
 
+    $scope.back=function(){
+      $window.history.back();
+    };
+
     var loadHomeworkFromRoute = function(params) {
         // try find homework in current week homeworks cache
         var homework = model.homeworks.findWhere({ id: parseInt(params.idHomework)});
@@ -379,6 +385,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
      * @param cb
      */
     $scope.goToListView = function (cb) {
+        console.warn('reprecated');
+        return;
+        //TODO delete
         $location.path('/listView');
     };
 
@@ -530,6 +539,13 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.publishLessons(lessons, isPublish, notifyKey, $scope.goToMainView());
     };
 
+    $scope.publishLesson = function (lesson, isPublish) {
+        var lessons = [];
+        lessons.push(lesson);
+        var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
+        $scope.publishLessons(lessons, isPublish, notifyKey, $scope.back());
+    };
+
     /**
      * Publish lessons
      * @param lessons Array of lessons to publish or unpublish
@@ -586,6 +602,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     var publishCB = function (list, toPublish, notifyKey, cb) {
         list.forEach(function (item) {
             item.changeState(toPublish);
+            item.selected=false;
         });
 
         $scope.cbCount--;
@@ -872,7 +889,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             }
 
             if (goToMainView) {
-                $scope.goToMainView();
+                $scope.back();
                 $scope.lesson = null;
                 $scope.homework = null;
             }

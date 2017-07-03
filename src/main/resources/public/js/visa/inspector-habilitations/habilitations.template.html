@@ -1,21 +1,20 @@
 <div  class="forheigth habilitation" ng-controller="HabilitationController as habilitationCtrl">
     <h1>
-        <a href="" >Habilitation des inspecteurs </a>
+        <a href="" ><i18n>diary.visa.inspect.title</i18n></a>
     </h1>
     <br/>
     <div class="row">
         <div class="twelve">
-            Cet écran vous permet de gérer la visibilité des inspecteurs sur les enseignants.
+            <i18n>diary.visa.inspect.description</i18n>
             <br/><br/>
-
-            S'il n'y a pas d'inspecteur il est possible que vous deviez ajouter les droits sur le compte de votre inspecteur depuis la console d'administration.
+            <i18n>diary.visa.inspect.description2</i18n>
         </div>
     </div>
     <br/>
 
     <div class="row" ng-if="habilitationCtrl.rended">
         <div class="cell four">
-            <label>Sélectionnez la structure</label>
+            <label><i18n>select.structure</i18n></label>
             <structure-drop-down
                 hide-if-solo="false"
                 is-hidden="structureHidden"
@@ -23,9 +22,9 @@
             </structure-drop-down>
         </div>
         <div class="cell four">
-            <label>Sélectionnez l'inspecteur</label>
+            <label><i18n>diary.visa.inspect.select</i18n></label>
             <diary-drop-down
-                placeholder="select.group.or.class"
+                placeholder="diary.visa.inspect.select"
                 list="habilitationCtrl.filters.inspectors"
                 selected="habilitationCtrl.filter.inspector"
                 nullable="true"
@@ -33,22 +32,16 @@
             </diary-drop-down>
         </div>
         <div class="cell four" ng-if="habilitationCtrl.filter.inspector">
-            <label>Selectionnez les proffesseurs que l'inspecteur doit inspecter</label>
+            <label><i18n>diary.visa.inspect.select.teacher</i18n></label>
             <search-drop-down
               items = "habilitationCtrl.filters.teachers"
-              place-holder ="Professeur"
+              place-holder ="enseignant"
               selected-item="habilitationCtrl.filter.teacher"
               show-expression="item.value"
           ></search-drop-down>
           <br/>
 
           <div class="teacher-list">
-              <div class="row" ng-if="habilitationCtrl.dirty">
-                  <div class="cell twelve">
-                      <button class="right" ng-click="habilitationCtrl.save()">save</button>
-                      <button  class="cancel right" ng-click="habilitationCtrl.cancel()">cancel</button>
-                  </div>
-              </div>
               <article ng-repeat="teacher in habilitationCtrl.selectedTeachers | orderBy : value ">
                   [[teacher.value]]
                   <i diary-tooltip="Suprimer" ng-click="habilitationCtrl.removeTeacher(teacher)" class="button-icon cancel-circled cancel-circled"></i>

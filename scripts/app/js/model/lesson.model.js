@@ -193,7 +193,6 @@ Lesson.prototype.update = function(cb, cbe) {
 
     http().putJson(url, this)
         .done(function(){
-
             if(typeof cb === 'function'){
                 cb();
             }

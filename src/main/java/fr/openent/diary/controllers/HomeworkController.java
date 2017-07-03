@@ -26,6 +26,7 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
 
@@ -112,6 +113,80 @@ public class HomeworkController extends ControllerHelper {
             }
         });
     }
+
+
+    @Get("/homework/external/list/:lessonId")
+    @ApiDoc("Get all homeworks for a lesson")
+    @SecuredAction(value = list_homeworks_by_lesson, type = ActionType.AUTHENTICATED)
+    public void externalListHomeworkByLesson(final HttpServerRequest request) {
+        final String lessonId = request.params().get("lessonId");
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(UserInfos user) {
+                if (user != null) {
+                    homeworkService.getExternalHomeworkByLessonId(user.getUserId(), lessonId, user.getGroupsIds(), arrayResponseHandler(request));
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
+
+
+
+   /* @Get("/homework/external/list/:lessonId")
+    @ApiDoc("Get all homeworks for a lesson")
+    @SecuredAction(value = list_homeworks_by_lesson, type = ActionType.AUTHENTICATED)
+    public void listExternalHomeworkByLesson(final HttpServerRequest request) {
+        final String lessonId = request.params().get("lessonId");
+
+        //TODO for students what about visibility of free homeworks? depending on due date and current date
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    diaryService.listGroupsFromChild(Arrays.asList(user.getUserId()),new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                List<String> memberIds = new ArrayList<>();
+                                for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                                    String groupId  = ((Map<String,String>)result).get("groupId");
+                                    memberIds.add(groupId);
+                                }
+                                homeworkService.getAllHomeworksForALesson(user.getUserId(), lessonId, memberIds, arrayResponseHandler(request));
+                            } else {
+                                badRequest(request,"error when retrieve child gorup");
+                            }
+                        }
+                    });
+
+
+
+                            new Handler<HandlerResponse<List<KeyValueModel>>>() {
+                        @Override
+                        public void handle(HandlerResponse<List<KeyValueModel>> event) {
+                            if (event.hasError()){
+                                badRequest(request,event.getMessage());
+                            }else{
+                                List<String> memberIds = new ArrayList<>();
+                                for (KeyValueModel group : event.getResult()){
+                                    memberIds.add(group.getKey());
+                                }
+
+                                //homeworkService.getAllHomeworksForTeacher(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            }
+
+                        }
+                    });
+                } else {
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }*/
 
     @Get("/homework/:etabIds/:startDate/:endDate/:childId")
     @ApiDoc("Get all homeworks for a school")
