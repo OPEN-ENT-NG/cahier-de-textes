@@ -566,24 +566,37 @@ var AngularExtensions = {
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
-
+                var p4 = $q.when([]);
                 if (model.isUserTeacher()) {
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
+                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        p4 = ModelWeekService.getModelWeeks();
+                    }
                 }
 
-                return $q.all([p1, p2, p3]).then(function (results) {
+                return $q.all([p1, p2, p3, p4]).then(function (results) {
                     var lessons = results[0];
                     var homeworks = results[1];
                     $scope.courses = results[2];
+                    var modelWeeks = results[3];
 
-                    var p = void 0;
+                    var p = $q.when();
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
-                            $scope.courses = modelCourses;
-                        });
-                    } else {
-                        p = $q.when();
+                        //dont get model if the current week is the model
+                        if (!moment(modelWeeks.A.beginDate).isSame(mondayOfWeek) && !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek)) {
+                            p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
+                                $scope.courses = modelCourses;
+                            });
+                            $scope.isModelWeek = false;
+                        } else {
+                            if (moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) {
+                                $scope.modelWeekCurrentWeek = 'A';
+                            } else {
+                                $scope.modelWeekCurrentWeek = 'B';
+                            }
+                            $scope.isModelWeek = true;
+                        }
                     }
 
                     p.then(function () {
@@ -4951,7 +4964,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             scope.ngModel = new Subject();
                             scope.ngModel.label = subjectLabel;
                             scope.ngModel.id = null;
-                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+
+                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ? scope.homework.audience.structureId : undefined;
                             scope.ngModel.teacher_id = model.me.userId;
                             subjects.push(scope.ngModel);
                         } else {
