@@ -33,6 +33,13 @@
                     item.calendarUpdate();
                 });
 
+                //handler calendar updates :
+                $scope.$on('calendar.refreshCalendar', () => {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(),
+                        $scope.mondayOfWeek,
+                        model.isUserParent,
+                        model.child ? model.child.id : undefined);
+                });
 
                 if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
 
@@ -112,7 +119,7 @@
                 var nextMonday = moment($scope.mondayOfWeek).add(7, 'd');
                 $location.path('/calendarView/' + nextMonday.format(constants.CAL_DATE_PATTERN));
             };
-        
+
             /**
              * Opens the previous week view of calendar
              */
@@ -241,21 +248,17 @@
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
-                var p4 = $q.when([]);
+
                 if (model.isUserTeacher()) {
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
-                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
-                        p4 = ModelWeekService.getModelWeeks();
-                    }
+
                 }
 
-                return $q.all([p1, p2, p3, p4]).then(results => {
+                return $q.all([p1, p2, p3]).then(results => {
                     let lessons = results[0];
                     let homeworks = results[1];
                     $scope.courses = results[2];
-                    $scope.modelWeeks = results[3];
 
                     let p;
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
@@ -267,6 +270,7 @@
                     }
 
                     p.then(() => {
+                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
                         model.lessons.all.splice(0, model.lessons.all.length);
                         model.lessons.addRange(lessons);
                         model.homeworks.all.splice(0, model.homeworks.all.length);
@@ -326,27 +330,7 @@
                 }
             };
 
-            $scope.setModel = function(alias) {
-                ModelWeekService.setModelWeek(alias, $scope.mondayOfWeek).then((modelWeek) => {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(),
-                        $scope.mondayOfWeek,
-                        model.isUserParent,
-                        model.child ? model.child.id : undefined);
-                });
 
-                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
-            };
-
-            $scope.invert = function() {
-                ModelWeekService.invertModelsWeek().then(() => {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(),
-                        $scope.mondayOfWeek,
-                        model.isUserParent,
-                        model.child ? model.child.id : undefined).then(() => {
-                        notify.info('diary.model.week.invert.effective');
-                    });
-                });
-            };
 
             $scope.redirect = function(path) {
                 $location.path(path);

@@ -36,7 +36,7 @@
                 method : 'GET',
                 params : {
                     structureId : structureId,
-                    teacherId: filter.teacher ? filter.teacher.key : undefined,
+                    teacherId: filter.teacher && filter.teacher.item ? filter.teacher.item.key : undefined,
                     audienceId: filter.audience ? filter.audience.key : undefined,
                     subjectId: filter.subject ? filter.subject.key : undefined,
                     todoOnly : filter.state ? (filter.state.key == "TODO" ? true : undefined): undefined

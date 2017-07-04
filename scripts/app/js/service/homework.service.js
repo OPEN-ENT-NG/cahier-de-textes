@@ -76,6 +76,7 @@
                     structureId: sqlHomework.structureId,
                     audienceType: sqlHomework.audience_type,
                     audienceLabel: sqlHomework.audience_label,
+                    teacherName: sqlHomework.teacher_display_name,
                     // TODO delete dueDate? (seems redondant info vs date field)
                     dueDate: moment(sqlHomework.homework_due_date),
                     date: moment(sqlHomework.homework_due_date),

@@ -21,6 +21,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -207,22 +209,31 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                 DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss");
                 LocalTime beginJodaTime = LocalTime.parse(beginHour, fmt);
                 LocalTime endJodaTime = LocalTime.parse(endHour, fmt);
-                MutableDateTime lessonDate = new MutableDateTime(DateUtils.parseDateSql(json.getString("lesson_date")));
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                MutableDateTime lessonDate = new MutableDateTime(sdf.parse(json.getString("lesson_date").substring(0,10)),DateTimeZone.UTC);
 
                 //get nb days between to calc actual date begin and end
                 LocalDate firstMondayOfLessonWeek = new LocalDate(lessonDate).withDayOfWeek(DateTimeConstants.MONDAY);
                 int nbDaysBetween = Days.daysBetween(firstMondayOfLessonWeek, new LocalDate(date)).getDays();
-                lessonDate.addDays(nbDaysBetween);
+                lessonDate.addDays(nbDaysBetween + 1);
 
-                MutableDateTime beginDate = new MutableDateTime(lessonDate);
-                beginDate.setHourOfDay(beginJodaTime.getHourOfDay());
-                beginDate.setMinuteOfHour(beginJodaTime.getMinuteOfHour());
-                beginDate.setSecondOfMinute(beginJodaTime.getSecondOfMinute());
+                LocalDateTime beginDate = new LocalDateTime(lessonDate.getYear(),
+                                            lessonDate.getMonthOfYear(),
+                                            lessonDate.getDayOfMonth(),
+                                            beginJodaTime.getHourOfDay(),
+                                            beginJodaTime.getMinuteOfHour());
 
-                MutableDateTime endDate = new MutableDateTime(lessonDate);
-                endDate.setHourOfDay(endJodaTime.getHourOfDay());
-                endDate.setMinuteOfHour(endJodaTime.getMinuteOfHour());
-                endDate.setSecondOfMinute(endJodaTime.getSecondOfMinute());
+
+
+                LocalDateTime endDate = new LocalDateTime(lessonDate.getYear(),
+                        lessonDate.getMonthOfYear(),
+                        lessonDate.getDayOfMonth(),
+                        endJodaTime.getHourOfDay(),
+                        endJodaTime.getMinuteOfHour());
+
+
 
                 lesson.setStartDate(beginDate.toDate());
                 lesson.setEndDate(endDate.toDate());

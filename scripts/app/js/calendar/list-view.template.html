@@ -91,12 +91,18 @@
                                           <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
                                           [[pedagogicItem.item.title]]
                                       </em>
+
+                                      <div ng-bind-html="pedagogicItem.item.description | maxChar:60  " ng-if="!pedagogicItem.expanded_description"></div>
+                                      <div ng-init="pedagogicItem.item.descriptionTrusted = (pedagogicItem.item.description | trusthtml)" ng-bind-html="pedagogicItem.item.descriptionTrusted" ng-if="pedagogicItem.expanded_description"></div>
+
+                                      <!--
                                       <span ng-show="!pedagogicItem.expanded_description">
 									 <span bind-html="pedagogicItem.item.description"></span>
                                       </span>
                                       <span ng-show="pedagogicItem.expanded_description">
 									 <span bind-html="pedagogicItem.item.description"></span>
                                       </span>
+                                    -->
                                       <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.item.color}"><i18n>diary.view.item.detail</i18n></span>
                                   </div>
                               </div>

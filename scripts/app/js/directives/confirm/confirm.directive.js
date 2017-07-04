@@ -13,11 +13,10 @@
                 $scope.apply
               });
             },*/
-            link: function (scope, element, attr) {
-              console.log("confirm click linked");
+            link: function (scope, element, attr) {              
                    zIndex++;
                    var clickAction = attr.confirmedClick;
-                   var html =  ` 
+                   var html =  `
                      <lightbox show="display" class="${scope.confirmClass}" on-close="remove()" style="z-index : ${zIndex}" >
                        <div class="row" ng-if="!confirmTemplate">
                           <h2> [[msg]] </h2>

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * Created by a457593 on 26/02/2016.
@@ -48,7 +49,8 @@ public final class DateUtils {
     }
 
     public static SimpleDateFormat getSimpleDateFormat(){
-        return new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        return sdf;
     }
 
     public static String formatDateSql(Date dateToParse) {

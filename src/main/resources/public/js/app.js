@@ -373,6 +373,11 @@ var AngularExtensions = {
                     item.calendarUpdate();
                 });
 
+                //handler calendar updates :
+                $scope.$on('calendar.refreshCalendar', function () {
+                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
+                });
+
                 if (SecureService.hasRight(constants.RIGHTS.SHOW_OTHER_TEACHER)) {
 
                     //vm.teacher = model.filters.teacher;
@@ -561,21 +566,16 @@ var AngularExtensions = {
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
-                var p4 = $q.when([]);
+
                 if (model.isUserTeacher()) {
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
-                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
-                        p4 = ModelWeekService.getModelWeeks();
-                    }
                 }
 
-                return $q.all([p1, p2, p3, p4]).then(function (results) {
+                return $q.all([p1, p2, p3]).then(function (results) {
                     var lessons = results[0];
                     var homeworks = results[1];
                     $scope.courses = results[2];
-                    $scope.modelWeeks = results[3];
 
                     var p = void 0;
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
@@ -587,6 +587,7 @@ var AngularExtensions = {
                     }
 
                     p.then(function () {
+                        $scope.currentModelWeekIndicator = moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
                         model.lessons.all.splice(0, model.lessons.all.length);
                         model.lessons.addRange(lessons);
                         model.homeworks.all.splice(0, model.homeworks.all.length);
@@ -644,22 +645,6 @@ var AngularExtensions = {
                 }
             };
 
-            $scope.setModel = function (alias) {
-                ModelWeekService.setModelWeek(alias, $scope.mondayOfWeek).then(function (modelWeek) {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined);
-                });
-
-                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
-            };
-
-            $scope.invert = function () {
-                ModelWeekService.invertModelsWeek().then(function () {
-                    refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, model.isUserParent, model.child ? model.child.id : undefined).then(function () {
-                        notify.info('diary.model.week.invert.effective');
-                    });
-                });
-            };
-
             $scope.redirect = function (path) {
                 $location.path(path);
             };
@@ -676,15 +661,45 @@ var AngularExtensions = {
         //controller declaration
         module.controller("MainCalendarPageController", controller);
 
-        function controller($scope, $timeout, $q, $location, constants, SecureService, UtilsService, LessonService, HomeworkService) {
+        function controller($scope, $timeout, $rootScope, $q, $location, constants, SecureService, UtilsService, LessonService, HomeworkService, ModelWeekService) {
+
+            var vm = this;
+
+            $timeout(init);
+            function init() {
+                $scope.getModel();
+            }
+
             $scope.goToListView = function () {
                 $location.path('/listView');
-                //model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
             };
 
             $scope.goToCalendarView = function () {
-                $location.path('/calendarView/' + moment($scope.mondayOfWeek).format(constants.CAL_DATE_PATTERN));
-                //model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+                $location.path('/calendarView/' + moment(model.mondayOfWeek).format(constants.CAL_DATE_PATTERN));
+            };
+
+            $scope.setModel = function (alias) {
+                ModelWeekService.setModelWeek(alias, model.mondayOfWeek).then(function (modelWeek) {
+                    $rootScope.$broadcast('calendar.refreshCalendar');
+                    $scope.getModel();
+                });
+
+                notify.info(lang.translate('diary.model.week.choice.effective') + " " + alias);
+            };
+
+            $scope.invert = function () {
+                ModelWeekService.invertModelsWeek().then(function () {
+                    $rootScope.$broadcast('calendar.refreshCalendar');
+                    $scope.getModel();
+                });
+            };
+
+            $scope.getModel = function () {
+                if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                    ModelWeekService.getModelWeeks().then(function (modelweeks) {
+                        $scope.modelWeeks = modelweeks;
+                    });
+                }
             };
         }
     });
@@ -3723,10 +3738,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
           });
         },*/
         link: function link(scope, element, attr) {
-          console.log("confirm click linked");
           zIndex++;
           var clickAction = attr.confirmedClick;
-          var html = ' \n                     <lightbox show="display" class="' + scope.confirmClass + '" on-close="remove()" style="z-index : ' + zIndex + '" >\n                       <div class="row" ng-if="!confirmTemplate">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />\n                           </div>\n                       </div>\n                       <div class="row" ng-if="confirmTemplate">\n                          <div ng-include="confirmTemplate">\n                          </div>\n                       </div>\n                     </lightbox>\n                     ';
+          var html = '\n                     <lightbox show="display" class="' + scope.confirmClass + '" on-close="remove()" style="z-index : ' + zIndex + '" >\n                       <div class="row" ng-if="!confirmTemplate">\n                          <h2> [[msg]] </h2>\n                           <div class="row">\n                               <button class="right-magnet " ng-click="confirm()">[[yes]]</button>\n                               <input type="button" class="right-magnet cancel" i18n-value="[[cancel]]" ng-click="remove()"  />\n                           </div>\n                       </div>\n                       <div class="row" ng-if="confirmTemplate">\n                          <div ng-include="confirmTemplate">\n                          </div>\n                       </div>\n                     </lightbox>\n                     ';
           var lightbox;
           element.bind('click', function (event) {
             scope.msg = attr.confirmClick || "Etes vous sur?";
@@ -7296,6 +7310,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         structureId: sqlHomework.structureId,
                         audienceType: sqlHomework.audience_type,
                         audienceLabel: sqlHomework.audience_label,
+                        teacherName: sqlHomework.teacher_display_name,
                         // TODO delete dueDate? (seems redondant info vs date field)
                         dueDate: moment(sqlHomework.homework_due_date),
                         date: moment(sqlHomework.homework_due_date),
@@ -7909,7 +7924,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     method: 'GET',
                     params: {
                         structureId: structureId,
-                        teacherId: filter.teacher ? filter.teacher.key : undefined,
+                        teacherId: filter.teacher && filter.teacher.item ? filter.teacher.item.key : undefined,
                         audienceId: filter.audience ? filter.audience.key : undefined,
                         subjectId: filter.subject ? filter.subject.key : undefined,
                         todoOnly: filter.state ? filter.state.key == "TODO" ? true : undefined : undefined
