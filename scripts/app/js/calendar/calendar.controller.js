@@ -248,25 +248,38 @@
 
                 //dont load courses if is not at teacher
                 var p3 = $q.when([]);
-
+                var p4 = $q.when([]);
                 if (model.isUserTeacher()) {
                     //TODO use structureIds
                     p3 = CourseService.getMergeCourses(model.me.structures[0], model.me.userId, mondayOfWeek);
-
+                    if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
+                        p4 = ModelWeekService.getModelWeeks();
+                    }
                 }
 
-                return $q.all([p1, p2, p3]).then(results => {
+                return $q.all([p1, p2, p3, p4]).then(results => {
                     let lessons = results[0];
                     let homeworks = results[1];
                     $scope.courses = results[2];
+                    let modelWeeks = results[3];
 
-                    let p;
+                    let p = $q.when();
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
-                        p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses) => {
-                            $scope.courses = modelCourses;
-                        });
-                    } else {
-                        p = $q.when();
+                            //dont get model if the current week is the model
+                        if  ( !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek) &&
+                            !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek)){
+                            p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses) => {
+                                $scope.courses = modelCourses;
+                            });
+                            $scope.isModelWeek = false;
+                        }else{
+                            if (moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)){
+                                $scope.modelWeekCurrentWeek = 'A';
+                            }else{
+                                $scope.modelWeekCurrentWeek = 'B';
+                            }
+                            $scope.isModelWeek = true;
+                        }
                     }
 
                     p.then(() => {
