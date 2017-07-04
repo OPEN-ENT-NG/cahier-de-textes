@@ -7592,8 +7592,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this2 = this;
 
                 _.each(courses, function (course) {
-                    course.startDate = moment(course.startDate);
-                    course.endDate = moment(course.endDate);
+
+                    var date = moment(course.date);
+                    var begin = moment(date);
+
+                    begin.set('hour', Number(course.startHour.split(":")[0]));
+                    begin.set('minute', Number(course.startHour.split(":")[1]));
+                    begin.set('second', Number(course.startHour.split(":")[2]));
+
+                    var end = moment(date);
+
+                    end.set('hour', Number(course.endHour.split(":")[0]));
+                    end.set('minute', Number(course.endHour.split(":")[1]));
+                    end.set('second', Number(course.endHour.split(":")[2]));
+
+                    course.startDate = begin.toDate();
+                    course.endDate = end.toDate();
+
                     _this2.CourseService.mappCourse(course);
                     course.subject = model.subjects.findWhere({ id: course.subjectId });
                     course.subject.subjectLabel = course.subjectLabel;

@@ -206,9 +206,6 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                 String beginHour = json.getString("lesson_start_time");
                 String endHour = json.getString("lesson_end_time");
 
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss");
-                LocalTime beginJodaTime = LocalTime.parse(beginHour, fmt);
-                LocalTime endJodaTime = LocalTime.parse(endHour, fmt);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -219,51 +216,14 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                     dayOfWeek = 6;
                 }
 
-                Calendar beginCal = Calendar.getInstance();
-                beginCal.setTime(date);
-                beginCal.add(Calendar.DAY_OF_YEAR,dayOfWeek);
+                Calendar dateCal = Calendar.getInstance();
+                dateCal.setTime(date);
+                dateCal.add(Calendar.DAY_OF_YEAR,dayOfWeek);
 
-                beginCal.set(Calendar.HOUR_OF_DAY,beginJodaTime.getHourOfDay());
-                beginCal.set(Calendar.MINUTE,beginJodaTime.getMinuteOfHour());
-                beginCal.set(Calendar.SECOND,0);
+                lesson.setDate(dateCal.getTime());
+                lesson.setStartHour(beginHour);
+                lesson.setEndHour(endHour);
 
-                Calendar endCal = Calendar.getInstance();
-                endCal.setTime(beginCal.getTime());
-
-                endCal.set(Calendar.HOUR_OF_DAY,endJodaTime.getHourOfDay());
-                endCal.set(Calendar.MINUTE,endJodaTime.getMinuteOfHour());
-                endCal.set(Calendar.SECOND,0);
-
-
-                /*
-                MutableDateTime lessonDate = new MutableDateTime(sdf.parse(json.getString("lesson_date").substring(0,10)),DateTimeZone.UTC);
-
-                //get nb days between to calc actual date begin and end
-                LocalDate firstMondayOfLessonWeek = new LocalDate(lessonDate).withDayOfWeek(DateTimeConstants.MONDAY);
-                int nbDaysBetween = Days.daysBetween(firstMondayOfLessonWeek, new LocalDate(date)).getDays();
-                lessonDate.addDays(nbDaysBetween + 1);
-
-                LocalDateTime beginDate = new LocalDateTime(lessonDate.getYear(),
-                                            lessonDate.getMonthOfYear(),
-                                            lessonDate.getDayOfMonth(),
-                                            beginJodaTime.getHourOfDay(),
-                                            beginJodaTime.getMinuteOfHour());
-
-
-
-                LocalDateTime endDate = new LocalDateTime(lessonDate.getYear(),
-                        lessonDate.getMonthOfYear(),
-                        lessonDate.getDayOfMonth(),
-                        endJodaTime.getHourOfDay(),
-                        endJodaTime.getMinuteOfHour());
-
-
-
-                lesson.setStartDate(beginDate.toDate());
-                lesson.setEndDate(endDate.toDate());
-                */
-                lesson.setStartDate(beginCal.getTime());
-                lesson.setEndDate(endCal.getTime());
                 String lessonroom = json.getString("lesson_room");
                 if (lessonroom != null){
                     lesson.setRoomLabels(Arrays.asList(lessonroom));

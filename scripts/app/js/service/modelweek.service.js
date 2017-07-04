@@ -63,8 +63,23 @@
 
         mappModelWeekToCourse(courses){
             _.each(courses,course =>{
-                course.startDate = moment(course.startDate);
-                course.endDate = moment(course.endDate);
+
+                let date = moment(course.date);
+                let begin = moment(date);
+
+                begin.set('hour', Number(course.startHour.split(":")[0]));
+                begin.set('minute', Number(course.startHour.split(":")[1]));
+                begin.set('second', Number(course.startHour.split(":")[2]));
+
+                let end = moment(date);
+
+                end.set('hour', Number(course.endHour.split(":")[0]));
+                end.set('minute', Number(course.endHour.split(":")[1]));
+                end.set('second', Number(course.endHour.split(":")[2]));
+
+                course.startDate = begin.toDate();
+                course.endDate = end.toDate();
+
                 this.CourseService.mappCourse(course);
                 course.subject = model.subjects.findWhere({id: course.subjectId});
                 course.subject.subjectLabel = course.subjectLabel;

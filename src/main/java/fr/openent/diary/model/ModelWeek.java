@@ -9,6 +9,8 @@ public class ModelWeek {
     private String weekAlias;
     private String teacherId;
     private Boolean pair;
+
+
     private Date beginDate;
     private Date endDate;
 

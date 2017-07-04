@@ -8,8 +8,11 @@ import java.util.List;
 public class LessonAsModel {
     private List<String> classes = new ArrayList<>();
     private String subjectId;
-    private Date startDate;
-    private Date endDate;
+
+
+    private Date date;
+    private String startHour;
+    private String endHour;
 
     public String getSubjectLabel() {
         return subjectLabel;
@@ -38,20 +41,28 @@ public class LessonAsModel {
         this.subjectId = subjectId;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public String getStartHour() {
+        return startHour;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setStartHour(String startHour) {
+        this.startHour = startHour;
+    }
+
+    public String getEndHour() {
+        return endHour;
+    }
+
+    public void setEndHour(String endHour) {
+        this.endHour = endHour;
     }
 
     public List<String> getRoomLabels() {
