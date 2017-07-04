@@ -266,19 +266,22 @@
                     let p = $q.when();
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
                             //dont get model if the current week is the model
-                        if  ( !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek) &&
-                            !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek)){
-                            p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses) => {
-                                $scope.courses = modelCourses;
-                            });
-                            $scope.isModelWeek = false;
-                        }else{
-                            if (moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)){
-                                $scope.modelWeekCurrentWeek = 'A';
+                        if (modelWeeks.A || modelWeeks.B){
+                            if  (
+                                (!modelWeeks.A || !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) &&
+                                (modelWeeks.B || !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))){
+                                p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses) => {
+                                    $scope.courses = modelCourses;
+                                });
+                                $scope.isModelWeek = false;
                             }else{
-                                $scope.modelWeekCurrentWeek = 'B';
+                                if (modelWeeks.A && moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)){
+                                    $scope.modelWeekCurrentWeek = 'A';
+                                }else{
+                                    $scope.modelWeekCurrentWeek = 'B';
+                                }
+                                $scope.isModelWeek = true;
                             }
-                            $scope.isModelWeek = true;
                         }
                     }
 
