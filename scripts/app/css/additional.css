@@ -492,7 +492,8 @@ section .homeworkInfos {
 }
 
 .item-suggest:hover{
-    background-color: #F0F0F0;
+    background-color: #e4e4e4;
+    color:#2a9cc8;
 }
 
 
