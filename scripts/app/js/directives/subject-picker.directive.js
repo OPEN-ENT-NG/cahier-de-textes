@@ -60,7 +60,8 @@
                             scope.ngModel = new Subject();
                             scope.ngModel.label = subjectLabel;
                             scope.ngModel.id = null;
-                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework.audience.structureId;
+
+                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ?scope.homework.audience.structureId : undefined;
                             scope.ngModel.teacher_id = model.me.userId;
                             subjects.push(scope.ngModel);
                         } else {

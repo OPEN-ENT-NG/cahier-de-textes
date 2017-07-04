@@ -464,6 +464,16 @@ section .homeworkInfos {
     right: auto;
     color: #2a9cc8;
 }
+.autocompletelist.create{
+  height : 45px;
+  padding-left : 10px;
+}
+
+.autocompletelist.create span{
+  float: right;
+  margin-right: 7px;
+}
+
 
 .item-suggest {
     padding-left: 10px;
