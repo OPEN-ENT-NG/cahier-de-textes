@@ -781,6 +781,7 @@ ent-dropdown div.dropdown-display span.placeholder {
 
 #placeholder{
     font-size: 17px !important;
+    overflow: hidden;
 }
 
 ent-dropdown div.dropdown-display i {
