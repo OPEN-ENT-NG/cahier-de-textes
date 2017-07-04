@@ -131,7 +131,8 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append("delete from  diary.homework_shares;")
                 .append("delete from  diary.homework;")
                 .append("delete from  diary.lesson;")
-                .append("delete from  diary.subject;")
+                //subject is use by progression mechanics
+                //.append("delete from  diary.subject;")
                 .append("delete from  diary.homework_type;")
                 .append("delete from  diary.audience;")
                 .append("delete from  diary.groups;")

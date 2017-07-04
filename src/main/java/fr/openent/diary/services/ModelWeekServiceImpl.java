@@ -212,6 +212,30 @@ public class ModelWeekServiceImpl extends SqlCrudService {
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+                Calendar lessonDateCalendar = Calendar.getInstance();
+                lessonDateCalendar.setTime(sdf.parse(json.getString("lesson_date").substring(0,10)));
+                int dayOfWeek = lessonDateCalendar.get(Calendar.DAY_OF_WEEK) - 2;
+                if (dayOfWeek == -1){
+                    dayOfWeek = 6;
+                }
+
+                Calendar beginCal = Calendar.getInstance();
+                beginCal.setTime(date);
+                beginCal.add(Calendar.DAY_OF_YEAR,dayOfWeek);
+
+                beginCal.set(Calendar.HOUR_OF_DAY,beginJodaTime.getHourOfDay());
+                beginCal.set(Calendar.MINUTE,beginJodaTime.getMinuteOfHour());
+                beginCal.set(Calendar.SECOND,0);
+
+                Calendar endCal = Calendar.getInstance();
+                endCal.setTime(beginCal.getTime());
+
+                endCal.set(Calendar.HOUR_OF_DAY,endJodaTime.getHourOfDay());
+                endCal.set(Calendar.MINUTE,endJodaTime.getMinuteOfHour());
+                endCal.set(Calendar.SECOND,0);
+
+
+                /*
                 MutableDateTime lessonDate = new MutableDateTime(sdf.parse(json.getString("lesson_date").substring(0,10)),DateTimeZone.UTC);
 
                 //get nb days between to calc actual date begin and end
@@ -237,6 +261,9 @@ public class ModelWeekServiceImpl extends SqlCrudService {
 
                 lesson.setStartDate(beginDate.toDate());
                 lesson.setEndDate(endDate.toDate());
+                */
+                lesson.setStartDate(beginCal.getTime());
+                lesson.setEndDate(endCal.getTime());
                 String lessonroom = json.getString("lesson_room");
                 if (lessonroom != null){
                     lesson.setRoomLabels(Arrays.asList(lessonroom));
