@@ -585,7 +585,7 @@ var AngularExtensions = {
                     if ((!$scope.courses || $scope.courses.length === 0) && SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
                         //dont get model if the current week is the model
                         if (modelWeeks.A || modelWeeks.B) {
-                            if ((!modelWeeks.A || !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) && (modelWeeks.B || !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))) {
+                            if ((!modelWeeks.A || !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) && (!modelWeeks.B || !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))) {
                                 p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
                                     $scope.courses = modelCourses;
                                 });
