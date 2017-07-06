@@ -13,3 +13,5 @@ CREATE TABLE diary.modelweek (
 );
 
 
+CREATE INDEX idx_m_teacher_id
+   ON diary.modelweek (teacherId ASC NULLS LAST);

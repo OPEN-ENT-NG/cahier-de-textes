@@ -20,5 +20,3 @@ CREATE INDEX idx_l_resource_id
 CREATE INDEX idx_l_action
    ON diary.lesson_shares (action ASC NULLS LAST);
 
-CREATE INDEX idx_m_teacher_id
-   ON diary.modelweek (teacherId ASC NULLS LAST);
