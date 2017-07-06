@@ -133,7 +133,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                 try{
                     List<ModelWeek> modelWeeks = event.getResult();
                     //to inverse we need to have 2 model set
-                    if (modelWeeks.size() == 2) {
+                    if (modelWeeks.size() > 0 ) {
                         List<SqlQuery> queries = new ArrayList<SqlQuery>();
                         for (ModelWeek modelWeek : event.getResult()) {
                             if (modelWeek.getWeekAlias().equals("A")) {
@@ -144,7 +144,12 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                             queries.add(modelWeekMapper.prepareUpdateStatement(modelWeek));
                         }
                         modelWeekMapper.executeTransactionnalQueries(queries, handler);
+                    }else{
+                        handler.handle(new GenericHandlerResponse());
                     }
+                    /*if (modelWeeks.size() = 2){
+
+                    }*/
                 }catch (Exception e){
                     HandlerUtils.<GenericHandlerResponse>genericError(e,handler);
                 }
