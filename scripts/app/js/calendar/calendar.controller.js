@@ -269,7 +269,7 @@
                         if (modelWeeks.A || modelWeeks.B){
                             if  (
                                 (!modelWeeks.A || !moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) &&
-                                (modelWeeks.B || !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))){
+                                (!modelWeeks.B || !moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))){
                                 p = ModelWeekService.getCoursesModel($scope.mondayOfWeek).then((modelCourses) => {
                                     $scope.courses = modelCourses;
                                 });

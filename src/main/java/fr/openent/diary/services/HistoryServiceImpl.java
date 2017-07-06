@@ -118,6 +118,38 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append(" and not exists (select 1 from diary.histo_homework hh where h.id = hh.homeworkId) ");
 
         queries.add(new SqlQuery(queryHomework.toString(),parametersHomework));
+
+
+        StringBuilder queryVisa = new StringBuilder();
+        JsonArray parametersVisa = new JsonArray().addString(yearLabel);
+        /*
+           visa part
+        */
+        queryVisa.append(" insert into diary.histo_visa ")
+                .append(" select ")
+                .append(" ? as yearLabel, ")
+                .append("* ")
+                .append(" from diary.visa h ");
+
+
+        queries.add(new SqlQuery(queryVisa.toString(),parametersVisa));
+
+
+        StringBuilder queryVisaLesson = new StringBuilder();
+        JsonArray parametersVisaLesson = new JsonArray().addString(yearLabel);
+        /*
+           visa lesson part
+        */
+        queryVisaLesson.append(" insert into diary.histo_visa_lesson ")
+                .append(" select ")
+                .append(" ? as yearLabel, ")
+                .append("* ")
+                .append(" from diary.visa_lesson h ");
+
+
+        queries.add(new SqlQuery(queryVisaLesson.toString(),parametersVisaLesson));
+
+
         return queries;
     }
 
@@ -139,6 +171,8 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append("delete from  diary.members;")
                 .append("delete from  diary.users;")
                 .append("delete from  diary.teacher;")
+                .append("delete from  diary.visa_lesson;")
+                .append("delete from  diary.visa;")
                 .toString()
                 ,new JsonArray());
     }
@@ -312,29 +346,35 @@ public class HistoryServiceImpl extends SqlCrudService {
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new JsonArray();
 
-        query.append("select h.lessonId , ")
-                .append(" audienceLabel as audienceLabel, ")
-                .append(" teacherName as teacherName, ")
-                .append(" subjectLabel as subject, ")
-                .append(" date as date, ")
-                .append(" to_char(startTime, 'HH12:MI') as startTime, ")
-                .append(" to_char(endTime, 'HH12:MI') as endTime, ")
-                .append(" title as title, ")
-                .append(" description as description ")
-                .append(" from diary.histo_lesson h ")
-                .append(" where yearLabel = ? ");
+        query.append(" select l.lessonId , ")
+                .append(" l.audienceLabel as audienceLabel, ")
+                .append(" l.teacherName as teacherName, ")
+                .append(" l.subjectLabel as subject, ")
+                .append(" l.date as date, ")
+                .append(" to_char(l.startTime, 'HH12:MI') as startTime, ")
+                .append(" to_char(l.endTime, 'HH12:MI') as endTime, ")
+                .append(" l.title as title, ")
+                .append(" l.description as description , ")
+                .append(" v.comment as visaComment, ")
+                .append(" v.ownername as visaOwnerName, ")
+                .append(" v.ownertype as visaOwnerType, ")
+                .append(" v.datecreate as visaDate ")
+                .append(" from diary.histo_lesson l ")
+                .append(" left outer join diary.histo_visa_lesson vl on vl.lesson_id = l.lessonId ")
+                .append(" left outer join diary.histo_visa v on v.id = ( select max(vl2.visa_id) from diary.histo_visa_lesson vl2 where vl2.lesson_id = l.lessonId) ")
+                .append(" where l.yearLabel = ? ");
 
 
         parameters.addString(yearLabel);
 
 
         if (teacherId != null ){
-            query.append(" and teacherId= ? ");
+            query.append(" and l.teacherId= ? ");
             parameters.addString(teacherId);
         }
 
         if (audienceId != null ){
-            query.append(" and audienceId= ? ");
+            query.append(" and l.audienceId= ? ");
             parameters.addString(audienceId);
         }
 

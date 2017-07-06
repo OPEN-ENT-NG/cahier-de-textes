@@ -22,6 +22,43 @@ public class LessonModel {
     private String description;
     private List<HomeworkModel> homeworks = new ArrayList<>();
 
+    private String visaComment;
+    private String visaOwnerName;
+    private String visaOwnerType;
+    private Date visaDate;
+
+    public String getVisaComment() {
+        return visaComment;
+    }
+
+    public void setVisaComment(String visaComment) {
+        this.visaComment = visaComment;
+    }
+
+    public String getVisaOwnerName() {
+        return visaOwnerName;
+    }
+
+    public void setVisaOwnerName(String visaOwnerName) {
+        this.visaOwnerName = visaOwnerName;
+    }
+
+    public String getVisaOwnerType() {
+        return visaOwnerType;
+    }
+
+    public void setVisaOwnerType(String visaOwnerType) {
+        this.visaOwnerType = visaOwnerType;
+    }
+
+    public Date getVisaDate() {
+        return visaDate;
+    }
+
+    public void setVisaDate(Date visaDate) {
+        this.visaDate = visaDate;
+    }
+
     public String getLessonId() {
         return lessonId;
     }

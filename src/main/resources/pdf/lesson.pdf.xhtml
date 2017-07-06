@@ -45,7 +45,9 @@
       .pdf .lesson .lesson-content .lesson-description {
         padding-top: 3px;
         font-size: 0.95em; }
-
+       .visa{
+        margin-top: 15px;
+       }
 	</style>
 </head>
 
@@ -77,6 +79,15 @@
                         {{{description}}}
                     {{/unicode}}
                 </div>
+                {{#visaownername}}
+                <div class="visa">
+                    <strong>Visa</strong> fait le {{visadate}} par <strong>{{visaownername}}</strong> ({{visaownertype}})
+                    <div>
+                        <label>Commentaire :</label>
+                        <p>{{visacomment}}</p>
+                    </div>
+                </div>
+                {{/visaownername}}
             </div>
         </div>
         <div class="homework-part">
