@@ -512,7 +512,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
      * @param goMainView
      */
     $scope.createAndPublishHomework = function (homework, isPublish, goMainView) {
-        $scope.createOrUpdateHomework(goMainView, function () {
+        $scope.createOrUpdateHomework(false, function () {
             $scope.publishHomeworkAndGoCalendarView(homework, isPublish);
         });
     };
