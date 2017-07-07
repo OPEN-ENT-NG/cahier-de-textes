@@ -21,6 +21,12 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     $scope.RIGHTS = constants.RIGHTS;
     $scope.model = model;
 
+
+    $rootScope.$on('edit-homework',(_,data)=>{
+        $scope.openHomeworkView (data);
+    });
+
+
     $scope.currentErrors = [];
     if (!model.filters){
         model.filters = {};

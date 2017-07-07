@@ -101,23 +101,25 @@
                         var pedagogicItemOfTheDay = JSON.parse($event.originalEvent.dataTransfer.getData("application/json"));
 
 
-                        if (pedagogicItemOfTheDay.type_item !== 'lesson' && pedagogicItemOfTheDay.type_item !== 'progression') {
+                        if (pedagogicItemOfTheDay.type_item !== 'lesson' && pedagogicItemOfTheDay.type_item !== 'progression' && pedagogicItemOfTheDay.type_item !== 'homework') {
                             return;
                         }
-
-
-
-                        var newLesson = new Lesson();
-                        newLesson.id = pedagogicItemOfTheDay.id;
 
                         var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
                         var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
                         var newLessonEndTime = newLessonStartTime + 1;
 
+                        if (pedagogicItemOfTheDay.type_item === 'homework'){
+                            copyHomework(pedagogicItemOfTheDay,scheduleItem);
+                            return;
+                        }
+
+                        var newLesson = new Lesson();
+                        newLesson.id = pedagogicItemOfTheDay.id;
 
                         // do not drop if item type is not a lesson
                         if (pedagogicItemOfTheDay.type_item === 'progression') {
-                            initLessonFromProgression(newLesson,pedagogicItemOfTheDay);
+                            initLessonFromProgression(newLesson);
                             return;
                         }
 
@@ -176,6 +178,35 @@
                             console.error(error);
                         });
                     });
+
+                    function copyHomework(pedagogicItemOfTheDay){
+                        let timeslotDates = extractBeginEnd();
+                        console.log(timeslotDates);
+                        console.log(pedagogicItemOfTheDay);
+
+                        var homework = new Homework();
+                        homework.dueDate = moment(timeslotDates.startDate);
+                        homework.date = moment(timeslotDates.startDate);
+                        homework.type = _.findWhere(model.homeworkTypes.all,{'label' : pedagogicItemOfTheDay.type_homework} );
+                        homework.subject = _.findWhere(model.subjects.all,{'label' : pedagogicItemOfTheDay.subject} );
+                        homework.audience = _.findWhere(model.audiences.all,{'name' : pedagogicItemOfTheDay.audience} );
+                        homework.title = pedagogicItemOfTheDay.title;
+                        homework.description = pedagogicItemOfTheDay.description;
+                        homework.color = pedagogicItemOfTheDay.color;
+                        homework.state = 'draft';
+                        /*
+                        lesson.date = moment(timeslotDates.startDate);
+                        lesson.startTime=moment(timeslotDates.startDate);
+                        lesson.startMoment=moment(timeslotDates.startDate);
+                        lesson.endTime=moment(timeslotDates.endDate);
+                        lesson.endMoment=moment(timeslotDates.endDate);
+                        */
+
+
+                        $rootScope.$broadcast('edit-homework',homework);
+
+
+                    }
 
                 }
             };
