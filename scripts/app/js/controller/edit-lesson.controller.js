@@ -188,7 +188,7 @@
                         id: vm.lesson.audience.id
                     });
                     if (goMainView) {
-                        //$scope.back();
+                        $scope.back();
                         vm.lesson = null;
                         $scope.homework = null;
                     }
