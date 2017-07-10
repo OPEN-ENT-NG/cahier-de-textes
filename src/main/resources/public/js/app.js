@@ -2992,10 +2992,11 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         $scope.processingData = true;
 
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        model.publishHomeworks({ ids: model.getItemsIds(homeworks) }, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
+        var p = model.publishHomeworks({ ids: model.getItemsIds(homeworks) }, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             $rootScope.validationError(e);
         });
+        console.log(p);
     };
 
     /**
@@ -3591,7 +3592,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     }
 }
 
-;'use strict';
+;"use strict";
 
 (function () {
     'use strict';
@@ -3603,7 +3604,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         function controller($scope, $rootScope, $routeParams, PedagogicItemService, constants, $q, SubjectService) {
 
             var vm = this;
-
+            console.log("editLessonController");
             init();
 
             function init() {
@@ -4891,6 +4892,33 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
     AngularExtensions.addModuleConfig(function (module) {
 
+        /**
+         * Directive for result items
+         */
+        module.directive('onFinishRender', function ($timeout) {
+            return {
+                restrict: 'A',
+                link: function link(scope, element, attr) {
+                    console.log("link !");
+                    if (scope.$last === true) {
+                        console.log("rendered");
+                        $timeout(function () {
+                            scope.$evalAsync(attr.onFinishRender);
+                        });
+                    }
+                }
+            };
+        });
+    });
+})();
+
+'use strict';
+
+(function () {
+    'use strict';
+
+    AngularExtensions.addModuleConfig(function (module) {
+
         module.directive('diaryTimeslotItem', directive);
 
         function directive(AudienceService, $rootScope) {
@@ -5001,7 +5029,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                         // do not drop if item type is not a lesson
                         if (pedagogicItemOfTheDay.type_item === 'progression') {
-                            initLessonFromProgression(newLesson);
+                            initLessonFromProgression(newLesson, pedagogicItemOfTheDay);
                             return;
                         }
 
@@ -7258,7 +7286,7 @@ Teacher.prototype.create = function (cb, cbe) {
     });
 };
 
-'use strict';
+"use strict";
 
 (function () {
     'use strict';
@@ -7277,6 +7305,13 @@ Teacher.prototype.create = function (cb, cbe) {
             vm.edit = function () {
                 vm.originalProgressionItem = angular.copy(vm.selectedProgressionItem);
                 vm.selectedProgressionItem.edit = true;
+            };
+
+            vm.resizePanel = function () {
+                $timeout(function () {
+                    console.log("resize");
+                    $('[diary-sortable-list]').css('height', $(window).outerHeight() - $('[diary-sortable-list]').offset().top - 50 + 'px');
+                });
             };
 
             vm.hasProgressItem = function () {
@@ -9178,8 +9213,11 @@ function Audience() {}
 function HomeworksLoad() {}
 function HomeworkType() {}
 
-model.getSecureService = function () {
+model.getHttp = function () {
+    return angular.injector(['ng', 'app']).get("$http");
+};
 
+model.getSecureService = function () {
     return angular.injector(['ng', 'app']).get("SecureService");
 };
 
@@ -9693,6 +9731,7 @@ model.build = function () {
             } else {
                 urlGetHomeworks += '%20';
             }
+            console.log("get homewroks called");
 
             that.loading = true;
             http().get(urlGetHomeworks).done(function (data) {

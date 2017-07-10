@@ -119,7 +119,7 @@
 
                         // do not drop if item type is not a lesson
                         if (pedagogicItemOfTheDay.type_item === 'progression') {
-                            initLessonFromProgression(newLesson);
+                            initLessonFromProgression(newLesson,pedagogicItemOfTheDay);
                             return;
                         }
 

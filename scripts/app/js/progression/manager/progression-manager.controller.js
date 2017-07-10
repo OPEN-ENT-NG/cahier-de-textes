@@ -17,6 +17,13 @@
                 vm.selectedProgressionItem.edit=true;
             };
 
+            vm.resizePanel = function(){
+                $timeout(()=>{
+                    console.log("resize");
+                    $('[diary-sortable-list]').css('height',($(window).outerHeight() - $('[diary-sortable-list]').offset().top - 50 ) +'px');                    
+                });
+            };
+
             vm.hasProgressItem = function(){
                 return vm.selectedProgressionItem === undefined;
             };

@@ -3,6 +3,10 @@ ng-include{
   display: block;
 }
 
+body .material section.main{
+  padding-bottom: 30px !important;
+}
+
 .non-draggable{
   user-drag: none;
 user-select: none;

@@ -8,7 +8,7 @@
         function controller($scope, $rootScope, $routeParams,PedagogicItemService,constants,$q,SubjectService) {
 
             var vm = this;
-
+            console.log("editLessonController");
             init();
 
             function init() {

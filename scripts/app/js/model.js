@@ -15,8 +15,11 @@ function Audience() { }
 function HomeworksLoad(){}
 function HomeworkType(){}
 
-model.getSecureService = function(){
+model.getHttp = function(){
+    return angular.injector(['ng','app']).get("$http");
+};
 
+model.getSecureService = function(){
     return angular.injector(['ng','app']).get("SecureService");
 };
 
@@ -559,6 +562,7 @@ model.build = function () {
             } else {
                 urlGetHomeworks += '%20';
             }
+            console.log("get homewroks called");
 
             that.loading = true;
             http().get(urlGetHomeworks).done(function (data) {

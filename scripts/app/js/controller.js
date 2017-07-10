@@ -592,10 +592,11 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.processingData = true;
 
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
+        var p = model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             $rootScope.validationError(e);
         });
+        console.log(p);
     };
 
     /**
