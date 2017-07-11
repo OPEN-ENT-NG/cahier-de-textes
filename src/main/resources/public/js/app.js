@@ -6787,7 +6787,7 @@ Lesson.prototype.save = function (cb, cbe) {
     var subjectPromise = model.$q().when();
     var lessonPromise;
     if (!this.subject.id) {
-        subjectPromise = this.subject.save(updateOrCreateLesson);
+        subjectPromise = this.subject.save();
     }
 
     return subjectPromise.then(function () {
@@ -7238,7 +7238,7 @@ Subject.prototype.save = function (cb, cbe) {
     if (this.id) {
         // not implemented yet at this stage/ not needed
     } else {
-        this.create(cb, cbe);
+        return this.create(cb, cbe);
     }
 };
 

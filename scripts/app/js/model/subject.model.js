@@ -12,7 +12,7 @@ Subject.prototype.save = function(cb, cbe){
         // not implemented yet at this stage/ not needed
     }
     else {
-        this.create(cb, cbe);
+        return this.create(cb, cbe);
     }
 };
 

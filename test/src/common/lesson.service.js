@@ -1,8 +1,7 @@
 var dragAndDrop = require('html-dnd').code;
 
 var srv = {
-    createLessonFromCal: (itemNumber, isDraft) => {
-
+    createLessonFromCal: (itemNumber, isDraft, matter) => {
         browser.waitForAngular();
         browser.sleep(1000);
         // URL: #/createLessonView/timeFromCalendar
@@ -12,8 +11,19 @@ var srv = {
         srv.setTitleDescriptionAnnotaiton("Titre de la sceance",
             "Description de la sceance",
             "ceci est l'annotation");
+        if (matter){
+            srv.createNewMatter(matter);
+        }
         srv.saveLesson(isDraft);
-
+    },
+    createNewMatter : (matter)=>{        
+        browser.waitForAngular();
+        browser.executeScript('window.scrollTo(0,0);');
+        element(by.css('span[ng-model="editLessonCtrl.lesson.subject"]>span:nth-of-type(1)>span:nth-of-type(1)>span')).click();
+        browser.sleep(100);
+        element(by.css('input[ng-model="search"]')).click();
+        element(by.css('#input-subject')).clear().sendKeys(matter);
+        element(by.css('span[ng-model="editLessonCtrl.lesson.subject"]>div:nth-of-type(1)>div:nth-of-type(1)>div>span')).click();
     },
     setTitleDescriptionAnnotaiton : (title,description,annotation,update)=>{
         browser.waitForAngular();

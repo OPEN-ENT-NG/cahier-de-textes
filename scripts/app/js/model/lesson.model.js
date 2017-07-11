@@ -136,7 +136,7 @@ Lesson.prototype.save = function(cb, cbe) {
     var subjectPromise = model.$q().when();
     var lessonPromise;
     if(!this.subject.id){
-        subjectPromise = this.subject.save(updateOrCreateLesson);
+        subjectPromise = this.subject.save();
     }
 
     return subjectPromise.then(()=>{
