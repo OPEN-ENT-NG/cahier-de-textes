@@ -3,6 +3,7 @@
   "devDependencies": {},
   "dependencies": {
     "html-dnd": "^1.2.0",
+    "moment": "^2.18.1",
     "pg": "^6.4.0"
   }
 }

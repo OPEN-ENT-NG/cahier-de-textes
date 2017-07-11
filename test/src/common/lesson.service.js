@@ -16,7 +16,25 @@ var srv = {
         }
         srv.saveLesson(isDraft);
     },
-    createNewMatter : (matter)=>{        
+    createLessonFromButton: (itemNumber, isDraft, day,begin,end,matter) => {
+        browser.waitForAngular();
+        browser.sleep(200);
+        // URL: #/createLessonView/timeFromCalendar
+        element(by.css('[workflow="diary.createLesson"]')).click();
+        browser.waitForAngular();
+        srv.selectAudience(4);
+        srv.setTitleDescriptionAnnotaiton("Titre de la sceance",
+            "Description de la sceance",
+            "ceci est l'annotation");
+        if (matter){
+            srv.createNewMatter(matter);
+        }
+        browser.executeScript('window.scrollTo(0,0);');
+        srv.setDay(day);
+        srv.setHours(begin,end);
+        srv.saveLesson(isDraft);
+    },
+    createNewMatter : (matter)=>{
         browser.waitForAngular();
         browser.executeScript('window.scrollTo(0,0);');
         element(by.css('span[ng-model="editLessonCtrl.lesson.subject"]>span:nth-of-type(1)>span:nth-of-type(1)>span')).click();
@@ -35,6 +53,20 @@ var srv = {
             element(by.css('.row.accordions > .accordion')).click();
         }
         element.all(by.css('[contenteditable]')).get(1).clear().sendKeys(annotation);
+    },
+    setDay : (day)=>{
+        element(by.css('[ng-model="newItem.date"]')).click();
+        browser.sleep(100);
+        let dateInputElement = element(by.css('[ng-model="newItem.date"]'));
+        dateInputElement.click().clear();
+        for (var i=0;i<10;i++){
+            dateInputElement.sendKeys(protractor.Key.BACK_SPACE);
+        }
+        dateInputElement.sendKeys(day);
+    },
+    setHours : (begin,end)=>{
+        element(by.css('[ng-model="newItem.beginning"]')).clear().sendKeys(begin);
+        element(by.css('[ng-model="newItem.end"]')).clear().sendKeys(end);
     },
     selectAudience : (nbAudience)=>{
         browser.waitForAngular();

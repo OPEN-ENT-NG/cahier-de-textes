@@ -12,7 +12,7 @@ describe('Protractor Calendar', function() {
     });
 
     it('Should connect', function() {
-        let week = constants.week;
+        let week = constants.momentWeek.format('YYYY-MM-DD');
         loginService.login("teacher","#/calendarView/"+week);
     });
 

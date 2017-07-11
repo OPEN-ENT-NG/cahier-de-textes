@@ -12,7 +12,7 @@ describe('Protractor Calendar', function() {
     });
 
     it('Should connect', function() {
-        let week = constants.week;
+        let week = constants.momentWeek.format('YYYY-MM-DD');
         loginService.login("teacher","#/calendarView/"+week);
     });
 
@@ -21,11 +21,10 @@ describe('Protractor Calendar', function() {
             expect(items.length).toBe(0);
         });
     });
-
+    /*
     it('Should create draft lesson', function() {
         lessonService.createLessonFromCal(14,true);
     });
-
 
     it('Should update draft lesson', function() {
         lessonService.updateLessonFromCal();
@@ -56,7 +55,23 @@ describe('Protractor Calendar', function() {
     it('Should delette publish lesson', function() {
         lessonService.deleteLessonFromCal();
     });
+    */
 
+    it('Should create draft lesson from button', function() {
+        lessonService.createLessonFromButton(14,true,constants.momentWeek.format('DD/MM/YYYY'),"10:00","11:00");
+    });
+
+    it('Should create publish lesson from button', function() {
+        lessonService.createLessonFromButton(24,false,constants.momentWeek.format('DD/MM/YYYY'),"11:00","12:00");
+    });
+
+    it('Should delette publish lesson', function() {
+        lessonService.deleteLessonFromCal();
+    });
+
+    it('Should delette publish lesson', function() {
+        lessonService.deleteLessonFromCal();
+    });
 
     it('Verify Calendar lesson creation',function(){
         element.all(by.css('input[ng-model="item.selected"]')).then(function(items) {
