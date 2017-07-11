@@ -52,22 +52,21 @@ Homework.prototype.api = {
 Homework.prototype.save = function(cb, cbe) {
 
     var that = this;
+    var promise = model.$q().when({});
 
-    var updateOrCreateHomework = function () {
+    if(!this.subject.id){
+        promise = this.subject.save(updateOrCreateHomework);
+    }
+
+    return promise.then(()=>{
         if (that.id) {
-            that.update(cb, cbe);
+            return that.update(cb, cbe);
         }
         else {
-            that.create(cb, cbe);
+            return that.create(cb, cbe);
         }
-    };
+    });
 
-    // autocreates subject if it does not exists
-    if(!this.subject.id){
-        this.subject.save(updateOrCreateHomework)
-    } else {
-        updateOrCreateHomework();
-    }
 };
 
 /**
@@ -103,33 +102,30 @@ Homework.prototype.update = function(cb, cbe) {
     var url = '/diary/homework/' + this.id;
 
     var homework = this;
-    http().putJson(url, this)
-        .done(function(){
+    return model.getHttp()({
+        method : 'PUT',
+        url : url,
+        data : homework
+    }).then(function(){
             if (typeof cb === 'function') {
                 cb();
-            }
-        }.bind(this))
-        .error(function(e){
-            if(typeof cbe === 'function'){
-                cbe(model.parseError(e));
             }
         });
 };
 
 Homework.prototype.create = function(cb, cbe) {
     var homework = this;
-    http().postJson('/diary/homework', this)
-        .done(function(b){
-            homework.updateData(b);
+    model.getHttp()({
+        method : 'POST',
+        url : '/diary/homework',
+        data : homework
+    }).then(function(result){
+            homework.updateData(result.data);
             model.homeworks.pushAll([homework]);
             if(typeof cb === 'function'){
                 cb();
             }
-        })
-        .error(function(e){
-            if(typeof cbe === 'function'){
-                cbe(model.parseError(e));
-            }
+            return result.data;
         });
 };
 

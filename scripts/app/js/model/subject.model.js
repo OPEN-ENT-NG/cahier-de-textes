@@ -23,18 +23,17 @@ Subject.prototype.save = function(cb, cbe){
  */
 Subject.prototype.create = function (cb, cbe) {
     var subject = this;
-    http().postJson('/diary/subject', this)
-        .done(function (b) {
-            subject.updateData(b);
+    return model.getHttp()({
+      method : 'POST',
+      url : '/diary/subject',
+      data : subject
+    }).then(function (result) {
+            subject.updateData(result.data);
             model.subjects.all.push(subject);
             if (typeof cb === 'function') {
                 cb();
             }
-        })
-        .error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
+            return result.data;
         });
 };
 

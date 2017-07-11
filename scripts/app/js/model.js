@@ -16,7 +16,11 @@ function HomeworksLoad(){}
 function HomeworkType(){}
 
 model.getHttp = function(){
-    return angular.injector(['ng','app']).get("$http");
+    return  angular.element($('html')).injector().get("$http");
+};
+
+model.$q = function(){
+    return  angular.element($('html')).injector().get("$q");
 };
 
 model.getSecureService = function(){
@@ -67,14 +71,15 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
 
     var url = isPublish ? "/diary/publishHomeworks" : "/diary/unPublishHomeworks";
 
-    return http().postJson(url, itemArray).done(function (r) {
+    return model.getHttp()({
+            method : 'POST',
+            url : url,
+            data : itemArray
+    }).then(function (r) {
         if (typeof cb === 'function') {
             cb();
         }
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
+        return r.data;
     });
 };
 
@@ -134,22 +139,21 @@ model.selectedPedagogicDate = function (){
 
 
 var syncHomeworks = function (cb) {
-    model.homeworks.syncHomeworks(
-        function () {
-            if (typeof cb === 'function') {
-                cb();
-            }
-        });
+    return model.homeworks.syncHomeworks().then(()=>{
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
 };
 
 var syncLessonsAndHomeworks = function (cb) {
-    model.lessons.syncLessons();
-    // need sync attached lesson homeworks
-    model.homeworks.syncHomeworks();
 
-    if (typeof cb === 'function') {
-        cb();
-    }
+    // need sync attached lesson homeworks
+    return model.homeworks.syncHomeworks().then(()=>{
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
 };
 
 /**
@@ -179,8 +183,11 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
 
     var url = isPublish ? "/diary/publishLessons" : "/diary/unPublishLessons";
 
-    return http().postJson(url, itemArray).done(function (r) {
-
+    return model.getHttp()({
+            method : 'POST',
+            url : url,
+            data : itemArray
+    }).then(function (r) {
         var updateLessons = new Array();
 
         // update lesson cache
@@ -188,15 +195,10 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
         // so have to delete and add modified lessons ...
         model.lessons.forEach(function(lessonModel){
             if(itemArray.ids.indexOf(lessonModel.id) != -1){
-                //model.lessons.remove(lessonModel);
 
                 lessonModel.changeState(isPublish);
                 lessonModel.selected=false;
                 lessonModel.tooltipText = model.getUtilsService().getResponsiveLessonTooltipText(lessonModel);
-                console.log(lessonModel.tooltipText);
-                // update tooltip text (has state label in it)
-                //lessonModel.tooltipText = getResponsiveLessonTooltipText(lessonModel);
-                //updateLessons.push(lessonModel);
             }
         });
 
@@ -205,17 +207,9 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
         if (typeof cb === 'function') {
             cb();
         }
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
+        return r.data;
     });
 };
-
-
-
-
-
 
 model.getMinutes = function (time) {
     return new Number(time.split(':')[0] * 60) + new Number(time.split(':')[1]);
@@ -251,9 +245,12 @@ model.getItemsIds = function (items) {
  */
 model.loadHomeworksLoad = function (homework, date, audienceId, cb, cbe) {
 
-    http().get('/diary/homework/load/' + date + '/' + audienceId).done(function (sqlHomeworksLoads) {
-
-        homework.weekhomeworksload = new Array();
+    return model.getHttp()({
+        method : 'GET',
+        url : '/diary/homework/load/'+ date + '/' + audienceId
+    }).then(function (result) {
+        var sqlHomeworksLoads = result.data;
+        homework.weekhomeworksload = [];
 
         sqlHomeworksLoads.forEach(function (homeworkLoad) {
             homework.weekhomeworksload.push(sqlToJsHomeworkLoad(homeworkLoad));
@@ -262,10 +259,7 @@ model.loadHomeworksLoad = function (homework, date, audienceId, cb, cbe) {
         if (typeof cb === 'function') {
             cb();
         }
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
+        return sqlHomeworksLoads;
     });
 };
 
@@ -286,21 +280,19 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
     if(model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)){
         url = '/diary/homework/external/list/';
     }
-    http().get(url + lesson.id).done(function (sqlHomeworks) {
-
+    return model.getHttp()({
+        method : 'GET',
+        url : url + lesson.id
+    }).then(function (result) {
+        var sqlHomeworks = result.data;
         lesson.homeworks = new Collection(Homework);
-
         sqlHomeworks.forEach(function (sqlHomework) {
             lesson.homeworks.push(sqlToJsHomework(sqlHomework));
         });
-
         if (typeof cb === 'function') {
             cb();
         }
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
+        return sqlHomeworks;
     });
 };
 
@@ -347,7 +339,7 @@ model.build = function () {
         syncLessons: function (cb, cbe) {
             console.warn("deprecated");
             return;
-            var that = this;
+            /*var that = this;
             if (that.loading)
                 return;
 
@@ -366,25 +358,27 @@ model.build = function () {
             }
 
             that.loading = true;
-            http().get(urlGetLessons).done(function (data) {
+            model.getHttp()({
+                method : 'GET',
+                url : urlGetLessons
+            }).then(function (data) {
                 lessons = lessons.concat(data);
                 that.addRange(
                     _.map(lessons, function (lesson) {
                         return sqlToJsLesson(lesson);
                     })
                 );
-
                 if(typeof cb === 'function'){
                     cb();
                 }
                 that.loading = false;
-            }).error(function (e) {
+            },function (e) {
                 if (typeof cbe === 'function') {
                     cbe(model.parseError(e));
                 }
                 that.loading = false;
-            });
-        }, pushAll: function(datas) {
+            });*/
+        },pushAll: function(datas) {
 
             if (datas) {
                 this.all = _.union(this.all, datas);
@@ -397,7 +391,7 @@ model.build = function () {
         syncSubjects: function (cb, cbe) {
             console.warn("deprecated");
             return ;
-
+            /*
             this.all = [];
             var that = this;
             if (that.loading)
@@ -436,7 +430,7 @@ model.build = function () {
                         }
                         that.loading = false;
                     });
-            }
+            }*/
 
         }
     });
@@ -446,7 +440,7 @@ model.build = function () {
         syncAudiences: function (cb, cbe) {
             console.warn("deprecated");
             return;
-            this.all = [];
+            /*this.all = [];
             var nbStructures = model.me.structures.length;
             var that = this;
             if (that.loading)
@@ -469,7 +463,7 @@ model.build = function () {
 
                 that.loading = false;
             });
-
+            */
             /*model.me.structures.forEach(function (structureId) {
                 http().get('/userbook/structure/' + structureId).done(function (structureData) {
                     structureData.classes = _.map(structureData.classes, function (audience) {
@@ -518,8 +512,12 @@ model.build = function () {
             var urlGetHomeworkTypes = url;
 
             that.loading = true;
-            http().get(urlGetHomeworkTypes).done(function (data) {
-                homeworkTypes = homeworkTypes.concat(data);
+            return model.getHttp()({
+                method : 'GET',
+                url : urlGetHomeworkTypes
+            }).then(function (result) {
+
+                homeworkTypes = homeworkTypes.concat(result.data);
                 that.addRange(
                     _.map(homeworkTypes, sqlToJsHomeworkType)
                 );
@@ -527,11 +525,10 @@ model.build = function () {
                     cb();
                 }
                 that.loading = false;
-            }).error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
+                return homeworkTypes;
+            }).catch(function (e) {
                 that.loading = false;
+                throw e;
             });
 
         }, pushAll: function(datas) {
@@ -562,11 +559,14 @@ model.build = function () {
             } else {
                 urlGetHomeworks += '%20';
             }
-            console.log("get homewroks called");
+
 
             that.loading = true;
-            http().get(urlGetHomeworks).done(function (data) {
-                homeworks = homeworks.concat(data);
+            return model.getHttp()({
+                method : 'GET',
+                url : urlGetHomeworks
+            }).then(function (result) {
+                homeworks = homeworks.concat(result.data);
                 that.addRange(
                     _.map(homeworks, sqlToJsHomework)
                 );
@@ -574,11 +574,10 @@ model.build = function () {
                     cb();
                 }
                 that.loading = false;
-            }).error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
+                return homeworks;
+            }).catch(function (e) {
                 that.loading = false;
+                throw e;
             });
 
         }, pushAll: function(datas) {
@@ -1146,8 +1145,12 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
         model.pedagogicDays.reset();
     }
 
-    http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
-
+    return model.getHttp()({
+        method : 'POST',
+        url : '/diary/pedagogicItems/list',
+        data : params
+    }).then(function (result) {
+        var items = result.data;
         var pedagogicItemsFromDB = _.map(items, sqlToJsPedagogicItem);
 
         var days = _.groupBy(pedagogicItemsFromDB, 'day');
@@ -1206,10 +1209,7 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
         if (typeof cb === 'function') {
             cb();
         }
-    }).error(function (e) {
-        if (typeof cbe === 'function') {
-            cbe(model.parseError(e));
-        }
+        return pedagogicDays;
     });
 };
 
@@ -1230,10 +1230,12 @@ model.listChildren = function (cb, cbe) {
 
     model.childs.removeAll();
 
-    http().get('/diary/children/list')
-        .done(function (data) {
+    return model.getHttp()({
+        method : 'GET',
+        url : '/diary/children/list'
+    }).then(function (result) {
 
-            model.childs.addRange(data);
+            model.childs.addRange(result.data);
 
             if(model.childs.all.length > 0) {
                 model.child = model.childs.all[0];
@@ -1243,13 +1245,7 @@ model.listChildren = function (cb, cbe) {
             if (typeof cb === 'function') {
                 cb();
             }
-        })
-        .error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
         });
-
 };
 
 //builds the set of different subjects encountered in the pedagogic items of the list

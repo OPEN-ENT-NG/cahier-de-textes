@@ -174,7 +174,10 @@
                                 model.child ? model.child.id : undefined);
 
                         }, $rootScope.validationError);
-                    }, $rootScope.validationError);
+                    }).catch((e)=>{
+                      $rootScope.validationError();
+                      throw e;
+                    });
                 });
             };
 

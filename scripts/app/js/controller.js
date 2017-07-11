@@ -318,7 +318,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.selectedDueDate = moment(day.dayName, "dddd DD MMMM YYYY");
     };
 
-    $scope.back=function(){
+    $rootScope.back=function(){
       $window.history.back();
     };
 
@@ -530,7 +530,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     $scope.publishSelectedLessons = function (isPublish) {
         $scope.currentErrors = [];
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        $scope.publishLessons($scope.getSelectedPedagogicItems('lesson'), isPublish, notifyKey);
+        return $scope.publishLessons($scope.getSelectedPedagogicItems('lesson'), isPublish, notifyKey);
     };
 
     /**
@@ -542,14 +542,16 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var lessons = [];
         lessons.push(lesson);
         var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
-        $scope.publishLessons(lessons, isPublish, notifyKey, $scope.goToMainView());
+        return $scope.publishLessons(lessons, isPublish, notifyKey).then(()=>{
+            $scope.goToMainView();
+        });
     };
 
     $scope.publishLesson = function (lesson, isPublish) {
         var lessons = [];
         lessons.push(lesson);
         var notifyKey = isPublish ? 'lesson.published' : 'lesson.unpublished';
-        $scope.publishLessons(lessons, isPublish, notifyKey, $scope.back());
+        return $scope.publishLessons(lessons, isPublish, notifyKey);
     };
 
     /**
@@ -563,7 +565,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.currentErrors = [];
         $scope.processingData = true;
 
-        model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, publishCB(lessons, isPublish, notifyKey, cb), function (e) {
+        return model.publishLessons({ids:model.getItemsIds(lessons)}, isPublish, publishCB(lessons, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             $rootScope.validationError(e);
         });
@@ -578,7 +580,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var homeworks = [];
         homeworks.push(homework);
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        $scope.publishHomeworks(homeworks, isPublish, notifyKey, $scope.goToMainView());
+        $scope.publishHomeworks(homeworks, isPublish, notifyKey).then(()=>{
+            $scope.goToMainView();
+        });
     };
 
     /**
@@ -592,11 +596,11 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.processingData = true;
 
         var notifyKey = isPublish ? 'item.published' : 'item.unpublished';
-        var p = model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
+        return model.publishHomeworks({ids:model.getItemsIds(homeworks)}, isPublish, publishCB(homeworks, isPublish, notifyKey, cb), function (e) {
             $scope.processingData = false;
             $rootScope.validationError(e);
         });
-        console.log(p);
+
     };
 
     /**
@@ -771,14 +775,14 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.cbCount = cbCount;
 
         if (lessons.length > 0) {
-            model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish, publishCB(lessons, toPublish, notifyKey),
+            return model.publishLessons({ids: model.getItemsIds(lessons)}, toPublish, publishCB(lessons, toPublish, notifyKey),
                 function (cbe) {
                     notify.error(cbe.message);
                 })
         }
 
         if (homeworks.length > 0) {
-            model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish, publishCB(homeworks, toPublish, notifyKey),
+            return model.publishHomeworks({ids: model.getItemsIds(homeworks)}, toPublish, publishCB(homeworks, toPublish, notifyKey),
                 function (cbe) {
                     notify.error(cbe.message);
                 })
@@ -889,27 +893,26 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             //$scope.showCal = !$scope.showCal;
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
-            $scope.$apply();
 
             if (typeof cb === 'function') {
                 cb();
             }
 
             if (goToMainView) {
-                $scope.back();
+                $rootScope.back();
                 $scope.lesson = null;
                 $scope.homework = null;
             }
         };
 
-        $scope.homework.save(function () {
+        return $scope.homework.save(function () {
             if (this.lesson_id) {
-                syncHomeworks(postHomeworkSave);
+                return syncHomeworks().then(()=>{
+                    postHomeworkSave();
+                });
             } else {
-                syncLessonsAndHomeworks(postHomeworkSave)
+                return syncLessonsAndHomeworks(postHomeworkSave);
             }
-        }, function (e) {
-            $rootScope.validationError(e);
         });
     };
 

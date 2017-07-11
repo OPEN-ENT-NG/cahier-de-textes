@@ -83,6 +83,9 @@ Lesson.prototype.calendarUpdate = function (cb, cbe) {
  * @param cbe Callback on error
  */
 Lesson.prototype.saveHomeworks = function (cb, cbe) {
+
+    var deferred = model.$q().defer();
+
     var homeworkSavedCount = 0;
     var homeworkCount = this.homeworks ? this.homeworks.all.length : 0;
     var that = this;
@@ -96,31 +99,23 @@ Lesson.prototype.saveHomeworks = function (cb, cbe) {
             homework.audience = that.audience;
             homework.subject = that.subject;
             homework.color = that.color;
-
-            homework.save(
-                function (x) {
-                    homeworkSavedCount++;
-                    // callback function once all homeworks saved
-                    if (homeworkSavedCount === homeworkCount) {
-                        if (typeof cb === 'function') {
-                            cb();
-                        }
+            homework.save().then(()=>{
+                homeworkSavedCount++;
+                // callback function once all homeworks saved
+                if (homeworkSavedCount === homeworkCount) {
+                    if (typeof cb === 'function') {
+                        cb();
                     }
-                },
-                function (e) {
-                    if (typeof cbe === 'function') {
-                        cbe(model.parseError(e));
-                    }
-                });
+                    deferred.resolve();
+                }
+            });
 
         });
-    } else {
-        if (typeof cb === 'function') {
-            cb();
-        }
+    }else{
+      deferred.resolve();
     }
 
-
+    return deferred.promise;
 };
 
 /**
@@ -131,35 +126,33 @@ Lesson.prototype.saveHomeworks = function (cb, cbe) {
  */
 Lesson.prototype.save = function(cb, cbe) {
 
+
+
     // startTime used for db save but startMoment in calendar view
     // startMoment day is given by lesson.date
     this.startMoment = model.getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.startTime));
     this.endMoment = model.getMomentDateTimeFromDateAndMomentTime(this.date, moment(this.endTime));
     var that = this;
+    var subjectPromise = model.$q().when();
+    var lessonPromise;
+    if(!this.subject.id){
+        subjectPromise = this.subject.save(updateOrCreateLesson);
+    }
 
-    var saveHomeworksAndSync = function(){
-        that.saveHomeworks(
-            function(){
-                syncLessonsAndHomeworks(cb);
-            }
-        );
-    };
-
-    var updateOrCreateLesson = function () {
+    return subjectPromise.then(()=>{
         if (that.id) {
-            that.update(saveHomeworksAndSync, cbe);
+            lessonPromise = that.update();
         }
         else {
-            that.create(saveHomeworksAndSync, cbe);
+            lessonPromise = that.create();
         }
-    };
 
-    // autocreates subject if it does not exists
-    if(!this.subject.id){
-        this.subject.save(updateOrCreateLesson)
-    } else {
-        updateOrCreateLesson();
-    }
+        return lessonPromise.then(()=>{
+            return that.saveHomeworks().then(()=>{
+                return syncLessonsAndHomeworks(cb);
+            });
+        });
+    });
 };
 
 /**
@@ -191,32 +184,28 @@ Lesson.prototype.update = function(cb, cbe) {
 
     var lesson = this;
 
-    http().putJson(url, this)
-        .done(function(){
-            if(typeof cb === 'function'){
-                cb();
-            }
-        }.bind(this))
-        .error(function(e){
-            if(typeof cbe === 'function'){
-                cbe(model.parseError(e));
-            }
-        });
+    return model.getHttp()({
+      method : 'PUT',
+      url : url,
+      data : lesson
+    }).then(function(){
+        if(typeof cb === 'function'){
+            cb();
+        }
+    });
 };
 
 Lesson.prototype.create = function(cb, cbe) {
     var lesson = this;
-    http().postJson('/diary/lesson', this)
-        .done(function(b){
-            lesson.updateData(b);
+    return model.getHttp()({
+        method : 'POST',
+        url : '/diary/lesson',
+        data : lesson
+    }).then(function(result){
+            lesson.updateData(result.data);
             model.lessons.pushAll([lesson]);
             if(typeof cb === 'function'){
                 cb();
-            }
-        })
-        .error(function(e){
-            if(typeof cbe === 'function'){
-                cbe(model.parseError(e));
             }
         });
 };
@@ -231,18 +220,14 @@ Lesson.prototype.delete = function (cb, cbe) {
 
     var lesson = this;
 
-    http().delete('/diary/lesson/' + this.id, this)
-        .done(function (b) {
-
+    model.getHttp()({
+        method : 'DELETE',
+        url : '/diary/lesson/' + this.id,
+        data : lesson
+    }).then(function (b) {
             lesson.deleteModelReferences();
-
             if (typeof cb === 'function') {
                 cb();
-            }
-        })
-        .error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
             }
         });
 };
@@ -265,15 +250,18 @@ Lesson.prototype.deleteList = function (lessons, cb, cbe) {
 Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
     var lesson = this;
+
     let url = '/diary/lesson/';
     if (model.getSecureService().hasRight(model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)){
         url = '/diary/lesson/external/';
     }
 
     var load = function () {
-        http().get(url + lesson.id)
-            .done(function (data) {
-                lesson.updateData(model.LessonService.mapLesson(data));
+        model.getHttp()({
+            method : 'GET',
+            url : url + lesson.id
+        }).then(function (result) {
+                lesson.updateData(model.LessonService.mapLesson(result.data));
 
                 if (loadHomeworks) {
                     model.loadHomeworksForLesson(lesson, cb, cbe);
@@ -281,11 +269,6 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
                 if (typeof cb === 'function') {
                     cb();
-                }
-            })
-            .error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
                 }
             });
     };
@@ -312,17 +295,15 @@ Lesson.prototype.publish = function (cb, cbe) {
     jsonLesson.id = this.id;
     jsonLesson.audience.structureId = this.structureId;
 
-    http().postJson('/diary/lesson/publish', jsonLesson)
-        .done(function () {
-            if (typeof cb === 'function') {
-                cb();
-            }
-        })
-        .error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
-        });
+    return model.getHttp()({
+        method : 'POST',
+        url : '/diary/lesson/publish',
+        data : jsonLesson
+    }).then(function () {
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
 };
 
 
@@ -366,11 +347,7 @@ Lesson.prototype.addHomework = function (cb) {
 
 Lesson.prototype.deleteHomework = function (homework) {
 
-    homework.delete(function(cb){
-
-    }, function(cbe){
-
-    });
+    homework.delete();
 
     var homework = new Homework();
     homework.dueDate = this.date;

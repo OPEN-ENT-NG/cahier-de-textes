@@ -13,6 +13,7 @@
 
             function init() {
                 //existing lesson
+                $scope.tabs.showAnnotations = false;
                 $q.all([
                     //need subjects
                     loadSubjects(),
@@ -51,13 +52,15 @@
             }
 
             function loadHomeworkTypes(){
+              var deferred = $q.defer();
                 if (!model.homeworkTypes || !model.homeworkTypes.all || model.homeworkTypes.all.length === 0){
                     model.homeworkTypes.syncHomeworkTypes(function() {
-                        return $q.when();
+                            deferred.resolve();
                         }, $rootScope.validationError);
                 }else{
-                    return $q.when();
+                    deferred.resolve();
                 }
+                return deferred.promise;
             }
 
             function loadSubjects(){
@@ -83,8 +86,8 @@
 
             function populateExistingLesson(){
                 $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
-                $scope.tabs.showAnnotations = false;
 
+                $scope.tabs.showAnnotations = !!vm.lesson.annotations;
                 // open existing lesson for edit
 
                 vm.lesson.previousLessonsLoaded = false; // will force reload
@@ -157,7 +160,6 @@
                             if (typeof cb !== 'undefined') {
                                 cb();
                             }
-                            $scope.$apply();
                         },
                         function(e) {
                             $rootScope.validationError(e);
@@ -174,7 +176,7 @@
              * @param goMainView if true will switch to calendar or list view
              * after create/update else stay on current page
              */
-            $scope.createOrUpdateLesson = function(goMainView, cb) {
+            var createOrUpdateLesson = function(goMainView, cb) {
 
                 $scope.currentErrors = [];
 
@@ -182,23 +184,21 @@
                 vm.lesson.endTime = $scope.newItem.end;
                 vm.lesson.date = $scope.newItem.date;
 
-                vm.lesson.save(function() {
+                return vm.lesson.save(function() {
                     notify.info('lesson.saved');
                     vm.lesson.audience = model.audiences.findWhere({
                         id: vm.lesson.audience.id
                     });
                     if (goMainView) {
-                        $scope.back();
                         vm.lesson = null;
                         $scope.homework = null;
                     }
                     if (typeof cb === 'function') {
                         cb();
                     }
-                }, function(e) {
-                    $rootScope.validationError(e);
+                }).catch(function(e) {
                     vm.errorValid = true;
-                    $scope.$apply();
+                    throw e;
                 });
             };
 
@@ -303,8 +303,16 @@
             };
 
             $scope.createAndPublishLesson = function (lesson, isPublish, goMainView) {
-                $scope.createOrUpdateLesson(goMainView, function(){
-                    $scope.publishLesson(lesson, isPublish);
+                return createOrUpdateLesson().then(() =>{
+                    return $scope.publishLesson(lesson, isPublish).then(()=>{
+                        $rootScope.back();
+                    });
+                });
+            };
+
+            $scope.createOrUpdateLesson = function(){
+                return createOrUpdateLesson().then(() =>{
+                    $rootScope.back();
                 });
             };
         }

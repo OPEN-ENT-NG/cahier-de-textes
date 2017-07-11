@@ -15,7 +15,7 @@
 
                     var angElement = angular.element(element);
 
-                    angElement.on('drag', function(event){                                                      
+                    angElement.on('drag', function(event){
                         angElement.css('opacity', 0.9);
                     });
 
@@ -31,7 +31,7 @@
                         try {
                             $originalEvent.dataTransfer.setData('application/json', JSON.stringify(item));
                         } catch (e) {
-                            $originalEvent.dataTransfer.setData('Text', JSON.stringify(item));
+                            $originalEvent.dataTransfer.setData('Text', JSON.stringify(item));														
                         }
                     };
                 }

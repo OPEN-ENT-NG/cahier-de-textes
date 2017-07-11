@@ -135,10 +135,12 @@
 
                         <br><br>
                         <!-- END -->
-                        <div class="row accordions">
-                            <article class="accordion" ng-class="{ opened: tabs.showAnnotations }">
+                        <div class="row accordions"  >
+                            <article class="accordion"
+
+                                ng-class="{ opened: tabs.showAnnotations }">
                                 <h2 ng-click="tabs.showAnnotations = !tabs.showAnnotations">
-                                    <i18n>annotations.title</i18n>
+                                    <i18n>annotations.title</i18n> [[tabs.showAnnotations]]
                                 </h2>
                                 <div class="toggle">
                                     <editor ng-model="editLessonCtrl.lesson.annotations"></editor>

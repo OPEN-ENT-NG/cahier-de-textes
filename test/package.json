@@ -1,7 +1,8 @@
 {
   "name": "cahier-de-texte",
-
-  "devDependencies": {
-
+  "devDependencies": {},
+  "dependencies": {
+    "html-dnd": "^1.2.0",
+    "pg": "^6.4.0"
   }
 }
