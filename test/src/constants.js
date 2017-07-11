@@ -10,6 +10,7 @@ module.exports = {
         max: 10,
         idleTimeoutMillis: 30000,
     },
+    week : '2017-05-29',
     profils : {
         'teacher' : {
             login : 'mia.barbier2',

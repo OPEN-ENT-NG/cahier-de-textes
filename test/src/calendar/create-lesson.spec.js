@@ -1,4 +1,5 @@
 
+var constants = require('../constants');
 var loginService = require('../common/login.service');
 var lessonService = require('../common/lesson.service.js');
 var pgService = require('../common/pg.service.js');
@@ -11,22 +12,31 @@ describe('Protractor Calendar', function() {
     });
 
     it('Should connect', function() {
-        let week = '2017-05-29';
+        let week = constants.week;
         loginService.login("teacher","#/calendarView/"+week);
+    });
+
+    it('Verify Calendar has no lessons',function(){
+        element.all(by.css('input[ng-model="item.selected"]')).then(function(items) {
+            expect(items.length).toBe(0);
+        });
     });
 
     it('Should create draft lesson', function() {
         lessonService.createLessonFromCal(14,true);
     });
 
+
     it('Should update draft lesson', function() {
         lessonService.updateLessonFromCal();
     });
 
+
     it('Should drag and drop', function() {
         lessonService.dragAndDropLastLesson(25);
     });
-    
+
+
     it('Should delete first draft lesson', function() {
         lessonService.deleteLessonFromCal();
     });
@@ -47,5 +57,15 @@ describe('Protractor Calendar', function() {
         lessonService.deleteLessonFromCal();
     });
 
+
+    it('Verify Calendar lesson creation',function(){
+        element.all(by.css('input[ng-model="item.selected"]')).then(function(items) {
+            expect(items.length).toBe(0);
+        });
+    });
+
+    it('Should disconnect', function() {
+        loginService.logout();
+    });
 
 });
