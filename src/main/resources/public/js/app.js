@@ -7438,9 +7438,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     'use strict';
 
     /*
-    * Progression service as class
-    * used to manipulate Progression model
-    */
+     * Progression service as class
+     * used to manipulate Progression model
+     */
 
     var ProgressionService = function () {
         function ProgressionService($http, $q, constants, $sce) {
@@ -7471,6 +7471,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'saveProgression',
             value: function saveProgression(progression) {
                 var progressionLight = angular.copy(progression);
+                var lessonItems = progressionLight.lessonItems;
+                var nbLessons = progressionLight.nbLessons;
                 delete progressionLight.lessonItems;
                 delete progressionLight.nbLessons;
                 var url = '/diary/progression';
@@ -7479,6 +7481,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     method: 'POST',
                     data: progressionLight
                 }).then(function (result) {
+                    if (!lessonItems && !nbLessons) {
+                        nbLessons = 0;
+                    }
+                    result.data.lessonItems = lessonItems;
+                    result.data.nbLessons = nbLessons;
+
                     return result.data;
                 });
             }

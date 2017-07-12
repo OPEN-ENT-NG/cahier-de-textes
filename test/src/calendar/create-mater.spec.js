@@ -4,7 +4,7 @@ var loginService = require('../common/login.service');
 var lessonService = require('../common/lesson.service.js');
 var pgService = require('../common/pg.service.js');
 // spec.js
-describe('Protractor Calendar', function() {
+describe('Protractor Matter Calendar', function() {
 
 
     it('Should remove datas ', function() {
@@ -28,10 +28,9 @@ describe('Protractor Calendar', function() {
       browser.sleep(1500);
       element.all(by.css('input[ng-model="item.selected"]')).then(function(items) {
           expect(items.length).toBe(1);
-
       });
 
-      element(by.css('#subjectlabel')).getText().then((text)=>{
+      $('#subjectlabel').getText().then((text)=>{
         expect(text.trim()).toEqual(matter);
       });
 

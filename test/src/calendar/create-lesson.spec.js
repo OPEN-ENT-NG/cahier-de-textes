@@ -4,7 +4,7 @@ var loginService = require('../common/login.service');
 var lessonService = require('../common/lesson.service.js');
 var pgService = require('../common/pg.service.js');
 // spec.js
-describe('Protractor Calendar', function() {
+describe('Protractor Lesson Calendar', function() {
 
 
     it('Should remove datas ', function() {
@@ -21,7 +21,7 @@ describe('Protractor Calendar', function() {
             expect(items.length).toBe(0);
         });
     });
-    /*
+        
     it('Should create draft lesson', function() {
         lessonService.createLessonFromCal(14,true);
     });
@@ -55,7 +55,6 @@ describe('Protractor Calendar', function() {
     it('Should delette publish lesson', function() {
         lessonService.deleteLessonFromCal();
     });
-    */
 
     it('Should create draft lesson from button', function() {
         lessonService.createLessonFromButton(14,true,constants.momentWeek.format('DD/MM/YYYY'),"10:00","11:00");

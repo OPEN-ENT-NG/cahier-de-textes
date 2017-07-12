@@ -14,7 +14,7 @@
     <div class="row">
         <div class="pedagogic-day-container">
             <ul>
-                <li ng-repeat="progressionItem in progressionManagerCtrl.progressionItems | filter :{ title: progressionManagerCtrl.progressionFilter }">
+                <li ng-repeat="progressionItem in progressionManagerCtrl.progressionItems | filter :{ title: progressionManagerCtrl.progressionFilter } | orderBy : 'title'">
                     <div class="pedagogic-day-card" ng-class="{' selected' : progressionItem === progressionManagerCtrl.selectedProgressionItem }" ng-click="progressionManagerCtrl.selectProgression(progressionItem)">
                         <div class="thumbnail" ng-class="{' thumb-selected' : progressionItem === progressionManagerCtrl.selectedProgressionItem }">
                             [[progressionItem.level]]
@@ -37,7 +37,7 @@
                 <div class="content-not-found" ng-show="!progressionManagerCtrl.selectedProgressionItem">
                     <div>
                         <i class="icon left "></i> <i18n>progression.help.select</i18n>
-                    </div>                   
+                    </div>
                 </div>
             </div>
         </div>

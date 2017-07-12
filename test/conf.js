@@ -5,6 +5,7 @@ exports.config = {
   specs: [
     'src/calendar/create-homework.spec.js',
     'src/calendar/create-lesson.spec.js',
-    'src/calendar/create-mater.spec.js'
+    'src/calendar/create-mater.spec.js',
+    'src/progression/progression.spec.js'
   ]
 };
