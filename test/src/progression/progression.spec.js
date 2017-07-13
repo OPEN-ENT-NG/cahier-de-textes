@@ -82,10 +82,7 @@ describe('Protractor Progression Calendar', function() {
       });
     });
 
-    it('Should add content to the first progression', function() {
-      element.all(by.css('.pedagogic-day-container ul li')).get(0).click();
-    });
-
+  
     it('Should disconnect', function() {
         loginService.logout();
     });

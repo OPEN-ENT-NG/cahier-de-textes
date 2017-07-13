@@ -7,11 +7,12 @@
      */
     class ProgressionService {
 
-        constructor($http, $q, constants, $sce) {
+        constructor($http, $q, constants, $sce,SubjectService) {
             this.$http = $http;
             this.$q = $q;
             this.constants = constants;
             this.$sce = $sce;
+            this.SubjectService = SubjectService;
             console.log(this.$sce);
         }
 
@@ -32,6 +33,8 @@
             let nbLessons = progressionLight.nbLessons;
             delete progressionLight.lessonItems;
             delete progressionLight.nbLessons;
+
+
             let url = `/diary/progression`;
             return this.$http({
                 url: url,
@@ -79,12 +82,25 @@
         saveLessonProgression(lesson) {
             let url = `/diary/progression/lesson`;
 
-            return this.$http({
-                url: url,
-                method: 'POST',
-                data: this.mapLessonToApi(lesson)
-            }).then(result => {
-                return result.data;
+            let subjectPromise = this.$q.when();
+            if(!lesson.subject.id){
+                subjectPromise = lesson.subject.save().then((subject)=>{
+                    subject.data = {
+                        id : subject.id,
+                        label : subject.label,
+                        school_id : subject.school_id
+                    };                 
+                });
+            }
+            return subjectPromise.then(()=>{
+
+                return this.$http({
+                    url: url,
+                    method: 'POST',
+                    data: this.mapLessonToApi(lesson)
+                }).then(result => {
+                    return result.data;
+                });
             });
         }
 
@@ -149,11 +165,11 @@
                 id: lesson.id,
                 title: lesson.title,
                 description: lesson.description,
-                subjectLabel: lesson.subject.subject_label,
+                subjectLabel: lesson.subject.label,
                 color: lesson.color,
                 annotations: lesson.annotations,
                 orderIndex: lesson.orderIndex,
-                subject: lesson.subject,
+                //subject: lesson.subject,
                 progressionId: lesson.progressionId,
                 homeworks: lesson.homeworks && lesson.homeworks.all ? _.map(lesson.homeworks.all, this.mapHomeworkToApi) : [],
             };
@@ -161,8 +177,8 @@
             if (lesson.homeworks) {
                 result.homeworks = JSON.stringify(_.map(lesson.homeworks.all, this.mapObject));
             }
-
-            result.subject = JSON.stringify(result.subject.data);
+            //let subject = lesson.subject.data.label ? lesson.subject.data : lesson.subject;
+            result.subject = JSON.stringify(lesson.subject.data);
             return result;
         }
 

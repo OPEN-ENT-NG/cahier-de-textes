@@ -31,6 +31,11 @@ var srv = {
     $('.edit-button').click();
     srv.setProgressionInfos(title,level,description);
     srv.saveProgression();
+  },
+  selectContentProgression : (nbItem)=>{
+    let liContentProgression = $$('[diary-sortable-element]>div>article').get(nbItem);
+    liContentProgression.$('label.checkbox').click();
+    browser.sleep(200);
   }
 
 };

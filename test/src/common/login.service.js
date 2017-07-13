@@ -23,7 +23,7 @@ module.exports = {
     },
     logout: () => {
         browser.waitForAngular();
-
+        browser.executeScript('window.scrollTo(0,0);');
         $('[logout]').click();
 
         browser.sleep(1000);

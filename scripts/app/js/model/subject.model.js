@@ -23,17 +23,23 @@ Subject.prototype.save = function(cb, cbe){
  */
 Subject.prototype.create = function (cb, cbe) {
     var subject = this;
+
+    if (!this.school_id ){
+      this.school_id = model.me.structures[0];
+    }
+
     return model.getHttp()({
       method : 'POST',
       url : '/diary/subject',
       data : subject
     }).then(function (result) {
+            //subject.updateData(subject);
             subject.updateData(result.data);
             model.subjects.all.push(subject);
             if (typeof cb === 'function') {
                 cb();
             }
-            return result.data;
+            return subject;
         });
 };
 
