@@ -25,6 +25,8 @@
 
             $scope.setModel = function(alias) {
                 ModelWeekService.setModelWeek(alias,model.mondayOfWeek).then((modelWeek) => {
+                    $scope.modelWeekCurrentWeek = alias;
+                    $scope.isModelWeek = true;
                     $rootScope.$broadcast('calendar.refreshCalendar');
                     $scope.getModel();
                 });
@@ -41,7 +43,7 @@
             };
 
             $scope.getModel = function(){
-                if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {                    
+                if (SecureService.hasRight(constants.RIGHTS.MANAGE_MODEL_WEEK)) {
                     ModelWeekService.getModelWeeks().then((modelweeks)=>{
                         $scope.modelWeeks = modelweeks;
                     });

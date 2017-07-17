@@ -9,7 +9,8 @@ exports.config = {
     'src/progression/progression.spec.js',
     'src/progression/progression-content.spec.js',
     'src/visa/visa.spec.js',
-    'src/visa/visa-lock.spec.js'
+    'src/visa/visa-lock.spec.js',
+    'src/model-week/model-week.spec.js'
   ],
    multiCapabilities: [
     {

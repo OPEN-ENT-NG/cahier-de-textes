@@ -7,10 +7,9 @@
                 restrict: 'E',
                 require: '^diary-calendar',
                 template: `<div class="schedule-item" resizable draggable horizontal-resize-lock
-                            ng-style="item.position.scheduleItemStyle"
-                            >
-                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>
-                            </div>`,
+                            ng-style="item.position.scheduleItemStyle">
+                          <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>
+                      </div>`,
                 controller: function($scope,$element,$timeout) {
 
                   var vm = this;

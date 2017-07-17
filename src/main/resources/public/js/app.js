@@ -698,6 +698,8 @@ var AngularExtensions = {
 
             $scope.setModel = function (alias) {
                 ModelWeekService.setModelWeek(alias, model.mondayOfWeek).then(function (modelWeek) {
+                    $scope.modelWeekCurrentWeek = alias;
+                    $scope.isModelWeek = true;
                     $rootScope.$broadcast('calendar.refreshCalendar');
                     $scope.getModel();
                 });
@@ -1136,7 +1138,7 @@ var AngularExtensions = {
                                                                   return {
                                                                                         restrict: 'E',
                                                                                         require: '^diary-calendar',
-                                                                                        template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle"\n                            >\n                                <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                            </div>',
+                                                                                        template: '<div class="schedule-item" resizable draggable horizontal-resize-lock\n                            ng-style="item.position.scheduleItemStyle">\n                          <container template="schedule-display-template" ng-style="item.position.containerStyle" class="absolute"></container>\n                      </div>',
                                                                                         controller: function controller($scope, $element, $timeout) {
 
                                                                                                               var vm = this;
