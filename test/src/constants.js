@@ -21,6 +21,10 @@ module.exports = {
         'director' : {
             login : 'alexia.garnier',
             pwd : 'Ong_1234'
+        },
+        'inspector': {
+          login :'diane.adam',
+          pwd : 'Ong_1234'
         }
     }
 };
