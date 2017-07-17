@@ -900,7 +900,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
             if (goToMainView) {
                 $rootScope.back();
-                $scope.lesson = null;
+                $scope.lesson = null; 
                 $scope.homework = null;
             }
         };
@@ -913,6 +913,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             } else {
                 return syncLessonsAndHomeworks(postHomeworkSave);
             }
+        },function(e) {
+            $scope.homework.errorValid = true;
+            throw e;
         });
     };
 

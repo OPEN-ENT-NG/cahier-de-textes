@@ -2,8 +2,10 @@
   "name": "cahier-de-texte",
   "devDependencies": {},
   "dependencies": {
+    "fs": "0.0.1-security",
     "html-dnd": "^1.2.0",
     "moment": "^2.18.1",
-    "pg": "^6.4.0"
+    "pg": "^6.4.0",
+    "rimraf": "^2.6.1"
   }
 }

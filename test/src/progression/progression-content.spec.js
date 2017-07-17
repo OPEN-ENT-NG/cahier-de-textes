@@ -34,26 +34,26 @@ describe('Protractor Progression Calendar', function() {
         $('[ng-click="progressionManagerCtrl.addNewLesson()"]').click();
 
         lessonService.setTitleDescriptionAnnotaiton("Titre de la sceance1",
-                "Description de la sceance1",
-                "ceci est l'annotation1");
+            "Description de la sceance1",
+            "ceci est l'annotation1");
 
         lessonService.saveLesson(false);
 
         $$('[diary-sortable-element]>div>article').then(function(items) {
-              expect(items.length).toBe(1);
+            expect(items.length).toBe(1);
         });
 
         $('[ng-click="progressionManagerCtrl.addNewLesson()"]').click();
 
         lessonService.setTitleDescriptionAnnotaiton("Titre de la sceance2",
-                "Description de la sceance2",
-                "ceci est l'annotation2");
+            "Description de la sceance2",
+            "ceci est l'annotation2");
         let matter = "Physique";
         lessonService.createNewMatter(matter);
         lessonService.saveLesson(false);
 
         $$('[diary-sortable-element]>div>article').then(function(items) {
-              expect(items.length).toBe(2);
+            expect(items.length).toBe(2);
         });
 
         expect($$('[diary-sortable-element]').get(1).$('.three label').getText()).toBe(matter);
@@ -67,50 +67,32 @@ describe('Protractor Progression Calendar', function() {
         $('[ ng-click="progressionManagerCtrl.editSelectedContent()"]').click();
         browser.waitForAngular();
         lessonService.setTitleDescriptionAnnotaiton("Titre de la sceance1M",
-                "Description de la sceance1M",
-                "ceci est l'annotation1M");
+            "Description de la sceance1M",
+            "ceci est l'annotation1M");
         lessonService.saveLesson(false);
     });
 
 
     it('Should drag and drop content from the first progression', function() {
 
-
         $('.pedagogic-day-card').click();
         let liContentProgression1 = $$('[diary-sortable-element]').get(0);
         let liContentProgression2 = $$('[diary-sortable-element]').get(1);
-        let container = $('[diary-sortable-list]');
+
         browser.sleep(400);
         expect(liContentProgression1.$('.six label').getText()).toBe("Titre de la sceance1M");
         expect(liContentProgression2.$('.six label').getText()).toBe("Titre de la sceance2");
-
-        //browser.pause();
-
-        utilsService.dragAndDrop(liContentProgression2,container);
-
-        /*
-        let moveTo = "var fireEvent = arguments[0];" + "var evObj = document.createEvent('MouseEvents');" + "evObj.initEvent( 'mouseover', true, true );" + "fireEvent.dispatchEvent(evObj);";
-
-        browser.executeScript(moveTo, liContentProgression2);
-        browser.actions()
-        .mouseDown().perform();
-
-        browser.executeScript(moveTo, container);
-
-        browser.actions()
-        .mouseUp()
-        .perform();
-        */
+        
+        utilsService.dragAndDrop(liContentProgression2, liContentProgression1);
         browser.sleep(200);
 
         let liContentProgression1M = $$('[diary-sortable-element]>div>article').get(0);
         let liContentProgression2M = $$('[diary-sortable-element]>div>article').get(1);
-        //browser.pause();
+
         expect(liContentProgression1M.$('.six label').getText()).toBe("Titre de la sceance2");
         expect(liContentProgression2M.$('.six label').getText()).toBe("Titre de la sceance1M");
 
-
-        progressionService.backToCalendar();
+        utilsService.backToCalendar();
         browser.waitForAngular();
         browser.sleep(400);
         progressionService.openProgressionTab();
@@ -126,8 +108,31 @@ describe('Protractor Progression Calendar', function() {
 
     });
 
-    /*
+    it('Should drag and drop 2 progression lesson', function() {
+        utilsService.backToCalendar();
+        browser.waitForAngular();
+        browser.sleep(200);
+        progressionService.openProgressionTab();
+
+        progressionService.dragAndDropLastProgression(1, 14, false);
+        browser.waitForAngular();
+        browser.sleep(200);
+        progressionService.openProgressionTab();
+        progressionService.dragAndDropLastProgression(1, 24, true);
+        browser.executeScript('window.scrollTo(0,0);');
+
+        element.all(by.css('input[ng-model="item.selected"]')).then(function(items) {
+            expect(items.length).toBe(2);
+        });
+    });
+
     it('Should delete content from the first progression', function() {
+        progressionService.openProgressionTab();
+        browser.sleep(200);
+        $('.search-progression button').click();
+        browser.waitForAngular();
+        browser.sleep(200);
+        $('.pedagogic-day-card').click();
         progressionService.selectContentProgression(0);
 
         $('[confirm-yes="Supprimer"]').click();
@@ -135,14 +140,12 @@ describe('Protractor Progression Calendar', function() {
         $('[ng-click="confirm()"]').click();
         browser.sleep(100);
         $$('[diary-sortable-element]>div>article').then(function(items) {
-              expect(items.length).toBe(1);
+            expect(items.length).toBe(1);
         });
     });
-
 
     it('Should disconnect', function() {
         loginService.logout();
     });
-    */
 
 });

@@ -550,8 +550,8 @@ public class VisaServiceImpl extends SqlCrudService {
                 .append(" join diary.subject s on tovise.subjectId = s.id ")
                 .append(" join diary.teacher t on tovise.teacherId = t.id ")
                 .append(" join diary.audience a on tovise.audienceId = a.id ")
-                .append(" join diary.lesson l on tovise.lessonId = l.id ")
-                    .append(" order by date desc");
+                .append(" join diary.lesson l on tovise.lessonId = l.id ");
+
 
 
             parameters.addString(visaModel.getAudienceId());
@@ -562,7 +562,7 @@ public class VisaServiceImpl extends SqlCrudService {
             parameters.addString(visaModel.getSubjectId());
             parameters.addString(visaModel.getTeacherId());
         }
-
+        query.append(" order by date desc");
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, LessonModel.class));
     }
 

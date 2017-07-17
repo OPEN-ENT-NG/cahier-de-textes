@@ -148,6 +148,9 @@
                 });
             };
 
+            vm.closepopup = function(){
+              $rootScope.$broadcast('closeallpop');
+            };
 
             vm.pdf = function(){
                 VisaService.getPdfForVisa(vm.createLightVisas(vm.currentAgregVisas));

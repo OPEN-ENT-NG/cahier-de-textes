@@ -3,7 +3,7 @@
     <div class="toggle">
         <div class="row">
             <button
-                ng-click="remove()">
+                ng-click="visaManagerCtrl.closepopup()">
                 <i18n>back</i18n>
             </button>
             <button
@@ -11,7 +11,7 @@
                 confirm-class="popup-viser"
                 confirm-template="/diary/public/js/visa/popup-valid/popup-valid.template.html" >
                 <i18n>diary.visa.action.apply</i18n>
-            </button>            
+            </button>
             <button ng-click="visaManagerCtrl.pdf()">
                 <i18n>diary.visa.action.generatepdf</i18n>
             </button>

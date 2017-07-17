@@ -11,7 +11,7 @@
           </div>
       </div>
       <div class="row visa-tab-content">
-          <article class="row visa-lesson" ng-repeat="visaAgreg in visaManagerCtrl.agregatedVisa">
+          <article class="row visa-lesson" ng-repeat="visaAgreg in visaManagerCtrl.agregatedVisa | orderBy : ['teacherName','subjectName','audienceName']">
               <div class="row visa-lesson-header">
                   <div class="cell three teacher">
                       [[visaAgreg.teacherName]]

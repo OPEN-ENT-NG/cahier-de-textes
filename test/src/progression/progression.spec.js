@@ -4,6 +4,7 @@ var loginService = require('../common/login.service');
 var lessonService = require('../common/lesson.service.js');
 var progressionService = require('../common/progression.service.js');
 var pgService = require('../common/pg.service.js');
+var utilsService = require('../common/utils.service.js');
 // spec.js
 describe('Protractor Progression Calendar', function() {
 
@@ -21,7 +22,7 @@ describe('Protractor Progression Calendar', function() {
       $('.search-progression button').click();
 
       progressionService.createProgression('Titre1','Niveau1','Description1');
-      progressionService.backToCalendar();
+      utilsService.backToCalendar();
 
       progressionService.openProgressionTab();
       $('.search-progression button').click();
@@ -31,7 +32,7 @@ describe('Protractor Progression Calendar', function() {
       });
 
       progressionService.createProgression('Titre2','Niveau2','Description2');
-      progressionService.backToCalendar();
+      utilsService.backToCalendar();
 
       progressionService.openProgressionTab();
       $('.search-progression button').click();
@@ -82,7 +83,7 @@ describe('Protractor Progression Calendar', function() {
       });
     });
 
-  
+
     it('Should disconnect', function() {
         loginService.logout();
     });

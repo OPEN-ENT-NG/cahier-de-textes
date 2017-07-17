@@ -52,7 +52,10 @@
             <subject-picker ng-model="homework.subject" homework="homework"></subject-picker>
         </div>
         <div class="three cell">
-            <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="homework.audience" property="name" school="currentSchool" lesson="" homework="homework"></ent-dropdown>
+            <span ng-class="{'valid-error' : homework.errorValid && !homework.audience.id }" >
+              <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="homework.audience" property="name" school="currentSchool" lesson="" homework="homework">
+              </ent-dropdown>
+            </span>
         </div>
     </div>
     <section class="homework-detail">

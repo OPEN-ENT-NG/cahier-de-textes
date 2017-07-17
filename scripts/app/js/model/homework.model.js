@@ -55,7 +55,7 @@ Homework.prototype.save = function(cb, cbe) {
     var promise = model.$q().when({});
 
     if(!this.subject.id){
-        promise = this.subject.save(updateOrCreateHomework);
+        promise = this.subject.save();
     }
 
     return promise.then(()=>{
@@ -110,6 +110,10 @@ Homework.prototype.update = function(cb, cbe) {
             if (typeof cb === 'function') {
                 cb();
             }
+        }).catch(function(e) {
+            if (cbe){
+                cbe();
+            }
         });
 };
 
@@ -126,6 +130,10 @@ Homework.prototype.create = function(cb, cbe) {
                 cb();
             }
             return result.data;
+        }).catch(function(e) {
+            if (cbe){
+                cbe();
+            }
         });
 };
 
