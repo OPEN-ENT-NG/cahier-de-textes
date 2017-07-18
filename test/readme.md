@@ -24,12 +24,14 @@ Now start up a server with:
 insure that all project is ready to test.
 run the selenium.bat server file
 
+**  /!\ Warning each test will be delete the data base make sure that you have configured the ```constants.js``` file correctly and you are in a safe environnement**
+
 ## Execution
 run command
 ```protractor conf.js```
 
 
-## tools
+## Tools
 To write test use plugins like [protractor recorder](https://github.com/hanthomas/protractor-recorder)
 or [Css selector](https://chrome.google.com/webstore/detail/css-selector-helper-for-c/gddgceinofapfodcekopkjjelkbjodin/related)
 or [Elementor](https://github.com/andresdominguez/elementor)
