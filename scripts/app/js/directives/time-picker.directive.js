@@ -34,7 +34,6 @@
                     }
 
                     scope.$watch('ngModel', function (newVal) {
-                            console.log(newVal);
                         if (!newVal) {
                             return;
                         }
@@ -49,15 +48,14 @@
                         });
                     });
 
-                    element.on('blur', function () {
-                         console.log(scope.ngModel);
+                    element.on('blur', function () {                        
                          if (scope.ngModel){
                                  element.timepicker('setTime', scope.ngModel.get('hour')+':'+scope.ngModel.get('minute'));
                                  element.timepicker({
                                     showMeridian: false,
                                     defaultTime: 'current',
                                     minuteStep: 5
-                                }); 
+                                });
                          }
                     });
 

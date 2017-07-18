@@ -9,12 +9,12 @@
 
         module.config(function($provide) {
             $provide.decorator('editorDirective', function($delegate, $parse, $compile) {
-                console.log("exec decorator");
+
                 var directive, link;
                 directive = $delegate[0];
                 link = linkSurcharge;
                 directive.compile = function() {
-                    console.log("compile");
+
                     return function Link(scope, element, attrs, ctrls) {
                         scope.active = scope.$parent.$eval(attrs.isactive);
                         return link.apply(this, arguments);
@@ -25,7 +25,7 @@
 
 
                 function linkSurcharge(scope, element, attributes) {
-                    console.log("surchage");
+                
                     if (navigator.userAgent.indexOf('Trident') !== -1 || navigator.userAgent.indexOf('Edge') !== -1) {
                         element.find('code').hide();
                     }

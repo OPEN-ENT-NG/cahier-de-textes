@@ -8,7 +8,6 @@
         function controller($scope, $rootScope, $routeParams,PedagogicItemService,constants,$q,SubjectService) {
 
             var vm = this;
-            console.log("editLessonController");
             init();
 
             function init() {
@@ -64,8 +63,7 @@
             }
 
             function loadSubjects(){
-                if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){
-                    console.log("no subjects founds");
+                if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){                    
                     return SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects)=>{
                         model.subjects.all=[];
                         if(subjects){

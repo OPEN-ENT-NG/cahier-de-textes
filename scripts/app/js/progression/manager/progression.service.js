@@ -12,8 +12,7 @@
             this.$q = $q;
             this.constants = constants;
             this.$sce = $sce;
-            this.SubjectService = SubjectService;
-            console.log(this.$sce);
+            this.SubjectService = SubjectService;          
         }
 
         getProgressions() {
@@ -89,7 +88,7 @@
                         id : subject.id,
                         label : subject.label,
                         school_id : subject.school_id
-                    };                 
+                    };
                 });
             }
             return subjectPromise.then(()=>{

@@ -53,8 +53,7 @@
                         return true;
                     }
                     return e.text.toLowerCase().indexOf($scope.searchFilter.toLowerCase())>-1;
-                });
-                console.log($scope.itemsToShow);
+                });                
             }
 
             function highlight(text, phrase) {

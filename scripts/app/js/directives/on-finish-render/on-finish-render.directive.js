@@ -10,9 +10,7 @@
             return {
                 restrict: 'A',
                 link: function(scope, element, attr) {
-                    console.log("link !");
-                    if (scope.$last === true) {
-                        console.log("rendered");
+                    if (scope.$last === true) {                        
                         $timeout(function() {
                           scope.$evalAsync(attr.onFinishRender);
                         });

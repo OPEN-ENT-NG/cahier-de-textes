@@ -23,7 +23,8 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
 
     $rootScope.$on('edit-homework',(_,data)=>{
-        $scope.openHomeworkView (data);
+        window.location = '/diary#/editHomeworkView/' + data.id;
+        //$scope.openHomeworkView (data);
     });
 
 
@@ -445,6 +446,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var postDelete = function(){
             notify.info('item.deleted');
             $scope.closeConfirmPanel();
+            $rootScope.$broadcast('refresh-list');
             $scope.$apply();
         };
 
@@ -881,6 +883,11 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         });
     };
 
+    $scope.hideHomework = function(){
+        if ($scope.homework)
+        $scope.lesson = null;
+        $scope.homework = null;
+    };
 
     $scope.createOrUpdateHomework = function (goToMainView, cb) {
 
@@ -900,7 +907,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
 
             if (goToMainView) {
                 $rootScope.back();
-                $scope.lesson = null; 
+                $scope.lesson = null;
                 $scope.homework = null;
             }
         };
@@ -1195,7 +1202,7 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
      */
      //TODO remove
     $scope.showMorePreviousLessons = function (lesson) {
-        console.log("error not used");
+        console.warn("deprecated");
         return;
         const displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
