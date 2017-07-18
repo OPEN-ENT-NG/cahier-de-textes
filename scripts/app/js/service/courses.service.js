@@ -29,17 +29,29 @@
         mappCourse(course){
           course.date = moment(course.startDate);
           course.date.week(model.calendar.week);
-          //course.beginning = moment(course.startDate);
-          //course.end = moment(course.endDate);
-          course.startMoment = moment(course.startDate);
-          course.endMoment = moment(course.endDate);
+
+          course.startMoment = this.recalc(moment(course.startDate));
+          course.endMoment = this.recalc(moment(course.endDate));
 
           course.startTime = moment(course.startDate).format('HH:mm:ss');
           course.endTime = moment(course.endDate).format('HH:mm:ss');
+
           course.calendarType = "shadow";
           course.locked=true;
           course.is_periodic =false;
           course.notShowOnCollision=true;
+        }
+
+        recalc(date){
+            // multi week gestion
+            //https://groups.google.com/forum/#!topic/entcore/ne1ODPHQabE
+            let diff = date.diff(model.mondayOfWeek,'days');
+            if ( diff < 0 ||  diff > 6){
+                let weekDay = date.weekday();
+                date.dayOfYear(model.mondayOfWeek.dayOfYear());
+                date.weekday(weekDay);
+            }
+            return date;
         }
 
         mappingCourses(courses,subjects){
@@ -54,7 +66,7 @@
             let begin = moment(firstDayOfWeek);
             let end = moment(firstDayOfWeek).add(6, 'd');
 
-            let url = `/directory/timetable/courses/teacher/${structureId}`;
+            let url = `/directory/timetable/courses/teacher/${structureId}`;            
             let config = {
                 params : {
                     begin: begin.format(this.constants.CAL_DATE_PATTERN),

@@ -8031,17 +8031,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function mappCourse(course) {
                 course.date = moment(course.startDate);
                 course.date.week(model.calendar.week);
-                //course.beginning = moment(course.startDate);
-                //course.end = moment(course.endDate);
-                course.startMoment = moment(course.startDate);
-                course.endMoment = moment(course.endDate);
+
+                course.startMoment = this.recalc(moment(course.startDate));
+                course.endMoment = this.recalc(moment(course.endDate));
 
                 course.startTime = moment(course.startDate).format('HH:mm:ss');
                 course.endTime = moment(course.endDate).format('HH:mm:ss');
+
                 course.calendarType = "shadow";
                 course.locked = true;
                 course.is_periodic = false;
                 course.notShowOnCollision = true;
+            }
+        }, {
+            key: 'recalc',
+            value: function recalc(date) {
+                // multi week gestion
+                //https://groups.google.com/forum/#!topic/entcore/ne1ODPHQabE
+                var diff = date.diff(model.mondayOfWeek, 'days');
+                if (diff < 0 || diff > 6) {
+                    var weekDay = date.weekday();
+                    date.dayOfYear(model.mondayOfWeek.dayOfYear());
+                    date.weekday(weekDay);
+                }
+                return date;
             }
         }, {
             key: 'mappingCourses',
