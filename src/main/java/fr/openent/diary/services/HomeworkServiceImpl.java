@@ -169,6 +169,11 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
+    public void getAllHomeworksForExternal(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+        getHomeworks(Context.EXTERNAL, userId, schoolIds, memberIds, startDate, endDate, null, handler);
+    }
+
+    @Override
     public void getExternalHomeworkByLessonId (final String userId,final String lessonId, final List<String> memberIds,Handler<Either<String, JsonArray>> handler){
         getHomeworks(Context.EXTERNAL, userId, null, memberIds, null, null, lessonId, handler);
     }

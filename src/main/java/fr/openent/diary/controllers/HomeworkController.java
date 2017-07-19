@@ -252,7 +252,7 @@ public class HomeworkController extends ControllerHelper {
                         case "teacher":
                             List<String> memberIds = new ArrayList<>();
                             memberIds.add(id);
-                            homeworkService.getAllHomeworksForTeacher(id, Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                            homeworkService.getAllHomeworksForExternal(id, Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                             break;
                         case "audience":
                             diaryService.listGroupsFromClassId(schoolIds[0], id, new Handler<HandlerResponse<List<KeyValueModel>>>() {
@@ -265,7 +265,7 @@ public class HomeworkController extends ControllerHelper {
                                         for (KeyValueModel group : event.getResult()){
                                             memberIds.add(group.getKey());
                                         }
-                                        homeworkService.getAllHomeworksForTeacher(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+                                        homeworkService.getAllHomeworksForStudent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
                                     }
 
                                 }
