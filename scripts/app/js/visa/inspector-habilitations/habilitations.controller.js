@@ -65,8 +65,7 @@
                 vm.selectedTeachers = undefined;
                 vm.filter.teacher = undefined;
 
-                VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then((result) => {
-                    //console.log(result);
+                VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then((result) => {                  
                     vm.filters.teachers = result.availableTeachers;
                     vm.selectedTeachers = result.onInspectorTeachers;
                 });

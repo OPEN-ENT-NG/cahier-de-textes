@@ -11,7 +11,7 @@
             $timeout(init);
 
             function init() {
-                console.log("initForProgressionLesson");
+
                 if ($routeParams.progressionId) {
                     $scope.data.tabSelected = 'lesson';
                     vm.isProgressionLesson = true;
@@ -23,7 +23,7 @@
             }
             function loadLesson(lessonId){
                 ProgressionService.getLessonProgression(lessonId).then((lesson)=>{
-                    console.log("lesson = ", lesson);
+                
                     $scope.$parent.editLessonCtrl.lesson = lesson;
                 });
             }

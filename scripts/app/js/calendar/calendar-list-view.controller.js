@@ -44,6 +44,10 @@
                 });
             }
 
+            $scope.$on('refresh-list',()=>{
+                vm.getDatas();
+            });
+
             vm.getDatas = function() {
                 var p1;
                 var p2;
@@ -81,7 +85,6 @@
                             }
                         });
                     }
-                    console.log(vm.dayItems);
                 });
             };
 

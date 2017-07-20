@@ -26,6 +26,8 @@ public interface HomeworkService {
      */
     void getAllHomeworksForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
+    void getAllHomeworksForExternal(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+
     void getExternalHomeworkByLessonId (String userId, String lessonId, List<String> memberIds, Handler<Either<String, JsonArray>> handler);
 
     /**

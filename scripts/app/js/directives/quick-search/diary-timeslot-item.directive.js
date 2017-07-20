@@ -82,7 +82,6 @@
 
 
                        model.newLesson =lesson;
-                       console.log(model.newLesson);
                        window.location = '/diary#/createLessonView/timeFromCalendar' ;
 
                    }
@@ -181,8 +180,6 @@
 
                     function copyHomework(pedagogicItemOfTheDay){
                         let timeslotDates = extractBeginEnd();
-                        console.log(timeslotDates);
-                        console.log(pedagogicItemOfTheDay);
 
                         var homework = new Homework();
                         homework.dueDate = moment(timeslotDates.startDate);
@@ -194,18 +191,16 @@
                         homework.description = pedagogicItemOfTheDay.description;
                         homework.color = pedagogicItemOfTheDay.color;
                         homework.state = 'draft';
-                        /*
-                        lesson.date = moment(timeslotDates.startDate);
-                        lesson.startTime=moment(timeslotDates.startDate);
-                        lesson.startMoment=moment(timeslotDates.startDate);
-                        lesson.endTime=moment(timeslotDates.endDate);
-                        lesson.endMoment=moment(timeslotDates.endDate);
-                        */
 
-
-                        $rootScope.$broadcast('edit-homework',homework);
-
-
+                        homework.save(function(data) {
+                            var homeworkBd = model.homeworks.findWhere({
+                                id: parseInt(homework.id)
+                            });
+                            model.homeworks.remove(homeworkBd);
+                            window.location = '/diary#/editHomeworkView/' + homework.id;
+                        }, function(error) {
+                            console.error(error);
+                        });                        
                     }
 
                 }

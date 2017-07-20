@@ -204,6 +204,10 @@ var AngularExtensions = {
                 });
             }
 
+            $scope.$on('refresh-list', function () {
+                vm.getDatas();
+            });
+
             vm.getDatas = function () {
                 var p1;
                 var p2;
@@ -241,7 +245,6 @@ var AngularExtensions = {
                             }
                         });
                     }
-                    console.log(vm.dayItems);
                 });
             };
 
@@ -1070,7 +1073,8 @@ var AngularExtensions = {
 
                 // fast click = no drag = real click
                 // or cursor did not move
-                if (!xMouseMoved && !yMouseMoved || new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime < 300) {
+                if (!xMouseMoved && !yMouseMoved) {
+                    //|| (new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime) < 300) {
                     // do not redirect to lesson view if user clicked on checkbox
                     if (!($event.target && $event.target.type === "checkbox")) {
                         $rootScope.redirect(path);
@@ -1374,12 +1378,12 @@ var AngularExtensions = {
 
         module.config(function ($provide) {
             $provide.decorator('editorDirective', function ($delegate, $parse, $compile) {
-                console.log("exec decorator");
+
                 var directive, link;
                 directive = $delegate[0];
                 link = linkSurcharge;
                 directive.compile = function () {
-                    console.log("compile");
+
                     return function Link(scope, element, attrs, ctrls) {
                         scope.active = scope.$parent.$eval(attrs.isactive);
                         return link.apply(this, arguments);
@@ -1388,7 +1392,7 @@ var AngularExtensions = {
                 return $delegate;
 
                 function linkSurcharge(scope, element, attributes) {
-                    console.log("surchage");
+
                     if (navigator.userAgent.indexOf('Trident') !== -1 || navigator.userAgent.indexOf('Edge') !== -1) {
                         element.find('code').hide();
                     }
@@ -2412,7 +2416,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     $scope.model = model;
 
     $rootScope.$on('edit-homework', function (_, data) {
-        $scope.openHomeworkView(data);
+        window.location = '/diary#/editHomeworkView/' + data.id;
+        //$scope.openHomeworkView (data);
     });
 
     $scope.currentErrors = [];
@@ -2819,6 +2824,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         var postDelete = function postDelete() {
             notify.info('item.deleted');
             $scope.closeConfirmPanel();
+            $rootScope.$broadcast('refresh-list');
             $scope.$apply();
         };
 
@@ -3242,6 +3248,11 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         });
     };
 
+    $scope.hideHomework = function () {
+        if ($scope.homework) $scope.lesson = null;
+        $scope.homework = null;
+    };
+
     $scope.createOrUpdateHomework = function (goToMainView, cb) {
 
         $scope.currentErrors = [];
@@ -3546,7 +3557,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
      */
     //TODO remove
     $scope.showMorePreviousLessons = function (lesson) {
-        console.log("error not used");
+        console.warn("deprecated");
         return;
         var displayStep = 3;
         lesson.previousLessonsDisplayed = lesson.previousLessons.slice(0, Math.min(lesson.previousLessons.length, lesson.previousLessonsDisplayed.length + displayStep));
@@ -3569,7 +3580,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     }
 }
 
-;"use strict";
+;'use strict';
 
 (function () {
     'use strict';
@@ -3581,7 +3592,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         function controller($scope, $rootScope, $routeParams, PedagogicItemService, constants, $q, SubjectService) {
 
             var vm = this;
-            console.log("editLessonController");
             init();
 
             function init() {
@@ -3637,7 +3647,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
             function loadSubjects() {
                 if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0) {
-                    console.log("no subjects founds");
                     return SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
                         model.subjects.all = [];
                         if (subjects) {
@@ -3882,7 +3891,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     });
 })();
 
-"use strict";
+'use strict';
 
 (function () {
     'use strict';
@@ -3897,7 +3906,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             $timeout(init);
 
             function init() {
-                console.log("initForProgressionLesson");
+
                 if ($routeParams.progressionId) {
                     $scope.data.tabSelected = 'lesson';
                     vm.isProgressionLesson = true;
@@ -3909,7 +3918,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             }
             function loadLesson(lessonId) {
                 ProgressionService.getLessonProgression(lessonId).then(function (lesson) {
-                    console.log("lesson = ", lesson);
+
                     $scope.$parent.editLessonCtrl.lesson = lesson;
                 });
             }
@@ -4884,9 +4893,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             return {
                 restrict: 'A',
                 link: function link(scope, element, attr) {
-                    console.log("link !");
                     if (scope.$last === true) {
-                        console.log("rendered");
                         $timeout(function () {
                             scope.$evalAsync(attr.onFinishRender);
                         });
@@ -4980,7 +4987,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         lesson.endMoment = moment(timeslotDates.endDate);
 
                         model.newLesson = lesson;
-                        console.log(model.newLesson);
                         window.location = '/diary#/createLessonView/timeFromCalendar';
                     }
 
@@ -5075,8 +5081,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 
                     function copyHomework(pedagogicItemOfTheDay) {
                         var timeslotDates = extractBeginEnd();
-                        console.log(timeslotDates);
-                        console.log(pedagogicItemOfTheDay);
 
                         var homework = new Homework();
                         homework.dueDate = moment(timeslotDates.startDate);
@@ -5088,15 +5092,16 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         homework.description = pedagogicItemOfTheDay.description;
                         homework.color = pedagogicItemOfTheDay.color;
                         homework.state = 'draft';
-                        /*
-                        lesson.date = moment(timeslotDates.startDate);
-                        lesson.startTime=moment(timeslotDates.startDate);
-                        lesson.startMoment=moment(timeslotDates.startDate);
-                        lesson.endTime=moment(timeslotDates.endDate);
-                        lesson.endMoment=moment(timeslotDates.endDate);
-                        */
 
-                        $rootScope.$broadcast('edit-homework', homework);
+                        homework.save(function (data) {
+                            var homeworkBd = model.homeworks.findWhere({
+                                id: parseInt(homework.id)
+                            });
+                            model.homeworks.remove(homeworkBd);
+                            window.location = '/diary#/editHomeworkView/' + homework.id;
+                        }, function (error) {
+                            console.error(error);
+                        });
                     }
                 }
             };
@@ -5661,7 +5666,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     }
                     return e.text.toLowerCase().indexOf($scope.searchFilter.toLowerCase()) > -1;
                 });
-                console.log($scope.itemsToShow);
             }
 
             function highlight(text, phrase) {
@@ -6025,7 +6029,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
 
                     scope.$watch('ngModel', function (newVal) {
-                        console.log(newVal);
                         if (!newVal) {
                             return;
                         }
@@ -6041,7 +6044,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     });
 
                     element.on('blur', function () {
-                        console.log(scope.ngModel);
                         if (scope.ngModel) {
                             element.timepicker('setTime', scope.ngModel.get('hour') + ':' + scope.ngModel.get('minute'));
                             element.timepicker({
@@ -6192,7 +6194,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					var valueItem = moment(item[Object.keys(item)[0]]);
 					return valueItem.isSame(valueCompare, 'd');
 				});
-				console.log(result);
 				return result;
 			};
 		}
@@ -7280,7 +7281,7 @@ Teacher.prototype.create = function (cb, cbe) {
     });
 };
 
-"use strict";
+'use strict';
 
 (function () {
     'use strict';
@@ -7303,7 +7304,6 @@ Teacher.prototype.create = function (cb, cbe) {
 
             vm.resizePanel = function () {
                 $timeout(function () {
-                    console.log("resize");
                     $('[diary-sortable-list]').css('height', $(window).outerHeight() - $('[diary-sortable-list]').offset().top - 50 + 'px');
                 });
             };
@@ -7437,7 +7437,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.constants = constants;
             this.$sce = $sce;
             this.SubjectService = SubjectService;
-            console.log(this.$sce);
         }
 
         _createClass(ProgressionService, [{
@@ -8031,17 +8030,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function mappCourse(course) {
                 course.date = moment(course.startDate);
                 course.date.week(model.calendar.week);
-                //course.beginning = moment(course.startDate);
-                //course.end = moment(course.endDate);
-                course.startMoment = moment(course.startDate);
-                course.endMoment = moment(course.endDate);
+
+                course.startMoment = this.recalc(moment(course.startDate));
+                course.endMoment = this.recalc(moment(course.endDate));
 
                 course.startTime = moment(course.startDate).format('HH:mm:ss');
                 course.endTime = moment(course.endDate).format('HH:mm:ss');
+
                 course.calendarType = "shadow";
                 course.locked = true;
                 course.is_periodic = false;
                 course.notShowOnCollision = true;
+            }
+        }, {
+            key: 'recalc',
+            value: function recalc(date) {
+                // multi week gestion
+                //https://groups.google.com/forum/#!topic/entcore/ne1ODPHQabE
+                var diff = date.diff(model.mondayOfWeek, 'days');
+                if (diff < 0 || diff > 6) {
+                    var weekDay = date.weekday();
+                    date.dayOfYear(model.mondayOfWeek.dayOfYear());
+                    date.weekday(weekDay);
+                }
+                return date;
             }
         }, {
             key: 'mappingCourses',
@@ -9052,7 +9064,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 vm.filter.teacher = undefined;
 
                 VisaService.getInspectTeachers(structureId, vm.filter.inspector.key).then(function (result) {
-                    //console.log(result);
                     vm.filters.teachers = result.availableTeachers;
                     vm.selectedTeachers = result.onInspectorTeachers;
                 });

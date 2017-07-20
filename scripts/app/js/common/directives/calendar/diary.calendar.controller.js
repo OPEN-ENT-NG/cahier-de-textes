@@ -327,7 +327,7 @@
 
                 // fast click = no drag = real click
                 // or cursor did not move
-                if ((!xMouseMoved && !yMouseMoved) || (new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime) < 300) {
+                if ((!xMouseMoved && !yMouseMoved) ){//|| (new Date().getTime() - vm.itemMouseEvent.lastMouseDownTime) < 300) {
                     // do not redirect to lesson view if user clicked on checkbox
                     if (!($event.target && $event.target.type === "checkbox")) {
                         $rootScope.redirect(path);
