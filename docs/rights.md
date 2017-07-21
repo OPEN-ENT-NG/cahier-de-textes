@@ -1,12 +1,12 @@
 ## Rights
 
 ### Teacher
-![](./resources/teacher.png)
+![](./docs/resources/teacher.png)
 ### Studiant
-![](./resources/studiant.png)
+![](./docs/resources/studiant.png)
 ### Director
-![](./resources/admin.png)
+![](./docs/resources/admin.png)
 ### Inspector
-![](./resources/inspector.png)
+![](./docs/resources/inspector.png)
 ### Relative
-![](./resources/relative.png)
+![](./docs/resources/relative.png)

@@ -10,7 +10,7 @@ First you need to have ```node```,```npm```,```brunch```,```bower```, ```ncp```
 #### Run your dev server
 1. run your backend part
 2. in the folder script run the command ```brunch w -s```
-3. run [fiddler](http://www.telerik.com/fiddler) proxy load the [fiddler script](./resources/fiddler.script.txt)
+3. run [fiddler](http://www.telerik.com/fiddler) proxy load the [fiddler script](./docs/resources/fiddler.script.txt)
 4. in fidler active the CORS option from the rule menu
 5. go to [http://localhost:3333/diary](http://localhost:3333/diary)
 6. its possible that you have to refresh your browser, the auto log isnt optimal
