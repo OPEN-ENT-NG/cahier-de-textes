@@ -3,13 +3,13 @@
 
 ```
     {
-      "name": "fr.openent~diary~0.1-SNAPSHOT",
+      "name": "fr.openent~diary~1.0.0",
       "config": {
         "main" : "fr.openent.diary.Diary",
         "port" : 8054,
         "app-name" : "Diary",
     	"app-address" : "/diary",
-    	"app-icon" : "Diary-large",
+    	"app-icon" : "cahier-textes-large",
         "host": "http://localhost:8090",
         "ssl" : false,
         "auto-redeploy": false,
