@@ -8069,14 +8069,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: 'getScheduleCourses',
             value: function getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
-                var begin = moment(firstDayOfWeek);
-                var end = moment(firstDayOfWeek).add(6, 'd');
+                var begin = moment(firstDayOfWeek).format(this.constants.CAL_DATE_PATTERN);
+                var end = moment(firstDayOfWeek).add(6, 'd').format(this.constants.CAL_DATE_PATTERN);
 
-                var url = '/directory/timetable/courses/teacher/' + structureId;
+                var url = '/directory/timetable/courses/' + structureId + '/' + begin + '/' + end;
                 var config = {
                     params: {
-                        begin: begin.format(this.constants.CAL_DATE_PATTERN),
-                        end: end.format(this.constants.CAL_DATE_PATTERN),
                         teacherId: teacherId
                     }
                 };

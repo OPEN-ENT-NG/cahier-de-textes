@@ -63,16 +63,14 @@
         }
 
         getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
-            let begin = moment(firstDayOfWeek);
-            let end = moment(firstDayOfWeek).add(6, 'd');
+            let begin = moment(firstDayOfWeek).format(this.constants.CAL_DATE_PATTERN);
+            let end = moment(firstDayOfWeek).add(6, 'd').format(this.constants.CAL_DATE_PATTERN);
 
-            let url = `/directory/timetable/courses/teacher/${structureId}`;            
+            let url = `/directory/timetable/courses/${structureId}/${begin}/${end}`;
             let config = {
                 params : {
-                    begin: begin.format(this.constants.CAL_DATE_PATTERN),
-                    end: end.format(this.constants.CAL_DATE_PATTERN),
                     teacherId : teacherId
-                }
+                } 
             };
             return this.$http.get(url,config).then(result =>{
                 return result.data;
