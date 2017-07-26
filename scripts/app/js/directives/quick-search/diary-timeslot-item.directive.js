@@ -49,51 +49,12 @@
                        };
                    }
 
-                   function initLessonFromProgression(lesson,pedagogicItemOfTheDay){
-
-                       lesson.id = null;
-                       // startTime and end format from db is "HH:MM:SS" as text type
-                       // for lesson save startTime need to be moment time type with date
-                       lesson.title=pedagogicItemOfTheDay.title;
-                       lesson.description=pedagogicItemOfTheDay.description;
-                       lesson.color=pedagogicItemOfTheDay.color;
-                       lesson.subject= pedagogicItemOfTheDay.subject;
-                       lesson.annotations=pedagogicItemOfTheDay.annotations;
-                       lesson.type_item = 'progression';
-                       lesson.homeworks = new Collection();
-                       if (pedagogicItemOfTheDay.homeworks && pedagogicItemOfTheDay.homeworks.length>0){
-                           lesson.homeworks.all = _.map(pedagogicItemOfTheDay.homeworks,(homework)=>{
-                               let hw = new Homework();
-                               _.each(Object.keys(homework),(key)=>{
-                                   hw[key] = homework[key];
-                               });
-                               return hw;
-                           });
-                       }
-
-                       let timeslotDates = extractBeginEnd();
-
-                       lesson.date = moment(timeslotDates.startDate);
-                       lesson.startTime=moment(timeslotDates.startDate);
-                       lesson.startMoment=moment(timeslotDates.startDate);
-                       lesson.endTime=moment(timeslotDates.endDate);
-                       lesson.endMoment=moment(timeslotDates.endDate);
-
-
-
-                       model.newLesson =lesson;
-                       window.location = '/diary#/createLessonView/timeFromCalendar' ;
-
-                   }
-
-
-                    timeslot.on('drop', function($event) {
+                   timeslot.on('drop', function($event) {
                        timeslot.removeClass("dragin");
                         let scheduleItem = scope.$parent.item;
 
                         $event.preventDefault();
-                        var timeslotsPerDay = $('.days .timeslot').length / 7;
-                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson
@@ -104,12 +65,9 @@
                             return;
                         }
 
-                        var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
-                        var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
-                        var newLessonEndTime = newLessonStartTime + 1;
 
                         if (pedagogicItemOfTheDay.type_item === 'homework'){
-                            copyHomework(pedagogicItemOfTheDay,scheduleItem);
+                            initHomeworkFromCalendar(pedagogicItemOfTheDay,scheduleItem);
                             return;
                         }
 
@@ -122,7 +80,22 @@
                             return;
                         }
 
-                        newLesson.load(false, function() {
+                        // do not drop if item type is not a lesson
+                        if (pedagogicItemOfTheDay.type_item === 'lesson') {
+                            initLessonFromPreviousLesson(newLesson,scheduleItem);
+                            return;
+                        }
+
+                    });
+
+                    function initLessonFromPreviousLesson(newLesson,scheduleItem){
+                        var timeslotsPerDay = $('.days .timeslot').length / 7;
+                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+                        var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
+                        var newLessonStartTime = model.startOfDay + (index % timeslotsPerDay);
+                        var newLessonEndTime = newLessonStartTime + 1;
+
+                        newLesson.load(true, function() {
                             // will force new lesson to be created in DB
                             newLesson.id = null;
                             // startTime and end format from db is "HH:MM:SS" as text type
@@ -143,6 +116,22 @@
                             newLesson.date.week(model.calendar.week);
 
                             newLesson.state = 'draft';
+                            if (newLesson.homeworks && newLesson.homeworks.all.length>0){
+                                newLesson.homeworks.all = _.map(newLesson.homeworks.all,homeworkCloneMap);/*(h)=>{
+                                    var homework = new Homework();
+
+                                    homework.dueDate = h.dueDate;
+                                    homework.date = h.date;
+                                    homework.title = h.title;
+                                    homework.description = h.description;
+                                    homework.color = h.color;
+                                    homework.state = 'draft';
+                                    homework.type = _.findWhere(model.homeworkTypes.all,{'label' : h.type.label} );
+                                    homework.subject = _.findWhere(model.subjects.all,{'label' : h.subject.label} );
+                                    homework.expanded = true;
+                                    return homework;
+                                });*/
+                            }
 
                             if (scheduleItem){
                                 newLesson.date = moment(scheduleItem.startDate);
@@ -163,7 +152,6 @@
                                 });
 
                                 model.newLesson =newLesson;
-
                                 window.location = '/diary#/createLessonView/timeFromCalendar' ;
                             }else{
 
@@ -176,9 +164,66 @@
                         }, function(error) {
                             console.error(error);
                         });
-                    });
+                    }
 
-                    function copyHomework(pedagogicItemOfTheDay){
+                    function homeworkCloneMap(h){
+                        var homeworkClone = new Homework();
+                        homeworkClone.dueDate = h.dueDate;
+                        homeworkClone.date = h.date;
+                        homeworkClone.type = _.findWhere(model.homeworkTypes.all,{'label' : h.type.label} );
+                        homeworkClone.subject = _.findWhere(model.subjects.all,{'label' : h.subject.label} );
+                        homeworkClone.title = h.title;
+                        homeworkClone.description = h.description;
+                        homeworkClone.color = h.color;
+                        homeworkClone.state = 'draft';
+                        homeworkClone.expanded = true;
+                        return homeworkClone;
+                    }
+                    function initLessonFromProgression(lesson,pedagogicItemOfTheDay){
+
+                        lesson.id = null;
+                        // startTime and end format from db is "HH:MM:SS" as text type
+                        // for lesson save startTime need to be moment time type with date
+                        lesson.title=pedagogicItemOfTheDay.title;
+                        lesson.description=pedagogicItemOfTheDay.description;
+                        lesson.color=pedagogicItemOfTheDay.color;
+                        lesson.subject= pedagogicItemOfTheDay.subject;
+                        lesson.annotations=pedagogicItemOfTheDay.annotations;
+                        lesson.type_item = 'progression';
+
+                        lesson.homeworks = new Collection();
+                        if (pedagogicItemOfTheDay.homeworks && pedagogicItemOfTheDay.homeworks.length>0){
+
+                            lesson.homeworks.all = _.map(pedagogicItemOfTheDay.homeworks,homeworkCloneMap); /*(h)=>{
+                                var homeworkClone = new Homework();
+                                homeworkClone.dueDate = h.dueDate;
+                                homeworkClone.date = h.date;
+                                homeworkClone.type = _.findWhere(model.homeworkTypes.all,{'label' : h.type.label} );
+                                homeworkClone.subject = _.findWhere(model.subjects.all,{'label' : h.subject.label} );
+                                homeworkClone.title = h.title;
+                                homeworkClone.description = h.description;
+                                homeworkClone.color = h.color;
+                                homeworkClone.state = 'draft';
+                                homeworkClone.expanded = true;
+                                return homeworkClone;
+                            });*/
+                        }
+
+
+                        let timeslotDates = extractBeginEnd();
+
+                        lesson.date = moment(timeslotDates.startDate);
+                        lesson.startTime=moment(timeslotDates.startDate);
+                        lesson.startMoment=moment(timeslotDates.startDate);
+                        lesson.endTime=moment(timeslotDates.endDate);
+                        lesson.endMoment=moment(timeslotDates.endDate);
+
+
+                        model.newLesson =lesson;
+                        window.location = '/diary#/createLessonView/timeFromCalendar' ;
+                    }
+
+                    function initHomeworkFromCalendar(pedagogicItemOfTheDay){
                         let timeslotDates = extractBeginEnd();
 
                         var homework = new Homework();
@@ -200,7 +245,7 @@
                             window.location = '/diary#/editHomeworkView/' + homework.id;
                         }, function(error) {
                             console.error(error);
-                        });                        
+                        });
                     }
 
                 }

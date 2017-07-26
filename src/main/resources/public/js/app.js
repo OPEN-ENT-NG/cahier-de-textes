@@ -4956,47 +4956,12 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         };
                     }
 
-                    function initLessonFromProgression(lesson, pedagogicItemOfTheDay) {
-
-                        lesson.id = null;
-                        // startTime and end format from db is "HH:MM:SS" as text type
-                        // for lesson save startTime need to be moment time type with date
-                        lesson.title = pedagogicItemOfTheDay.title;
-                        lesson.description = pedagogicItemOfTheDay.description;
-                        lesson.color = pedagogicItemOfTheDay.color;
-                        lesson.subject = pedagogicItemOfTheDay.subject;
-                        lesson.annotations = pedagogicItemOfTheDay.annotations;
-                        lesson.type_item = 'progression';
-                        lesson.homeworks = new Collection();
-                        if (pedagogicItemOfTheDay.homeworks && pedagogicItemOfTheDay.homeworks.length > 0) {
-                            lesson.homeworks.all = _.map(pedagogicItemOfTheDay.homeworks, function (homework) {
-                                var hw = new Homework();
-                                _.each(Object.keys(homework), function (key) {
-                                    hw[key] = homework[key];
-                                });
-                                return hw;
-                            });
-                        }
-
-                        var timeslotDates = extractBeginEnd();
-
-                        lesson.date = moment(timeslotDates.startDate);
-                        lesson.startTime = moment(timeslotDates.startDate);
-                        lesson.startMoment = moment(timeslotDates.startDate);
-                        lesson.endTime = moment(timeslotDates.endDate);
-                        lesson.endMoment = moment(timeslotDates.endDate);
-
-                        model.newLesson = lesson;
-                        window.location = '/diary#/createLessonView/timeFromCalendar';
-                    }
-
                     timeslot.on('drop', function ($event) {
                         timeslot.removeClass("dragin");
                         var scheduleItem = scope.$parent.item;
 
                         $event.preventDefault();
-                        var timeslotsPerDay = $('.days .timeslot').length / 7;
-                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+
                         timeslot.css('background-color', '');
 
                         // duplicate dragged lesson
@@ -5006,12 +4971,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                             return;
                         }
 
-                        var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
-                        var newLessonStartTime = model.startOfDay + index % timeslotsPerDay;
-                        var newLessonEndTime = newLessonStartTime + 1;
-
                         if (pedagogicItemOfTheDay.type_item === 'homework') {
-                            copyHomework(pedagogicItemOfTheDay, scheduleItem);
+                            initHomeworkFromCalendar(pedagogicItemOfTheDay, scheduleItem);
                             return;
                         }
 
@@ -5024,7 +4985,21 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                             return;
                         }
 
-                        newLesson.load(false, function () {
+                        // do not drop if item type is not a lesson
+                        if (pedagogicItemOfTheDay.type_item === 'lesson') {
+                            initLessonFromPreviousLesson(newLesson, scheduleItem);
+                            return;
+                        }
+                    });
+
+                    function initLessonFromPreviousLesson(newLesson, scheduleItem) {
+                        var timeslotsPerDay = $('.days .timeslot').length / 7;
+                        var index = scope.$parent.$index * timeslotsPerDay + scope.$index;
+                        var newLessonDayOfWeek = Math.floor(index / timeslotsPerDay) + 1;
+                        var newLessonStartTime = model.startOfDay + index % timeslotsPerDay;
+                        var newLessonEndTime = newLessonStartTime + 1;
+
+                        newLesson.load(true, function () {
                             // will force new lesson to be created in DB
                             newLesson.id = null;
                             // startTime and end format from db is "HH:MM:SS" as text type
@@ -5045,6 +5020,21 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                             newLesson.date.week(model.calendar.week);
 
                             newLesson.state = 'draft';
+                            if (newLesson.homeworks && newLesson.homeworks.all.length > 0) {
+                                newLesson.homeworks.all = _.map(newLesson.homeworks.all, homeworkCloneMap); /*(h)=>{
+                                                                                                            var homework = new Homework();
+                                                                                                            homework.dueDate = h.dueDate;
+                                                                                                            homework.date = h.date;
+                                                                                                            homework.title = h.title;
+                                                                                                            homework.description = h.description;
+                                                                                                            homework.color = h.color;
+                                                                                                            homework.state = 'draft';
+                                                                                                            homework.type = _.findWhere(model.homeworkTypes.all,{'label' : h.type.label} );
+                                                                                                            homework.subject = _.findWhere(model.subjects.all,{'label' : h.subject.label} );
+                                                                                                            homework.expanded = true;
+                                                                                                            return homework;
+                                                                                                            });*/
+                            }
 
                             if (scheduleItem) {
                                 newLesson.date = moment(scheduleItem.startDate);
@@ -5064,7 +5054,6 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                                 });
 
                                 model.newLesson = newLesson;
-
                                 window.location = '/diary#/createLessonView/timeFromCalendar';
                             } else {
 
@@ -5077,9 +5066,64 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                         }, function (error) {
                             console.error(error);
                         });
-                    });
+                    }
 
-                    function copyHomework(pedagogicItemOfTheDay) {
+                    function homeworkCloneMap(h) {
+                        var homeworkClone = new Homework();
+                        homeworkClone.dueDate = h.dueDate;
+                        homeworkClone.date = h.date;
+                        homeworkClone.type = _.findWhere(model.homeworkTypes.all, { 'label': h.type.label });
+                        homeworkClone.subject = _.findWhere(model.subjects.all, { 'label': h.subject.label });
+                        homeworkClone.title = h.title;
+                        homeworkClone.description = h.description;
+                        homeworkClone.color = h.color;
+                        homeworkClone.state = 'draft';
+                        homeworkClone.expanded = true;
+                        return homeworkClone;
+                    }
+                    function initLessonFromProgression(lesson, pedagogicItemOfTheDay) {
+
+                        lesson.id = null;
+                        // startTime and end format from db is "HH:MM:SS" as text type
+                        // for lesson save startTime need to be moment time type with date
+                        lesson.title = pedagogicItemOfTheDay.title;
+                        lesson.description = pedagogicItemOfTheDay.description;
+                        lesson.color = pedagogicItemOfTheDay.color;
+                        lesson.subject = pedagogicItemOfTheDay.subject;
+                        lesson.annotations = pedagogicItemOfTheDay.annotations;
+                        lesson.type_item = 'progression';
+
+                        lesson.homeworks = new Collection();
+                        if (pedagogicItemOfTheDay.homeworks && pedagogicItemOfTheDay.homeworks.length > 0) {
+
+                            lesson.homeworks.all = _.map(pedagogicItemOfTheDay.homeworks, homeworkCloneMap); /*(h)=>{
+                                                                                                             var homeworkClone = new Homework();
+                                                                                                             homeworkClone.dueDate = h.dueDate;
+                                                                                                             homeworkClone.date = h.date;
+                                                                                                             homeworkClone.type = _.findWhere(model.homeworkTypes.all,{'label' : h.type.label} );
+                                                                                                             homeworkClone.subject = _.findWhere(model.subjects.all,{'label' : h.subject.label} );
+                                                                                                             homeworkClone.title = h.title;
+                                                                                                             homeworkClone.description = h.description;
+                                                                                                             homeworkClone.color = h.color;
+                                                                                                             homeworkClone.state = 'draft';
+                                                                                                             homeworkClone.expanded = true;
+                                                                                                             return homeworkClone;
+                                                                                                             });*/
+                        }
+
+                        var timeslotDates = extractBeginEnd();
+
+                        lesson.date = moment(timeslotDates.startDate);
+                        lesson.startTime = moment(timeslotDates.startDate);
+                        lesson.startMoment = moment(timeslotDates.startDate);
+                        lesson.endTime = moment(timeslotDates.endDate);
+                        lesson.endMoment = moment(timeslotDates.endDate);
+
+                        model.newLesson = lesson;
+                        window.location = '/diary#/createLessonView/timeFromCalendar';
+                    }
+
+                    function initHomeworkFromCalendar(pedagogicItemOfTheDay) {
                         var timeslotDates = extractBeginEnd();
 
                         var homework = new Homework();
@@ -5862,7 +5906,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             scope.ngModel.label = subjectLabel;
                             scope.ngModel.id = null;
 
-                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ? scope.homework.audience.structureId : undefined;
+                            if (scope.lesson && scope.lesson.audience) {
+                                scope.ngModel.school_id = scope.lesson.audience.structureId;
+                            } else if (scope.homework && scope.homework.audience) {
+                                scope.ngModel.school_id = scope.homework.audience.structureId;
+                            }
+                            if (!scope.ngModel.school_id) {
+                                scope.ngModel.school_id = model.me.structures[0];
+                            }
+                            //scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ?scope.homework.audience.structureId : undefined;
                             scope.ngModel.teacher_id = model.me.userId;
                             subjects.push(scope.ngModel);
                         } else {
@@ -6893,10 +6945,10 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
             if (loadHomeworks) {
                 model.loadHomeworksForLesson(lesson, cb, cbe);
-            }
-
-            if (typeof cb === 'function') {
-                cb();
+            } else {
+                if (typeof cb === 'function') {
+                    cb();
+                }
             }
         });
     };
@@ -7587,6 +7639,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     if (homework.description) {
                         homework.descriptionTrusted = _this5.$sce.trustAsHtml(homework.description);
                     }
+                    homework.type = _.find(model.homeworkTypes.all, { 'label': homework.type.label });
                 });
 
                 var homeworks = new Collection();

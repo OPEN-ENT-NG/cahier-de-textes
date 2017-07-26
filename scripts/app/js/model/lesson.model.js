@@ -265,10 +265,10 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
 
                 if (loadHomeworks) {
                     model.loadHomeworksForLesson(lesson, cb, cbe);
-                }
-
-                if (typeof cb === 'function') {
+                }else{
+                  if (typeof cb === 'function') {
                     cb();
+                  }
                 }
             });
     };

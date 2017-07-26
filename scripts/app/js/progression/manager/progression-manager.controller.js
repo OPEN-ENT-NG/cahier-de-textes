@@ -18,7 +18,7 @@
             };
 
             vm.resizePanel = function(){
-                $timeout(()=>{                    
+                $timeout(()=>{
                     $('[diary-sortable-list]').css('height',($(window).outerHeight() - $('[diary-sortable-list]').offset().top - 50 ) +'px');
                 });
             };
@@ -130,6 +130,4 @@
             };
         }
     });
-
-
 })();

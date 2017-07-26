@@ -61,7 +61,15 @@
                             scope.ngModel.label = subjectLabel;
                             scope.ngModel.id = null;
 
-                            scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ?scope.homework.audience.structureId : undefined;
+                            if (scope.lesson && scope.lesson.audience){
+                                scope.ngModel.school_id = scope.lesson.audience.structureId;
+                            }else if (scope.homework && scope.homework.audience){
+                                scope.ngModel.school_id = scope.homework.audience.structureId ;
+                            }
+                            if (!scope.ngModel.school_id){
+                                scope.ngModel.school_id = model.me.structures[0];
+                            }
+                            //scope.ngModel.school_id = scope.lesson ? scope.lesson.audience.structureId : scope.homework && scope.homework.audience ?scope.homework.audience.structureId : undefined;
                             scope.ngModel.teacher_id = model.me.userId;
                             subjects.push(scope.ngModel);
                         } else {

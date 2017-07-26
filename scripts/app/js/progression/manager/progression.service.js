@@ -12,7 +12,7 @@
             this.$q = $q;
             this.constants = constants;
             this.$sce = $sce;
-            this.SubjectService = SubjectService;          
+            this.SubjectService = SubjectService;
         }
 
         getProgressions() {
@@ -144,6 +144,7 @@
                 if (homework.description) {
                     homework.descriptionTrusted = this.$sce.trustAsHtml(homework.description);
                 }
+                homework.type = _.find(model.homeworkTypes.all,{'label':homework.type.label});
             });
 
             let homeworks = new Collection();
