@@ -22,13 +22,15 @@ var srv = {
         srv.setTitleDescriptionHomework("Titre du devoir maison", "Description du devoir maison");
         srv.saveHomework(isDraft);
     },
-    createHomeworkFromButton: (isDraft, day,matter) => {
+    createHomeworkFromButton: (isDraft,audience,day,matter) => {
         browser.waitForAngular();
-        browser.sleep(200);
+        browser.sleep(600);
         // URL: #/createLessonView/timeFromCalendar
         $('[workflow="diary.createFreeHomework"]').click();
         browser.waitForAngular();
-        srv.selectAudience(4);
+        if (audience){
+          srv.selectAudience(audience);
+        }
         srv.setTitleDescriptionHomework("Titre du travail a faire",
             "Description du travail a faire");
         if (matter){
@@ -49,6 +51,13 @@ var srv = {
         browser.waitForAngular();
         $('input[ng-model="homework.title"]').click();
         $('input[ng-model="homework.title"]').clear().sendKeys(title);
+        element.all(by.css('[contenteditable]')).get(0).clear().sendKeys(description);
+        browser.executeScript('window.scrollTo(0,200);');
+    },
+    setTitleDescriptionHomeworkdad : (title,description)=>{
+        browser.waitForAngular();
+        $('[ng-model="homework.title"]').click();
+        $('[ng-model="homework.title"]').clear().sendKeys(title);
         element.all(by.css('[contenteditable]')).get(0).clear().sendKeys(description);
         browser.executeScript('window.scrollTo(0,200);');
     },
@@ -93,6 +102,7 @@ var srv = {
         browser.sleep(400);
         $$('[ng-model="dailyEvent.selected"]').get(0).click();
         $$('[ng-model="dailyEvent.selected"]').get(1).click();
+        $$('[ng-model="dailyEvent.selected"]').get(2).click();
         browser.sleep(400);
         $('[ng-click="showConfirmPanel(\'confirm-delete\')"]').click();
         browser.sleep(400);
@@ -128,6 +138,46 @@ var srv = {
       srv.selectAudience(4);
       srv.setTitleDescriptionHomework("Titre du devoir maison modifié", "Description du devoir maison modifié");
       srv.saveHomework(isDraft);
+    },
+    dragAndDropLastLessonWithHomework: (itemNumber,isDraft) => {
+        browser.waitForAngular();
+        $('quick-search:nth-of-type(1)>div:nth-of-type(1)').click();
+        browser.sleep(1000);
+        var draggable = $('article.quick-search-card');
+        var droppable = element.all(by.css('[ng-repeat="timeslot in day.timeSlots.all"]')).get(itemNumber);
+        browser.executeScript(dragAndDrop, draggable, droppable, 5, 5);
+        browser.sleep(200);
+        browser.waitForAngular();
+        srv.selectAudience(4);
+        srv.setTitleDescriptionLesson("Titre de la sceance modifiée",
+            "Description de la sceance modifiée",
+            "ceci est l'annotation",true);
+        browser.executeScript('window.scrollTo(0,0);');
+        $('[data-ng-class="{\'selected\': data.tabSelected === \'homeworks\'}"]').click();
+        browser.sleep(200);
+        srv.setTitleDescriptionHomework("Titre du devoir maison", "Description du devoir maison");
+        srv.saveHomework(isDraft);
+    },
+    dragAndDropLastProgressionWithHomework: (itemNumberSrc,itemNumberTarget,isDraft) => {
+        browser.waitForAngular();
+        browser.executeScript('window.scrollTo(0,document.body.scrollHeight);');
+        $('right-panel:nth-of-type(1)>div:nth-of-type(1)>div').click();
+        $$('[ng-click="progressionRightPanelCtrl.selectProgression(progression)"]>article').get(0).click();
+        browser.sleep(200);
+        var draggable = $$('.content-lesson>div').get(itemNumberSrc);
+        var droppable = element.all(by.css('[ng-repeat="timeslot in day.timeSlots.all"]')).get(itemNumberTarget);
+        browser.executeScript(dragAndDrop, draggable, droppable, 5, 5);
+        browser.sleep(200);
+        browser.waitForAngular();
+        srv.selectAudience(4);
+        srv.setTitleDescriptionLesson("Titre de la sceance modifiée",
+            "Description de la sceance modifiée",
+            "ceci est l'annotation",true);
+        browser.executeScript('window.scrollTo(0,0);');
+        $('[data-ng-class="{\'selected\': data.tabSelected === \'homeworks\'}"]').click();
+        browser.sleep(200);
+        srv.setTitleDescriptionHomeworkdad("Titre du devoir maison", "Description du devoir maison");
+        srv.saveHomework(isDraft);
     }
 };
 
