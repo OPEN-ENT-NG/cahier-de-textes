@@ -27,14 +27,14 @@ describe('Protractor Calendar', function() {
 
 
     it('Sould create draft homework from button', function() {
-        homeworkService.createHomeworkFromButton(true,constants.momentWeek.format('DD/MM/YYYY'));
+        homeworkService.createHomeworkFromButton(true,14,constants.momentWeek.format('DD/MM/YYYY'));
     });
 
-    it('Sould create public homework from button', function() {
-        homeworkService.createHomeworkFromButton(false,constants.momentWeek.format('DD/MM/YYYY'));
+    it('Sould create public homework 1 from button', function() {
+        homeworkService.createHomeworkFromButton(false,15,constants.momentWeek.format('DD/MM/YYYY'));
     });
 
-    it('Should create public homework from Calendar', function() {
+    it('Should create public homework 2 from Calendar', function() {
         homeworkService.createHomeworkFromCal(24, false)
     });
 
@@ -110,20 +110,8 @@ describe('Protractor Calendar', function() {
         homeworkService.dragAndDropLastProgressionWithHomework(1, 14, false);
     });
 
-    it('Should delette publish lesson', function() {
+    it('Should delete publish lesson 1', function() {
         lessonService.deleteLessonFromCal();
-    });
-
-    it('Should delette publish lesson', function() {
-        lessonService.deleteLessonFromCal();
-    });
-
-    it('Should delette publish lesson', function() {
-        lessonService.deleteLessonFromCal();
-    });
-
-    it('Should delete selected homework', function() {
-        homeworkService.deleteHomeworkFromBan()
     });
 
     it('Verify Calendar homework creation',function(){
