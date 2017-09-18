@@ -14,8 +14,8 @@
               });
             }
 
-            vm.loadpdf = function(key){
-                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel,vm.toogle,key);
+            vm.loadpdf = function(key,value){
+                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel,vm.toogle,key,value);
             };
 
         }

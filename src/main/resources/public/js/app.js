@@ -6302,8 +6302,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
 
-            vm.loadpdf = function (key) {
-                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, key);
+            vm.loadpdf = function (key, value) {
+                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, key, value);
             };
         }
     });
@@ -8185,7 +8185,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: 'getPdfArchive',
-            value: function getPdfArchive(yearLabel, type, key) {
+            value: function getPdfArchive(yearLabel, type, key, value) {
                 var url = '/diary/history/pdf';
 
                 var params = {
@@ -8206,7 +8206,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }).success(function (data, status, headers, config) {
                     var blob = new Blob([data], { type: " application/pdf" });
                     var date = moment().format("YYYY-MM-DD_HH-mm-ss");
-                    var fileName = 'ent-archive-generation_' + yearLabel + '_' + date + '.pdf';
+                    var fileName = 'ent-archive-generation_' + value + '_' + yearLabel + '.pdf';
                     saveAs(blob, fileName);
                 }).error(function (data, status, headers, config) {
                     //upload failed

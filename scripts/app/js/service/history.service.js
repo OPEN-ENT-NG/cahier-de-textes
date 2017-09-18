@@ -28,7 +28,7 @@
             });
         }
 
-        getPdfArchive(yearLabel,type,key){
+        getPdfArchive(yearLabel,type,key,value){
             let url = `/diary/history/pdf`;
 
             let params = {
@@ -49,8 +49,8 @@
             }).success(function (data, status, headers, config) {
                 var blob = new Blob([data], {type: " application/pdf"});
                 let date = moment().format("YYYY-MM-DD_HH-mm-ss");
-                let fileName = `ent-archive-generation_${yearLabel}_${date}.pdf`;
-                saveAs(blob,fileName);
+                let fileName = `ent-archive-generation_${value}_${yearLabel}.pdf`;
+                saveAs(blob,fileName); 
             }).error(function (data, status, headers, config) {
                 //upload failed
             });
