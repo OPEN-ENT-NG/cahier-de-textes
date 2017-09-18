@@ -1,13 +1,17 @@
 var dragAndDrop = require('html-dnd').code;
 
 var srv = {
-    createLessonFromCal: (itemNumber, isDraft, matter) => {
+    createLessonFromCal: (itemNumber, isDraft, matter, audience) => {
         browser.waitForAngular();
         browser.sleep(1000);
         // URL: #/createLessonView/timeFromCalendar
         element.all(by.css('[ng-repeat="timeslot in day.timeSlots.all"]')).get(itemNumber).click();
         browser.waitForAngular();
-        srv.selectAudience(4);
+        if (audience){
+          srv.selectAudience(audience);
+        }else {
+          srv.selectAudience(4);
+        }
         srv.setTitleDescriptionAnnotaiton("Titre de la sceance",
             "Description de la sceance",
             "ceci est l'annotation");
