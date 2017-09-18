@@ -10,11 +10,11 @@
         <strong>[[visaManagerCtrl.recap.nbTeacher]]</strong> <i18n>diary.visa.apply.statteacher</i18n>,
         <strong>[[visaManagerCtrl.recap.nbSubject]]</strong> <i18n>diary.visa.apply.statsubject</i18n>
         <strong>[[visaManagerCtrl.recap.nbAudience]]</strong> <i18n>diary.visa.apply.stataudience</i18n>
-    </div>
+    </div> 
     <div class="comment-box" ng-init="visaManagerCtrl.comment=''">
-      <p> <i18n>diary.visa.comment</i18n> : </p>
+      <p> <i18n>diary.visa.comment</i18n> <span class="required" ng-if="!visaManagerCtrl.comment">*</span> :</p>
       <textarea ng-model="visaManagerCtrl.comment"></textarea>
-    </div>
+    </div> 
     <div class="controls">
       <button ng-click="visaManagerCtrl.pdf()" ><i18n>diary.visa.action.generatepdf</i18n></button>
       <button ng-click="visaManagerCtrl.applyVisa(false)" ng-disabled="!visaManagerCtrl.comment" ><i18n>diary.visa.action.applywithoulock</i18n></button>

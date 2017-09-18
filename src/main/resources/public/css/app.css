@@ -1,4 +1,8 @@
 
+.required {
+    color:red;
+}
+
 ng-include{
   display: block;
 }
