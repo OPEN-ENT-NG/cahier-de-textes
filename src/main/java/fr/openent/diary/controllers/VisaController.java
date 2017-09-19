@@ -121,7 +121,7 @@ public class VisaController extends ControllerHelper {
         String teacherId = request.params().get("teacherId");
         String audienceId = request.params().get("audienceId");
         String subjectId = request.params().get("subjectId");
-        Boolean todoOnly = request.params().get("todoOnly")!=null && request.params().get("todoOnly").equals("true");
+        String todoOnly = request.params().get("statut");
 
         this.visaService.getAllAgregatedVisas(structureId,teacherId,audienceId,subjectId,todoOnly,GenericHandlerResponse.<List<ResultVisaList>>handler(request));
 

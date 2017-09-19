@@ -141,7 +141,7 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
 
-    public void getAllAgregatedVisas(final String structureId,String teacherId, String audienceId, String subjectId, final Boolean todoOnly, final Handler<HandlerResponse<List<ResultVisaList>>> handler) {
+    public void getAllAgregatedVisas(final String structureId,String teacherId, String audienceId, String subjectId, final String statut, final Handler<HandlerResponse<List<ResultVisaList>>> handler) {
 
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new JsonArray().addString(structureId);
@@ -212,9 +212,9 @@ public class VisaServiceImpl extends SqlCrudService {
                                 visaList.setVisas(event.getResult());
                                 counter.append("+");
                                 if(counter.length() == listResultVisas.size()){
-                                    if (todoOnly){
-                                        eventListVisa.setResult(filterTodoOnly(eventListVisa.getResult()));
-                                    }
+                                    //if (statut.equals("todoOnly")){
+                                    eventListVisa.setResult(filterByStatut(statut,eventListVisa.getResult()));
+                                    //}
                                     handler.handle(eventListVisa);
                                 }
                             }
@@ -226,16 +226,21 @@ public class VisaServiceImpl extends SqlCrudService {
             }
         }, ResultVisaList.class));
     }
-    private List<ResultVisaList> filterTodoOnly(List<ResultVisaList> listResultVisas){
+    private List<ResultVisaList> filterByStatut(String statut,List<ResultVisaList> listResultVisas){
         List<ResultVisaList> result = new ArrayList<>();
         for (ResultVisaList resultVisaList : listResultVisas){
             Long nbToDo = resultVisaList.getNbNotVised();
             if (resultVisaList.getVisas()!=null && resultVisaList.getVisas().size()>0){
                 nbToDo = resultVisaList.getVisas().get(0).getNbDirty();
             }
-            if (nbToDo>0){
+            if (nbToDo>0 && !statut.equals("DID_ONLY")){
                 result.add(resultVisaList);
             }
+
+            if (nbToDo==0 && !statut.equals("TODO_ONLY")){
+                result.add(resultVisaList);
+            }
+
         }
 
         return result;

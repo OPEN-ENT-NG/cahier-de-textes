@@ -39,7 +39,7 @@
                     teacherId: filter.teacher && filter.teacher.item ? filter.teacher.item.key : undefined,
                     audienceId: filter.audience ? filter.audience.key : undefined,
                     subjectId: filter.subject ? filter.subject.key : undefined,
-                    todoOnly : filter.state ? (filter.state.key == "TODO" ? true : undefined): undefined
+                    statut : filter.state.key //? (filter.state.key == "TODO" ? true : undefined): undefined
                 }
             }).then((result)=>{
                 return result.data;

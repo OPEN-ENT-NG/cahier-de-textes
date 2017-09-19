@@ -11,29 +11,24 @@
             vm.items = [{name : 'teacher1'},{name : 'teacher2'}];
             init();
             function init(){
+                var getFilterPromise;
                 if (SecureService.hasRight(constants.RIGHTS.VISA_ADMIN)){
-                    VisaService.getFilters(model.me.structures[0]).then((filters)=>{
-                        vm.filters = filters;
-                        vm.filters.states = [
-                            { key : 'TODO', value :lang.translate('diary.visa.state.todo')},
-                            { key :'ALL' , value :lang.translate('diary.visa.state.all')},
-                        ];
-                        vm.filter = {
-                            state : vm.filters.states[0]
-                        };
-                    });
+                    getFilterPromise = VisaService.getFilters(model.me.structures[0]);
                 }else if (SecureService.hasRight(constants.RIGHTS.VISA_INSPECTOR)){
-                    VisaService.getInspectorFilters(model.me.structures[0],model.me.userId).then((filters)=>{
-                        vm.filters = filters;
-                        vm.filters.states = [
-                            { key : 'TODO', value :lang.translate('diary.visa.state.todo')},
-                            { key :'ALL' , value :lang.translate('diary.visa.state.all')},
-                        ];
-                        vm.filter = {
-                            state : vm.filters.states[0]
-                        };
-                    });
+                    getFilterPromise= VisaService.getInspectorFilters(model.me.structures[0],model.me.userId);
                 }
+
+                getFilterPromise.then((filters)=>{
+                    vm.filters = filters;
+                    vm.filters.states = [
+                        { key : 'TODO_ONLY', value :lang.translate('diary.visa.state.todo')},
+                        { key :'ALL' , value :lang.translate('diary.visa.state.all')},
+                        { key :'DID_ONLY' , value :lang.translate('diary.visa.state.did')}
+                    ];
+                    vm.filter = {
+                        state : vm.filters.states[0]
+                    };
+                });
 
             }
 
