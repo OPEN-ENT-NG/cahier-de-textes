@@ -1,0 +1,83 @@
+@media screen and (min-width : 1120px)and (max-width:1396px){
+
+    .pedagogic-day-card{
+        .thumbnail{
+            font-size: 1em;
+            width : 20%;  
+        } 
+        .summary{
+            font-size: 1em;
+            width:80%;
+        }
+    }
+
+}
+
+
+@media screen and (min-width : 780px) and(max-width:1120px){
+    
+    .pedagogic-day-card{
+        .thumbnail{
+            font-size: 1em;
+            width : 30%;   
+        } 
+        .summary{
+            position: relative;
+            font-size: 0.9em;
+            width:70%;
+        }
+
+         
+        .itemone, .itemtwo{
+            position: absolute;
+            font-size: 0.8em;
+            right: 5px;
+            i{
+                font-size:1em;
+            }
+        }
+        .itemone{
+            top:5px;
+        }
+        .itemtwo{            
+            bottom:5px;
+        }
+
+    }
+    
+}
+
+
+@media screen and (max-width : 780px){
+    
+    .pedagogic-day-card{
+        .thumbnail{
+            font-size: 1em;
+            width : 30%;   
+            display: none;
+        } 
+        .summary{
+            position: relative;
+            font-size: 0.9em;
+            width:100%;
+        }
+
+         
+        .itemone, .itemtwo{
+            position: absolute;
+            font-size: 0.8em;
+            right: 5px;
+            i{
+                font-size:1em;
+            }
+        }
+        .itemone{
+            top:5px;
+        }
+        .itemtwo{            
+            bottom:5px;
+        }
+
+    }
+    
+}

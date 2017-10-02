@@ -33,10 +33,17 @@
                       <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="calendarListViewCtrl.selectDay(day)">
                           <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.shortName]]</div>
                           <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">
-                              [[day.shortDate]]&nbsp; [[ (day.items | filter : {type : 'homework'}).length]]
-                              <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
-                               [[ (day.items | filter : {type : 'lesson'}).length]]
-                              <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                              <span class="itemdate">                            
+                                  [[day.shortDate]]&nbsp;
+                              </span>
+                              <span class="itemone">
+                                    [[ (day.items | filter : {type : 'homework'}).length]]
+                                    <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
+                              </span>
+                              <span class="itemtwo">                              
+                                [[ (day.items | filter : {type : 'lesson'}).length]]
+                                <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                              </span>
                           </div>
                       </div>
                   </li>
