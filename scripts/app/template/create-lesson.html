@@ -212,10 +212,16 @@
                                     </span>
                                 </div>
                                 <div class="row">
+                                   
+                                    
                                     <div ng-if="!isLessonHomeworkEditable" ng-bind-html="homework.description" class="lessonHomeworkDescription"></div>
                                     <!--<editor ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>-->
 
                                     <editor id="edit_[[$index]]" ng-if="isLessonHomeworkEditable" ng-model="homework.description"></editor>
+
+                                    <button ng-if="isLessonHomeworkEditable" style="margin-left: 10px;" ng-click="showConfirmPanel('confirm-delete-homeworklesson', {homework: homework, lesson : editLessonCtrl.lesson })" class="right">
+                                        <i18n>diary.delete</i18n>
+                                    </button>
                                     <button id="btn_apercu_[[$index]]" ng-if="isLessonHomeworkEditable" class="right-magnet cancel" type="button" ng-click="changeHomeworkDescriptionMode([[$index]], true)">
                                     <i18n>description.see</i18n>
                                 </button>
@@ -226,14 +232,9 @@
                                     <button id="btn_edit_[[$index]]" ng-if="isLessonHomeworkEditable" class="right-magnet cancel hidden" type="button" ng-click="changeHomeworkDescriptionMode([[$index]], false)">
                                     <i18n>description.edit</i18n>
                                 </button>
-
+                                
                                 </div>
-                                <!-- deletes homework -->
-                                <div class="controls">
-                                    <button ng-if="isLessonHomeworkEditable" style="margin-top: 10px;" ng-click="showConfirmPanel('confirm-delete-homeworklesson', {homework: homework, lesson : editLessonCtrl.lesson })">
-                                    <i18n>diary.delete</i18n>
-                                </button>
-                                </div>
+                                
                             </div>
                         </article>
                     </div>
