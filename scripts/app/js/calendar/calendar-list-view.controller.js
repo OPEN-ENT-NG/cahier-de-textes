@@ -11,10 +11,17 @@
             $timeout(init);
 
             function init() {
-                if (!model.filters.startDate) {
+                /*if (!model.filters.startDate) {
                     model.filters.startDate = moment().startOf('week');
                     model.filters.endDate = moment(model.filters.startDate).add(7, 'd');
+                }*/
+
+                if (model.mondayOfWeek){
+                    model.filters.startDate = moment(model.mondayOfWeek);
+                    model.filters.endDate = moment(model.filters.startDate).add(7, 'd');
                 }
+                
+
                 vm.getDatas();
 
                 //reset filter;
@@ -42,6 +49,8 @@
                         $timeout(vm.getDatas);
                     }
                 });
+
+                
             }
 
             $scope.$on('refresh-list',()=>{
