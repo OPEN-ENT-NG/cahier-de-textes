@@ -12,7 +12,7 @@
 				}
 				let valueCompare = moment(d);
 				let result = items.filter((item)=>{
-					let valueItem = moment(item[Object.keys(item)[0]]);
+					let valueItem = moment(item.date);
 					return valueItem.isSame(valueCompare,'d');
 				});				
 				return result;
