@@ -15,7 +15,17 @@
             }
 
             vm.loadpdf = function(key,value){
-                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel,vm.toogle,key,value);
+                let teacherId,audienceId;
+                if (vm.toogle==='teacher'){
+                    teacherId=key;
+                }else{
+                    audienceId=key;
+                    if (model.isUserTeacher()){
+                        teacherId = model.me.userId;                        
+                    }
+                }
+
+                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel,vm.toogle,teacherId,audienceId,value);
             };
 
         }

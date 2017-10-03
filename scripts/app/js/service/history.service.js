@@ -28,18 +28,17 @@
             });
         }
 
-        getPdfArchive(yearLabel,type,key,value){
+        getPdfArchive(yearLabel,type,teacherId,audienceId,value){
             let url = `/diary/history/pdf`;
 
             let params = {
                 yearLabel : yearLabel
             };
 
-            if (type==='teacher'){
-                params.teacherId = key;
-            }else{
-                params.audienceId = key;
-            }
+          
+            params.teacherId = teacherId;          
+            params.audienceId = audienceId;                
+          
 
             this.$http({
                 url: url,

@@ -96,9 +96,9 @@ public class HistoryController extends ControllerHelper {
             final String teacherId = request.params().get("teacherId");
             final String audienceId = request.params().get("audienceId");
 
-            if (teacherId == null && audienceId == null || (teacherId != null && audienceId != null)){
+            /*if (teacherId == null && audienceId == null || (teacherId != null && audienceId != null)){
                 badRequest(request, "required teacherId or audienceId, not both");
-            }
+            }*/
 
             JsonObject specificDatas = new JsonObject();
 
