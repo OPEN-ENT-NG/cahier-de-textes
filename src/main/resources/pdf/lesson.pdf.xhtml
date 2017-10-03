@@ -48,6 +48,26 @@
        .visa{
         margin-top: 15px;
        }
+
+         #footer {
+        position: running(footer);
+        text-align: right;
+    }
+
+    @page {
+        @bottom-right {
+            content: element(footer);
+        }
+    }
+
+    #pagenumber:before {
+        content: counter(page);
+    }
+
+    #pagecount:before {
+        content: counter(pages);
+    }
+
 	</style>
 </head>
 
@@ -106,6 +126,11 @@
         </div>
     </div>
     {{/lessons}}
+
+    <div id="footer">
+        page <span id="pagenumber"></span> sur <span id="pagecount"></span>
+    </div>
+
 </div>
 </body>
 </html>
