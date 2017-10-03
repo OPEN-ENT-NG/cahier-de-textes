@@ -13,6 +13,7 @@ import java.util.TimeZone;
 public final class DateUtils {
 
     public final static String DATE_FORMAT ="yyyy-MM-dd";
+    public final static String FRENCH_DATE_FORMAT ="dd-MM-yyyy";
     public final static String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
     public final static String DATE_FORMAT_SQL = "yyyy-MM-dd HH:mm:ss";
 
@@ -50,6 +51,11 @@ public final class DateUtils {
 
     public static SimpleDateFormat getSimpleDateFormat(){
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        return sdf;
+    }
+
+    public static SimpleDateFormat getFrenchSimpleDateFormat(){
+        SimpleDateFormat sdf = new SimpleDateFormat(FRENCH_DATE_FORMAT);
         return sdf;
     }
 

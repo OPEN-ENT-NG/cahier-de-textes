@@ -55,7 +55,7 @@ public class PdfServiceImpl {
                 templateProps.putString("nbLesson",lessons.size()+"");
 
                 try {
-                    templateProps.putArray("lessons",(JsonArray) SqlMapper.objectToJson(lessons, fr.openent.diary.utils.DateUtils.getSimpleDateFormat()));
+                    templateProps.putArray("lessons",(JsonArray) SqlMapper.objectToJson(lessons, fr.openent.diary.utils.DateUtils.getFrenchSimpleDateFormat()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -74,7 +74,7 @@ public class PdfServiceImpl {
 
                             StringReader reader = new StringReader(result.result().toString("UTF-8"));
 
-                            render.processTemplate(request, templateProps, "massmail.pdf.xhtml", reader, new Handler<Writer>(){
+                            render.processTemplate(request, templateProps, templatePath, reader, new Handler<Writer>(){
                                 public void handle(Writer writer) {
                                     String processedTemplate = ((StringWriter) writer).getBuffer().toString();
 

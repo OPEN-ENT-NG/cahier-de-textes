@@ -575,7 +575,7 @@ public class VisaServiceImpl extends SqlCrudService {
     public Map<String,String> getVisaSelectLessonStats(List<LessonModel> lessonModels){
         Map<String,String> result = new HashMap<>();
 
-        result.put("currentDate", DateUtils.formatDate(new Date()));
+        result.put("currentDate", DateUtils.getFrenchSimpleDateFormat().format(new Date()));
 
         HashSet<String> uniqueAudience = new HashSet<>();
         HashSet<String> uniqueTeacher = new HashSet<>();
