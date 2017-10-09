@@ -39,8 +39,7 @@
                         <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : lesson.expanded, 'up-open':!lesson.expanded}"></i>
                     </div> 
                     <div class="hover-orange" >
-                        <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[lesson.title]]
-                        <i class="external-link"></i>
+                        <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[lesson.title]]                        
                     </div>
                     <div class="item-description" ng-init="lesson.expanded=!hasBigLength">  
                         <div ng-bind-html="lesson.description | maxChar:60  " ng-if="!lesson.expanded"></div>
