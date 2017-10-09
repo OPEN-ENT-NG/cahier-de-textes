@@ -9,6 +9,14 @@
     margin-right: -15px;
     margin-left: -15px;
     padding : 10px 20px;
+    a{
+      color: white;      
+      transition:none;
+    }
+
+    &:hover a{
+      color:#FF8351 !important;
+    }
   }
   .right-magnet{
     margin-right: 20px;
