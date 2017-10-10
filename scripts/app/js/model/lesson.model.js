@@ -356,7 +356,8 @@ Lesson.prototype.toJSON = function () {
 };
 
 Lesson.prototype.addHomework = function (cb) {
-    let dueDate = this.startTime ? this.startTime.minute(0).second(0) : moment();
+    let date = moment.isMoment(this.startTime) ? this.startTime : (this.startMoment ? this.startMoment : moment());
+    let dueDate = date.second(0);
     var homework = model.initHomework(dueDate,this);
     this.homeworks.push(homework);
 };

@@ -764,7 +764,7 @@ model.build = function () {
     sqlToJsHomeworkLoad = function (sqlHomeworkload) {
         return {
             countLoad: sqlHomeworkload.countload,
-            description: sqlHomeworkload.countload + ' ' + lang.translate('diary.homework.label'),
+            description: sqlHomeworkload.countload + ' ' + (sqlHomeworkload.countload > 1 ? lang.translate('diary.homework.labels') : lang.translate('diary.homework.label')),
             day: moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(), // 'lundi' -> 'lu' -> 'L'
             numDay: moment(sqlHomeworkload.day).format('DD') // 15
         };

@@ -16,7 +16,7 @@
                     let dragCounter = 0;
 
                     timeslot.on('dragover', function($event) {
-                        event.preventDefault();
+                        $event.preventDefault();
                     });
 
                     timeslot.bind('dragenter', onenter);
