@@ -71,7 +71,7 @@
 												scope.isPlaceholder = scope.selected[scope.property] === undefined;
 												scope.display = scope.selected[scope.property];
 
-												if (scope.lesson && scope.lesson.id && scope.lesson.endTime) {
+												if (scope.lesson && scope.lesson.audience && scope.lesson.audience.id && scope.lesson.endTime) {
 														if (scope.lesson.homeworks.all.length > 0) {
 																scope.$parent.refreshHomeworkLoads(scope.lesson);
 														}

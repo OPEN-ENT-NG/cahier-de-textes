@@ -945,7 +945,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         $scope.countdown --;
 
         if ($scope.countdown == 0) {
-            $scope.$apply();
+            if(!$scope.$$phase) {
+                $scope.$apply();
+              }            
         }
     };
 
