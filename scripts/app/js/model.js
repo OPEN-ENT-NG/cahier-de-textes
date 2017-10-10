@@ -1318,7 +1318,7 @@ model.createSubject = function(label, cb, cbe){
 
     var subject = new Subject();
     subject.label = label;
-    subject.save(cb, cbe);
+    return subject.save(cb, cbe);
 };
 
 /**

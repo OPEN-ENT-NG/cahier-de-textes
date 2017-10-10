@@ -197,17 +197,32 @@ Lesson.prototype.update = function(cb, cbe) {
 
 Lesson.prototype.create = function(cb, cbe) {
     var lesson = this;
-    return model.getHttp()({
-        method : 'POST',
-        url : '/diary/lesson',
-        data : lesson
-    }).then(function(result){
-            lesson.updateData(result.data);
-            model.lessons.pushAll([lesson]);
-            if(typeof cb === 'function'){
-                cb();
-            }
+
+    let subject = model.subjects.all.find((l)=>{ return l.label = lesson.subject.label });
+
+    let createSubjectPromise = model.$q().when();
+
+    if (!subject){
+        createSubjectPromise = model.createSubject(lesson.subject.label).then((newSubject)=>{
+            lesson.subject = newSubject;
         });
+    }else{
+        lesson.subject = subject;
+    }
+
+    return createSubjectPromise.then(()=>{
+        return model.getHttp()({
+            method : 'POST',
+            url : '/diary/lesson',
+            data : lesson
+        }).then(function(result){
+                lesson.updateData(result.data);
+                model.lessons.pushAll([lesson]);
+                if(typeof cb === 'function'){
+                    cb();
+                }
+            });
+    })
 };
 
 
