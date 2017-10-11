@@ -99,6 +99,7 @@ Lesson.prototype.saveHomeworks = function (cb, cbe) {
             homework.audience = that.audience;
             homework.subject = that.subject;
             homework.color = that.color;
+            homework.state = that.state;
             homework.save().then(()=>{
                 homeworkSavedCount++;
                 // callback function once all homeworks saved
@@ -390,20 +391,18 @@ Lesson.prototype.isPublishable = function(toPublish){
  */
 Lesson.prototype.changeState = function (isPublished) {
     this.state = isPublished ? 'published' : 'draft';
-
+    let that = this;
     // change state of associated homeworks
     this.homeworks.forEach(function (homework) {
         var lessonHomework = homework;
         homework.state = isPublished ? 'published' : 'draft';
 
-        var found = false;
-
-        // change state of homeworks cache in calendar for current week
-        model.homeworks.forEach(function (homeworkCache) {
-            if (!found && homeworkCache.id == lessonHomework.id) {
-                homeworkCache.state = isPublished ? 'published' : 'draft';
-                found = true;
-            }
-        });
+        var found = false;        
     });
+
+    // change state of homeworks cache in calendar for current week
+    model.homeworks.all.filter((h)=>{return h.lesson_id = that.id}).forEach((homeworkCache) =>{        
+        homeworkCache.state = that.state;
+    });    
+
 };
