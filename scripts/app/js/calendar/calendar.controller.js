@@ -350,6 +350,11 @@
             };
 
 
+            $scope.$watch(()=>{
+                return  $rootScope.currentRightPanelVisible;
+            },(n)=>{
+                $scope.currentRightPanelVisible = n;                
+            });             
 
             $scope.redirect = function(path) {
                 $location.path(path);

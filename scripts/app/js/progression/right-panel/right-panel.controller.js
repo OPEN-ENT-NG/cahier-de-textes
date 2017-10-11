@@ -10,29 +10,22 @@
             var vm = this;
             $scope.panelVisible = false;
 
-
-            $scope.toggle = function(){
-                if (!$scope.panelVisible){
-                    $scope.$parent.$$childTail.panelVisible = false;
-                    $scope.$parent.$$childHead.panelVisible = false;
-                    $rootScope.$broadcast('rightpanel.open',id);
-                }
-                $scope.panelVisible = !$scope.panelVisible;
-
-                if ($scope.panelVisible) {
-                    $('.mainDiaryContainer').width('84%');
-                    $('.quick-search').width('16%');
-                } else {
-                    $('.mainDiaryContainer').width('97%');
-                    $('.quick-search').width('2%');
-                }
-            };
-
-            $scope.$on('rightpanel.open',function(_,rightpanelid){
-                if (id !== rightpanelid && $scope.panelVisible){
-                    $scope.toggle();
-                }
+           // $('.mainDiaryContainer').width('84%');
+            //$('.quick-search').width('16%');
+            $scope.$watch(()=>{
+                return  $rootScope.currentRightPanelVisible;
+            },(n)=>{
+                $scope.currentRightPanelVisible = n;                
             });
+
+            $scope.toggle = function (show){     
+                console.log("togle")           
+                if (show){
+                    $rootScope.currentRightPanelVisible = show;                     
+                }else{
+                    $rootScope.currentRightPanelVisible = undefined;
+                }
+            }
         }
     });
 

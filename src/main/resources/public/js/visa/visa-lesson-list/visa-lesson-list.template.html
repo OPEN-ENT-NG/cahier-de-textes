@@ -24,20 +24,24 @@
             overflow-y="scroll" on-finish-render="visaManagerCtrl.resize()"
             bottom-scroll="loadMorePreviousLessonsFromLesson(editLessonCtrl.lesson)">
             <div class="prev-lesson-summary">
-                [[lesson.date | date : constants.CAL_DATE_PATTERN_NG ]] - [[lesson.startTime]] - [[lesson.endTime]] - [[lesson.subject]] - [[lesson.audienceLabel]]
+                <a href="/diary#/showLessonView/[[lesson.lessonId]]" target="_blank">
+                    [[lesson.date | date : constants.CAL_DATE_PATTERN_NG ]] - [[lesson.startTime]] - [[lesson.endTime]] - [[lesson.subject]] - [[lesson.audienceLabel]]
+                </a>
                 <i class="external-link"></i>
             </div>
             <div class="row">
                 <!-- LESSON DESCRIPTION -->
-                <div class="item-detail lesson-detail" ng-class="{'full':!lesson.homeworks.length, 'alf' : lesson.homeworks.length > 0}">
-                    <div class="cell left-magnet">
-                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : lesson.expanded, 'up-open':!lesson.expanded}"></i>
+                <div class="item-detail lesson-detail"
+                     ng-class="{'full':!lesson.homeworks.length, 'alf' : lesson.homeworks.length > 0}"
+                     ng-init="hasBigLength = (lesson.description | maxChar:60).length >= 60">
+
+                    <div class="cell left-magnet" ng-if="hasBigLength" >
+                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : !lesson.expanded, 'up-open':lesson.expanded}"></i>
+                    </div> 
+                    <div class="hover-orange" >
+                        <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[lesson.title]]                        
                     </div>
-                    <div class="hover-orange">
-                        <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[lesson.title]]
-                        <i class="external-link"></i>
-                    </div>
-                    <div class="item-description">
+                    <div class="item-description" ng-init="lesson.expanded=!hasBigLength">  
                         <div ng-bind-html="lesson.description | maxChar:60  " ng-if="!lesson.expanded"></div>
                         <div ng-init="lesson.descriptionTrusted = (lesson.description | trusthtml)" ng-bind-html="lesson.descriptionTrusted" ng-if="lesson.expanded"></div>
                     </div>
@@ -45,13 +49,15 @@
 
                 <!-- ATTACHED HOMEWORKS -->
                 <div class="item-detail homework-visa-detail alf" ng-if="lesson.homeworks.length > 0">
-                    <div class="row" ng-repeat="homework in lesson.homeworks">
-                        <div class="cell right-magnet">
+                    <div class="row" ng-repeat="homework in lesson.homeworks"
+                        ng-init="hasBigHomeworksLength = (homework.description | maxChar:60).length >= 60"
+                    >
+                        <div class="cell right-magnet" ng-if="hasBigHomeworksLength">
                             <i ng-click="homework.expanded=!homework.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : homework.expanded, 'up-open':!homework.expanded}"></i>
                         </div>
                         <b><i18n>homework.date</i18n> [[homework.date  | date  : constants.CAL_DATE_PATTERN_NG]]</b> [[homework.title]]
 
-                        <div class="item-description">
+                        <div class="item-description" ng-init="homework.expanded=!hasBigHomeworksLength">
                             <div ng-bind-html="homework.description | maxChar:60  " ng-if="!homework.expanded"></div>
                             <div ng-init="homework.descriptionTrusted = (homework.description | trusthtml)" ng-bind-html="homework.descriptionTrusted" ng-if="homework.expanded"></div>
                         </div>

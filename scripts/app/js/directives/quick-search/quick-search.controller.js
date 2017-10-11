@@ -83,51 +83,71 @@
                 $scope.panelLabel = isQuickSearchLesson ? lang.translate('diary.lessons') : lang.translate('diary.homeworks');
             }
 
+          
+
             $scope.$on('rightpanel.open',function(_,rightpanelid){
+                
                 if (id !== rightpanelid && $scope.panelVisible){
-                    $scope.setPanelVisible(false,{
-                        target : {
-                            type : "text"
-                        }
-                    });
+                    $scope.setPanelVisible(false,true);
                 }
+                /*else{
+                    if ($scope.panelVisible) { 
+                        $('.mainDiaryContainer').width('84%');
+                        $('.quick-search').width('16%');                    
+                    } 
+                }*/
             });
 
-            $scope.setPanelVisible = function(isVisible, $event) {
-                if (!$event.target || $event.target.type !== "text") {
+            $scope.$watch(()=>{
+                return  $rootScope.currentRightPanelVisible;
+            },(n)=>{
+                $scope.currentRightPanelVisible = n;                
+            });
 
-                    $scope.panelVisible = isVisible;
-
-                    /**
-                     * On first panel maximize search items
-                     */
+            $scope.toogle = function (show){
+                if (show){
+                    $rootScope.currentRightPanelVisible = show;
                     if ($scope.isFirstSearch) {
                         $scope.quickSearch(true);
                     }
+                }else{
+                    $rootScope.currentRightPanelVisible = undefined;
+                }
+            }
 
+            $scope.setPanelVisible = function(isVisible,dontHide) {
+                
+                    /*
+                    $scope.panelVisible = isVisible;
+                    */
+
+                    
+                    if ($scope.isFirstSearch) {
+                        $scope.quickSearch(true);
+                    }
+                    /*
                     // hide the other panel (panel or homework)
                     if ($scope.itemType == 'lesson') {
                         // tricky way to get the other directive for homeworks
-                        if (isQuickSearchLesson) {
+                        if (isQuickSearchLesson && !dontHide) {
                             $scope.$parent.$$childTail.panelVisible = false;
                         }
                     } else if ($scope.itemType == 'homework') {
-                        if (!isQuickSearchLesson) {
+                        if (!isQuickSearchLesson && !dontHide) {
                             $scope.$parent.$$childHead.panelVisible = false;
                         }
                     }
 
                     // let enough room to display quick search panel maximized
-                    if (isVisible) {
-                        $('.mainDiaryContainer').width('84%');
-                        $('.quick-search').width('16%');
+                    if (isVisible) {                        
                         $rootScope.$broadcast('rightpanel.open',id);
-
                     } else {
-                        $('.mainDiaryContainer').width('97%');
-                        $('.quick-search').width('2%');
-                    }
-                }
+                        if (!dontHide){
+                            $('.mainDiaryContainer').width('97%');
+                            $('.quick-search').width('2%');
+                        }                        
+                    }   
+                    */             
             };
 
             /**

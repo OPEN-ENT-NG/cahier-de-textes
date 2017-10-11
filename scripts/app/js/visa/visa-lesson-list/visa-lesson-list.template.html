@@ -36,7 +36,7 @@
                      ng-init="hasBigLength = (lesson.description | maxChar:60).length >= 60">
 
                     <div class="cell left-magnet" ng-if="hasBigLength" >
-                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : lesson.expanded, 'up-open':!lesson.expanded}"></i>
+                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier" ng-class="{'down-open' : !lesson.expanded, 'up-open':lesson.expanded}"></i>
                     </div> 
                     <div class="hover-orange" >
                         <span><b><i18n>daily.lesson.previous.label</i18n></b></span> [[lesson.title]]                        

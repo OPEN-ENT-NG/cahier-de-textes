@@ -28,6 +28,7 @@ run the selenium.bat server file
 
 ## Execution
 run command
+```webdriver-manager update```
 ```protractor conf.js```
 
 

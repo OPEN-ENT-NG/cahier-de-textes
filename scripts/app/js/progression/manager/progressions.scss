@@ -1,5 +1,13 @@
 .progression-manager{
   width:100%;
+
+
+  .progression-article .row.hover-orange{
+    cursor: pointer;
+    label{
+     cursor : pointer;
+    }
+  }
   .search-row{
     padding : 8px 25px;
   }

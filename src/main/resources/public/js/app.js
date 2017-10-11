@@ -173,10 +173,17 @@ var AngularExtensions = {
             $timeout(init);
 
             function init() {
-                if (!model.filters.startDate) {
-                    model.filters.startDate = moment().startOf('week');
+
+                if (model.mondayOfWeek) {
+                    model.filters.startDate = moment(model.mondayOfWeek);
                     model.filters.endDate = moment(model.filters.startDate).add(7, 'd');
+                } else {
+                    if (!model.filters.startDate) {
+                        model.filters.startDate = moment().startOf('week');
+                        model.filters.endDate = moment(model.filters.startDate).add(7, 'd');
+                    }
                 }
+
                 vm.getDatas();
 
                 //reset filter;
@@ -665,6 +672,12 @@ var AngularExtensions = {
                     $scope.display.bShowHomeworks = true;
                 }
             };
+
+            $scope.$watch(function () {
+                return $rootScope.currentRightPanelVisible;
+            }, function (n) {
+                $scope.currentRightPanelVisible = n;
+            });
 
             $scope.redirect = function (path) {
                 $location.path(path);
@@ -2413,7 +2426,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
     model.LessonService = LessonService;
     $scope.constants = constants;
     $scope.RIGHTS = constants.RIGHTS;
-    $scope.model = model;
+    $rootScope.model = model;
+
+    $rootScope.currentRightPanelVisible = undefined; //= 'test';
 
     $rootScope.$on('edit-homework', function (_, data) {
         window.location = '/diary#/editHomeworkView/' + data.id;
@@ -3306,7 +3321,9 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         $scope.countdown--;
 
         if ($scope.countdown == 0) {
-            $scope.$apply();
+            if (!$scope.$$phase) {
+                $scope.$apply();
+            }
         }
     };
 
@@ -4826,7 +4843,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
 														scope.isPlaceholder = scope.selected[scope.property] === undefined;
 														scope.display = scope.selected[scope.property];
 
-														if (scope.lesson && scope.lesson.id && scope.lesson.endTime) {
+														if (scope.lesson && scope.lesson.audience && scope.lesson.audience.id && scope.lesson.endTime) {
 																if (scope.lesson.homeworks.all.length > 0) {
 																		scope.$parent.refreshHomeworkLoads(scope.lesson);
 																}
@@ -4924,7 +4941,7 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
                     var dragCounter = 0;
 
                     timeslot.on('dragover', function ($event) {
-                        event.preventDefault();
+                        $event.preventDefault();
                     });
 
                     timeslot.bind('dragenter', onenter);
@@ -5285,49 +5302,66 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
             }
 
             $scope.$on('rightpanel.open', function (_, rightpanelid) {
+
                 if (id !== rightpanelid && $scope.panelVisible) {
-                    $scope.setPanelVisible(false, {
-                        target: {
-                            type: "text"
-                        }
-                    });
+                    $scope.setPanelVisible(false, true);
                 }
+                /*else{
+                    if ($scope.panelVisible) { 
+                        $('.mainDiaryContainer').width('84%');
+                        $('.quick-search').width('16%');                    
+                    } 
+                }*/
             });
 
-            $scope.setPanelVisible = function (isVisible, $event) {
-                if (!$event.target || $event.target.type !== "text") {
+            $scope.$watch(function () {
+                return $rootScope.currentRightPanelVisible;
+            }, function (n) {
+                $scope.currentRightPanelVisible = n;
+            });
 
-                    $scope.panelVisible = isVisible;
-
-                    /**
-                     * On first panel maximize search items
-                     */
+            $scope.toogle = function (show) {
+                if (show) {
+                    $rootScope.currentRightPanelVisible = show;
                     if ($scope.isFirstSearch) {
                         $scope.quickSearch(true);
                     }
+                } else {
+                    $rootScope.currentRightPanelVisible = undefined;
+                }
+            };
 
-                    // hide the other panel (panel or homework)
-                    if ($scope.itemType == 'lesson') {
-                        // tricky way to get the other directive for homeworks
-                        if (isQuickSearchLesson) {
-                            $scope.$parent.$$childTail.panelVisible = false;
-                        }
-                    } else if ($scope.itemType == 'homework') {
-                        if (!isQuickSearchLesson) {
-                            $scope.$parent.$$childHead.panelVisible = false;
-                        }
+            $scope.setPanelVisible = function (isVisible, dontHide) {
+
+                /*
+                $scope.panelVisible = isVisible;
+                */
+
+                if ($scope.isFirstSearch) {
+                    $scope.quickSearch(true);
+                }
+                /*
+                // hide the other panel (panel or homework)
+                if ($scope.itemType == 'lesson') {
+                    // tricky way to get the other directive for homeworks
+                    if (isQuickSearchLesson && !dontHide) {
+                        $scope.$parent.$$childTail.panelVisible = false;
                     }
-
-                    // let enough room to display quick search panel maximized
-                    if (isVisible) {
-                        $('.mainDiaryContainer').width('84%');
-                        $('.quick-search').width('16%');
-                        $rootScope.$broadcast('rightpanel.open', id);
-                    } else {
-                        $('.mainDiaryContainer').width('97%');
-                        $('.quick-search').width('2%');
+                } else if ($scope.itemType == 'homework') {
+                    if (!isQuickSearchLesson && !dontHide) {
+                        $scope.$parent.$$childHead.panelVisible = false;
                     }
                 }
+                  // let enough room to display quick search panel maximized
+                if (isVisible) {                        
+                    $rootScope.$broadcast('rightpanel.open',id);
+                } else {
+                    if (!dontHide){
+                        $('.mainDiaryContainer').width('97%');
+                        $('.quick-search').width('2%');
+                    }                        
+                }   
+                */
             };
 
             /**
@@ -6243,7 +6277,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 				var valueCompare = moment(d);
 				var result = items.filter(function (item) {
-					var valueItem = moment(item[Object.keys(item)[0]]);
+					var valueItem = moment(item.date);
 					return valueItem.isSame(valueCompare, 'd');
 				});
 				return result;
@@ -6284,7 +6318,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	});
 })();
 
-"use strict";
+'use strict';
 
 (function () {
     'use strict';
@@ -6303,7 +6337,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
 
             vm.loadpdf = function (key, value) {
-                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, key, value);
+                var teacherId = void 0,
+                    audienceId = void 0;
+                if (vm.toogle === 'teacher') {
+                    teacherId = key;
+                } else {
+                    audienceId = key;
+                    if (model.isUserTeacher()) {
+                        teacherId = model.me.userId;
+                    }
+                }
+
+                HistoryService.getPdfArchive(vm.selectedYearItem.yearLabel, vm.toogle, teacherId, audienceId, value);
             };
         }
     });
@@ -6786,6 +6831,7 @@ Lesson.prototype.saveHomeworks = function (cb, cbe) {
             homework.audience = that.audience;
             homework.subject = that.subject;
             homework.color = that.color;
+            homework.state = that.state;
             homework.save().then(function () {
                 homeworkSavedCount++;
                 // callback function once all homeworks saved
@@ -6878,16 +6924,33 @@ Lesson.prototype.update = function (cb, cbe) {
 
 Lesson.prototype.create = function (cb, cbe) {
     var lesson = this;
-    return model.getHttp()({
-        method: 'POST',
-        url: '/diary/lesson',
-        data: lesson
-    }).then(function (result) {
-        lesson.updateData(result.data);
-        model.lessons.pushAll([lesson]);
-        if (typeof cb === 'function') {
-            cb();
-        }
+
+    var subject = model.subjects.all.find(function (l) {
+        return l.label = lesson.subject.label;
+    });
+
+    var createSubjectPromise = model.$q().when();
+
+    if (!subject) {
+        createSubjectPromise = model.createSubject(lesson.subject.label).then(function (newSubject) {
+            lesson.subject = newSubject;
+        });
+    } else {
+        lesson.subject = subject;
+    }
+
+    return createSubjectPromise.then(function () {
+        return model.getHttp()({
+            method: 'POST',
+            url: '/diary/lesson',
+            data: lesson
+        }).then(function (result) {
+            lesson.updateData(result.data);
+            model.lessons.pushAll([lesson]);
+            if (typeof cb === 'function') {
+                cb();
+            }
+        });
     });
 };
 
@@ -7019,7 +7082,9 @@ Lesson.prototype.toJSON = function () {
 };
 
 Lesson.prototype.addHomework = function (cb) {
-    var homework = model.initHomework(this);
+    var date = moment.isMoment(this.startTime) ? this.startTime : this.startMoment ? this.startMoment : moment();
+    var dueDate = date.second(0);
+    var homework = model.initHomework(dueDate, this);
     this.homeworks.push(homework);
 };
 
@@ -7051,21 +7116,20 @@ Lesson.prototype.isPublishable = function (toPublish) {
  */
 Lesson.prototype.changeState = function (isPublished) {
     this.state = isPublished ? 'published' : 'draft';
-
+    var that = this;
     // change state of associated homeworks
     this.homeworks.forEach(function (homework) {
         var lessonHomework = homework;
         homework.state = isPublished ? 'published' : 'draft';
 
         var found = false;
+    });
 
-        // change state of homeworks cache in calendar for current week
-        model.homeworks.forEach(function (homeworkCache) {
-            if (!found && homeworkCache.id == lessonHomework.id) {
-                homeworkCache.state = isPublished ? 'published' : 'draft';
-                found = true;
-            }
-        });
+    // change state of homeworks cache in calendar for current week
+    model.homeworks.all.filter(function (h) {
+        return h.lesson_id = that.id;
+    }).forEach(function (homeworkCache) {
+        homeworkCache.state = that.state;
     });
 };
 
@@ -7762,7 +7826,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     });
 })();
 
-'use strict';
+"use strict";
 
 (function () {
     'use strict';
@@ -7776,28 +7840,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var vm = this;
             $scope.panelVisible = false;
 
-            $scope.toggle = function () {
-                if (!$scope.panelVisible) {
-                    $scope.$parent.$$childTail.panelVisible = false;
-                    $scope.$parent.$$childHead.panelVisible = false;
-                    $rootScope.$broadcast('rightpanel.open', id);
-                }
-                $scope.panelVisible = !$scope.panelVisible;
+            // $('.mainDiaryContainer').width('84%');
+            //$('.quick-search').width('16%');
+            $scope.$watch(function () {
+                return $rootScope.currentRightPanelVisible;
+            }, function (n) {
+                $scope.currentRightPanelVisible = n;
+            });
 
-                if ($scope.panelVisible) {
-                    $('.mainDiaryContainer').width('84%');
-                    $('.quick-search').width('16%');
+            $scope.toggle = function (show) {
+                console.log("togle");
+                if (show) {
+                    $rootScope.currentRightPanelVisible = show;
                 } else {
-                    $('.mainDiaryContainer').width('97%');
-                    $('.quick-search').width('2%');
+                    $rootScope.currentRightPanelVisible = undefined;
                 }
             };
-
-            $scope.$on('rightpanel.open', function (_, rightpanelid) {
-                if (id !== rightpanelid && $scope.panelVisible) {
-                    $scope.toggle();
-                }
-            });
         }
     });
 })();
@@ -8185,18 +8243,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: 'getPdfArchive',
-            value: function getPdfArchive(yearLabel, type, key, value) {
+            value: function getPdfArchive(yearLabel, type, teacherId, audienceId, value) {
                 var url = '/diary/history/pdf';
 
                 var params = {
                     yearLabel: yearLabel
                 };
 
-                if (type === 'teacher') {
-                    params.teacherId = key;
-                } else {
-                    params.audienceId = key;
-                }
+                params.teacherId = teacherId;
+                params.audienceId = audienceId;
 
                 this.$http({
                     url: url,
@@ -10010,7 +10065,7 @@ model.build = function () {
     sqlToJsHomeworkLoad = function sqlToJsHomeworkLoad(sqlHomeworkload) {
         return {
             countLoad: sqlHomeworkload.countload,
-            description: sqlHomeworkload.countload + ' ' + lang.translate('diary.homework.label'),
+            description: sqlHomeworkload.countload + ' ' + (sqlHomeworkload.countload > 1 ? lang.translate('diary.homework.labels') : lang.translate('diary.homework.label')),
             day: moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(), // 'lundi' -> 'lu' -> 'L'
             numDay: moment(sqlHomeworkload.day).format('DD') // 15
         };
@@ -10557,7 +10612,7 @@ model.createSubject = function (label, cb, cbe) {
 
     var subject = new Subject();
     subject.label = label;
-    subject.save(cb, cbe);
+    return subject.save(cb, cbe);
 };
 
 /**

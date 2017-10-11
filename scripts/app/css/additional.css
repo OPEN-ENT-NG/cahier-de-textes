@@ -997,7 +997,7 @@ ent-dropdown div.show>div.dropdown-list {
     color: orangered !important;
 }
 
-
+ 
 .quick-search-card{
     font-size: 14px !important;
     margin-bottom: 5px !important;
@@ -1007,14 +1007,6 @@ ent-dropdown div.show>div.dropdown-list {
     background-color: #e2e8ff;
 }
 
-
-.quick-search.lessontype {
-    top: 275px;
-}
-
-.quick-search.homeworktype {
-    top: 130px;
-}
 
 .quick-search-showmore {
     text-align: center;

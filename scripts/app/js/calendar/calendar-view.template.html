@@ -1,7 +1,6 @@
 <div ng-controller="CalendarController as calendarController">
 
-
-<div  class="mainDiaryContainer" style="float: left; width: 97%;" ng-init="model.display.showList=false" >
+<div  class="mainDiaryContainer" style="float: left " ng-init="model.display.showList=false" ng-class="{'active': currentRightPanelVisible }" >
       <div class="row diary-container" ng-class="{'diary-show-homeworks' : display.bShowHomeworks,'diary-show-calendar' : display.bShowCalendar}">
           <filters style="padding-bottom: 0.8em;">
               <ul>
@@ -37,7 +36,7 @@
   </div>
 
   <!-- quick search panel -->
-  <div ng-if="isUserTeacher">
+  <div ng-if="isUserTeacher" ng-class="{'active': currentRightPanelVisible }" style="position: relative">
       <quick-search item-type="lesson" class="quick-search lessontype"></quick-search>
       <quick-search item-type="homework" class="quick-search homeworktype"></quick-search>
       <right-panel label='progression.title'

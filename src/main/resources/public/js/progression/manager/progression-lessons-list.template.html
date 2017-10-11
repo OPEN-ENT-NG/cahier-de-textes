@@ -15,7 +15,7 @@
                 ng-model="lesson.orderIndex"
                 ng-change="progressionManagerCtrl.saveOrder(progressionManagerCtrl.selectedProgressionItem)">
             <article class="notification progression-article">
-                <div class="row hover-orange" >
+                <div class="row hover-orange" ng-click="lesson.expanded=!lesson.expanded"  >
                     <div class="cell one" >&nbsp;</div>
                     <div class="cell three" >
                         <label>[[lesson.subject.label]]</label>
@@ -24,8 +24,8 @@
                         <label>[[lesson.title]]</label>
                     </div>
                     <div class="cell right-magnet">
-                        <i ng-click="lesson.expanded=!lesson.expanded" diary-tooltip="Déplier"
-                        ng-class="{'down-open' : lesson.expanded, 'up-open':!lesson.expanded}"></i>
+                        <i diary-tooltip="Déplier"
+                        ng-class="{'down-open' : !lesson.expanded, 'up-open':lesson.expanded}"></i>
                     </div>
                 </div>
                 <div class="row">

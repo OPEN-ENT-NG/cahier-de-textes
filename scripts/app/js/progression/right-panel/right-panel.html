@@ -1,14 +1,14 @@
 <!-- minified quick search panel -->
 <div class="right-panel">
-    <div ng-click="toggle()"
+    <div ng-click="toggle(label)"
         diary-tooltip="[[('diary.consult.progession' | translate) + ' ' +  (label | translate)]]"
         diary-tooltip-style="margin-top : -75px"
-        class="quick-search-label-minified" ng-show="!panelVisible">
+        class="quick-search-label-minified" ng-show="!currentRightPanelVisible || currentRightPanelVisible!=label">
         [[label | translate]]
     </div>
 
     <!-- maximized quick search panel -->
-    <div class="quick-search-results" ng-if="panelVisible">
+    <div class="quick-search-results" ng-if="currentRightPanelVisible==label">
         <ng-include src="contentUrl"></ng-include>
     </div>
 </div>

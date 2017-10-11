@@ -33,10 +33,17 @@
                       <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="calendarListViewCtrl.selectDay(day)">
                           <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.shortName]]</div>
                           <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">
-                              [[day.shortDate]]&nbsp; [[ (day.items | filter : {type : 'homework'}).length]]
-                              <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
-                               [[ (day.items | filter : {type : 'lesson'}).length]]
-                              <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                              <span class="itemdate">                            
+                                  [[day.shortDate]]&nbsp;
+                              </span>
+                              <span class="itemone">
+                                    [[ (day.items | filter : {type : 'homework'}).length]]
+                                    <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i>
+                              </span>
+                              <span class="itemtwo">                              
+                                [[ (day.items | filter : {type : 'lesson'}).length]]
+                                <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                              </span>
                           </div>
                       </div>
                   </li>
@@ -81,16 +88,16 @@
                               </div>
 
                               <div class="ten cell">
-                                  <div class="tooltip-detail" ng-click="calendarListViewCtrl.goToItemDetail(pedagogicItem)">
+                                  <div class="tooltip-detail" ng-click="calendarListViewCtrl.goToItemDetail(pedagogicItem)" diary-tooltip="diary.view.item.detail"> 
                                       <em class="medium-importance" ng-if="pedagogicItem.type === 'lesson'">
                                           <p style="display:inline">[[pedagogicItem.item.startTime | formatHour]] - [[pedagogicItem.item.endTime | formatHour]]&nbsp;</p>
                                           <p style="display:inline" ng-if="pedagogicItem.item.room">(<i18n>room</i18n> - [[pedagogicItem.item.room]])&nbsp;</p>
                                           [[pedagogicItem.item.title]]
-                                      </em>
-                                      <em class="medium-importance" ng-if="pedagogicItem.type === 'homework'">
+                                      </em> 
+                                      <em class="medium-importance" ng-if="pedagogicItem.type === 'homework'" >
                                           <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
                                           [[pedagogicItem.item.title]]
-                                      </em>
+                                      </em> 
 
                                       <div ng-bind-html="pedagogicItem.item.description | maxChar:60  " ng-if="!pedagogicItem.expanded_description"></div>
                                       <div ng-init="pedagogicItem.item.descriptionTrusted = (pedagogicItem.item.description | trusthtml)" ng-bind-html="pedagogicItem.item.descriptionTrusted" ng-if="pedagogicItem.expanded_description"></div>
@@ -102,8 +109,7 @@
                                       <span ng-show="pedagogicItem.expanded_description">
 									 <span bind-html="pedagogicItem.item.description"></span>
                                       </span>
-                                    -->
-                                      <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.item.color}"><i18n>diary.view.item.detail</i18n></span>
+                                    -->                                  
                                   </div>
                               </div>
 

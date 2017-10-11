@@ -19,8 +19,9 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
     model.LessonService = LessonService;
     $scope.constants = constants;
     $scope.RIGHTS = constants.RIGHTS;
-    $scope.model = model;
+    $rootScope.model = model;
 
+    $rootScope.currentRightPanelVisible = undefined ;//= 'test';
 
     $rootScope.$on('edit-homework',(_,data)=>{
         window.location = '/diary#/editHomeworkView/' + data.id;
