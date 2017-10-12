@@ -25,11 +25,11 @@
           <p class="row info tuto">
               <i18n>diary.search.no.result</i18n>
           </p>
-      </div>
+      </div> 
       <div ng-if="calendarListViewCtrl.dayItems.length > 0">
           <div class="pedagogic-day-container">
               <ul>
-                  <li ng-repeat="day in calendarListViewCtrl.dayItems">
+                  <li ng-repeat="day in calendarListViewCtrl.dayItems | orderBy : 'shortDate' ">
                       <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="calendarListViewCtrl.selectDay(day)">
                           <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.shortName]]</div>
                           <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">

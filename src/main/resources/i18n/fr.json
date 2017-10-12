@@ -223,6 +223,7 @@
   "diary.consult.progession" : "Consultez vos  ",
   "diary.historique.show.action" : "Voir les archives",
   "diary.visa.lesson.locked" : "Un visa a vérouillé cette séance",
-  "diary.modelweek.current.is.week" : " cette semaine est enregistrée comme modèle de semaine"
-
+  "diary.modelweek.current.is.week" : " cette semaine est enregistrée comme modèle de semaine",
+  "director" : "Directeur",
+  "inspector" : "Inspecteur"
 }
