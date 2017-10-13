@@ -211,6 +211,10 @@ var AngularExtensions = {
                 });
             }
 
+            $scope.$on('show-child', function (_, child) {
+                vm.getDatas();
+            });
+
             $scope.$on('refresh-list', function () {
                 vm.getDatas();
             });
@@ -494,8 +498,8 @@ var AngularExtensions = {
                 // homeworks and lessons props
 
                 model.childs.syncChildren(function () {
-                    $scope.child = model.child;
-                    $scope.children = model.childs;
+                    vm.child = model.child;
+                    vm.children = model.childs;
                     SubjectService.getCustomSubjects(model.isUserTeacher()).then(function (subjects) {
                         model.subjects.all = [];
                         if (subjects) {
@@ -626,21 +630,16 @@ var AngularExtensions = {
             }
 
             $scope.setChildFilter = function (child, cb) {
-
-                $scope.children.forEach(function (theChild) {
-                    theChild.selected = theChild.id === child.id;
-                });
-
-                child.selected = true;
-                $scope.child = child;
-                model.child = child;
-
                 refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
             };
 
             $scope.showCalendarForChild = function (child) {
                 $scope.setChildFilter(child);
             };
+
+            $scope.$on('show-child', function (_, child) {
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+            });
 
             var showTemplates = function showTemplates() {
                 template.open('main', 'main');
@@ -686,7 +685,7 @@ var AngularExtensions = {
     });
 })();
 
-'use strict';
+"use strict";
 
 (function () {
     'use strict';
@@ -702,7 +701,22 @@ var AngularExtensions = {
             $timeout(init);
             function init() {
                 $scope.getModel();
+                vm.isUserParent = model.isUserParent();
+                $scope.child = model.child;
+                $scope.children = model.childs;
             }
+
+            $scope.showCalendarForChild = function (childd) {
+                console.log("broadcast");
+                $scope.children.forEach(function (theChild) {
+                    theChild.selected = theChild.id === childd.id;
+                });
+
+                childd.selected = true;
+                $scope.child = childd;
+                model.child = childd;
+                $rootScope.$broadcast('show-child', childd);
+            };
 
             $scope.goToListView = function () {
                 $location.path('/listView');
@@ -10523,13 +10537,11 @@ model.listChildren = function (cb, cbe) {
         return;
     }
 
-    model.childs.removeAll();
-
     return model.getHttp()({
         method: 'GET',
         url: '/diary/children/list'
     }).then(function (result) {
-
+        model.childs.removeAll();
         model.childs.addRange(result.data);
 
         if (model.childs.all.length > 0) {

@@ -1228,13 +1228,13 @@ model.listChildren = function (cb, cbe) {
         return;
     }
 
-    model.childs.removeAll();
+    
 
     return model.getHttp()({
         method : 'GET',
         url : '/diary/children/list'
     }).then(function (result) {
-
+        model.childs.removeAll();
             model.childs.addRange(result.data);
 
             if(model.childs.all.length > 0) {

@@ -156,8 +156,8 @@
                 // homeworks and lessons props
 
                 model.childs.syncChildren(function() {
-                    $scope.child = model.child;
-                    $scope.children = model.childs;
+                    vm.child = model.child;
+                    vm.children = model.childs;
                     SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects) => {
                         model.subjects.all = [];
                         if (subjects) {
@@ -301,15 +301,6 @@
 
 
             $scope.setChildFilter = function(child, cb) {
-
-                $scope.children.forEach(function(theChild) {
-                    theChild.selected = (theChild.id === child.id);
-                });
-
-                child.selected = true;
-                $scope.child = child;
-                model.child = child;
-
                 refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
             };
 
@@ -317,6 +308,9 @@
                 $scope.setChildFilter(child);
             };
 
+            $scope.$on('show-child',(_,child)=>{
+                refreshDatas(UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+            });
 
             var showTemplates = function() {
                 template.open('main', 'main');

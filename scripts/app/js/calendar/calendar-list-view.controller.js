@@ -23,7 +23,7 @@
                     }
                 }
                 
-
+               
                 vm.getDatas();
 
                 //reset filter;
@@ -54,6 +54,12 @@
 
                 
             }
+
+
+            $scope.$on('show-child',(_,child)=>{
+                vm.getDatas();
+            });
+
 
             $scope.$on('refresh-list',()=>{
                 vm.getDatas();

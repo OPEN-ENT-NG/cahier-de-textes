@@ -12,6 +12,21 @@
             $timeout(init);
             function init(){
                 $scope.getModel();
+                vm.isUserParent = model.isUserParent();
+                $scope.child = model.child;
+                $scope.children = model.childs;
+            }
+
+            $scope.showCalendarForChild = function(childd){
+                console.log("broadcast");
+                $scope.children.forEach(function(theChild) {
+                    theChild.selected = (theChild.id === childd.id);
+                });
+
+                childd.selected = true;
+                $scope.child = childd;
+                model.child = childd;
+                $rootScope.$broadcast('show-child',childd);
             }
 
             $scope.goToListView = function() {
