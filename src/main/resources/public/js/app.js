@@ -6631,29 +6631,17 @@ Homework.prototype.load = function (cb, cbe) {
 
     var homework = this;
 
-    var load = function load() {
-        http().get('/diary/homework/' + homework.id).done(function (data) {
-            homework.updateData(sqlToJsHomework(data));
+    http().get('/diary/homework/' + homework.id).done(function (data) {
+        homework.updateData(sqlToJsHomework(data));
 
-            if (typeof cb === 'function') {
-                cb();
-            }
-        }).error(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
-        });
-    };
-
-    // might occur when user pressed F5 on lesson view
-    // needed to fill homework.audience and subject properties
-    if (model.audiences.all.length === 0) {
-        model.audiences.syncAudiences(function () {
-            model.subjects.syncSubjects(load);
-        });
-    } else {
-        load();
-    }
+        if (typeof cb === 'function') {
+            cb();
+        }
+    }).error(function (e) {
+        if (typeof cbe === 'function') {
+            cbe(model.parseError(e));
+        }
+    });
 };
 
 /**
@@ -7013,31 +7001,20 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
         url = '/diary/lesson/external/';
     }
 
-    var load = function load() {
-        model.getHttp()({
-            method: 'GET',
-            url: url + lesson.id
-        }).then(function (result) {
-            lesson.updateData(model.LessonService.mapLesson(result.data));
+    return model.getHttp()({
+        method: 'GET',
+        url: url + lesson.id
+    }).then(function (result) {
+        lesson.updateData(model.LessonService.mapLesson(result.data));
 
-            if (loadHomeworks) {
-                model.loadHomeworksForLesson(lesson, cb, cbe);
-            } else {
-                if (typeof cb === 'function') {
-                    cb();
-                }
+        if (loadHomeworks) {
+            model.loadHomeworksForLesson(lesson, cb, cbe);
+        } else {
+            if (typeof cb === 'function') {
+                cb();
             }
-        });
-    };
-
-    // might occur when user pressed F5 on lesson view
-    if (model.audiences.all.length === 0) {
-        model.audiences.syncAudiences(function () {
-            model.subjects.syncSubjects(load);
-        });
-    } else {
-        load();
-    }
+        }
+    });
 };
 
 /**

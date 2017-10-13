@@ -272,32 +272,23 @@ Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
         url = '/diary/lesson/external/';
     }
 
-    var load = function () {
-        model.getHttp()({
-            method : 'GET',
-            url : url + lesson.id
-        }).then(function (result) {
-                lesson.updateData(model.LessonService.mapLesson(result.data));
+    
+    return model.getHttp()({
+        method : 'GET',
+        url : url + lesson.id
+    }).then(function (result) {
+            lesson.updateData(model.LessonService.mapLesson(result.data));
 
-                if (loadHomeworks) {
-                    model.loadHomeworksForLesson(lesson, cb, cbe);
-                }else{
-                  if (typeof cb === 'function') {
-                    cb();
-                  }
+            if (loadHomeworks) {
+                model.loadHomeworksForLesson(lesson, cb, cbe);
+            }else{
+                if (typeof cb === 'function') {
+                cb();
                 }
-            });
-    };
-
-    // might occur when user pressed F5 on lesson view
-    if (model.audiences.all.length === 0) {
-        model.audiences.syncAudiences(
-            function () {
-                model.subjects.syncSubjects(load);
-            });
-    } else {
-        load();
-    }
+            }
+        });
+    
+    
 };
 
 /**

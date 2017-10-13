@@ -146,32 +146,20 @@ Homework.prototype.load = function (cb, cbe) {
 
     var homework = this;
 
-    var load = function () {
-        http().get('/diary/homework/' + homework.id)
-            .done(function (data) {
-                homework.updateData(sqlToJsHomework(data));
 
-                if (typeof cb === 'function') {
-                    cb();
-                }
-            })
-            .error(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-            });
-    };
+    http().get('/diary/homework/' + homework.id)
+        .done(function (data) {
+            homework.updateData(sqlToJsHomework(data));
 
-    // might occur when user pressed F5 on lesson view
-    // needed to fill homework.audience and subject properties
-    if (model.audiences.all.length === 0) {
-        model.audiences.syncAudiences(
-            function () {
-                model.subjects.syncSubjects(load);
-            });
-    } else {
-        load();
-    }
+            if (typeof cb === 'function') {
+                cb();
+            }
+        })
+        .error(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
+        });        
 };
 
 /**
