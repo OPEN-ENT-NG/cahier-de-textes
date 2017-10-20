@@ -49,7 +49,7 @@
         margin-top: 15px;
        }
 
-         #footer {
+     /*    #footer {
         position: running(footer);
         text-align: right;
     }
@@ -66,6 +66,12 @@
 
     #pagecount:before {
         content: counter(pages);
+    }*/
+
+    @page {
+        @bottom-right {
+            content: "Page " counter(page) " sur " counter(pages);
+        }
     }
 
 	</style>
@@ -127,10 +133,11 @@
     </div>
     {{/lessons}}
 
+    <!--
     <div id="footer">
         page <span id="pagenumber"></span> sur <span id="pagecount"></span>
     </div>
-
+-->
 </div>
 </body>
 </html>
