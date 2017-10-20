@@ -7828,6 +7828,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         module.controller("RightPanelController", controller);
 
         function controller($scope, $rootScope, ProgressionService) {
+            $rootScope.currentRightPanelVisible = undefined;
             var id = Date.now();
             var vm = this;
             $scope.panelVisible = false;
@@ -7841,7 +7842,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
 
             $scope.toggle = function (show) {
-                console.log("togle");
                 if (show) {
                     $rootScope.currentRightPanelVisible = show;
                 } else {

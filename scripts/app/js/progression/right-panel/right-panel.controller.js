@@ -6,6 +6,7 @@
         module.controller("RightPanelController", controller);
 
         function controller($scope,$rootScope,ProgressionService) {
+            $rootScope.currentRightPanelVisible = undefined;
             let id = Date.now();
             var vm = this;
             $scope.panelVisible = false;
@@ -18,8 +19,7 @@
                 $scope.currentRightPanelVisible = n;                
             });
 
-            $scope.toggle = function (show){     
-                console.log("togle")           
+            $scope.toggle = function (show){                     
                 if (show){
                     $rootScope.currentRightPanelVisible = show;                     
                 }else{

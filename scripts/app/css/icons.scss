@@ -9,6 +9,16 @@ button.diary-ico-button{
   line-height: 24px;
 }
 
+.close{
+  position : absolute;
+  top : 8px;
+  right: 5px;
+  cursor : pointer;  
+  color: #2a9cc8;
+  font-weight: 700;
+  font-size: 17px;
+}
+
 .reservation:before {
     content: "\e80e";
 }
