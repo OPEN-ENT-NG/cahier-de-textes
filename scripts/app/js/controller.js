@@ -1172,7 +1172,8 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
         var date = forcedDate ? forcedDate : homework.date;
         var formattedDate = moment(date).format("YYYY-MM-DD");
 
-        model.loadHomeworksLoad(homework, formattedDate, homework.audience.id, cb, callbackErrorFunc);
+        var audienceId = homework.audience ? homework.audience.id : homework.audienceId;
+        model.loadHomeworksLoad(homework, formattedDate, audienceId, cb, callbackErrorFunc);
     };
 
     $scope.isHighHomeworkLoad = function(homeworkLoad){

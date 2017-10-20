@@ -3555,7 +3555,8 @@ function DiaryController($scope, $rootScope, template, model, route, $location, 
         var date = forcedDate ? forcedDate : homework.date;
         var formattedDate = moment(date).format("YYYY-MM-DD");
 
-        model.loadHomeworksLoad(homework, formattedDate, homework.audience.id, cb, callbackErrorFunc);
+        var audienceId = homework.audience ? homework.audience.id : homework.audienceId;
+        model.loadHomeworksLoad(homework, formattedDate, audienceId, cb, callbackErrorFunc);
     };
 
     $scope.isHighHomeworkLoad = function (homeworkLoad) {
@@ -8252,7 +8253,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }).success(function (data, status, headers, config) {
                     var blob = new Blob([data], { type: " application/pdf" });
                     var date = moment().format("YYYY-MM-DD_HH-mm-ss");
-                    var fileName = 'ent-archive-generation_' + value + '_' + yearLabel + '.pdf';
+                    var fileName = 'CDT-archive_' + value + '_' + yearLabel + '.pdf';
                     saveAs(blob, fileName);
                 }).error(function (data, status, headers, config) {
                     //upload failed
