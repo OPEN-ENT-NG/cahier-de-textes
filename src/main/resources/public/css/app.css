@@ -1217,64 +1217,82 @@ button.diary-ico-button {
         padding-top: 3px;
         font-size: 0.95em; }
 
+/* line 3, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+.pedagogic-item-card article.notification {
+  min-height: 75px; }
+  /* line 6, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  .pedagogic-item-card article.notification > .row > div:nth-child(1) {
+    width: 45px;
+    padding-top: 15px;
+    padding-left: 10px; }
+  /* line 12, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  .pedagogic-item-card article.notification > .row > div:nth-child(2) {
+    width: calc(100% - 115px); }
+    /* line 15, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+    .pedagogic-item-card article.notification > .row > div:nth-child(2) i {
+      margin-right: 10px; }
+  /* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  .pedagogic-item-card article.notification > .row > div:nth-child(3) {
+    width: 65px; }
+
 @media screen and (min-width: 1120px) and (max-width: 1396px) {
-  /* line 4, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 33, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .thumbnail {
     font-size: 1em;
     width: 20%; }
-  /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 37, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .summary {
     font-size: 1em;
     width: 80%; } }
 
 @media screen and (min-width: 780px) and (max-width: 1120px) {
-  /* line 20, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 49, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .thumbnail {
     font-size: 1em;
     width: 30%; }
-  /* line 24, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 53, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .summary {
     position: relative;
     font-size: 0.9em;
     width: 70%; }
-  /* line 31, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 60, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemone, .pedagogic-day-card .itemtwo {
     position: absolute;
     font-size: 0.8em;
     right: 5px; }
-    /* line 35, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+    /* line 64, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
     .pedagogic-day-card .itemone i, .pedagogic-day-card .itemtwo i {
       font-size: 1em; }
-  /* line 39, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 68, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemone {
     top: 5px; }
-  /* line 42, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 71, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemtwo {
     bottom: 5px; } }
 
 @media screen and (max-width: 780px) {
-  /* line 54, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 83, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .thumbnail {
     font-size: 1em;
     width: 30%;
     display: none; }
-  /* line 59, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 88, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .summary {
     position: relative;
     font-size: 0.9em;
     width: 100%; }
-  /* line 66, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 95, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemone, .pedagogic-day-card .itemtwo {
     position: absolute;
     font-size: 0.8em;
     right: 5px; }
-    /* line 70, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+    /* line 99, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
     .pedagogic-day-card .itemone i, .pedagogic-day-card .itemtwo i {
       font-size: 1em; }
-  /* line 74, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 103, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemone {
     top: 5px; }
-  /* line 77, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
+  /* line 106, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/pedagogic-item.scss */
   .pedagogic-day-card .itemtwo {
     bottom: 5px; } }
 
