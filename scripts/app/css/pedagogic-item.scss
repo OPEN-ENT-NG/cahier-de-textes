@@ -1,3 +1,32 @@
+
+.pedagogic-item-card{
+    article.notification {  
+        min-height: 75px;        
+        &>.row{
+            &>div:nth-child(1){
+                width:45px;
+                padding-top: 15px;
+                padding-left: 10px;            
+            } 
+    
+            &>div:nth-child(2){
+                width:calc(100% - 115px);
+
+                i{
+                    margin-right: 10px;
+                }
+            } 
+    
+            &>div:nth-child(3){
+                width:65px;  
+            }
+        }
+    }
+    
+}
+
+
+
 @media screen and (min-width : 1120px)and (max-width:1396px){
 
     .pedagogic-day-card{

@@ -54,28 +54,9 @@
           <div class="pedagogic-item-card">
               <ul style="margin-bottom: 60px;">
                   <li ng-repeat="pedagogicItem in filteredDays = (model.selectedDay.items | filter : {'item.subjectLabel' : model.filters.selectedSubject})">
-                      <article class="notification">
-
-                          <div ng-if="(pedagogicItem.item.description.length >= 60)" class="row hover-orange" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
-                              <div class="cell" style="margin-left: 90px;">
-                                  <i ng-if="pedagogicItem.item.state!=='published'"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                  <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.item.subjectLabel]] &nbsp; [[pedagogicItem.item.audienceLabel]] &nbsp; [[pedagogicItem.item.teacherName]]</em><br/>
-                              </div>
-
-                              <div class="cell right-magnet">
-                                  <i ng-show="!pedagogicItem.expanded_description" data-tooltip="Déplier" class="down-open"></i>
-                                  <i ng-hide="!pedagogicItem.expanded_description" data-tooltip="Plier" class="up-open"></i>
-                              </div>
-                          </div>
-
-                          <div ng-if="!(pedagogicItem.item.description.length >= 60)" class="row">
-                              <div class="cell" style="margin-left: 90px;">
-                                  <i ng-if="pedagogicItem.item.state!=='published'"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                  <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.item.subjectLabel]] &nbsp; [[pedagogicItem.item.audienceLabel]] &nbsp; [[pedagogicItem.item.teacherName]]</em><br/>
-                              </div>
-                          </div>
+                      <article class="notification">                          
                           <div class="row">
-                              <div class="one cell" style="padding: 5px 0px 0px 20px">
+                              <div class="cell" >
                                   <label class="checkbox" ng-if="isUserTeacher && !pedagogicItem.item.locked">
                                       <input type="checkbox" ng-model="pedagogicItem.item.selected"  />
                                       <span></span>
@@ -87,7 +68,26 @@
                                   </label>
                               </div>
 
-                              <div class="ten cell">
+                              <div class="cell" >
+                                    <div ng-if="(pedagogicItem.item.description.length >= 60)" class="row hover-orange" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
+                                            <div class="cell"  >
+                                                <i ng-if="pedagogicItem.item.state!=='published'"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                                <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.item.subjectLabel]] &nbsp; [[pedagogicItem.item.audienceLabel]] &nbsp; [[pedagogicItem.item.teacherName]]</em><br/>
+                                            </div>
+              
+                                            <div class="cell right-magnet">
+                                                <i ng-show="!pedagogicItem.expanded_description" data-tooltip="Déplier" class="down-open"></i>
+                                                <i ng-hide="!pedagogicItem.expanded_description" data-tooltip="Plier" class="up-open"></i>
+                                            </div>
+                                        </div>
+              
+                                        <div ng-if="!(pedagogicItem.item.description.length >= 60)" class="row">
+                                            <div class="cell"  >
+                                                <i ng-if="pedagogicItem.item.state!=='published'"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                                <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.item.subjectLabel]] &nbsp; [[pedagogicItem.item.audienceLabel]] &nbsp; [[pedagogicItem.item.teacherName]]</em><br/>
+                                            </div>
+                                        </div>
+
                                   <div class="tooltip-detail" ng-click="calendarListViewCtrl.goToItemDetail(pedagogicItem)" diary-tooltip="diary.view.item.detail"> 
                                       <em class="medium-importance" ng-if="pedagogicItem.type === 'lesson'">
                                           <p style="display:inline">[[pedagogicItem.item.startTime | formatHour]] - [[pedagogicItem.item.endTime | formatHour]]&nbsp;</p>
@@ -95,7 +95,7 @@
                                           [[pedagogicItem.item.title]]
                                       </em> 
                                       <em class="medium-importance" ng-if="pedagogicItem.type === 'homework'" >
-                                          <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
+                                          <span>[[pedagogicItem.type_homework]]</span>
                                           [[pedagogicItem.item.title]]
                                       </em> 
 
@@ -113,7 +113,7 @@
                                   </div>
                               </div>
 
-                              <div class="one cell float:right">
+                              <div class=" cell  ">
                                   <i ng-class="pedagogicItem.type === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.item.color}"></i>
                               </div>
                           </div>
