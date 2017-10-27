@@ -39,7 +39,7 @@
                     50 ) + 'px';
                 setTimeout(()=>{
                     vm.listLessonHeight();
-                    $scope.apply();
+                    $scope.$apply();
                 },500);
             };
 

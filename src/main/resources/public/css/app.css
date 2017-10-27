@@ -1307,9 +1307,9 @@ lightbox {
     /* line 8, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/popup.scss */
     lightbox.fullscreen section.lightbox .content {
       box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      margin: 0px;
+      width: 80%;
+      height: 80%;
+      margin-top: 3%;
       z-index: 100; }
 
 /* line 1, C:/Users/A664240/Documents/work/worspace/v1.25/cahier-de-texte/scripts/app/css/radio-button.scss */

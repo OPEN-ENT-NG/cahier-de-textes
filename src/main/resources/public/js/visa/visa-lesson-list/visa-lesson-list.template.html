@@ -1,24 +1,34 @@
 <div  class="forheigth">
-    <h1>
-        <a href="#" ><i18n>diary.title</i18n> </a> >
-        <a href="" ng-click="close()" ><i18n>diary.visa.title</i18n> </a> >
+    <h1>        
         <a href="" ><i18n>diary.visa.tovise.title</i18n> </a>
     </h1>
     <div class="visa-lessons-filter row">
-        <div class="cell six">
+        <div class="cell four"> 
             <label class="cell three"><i18n>title</i18n></label>
             <input type="text"
               ng-init="visaManagerCtrl.searchFilter=''"
               style="background-color: white;"
               ng-model="visaManagerCtrl.searchFilter"  translate attr="placeholder" placeholder="diary.quicksearch.zoomlabel" size="20" >
         </div>
-        <div class="cell six" ng-init="visaManagerCtrl.searchFilterDate=undefined">
+        <div class="cell four" ng-init="visaManagerCtrl.searchFilterDate=undefined">
             <label class="cell three"><i18n>date</i18n></label>
             <diary-date-picker ng-model="visaManagerCtrl.searchFilterDate" nullable="true" class="cell six"></diary-date-picker>
         </div>
+        <div class="cell four right">
+            <button
+                class="right"
+                confirm-popup
+                confirm-class="popup-viser"
+                confirm-template="/diary/public/js/visa/popup-valid/popup-valid.template.html" >
+                <i18n>diary.visa.action.apply</i18n>
+            </button>
+            <button ng-click="visaManagerCtrl.pdf()" class="right cancel">
+                <i18n>diary.visa.action.generatepdf</i18n>
+            </button>
+        </div>
         <!-- filters -->
     </div>
-    <div class="lesson-list scrollbar-fine" style="height : [[visaManagerCtrl.lessonHeight]]" ng-init="visaManagerCtrl.listLessonHeight">
+    <div class="lesson-list scrollbar-fine" style="height : [[visaManagerCtrl.lessonHeight]]" ng-init="visaManagerCtrl.listLessonHeight()">
         <!-- lessons -->
         <article ng-repeat="lesson in visaManagerCtrl.selectedLessons | filter : { title : visaManagerCtrl.searchFilter} | sameDate : {date : visaManagerCtrl.searchFilterDate}"
             overflow-y="scroll" on-finish-render="visaManagerCtrl.resize()"
@@ -69,5 +79,7 @@
 
         </article>
     </div>
+    <!--
     <div ng-include="'/diary/public/js/visa/visa-lesson-list/toggle-selected.template.html'"></div>
+    -->
 </div>

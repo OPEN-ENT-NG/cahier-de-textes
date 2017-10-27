@@ -9211,7 +9211,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 vm.lessonHeight = $('.popup-visa-lesson-list .content').innerHeight() - $('.popup-visa-lesson-list .forheigth > h1').outerHeight() - $($('.popup-visa-lesson-list .forheigth > div')[0]).outerHeight() - 50 + 'px';
                 setTimeout(function () {
                     vm.listLessonHeight();
-                    $scope.apply();
+                    $scope.$apply();
                 }, 500);
             };
 
