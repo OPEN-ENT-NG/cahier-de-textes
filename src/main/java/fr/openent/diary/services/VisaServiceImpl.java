@@ -237,14 +237,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
         for (ResultVisaList resultVisaList : listResultVisas){
 
-            Long nbToDo = 0L;
-
-            if (resultVisaList.getVisas()!=null && resultVisaList.getVisas().size()>0){
-                for (VisaModel visa : resultVisaList.getVisas()){
-                    nbToDo += visa.getNbDirty();
-                }
-            }
-            if (nbToDo>0){
+            if (resultVisaList.getNbNotVised()>0){
                 dirtyResult.add(resultVisaList);
             }else {
                 doneResult.add(resultVisaList);
