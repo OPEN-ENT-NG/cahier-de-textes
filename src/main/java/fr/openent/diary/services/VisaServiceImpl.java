@@ -227,26 +227,35 @@ public class VisaServiceImpl extends SqlCrudService {
         }, ResultVisaList.class));
     }
     private List<ResultVisaList> filterByStatut(String statut,List<ResultVisaList> listResultVisas){
-        List<ResultVisaList> result = new ArrayList<>();
+
+        if (statut.equals("ALL")){
+            return listResultVisas;
+        }
+
+        List<ResultVisaList> dirtyResult = new ArrayList<>();
+        List<ResultVisaList> doneResult = new ArrayList<>();
+
         for (ResultVisaList resultVisaList : listResultVisas){
-            Long nb  = resultVisaList.getNbNotVised();
+
             Long nbToDo = 0L;
+
             if (resultVisaList.getVisas()!=null && resultVisaList.getVisas().size()>0){
                 for (VisaModel visa : resultVisaList.getVisas()){
                     nbToDo += visa.getNbDirty();
                 }
             }
-            if (nbToDo>0 && !statut.equals("DID_ONLY")){
-                result.add(resultVisaList);
+            if (nbToDo>0){
+                dirtyResult.add(resultVisaList);
+            }else {
+                doneResult.add(resultVisaList);
             }
-
-            if (nbToDo==0 && !statut.equals("TODO_ONLY")){
-                result.add(resultVisaList);
-            }
-
+        }
+        if (statut.equals("TODO_ONLY")){
+            return dirtyResult;
+        }else {
+           return doneResult;
         }
 
-        return result;
     }
 
     public void applyVisas(final ApplyVisaModel applyVisa, final Boolean lock, final Handler<GenericHandlerResponse> handler) {
