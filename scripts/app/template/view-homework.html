@@ -3,8 +3,8 @@
 	 <div class="row">
         <div class="twelve cell">
             <span ng-style="{background: homework.color}" style="padding-left: 45px;;"></span>
-			<span ng-bind="homework.subject.label" class="lessonHeader"></span>
-			<span ng-bind="homework.audience.name" class="lessonHeader"></span>
+			<span  class="lessonHeader" ng-bind="homework.subjectLabel"></span>
+			<span  class="lessonHeader" ng-bind="homework.audienceLabel"></span>  
             <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
             <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
                   ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
@@ -18,8 +18,9 @@
         <!-- FREE HOMEWORK -->
                     <div class="row rowHeader">
                         <span class="lessonInfosGrey">[[formatDate(homework.dueDate)]]</span>
-                        <span class="lessonInfosGrey">[[homework.type.label]]&nbsp;&#58;</span>
                         <span ng-bind="homework.title" class="lessonInfosBlack"></span>
+                        <span class="lessonInfosGrey">[['diary.homework.types' | translate]]&nbsp;&#58;</span>
+                        <span ng-bind="homework.typeLabel" class="lessonInfosBlack"></span>
                     </div>
                     <div class="row">
                         <div bind-html="homework.description" class="lessonHomeworkDescription"></div>

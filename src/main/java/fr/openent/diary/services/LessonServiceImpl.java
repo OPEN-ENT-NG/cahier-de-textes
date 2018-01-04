@@ -1,14 +1,20 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.model.general.*;
+import fr.openent.diary.model.GenericHandlerResponse;
+import fr.openent.diary.model.general.Attachment;
+import fr.openent.diary.model.general.Audience;
+import fr.openent.diary.model.general.Context;
+import fr.openent.diary.model.general.ResourceState;
 import fr.openent.diary.utils.DateUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
+import org.entcore.common.user.UserInfos;
 import org.entcore.common.utils.StringUtils;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -27,7 +33,7 @@ import static org.entcore.common.sql.SqlResult.*;
 public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     private DiaryService diaryService;
-
+    private HomeworkService homeworkService;
     private AudienceService audienceService;
 
     private final static String DATABASE_TABLE ="lesson";
@@ -46,10 +52,11 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private static final String SQL_ATTACHMENT_TABLE_NAME = "attachment";
     private static final String SQL_LESSON_HAS_ATTACHMENT_TABLE_NAME = "lesson_has_attachment";
 
-    public LessonServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
+    public LessonServiceImpl(final DiaryService diaryService, final AudienceService audienceService,final HomeworkService homeworkService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
         this.diaryService = diaryService;
         this.audienceService = audienceService;
+        this.homeworkService = homeworkService;
     }
 
 
@@ -521,10 +528,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param lessonId Id of lesson to be deleted
      * @param handler
      */
-    public void publishLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
+    public void publishLesson(String lessonId, final UserInfos userInfos,Handler<Either<String, JsonObject>> handler) {
         List<String> idLessonsToDelete = new ArrayList<String>();
         idLessonsToDelete.add(lessonId);
-        publishLessons(idLessonsToDelete, handler);
+        publishLessons(idLessonsToDelete, userInfos,handler);
     }
 
     /**
@@ -535,13 +542,13 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param handler
      */
     @Override
-    public void publishLessons(List<String> lessonIds, Handler<Either<String, JsonObject>> handler) {
-        changeLessonsState(lessonIds, ResourceState.DRAFT, ResourceState.PUBLISHED, handler);
+    public void publishLessons(List<String> lessonIds,final UserInfos userInfos, Handler<Either<String, JsonObject>> handler) {
+        changeLessonsState(lessonIds, ResourceState.DRAFT, ResourceState.PUBLISHED, userInfos,handler);
     }
 
     @Override
-    public void unPublishLessons(List<String> lessonIds, Handler<Either<String, JsonObject>> handler) {
-        changeLessonsState(lessonIds, ResourceState.PUBLISHED, ResourceState.DRAFT, handler);
+    public void unPublishLessons(List<String> lessonIds,Handler<Either<String, JsonObject>> handler) {
+        changeLessonsState(lessonIds, ResourceState.PUBLISHED, ResourceState.DRAFT, null,handler);
     }
 
     /**
@@ -550,7 +557,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param finalState   Final state of lessons
      * @param handler
      */
-    private void changeLessonsState(List<String> lessonIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
+    private void changeLessonsState(final List<String> lessonIds, ResourceState initialState, final ResourceState finalState, final UserInfos userInfos, final Handler<Either<String, JsonObject>> handler) {
         StringBuilder lessonSb = new StringBuilder();
         JsonArray parameters = new JsonArray();
 
@@ -574,7 +581,21 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         SqlStatementsBuilder transactionBuilder = new SqlStatementsBuilder();
         transactionBuilder.prepared(lessonSb.toString(), parameters);
         transactionBuilder.prepared(homeworkSb.toString(), parameters);
-        sql.transaction(transactionBuilder.build(), validUniqueResultHandler(0, handler));
+        sql.transaction(transactionBuilder.build(), new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> event) {
+                if (finalState == ResourceState.PUBLISHED ){
+                    for (Object lessonId :  lessonIds ){
+                        homeworkService.notifyHomeworkShare(new Long((Integer)lessonId), null, userInfos, new Handler<GenericHandlerResponse>() {
+                            @Override
+                            public void handle(GenericHandlerResponse event) {
+                            }
+                        });
+                    }
+                }
+                handler.handle(new Either.Right<String, JsonObject>(event.body()));
+            }
+        });
     }
 
     /**

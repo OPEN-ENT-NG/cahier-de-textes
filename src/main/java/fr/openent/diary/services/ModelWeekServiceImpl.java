@@ -5,7 +5,6 @@ import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.LessonAsModel;
 import fr.openent.diary.model.ModelWeek;
-import fr.openent.diary.model.visa.VisaFilters;
 import fr.openent.diary.utils.DateUtils;
 import fr.openent.diary.utils.HandlerUtils;
 import fr.openent.diary.utils.SqlMapper;
@@ -14,14 +13,12 @@ import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.user.UserInfos;
-import org.joda.time.*;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.DateTime;
+import org.joda.time.MutableDateTime;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 

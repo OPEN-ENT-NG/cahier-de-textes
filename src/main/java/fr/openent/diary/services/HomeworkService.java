@@ -1,7 +1,9 @@
 package fr.openent.diary.services;
 
+import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.general.Audience;
 import fr.wseduc.webutils.Either;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -83,9 +85,9 @@ public interface HomeworkService {
      * @param homeworkId
      * @param handler
      */
-    void publishHomework(final Integer homeworkId, final Handler<Either<String, JsonObject>> handler);
+    void publishHomework(final UserInfos userInfos, final Long lessonId,final Integer homeworkId, final Handler<Either<String, JsonObject>> handler);
 
-    void publishHomeworks(final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler);
+    void publishHomeworks(final UserInfos userInfos, final Long lessonId, final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler);
 
     /**
      * Un-publishes homeworks
@@ -116,4 +118,7 @@ public interface HomeworkService {
      * @param handler
      */
     void getHomeworksLoad(final String currentDateFormatted, String audienceId, Handler<Either<String, JsonArray>> handler);
+
+
+    void notifyHomeworkShare(final Long lessonId, final Long homeworkId, final UserInfos userInfos , Handler<GenericHandlerResponse> handler );
 }

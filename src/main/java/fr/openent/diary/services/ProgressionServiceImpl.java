@@ -3,8 +3,6 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.DiaryController;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
-import fr.openent.diary.model.LessonAsModel;
-import fr.openent.diary.model.lessonview.HomeworkModel;
 import fr.openent.diary.model.progression.LessonProgression;
 import fr.openent.diary.model.progression.OrderLesson;
 import fr.openent.diary.model.progression.Progression;
@@ -19,9 +17,6 @@ import org.vertx.java.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static org.entcore.common.sql.SqlResult.validRowsResultHandler;
 
 
 public class ProgressionServiceImpl extends SqlCrudService {

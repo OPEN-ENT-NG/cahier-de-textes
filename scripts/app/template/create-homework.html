@@ -74,7 +74,7 @@
                 <label class="cell"><i18n>homework.date</i18n></label>
                 <date-picker ng-model="newItem.date" ng-change="showHomeworksLoad(homework, newItem.date.getTime())"  class="cell six"></date-picker>
             </div>
-            <label><i18n>homework.types</i18n></label>
+            <label><i18n>diary.homework.types</i18n></label>
             <select ng-options="type as type.label for type in homeworkTypes.all | filter:{type.structureId:homework.audience.schoolId}"
                 ng-model="homework.type">
             </select>

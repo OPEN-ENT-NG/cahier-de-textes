@@ -3,7 +3,6 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.VisaController;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.lessonview.LessonModel;
-import fr.openent.diary.model.visa.VisaModel;
 import fr.openent.diary.utils.SqlMapper;
 import fr.wseduc.webutils.http.Renders;
 import org.vertx.java.core.AsyncResult;

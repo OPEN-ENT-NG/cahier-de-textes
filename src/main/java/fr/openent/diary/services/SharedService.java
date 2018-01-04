@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.wseduc.webutils.Either;
+import org.entcore.common.user.UserInfos;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public interface SharedService {
 
-    void shareResource(String ownerId, String classGroupId, final String resourceId, Boolean isGroup, final List<String> actions,
+    void shareResource(final UserInfos userInfos,String classGroupId, final String resourceId, Boolean isGroup, final List<String> actions,
                               final Handler<Either<String, JsonObject>> handler);
 
     void removeShareResource(String classGroupId, final String resourceId, Boolean isGroup,
@@ -27,19 +28,19 @@ public interface SharedService {
      * @param actions sharing actions
      * @param handler
      */
-    void updateShareResource(final String oldClassGroupId, final String newClassGroupId, final String resourceId, final Boolean isOldGroup, final Boolean isNewGroup,
+    void updateShareResource(final UserInfos userInfos, final String oldClassGroupId, final String newClassGroupId, final String resourceId, final Boolean isOldGroup, final Boolean isNewGroup,
                                     final List<String> actions, final Handler<Either<String, JsonObject>> handler);
 
     /**
      * Performs sharing on homeworks linked to a lesson to be shared.
      * @param resourceIds identifiers of every homework that need to be shared.
-     * @param userId identifier of target user for the sharing (null if the target is a group of users).
+     * @param userInfos target user for the sharing (null if the target is a group of users).
      * @param groupId identifier of target group of users for the sharing (null if the target is a single user).
      * @param actions actions to be shared.
      * @param handler
      */
-    void shareOrUpdateLinkedResources(final List<Long> resourceIds, final String userId, final String groupId, final List<String> actions,
-                                             final Handler<Either<String, JsonObject>> handler);
+    void shareOrUpdateLinkedResources(final Long parentResourceId, final List<Long> resourceIds, final UserInfos userInfos, final String groupId, final List<String> actions,
+                                      final Handler<Either<String, JsonObject>> handler);
 
     /**
      * Removes sharing data for the given homeworks, member and actions.

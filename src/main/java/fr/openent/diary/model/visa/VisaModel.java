@@ -1,7 +1,6 @@
 package fr.openent.diary.model.visa;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by A664240 on 08/06/2017.

@@ -9,7 +9,6 @@ import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.collections.Joiner;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -26,7 +25,6 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;

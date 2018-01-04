@@ -3,6 +3,11 @@
     color:red;
 }
 
+
+i.diary-large::before, i.type.diary::before, i.diary::before{
+    color:white !important;
+}
+
 ng-include{
   display: block;
 }

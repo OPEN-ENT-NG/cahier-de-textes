@@ -3,6 +3,7 @@ package fr.openent.diary;
 import fr.openent.diary.controllers.*;
 import fr.openent.diary.services.*;
 import org.entcore.common.http.BaseServer;
+import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
@@ -24,10 +25,14 @@ public class Diary extends BaseServer {
 		super.start();
         final EventBus eb = getEventBus(vertx);
 
+        TimelineHelper timeline = new TimelineHelper(vertx, eb, container);
+
         final DiaryService diaryService = new DiaryServiceImpl();
         final AudienceService audienceService = new AudienceServiceImpl();
-        final LessonService lessonService = new LessonServiceImpl(diaryService, audienceService);
-        final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService, audienceService);
+
+        final NotifyServiceImpl notifyService = new NotifyServiceImpl(timeline,eb,getPathPrefix(config));
+        final HomeworkService homeworkService = new HomeworkServiceImpl(diaryService, audienceService,notifyService);
+        final LessonService lessonService = new LessonServiceImpl(diaryService, audienceService,homeworkService);
         final ModelWeekServiceImpl modelWeekService = new ModelWeekServiceImpl(lessonService);
         final ProgressionServiceImpl progressionService = new ProgressionServiceImpl();
         final VisaServiceImpl visaService = new VisaServiceImpl();

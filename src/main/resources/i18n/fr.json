@@ -101,7 +101,7 @@
   "daily.homework.unpublish.confirm.multi": "Êtes-vous sûr(e) de vouloir dépublier ces travails à faire ?",
   "daily.homework.givenduedate": "Devoir à rendre pour le",
   "daily.homework.givenduedateshort": "Devoir à rendre",
-  "homework.types": "Type de travail",
+  "diary.homework.types": "Type de travail",
   "diary.icon.show.calendar": "Calendrier des séances",
   "diary.icon.show.list": "Liste des séances",
   "diary.icon.show.homeworkpanel": "Afficher / masquer le bandeau des travails à faire",

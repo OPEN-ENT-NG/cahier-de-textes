@@ -9,7 +9,6 @@ import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.utils.*;
-import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.vertx.java.core.Handler;
@@ -18,8 +17,6 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.*;
-
-import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 
 public class VisaServiceImpl extends SqlCrudService {
