@@ -1,0 +1,31 @@
+<span class="custom-tagsinput four">
+    <!-- CURRENT SUBJECT DISPLAY -->
+    <span id="current-subject" ng-show="!displaySearch">
+        <span class="item-display item-remove">{{ngModel.label}}
+            <span data-role="remove" style="float: right;" data-ng-click="goToSearchMode()" id="remove-subject"></span>
+        </span>
+    </span>
+
+    <!-- AUTOCOMPLETE -->
+    <div ng-show="displaySearch">
+        <input type="text" id="input-subject"
+               placeholder="Saisir une matière"
+               ng-keyup="searchSubject($event)"
+               ng-keydown="searchSubject($event)"
+               ng-model="search">
+            <!-- Subjects found -->
+            <div class="autocompletelist" ng-if="suggestedSubjects.length > 0" >
+                <div class="item-suggest"
+                 ng-repeat="suggestedSubject in suggestedSubjects"
+                 ng-click="selectSubject(suggestedSubject)"
+                 ng-class="{ selected: isSelected(suggestedSubject) }">[[suggestedSubject.label]]
+                </div>
+            </div>
+            <!-- No subjects found -->
+            <div class="autocompletelist create item-suggest" ng-if="suggestedSubjects.length === 0">
+                <div  >
+                  [[search]] <span>( Créer )</span>
+                </div>
+            </div>
+    <div>
+</span>

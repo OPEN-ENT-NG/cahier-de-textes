@@ -1,0 +1,85 @@
+/*
+Override marging for homeworks display
+*/
+
+.diary-container{
+
+  button.previous-timeslots,button.next-timeslots{
+        left : -3px;
+    }
+
+  calendar-daily-events{
+    display : none;
+    margin-left: 130px !important;
+    .days .day {
+      height:auto;
+      min-height: 100px;
+    }
+  }
+
+  .timeslots{
+    display: none;
+  }
+
+  &.diary-show-calendar{
+    .timeslots{
+      display: initial;
+    }
+    .homeworkpanel{
+      padding: 0px !important;
+    }
+
+    calendar-daily-events{
+
+      .days .day {
+        height:40px;
+        min-height:40px;
+        width:calc((100% - 131px) / 7) !important
+      }
+    }
+  }
+  &.diary-show-homeworks{
+    &:not(.diary-show-calendar){
+      .daily-events{
+        display: none;
+      }
+    }
+    calendar-daily-events{
+
+      display : initial;
+    }
+
+    .schedule-item {
+        margin-top: 40px;
+    }
+
+    .day .timeslots .timeslot:first-child{
+      margin-top: 40px;
+    }
+
+
+    legend.timeslots{
+        margin-top: 100px;
+    }
+    .next-timeslots{
+        bottom: -20px;
+
+    }
+  }
+  .schedule .days{
+    height: auto;
+  }
+
+
+
+
+  .schedule-item {
+      margin-top: 0px;
+  }
+
+
+  [resizable]{
+    transition: none !important;
+  }
+
+}

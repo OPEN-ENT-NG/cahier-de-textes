@@ -1,0 +1,35 @@
+
+.mainDiaryContainer{
+    width:97%;
+     
+    &.active{
+        width:84%;                
+    }
+}
+
+
+.quick-search{
+    .quick-search-results{
+        margin-top: 10px;
+    }
+}
+.quick-search.lessontype {
+    top: 278px;
+}
+
+.quick-search.homeworktype {
+    top: 155px;
+}
+
+.quick-search.progressiontype {
+    top: 403px;
+}
+
+.quick-search{
+    width:2%;
+    position: absolute;
+}
+
+.active .quick-search{
+    width:16%;
+}

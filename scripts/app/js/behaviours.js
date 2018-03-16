@@ -1,3 +1,5 @@
+import { Behaviours } from 'entcore';
+
 /**
  * Statement of rights to be used by the directive "behavior" or by "workflow" property to hide / display allowed behaviors like creating, updating, sharing, etc.
  * No use for share-panel Directive !

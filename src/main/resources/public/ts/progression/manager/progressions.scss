@@ -1,0 +1,167 @@
+.progression-manager{
+  width:100%;
+
+
+  .progression-article .row.hover-orange{
+    cursor: pointer;
+    label{
+     cursor : pointer;
+    }
+  }
+  .search-row{
+    padding : 8px 25px;
+  }
+  form{
+    position: relative;
+    .edit-button{
+      padding: 5px;
+      right: 5px;
+      position: absolute;
+      cursor: pointer;
+      z-index: 1;
+      font-size: 1.5em;
+    }
+  }
+  .progression-homework{
+    &>div{
+      margin-top : 15px;
+    }
+    i{
+      color:rgba(1,1,1,0.5);
+      padding-left: 15px;
+    }
+    .homework-title{
+      font-weight: bold;
+    }
+    .homework-type{
+      font-size: 0.95em;
+      font-style: italic;
+    }
+  }
+  .progression-icon-homeworks{
+    color:#7bbcf0;
+  }
+  .create-content{
+      position:absolute;
+      right: 0px;
+      top : -50px;
+  }
+
+  .pedagogic-item-container{
+
+    ul[diary-sortable-list]{      
+      overflow-y: auto;
+      width: auto;
+      padding-right: 0px;
+    }
+  }
+
+  .pedagogic-day-container{
+    i{
+      padding-left: 0px;
+    }
+    .pedagogic-day-card{
+      display: flex;
+      align-items:stretch;
+
+      div{
+        height:100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .thumbnail{
+        width : 25%;
+        font-size : 0.75em;
+        overflow: hidden;
+        text-align: center;
+        padding: 0px;
+
+      }
+      .summary{
+        margin:0px;
+        align-self:center;
+        text-align: left;
+        padding: 0px 5px;
+        width : 60%;
+        font-size : 0.85em;
+      }
+      .indicator{
+        align-self:center;
+        text-align: right;;
+        width : 15%;
+        text-align: center;
+        padding: 0px;
+      }
+    }
+  }
+}
+
+.content-not-found{
+  font-size: 2em;
+  color: #2a9cc8;
+  text-align: center;
+  vertical-align: middle;
+  div{
+    padding: 10px 100px;
+    line-height: 1.5em;
+  }
+  i {
+    position: relative;
+    top:10px;
+    font-size: 2.2em;
+    margin-right: 10px;
+  }
+  button{
+    margin: 15px auto;
+    float: none;
+  }
+}
+
+.new-progression{
+      margin: 0px 0px 15px 15px;
+      background-color: #7bbcf0;
+      color:white;
+      padding : 10px 15px;
+      border-radius: 3px;
+
+      .row{
+        margin-top: 15px;
+      }
+      div.six.cell,div.twelve.cell{
+        label{
+          text-decoration: underline;
+        }
+        padding : 5px 10px;
+      }
+      textarea{
+        border-radius: 3px;
+        background-color: #7bbcf0;
+        &::placeholder{
+          color:rgba(255,255,255,0.7);
+        }
+        &{
+          color: white;
+        }
+        &:focus {
+            outline: none;
+            border-left : 1px solid #DDD;
+            border-right : 1px solid #DDD;
+            border-top : 1px solid #DDD;
+            border-bottom: 2px solid #FF8500;
+        }
+      }
+      input{
+        width:100%;
+        &::placeholder{
+          color:rgba(255,255,255,0.7);
+        }
+
+        &[type=text]{
+          color: white;
+
+        }
+      }
+
+}

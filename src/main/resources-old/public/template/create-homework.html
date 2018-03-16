@@ -1,0 +1,104 @@
+﻿<div ng-if="display.showPanel">
+    <lightbox show="display.showPanel" on-close="closeConfirmPanel()">
+        <container template="lightbox"></container>
+    </lightbox>
+</div>
+<div>
+    <span class="float-left">
+        <h1 class="float-left margintopimportant">
+            <a href="#" ng-click="showCalendar()"><i18n>diary.title</i18n></a>&nbsp;>&nbsp;<i18n>diary.homework.label</i18n>
+        </h1>
+        <h1 ng-if="homework.state == 'draft'" class="itemstate-red">(Brouillon)</h1>
+        <h1 ng-if="homework.state == 'published'" class="itemstate-green">(Publié)</h1>
+    </span>
+    <span class="float-right">
+        <div class="row lessonHomeworkBtn">
+            <!-- publishes the current lesson ang go back to calendar view -->
+            <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'draft'" data-ng-click="homeworkform.$valid && publishHomeworkAndGoCalendarView(homework, true)">
+                <i18n>daily.item.publish</i18n>
+            </button>
+
+            <!-- save & publish homework in create mode -->
+            <button ng-if="homework.id == null" class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createAndPublishHomework(homework, true, true)">
+                <i18n>daily.item.publish</i18n>
+            </button>
+
+            <!-- share the homework -->
+            <!--
+            <button class="right-magnet" ng-click="openShareHomeworkPanel(homework)" >
+                <i18n>share</i18n>
+            </button>
+            -->
+
+            <!-- un-publishes the current lesson (back to draft mode) and go back to calendar view -->
+            <button class="right-magnet" type="submit" ng-if="homework.id && homework.state == 'published'" data-ng-click="homeworkform.$valid && publishHomeworkAndGoCalendarView(homework, false)">
+                <i18n>daily.item.unpublish</i18n>
+            </button>
+
+            <!-- save homework in draft mode -->
+            <button class="right-magnet" type="submit" data-ng-click="homeworkform.$valid && createOrUpdateHomework(true)">
+                <i18n>save</i18n>
+            </button>
+
+            <!-- go back to calendar view without saving -->
+            <button type="button" class="right-magnet cancel" ng-click="back()"><i18n>cancel</i18n></button>
+        </div>
+    </span>
+</div>
+
+<form name="homeworkform">
+    <div class="row">
+        <div class="three cell">
+            <subject-picker ng-model="homework.subject" homework="homework"></subject-picker>
+        </div>
+        <div class="three cell">
+            <span ng-class="{'valid-error' : homework.errorValid && !homework.audience.id }" >
+              <ent-dropdown placeholder="select.group.or.class" list="audiences.all" selected="homework.audience" property="name" school="currentSchool" lesson="" homework="homework">
+              </ent-dropdown>
+            </span>
+        </div>
+    </div>
+    <section class="homework-detail">
+    <div class="row">
+        <input type="text" i18n-placeholder="title" ng-model="homework.title" maxlength="50" required class="six cell" />
+        <div class="five cell right-magnet">
+            <div class="cell right-magnet">
+                &nbsp;
+                <input type="color" ng-model="homework.color">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="row">
+            <div class="three cell">
+                <label class="cell"><i18n>homework.date</i18n></label>
+                <date-picker ng-model="newItem.date" ng-change="showHomeworksLoad(homework, newItem.date.getTime())"  class="cell six"></date-picker>
+            </div>
+            <label><i18n>homework.types</i18n></label>
+            <select ng-options="type as type.label for type in homeworkTypes.all | filter:{type.structureId:homework.audience.schoolId}"
+                ng-model="homework.type">
+            </select>
+        </div>
+    </div>
+        <div>
+            <label class="cell space-right"><i18n>homework.load</i18n></label>
+            <span ng-repeat="homeworkLoad in homework.weekhomeworksload">
+            <span class="homeworksDayLoad" tooltip="[[homeworkLoad.description]]"
+                  ng-class="{ 'red': isHighHomeworkLoad(homeworkLoad), 'yellow': isMediumHomeworkLoad(homeworkLoad), 'green': isLowHomeworkLoad(homeworkLoad) }">
+                [[homeworkLoad.day]] [[homeworkLoad.numDay]]</span>
+        </span>
+        </div>
+    <div class="row">
+
+        <editor ng-if="!homeworkDescriptionIsReadOnly" ng-model="homework.description"></editor>
+        <button ng-if="!homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">
+            <i18n>description.see</i18n>
+        </button>
+        <!-- see homework.description in readonly -->
+        <div ng-if="homeworkDescriptionIsReadOnly" bind-html="homework.description" class="lessonHomeworkDescription"></div>
+        <button ng-if="homeworkDescriptionIsReadOnly" class="right-magnet cancel" type="button" ng-click="setHomeworkDescriptionMode()">
+            <i18n>description.edit</i18n>
+        </button>
+    </div>
+    </section>
+</form>

@@ -1,0 +1,24 @@
+<!-- action panel displayed if at least one lesson or homework selected -->
+<section class="toggle-buttons" ng-class="{ hide: visaManagerCtrl.selectedContent().length === 0 }" >
+    <div class="toggle">
+        <div class="row">
+            <button
+                ng-click="visaManagerCtrl.initSelectContent()"
+                confirm-popup
+                confirm-class="popup-viser"
+                confirm-template="/diary/public/js/visa/popup-valid/popup-valid.template.html" >
+                <i18n>diary.visa.action.apply</i18n>
+            </button>
+            <button
+                ng-click="visaManagerCtrl.showSelected()"
+                confirm-popup
+                confirm-class="fullscreen popup-visa-lesson-list"
+                confirm-template="/diary/public/js/visa/visa-lesson-list/visa-lesson-list.template.html" >
+                <i18n>diary.visa.action.showtovise</i18n>
+            </button>
+            <button ng-click="visaManagerCtrl.initSelectContent();visaManagerCtrl.pdf()">
+                <i18n>diary.visa.action.generatepdf</i18n>
+            </button>
+        </div>
+    </div>
+</section>

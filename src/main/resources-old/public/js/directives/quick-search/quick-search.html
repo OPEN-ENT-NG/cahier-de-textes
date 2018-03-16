@@ -1,0 +1,60 @@
+<!-- minified quick search panel -->
+<div ng-click="toogle(panelLabel)"  class="quick-search-label-minified" ng-show="!currentRightPanelVisible || currentRightPanelVisible != panelLabel"
+    diary-tooltip="[[('diary.consult.last' | translate) + ' ' + panelLabel ]]"
+    diary-tooltip-style="margin-top : -75px"
+    >
+    [[panelLabel]]    
+</div>
+
+<!-- maximized quick search panel -->
+<div class="quick-search-results" ng-show="currentRightPanelVisible == panelLabel">
+
+    <!-- Search criteria -->
+    <div ng-click="toogle()"
+         style="background-color: #ddd; padding-top: 10px; padding-left: 10px; margin-bottom: 10px;">
+
+        <label style="font-weight: bold; color: #2a9cc8;"
+               ng-click="toogle()">
+            [[panelLabel]]
+        </label>
+        <div class="close right">
+            <i diary-tooltip="Fermer" ng-click="toogle()" class="cancel-circled"></i>
+        </div>
+        <div style="background-color: #ddd">
+            <input type="text" style="background-color: white;" translate attr="placeholder" placeholder="diary.quicksearch.zoomlabel"
+                   ng-keypressed="quickSearch(true)" ng-keyup="quickSearch(true)" ng-model="multiSearch" size="16"/>
+            <br>
+            <label class="cell"><i18n>diary.quicksearch.until</i18n></label>
+            <date-picker ng-model="endDate" ng-change="quickSearch(true)" class="cell six"></date-picker>
+        </div>
+    </div>
+    <br>
+
+    <!-- Display previous items -->
+    <!-- -ng-show="isPreviousPedagogicDaysDisplayed" -->
+    <div class="quick-search-showmore row up-open"
+         ng-show="isPreviousPedagogicDaysDisplayed"
+         attr="tooltip"
+         tooltip="diary.quicksearch.previous"
+         ng-click="isPreviousPedagogicDaysDisplayed && quickSearchPreviousPedagogicDays()">
+
+    </div>
+
+    <!-- Results -->
+    <div  ng-repeat="pedagogicItemOfTheDay in quickSearchPedagogicDaysDisplayed track by $index" style="padding-left: 5px; padding-right: 5px">
+       <quick-search-item></quick-search-item>
+    </div>
+
+    <!-- display "no results" text -->
+    <div ng-if="displayNoResultsText" class="quick-search-noresults">
+        <label><i18n>diary.quicksearch.noresult</i18n></label>
+    </div>
+
+    <!-- Display next items -->
+    <div class="quick-search-showmore row down-open"
+         ng-show="isNextPedagogicDaysDisplayed"
+         attr="tooltip"
+         tooltip="diary.quicksearch.next"
+         ng-click="quickSearchNextPedagogicDays()">
+    </div>
+</div>

@@ -1,0 +1,73 @@
+button.diary-ico-button{
+  i {
+    background-color: transparent !important;
+    font-size: 32px;
+    padding: 0px !important;
+    box-shadow: initial !important;
+  }
+  padding : 8px 8px 0px 8px;
+  line-height: 24px;
+}
+
+.close{
+  position : absolute;
+  top : 8px;
+  right: 5px;
+  cursor : pointer;  
+  color: #2a9cc8;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.reservation:before {
+    content: "\e80e";
+}
+
+.arrows-cw:before {
+    content: "\e874";
+}
+
+.cog:before{
+  content : "\e854"
+}
+
+.left-open:before{
+  content : "\e87b"
+}
+
+
+.left:before{
+  content : "\e84c"
+}
+
+.pencil::before{
+  content:'\e858'
+}
+
+.lock-alt::before{
+  content : '\e860'
+}
+
+.grades::before{
+  content : '\e614'
+}
+
+.history::before{
+  content : '\e844'
+}
+
+.user::before{
+  content : '\e870'
+}
+
+.users::before{
+  content : '\e822'
+}
+
+.file-pdf::before{
+  content : '\e857'
+}
+
+.cancel-circled::before{
+  content : '\e848'
+}

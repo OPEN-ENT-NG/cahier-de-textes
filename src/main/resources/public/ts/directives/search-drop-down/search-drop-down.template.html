@@ -1,0 +1,25 @@
+<div class="seach-drop-down">
+    <div class="result" ng-if="selectedItem" ng-click="eraseSelected($event)">
+        <span>[[selectedItem.text]]</span>
+    </div>
+    <input type="text"
+        class="twelve-mobile"
+        placeholder="[[placeHolder]]"
+        ng-model="searchFilter"
+        ng-focus="showDropDown = true;eraseSelected($event)"
+        ng-change="change()"
+        ng-keypress="enter($event)"
+        ng-blur="blur()" />
+
+    <div class="drop-down scrollbar-fine" ng-if="showDropDown && itemsToShow.length > 0">
+        <div>
+            <ul class="ten cell right-magnet"  >
+                <li ng-repeat="option in itemsToShow" ng-mousedown="selectItem(option)" >
+                    <span ng-bind-html="option.hightlightedText"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>

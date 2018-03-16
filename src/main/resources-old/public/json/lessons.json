@@ -1,0 +1,10 @@
+[
+  {"lessonId":"21455", "subjectLabel":"Maths","lessonRoom":"112","lessonColor":"000000","className":"1ère F",
+    "dateLesson":"2016-02-17", "startTimeLesson":"8h00","endTimeLesson":"10h00"},
+
+  {"lessonId":"21456", "subjectLabel":"Français","lessonRoom":"114","lessonColor":"000000","className":"1ère F",
+    "dateLesson":"2016-02-17", "startTimeLesson":"10h00","endTimeLesson":"12h00"},
+
+  {"lessonId":"21457", "subjectLabel":"Physique","lessonRoom":"120","lessonColor":"000000","className":"1ère F",
+    "dateLesson":"2016-02-17", "startTimeLesson":"14h00","endTimeLesson":"15h00"}
+]

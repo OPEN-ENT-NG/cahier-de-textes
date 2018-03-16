@@ -1,3 +1,5 @@
+import {model} from 'entcore';
+
 /**
  * Date calendar pattern for url date parsing
  * @type {string}

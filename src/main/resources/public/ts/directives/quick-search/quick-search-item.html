@@ -1,0 +1,15 @@
+<!-- draggable="true" -->
+<article class="quick-search-card"
+         dragstart="drag(pedagogicItemOfTheDay, $originalEvent)"
+         dragcondition="dragCondition(pedagogicItemOfTheDay);"
+         dropcondition="dropCondition(pedagogicItemOfTheDay)"
+         ng-style="{'background-color': pedagogicItemOfTheDay.color}"
+
+         style="padding-bottom: 5px !important; padding-top: 5px !important;">
+    <em class="medium-importance" style="color: white !important;">
+        <span style="font-weight: bold;">[[pedagogicItemOfTheDay.dayFormatted]]</span>
+        <span>[[pedagogicItemOfTheDay.audience]]</span><br>
+        [[pedagogicItemOfTheDay.subject]]<br>
+        <i>[[pedagogicItemOfTheDay.title]]</i>
+    </em>
+</article>

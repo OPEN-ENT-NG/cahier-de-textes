@@ -1,3 +1,5 @@
+import {module} from 'entcore';
+
 (function() {
     'use strict';
 

@@ -1,0 +1,46 @@
+<div class="calendar-current-week">
+	  <i18n>calendar.weekfrom</i18n> [[mondayOfWeek.format('DD/MM/YYYY')]] <i18n>calendar.weekto</i18n> [[lastDay.format('DD/MM/YYYY')]]
+</div>
+<div class="week-switcher">
+	<date-picker-icon ng-model="DiaryCalendarCtrl.calendar.dayForWeek" ng-change="DiaryCalendarCtrl.updateCalendarWeek()" class="cell"></date-picker-icon>
+</div>
+<div class="schedule" drawing-zone>
+	<legend class="timeslots">
+		<div ng-repeat="timeslot in DiaryCalendarCtrl.calendar.timeSlots.all"  class="timeslot">
+			[[timeslot.beginning]]h00 - [[timeslot.end]]h00
+		</div>
+	</legend>
+	<div class="days">
+		<button class="previous-timeslots" ng-click="previousTimeslots()" ng-disabled="DiaryCalendarCtrl.calendar.timeSlots.first().beginning === 0"></button>
+		<div ng-repeat="day in DiaryCalendarCtrl.calendar.days.all" class="day">
+			<legend translate content="[[day.name]]"></legend>
+			<div class="hidden-schedule-items before" ng-if="day.scheduleItems.beforeCalendar() > 0">
+				+ [[day.scheduleItems.beforeCalendar()]]
+			</div>
+
+			<div ng-if="!DiaryCalendarCtrl.display.readonly" class="timeslots">
+				<div ng-repeat="timeslot in day.timeSlots.all" class="timeslot" ng-click="!readOnly && DiaryCalendarCtrl.createItem(day, timeslot)" diary-timeslot-item>
+
+				</div>
+			</div>
+
+			<div class="schedule-items" >
+				<div ng-repeat="item in day.scheduleItems.all" >
+					<diary-schedule-item item="item"  ng-init="item.domId='item_'+$parent.$index + '_' + $index" id="[[item.domId]]" day="day"></diary-schedule-item>
+				</div>
+			</div>
+			<div class="hidden-schedule-items after" ng-if="day.scheduleItems.afterCalendar() > 0">
+				+ [[day.scheduleItems.afterCalendar()]]
+			</div>
+		</div>
+		<button class="next-timeslots" ng-click="nextTimeslots()"  ng-disabled="DiaryCalendarCtrl.calendar.timeSlots.last().end === 24"></button>
+	</div>
+	<div class="row"></div>
+
+	<lightbox show="DiaryCalendarCtrl.display.editItem" on-close="DiaryCalendarCtrl.display.editItem = false;">
+		<container template="schedule-edit-template"></container>
+	</lightbox>
+	<lightbox show="DiaryCalendarCtrl.display.createItem" on-close="DiaryCalendarCtrl.closeCreateWindow()">
+		<container template="schedule-create-template"></container>
+	</lightbox>
+</div>
