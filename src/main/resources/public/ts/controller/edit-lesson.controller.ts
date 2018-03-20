@@ -1,6 +1,6 @@
 import {model, moment, _, notify} from 'entcore';
 import {DATE_FORMAT } from '../tools';
-import {Lesson} from '../model/Lesson.model';
+import { Lesson } from '../model/Lesson.model';
 
 import {AngularExtensions} from '../app';
 
@@ -116,7 +116,7 @@ import {AngularExtensions} from '../app';
             * load existing lesson
             */
             function loadExistingLesson() {
-                let lesson = new Lesson();
+                var lesson = new Lesson();
                 model.lesson = lesson;
                 lesson.id = parseInt($routeParams.idLesson);
 

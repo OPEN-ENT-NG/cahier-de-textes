@@ -1,11 +1,11 @@
 import {  _ } from 'entcore';
-import {Attachment} from '../model/Attachment.model';
+import { Attachment } from '../model/Attachment.model';
 
 /*
  * Attachement service as class
  * used to manipulate Attachement model
  */
-export class AttachmentService  {
+export class AttachmentService {
     /*
     *   Mapp homeworks
     */
@@ -21,7 +21,4 @@ export class AttachmentService  {
             return att;
         });
     }
-
-
-
 };

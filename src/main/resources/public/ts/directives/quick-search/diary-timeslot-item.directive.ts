@@ -1,7 +1,7 @@
 import { model, moment, _, Collection } from 'entcore';
 import {AngularExtensions} from '../../app';
-import {Homework} from '../../model/Homework.model';
-import {Lesson} from '../../model/Lesson.model';
+import { Homework } from '../../model/Homework.model';
+import { Lesson } from '../../model/Lesson.model';
 
 (function() {
     'use strict';

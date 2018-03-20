@@ -1,5 +1,5 @@
 import {_, moment, model, $http} from 'entcore';
-import {PedagogicItem} from "../model/PedagogicItem.model";
+import { PedagogicItem } from "../model/PedagogicItem.model";
 
 export class PedagogicItemService {
     static getPedagogicItems(params){

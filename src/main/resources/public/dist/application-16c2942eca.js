@@ -83,6 +83,7 @@
 	var lessons_service_1 = __webpack_require__(81);
 	var secure_service_1 = __webpack_require__(84);
 	var audiences_service_1 = __webpack_require__(85);
+	var tools_2 = __webpack_require__(3);
 	/**
 	 * Date calendar pattern for url date parsing
 	 * @type {string}
@@ -98,12 +99,12 @@
 	 * @constructor
 	 */
 	exports.DiaryController = entcore_1.ng.controller('DiaryController', [
-	    '$scope', '$rootScope', 'model', 'route', '$location', '$window', 'constants', '$sce',
-	    function ($scope, $rootScope, model, route, $location, $window, constants, $sce) {
+	    '$scope', '$rootScope', 'model', 'route', '$location', '$window', '$sce',
+	    function ($scope, $rootScope, model, route, $location, $window, $sce) {
 	        model.CourseService = courses_service_1.CourseService;
 	        model.LessonService = lessons_service_1.LessonService;
-	        $scope.constants = constants;
-	        $scope.RIGHTS = constants.RIGHTS;
+	        $scope.constants = tools_2.CONSTANTS;
+	        $scope.RIGHTS = tools_2.CONSTANTS.RIGHTS;
 	        $rootScope.model = model;
 	        $rootScope.currentRightPanelVisible = undefined; //= 'test';
 	        $rootScope.$on('edit-homework', function (_, data) {
@@ -217,7 +218,7 @@
 	                $scope.homeworkDescriptionIsReadOnly = false;
 	                //$scope.openLessonView(null, params);
 	                entcore_1.template.open('main', 'main');
-	                if (secure_service_1.SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)) {
+	                if (secure_service_1.SecureService.hasRight(tools_2.CONSTANTS.RIGHTS.CREATE_LESSON)) {
 	                    entcore_1.template.open('main-view', 'create-lesson');
 	                }
 	            },
@@ -228,7 +229,7 @@
 	            },
 	            editLessonView: function (params) {
 	                entcore_1.template.open('main', 'main');
-	                if (secure_service_1.SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)) {
+	                if (secure_service_1.SecureService.hasRight(tools_2.CONSTANTS.RIGHTS.CREATE_LESSON)) {
 	                    entcore_1.template.open('main-view', 'create-lesson');
 	                }
 	                else {
@@ -1133,7 +1134,7 @@
 	            //var nbStructures = model.me.structures.length;
 	            model.currentSchool = model.me.structures[0];
 	            audiences_service_1.AudienceService.getAudiences(model.me.structures).then(function (audiences) {
-	                model.audiences.addRange(audiences);
+	                //model.audiences.addRange(audiences);
 	                model.audiences.trigger('sync');
 	                model.audiences.trigger('change');
 	                if (typeof cb === 'function') {
@@ -1437,100 +1438,96 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var axios_1 = __webpack_require__(5);
-	var PedagogicItem = (function () {
-	    function PedagogicItem() {
-	        this.deleteModelReferences = function () {
-	            entcore_1.model.deletePedagogicItemReferences(this.id);
-	        };
-	        this.changeState = function (toPublish) {
-	            //if item is a lesson may need to upgrade his related homework
-	            if (this.type_item === 'lesson') {
-	                var relatedToLesson = entcore_1.model.pedagogicDays.getItemsByLesson(this.id);
-	                relatedToLesson.forEach(function (item) {
-	                    item.state = toPublish ? 'published' : 'draft';
-	                });
-	            }
-	            else {
-	                this.state = toPublish ? 'published' : 'draft';
-	            }
-	        };
-	        this.isPublished = function () {
-	            return this.state === 'published';
-	        };
-	        this.descriptionMaxSize = 140;
-	        this.getPreviewDescription = function () {
-	            if (this.description) {
-	                if (this.description.length >= this.descriptionMaxSize) {
-	                    this.preview_description = '<p class="itemPreview">' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
-	                }
-	                else {
-	                    this.preview_description = this.description;
-	                }
-	            }
-	            else {
-	                this.preview_description = this.description;
-	            }
-	        };
-	        this.isPublishable = function (toPublish) {
-	            return this.id && this.state == (toPublish ? 'draft' : 'published') && (this.lesson_id == null || this.lesson_id == this.id); // id test to detect free homeworks
-	        };
-	        this.delete = function (cb, cbe) {
-	            var url = (this.type_item == "lesson") ? '/diary/lesson/' : '/diary/homework/';
-	            var idToDelete = this.id;
-	            axios_1.default.delete(url + idToDelete, this).then(function (b) {
-	                entcore_1.model.deletePedagogicItemReferences(idToDelete);
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            }).catch(function (e) {
-	                if (typeof cbe === 'function') {
-	                    cbe(entcore_1.model.parseError(e));
-	                }
-	            });
-	        };
-	        this.deleteList = function (items, cb, cbe) {
-	            // split into two arrays of PedagogicItem, one for the lessons, one for the homeworks
-	            var itemsByType = []; // array of array(s)
-	            if (items.length == 1) {
-	                itemsByType.push(items);
-	            }
-	            else {
-	                itemsByType = entcore_1._.partition(items, function (item) {
-	                    return item.type_item === 'lesson';
-	                });
-	            }
-	            var countdown = 0;
-	            if (itemsByType.length > 0) {
-	                countdown = itemsByType.length;
-	                itemsByType.forEach(function (arrayForTypeItem) {
-	                    if (arrayForTypeItem.length > 0) {
-	                        entcore_1.model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function () {
-	                            countdown--;
-	                            if (countdown == 0) {
-	                                if (typeof cb === 'function') {
-	                                    cb();
-	                                }
-	                            }
-	                        }, cbe);
-	                    }
-	                    else {
-	                        countdown--;
-	                    }
-	                });
-	            }
-	        };
-	        this.isFiltered = function () {
-	            if (entcore_1.model.searchForm.selectedSubject != null) {
-	                return !(this.subject === entcore_1.model.searchForm.selectedSubject);
-	            }
-	            return false;
-	        };
-	        this.selected = false;
-	    }
-	    return PedagogicItem;
-	}());
+	function PedagogicItem() {
+	    this.selected = false;
+	}
 	exports.PedagogicItem = PedagogicItem;
-	;
+	PedagogicItem.prototype.deleteModelReferences = function () {
+	    entcore_1.model.deletePedagogicItemReferences(this.id);
+	};
+	PedagogicItem.prototype.changeState = function (toPublish) {
+	    //if item is a lesson may need to upgrade his related homework
+	    if (this.type_item === 'lesson') {
+	        var relatedToLesson = entcore_1.model.pedagogicDays.getItemsByLesson(this.id);
+	        relatedToLesson.forEach(function (item) {
+	            item.state = toPublish ? 'published' : 'draft';
+	        });
+	    }
+	    else {
+	        this.state = toPublish ? 'published' : 'draft';
+	    }
+	};
+	PedagogicItem.prototype.isPublished = function () {
+	    return this.state === 'published';
+	};
+	PedagogicItem.prototype.descriptionMaxSize = 140;
+	PedagogicItem.prototype.getPreviewDescription = function () {
+	    if (this.description) {
+	        if (this.description.length >= this.descriptionMaxSize) {
+	            this.preview_description = '<p class="itemPreview">' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
+	        }
+	        else {
+	            this.preview_description = this.description;
+	        }
+	    }
+	    else {
+	        this.preview_description = this.description;
+	    }
+	};
+	PedagogicItem.prototype.isPublishable = function (toPublish) {
+	    return this.id && this.state == (toPublish ? 'draft' : 'published') && (this.lesson_id == null || this.lesson_id == this.id); // id test to detect free homeworks
+	};
+	PedagogicItem.prototype.delete = function (cb, cbe) {
+	    var url = (this.type_item == "lesson") ? '/diary/lesson/' : '/diary/homework/';
+	    var idToDelete = this.id;
+	    axios_1.default.delete(url + idToDelete, this).then(function (b) {
+	        entcore_1.model.deletePedagogicItemReferences(idToDelete);
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    }).catch(function (e) {
+	        if (typeof cbe === 'function') {
+	            cbe(entcore_1.model.parseError(e));
+	        }
+	    });
+	};
+	PedagogicItem.prototype.deleteList = function (items, cb, cbe) {
+	    // split into two arrays of PedagogicItem, one for the lessons, one for the homeworks
+	    var itemsByType = []; // array of array(s)
+	    if (items.length == 1) {
+	        itemsByType.push(items);
+	    }
+	    else {
+	        itemsByType = entcore_1._.partition(items, function (item) {
+	            return item.type_item === 'lesson';
+	        });
+	    }
+	    var countdown = 0;
+	    if (itemsByType.length > 0) {
+	        countdown = itemsByType.length;
+	        itemsByType.forEach(function (arrayForTypeItem) {
+	            if (arrayForTypeItem.length > 0) {
+	                entcore_1.model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function () {
+	                    countdown--;
+	                    if (countdown == 0) {
+	                        if (typeof cb === 'function') {
+	                            cb();
+	                        }
+	                    }
+	                }, cbe);
+	            }
+	            else {
+	                countdown--;
+	            }
+	        });
+	    }
+	};
+	PedagogicItem.prototype.isFiltered = function () {
+	    if (entcore_1.model.searchForm.selectedSubject != null) {
+	        return !(this.subject === entcore_1.model.searchForm.selectedSubject);
+	    }
+	    return false;
+	};
 
 
 /***/ }),
@@ -3261,214 +3258,219 @@
 	var entcore_1 = __webpack_require__(1);
 	var axios_1 = __webpack_require__(5);
 	var tools_1 = __webpack_require__(3);
-	var Homework = (function () {
-	    function Homework() {
-	        this.expanded = false;
-	        /**
-	         * Delete calendar references of current homework
-	         */
-	        this.deleteModelReferences = function () {
-	            var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
-	            // delete homework in calendar cache
-	            if (idxHomeworkToDelete >= 0) {
-	                entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
-	            }
-	        };
-	        /**
-	         * Adds an attachment
-	         * @param attachment
-	         */
-	        this.addAttachment = function (attachment) {
-	            this.attachments.push(attachment);
-	        };
-	        /**
-	         * Removes attachment associated to this lesson
-	         * @param attachment
-	         * @param cb
-	         * @param cbe
-	         */
-	        this.detachAttachment = function (attachment, cb, cbe) {
-	            attachment.detachFromItem(this.id, 'lesson', cb, cbe);
-	        };
-	        this.api = {
-	            delete: '/diary/homework/:id'
-	        };
-	        this.save = function (cb, cbe) {
-	            var that = this;
-	            var promise = entcore_1.model.$q().when({});
-	            if (!this.subject.id) {
-	                promise = this.subject.save();
-	            }
-	            return promise.then(function () {
-	                if (that.id) {
-	                    return that.update(cb, cbe);
-	                }
-	                else {
-	                    return that.create(cb, cbe);
-	                }
-	            });
-	        };
-	        /**
-	         * Returns true if current homework is attached to a lesson
-	         * @returns {boolean}
-	         */
-	        this.isAttachedToLesson = function () {
-	            return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
-	        };
-	        this.isDraft = function () {
-	            return this.state === "draft";
-	        };
-	        this.isPublished = function () {
-	            return !this.isDraft();
-	        };
-	        /**
-	         * A directly publishable homework must exist in database and not linked to a lesson
-	         * @param toPublish
-	         * @returns {*|boolean} true if homework can be published directly
-	         */
-	        this.isPublishable = function (toPublish) {
-	            return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
-	        };
-	        this.changeState = function (toPublish) {
-	            this.state = toPublish ? 'published' : 'draft';
-	        };
-	        this.update = function (cb, cbe) {
-	            var url = '/diary/homework/' + this.id;
-	            var homework = this;
-	            return entcore_1.model.getHttp()({
-	                method: 'PUT',
-	                url: url,
-	                data: homework
-	            }).then(function () {
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            }).catch(function (e) {
-	                if (cbe) {
-	                    cbe();
-	                }
-	            });
-	        };
-	        this.create = function (cb, cbe) {
-	            var homework = this;
-	            entcore_1.model.getHttp()({
-	                method: 'POST',
-	                url: '/diary/homework',
-	                data: homework
-	            }).then(function (result) {
-	                homework.updateData(result.data);
-	                entcore_1.model.homeworks.pushAll([homework]);
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                return result.data;
-	            }).catch(function (e) {
-	                if (cbe) {
-	                    cbe();
-	                }
-	            });
-	        };
-	        /**
-	         * Load homework object from id
-	         * @param cb Callback function
-	         * @param cbe Callback on error function
-	         */
-	        this.load = function (cb, cbe) {
-	            var homework = this;
-	            axios_1.default.get('/diary/homework/' + homework.id)
-	                .then(function (res) {
-	                homework.updateData(tools_1.sqlToJsHomework(res.data));
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            })
-	                .catch(function (e) {
-	                if (typeof cbe === 'function') {
-	                    cbe(entcore_1.model.parseError(e));
-	                }
-	            });
-	        };
-	        /**
-	         * Deletes a list of homeworks
-	         * @param homeworks Homeworks to be deleted
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.deleteList = function (homeworks, cb, cbe) {
-	            entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
-	        };
-	        /**
-	         * Deletes the homework
-	         * @param Optional lesson attached to homework
-	         * @param cb Callback after delete
-	         * @param cbe Callback on error
-	         */
-	        this.delete = function (lesson, cb, cbe) {
-	            var homework = this;
-	            var deleteHomeworkReferences = function () {
-	                // delete homework from calendar cache
-	                entcore_1.model.homeworks.forEach(function (modelHomework) {
-	                    if (modelHomework.id === homework.id) {
-	                        entcore_1.model.homeworks.remove(modelHomework);
-	                    }
-	                });
-	                if (lesson && lesson.homeworks) {
-	                    lesson.homeworks.remove(homework);
-	                }
-	            };
-	            if (this.id) {
-	                axios_1.default.delete('/diary/homework/' + this.id)
-	                    .then(function (b) {
-	                    deleteHomeworkReferences();
-	                    if (typeof cb === 'function') {
-	                        cb();
-	                    }
-	                })
-	                    .catch(function (error) {
-	                    if (typeof cbe === 'function') {
-	                        cbe(entcore_1.model.parseError(error));
-	                    }
-	                });
-	            }
-	            else {
-	                deleteHomeworkReferences();
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            }
-	        };
-	        this.toJSON = function () {
-	            var json = {
-	                homework_title: this.title,
-	                subject_id: this.subject.id,
-	                homework_type_id: this.type.id,
-	                teacher_id: entcore_1.model.me.userId,
-	                school_id: this.audience.structureId,
-	                audience_id: this.audience.id,
-	                homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
-	                homework_description: this.description,
-	                homework_color: this.color,
-	                homework_state: this.state,
-	                // used to auto create postgresql diary.audience if needed
-	                // not this.audience object is originally from neo4j graph (see syncAudiences function)
-	                audience_type: this.audience.type,
-	                audience_name: this.audience.name,
-	                attachments: this.attachments
-	            };
-	            if (this.lesson_id) {
-	                json.lesson_id = this.lesson_id;
-	            }
-	            /*if (!this.id) {
-	                created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
-	            }*/
-	            return json;
-	        };
-	        this.expanded = false;
+	function Homework() {
+	    /**
+	     * used in ui in homework tab in lesson view
+	     * @type {boolean}
+	     */
+	    this.expanded = false;
+	    /**
+	     * Attachments
+	     */
+	    if (!this.attachments) {
+	        this.attachments = new Array();
 	    }
-	    return Homework;
-	}());
+	    /**
+	     * Delete calendar references of current homework
+	     */
+	    this.deleteModelReferences = function () {
+	        var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
+	        // delete homework in calendar cache
+	        if (idxHomeworkToDelete >= 0) {
+	            entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
+	        }
+	    };
+	    /**
+	     * Adds an attachment
+	     * @param attachment
+	     */
+	    this.addAttachment = function (attachment) {
+	        this.attachments.push(attachment);
+	    };
+	    /**
+	     * Removes attachment associated to this lesson
+	     * @param attachment
+	     * @param cb
+	     * @param cbe
+	     */
+	    this.detachAttachment = function (attachment, cb, cbe) {
+	        attachment.detachFromItem(this.id, 'lesson', cb, cbe);
+	    };
+	}
 	exports.Homework = Homework;
-	;
+	Homework.prototype.api = {
+	    delete: '/diary/homework/:id'
+	};
+	Homework.prototype.save = function (cb, cbe) {
+	    var that = this;
+	    var promise = entcore_1.model.$q().when({});
+	    if (!this.subject.id) {
+	        promise = this.subject.save();
+	    }
+	    return promise.then(function () {
+	        if (that.id) {
+	            return that.update(cb, cbe);
+	        }
+	        else {
+	            return that.create(cb, cbe);
+	        }
+	    });
+	};
+	/**
+	 * Returns true if current homework is attached to a lesson
+	 * @returns {boolean}
+	 */
+	Homework.prototype.isAttachedToLesson = function () {
+	    return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
+	};
+	Homework.prototype.isDraft = function () {
+	    return this.state === "draft";
+	};
+	Homework.prototype.isPublished = function () {
+	    return !this.isDraft();
+	};
+	/**
+	 * A directly publishable homework must exist in database and not linked to a lesson
+	 * @param toPublish
+	 * @returns {*|boolean} true if homework can be published directly
+	 */
+	Homework.prototype.isPublishable = function (toPublish) {
+	    return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
+	};
+	Homework.prototype.changeState = function (toPublish) {
+	    this.state = toPublish ? 'published' : 'draft';
+	};
+	Homework.prototype.update = function (cb, cbe) {
+	    var url = '/diary/homework/' + this.id;
+	    var homework = this;
+	    return entcore_1.model.getHttp()({
+	        method: 'PUT',
+	        url: url,
+	        data: homework
+	    }).then(function () {
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    }).catch(function (e) {
+	        if (cbe) {
+	            cbe();
+	        }
+	    });
+	};
+	Homework.prototype.create = function (cb, cbe) {
+	    var homework = this;
+	    entcore_1.model.getHttp()({
+	        method: 'POST',
+	        url: '/diary/homework',
+	        data: homework
+	    }).then(function (result) {
+	        homework.updateData(result.data);
+	        entcore_1.model.homeworks.pushAll([homework]);
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	        return result.data;
+	    }).catch(function (e) {
+	        if (cbe) {
+	            cbe();
+	        }
+	    });
+	};
+	/**
+	 * Load homework object from id
+	 * @param cb Callback function
+	 * @param cbe Callback on error function
+	 */
+	Homework.prototype.load = function (cb, cbe) {
+	    var homework = this;
+	    axios_1.default.get('/diary/homework/' + homework.id)
+	        .then(function (res) {
+	        homework.updateData(tools_1.sqlToJsHomework(res.data));
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    })
+	        .catch(function (e) {
+	        if (typeof cbe === 'function') {
+	            cbe(entcore_1.model.parseError(e));
+	        }
+	    });
+	};
+	/**
+	 * Deletes a list of homeworks
+	 * @param homeworks Homeworks to be deleted
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Homework.prototype.deleteList = function (homeworks, cb, cbe) {
+	    entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
+	};
+	/**
+	 * Deletes the homework
+	 * @param Optional lesson attached to homework
+	 * @param cb Callback after delete
+	 * @param cbe Callback on error
+	 */
+	Homework.prototype.delete = function (lesson, cb, cbe) {
+	    var homework = this;
+	    var deleteHomeworkReferences = function () {
+	        // delete homework from calendar cache
+	        entcore_1.model.homeworks.forEach(function (modelHomework) {
+	            if (modelHomework.id === homework.id) {
+	                entcore_1.model.homeworks.remove(modelHomework);
+	            }
+	        });
+	        if (lesson && lesson.homeworks) {
+	            lesson.homeworks.remove(homework);
+	        }
+	    };
+	    if (this.id) {
+	        axios_1.default.delete('/diary/homework/' + this.id)
+	            .then(function (b) {
+	            deleteHomeworkReferences();
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        })
+	            .catch(function (error) {
+	            if (typeof cbe === 'function') {
+	                cbe(entcore_1.model.parseError(error));
+	            }
+	        });
+	    }
+	    else {
+	        deleteHomeworkReferences();
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    }
+	};
+	Homework.prototype.toJSON = function () {
+	    var json = {
+	        homework_title: this.title,
+	        subject_id: this.subject.id,
+	        homework_type_id: this.type.id,
+	        teacher_id: entcore_1.model.me.userId,
+	        school_id: this.audience.structureId,
+	        audience_id: this.audience.id,
+	        homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
+	        homework_description: this.description,
+	        homework_color: this.color,
+	        homework_state: this.state,
+	        // used to auto create postgresql diary.audience if needed
+	        // not this.audience object is originally from neo4j graph (see syncAudiences function)
+	        audience_type: this.audience.type,
+	        audience_name: this.audience.name,
+	        attachments: this.attachments
+	    };
+	    if (this.lesson_id) {
+	        json.lesson_id = this.lesson_id;
+	    }
+	    /*if (!this.id) {
+	        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
+	    }*/
+	    return json;
+	};
 
 
 /***/ }),
@@ -3482,344 +3484,346 @@
 	var Homework_model_1 = __webpack_require__(32);
 	var Subject_model_1 = __webpack_require__(34);
 	var model_1 = __webpack_require__(35);
-	var Lesson = (function () {
-	    function Lesson(data) {
-	        var _this = this;
-	        this.api = { delete: '/diary/lesson/:id' };
-	        /**
-	         * Adds an attachment
-	         * @param attachment
-	         */
-	        this.addAttachment = function (attachment) {
-	            this.attachments.push(attachment);
-	        };
-	        /**
-	         * Delete calendar references of current lesson
-	         */
-	        this.deleteModelReferences = function () {
-	            var that = _this;
-	            entcore_1.model.lessons.forEach(function (lesson) {
-	                if (lesson.id === that.id) {
-	                    entcore_1.model.lessons.remove(lesson);
-	                }
-	            });
-	            // delete associated homeworks references
-	            var lessonHomeworks = entcore_1.model.homeworks.filter(function (homework) {
-	                return homework && homework.lesson_id === that.id;
-	            });
-	            lessonHomeworks.forEach(function (homework) {
-	                entcore_1.model.homeworks.remove(homework);
-	            });
-	        };
-	        /**
-	         * Triggered when lesson item has stopped being dragged in calendar view
-	         * see angular-app.js scheduleItemEl.on('stopDrag').
-	         * Will auto-save lesson in db on item move/resize
-	         * @param cb
-	         * @param cbe
-	         */
-	        this.calendarUpdate = function (cb, cbe) {
-	            // TODO date fields types are kinda messy
-	            // toJson method needs date fields to be in some specific format
-	            if (this.beginning) {
-	                this.date = this.beginning;
-	                this.startMoment = this.beginning;
-	                this.endMoment = this.end;
-	                this.startTime = this.startMoment;
-	                this.endTime = this.endMoment;
-	            }
-	            if (this.id) {
-	                this.update(function () {
-	                    //model.refresh();
-	                }, function (error) {
-	                    entcore_1.model.parseError(error);
-	                });
-	            }
-	        };
-	        /**
-	         * Save attached homeworks of lesson
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.saveHomeworks = function (cb, cbe) {
-	            var deferred = entcore_1.model.$q().defer();
-	            var homeworkSavedCount = 0;
-	            var homeworkCount = this.homeworks ? this.homeworks.all.length : 0;
-	            var that = this;
-	            // make sure subject and audience of homeworks are
-	            // same as the lesson
-	            if (homeworkCount > 0) {
-	                this.homeworks.forEach(function (homework) {
-	                    homework.lesson_id = that.id;
-	                    // needed fields as in model.js Homework.prototype.toJSON
-	                    homework.audience = that.audience;
-	                    homework.subject = that.subject;
-	                    homework.color = that.color;
-	                    homework.state = that.state;
-	                    homework.save().then(function () {
-	                        homeworkSavedCount++;
-	                        // callback function once all homeworks saved
-	                        if (homeworkSavedCount === homeworkCount) {
-	                            if (typeof cb === 'function') {
-	                                cb();
-	                            }
-	                            deferred.resolve();
-	                        }
-	                    });
-	                });
-	            }
-	            else {
-	                deferred.resolve();
-	            }
-	            return deferred.promise;
-	        };
-	        /**
-	         * Save lesson and attached homeworks
-	         * and sync calendar lessons and homeworks cache
-	         * @param cb
-	         * @param cbe
-	         */
-	        this.save = function (cb, cbe) {
-	            // startTime used for db save but startMoment in calendar view
-	            // startMoment day is given by lesson.date
-	            this.startMoment = entcore_1.model.getMomentDateTimeFromDateAndMomentTime(this.date, entcore_1.moment(this.startTime));
-	            this.endMoment = entcore_1.model.getMomentDateTimeFromDateAndMomentTime(this.date, entcore_1.moment(this.endTime));
-	            var that = this;
-	            var subjectPromise = entcore_1.model.$q().when();
-	            var lessonPromise;
-	            if (!this.subject.id) {
-	                subjectPromise = this.subject.save();
-	            }
-	            return subjectPromise.then(function () {
-	                if (that.id) {
-	                    lessonPromise = that.update();
-	                }
-	                else {
-	                    lessonPromise = that.create();
-	                }
-	                return lessonPromise.then(function () {
-	                    return that.saveHomeworks().then(function () {
-	                        return tools_1.syncLessonsAndHomeworks(cb);
-	                    });
-	                });
-	            });
-	        };
-	        /**
-	         *
-	         * @param idHomework
-	         * @returns {boolean}
-	         */
-	        this.hasHomeworkWithId = function (idHomework) {
-	            var found = false;
-	            if (!idHomework || !this.homeworks) {
-	                found = false;
-	            }
-	            this.homeworks.forEach(function (homework) {
-	                if (homework.id === idHomework) {
-	                    found = true;
-	                }
-	            });
-	            return found;
-	        };
-	        this.update = function (cb, cbe) {
-	            var url = '/diary/lesson/' + this.id;
-	            var lesson = this;
-	            return entcore_1.model.getHttp()({
-	                method: 'PUT',
-	                url: url,
-	                data: lesson
-	            }).then(function () {
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            });
-	        };
-	        this.create = function (cb, cbe) {
-	            var lesson = this;
-	            var subject = entcore_1.model.subjects.all.find(function (l) { return l.label = lesson.subject.label; });
-	            var createSubjectPromise = entcore_1.model.$q().when();
-	            if (!subject) {
-	                createSubjectPromise = entcore_1.model.createSubject(lesson.subject.label).then(function (newSubject) {
-	                    lesson.subject = newSubject;
-	                });
-	            }
-	            else {
-	                lesson.subject = subject;
-	            }
-	            return createSubjectPromise.then(function () {
-	                return entcore_1.model.getHttp()({
-	                    method: 'POST',
-	                    url: '/diary/lesson',
-	                    data: lesson
-	                }).then(function (result) {
-	                    lesson.updateData(result.data);
-	                    entcore_1.model.lessons.pushAll([lesson]);
-	                    if (typeof cb === 'function') {
-	                        cb();
-	                    }
-	                });
-	            });
-	        };
-	        /**
-	         * Deletes the lesson
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.delete = function (cb, cbe) {
-	            var lesson = this;
-	            entcore_1.model.getHttp()({
-	                method: 'DELETE',
-	                url: '/diary/lesson/' + this.id,
-	                data: lesson
-	            }).then(function (b) {
-	                lesson.deleteModelReferences();
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            });
-	        };
-	        /**
-	         * Deletes a list of lessons
-	         * @param lessons Lessons to be deleted
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.deleteList = function (lessons, cb, cbe) {
-	            entcore_1.model.deleteItemList(lessons, 'lesson', cb, cbe);
-	        };
-	        /**
-	         * Load lesson object from id
-	         * @param cb Callback function
-	         * @param cbe Callback on error function
-	         */
-	        this.load = function (loadHomeworks, cb, cbe) {
-	            var lesson = this;
-	            var url = '/diary/lesson/';
-	            if (entcore_1.model.getSecureService().hasRight(entcore_1.model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)) {
-	                url = '/diary/lesson/external/';
-	            }
-	            return entcore_1.model.getHttp()({
-	                method: 'GET',
-	                url: url + lesson.id
-	            }).then(function (result) {
-	                lesson.updateData(entcore_1.model.LessonService.mapLesson(result.data));
-	                if (loadHomeworks) {
-	                    entcore_1.model.loadHomeworksForLesson(lesson, cb, cbe);
-	                }
-	                else {
-	                    if (typeof cb === 'function') {
-	                        cb();
-	                    }
-	                }
-	            });
-	        };
-	        /**
-	         * Publishes the lesson
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.publish = function (cb, cbe) {
-	            var jsonLesson = new Lesson();
-	            jsonLesson.id = this.id;
-	            jsonLesson.audience.structureId = this.structureId;
-	            return entcore_1.model.getHttp()({
-	                method: 'POST',
-	                url: '/diary/lesson/publish',
-	                data: jsonLesson
-	            }).then(function () {
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            });
-	        };
-	        /**
-	         *
-	         * JSON object corresponding to sql diary.lesson table columns
-	         */
-	        this.toJSON = function () {
-	            var json = {
-	                lesson_id: this.id,
-	                subject_id: this.subject.id,
-	                school_id: this.audience.structureId,
-	                // TODO missing teacher_id
-	                audience_id: this.audience.id,
-	                lesson_title: this.title,
-	                lesson_color: this.color,
-	                lesson_date: entcore_1.moment(this.date).format(tools_1.DATE_FORMAT),
-	                lesson_start_time: entcore_1.moment(this.startTime).format('HH:mm'),
-	                lesson_end_time: entcore_1.moment(this.endTime).format('HH:mm'),
-	                lesson_description: this.description,
-	                lesson_annotation: this.annotations,
-	                lesson_state: this.state,
-	                // start columns not in lesson table TODO move
-	                audience_type: this.audience.type,
-	                audience_name: this.audience.name,
-	                attachments: this.attachments
-	            };
-	            if (this.room) {
-	                json.lesson_room = this.room;
-	            }
-	            return json;
-	        };
-	        this.addHomework = function (cb) {
-	            var date = entcore_1.moment.isMoment(this.startTime) ? this.startTime : (this.startMoment ? this.startMoment : entcore_1.moment());
-	            var dueDate = date.second(0);
-	            var homework = entcore_1.model.initHomework(dueDate, this);
-	            this.homeworks.push(homework);
-	        };
-	        this.deleteHomework = function (homework) {
-	            homework.delete();
-	            homework = new Homework_model_1.Homework();
-	            homework.dueDate = this.date;
-	            homework.type = entcore_1.model.homeworkTypes.first();
-	            this.homeworks.push(homework);
-	        };
-	        this.isDraft = function () {
-	            return this.state === "draft";
-	        };
-	        this.isPublished = function () {
-	            return !this.isDraft();
-	        };
-	        this.isPublishable = function (toPublish) {
-	            return this.id && this.state == (toPublish ? 'draft' : 'published');
-	        };
-	        /**
-	         * Change state of current and associated homeworks
-	         * @param isPublished
-	         */
-	        this.changeState = function (isPublished) {
-	            this.state = isPublished ? 'published' : 'draft';
-	            var that = this;
-	            // change state of associated homeworks
-	            this.homeworks.forEach(function (homework) {
-	                var lessonHomework = homework;
-	                homework.state = isPublished ? 'published' : 'draft';
-	                var found = false;
-	            });
-	            // change state of homeworks cache in calendar for current week
-	            entcore_1.model.homeworks.all.filter(function (h) { return h.lesson_id = that.id; }).forEach(function (homeworkCache) {
-	                homeworkCache.state = that.state;
-	            });
-	        };
-	        this.selected = false;
-	        //this.collection(Attachment);
-	        // initialize homeworks collection (see lib.js)
-	        if (!this.homeworks) {
-	            entcore_1.collection(Homework_model_1.Homework);
-	        }
-	        this.subject = (data) ? data.subject : new Subject_model_1.Subject();
-	        this.audience = (data) ? data.audience : new model_1.Audience();
-	        /**
-	         *
-	         * Attachments
-	         */
-	        if (!this.attachments) {
-	            this.attachments = new Array();
-	        }
+	function Lesson(data) {
+	    this.selected = false;
+	    //this.collection(Attachment);
+	    // initialize homeworks collection (see lib.js)
+	    if (!this.homeworks) {
+	        this.collection(Homework_model_1.Homework);
 	    }
-	    return Lesson;
-	}());
+	    this.subject = (data) ? data.subject : new Subject_model_1.Subject();
+	    this.audience = (data) ? data.audience : new model_1.Audience();
+	    /**
+	     *
+	     * Attachments
+	     */
+	    if (!this.attachments) {
+	        this.attachments = new Array();
+	    }
+	    var that = this;
+	    /**
+	     * Adds an attachment
+	     * @param attachment
+	     */
+	    this.addAttachment = function (attachment) {
+	        this.attachments.push(attachment);
+	    };
+	    /**
+	     * Delete calendar references of current lesson
+	     */
+	    this.deleteModelReferences = function () {
+	        entcore_1.model.lessons.forEach(function (lesson) {
+	            if (lesson.id === that.id) {
+	                entcore_1.model.lessons.remove(lesson);
+	            }
+	        });
+	        // delete associated homeworks references
+	        var lessonHomeworks = entcore_1.model.homeworks.filter(function (homework) {
+	            return homework && homework.lesson_id === that.id;
+	        });
+	        lessonHomeworks.forEach(function (homework) {
+	            entcore_1.model.homeworks.remove(homework);
+	        });
+	    };
+	}
 	exports.Lesson = Lesson;
+	Lesson.prototype.api = {
+	    delete: '/diary/lesson/:id'
+	};
+	/**
+	 * Triggered when lesson item has stopped being dragged in calendar view
+	 * see angular-app.js scheduleItemEl.on('stopDrag').
+	 * Will auto-save lesson in db on item move/resize
+	 * @param cb
+	 * @param cbe
+	 */
+	Lesson.prototype.calendarUpdate = function (cb, cbe) {
+	    // TODO date fields types are kinda messy
+	    // toJson method needs date fields to be in some specific format
+	    if (this.beginning) {
+	        this.date = this.beginning;
+	        this.startMoment = this.beginning;
+	        this.endMoment = this.end;
+	        this.startTime = this.startMoment;
+	        this.endTime = this.endMoment;
+	    }
+	    if (this.id) {
+	        this.update(function () {
+	            //model.refresh();
+	        }, function (error) {
+	            entcore_1.model.parseError(error);
+	        });
+	    }
+	};
+	/**
+	 * Save attached homeworks of lesson
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Lesson.prototype.saveHomeworks = function (cb, cbe) {
+	    var deferred = entcore_1.model.$q().defer();
+	    var homeworkSavedCount = 0;
+	    var homeworkCount = this.homeworks ? this.homeworks.all.length : 0;
+	    var that = this;
+	    // make sure subject and audience of homeworks are
+	    // same as the lesson
+	    if (homeworkCount > 0) {
+	        this.homeworks.forEach(function (homework) {
+	            homework.lesson_id = that.id;
+	            // needed fields as in model.js Homework.prototype.toJSON
+	            homework.audience = that.audience;
+	            homework.subject = that.subject;
+	            homework.color = that.color;
+	            homework.state = that.state;
+	            homework.save().then(function () {
+	                homeworkSavedCount++;
+	                // callback function once all homeworks saved
+	                if (homeworkSavedCount === homeworkCount) {
+	                    if (typeof cb === 'function') {
+	                        cb();
+	                    }
+	                    deferred.resolve();
+	                }
+	            });
+	        });
+	    }
+	    else {
+	        deferred.resolve();
+	    }
+	    return deferred.promise;
+	};
+	/**
+	 * Save lesson and attached homeworks
+	 * and sync calendar lessons and homeworks cache
+	 * @param cb
+	 * @param cbe
+	 */
+	Lesson.prototype.save = function (cb, cbe) {
+	    // startTime used for db save but startMoment in calendar view
+	    // startMoment day is given by lesson.date
+	    this.startMoment = entcore_1.model.getMomentDateTimeFromDateAndMomentTime(this.date, entcore_1.moment(this.startTime));
+	    this.endMoment = entcore_1.model.getMomentDateTimeFromDateAndMomentTime(this.date, entcore_1.moment(this.endTime));
+	    var that = this;
+	    var subjectPromise = entcore_1.model.$q().when();
+	    var lessonPromise;
+	    if (!this.subject.id) {
+	        subjectPromise = this.subject.save();
+	    }
+	    return subjectPromise.then(function () {
+	        if (that.id) {
+	            lessonPromise = that.update();
+	        }
+	        else {
+	            lessonPromise = that.create();
+	        }
+	        return lessonPromise.then(function () {
+	            return that.saveHomeworks().then(function () {
+	                return tools_1.syncLessonsAndHomeworks(cb);
+	            });
+	        });
+	    });
+	};
+	/**
+	 *
+	 * @param idHomework
+	 * @returns {boolean}
+	 */
+	Lesson.prototype.hasHomeworkWithId = function (idHomework) {
+	    var found = false;
+	    if (!idHomework || !this.homeworks) {
+	        found = false;
+	    }
+	    this.homeworks.forEach(function (homework) {
+	        if (homework.id === idHomework) {
+	            found = true;
+	        }
+	    });
+	    return found;
+	};
+	Lesson.prototype.update = function (cb, cbe) {
+	    var url = '/diary/lesson/' + this.id;
+	    var lesson = this;
+	    return entcore_1.model.getHttp()({
+	        method: 'PUT',
+	        url: url,
+	        data: lesson
+	    }).then(function () {
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    });
+	};
+	Lesson.prototype.create = function (cb, cbe) {
+	    var lesson = this;
+	    var subject = entcore_1.model.subjects.all.find(function (l) {
+	        return l.label = lesson.subject.label;
+	    });
+	    var createSubjectPromise = entcore_1.model.$q().when();
+	    if (!subject) {
+	        createSubjectPromise = entcore_1.model.createSubject(lesson.subject.label).then(function (newSubject) {
+	            lesson.subject = newSubject;
+	        });
+	    }
+	    else {
+	        lesson.subject = subject;
+	    }
+	    return createSubjectPromise.then(function () {
+	        return entcore_1.model.getHttp()({
+	            method: 'POST',
+	            url: '/diary/lesson',
+	            data: lesson
+	        }).then(function (result) {
+	            lesson.updateData(result.data);
+	            entcore_1.model.lessons.pushAll([lesson]);
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        });
+	    });
+	};
+	/**
+	 * Deletes the lesson
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Lesson.prototype.delete = function (cb, cbe) {
+	    var lesson = this;
+	    entcore_1.model.getHttp()({
+	        method: 'DELETE',
+	        url: '/diary/lesson/' + this.id,
+	        data: lesson
+	    }).then(function (b) {
+	        lesson.deleteModelReferences();
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    });
+	};
+	/**
+	 * Deletes a list of lessons
+	 * @param lessons Lessons to be deleted
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Lesson.prototype.deleteList = function (lessons, cb, cbe) {
+	    entcore_1.model.deleteItemList(lessons, 'lesson', cb, cbe);
+	};
+	/**
+	 * Load lesson object from id
+	 * @param cb Callback function
+	 * @param cbe Callback on error function
+	 */
+	Lesson.prototype.load = function (loadHomeworks, cb, cbe) {
+	    var lesson = this;
+	    var url = '/diary/lesson/';
+	    if (entcore_1.model.getSecureService().hasRight(entcore_1.model.getConstants().RIGHTS.SHOW_OTHER_TEACHER)) {
+	        url = '/diary/lesson/external/';
+	    }
+	    return entcore_1.model.getHttp()({
+	        method: 'GET',
+	        url: url + lesson.id
+	    }).then(function (result) {
+	        lesson.updateData(entcore_1.model.LessonService.mapLesson(result.data));
+	        if (loadHomeworks) {
+	            entcore_1.model.loadHomeworksForLesson(lesson, cb, cbe);
+	        }
+	        else {
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        }
+	    });
+	};
+	/**
+	 * Publishes the lesson
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Lesson.prototype.publish = function (cb, cbe) {
+	    var jsonLesson = new Lesson();
+	    jsonLesson.id = this.id;
+	    jsonLesson.audience.structureId = this.structureId;
+	    return entcore_1.model.getHttp()({
+	        method: 'POST',
+	        url: '/diary/lesson/publish',
+	        data: jsonLesson
+	    }).then(function () {
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    });
+	};
+	/**
+	 *
+	 * JSON object corresponding to sql diary.lesson table columns
+	 */
+	Lesson.prototype.toJSON = function () {
+	    var json = {
+	        lesson_id: this.id,
+	        subject_id: this.subject.id,
+	        school_id: this.audience.structureId,
+	        // TODO missing teacher_id
+	        audience_id: this.audience.id,
+	        lesson_title: this.title,
+	        lesson_color: this.color,
+	        lesson_date: entcore_1.moment(this.date).format(tools_1.DATE_FORMAT),
+	        lesson_start_time: entcore_1.moment(this.startTime).format('HH:mm'),
+	        lesson_end_time: entcore_1.moment(this.endTime).format('HH:mm'),
+	        lesson_description: this.description,
+	        lesson_annotation: this.annotations,
+	        lesson_state: this.state,
+	        // start columns not in lesson table TODO move
+	        audience_type: this.audience.type,
+	        audience_name: this.audience.name,
+	        attachments: this.attachments
+	    };
+	    if (this.room) {
+	        json.lesson_room = this.room;
+	    }
+	    return json;
+	};
+	Lesson.prototype.addHomework = function (cb) {
+	    var date = entcore_1.moment.isMoment(this.startTime) ? this.startTime : (this.startMoment ? this.startMoment : entcore_1.moment());
+	    var dueDate = date.second(0);
+	    var homework = entcore_1.model.initHomework(dueDate, this);
+	    this.homeworks.push(homework);
+	};
+	Lesson.prototype.deleteHomework = function (homework) {
+	    homework.delete();
+	    var homework = new Homework_model_1.Homework();
+	    homework.dueDate = this.date;
+	    homework.type = entcore_1.model.homeworkTypes.first();
+	    this.homeworks.push(homework);
+	};
+	Lesson.prototype.isDraft = function () {
+	    return this.state === "draft";
+	};
+	Lesson.prototype.isPublished = function () {
+	    return !this.isDraft();
+	};
+	Lesson.prototype.isPublishable = function (toPublish) {
+	    return this.id && this.state == (toPublish ? 'draft' : 'published');
+	};
+	/**
+	 * Change state of current and associated homeworks
+	 * @param isPublished
+	 */
+	Lesson.prototype.changeState = function (isPublished) {
+	    this.state = isPublished ? 'published' : 'draft';
+	    var that = this;
+	    // change state of associated homeworks
+	    this.homeworks.forEach(function (homework) {
+	        var lessonHomework = homework;
+	        homework.state = isPublished ? 'published' : 'draft';
+	        var found = false;
+	    });
+	    // change state of homeworks cache in calendar for current week
+	    entcore_1.model.homeworks.all.filter(function (h) {
+	        return h.lesson_id = that.id;
+	    }).forEach(function (homeworkCache) {
+	        homeworkCache.state = that.state;
+	    });
+	};
 
 
 /***/ }),
@@ -3829,60 +3833,56 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Subject = (function () {
-	    function Subject() {
-	        /**
-	         * Saves the subject to databases.
-	         * It's auto-created if it does not exists in database
-	         * @param cb
-	         * @param cbe
-	         */
-	        this.save = function (cb, cbe) {
-	            if (this.id) {
-	                // not implemented yet at this stage/ not needed
-	            }
-	            else {
-	                return this.create(cb, cbe);
-	            }
-	        };
-	        /**
-	         * Creates a subject
-	         * @param cb Callback function
-	         * @param cbe Callback on error function
-	         */
-	        this.create = function (cb, cbe) {
-	            var subject = this;
-	            if (!this.school_id) {
-	                this.school_id = entcore_1.model.me.structures[0];
-	            }
-	            return entcore_1.model.getHttp()({
-	                method: 'POST',
-	                url: '/diary/subject',
-	                data: subject
-	            }).then(function (result) {
-	                //subject.updateData(subject);
-	                subject.updateData(result.data);
-	                entcore_1.model.subjects.all.push(subject);
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                return subject;
-	            });
-	        };
-	        this.toJSON = function () {
-	            return {
-	                id: this.id,
-	                school_id: this.school_id,
-	                subject_label: this.label,
-	                teacher_id: this.teacher_id,
-	                original_subject_id: this.originalsubjectid
-	            };
-	        };
-	    }
-	    return Subject;
-	}());
+	function Subject() { }
 	exports.Subject = Subject;
 	;
+	/**
+	 * Saves the subject to databases.
+	 * It's auto-created if it does not exists in database
+	 * @param cb
+	 * @param cbe
+	 */
+	Subject.prototype.save = function (cb, cbe) {
+	    if (this.id) {
+	        // not implemented yet at this stage/ not needed
+	    }
+	    else {
+	        return this.create(cb, cbe);
+	    }
+	};
+	/**
+	 * Creates a subject
+	 * @param cb Callback function
+	 * @param cbe Callback on error function
+	 */
+	Subject.prototype.create = function (cb, cbe) {
+	    var subject = this;
+	    if (!this.school_id) {
+	        this.school_id = entcore_1.model.me.structures[0];
+	    }
+	    return entcore_1.model.getHttp()({
+	        method: 'POST',
+	        url: '/diary/subject',
+	        data: subject
+	    }).then(function (result) {
+	        //subject.updateData(subject);
+	        subject.updateData(result.data);
+	        entcore_1.model.subjects.all.push(subject);
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	        return subject;
+	    });
+	};
+	Subject.prototype.toJSON = function () {
+	    return {
+	        id: this.id,
+	        school_id: this.school_id,
+	        subject_label: this.label,
+	        teacher_id: this.teacher_id,
+	        original_subject_id: this.originalsubjectid
+	    };
+	};
 
 
 /***/ }),
@@ -3903,12 +3903,12 @@
 	var SearchForm_model_1 = __webpack_require__(77);
 	/**
 	 * Model from table
-	 * diary.lesson_has_attachment
+	 * diary.lesson_has_attachmentH
 	 * @constructor
 	 */
 	function LessonAttachment() { }
 	exports.LessonAttachment = LessonAttachment;
-	function Audience() { }
+	function Audience(audience) { }
 	exports.Audience = Audience;
 	;
 	function HomeworksLoad() { }
@@ -4109,7 +4109,11 @@
 	                    that.loading = false;
 	                });
 	            });*/
-	        }
+	        }, pushAll: function (datas) {
+	            if (datas) {
+	                this.all = entcore_1._.union(this.all, datas);
+	            }
+	        }, behaviours: 'diary'
 	    });
 	    this.collection(HomeworkType, {
 	        loading: false,
@@ -7134,27 +7138,24 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var PedagogicDay = (function () {
-	    function PedagogicDay() {
-	        this.selected = false;
-	        this.dayName = entcore_1.moment().format("dddd DD MMMM YYYY");
-	        this.shortName = this.dayName.substring(0, 2);
-	        this.shortDate = entcore_1.moment().format("DD/MM");
-	        this.pedagogicItemsOfTheDay = [];
-	        this.nbLessons = 0;
-	        this.nbHomeworks = 0;
-	        this.numberOfItems = function () {
-	            return this.nbLessons + this.nbHomeworks;
-	        };
-	        this.resetCountValues = function () {
-	            var countItems = entcore_1._.groupBy(this.pedagogicItemsOfTheDay, 'type_item');
-	            this.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
-	            this.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
-	        };
-	    }
-	    return PedagogicDay;
-	}());
+	function PedagogicDay() {
+	    this.selected = false;
+	    this.dayName = entcore_1.moment().format("dddd DD MMMM YYYY");
+	    this.shortName = this.dayName.substring(0, 2);
+	    this.shortDate = entcore_1.moment().format("DD/MM");
+	    this.pedagogicItemsOfTheDay = [];
+	    this.nbLessons = 0;
+	    this.nbHomeworks = 0;
+	}
 	exports.PedagogicDay = PedagogicDay;
+	PedagogicDay.prototype.numberOfItems = function () {
+	    return this.nbLessons + this.nbHomeworks;
+	};
+	PedagogicDay.prototype.resetCountValues = function () {
+	    var countItems = entcore_1._.groupBy(this.pedagogicItemsOfTheDay, 'type_item');
+	    this.nbLessons = (countItems['lesson']) ? countItems['lesson'].length : 0;
+	    this.nbHomeworks = (countItems['homework']) ? countItems['homework'].length : 0;
+	};
 
 
 /***/ }),
@@ -7163,12 +7164,13 @@
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Child = (function () {
-	    function Child() {
-	        this.selected = false;
-	    }
-	    return Child;
-	}());
+	function Child() {
+	    this.id; //String
+	    this.displayName; //String
+	    this.classId; //String
+	    this.className; //String
+	    this.selected = false;
+	}
 	exports.Child = Child;
 
 
@@ -7180,54 +7182,61 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var tools_1 = __webpack_require__(3);
-	var SearchForm = (function () {
-	    function SearchForm(isQuickSearch) {
-	        this.startDate = {};
-	        this.endDate = {};
-	        this.publishState = {};
-	        this.returnType = {};
-	        this.displayLesson = {};
-	        this.displayHomework = {};
-	        this.audienceId = {};
-	        this.subjects = [];
-	        this.selectedSubject = null;
-	        this.subjectsFilters = [];
-	        this.initForTeacher = function () {
-	            this.publishState = "";
-	            this.returnType = "both";
-	            var period = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1);
-	            this.startDate = period.format(tools_1.DATE_FORMAT);
-	            this.endDate = period.add(15, 'days').format(tools_1.DATE_FORMAT);
-	            this.displayLesson = true;
-	            this.displayHomework = true;
-	            this.audienceId = "";
-	        };
-	        this.initForStudent = function () {
-	            this.publishState = "published";
-	            this.returnType = "both";
-	            var period = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1);
-	            this.startDate = period.format(tools_1.DATE_FORMAT);
-	            this.endDate = period.add(15, 'days').format(tools_1.DATE_FORMAT);
-	            this.displayLesson = false;
-	            this.displayHomework = true;
-	        };
-	        this.getSearch = function () {
-	            var params = {};
-	            params.startDate = this.startDate;
-	            params.endDate = this.endDate;
-	            params.publishState = this.publishState;
-	            params.returnType = this.returnType;
-	            if (entcore_1.model.isUserParent()) {
-	                params.audienceId = entcore_1.model.child.classId;
-	            }
-	            return params;
-	        };
-	        this.isQuickSearch = isQuickSearch;
-	    }
-	    return SearchForm;
-	}());
+	function SearchForm(isQuickSearch) {
+	    this.startDate = {};
+	    this.endDate = {};
+	    this.publishState = {};
+	    this.returnType = {};
+	    this.displayLesson = {};
+	    this.displayHomework = {};
+	    this.audienceId = {};
+	    this.subjects = [];
+	    this.selectedSubject = null;
+	    this.subjectsFilters = [];
+	    /**
+	     * If true search result will be stored in model.quickSearchPedagogicDays instead of model.pedagogicDays
+	     * @type {boolean}
+	     */
+	    this.isQuickSearch = isQuickSearch;
+	    /**
+	     * Custom pedagogic days array.
+	     * Avoid conflicting with model.pedagogicDays)
+	     * @type {Array}
+	     */
+	    this.customPedagogicDaysArray;
+	}
 	exports.SearchForm = SearchForm;
 	;
+	SearchForm.prototype.initForTeacher = function () {
+	    this.publishState = "";
+	    this.returnType = "both";
+	    var period = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1);
+	    this.startDate = period.format(tools_1.DATE_FORMAT);
+	    this.endDate = period.add(15, 'days').format(tools_1.DATE_FORMAT);
+	    this.displayLesson = true;
+	    this.displayHomework = true;
+	    this.audienceId = "";
+	};
+	SearchForm.prototype.initForStudent = function () {
+	    this.publishState = "published";
+	    this.returnType = "both";
+	    var period = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1);
+	    this.startDate = period.format(tools_1.DATE_FORMAT);
+	    this.endDate = period.add(15, 'days').format(tools_1.DATE_FORMAT);
+	    this.displayLesson = false;
+	    this.displayHomework = true;
+	};
+	SearchForm.prototype.getSearch = function () {
+	    var params = {};
+	    params.startDate = this.startDate;
+	    params.endDate = this.endDate;
+	    params.publishState = this.publishState;
+	    params.returnType = this.returnType;
+	    if (entcore_1.model.isUserParent()) {
+	        params.audienceId = entcore_1.model.child.classId;
+	    }
+	    return params;
+	};
 
 
 /***/ }),
@@ -7614,7 +7623,6 @@
 /***/ (function(module, exports) {
 
 	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
 	/**
 	 }
 	 }
@@ -7622,69 +7630,67 @@
 	 * table diary.attachment (DB)
 	 * @constructor
 	 */
-	var Attachment = (function () {
-	    function Attachment() {
-	        /**
-	         * Attachment id as in diary.attachment table
-	         * @type {number}
-	         */
-	        this.id = null;
-	        this.user_id = null;
-	        /**
-	         * Id of stored document within the document module
-	         * (see mongodb -> Documents table)
-	         * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
-	         * @type {string}
-	         */
-	        this.document_id = null;
-	        /***
-	         * Creation date
-	         * @type {null}
-	         */
-	        this.creation_date = null;
-	        /**
-	         * Filename of attachment
-	         * @type {string}
-	         */
-	        this.document_label = null;
-	        /**
-	         * Download the attachment
-	         */
-	        this.download = function () {
-	            window.location.href = window.location.host + '/workspace/document/' + this.document_id;
-	        };
-	        /**
-	         * Detach attachment to a lesson
-	         * Attachment link will be detached to back end on lesson save
-	         * @param item Lesson or homework
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.detachFromItem = function (item, cb, cbe) {
-	            var that = this;
-	            if (item && item.attachments) {
-	                var udpatedAttachments = new Array();
-	                item.attachments.forEach(function (attachment) {
-	                    if (attachment && attachment.document_id !== that.document_id) {
-	                        udpatedAttachments.push(attachment);
-	                    }
-	                });
-	                item.attachments = udpatedAttachments;
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                else
-	                    (typeof cbe === 'function');
-	                {
-	                    cbe();
-	                }
-	            }
-	        };
-	    }
-	    return Attachment;
-	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	function Attachment() {
+	    /**
+	     * Attachment id as in diary.attachment table
+	     * @type {number}
+	     */
+	    this.id = null;
+	    this.user_id = null;
+	    /**
+	     * Id of stored document within the document module
+	     * (see mongodb -> Documents table)
+	     * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
+	     * @type {string}
+	     */
+	    this.document_id = null;
+	    /***
+	     * Creation date
+	     * @type {null}
+	     */
+	    this.creation_date = null;
+	    /**
+	     * Filename of attachment
+	     * @type {string}
+	     */
+	    this.document_label = null;
+	}
 	exports.Attachment = Attachment;
 	;
+	/**
+	 * Download the attachment
+	 */
+	Attachment.prototype.download = function () {
+	    window.location.href = window.location.host + '/workspace/document/' + this.document_id;
+	};
+	/**
+	 * Detach attachment to a lesson
+	 * Attachment link will be detached to back end on lesson save
+	 * @param item Lesson or homework
+	 * @param cb Callback
+	 * @param cbe Callback on error
+	 */
+	Attachment.prototype.detachFromItem = function (item, cb, cbe) {
+	    var that = this;
+	    if (item && item.attachments) {
+	        var udpatedAttachments = new Array();
+	        item.attachments.forEach(function (attachment) {
+	            if (attachment && attachment.document_id !== that.document_id) {
+	                udpatedAttachments.push(attachment);
+	            }
+	        });
+	        item.attachments = udpatedAttachments;
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	        else
+	            (typeof cbe === 'function');
+	        {
+	            cbe();
+	        }
+	    }
+	};
 
 
 /***/ }),
@@ -7718,6 +7724,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
+	var axios_1 = __webpack_require__(5);
 	/*
 	* Audience service as class
 	* used to manipulate Audience model
@@ -7745,7 +7752,7 @@
 	            if (!_this.context.processesPromise[structureId]) {
 	                _this.context.processesPromise[structureId] = [];
 	                var url = "/userbook/structure/" + structureId;
-	                _this.context.processesPromise[structureId] = entcore_1.$http.get(url).then(function (result) {
+	                _this.context.processesPromise[structureId] = axios_1.default.get(url).then(function (result) {
 	                    return {
 	                        structureId: structureId,
 	                        structureData: result.data
@@ -7755,7 +7762,7 @@
 	            processes.push(_this.context.processesPromise[structureId]);
 	        });
 	        //execute promises
-	        return entcore_1.$q.all(processes).then(function (results) {
+	        return Promise.all(processes).then(function (results) {
 	            var result = [];
 	            entcore_1._.each(results, (function (datas) {
 	                var structureId = datas.structureId;

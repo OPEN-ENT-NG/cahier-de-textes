@@ -1,23 +1,21 @@
-import { model } from 'entcore';
+import {model} from 'entcore';
 import http from 'axios';
 
 
-export class Teacher{
-    constructor() {}
+export function Teacher () {};
 
-    create = function(cb, cbe) {
+Teacher.prototype.create = function (cb, cbe) {
 
-        model.me.structures.forEach(function (structureId) {
-            http.post('/diary/teacher/' + structureId).then(function (e) {
+    model.me.structures.forEach(function (structureId) {
+        http.post('/diary/teacher/' + structureId).then(function (e) {
 
-                if(typeof cb === 'function'){
-                    cb();
-                }
-            }).catch(function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-            });
+            if (typeof cb === 'function') {
+                cb();
+            }
+        }).catch(function (e) {
+            if (typeof cbe === 'function') {
+                cbe(model.parseError(e));
+            }
         });
-    };
+    });
 };

@@ -1,4 +1,5 @@
-import { _, idiom as lang, $http, $q} from 'entcore';
+import { angular, _, idiom as lang } from 'entcore';
+import http from 'axios';
 
 /*
 * Audience service as class
@@ -29,7 +30,7 @@ export class AudienceService {
             if (!this.context.processesPromise[structureId]){
                 this.context.processesPromise[structureId] = [];
                 let url = `/userbook/structure/${structureId}`;
-                this.context.processesPromise[structureId] = $http.get(url).then((result)=>{
+                this.context.processesPromise[structureId] = http.get(url).then((result)=>{
                     return {
                         structureId : structureId,
                         structureData : result.data
@@ -41,9 +42,9 @@ export class AudienceService {
         });
 
         //execute promises
-        return $q.all(processes).then((results) => {
+        return Promise.all(processes).then((results) => {
             let result = [];
-            _.each(results,(datas=>{
+            _.each(results,(datas => {
                 let structureId = datas.structureId;
                 let structureData = datas.structureData;
                 result = result.concat(this.mapAudiences(structureData.classes,structureId));

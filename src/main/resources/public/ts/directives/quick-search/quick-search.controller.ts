@@ -1,9 +1,9 @@
 import { model, moment, _, idiom as lang } from 'entcore';
 import {AngularExtensions} from '../../app';
 
-import {Homework} from '../../model/Homework.model';
-import {PedagogicDay} from '../../model/PedagogicDay.model';
-import {SearchForm} from '../../model/SearchForm.model';
+import { Homework } from '../../model/Homework.model';
+import { PedagogicDay } from '../../model/PedagogicDay.model';
+import { SearchForm } from '../../model/SearchForm.model';
 
 (function() {
     'use strict';

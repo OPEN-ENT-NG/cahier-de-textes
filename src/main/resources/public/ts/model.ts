@@ -12,11 +12,11 @@ import { SearchForm } from './model/SearchForm.model';
 
 /**
  * Model from table
- * diary.lesson_has_attachment
+ * diary.lesson_has_attachmentH
  * @constructor
  */
 export function LessonAttachment() {}
-export function Audience() {};
+export function Audience(audience?) {};
 export function HomeworksLoad(){}
 export function HomeworkType(){}
 
@@ -229,7 +229,11 @@ model.build = function () {
                     that.loading = false;
                 });
             });*/
-        }
+        }, pushAll: function (datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
     });
 
     this.collection(HomeworkType, {
@@ -713,7 +717,7 @@ model.initHomework = function (dueDate, lesson) {
  * @returns {Lesson}
  */
 model.initLesson = function (timeFromCalendar, selectedDate) {
-    let lesson = new Lesson();
+    var lesson = new Lesson();
 
     lesson.audience = {}; //sets the default audience to undefined
     lesson.subject = model.subjects.first();

@@ -2,7 +2,7 @@ import {model, _} from 'entcore';
 import {sansAccent} from '../tools';
 import {AngularExtensions} from '../app';
 
-import {Subject} from '../model/Subject.model';
+import { Subject } from '../model/Subject.model';
 
 (function() {
     'use strict';

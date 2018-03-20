@@ -2,14 +2,15 @@ import { ng, angular, model, moment, _, notify, template } from 'entcore';
 import { syncLessonsAndHomeworks, syncHomeworks} from './tools';
 
 
-import {Homework} from './model/Homework.model';
-import {Lesson} from './model/Lesson.model';
-import {PedagogicItem} from './model/PedagogicItem.model';
-import {CourseService} from "./service/courses.service";
-import {LessonService} from "./service/lessons.service";
-import {SecureService} from "./directives/secure/secure.service";
-import {AudienceService} from "./service/audiences.service";
-
+import { Homework } from './model/Homework.model';
+import { Lesson } from './model/Lesson.model';
+import { PedagogicItem } from './model/PedagogicItem.model';
+import { CourseService } from "./service/courses.service";
+import { LessonService } from "./service/lessons.service";
+import { SecureService } from "./directives/secure/secure.service";
+import { AudienceService } from "./service/audiences.service";
+import {Audience} from './model';
+import {CONSTANTS} from './tools';
 
 
 /**
@@ -29,13 +30,13 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  */
 
 export let DiaryController = ng.controller('DiaryController', [
-    '$scope', '$rootScope', 'model', 'route', '$location', '$window', 'constants', '$sce',
-    function ($scope, $rootScope, model, route, $location, $window,constants,$sce) {
+    '$scope', '$rootScope', 'model', 'route', '$location', '$window', '$sce',
+    function ($scope, $rootScope, model, route, $location, $window, $sce) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
-    $scope.constants = constants;
-    $scope.RIGHTS = constants.RIGHTS;
+    $scope.constants = CONSTANTS;
+    $scope.RIGHTS = CONSTANTS.RIGHTS;
     $rootScope.model = model;
 
     $rootScope.currentRightPanelVisible = undefined ;//= 'test';
@@ -172,7 +173,7 @@ export let DiaryController = ng.controller('DiaryController', [
                 //$scope.openLessonView(null, params);
 
                 template.open('main', 'main');
-                if (SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)){
+                if (SecureService.hasRight(CONSTANTS.RIGHTS.CREATE_LESSON)){
                   template.open('main-view', 'create-lesson');
               }
         },
@@ -183,7 +184,7 @@ export let DiaryController = ng.controller('DiaryController', [
         },
         editLessonView: function(params) {
             template.open('main', 'main');
-            if (SecureService.hasRight(constants.RIGHTS.CREATE_LESSON)){
+            if (SecureService.hasRight(CONSTANTS.RIGHTS.CREATE_LESSON)){
               template.open('main-view', 'create-lesson');
             }else{
                 template.open('main-view', 'view-lesson');
@@ -1238,7 +1239,8 @@ export let DiaryController = ng.controller('DiaryController', [
             model.currentSchool = model.me.structures[0];
 
             AudienceService.getAudiences(model.me.structures).then((audiences)=>{
-                model.audiences.addRange(audiences);
+
+                //model.audiences.addRange(audiences);
                     model.audiences.trigger('sync');
                     model.audiences.trigger('change');
                     if(typeof cb === 'function'){

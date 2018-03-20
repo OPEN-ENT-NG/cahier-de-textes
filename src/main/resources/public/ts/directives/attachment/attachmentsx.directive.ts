@@ -1,7 +1,7 @@
 import { model, notify, _ } from 'entcore';
 import {AngularExtensions} from '../../app';
 
-import {Attachment} from '../../model/Attachment.model';
+import { Attachment } from '../../model/Attachment.model';
 
 (function() {
 	'use strict';

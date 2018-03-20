@@ -1,5 +1,5 @@
 import {angular, moment, _, idiom as lang, model } from 'entcore';
-import {PedagogicItem} from "./model/PedagogicItem.model";
+import { PedagogicItem } from "./model/PedagogicItem.model";
 
 export const DATE_FORMAT = 'YYYY-MM-DD';
 

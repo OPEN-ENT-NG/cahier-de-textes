@@ -1,6 +1,5 @@
-import {AngularExtensions} from '../app';
 import {_, $http } from 'entcore';
-import {Subject} from "../model/Subject.model";
+import { Subject} from "../model/Subject.model";
 import {UtilsService} from "./utils.service";
 
 /*
