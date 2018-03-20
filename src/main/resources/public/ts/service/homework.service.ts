@@ -1,6 +1,5 @@
-import {AngularExtensions} from '../app';
-import { _, idiom as lang, moment, model } from 'entcore';
-import { jsonToJsAttachment } from '../tools';
+import { _, idiom as lang, moment, model, $http } from 'entcore';
+import { jsonToJsAttachment, CONSTANTS } from '../tools';
 
 
 
@@ -8,27 +7,14 @@ import { jsonToJsAttachment } from '../tools';
 * Homework service as class
 * used to manipulate Homework model
 */
-export default class HomeworkService {
+export class HomeworkService {
 
-    $http: any;
-    $q: any;
-    constants: any;
-
-    constructor($http,$q,constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-    }
-
-    /*
-    * get homeworks
-    */
-    getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate){
-        var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
-        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+    static getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate){
+        var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
+        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
         if (fromDate){
-            start = fromDate.format(this.constants.CAL_DATE_PATTERN);
-            end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            start = fromDate.format(CONSTANTS.CAL_DATE_PATTERN);
+            end = toDate.format(CONSTANTS.CAL_DATE_PATTERN);
         }
         var urlGetHomeworks = `/diary/homework/${userStructuresIds}/${start}/${end}/`;
 
@@ -38,24 +24,24 @@ export default class HomeworkService {
             urlGetHomeworks += '%20';
         }
 
-        return this.$http.get(urlGetHomeworks).then((result)=>{
+        return $http.get(urlGetHomeworks).then((result)=>{
             return this.mappHomework(result.data);
         });
     }
 
-    getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate){
-        var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
-        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+    static getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate){
+        var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
+        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
         if (fromDate){
-            start = fromDate.format(this.constants.CAL_DATE_PATTERN);
-            end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            start = fromDate.format(CONSTANTS.CAL_DATE_PATTERN);
+            end = toDate.format(CONSTANTS.CAL_DATE_PATTERN);
         }
         let type = teacher ? "teacher" : "audience";
         let id = teacher ? teacher.key : audience.key;
 
         var urlGetHomeworks = `/diary/homework/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
 
-        return this.$http.get(urlGetHomeworks).then((result)=>{
+        return $http.get(urlGetHomeworks).then((result)=>{
             return this.mappHomework(result.data);
         });
     }
@@ -63,7 +49,7 @@ export default class HomeworkService {
     /*
     *   Mapp homeworks
     */
-    mappHomework(homeworks){
+    static mappHomework(homeworks){
         return _.map(homeworks,(sqlHomework) =>{
             let homework:any =   {
                 //for share directive you must have _id
@@ -111,13 +97,3 @@ export default class HomeworkService {
 
 
 };
-
-
-(function () {
-    'use strict';
-
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("HomeworkService",HomeworkService);
-    });
-
-})();

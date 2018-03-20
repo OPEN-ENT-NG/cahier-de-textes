@@ -1,19 +1,12 @@
-import {AngularExtensions} from '../app';
 import {_, model, idiom as lang} from 'entcore';
 
 /*
  * Utils service as class
  * used to manipulate Utils model
  */
-export default class UtilsService {
-    constants:any;
+export class UtilsService {
 
-    constructor($http, $q, constants) {
-        this.constants = constants;
-    }
-
-
-    getUserStructuresIdsAsString() {
+   static getUserStructuresIdsAsString() {
         var structureIds = "";
 
         model.me.structures.forEach(function(structureId) {
@@ -28,7 +21,7 @@ export default class UtilsService {
      * Tricky responsive must be linked to additional.css behaviour
      * @param lesson
      */
-    getResponsiveLessonTooltipText(lesson) {
+    static getResponsiveLessonTooltipText(lesson) {
         var tooltipText = lesson.title + ' (' + lang.translate(lesson.state) + ')';
         var screenWidth = window.innerWidth;
 
@@ -63,11 +56,3 @@ export default class UtilsService {
 
 
 };
-
-(function () {
-    'use strict';
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("UtilsService", UtilsService);
-    });
-
-})();

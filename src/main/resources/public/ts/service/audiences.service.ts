@@ -1,31 +1,14 @@
-import {AngularExtensions} from '../app';
-import { _, idiom as lang } from 'entcore';
-
-
+import { _, idiom as lang, $http, $q} from 'entcore';
 
 /*
 * Audience service as class
 * used to manipulate Audience model
 */
-export default class AudienceService {
-    $http:any;
-    $q: any;
-    constants:any;
-    context:any;
-
-    constructor($http,$q,constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.context = {
-            processesPromise : []
-        };
+export class AudienceService {
+    static context = {
+        processesPromise: []
     }
-
-    /*
-    * get a map indexed by label
-    */
-    getAudiencesAsMap(structureIdArray){
+    static getAudiencesAsMap(structureIdArray){
         return this.getAudiences(structureIdArray).then((classes)=>{
             let result = {};
             _.each(classes,(classe)=>{
@@ -38,7 +21,7 @@ export default class AudienceService {
     /*
     * get classes for all structureIds
     */
-    getAudiences(structureIdArray) {
+    static getAudiences(structureIdArray) {
         //cache the promises, this datas will not change in a uniq session
         let processes = [];
         _.each(structureIdArray,(structureId)=>{
@@ -46,7 +29,7 @@ export default class AudienceService {
             if (!this.context.processesPromise[structureId]){
                 this.context.processesPromise[structureId] = [];
                 let url = `/userbook/structure/${structureId}`;
-                this.context.processesPromise[structureId] = this.$http.get(url).then((result)=>{
+                this.context.processesPromise[structureId] = $http.get(url).then((result)=>{
                     return {
                         structureId : structureId,
                         structureData : result.data
@@ -58,7 +41,7 @@ export default class AudienceService {
         });
 
         //execute promises
-        return this.$q.all(processes).then((results) => {
+        return $q.all(processes).then((results) => {
             let result = [];
             _.each(results,(datas=>{
                 let structureId = datas.structureId;
@@ -73,7 +56,7 @@ export default class AudienceService {
     /*
     *   map an Audience
     */
-    mapAudiences(classes,structureId){
+    static mapAudiences(classes,structureId){
         return _.map(classes,  (audience) =>{
             audience.structureId = structureId;
             audience.type = 'class';
@@ -82,12 +65,4 @@ export default class AudienceService {
         });
     }
 
-}
-
-(function () {
-    'use strict';
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("AudienceService",AudienceService);
-    });
-
-})();
+};

@@ -1,32 +1,17 @@
-import {AngularExtensions} from '../app';
-import { moment, model, _} from 'entcore';
-import SubjectService from "./subject.service";
+import { moment, model, _, $q, $http} from 'entcore';
+import { CONSTANTS} from '../tools';
+import {SubjectService} from "./subject.service";
 
 /*
 * Course service as class
 * used to manipulate Course model
 */
-export default class CourseService {
+export class CourseService {
 
-    $http: any;
-    $q: any;
-    constants: any;
-    context: any;
-    SubjectService: any;
-
-    constructor($http, $q, constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.context = {};
-        this.SubjectService = new SubjectService(this.$http, this.$q, this.constants);
-    }
-
-
-    getMergeCourses(structureId, teacherId, firstDayOfWeek){
-        return this.$q.all([
+   static getMergeCourses(structureId, teacherId, firstDayOfWeek){
+        return $q.all([
             this.getScheduleCourses(structureId, teacherId, firstDayOfWeek),
-            this.SubjectService.getStructureSubjectsAsMap(structureId)
+            SubjectService.getStructureSubjectsAsMap(structureId)
         ]).then(results =>{
             let courses = results[0];
             let subjects = results[1];
@@ -34,7 +19,7 @@ export default class CourseService {
         });
     }
 
-    mappCourse(course){
+    static mappCourse(course){
         course.date = moment(course.startDate);
         course.date.week(model.calendar.week);
 
@@ -50,7 +35,7 @@ export default class CourseService {
         course.notShowOnCollision=true;
     }
 
-    recalc(date){
+    static recalc(date){
         // multi week gestion
         //https://groups.google.com/forum/#!topic/entcore/ne1ODPHQabE
         let diff = date.diff(model.mondayOfWeek,'days');
@@ -62,7 +47,7 @@ export default class CourseService {
         return date;
     }
 
-    mappingCourses(courses,subjects){
+    static mappingCourses(courses,subjects){
         _.each(courses,course =>{
             course.subject = subjects[course.subjectId];
             this.mappCourse(course);
@@ -70,9 +55,9 @@ export default class CourseService {
         return courses;
     }
 
-    getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
-        let begin = moment(firstDayOfWeek).format(this.constants.CAL_DATE_PATTERN);
-        let end = moment(firstDayOfWeek).add(6, 'd').format(this.constants.CAL_DATE_PATTERN);
+    static getScheduleCourses(structureId, teacherId, firstDayOfWeek) {
+        let begin = moment(firstDayOfWeek).format(CONSTANTS.CAL_DATE_PATTERN);
+        let end = moment(firstDayOfWeek).add(6, 'd').format(CONSTANTS.CAL_DATE_PATTERN);
 
         let url = `/directory/timetable/courses/${structureId}/${begin}/${end}`;
         let config = {
@@ -80,18 +65,10 @@ export default class CourseService {
                 teacherId : teacherId
             }
         };
-        return this.$http.get(url,config).then(result =>{
+        return $http.get(url,config).then(result =>{
             return result.data;
         });
     }
 
 };
 
-(function () {
-    'use strict';
-
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("CourseService",CourseService);
-    });
-
-})();

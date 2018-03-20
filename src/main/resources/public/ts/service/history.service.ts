@@ -1,28 +1,16 @@
-import {AngularExtensions} from '../app';
-import {moment, model, _} from 'entcore';
+import {moment, model, $http, _} from 'entcore';
 
 import * as FileSaver from 'file-saver';
 /*
  * History service as class
  * used to manipulate History model
  */
-export default class HistoryService {
+export class HistoryService {
 
-    $http: any;
-    $q: any;
-    constants: any;
-
-
-    constructor($http, $q, constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-    }
-
-    getFilters(structureId){
+    static getFilters(structureId){
         let url = `/diary/history/filters`;
 
-        return this.$http({
+        return $http({
             method : 'GET',
             url : url,
             params : {
@@ -33,7 +21,7 @@ export default class HistoryService {
         });
     }
 
-    getPdfArchive(yearLabel,type,teacherId,audienceId,value){
+    static getPdfArchive(yearLabel,type,teacherId,audienceId,value){
         let url = `/diary/history/pdf`;
 
         let params:any = {
@@ -45,7 +33,7 @@ export default class HistoryService {
         params.audienceId = audienceId;
 
 
-        this.$http({
+        $http({
             url: url,
             method: "GET",
             params: params,
@@ -61,13 +49,3 @@ export default class HistoryService {
     }
 
 }
-
-
-(function () {
-    'use strict';
-    /* create singleton */
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("HistoryService", HistoryService);
-    });
-
-})();

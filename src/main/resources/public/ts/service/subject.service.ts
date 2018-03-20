@@ -1,37 +1,21 @@
 import {AngularExtensions} from '../app';
-import {_} from 'entcore';
+import {_, $http } from 'entcore';
 import {Subject} from "../model/Subject.model";
-import UtilsService from "./utils.service";
-
-
+import {UtilsService} from "./utils.service";
 
 /*
  * Subject service as class
  * used to manipulate Subject model
  */
-export default class SubjectService {
-
-    $http: any;
-    constants: any;
-    $q: any;
-    context: any;
-    UtilsService: any;
-
-    constructor($http, $q, constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.UtilsService = new UtilsService(this.$http, this.$q, this.constants);
-        this.context = {
-            subjectPromise : []
-        };
-    }
-
+export class SubjectService {
+    static context = {
+        subjectPromise: []
+    };
     /*
     *   Get all subject from a structureId as map
     *   used to map a course from the subject id
     */
-    getStructureSubjectsAsMap(structureId){
+    static getStructureSubjectsAsMap(structureId){
         return this.getStructureSubjects(structureId).then((result)=>{
             let subjects = result;
             let results = {};
@@ -46,10 +30,10 @@ export default class SubjectService {
     *   Get all subject from a structureId
     *   used to map a course from the subject id
     */
-    getStructureSubjects(structureId){
+    static getStructureSubjects(structureId){
         if (!this.context.subjectPromise[structureId]){
             var url = `/directory/timetable/subjects/${structureId}`;
-            this.context.subjectPromise[structureId] = this.$http.get(url).then(result =>{
+            this.context.subjectPromise[structureId] = $http.get(url).then(result =>{
                 return result.data;
             });
         }
@@ -61,15 +45,15 @@ export default class SubjectService {
     *   get subjects created by the teacher
     *   used to edit a lesson
     */
-    getCustomSubjects(isTeacher){
+    static getCustomSubjects(isTeacher){
         let urlGetSubjects = '';
         if (isTeacher) {
             urlGetSubjects = '/diary/subject/initorlist';
         }else{
-            urlGetSubjects = '/diary/subject/list/' + this.UtilsService.getUserStructuresIdsAsString();
+            urlGetSubjects = '/diary/subject/list/' + UtilsService.getUserStructuresIdsAsString();
         }
 
-        return this.$http.get(urlGetSubjects).then((result)=>{
+        return $http.get(urlGetSubjects).then((result)=>{
             return result.data;
         });
     }
@@ -77,7 +61,7 @@ export default class SubjectService {
     /*
     * map original subject to diary subject
     */
-    mapToDiarySubject(subject){
+    static mapToDiarySubject(subject){
         let result = new Subject();
 
         result.id = null;
@@ -88,11 +72,3 @@ export default class SubjectService {
         return result;
     }
 }
-
-(function () {
-    'use strict';
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("SubjectService", SubjectService);
-    });
-
-})();

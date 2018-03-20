@@ -1,7 +1,7 @@
-export let Child = () => {
-    this.id; //String
-    this.displayName; //String
-    this.classId; //String
-    this.className; //String
-    this.selected = false;
+export class Child  {
+    id; //String
+    displayName; //String
+    classId; //String
+    className; //String
+    selected = false;
 }

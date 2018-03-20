@@ -2,25 +2,39 @@ import { model, moment } from 'entcore';
 import http from 'axios';
 import { DATE_FORMAT, sqlToJsHomework } from '../tools';
 
-export let Homework = () => {
+export class Homework {
 
     /**
      * used in ui in homework tab in lesson view
      * @type {boolean}
      */
-    this.expanded = false;
+    id: any;
+    created: any;
+    expanded:any = false;
+    type: any;
+    title: any;
+    date: any;
 
-    /**
-     * Attachments
-     */
-    if (!this.attachments) {
-        this.attachments = new Array();
+    audience: any;
+    subject: any;
+    audienceType: any;
+    color: any;
+    state: any;
+
+    dueDate: any;
+    description: any;
+    attachments:any;
+
+    CrudApi:any;
+
+    constructor(){
+        this.expanded = false;
     }
 
     /**
      * Delete calendar references of current homework
      */
-    this.deleteModelReferences = function () {
+    deleteModelReferences = function () {
         var idxHomeworkToDelete = model.homeworks.indexOf(this);
 
         // delete homework in calendar cache
@@ -34,7 +48,7 @@ export let Homework = () => {
      * Adds an attachment
      * @param attachment
      */
-    this.addAttachment = function (attachment) {
+    addAttachment = function (attachment) {
         this.attachments.push(attachment);
     };
 
@@ -44,73 +58,73 @@ export let Homework = () => {
      * @param cb
      * @param cbe
      */
-    this.detachAttachment = function (attachment, cb, cbe) {
+    detachAttachment = function (attachment, cb, cbe) {
         attachment.detachFromItem(this.id, 'lesson', cb, cbe);
     };
-}
 
-Homework.prototype.api = {
-    delete: '/diary/homework/:id'
-};
 
-Homework.prototype.save = function(cb, cbe) {
+    api = {
+        delete: '/diary/homework/:id'
+    };
 
-    var that = this;
-    var promise = model.$q().when({});
+    save = function(cb, cbe) {
 
-    if(!this.subject.id){
-        promise = this.subject.save();
-    }
+        var that = this;
+        var promise = model.$q().when({});
 
-    return promise.then(()=>{
-        if (that.id) {
-            return that.update(cb, cbe);
+        if(!this.subject.id){
+            promise = this.subject.save();
         }
-        else {
-            return that.create(cb, cbe);
-        }
-    });
 
-};
+        return promise.then(()=>{
+            if (that.id) {
+                return that.update(cb, cbe);
+            }
+            else {
+                return that.create(cb, cbe);
+            }
+        });
 
-/**
- * Returns true if current homework is attached to a lesson
- * @returns {boolean}
- */
-Homework.prototype.isAttachedToLesson = function() {
-    return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
-};
+    };
 
-Homework.prototype.isDraft = function () {
-    return this.state === "draft";
-};
+    /**
+     * Returns true if current homework is attached to a lesson
+     * @returns {boolean}
+     */
+    isAttachedToLesson = function() {
+        return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
+    };
 
-Homework.prototype.isPublished = function () {
-    return !this.isDraft();
-};
+    isDraft = function () {
+        return this.state === "draft";
+    };
 
-/**
- * A directly publishable homework must exist in database and not linked to a lesson
- * @param toPublish
- * @returns {*|boolean} true if homework can be published directly
- */
-Homework.prototype.isPublishable = function (toPublish) {
-    return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
-};
+    isPublished = function () {
+        return !this.isDraft();
+    };
 
-Homework.prototype.changeState = function (toPublish) {
-    this.state = toPublish ? 'published' : 'draft';
-};
+    /**
+     * A directly publishable homework must exist in database and not linked to a lesson
+     * @param toPublish
+     * @returns {*|boolean} true if homework can be published directly
+     */
+    isPublishable = function (toPublish) {
+        return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
+    };
 
-Homework.prototype.update = function(cb, cbe) {
-    var url = '/diary/homework/' + this.id;
+    changeState = function (toPublish) {
+        this.state = toPublish ? 'published' : 'draft';
+    };
 
-    var homework = this;
-    return model.getHttp()({
-        method : 'PUT',
-        url : url,
-        data : homework
-    }).then(function(){
+    update = function(cb, cbe) {
+        var url = '/diary/homework/' + this.id;
+
+        var homework = this;
+        return model.getHttp()({
+            method : 'PUT',
+            url : url,
+            data : homework
+        }).then(function(){
             if (typeof cb === 'function') {
                 cb();
             }
@@ -119,15 +133,15 @@ Homework.prototype.update = function(cb, cbe) {
                 cbe();
             }
         });
-};
+    };
 
-Homework.prototype.create = function(cb, cbe) {
-    var homework = this;
-    model.getHttp()({
-        method : 'POST',
-        url : '/diary/homework',
-        data : homework
-    }).then(function(result){
+    create = function(cb, cbe) {
+        var homework = this;
+        model.getHttp()({
+            method : 'POST',
+            url : '/diary/homework',
+            data : homework
+        }).then(function(result){
             homework.updateData(result.data);
             model.homeworks.pushAll([homework]);
             if(typeof cb === 'function'){
@@ -139,120 +153,121 @@ Homework.prototype.create = function(cb, cbe) {
                 cbe();
             }
         });
-};
-
-/**
- * Load homework object from id
- * @param cb Callback function
- * @param cbe Callback on error function
- */
-Homework.prototype.load = function (cb, cbe) {
-
-    var homework = this;
-
-
-    http.get('/diary/homework/' + homework.id)
-        .then(function (res) {
-            homework.updateData(sqlToJsHomework(res.data));
-
-            if (typeof cb === 'function') {
-                cb();
-            }
-        })
-        .catch(function (e) {
-            if (typeof cbe === 'function') {
-                cbe(model.parseError(e));
-            }
-        });        
-};
-
-/**
- * Deletes a list of homeworks
- * @param homeworks Homeworks to be deleted
- * @param cb Callback
- * @param cbe Callback on error
- */
-Homework.prototype.deleteList = function (homeworks, cb, cbe) {
-    model.deleteItemList(homeworks, 'homework', cb, cbe);
-};
-
-
-/**
- * Deletes the homework
- * @param Optional lesson attached to homework
- * @param cb Callback after delete
- * @param cbe Callback on error
- */
-Homework.prototype.delete = function (lesson, cb, cbe) {
-
-    var homework = this;
-
-    var deleteHomeworkReferences = function () {
-
-        // delete homework from calendar cache
-        model.homeworks.forEach(function (modelHomework) {
-            if (modelHomework.id === homework.id) {
-                model.homeworks.remove(modelHomework);
-            }
-        });
-
-        if (lesson && lesson.homeworks) {
-            lesson.homeworks.remove(homework);
-        }
     };
 
-    if (this.id) {
-        http.delete('/diary/homework/' + this.id)
-            .then(function (b) {
+    /**
+     * Load homework object from id
+     * @param cb Callback function
+     * @param cbe Callback on error function
+     */
+    load = function (cb, cbe) {
 
-                deleteHomeworkReferences();
+        var homework = this;
+
+
+        http.get('/diary/homework/' + homework.id)
+            .then(function (res) {
+                homework.updateData(sqlToJsHomework(res.data));
 
                 if (typeof cb === 'function') {
                     cb();
                 }
             })
-            .catch(function (error) {
+            .catch(function (e) {
                 if (typeof cbe === 'function') {
-                    cbe(model.parseError(error));
+                    cbe(model.parseError(e));
                 }
             });
-    } else {
-        deleteHomeworkReferences();
-
-        if (typeof cb === 'function') {
-            cb();
-        }
-    }
-};
-
-
-Homework.prototype.toJSON = function () {
-
-    let json:any = {
-        homework_title: this.title,
-        subject_id: this.subject.id,
-        homework_type_id: this.type.id,
-        teacher_id: model.me.userId,
-        school_id: this.audience.structureId,
-        audience_id: this.audience.id,
-        homework_due_date: moment(this.dueDate).format(DATE_FORMAT),
-        homework_description: this.description,
-        homework_color: this.color,
-        homework_state: this.state,
-        // used to auto create postgresql diary.audience if needed
-        // not this.audience object is originally from neo4j graph (see syncAudiences function)
-        audience_type: this.audience.type,
-        audience_name: this.audience.name,
-        attachments: this.attachments
     };
 
-    if (this.lesson_id) {
-        json.lesson_id = this.lesson_id;
-    }
+    /**
+     * Deletes a list of homeworks
+     * @param homeworks Homeworks to be deleted
+     * @param cb Callback
+     * @param cbe Callback on error
+     */
+    deleteList = function (homeworks, cb, cbe) {
+        model.deleteItemList(homeworks, 'homework', cb, cbe);
+    };
 
-    /*if (!this.id) {
-        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
-    }*/
 
-    return json;
+    /**
+     * Deletes the homework
+     * @param Optional lesson attached to homework
+     * @param cb Callback after delete
+     * @param cbe Callback on error
+     */
+    delete = function (lesson, cb, cbe) {
+
+        var homework = this;
+
+        var deleteHomeworkReferences = function () {
+
+            // delete homework from calendar cache
+            model.homeworks.forEach(function (modelHomework) {
+                if (modelHomework.id === homework.id) {
+                    model.homeworks.remove(modelHomework);
+                }
+            });
+
+            if (lesson && lesson.homeworks) {
+                lesson.homeworks.remove(homework);
+            }
+        };
+
+        if (this.id) {
+            http.delete('/diary/homework/' + this.id)
+                .then(function (b) {
+
+                    deleteHomeworkReferences();
+
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                })
+                .catch(function (error) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(error));
+                    }
+                });
+        } else {
+            deleteHomeworkReferences();
+
+            if (typeof cb === 'function') {
+                cb();
+            }
+        }
+    };
+
+
+    toJSON = function () {
+
+        let json:any = {
+            homework_title: this.title,
+            subject_id: this.subject.id,
+            homework_type_id: this.type.id,
+            teacher_id: model.me.userId,
+            school_id: this.audience.structureId,
+            audience_id: this.audience.id,
+            homework_due_date: moment(this.dueDate).format(DATE_FORMAT),
+            homework_description: this.description,
+            homework_color: this.color,
+            homework_state: this.state,
+            // used to auto create postgresql diary.audience if needed
+            // not this.audience object is originally from neo4j graph (see syncAudiences function)
+            audience_type: this.audience.type,
+            audience_name: this.audience.name,
+            attachments: this.attachments
+        };
+
+        if (this.lesson_id) {
+            json.lesson_id = this.lesson_id;
+        }
+
+        /*if (!this.id) {
+            created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
+        }*/
+
+        return json;
+    };
 };

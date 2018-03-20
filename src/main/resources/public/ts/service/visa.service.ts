@@ -1,42 +1,32 @@
-import {AngularExtensions} from '../app';
-import {_, model, moment} from 'entcore';
+import {_, model, moment, $http} from 'entcore';
 import * as FileSaver from 'file-saver';
 
 
 /*
  * Visa service as class
- * used to manipulate Visa model
+ * used to manipulate Visa modelH
  */
-export default class VisaService {
-    $http: any;
-    constants: any;
-    $q: any;
+export class VisaService {
 
-    constructor($http, $q, constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-    }
-
-    getFilters(structureId) {
+    static getFilters(structureId) {
 
         let url = `/diary/visa/filters/${structureId}`;
 
-        return this.$http.get(url).then((result)=>{
+        return $http.get(url).then((result)=>{
             return result.data;
         });
     }
 
-    getInspectorFilters(structureId,inspectorId) {
+    static getInspectorFilters(structureId,inspectorId) {
         let url = `/diary/visa/filtersinspector/${structureId}/${inspectorId}`;
-        return this.$http.get(url).then((result)=>{
+        return $http.get(url).then((result)=>{
             return result.data;
         });
     }
 
-    getAgregatedVisas(structureId, filter){
+    static getAgregatedVisas(structureId, filter){
         let url = `/diary/visa/agregs`;
-        return this.$http({
+        return $http({
             url : url,
             method : 'GET',
             params : {
@@ -51,9 +41,9 @@ export default class VisaService {
         });
     }
 
-    applyVisa(applyVisa,lock){
+    static applyVisa(applyVisa,lock){
         let url = `/diary/visa/apply/${lock}`;
-        return this.$http({
+        return $http({
             url : url,
             method : 'POST',
             data : applyVisa
@@ -62,9 +52,9 @@ export default class VisaService {
         });
     }
 
-    getLessonForVisa(resultVisaList){
+    static getLessonForVisa(resultVisaList){
         let url = `/diary/visa/lessons`;
-        return this.$http({
+        return $http({
             url : url,
             method : 'POST',
             data : resultVisaList
@@ -73,9 +63,9 @@ export default class VisaService {
         });
     }
 
-    getPdfForVisa(resultVisaList){
+    static getPdfForVisa(resultVisaList){
         let url = `/diary/visa/pdf`;
-        this.$http({
+        $http({
             url: url,
             method: "POST",
             data: resultVisaList,
@@ -90,18 +80,18 @@ export default class VisaService {
         });
     }
 
-    applyInspectorRight(structureId,inspectorId,teachers){
+    static applyInspectorRight(structureId,inspectorId,teachers){
         let url = `/diary/inspect/right/${structureId}/${inspectorId}`;
-        return this.$http({
+        return $http({
             url: url,
             method: "POST",
             data: teachers,
         });
     }
 
-    getInspectTeachers(structureId,inspectorId){
+    static getInspectTeachers(structureId,inspectorId){
         let url = `/diary/inspect/getTeacher/${structureId}/${inspectorId}`;
-        return this.$http({
+        return $http({
             url : url,
             method : 'GET'
         }).then((result)=>{
@@ -109,9 +99,9 @@ export default class VisaService {
         });
     }
 
-    getInspectorList(){
+    static getInspectorList(){
         let url = `/diary/inspect/getInspectors`;
-        return this.$http({
+        return $http({
             url : url,
             method : 'GET'
         }).then((result)=>{
@@ -119,13 +109,3 @@ export default class VisaService {
         });
     }
 }
-
-
-(function () {
-    'use strict';
-    /* create singleton */
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("VisaService", VisaService);
-    });
-
-})();

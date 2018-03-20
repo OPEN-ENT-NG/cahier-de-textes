@@ -1,35 +1,20 @@
-import {AngularExtensions} from '../app';
-import {_, moment, model} from 'entcore';
+import {_, moment, model, $http} from 'entcore';
 import {PedagogicItem} from "../model/PedagogicItem.model";
-import UtilsService from "./utils.service";
 
-export default class PedagogicItemService {
-    $http: any;
-    constants: any;
-    $q: any;
-    UtilsService: any;
-
-    constructor($http, $q, constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.UtilsService= new UtilsService(this.$http, this.$q, this.constants);
-    }
-
-
-    getPedagogicItems(params){
+export class PedagogicItemService {
+    static getPedagogicItems(params){
         let options = {
             method : 'POST',
             url : `/diary/pedagogicItems/list`,
             data : params
         };
 
-        return this.$http(options).then((result) =>{
+        return $http(options).then((result) =>{
             return _.map(result.data, this.mapPedagogicItem);
         } );
     }
 
-    mapPedagogicItem(data) {
+    static mapPedagogicItem(data) {
         var item = new PedagogicItem();
         item.type_item = data.type_item;
         item.id = data.id;
@@ -61,13 +46,3 @@ export default class PedagogicItemService {
     }
 
 };
-
-
-(function () {
-    'use strict';
-    /* create singleton */
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("PedagogicItemService", PedagogicItemService);
-    });
-
-})();

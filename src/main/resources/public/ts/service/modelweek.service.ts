@@ -1,36 +1,22 @@
-import {AngularExtensions} from '../app';
-import {_, moment, model} from 'entcore';
+import {_, moment, model, $http} from 'entcore';
+import {CONSTANTS} from "../tools";
+import {CourseService} from "./courses.service";
 
-import CourseService from "./courses.service";
 
+export class ModelWeekService {
+    static promiseGetmodelWeek:any;
 
-export default class ModelWeekService {
-    $http:any;
-    $q:any;
-    constants: any;
-    promiseGetmodelWeek: any;
-    CourseService:any;
-
-    constructor($http,$q,constants) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.promiseGetmodelWeek = undefined;
-
-        this.CourseService = new CourseService(this.$http, this.$q, this.constants);
-    }
-
-    setModelWeek(alias,date){
-        let dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
+    static setModelWeek(alias,date){
+        let dateParam = moment(date).format(CONSTANTS.CAL_DATE_PATTERN);
         let url = `/diary/modelweek/${alias}/${dateParam}`;
         this.promiseGetmodelWeek = undefined;
-        return this.$http.post(url);
+        return $http.post(url);
     }
 
-    getModelWeeks(){
+    static getModelWeeks(){
         let url = `/diary/modelweek/list`;
         if ( !this.promiseGetmodelWeek){
-            this.promiseGetmodelWeek = this.$http.get(url).then((result)=>{
+            this.promiseGetmodelWeek = $http.get(url).then((result)=>{
                 let modelWeeks = result.data;
                 _.each(modelWeeks,modelWeek =>{
                     modelWeek.startDate = moment(modelWeek.startDate).toDate();
@@ -48,19 +34,19 @@ export default class ModelWeekService {
         return this.promiseGetmodelWeek;
     }
 
-    invertModelsWeek(){
+    static invertModelsWeek(){
         let url = `/diary/modelweek/invert`;
         this.promiseGetmodelWeek = undefined;
-        return this.$http.post(url).then((result)=>{
+        return $http.post(url).then((result)=>{
             return result.data;
         });
     }
 
-    getCoursesModel(date){
-        let dateParam = moment(date).format(this.constants.CAL_DATE_PATTERN);
+    static getCoursesModel(date){
+        let dateParam = moment(date).format(CONSTANTS.CAL_DATE_PATTERN);
         let url = `/diary/modelweek/items/${dateParam}`;
 
-        return this.$http.get(url).then((result)=>{
+        return $http.get(url).then((result)=>{
             let courses=result.data;
             if (!courses){
                 courses=[];
@@ -70,7 +56,7 @@ export default class ModelWeekService {
         });
     }
 
-    mappModelWeekToCourse(courses){
+    static mappModelWeekToCourse(courses){
         _.each(courses,course =>{
 
             let date = moment(course.date);
@@ -89,7 +75,7 @@ export default class ModelWeekService {
             course.startDate = begin.toDate();
             course.endDate = end.toDate();
 
-            this.CourseService.mappCourse(course);
+            CourseService.mappCourse(course);
             course.subject = model.subjects.findWhere({id: course.subjectId});
             course.subject.subjectLabel = course.subjectLabel;
             course.subjectId = course.subjectId;
@@ -99,11 +85,3 @@ export default class ModelWeekService {
     }
 
 }
-
-(function () {
-    'use strict';
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("ModelWeekService",ModelWeekService);
-    });
-
-})();

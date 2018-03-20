@@ -6,7 +6,7 @@ import { DATE_FORMAT, sansAccent, sqlToJsPedagogicItem, sqlToJsHomework, sqlToJs
 import { Homework } from './model/Homework.model';
 import { Lesson } from './model/Lesson.model';
 import { PedagogicDay } from './model/PedagogicDay.model';
-import {Child } from './model/Child.model';
+import { Child } from './model/Child.model';
 import { Subject } from './model/Subject.model';
 import { SearchForm } from './model/SearchForm.model';
 
@@ -15,10 +15,10 @@ import { SearchForm } from './model/SearchForm.model';
  * diary.lesson_has_attachment
  * @constructor
  */
-function LessonAttachment() {}
-export let Audience= () => { };
-function HomeworksLoad(){}
-function HomeworkType(){}
+export function LessonAttachment() {}
+export function Audience() {};
+export function HomeworksLoad(){}
+export function HomeworkType(){}
 
 
 /**
@@ -39,7 +39,7 @@ const DEFAULT_STATE = 'draft';
  * seperated with ':'
  * @returns {string} schoolid_1:schoolid_2:...
  */
-var getUserStructuresIdsAsString = function () {
+export function getUserStructuresIdsAsString () {
     var structureIds = "";
 
     model.me.structures.forEach(function (structureId) {
@@ -50,6 +50,326 @@ var getUserStructuresIdsAsString = function () {
 };
 
 
+model.build = function () {
+
+    calendar.startOfDay = 8;
+    calendar.endOfDay = 19;
+    calendar.dayHeight = 65;
+    /*model.calendar = new calendar.Calendar({
+        week: moment().week()
+    });
+    */
+
+    // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
+    // note: model.calendar.startOfDay does not work in console.
+    model.startOfDay = calendar.startOfDay;
+    model.endOfDay = calendar.endOfDay;
+
+    this.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
+    Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
+
+    this.searchForm = new SearchForm(false);
+    this.currentSchool = {};
+
+    this.collection(Lesson, {
+        loading: false,
+        syncLessons: function (cb, cbe) {
+            console.warn("deprecated");
+            return;
+            /*var that = this;
+            if (that.loading)
+                return;
+
+            var lessons = [];
+            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
+
+            model.lessons.all.splice(0, model.lessons.all.length);
+
+            var urlGetLessons = '/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+
+            if (model.isUserParent() && model.child) {
+                urlGetLessons += model.child.id;
+            } else {
+                urlGetLessons += '%20';
+            }
+
+            that.loading = true;
+            model.getHttp()({
+                method : 'GET',
+                url : urlGetLessons
+            }).then(function (data) {
+                lessons = lessons.concat(data);
+                that.addRange(
+                    _.map(lessons, function (lesson) {
+                        return sqlToJsLesson(lesson);
+                    })
+                );
+                if(typeof cb === 'function'){
+                    cb();
+                }
+                that.loading = false;
+            },function (e) {
+                if (typeof cbe === 'function') {
+                    cbe(model.parseError(e));
+                }
+                that.loading = false;
+            });*/
+        }, pushAll: function (datas) {
+
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
+    });
+
+    this.collection(Subject, {
+        loading: false,
+        syncSubjects: function (cb, cbe) {
+            console.warn("deprecated");
+            return;
+            /*
+            this.all = [];
+            var that = this;
+            if (that.loading)
+                return;
+
+            that.loading = true;
+
+            if (model.isUserTeacher()) {
+                http().get('/diary/subject/initorlist').done(function (data) {
+                if (data ===""){
+                data = [];
+                }
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            } else {
+                http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
+                    model.subjects.addRange(data);
+                    if (typeof cb === 'function') {
+                        cb();
+                    }
+                    that.loading = false;
+                }.bind(that))
+                    .error(function (e) {
+                        if (typeof cbe === 'function') {
+                            cbe(model.parseError(e));
+                        }
+                        that.loading = false;
+                    });
+            }*/
+
+        }
+    });
+
+    this.collection(Audience, {
+        loading: false,
+        syncAudiences: function (cb, cbe) {
+            console.warn("deprecated");
+            return;
+            /*this.all = [];
+            var nbStructures = model.me.structures.length;
+            var that = this;
+            if (that.loading)
+                return;
+
+            model.currentSchool = model.me.structures[0];
+            that.loading = true;
+
+            model.getAudienceService().getAudiences(model.me.structures).then((audiences)=>{
+                this.addRange(structureData.classes);
+                // TODO get groups
+                nbStructures--;
+                if (nbStructures === 0) {
+                    this.trigger('sync');
+                    this.trigger('change');
+                    if(typeof cb === 'function'){
+                        cb();
+                    }
+                }
+
+                that.loading = false;
+            });
+            */
+            /*model.me.structures.forEach(function (structureId) {
+                http().get('/userbook/structure/' + structureId).done(function (structureData) {
+                    structureData.classes = _.map(structureData.classes, function (audience) {
+                        audience.structureId = structureId;
+                        audience.type = 'class';
+                        audience.typeLabel = lang.translate('diary.audience.class');
+                        return audience;
+                    });
+                    this.addRange(structureData.classes);
+                    // TODO get groups
+                    nbStructures--;
+                    if (nbStructures === 0) {
+                        this.trigger('sync');
+                        this.trigger('change');
+                        if(typeof cb === 'function'){
+                            cb();
+                        }
+                    }
+
+                    that.loading = false;
+                }.bind(that))
+                .error(function (e) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(e));
+                    }
+                    that.loading = false;
+                });
+            });*/
+        }
+    });
+
+    this.collection(HomeworkType, {
+        loading: false,
+        syncHomeworkTypes: function (cb, cbe) {
+
+            var homeworkTypes = [];
+            var that = this;
+
+            if (that.loading)
+                return;
+
+            model.homeworkTypes.all.splice(0, model.homeworkTypes.all.length);
+
+            var url = '/diary/homeworktype/initorlist';
+
+            var urlGetHomeworkTypes = url;
+
+            that.loading = true;
+            return model.getHttp()({
+                method: 'GET',
+                url: urlGetHomeworkTypes
+            }).then(function (result) {
+
+                homeworkTypes = homeworkTypes.concat(result.data);
+                that.addRange(
+                    _.map(homeworkTypes, sqlToJsHomeworkType)
+                );
+                if (typeof cb === 'function') {
+                    cb();
+                }
+                that.loading = false;
+                return homeworkTypes;
+            }).catch(function (e) {
+                that.loading = false;
+                throw e;
+            });
+
+        }, pushAll: function (datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
+    });
+
+    this.collection(Homework, {
+        loading: false,
+        syncHomeworks: function (cb, cbe) {
+
+            var homeworks = [];
+            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
+            var that = this;
+
+            if (that.loading)
+                return;
+
+            model.homeworks.all.splice(0, model.homeworks.all.length);
+
+            var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+
+            if (model.isUserParent() && model.child) {
+                urlGetHomeworks += model.child.id;
+            } else {
+                urlGetHomeworks += '%20';
+            }
+
+
+            that.loading = true;
+            return model.getHttp()({
+                method: 'GET',
+                url: urlGetHomeworks
+            }).then(function (result) {
+                homeworks = homeworks.concat(result.data);
+                that.addRange(
+                    _.map(homeworks, sqlToJsHomework)
+                );
+                if (typeof cb === 'function') {
+                    cb();
+                }
+                that.loading = false;
+                return homeworks;
+            }).catch(function (e) {
+                that.loading = false;
+                throw e;
+            });
+
+        }, pushAll: function (datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }, behaviours: 'diary'
+    });
+
+    this.collection(PedagogicDay, {
+        reset: function () {
+            model.pedagogicDays.selectAll();
+            model.pedagogicDays.removeSelection();
+        },
+        syncPedagogicItems: function (cb, cbe) {
+            var params = model.searchForm.getSearch();
+            model.performPedagogicItemSearch(params, model.isUserTeacher(), cb, cbe);
+        },
+        pushAll: function (datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        },
+        getItemsByLesson: function (lessonId) {
+            var items = [];
+
+            model.pedagogicDays.forEach(function (day) {
+                var relatedToLesson = _.filter(day.pedagogicItemsOfTheDay, function (item) {
+                    return item.lesson_id == lessonId;
+                });
+                items = _.union(items, relatedToLesson);
+            });
+
+            return items;
+        }
+    });
+
+    /**
+     *
+     */
+    this.collection(Child, {
+        reset: function () {
+            // n.b: childs not 'children' since collection function adds a 's'
+            model.childs.selectAll();
+            model.childs.removeSelection();
+        },
+        syncChildren: function (cb, cbe) {
+            model.listChildren(cb, cbe);
+        }, pushAll: function (datas) {
+            if (datas) {
+                this.all = _.union(this.all, datas);
+            }
+        }
+    });
+};
 
 
 model.getHttp = function(){
@@ -315,326 +635,6 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
     });
 };
 
-model.build = function () {
-
-    calendar.startOfDay=8;
-    calendar.endOfDay=19;
-    calendar.dayHeight = 65;
-    /*model.calendar = new calendar.Calendar({
-        week: moment().week()
-    });
-    */
-
-    // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
-    // note: model.calendar.startOfDay does not work in console.
-    model.startOfDay = calendar.startOfDay;
-    model.endOfDay = calendar.endOfDay;
-
-    model.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
-    Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
-
-    this.searchForm = new SearchForm(false);
-    this.currentSchool = {};
-
-    this.collection(Lesson, {
-        loading: false,
-        syncLessons: function (cb, cbe) {
-            console.warn("deprecated");
-            return;
-            /*var that = this;
-            if (that.loading)
-                return;
-
-            var lessons = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
-
-            model.lessons.all.splice(0, model.lessons.all.length);
-
-            var urlGetLessons = '/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
-
-            if (model.isUserParent() && model.child) {
-                urlGetLessons += model.child.id;
-            } else {
-                urlGetLessons += '%20';
-            }
-
-            that.loading = true;
-            model.getHttp()({
-                method : 'GET',
-                url : urlGetLessons
-            }).then(function (data) {
-                lessons = lessons.concat(data);
-                that.addRange(
-                    _.map(lessons, function (lesson) {
-                        return sqlToJsLesson(lesson);
-                    })
-                );
-                if(typeof cb === 'function'){
-                    cb();
-                }
-                that.loading = false;
-            },function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-                that.loading = false;
-            });*/
-        },pushAll: function(datas) {
-
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
-    });
-
-    this.collection(Subject, {
-        loading: false,
-        syncSubjects: function (cb, cbe) {
-            console.warn("deprecated");
-            return ;
-            /*
-            this.all = [];
-            var that = this;
-            if (that.loading)
-                return;
-
-            that.loading = true;
-
-            if (model.isUserTeacher()) {
-                http().get('/diary/subject/initorlist').done(function (data) {
-                if (data ===""){
-                data = [];
-                }
-                    model.subjects.addRange(data);
-                    if (typeof cb === 'function') {
-                        cb();
-                    }
-                    that.loading = false;
-                }.bind(that))
-                    .error(function (e) {
-                        if (typeof cbe === 'function') {
-                            cbe(model.parseError(e));
-                        }
-                        that.loading = false;
-                    });
-            } else {
-                http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
-                    model.subjects.addRange(data);
-                    if (typeof cb === 'function') {
-                        cb();
-                    }
-                    that.loading = false;
-                }.bind(that))
-                    .error(function (e) {
-                        if (typeof cbe === 'function') {
-                            cbe(model.parseError(e));
-                        }
-                        that.loading = false;
-                    });
-            }*/
-
-        }
-    });
-
-    this.collection(Audience, {
-        loading: false,
-        syncAudiences: function (cb, cbe) {
-            console.warn("deprecated");
-            return;
-            /*this.all = [];
-            var nbStructures = model.me.structures.length;
-            var that = this;
-            if (that.loading)
-                return;
-
-            model.currentSchool = model.me.structures[0];
-            that.loading = true;
-
-            model.getAudienceService().getAudiences(model.me.structures).then((audiences)=>{
-                this.addRange(structureData.classes);
-                // TODO get groups
-                nbStructures--;
-                if (nbStructures === 0) {
-                    this.trigger('sync');
-                    this.trigger('change');
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
-                }
-
-                that.loading = false;
-            });
-            */
-            /*model.me.structures.forEach(function (structureId) {
-                http().get('/userbook/structure/' + structureId).done(function (structureData) {
-                    structureData.classes = _.map(structureData.classes, function (audience) {
-                        audience.structureId = structureId;
-                        audience.type = 'class';
-                        audience.typeLabel = lang.translate('diary.audience.class');
-                        return audience;
-                    });
-                    this.addRange(structureData.classes);
-                    // TODO get groups
-                    nbStructures--;
-                    if (nbStructures === 0) {
-                        this.trigger('sync');
-                        this.trigger('change');
-                        if(typeof cb === 'function'){
-                            cb();
-                        }
-                    }
-
-                    that.loading = false;
-                }.bind(that))
-                .error(function (e) {
-                    if (typeof cbe === 'function') {
-                        cbe(model.parseError(e));
-                    }
-                    that.loading = false;
-                });
-            });*/
-        }
-    });
-
-    this.collection(HomeworkType, {
-        loading: false,
-        syncHomeworkTypes: function(cb, cbe){
-
-            var homeworkTypes = [];
-            var that = this;
-
-            if (that.loading)
-                return;
-
-            model.homeworkTypes.all.splice(0, model.homeworkTypes.all.length);
-
-            var url = '/diary/homeworktype/initorlist';
-
-            var urlGetHomeworkTypes = url;
-
-            that.loading = true;
-            return model.getHttp()({
-                method : 'GET',
-                url : urlGetHomeworkTypes
-            }).then(function (result) {
-
-                homeworkTypes = homeworkTypes.concat(result.data);
-                that.addRange(
-                    _.map(homeworkTypes, sqlToJsHomeworkType)
-                );
-                if (typeof cb === 'function') {
-                    cb();
-                }
-                that.loading = false;
-                return homeworkTypes;
-            }).catch(function (e) {
-                that.loading = false;
-                throw e;
-            });
-
-        }, pushAll: function(datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
-    });
-
-    this.collection(Homework, {
-        loading: false,
-        syncHomeworks: function(cb, cbe){
-
-            var homeworks = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
-            var that = this;
-
-            if (that.loading)
-                return;
-
-            model.homeworks.all.splice(0, model.homeworks.all.length);
-
-            var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
-
-            if (model.isUserParent() && model.child) {
-                urlGetHomeworks += model.child.id;
-            } else {
-                urlGetHomeworks += '%20';
-            }
-
-
-            that.loading = true;
-            return model.getHttp()({
-                method : 'GET',
-                url : urlGetHomeworks
-            }).then(function (result) {
-                homeworks = homeworks.concat(result.data);
-                that.addRange(
-                    _.map(homeworks, sqlToJsHomework)
-                );
-                if(typeof cb === 'function'){
-                    cb();
-                }
-                that.loading = false;
-                return homeworks;
-            }).catch(function (e) {
-                that.loading = false;
-                throw e;
-            });
-
-        }, pushAll: function(datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
-    });
-
-    this.collection(PedagogicDay, {
-        reset: function() {
-            model.pedagogicDays.selectAll();
-            model.pedagogicDays.removeSelection();
-        },
-        syncPedagogicItems: function(cb, cbe){
-            var params = model.searchForm.getSearch();
-            model.performPedagogicItemSearch(params, model.isUserTeacher(), cb, cbe);
-        },
-        pushAll: function(datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        },
-        getItemsByLesson : function(lessonId) {
-            var items = [];
-
-            model.pedagogicDays.forEach(function (day) {
-                var relatedToLesson = _.filter(day.pedagogicItemsOfTheDay, function(item) {
-                    return item.lesson_id == lessonId;
-                });
-                items = _.union(items, relatedToLesson);
-            });
-
-            return items;
-        }
-    });
-
-    /**
-     *
-     */
-    this.collection(Child, {
-        reset: function() {
-            // n.b: childs not 'children' since collection function adds a 's'
-            model.childs.selectAll();
-            model.childs.removeSelection();
-        },
-        syncChildren: function(cb, cbe){
-            model.listChildren(cb, cbe);
-        }, pushAll: function(datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }
-    });
-};
 
 /**
  * On window resize compute lesson tooltips (responsive design)

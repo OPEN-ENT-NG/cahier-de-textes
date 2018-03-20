@@ -1,40 +1,25 @@
-import {AngularExtensions} from '../app';
-import {_, idiom as lang, moment, model} from 'entcore';
+import {_, idiom as lang, moment, model, $http} from 'entcore';
 import { Homework } from '../model/Homework.model';
 import { Subject } from '../model/Subject.model';
-import AttachmentService from "./attachment.service";
-import UtilsService from "./utils.service";
+import { CONSTANTS } from '../tools';
+import {UtilsService} from "./utils.service";
+import {AttachmentService} from "./attachment.service";
 
 
 /*
  * Lesson service as class
  * used to manipulate Lesson model
  */
-export default class LessonService {
+export class LessonService {
 
-    $http: any;
-    $q: any;
-    constants: any;
-    AttachmentService: any;
-    UtilsService: any;
+    static getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate) {
 
-
-    constructor($http, $q, constants ) {
-        this.$http = $http;
-        this.$q = $q;
-        this.constants = constants;
-        this.UtilsService = new UtilsService(this.$http, this.$q, this.constants);
-        this.AttachmentService = new AttachmentService(this.$http, this.$q, this.constants);
-    }
-
-    getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate) {
-
-        var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
-        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+        var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
+        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
 
         if (fromDate){
-            start = fromDate.format(this.constants.CAL_DATE_PATTERN);
-            end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            start = fromDate.format(CONSTANTS.CAL_DATE_PATTERN);
+            end = toDate.format(CONSTANTS.CAL_DATE_PATTERN);
         }
 
         var urlGetLessons = `/diary/lesson/${userStructuresIds}/${start}/${end}/`;
@@ -45,25 +30,25 @@ export default class LessonService {
             urlGetLessons += '%20';
         }
 
-        return this.$http.get(urlGetLessons).then((result)=>{
+        return $http.get(urlGetLessons).then((result)=>{
             return this.mappLessons(result.data);
         });
     }
 
-    getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate) {
+    static getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate) {
 
-        var start = moment(mondayOfWeek).day(1).format(this.constants.CAL_DATE_PATTERN);
-        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(this.constants.CAL_DATE_PATTERN);
+        var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
+        var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
         if (fromDate){
-            start = fromDate.format(this.constants.CAL_DATE_PATTERN);
-            end = toDate.format(this.constants.CAL_DATE_PATTERN);
+            start = fromDate.format(CONSTANTS.CAL_DATE_PATTERN);
+            end = toDate.format(CONSTANTS.CAL_DATE_PATTERN);
         }
         let type = teacher ? "teacher" : "audience";
         let id = teacher ? teacher.key : audience.key;
 
         var urlGetLessons = `/diary/lesson/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
 
-        return this.$http.get(urlGetLessons).then((result)=>{
+        return $http.get(urlGetLessons).then((result)=>{
             return this.mappLessons(result.data);
         });
     }
@@ -71,7 +56,7 @@ export default class LessonService {
     /*
     *   Map lesson
     */
-    mappLessons(lessons){
+    static mappLessons(lessons){
         return _.map(lessons,(lessonData) =>{
             return this.mapLesson(lessonData);
         });
@@ -80,7 +65,7 @@ export default class LessonService {
     /*
     *  Map one lesson
     */
-    mapLesson(lessonData){
+    static mapLesson(lessonData){
         var lessonHomeworks = [];
 
         // only initialize homeworks attached to lesson
@@ -136,23 +121,13 @@ export default class LessonService {
         }
 
         if (lessonData.attachments) {
-            lesson.attachments = this.AttachmentService.mappAttachement(JSON.parse(lessonData.attachments));
+            lesson.attachments = AttachmentService.mappAttachement(JSON.parse(lessonData.attachments));
         }
 
-        lesson.tooltipText = this.UtilsService.getResponsiveLessonTooltipText(lesson);
+        lesson.tooltipText = UtilsService.getResponsiveLessonTooltipText(lesson);
         return lesson;
     }
 
 
 
 };
-
-
-(function () {
-    'use strict';
-    /* create singleton */
-    AngularExtensions.addModuleConfig(function(module) {
-        module.service("LessonService", LessonService);
-    });
-
-})();

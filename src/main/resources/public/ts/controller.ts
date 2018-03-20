@@ -1,10 +1,14 @@
-import { angular, model, moment, _, notify } from 'entcore';
+import { ng, angular, model, moment, _, notify, template } from 'entcore';
 import { syncLessonsAndHomeworks, syncHomeworks} from './tools';
 
 
 import {Homework} from './model/Homework.model';
 import {Lesson} from './model/Lesson.model';
 import {PedagogicItem} from './model/PedagogicItem.model';
+import {CourseService} from "./service/courses.service";
+import {LessonService} from "./service/lessons.service";
+import {SecureService} from "./directives/secure/secure.service";
+import {AudienceService} from "./service/audiences.service";
 
 
 
@@ -23,7 +27,10 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
  * @param $location
  * @constructor
  */
-function DiaryController($scope, $rootScope,template, model, route, $location, $window,CourseService,AudienceService,LessonService,SecureService,constants,$sce) {
+
+export let DiaryController = ng.controller('DiaryController', [
+    '$scope', '$rootScope', 'model', 'route', '$location', '$window', 'constants', '$sce',
+    function ($scope, $rootScope, model, route, $location, $window,constants,$sce) {
 
     model.CourseService = CourseService;
     model.LessonService = LessonService;
@@ -1240,3 +1247,4 @@ function DiaryController($scope, $rootScope,template, model, route, $location, $
             });
     }
 }
+]);
