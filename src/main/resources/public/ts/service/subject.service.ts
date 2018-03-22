@@ -1,6 +1,7 @@
-import {_, $http } from 'entcore';
+import { BaseMode, _ } from 'entcore';
 import { Subject} from "../model/Subject.model";
 import {UtilsService} from "./utils.service";
+import http from 'axios';
 
 /*
  * Subject service as class
@@ -32,7 +33,7 @@ export class SubjectService {
     static getStructureSubjects(structureId){
         if (!this.context.subjectPromise[structureId]){
             var url = `/directory/timetable/subjects/${structureId}`;
-            this.context.subjectPromise[structureId] = $http.get(url).then(result =>{
+            this.context.subjectPromise[structureId] = http.get(url).then(result =>{
                 return result.data;
             });
         }
@@ -52,8 +53,10 @@ export class SubjectService {
             urlGetSubjects = '/diary/subject/list/' + UtilsService.getUserStructuresIdsAsString();
         }
 
-        return $http.get(urlGetSubjects).then((result)=>{
-            return result.data;
+        return http.get(urlGetSubjects).then((result)=>{
+            return _.map(result.data, (sub)=> {
+               return new Subject(sub);
+            });
         });
     }
 

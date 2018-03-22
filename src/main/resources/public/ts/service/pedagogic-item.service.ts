@@ -1,5 +1,6 @@
-import {_, moment, model, $http} from 'entcore';
+import {_, moment, model } from 'entcore';
 import { PedagogicItem } from "../model/PedagogicItem.model";
+import http from 'axios';
 
 export class PedagogicItemService {
     static getPedagogicItems(params){
@@ -9,7 +10,7 @@ export class PedagogicItemService {
             data : params
         };
 
-        return $http(options).then((result) =>{
+        return http(options).then((result) =>{
             return _.map(result.data, this.mapPedagogicItem);
         } );
     }

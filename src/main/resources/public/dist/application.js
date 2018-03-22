@@ -48,7 +48,11 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var controller_1 = __webpack_require__(2);
+	var controllers = __webpack_require__(86);
 	entcore_1.ng.controllers.push(controller_1.DiaryController);
+	for (var controller in controllers) {
+	    entcore_1.ng.controllers.push(controllers[controller]);
+	}
 	exports.AngularExtensions = {
 	    moduleConfigs: [],
 	    addModuleConfig: function (callBack) {
@@ -60,6 +64,54 @@
 	        });
 	    }
 	};
+	entcore_1.routes.define(function ($routeProvider) {
+	    $routeProvider
+	        .when('/showHistoryView', {
+	        action: 'showHistoryView'
+	    })
+	        .when('/manageVisaView/:teacherId', {
+	        action: 'manageVisaView'
+	    })
+	        .when('/progressionManagerView/:selectedProgressionId', {
+	        action: 'progressionManagerView'
+	    })
+	        .when('/progressionEditLesson/:progressionId/:editProgressionLessonId', {
+	        action: 'editLessonView'
+	    })
+	        .when('/createLessonView/:timeFromCalendar', {
+	        action: 'createLessonView'
+	    })
+	        .when('/createHomeworkView', {
+	        action: 'createHomeworkView'
+	    })
+	        .when('/editLessonView/:idLesson', {
+	        action: 'editLessonView'
+	    })
+	        .when('/showLessonView/:idLesson', {
+	        action: 'showLessonView'
+	    })
+	        .when('/editLessonView/:idLesson/:idHomework', {
+	        action: 'editLessonView'
+	    })
+	        .when('/editHomeworkView/:idHomework', {
+	        action: 'editHomeworkView'
+	    })
+	        .when('/editHomeworkView/:idHomework/:idLesson', {
+	        action: 'editHomeworkView'
+	    })
+	        .when('/calendarView/:mondayOfWeek', {
+	        action: 'calendarView'
+	    })
+	        .when('/listView', {
+	        action: 'listView'
+	    })
+	        .when('/mainView', {
+	        action: 'mainView'
+	    })
+	        .otherwise({
+	        action: 'calendarView'
+	    });
+	});
 
 
 /***/ }),
@@ -247,12 +299,12 @@
 	                entcore_1.template.open('main', 'main');
 	                entcore_1.template.open('main-view', 'calendar');
 	                entcore_1.template.open('daily-event-details', 'daily-event-details');
-	                model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+	                model.selectedViewMode = '/diary/public/template/calendar/calendar-view.template.html';
 	            },
 	            listView: function () {
 	                entcore_1.template.open('main', 'main');
 	                entcore_1.template.open('main-view', 'calendar');
-	                model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
+	                model.selectedViewMode = '/diary/public/template/calendar/list-view.template.html';
 	            },
 	            mainView: function () {
 	                if ($scope.display.showList) {
@@ -3254,223 +3306,239 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var axios_1 = __webpack_require__(5);
 	var tools_1 = __webpack_require__(3);
-	function Homework() {
-	    /**
-	     * used in ui in homework tab in lesson view
-	     * @type {boolean}
-	     */
-	    this.expanded = false;
-	    /**
-	     * Attachments
-	     */
-	    if (!this.attachments) {
-	        this.attachments = new Array();
-	    }
-	    /**
-	     * Delete calendar references of current homework
-	     */
-	    this.deleteModelReferences = function () {
-	        var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
-	        // delete homework in calendar cache
-	        if (idxHomeworkToDelete >= 0) {
-	            entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
+	var Homework = (function (_super) {
+	    __extends(Homework, _super);
+	    function Homework(data) {
+	        var _this = _super.call(this) || this;
+	        _this.expanded = false;
+	        _this.api = { delete: '/diary/homework/:id' };
+	        /**
+	         * Delete calendar references of current homework
+	         */
+	        _this.deleteModelReferences = function () {
+	            var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
+	            // delete homework in calendar cache
+	            if (idxHomeworkToDelete >= 0) {
+	                entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
+	            }
+	        };
+	        /**
+	         * Adds an attachment
+	         * @param attachment
+	         */
+	        _this.addAttachment = function (attachment) {
+	            this.attachments.push(attachment);
+	        };
+	        /**
+	         * Removes attachment associated to this lesson
+	         * @param attachment
+	         * @param cb
+	         * @param cbe
+	         */
+	        _this.detachAttachment = function (attachment, cb, cbe) {
+	            attachment.detachFromItem(this.id, 'lesson', cb, cbe);
+	        };
+	        _this.save = function (cb, cbe) {
+	            var that = this;
+	            var promise = entcore_1.model.$q().when({});
+	            if (!this.subject.id) {
+	                promise = this.subject.save();
+	            }
+	            return promise.then(function () {
+	                if (that.id) {
+	                    return that.update(cb, cbe);
+	                }
+	                else {
+	                    return that.create(cb, cbe);
+	                }
+	            });
+	        };
+	        /**
+	         * Returns true if current homework is attached to a lesson
+	         * @returns {boolean}
+	         */
+	        _this.isAttachedToLesson = function () {
+	            return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
+	        };
+	        _this.isDraft = function () {
+	            return this.state === "draft";
+	        };
+	        _this.isPublished = function () {
+	            return !this.isDraft();
+	        };
+	        /**
+	         * A directly publishable homework must exist in database and not linked to a lesson
+	         * @param toPublish
+	         * @returns {*|boolean} true if homework can be published directly
+	         */
+	        _this.isPublishable = function (toPublish) {
+	            return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
+	        };
+	        _this.changeState = function (toPublish) {
+	            this.state = toPublish ? 'published' : 'draft';
+	        };
+	        _this.update = function (cb, cbe) {
+	            var url = '/diary/homework/' + this.id;
+	            var homework = this;
+	            return entcore_1.model.getHttp()({
+	                method: 'PUT',
+	                url: url,
+	                data: homework
+	            }).then(function () {
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	            }).catch(function (e) {
+	                if (cbe) {
+	                    cbe();
+	                }
+	            });
+	        };
+	        _this.create = function (cb, cbe) {
+	            var homework = this;
+	            entcore_1.model.getHttp()({
+	                method: 'POST',
+	                url: '/diary/homework',
+	                data: homework
+	            }).then(function (result) {
+	                homework.updateData(result.data);
+	                entcore_1.model.homeworks.pushAll([homework]);
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	                return result.data;
+	            }).catch(function (e) {
+	                if (cbe) {
+	                    cbe();
+	                }
+	            });
+	        };
+	        /**
+	         * Load homework object from id
+	         * @param cb Callback function
+	         * @param cbe Callback on error function
+	         */
+	        _this.load = function (cb, cbe) {
+	            var homework = this;
+	            axios_1.default.get('/diary/homework/' + homework.id)
+	                .then(function (res) {
+	                homework.updateData(tools_1.sqlToJsHomework(res.data));
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	            })
+	                .catch(function (e) {
+	                if (typeof cbe === 'function') {
+	                    cbe(entcore_1.model.parseError(e));
+	                }
+	            });
+	        };
+	        /**
+	         * Deletes a list of homeworks
+	         * @param homeworks Homeworks to be deleted
+	         * @param cb Callback
+	         * @param cbe Callback on error
+	         */
+	        _this.deleteList = function (homeworks, cb, cbe) {
+	            entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
+	        };
+	        /**
+	         * Deletes the homework
+	         * @param Optional lesson attached to homework
+	         * @param cb Callback after delete
+	         * @param cbe Callback on error
+	         */
+	        _this.delete = function (lesson, cb, cbe) {
+	            var homework = this;
+	            var deleteHomeworkReferences = function () {
+	                // delete homework from calendar cache
+	                entcore_1.model.homeworks.forEach(function (modelHomework) {
+	                    if (modelHomework.id === homework.id) {
+	                        entcore_1.model.homeworks.remove(modelHomework);
+	                    }
+	                });
+	                if (lesson && lesson.homeworks) {
+	                    lesson.homeworks.remove(homework);
+	                }
+	            };
+	            if (this.id) {
+	                axios_1.default.delete('/diary/homework/' + this.id)
+	                    .then(function (b) {
+	                    deleteHomeworkReferences();
+	                    if (typeof cb === 'function') {
+	                        cb();
+	                    }
+	                })
+	                    .catch(function (error) {
+	                    if (typeof cbe === 'function') {
+	                        cbe(entcore_1.model.parseError(error));
+	                    }
+	                });
+	            }
+	            else {
+	                deleteHomeworkReferences();
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	            }
+	        };
+	        _this.toJSON = function () {
+	            var json = {
+	                homework_title: this.title,
+	                subject_id: this.subject.id,
+	                homework_type_id: this.type.id,
+	                teacher_id: entcore_1.model.me.userId,
+	                school_id: this.audience.structureId,
+	                audience_id: this.audience.id,
+	                homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
+	                homework_description: this.description,
+	                homework_color: this.color,
+	                homework_state: this.state,
+	                // used to auto create postgresql diary.audience if needed
+	                // not this.audience object is originally from neo4j graph (see syncAudiences function)
+	                audience_type: this.audience.type,
+	                audience_name: this.audience.name,
+	                attachments: this.attachments
+	            };
+	            if (this.lesson_id) {
+	                json.lesson_id = this.lesson_id;
+	            }
+	            /*if (!this.id) {
+	                created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
+	            }*/
+	            return json;
+	        };
+	        if (data) {
+	            for (var key in data) {
+	                _this[key] = data[key];
+	            }
 	        }
-	    };
-	    /**
-	     * Adds an attachment
-	     * @param attachment
-	     */
-	    this.addAttachment = function (attachment) {
-	        this.attachments.push(attachment);
-	    };
-	    /**
-	     * Removes attachment associated to this lesson
-	     * @param attachment
-	     * @param cb
-	     * @param cbe
-	     */
-	    this.detachAttachment = function (attachment, cb, cbe) {
-	        attachment.detachFromItem(this.id, 'lesson', cb, cbe);
-	    };
-	}
+	        /**
+	         * Attachments
+	         */
+	        if (!_this.attachments) {
+	            _this.attachments = new Array();
+	        }
+	        return _this;
+	    }
+	    return Homework;
+	}(entcore_1.Model));
 	exports.Homework = Homework;
-	Homework.prototype.api = {
-	    delete: '/diary/homework/:id'
-	};
-	Homework.prototype.save = function (cb, cbe) {
-	    var that = this;
-	    var promise = entcore_1.model.$q().when({});
-	    if (!this.subject.id) {
-	        promise = this.subject.save();
-	    }
-	    return promise.then(function () {
-	        if (that.id) {
-	            return that.update(cb, cbe);
-	        }
-	        else {
-	            return that.create(cb, cbe);
-	        }
-	    });
-	};
-	/**
-	 * Returns true if current homework is attached to a lesson
-	 * @returns {boolean}
-	 */
-	Homework.prototype.isAttachedToLesson = function () {
-	    return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
-	};
-	Homework.prototype.isDraft = function () {
-	    return this.state === "draft";
-	};
-	Homework.prototype.isPublished = function () {
-	    return !this.isDraft();
-	};
-	/**
-	 * A directly publishable homework must exist in database and not linked to a lesson
-	 * @param toPublish
-	 * @returns {*|boolean} true if homework can be published directly
-	 */
-	Homework.prototype.isPublishable = function (toPublish) {
-	    return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
-	};
-	Homework.prototype.changeState = function (toPublish) {
-	    this.state = toPublish ? 'published' : 'draft';
-	};
-	Homework.prototype.update = function (cb, cbe) {
-	    var url = '/diary/homework/' + this.id;
-	    var homework = this;
-	    return entcore_1.model.getHttp()({
-	        method: 'PUT',
-	        url: url,
-	        data: homework
-	    }).then(function () {
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	    }).catch(function (e) {
-	        if (cbe) {
-	            cbe();
-	        }
-	    });
-	};
-	Homework.prototype.create = function (cb, cbe) {
-	    var homework = this;
-	    entcore_1.model.getHttp()({
-	        method: 'POST',
-	        url: '/diary/homework',
-	        data: homework
-	    }).then(function (result) {
-	        homework.updateData(result.data);
-	        entcore_1.model.homeworks.pushAll([homework]);
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	        return result.data;
-	    }).catch(function (e) {
-	        if (cbe) {
-	            cbe();
-	        }
-	    });
-	};
-	/**
-	 * Load homework object from id
-	 * @param cb Callback function
-	 * @param cbe Callback on error function
-	 */
-	Homework.prototype.load = function (cb, cbe) {
-	    var homework = this;
-	    axios_1.default.get('/diary/homework/' + homework.id)
-	        .then(function (res) {
-	        homework.updateData(tools_1.sqlToJsHomework(res.data));
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	    })
-	        .catch(function (e) {
-	        if (typeof cbe === 'function') {
-	            cbe(entcore_1.model.parseError(e));
-	        }
-	    });
-	};
-	/**
-	 * Deletes a list of homeworks
-	 * @param homeworks Homeworks to be deleted
-	 * @param cb Callback
-	 * @param cbe Callback on error
-	 */
-	Homework.prototype.deleteList = function (homeworks, cb, cbe) {
-	    entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
-	};
-	/**
-	 * Deletes the homework
-	 * @param Optional lesson attached to homework
-	 * @param cb Callback after delete
-	 * @param cbe Callback on error
-	 */
-	Homework.prototype.delete = function (lesson, cb, cbe) {
-	    var homework = this;
-	    var deleteHomeworkReferences = function () {
-	        // delete homework from calendar cache
-	        entcore_1.model.homeworks.forEach(function (modelHomework) {
-	            if (modelHomework.id === homework.id) {
-	                entcore_1.model.homeworks.remove(modelHomework);
-	            }
-	        });
-	        if (lesson && lesson.homeworks) {
-	            lesson.homeworks.remove(homework);
-	        }
-	    };
-	    if (this.id) {
-	        axios_1.default.delete('/diary/homework/' + this.id)
-	            .then(function (b) {
-	            deleteHomeworkReferences();
-	            if (typeof cb === 'function') {
-	                cb();
-	            }
-	        })
-	            .catch(function (error) {
-	            if (typeof cbe === 'function') {
-	                cbe(entcore_1.model.parseError(error));
-	            }
-	        });
-	    }
-	    else {
-	        deleteHomeworkReferences();
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	    }
-	};
-	Homework.prototype.toJSON = function () {
-	    var json = {
-	        homework_title: this.title,
-	        subject_id: this.subject.id,
-	        homework_type_id: this.type.id,
-	        teacher_id: entcore_1.model.me.userId,
-	        school_id: this.audience.structureId,
-	        audience_id: this.audience.id,
-	        homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
-	        homework_description: this.description,
-	        homework_color: this.color,
-	        homework_state: this.state,
-	        // used to auto create postgresql diary.audience if needed
-	        // not this.audience object is originally from neo4j graph (see syncAudiences function)
-	        audience_type: this.audience.type,
-	        audience_name: this.audience.name,
-	        attachments: this.attachments
-	    };
-	    if (this.lesson_id) {
-	        json.lesson_id = this.lesson_id;
-	    }
-	    /*if (!this.id) {
-	        created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
-	    }*/
-	    return json;
-	};
+	;
 
 
 /***/ }),
@@ -3831,58 +3899,79 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	function Subject() { }
-	exports.Subject = Subject;
-	;
-	/**
-	 * Saves the subject to databases.
-	 * It's auto-created if it does not exists in database
-	 * @param cb
-	 * @param cbe
-	 */
-	Subject.prototype.save = function (cb, cbe) {
-	    if (this.id) {
-	        // not implemented yet at this stage/ not needed
-	    }
-	    else {
-	        return this.create(cb, cbe);
-	    }
-	};
-	/**
-	 * Creates a subject
-	 * @param cb Callback function
-	 * @param cbe Callback on error function
-	 */
-	Subject.prototype.create = function (cb, cbe) {
-	    var subject = this;
-	    if (!this.school_id) {
-	        this.school_id = entcore_1.model.me.structures[0];
-	    }
-	    return entcore_1.model.getHttp()({
-	        method: 'POST',
-	        url: '/diary/subject',
-	        data: subject
-	    }).then(function (result) {
-	        //subject.updateData(subject);
-	        subject.updateData(result.data);
-	        entcore_1.model.subjects.all.push(subject);
-	        if (typeof cb === 'function') {
-	            cb();
+	var Subject = (function (_super) {
+	    __extends(Subject, _super);
+	    function Subject(data) {
+	        var _this = _super.call(this) || this;
+	        /**
+	         * Saves the subject to databases.
+	         * It's auto-created if it does not exists in database
+	         * @param cb
+	         * @param cbe
+	         */
+	        _this.save = function (cb, cbe) {
+	            if (this.id) {
+	                // not implemented yet at this stage/ not needed
+	            }
+	            else {
+	                return this.create(cb, cbe);
+	            }
+	        };
+	        /**
+	         * Creates a subject
+	         * @param cb Callback function
+	         * @param cbe Callback on error function
+	         */
+	        _this.create = function (cb, cbe) {
+	            var subject = this;
+	            if (!this.school_id) {
+	                this.school_id = entcore_1.model.me.structures[0];
+	            }
+	            return entcore_1.model.getHttp()({
+	                method: 'POST',
+	                url: '/diary/subject',
+	                data: subject
+	            }).then(function (result) {
+	                //subject.updateData(subject);
+	                subject.updateData(result.data);
+	                entcore_1.model.subjects.all.push(subject);
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	                return subject;
+	            });
+	        };
+	        _this.toJSON = function () {
+	            return {
+	                id: this.id,
+	                school_id: this.school_id,
+	                subject_label: this.label,
+	                teacher_id: this.teacher_id,
+	                original_subject_id: this.originalsubjectid
+	            };
+	        };
+	        if (data) {
+	            for (var key in data) {
+	                _this[key] = data[key];
+	            }
 	        }
-	        return subject;
-	    });
-	};
-	Subject.prototype.toJSON = function () {
-	    return {
-	        id: this.id,
-	        school_id: this.school_id,
-	        subject_label: this.label,
-	        teacher_id: this.teacher_id,
-	        original_subject_id: this.originalsubjectid
-	    };
-	};
+	        return _this;
+	    }
+	    return Subject;
+	}(entcore_1.Model));
+	exports.Subject = Subject;
 
 
 /***/ }),
@@ -7248,6 +7337,7 @@
 	var entcore_1 = __webpack_require__(1);
 	var tools_1 = __webpack_require__(3);
 	var subject_service_1 = __webpack_require__(79);
+	var axios_1 = __webpack_require__(5);
 	/*
 	* Course service as class
 	* used to manipulate Course model
@@ -7257,7 +7347,7 @@
 	    }
 	    CourseService.getMergeCourses = function (structureId, teacherId, firstDayOfWeek) {
 	        var _this = this;
-	        return entcore_1.$q.all([
+	        return Promise.all([
 	            this.getScheduleCourses(structureId, teacherId, firstDayOfWeek),
 	            subject_service_1.SubjectService.getStructureSubjectsAsMap(structureId)
 	        ]).then(function (results) {
@@ -7306,7 +7396,7 @@
 	                teacherId: teacherId
 	            }
 	        };
-	        return entcore_1.$http.get(url, config).then(function (result) {
+	        return axios_1.default.get(url, config).then(function (result) {
 	            return result.data;
 	        });
 	    };
@@ -7325,6 +7415,7 @@
 	var entcore_1 = __webpack_require__(1);
 	var Subject_model_1 = __webpack_require__(34);
 	var utils_service_1 = __webpack_require__(80);
+	var axios_1 = __webpack_require__(5);
 	/*
 	 * Subject service as class
 	 * used to manipulate Subject model
@@ -7353,7 +7444,7 @@
 	    SubjectService.getStructureSubjects = function (structureId) {
 	        if (!this.context.subjectPromise[structureId]) {
 	            var url = "/directory/timetable/subjects/" + structureId;
-	            this.context.subjectPromise[structureId] = entcore_1.$http.get(url).then(function (result) {
+	            this.context.subjectPromise[structureId] = axios_1.default.get(url).then(function (result) {
 	                return result.data;
 	            });
 	        }
@@ -7371,8 +7462,10 @@
 	        else {
 	            urlGetSubjects = '/diary/subject/list/' + utils_service_1.UtilsService.getUserStructuresIdsAsString();
 	        }
-	        return entcore_1.$http.get(urlGetSubjects).then(function (result) {
-	            return result.data;
+	        return axios_1.default.get(urlGetSubjects).then(function (result) {
+	            return entcore_1._.map(result.data, function (sub) {
+	                return new Subject_model_1.Subject(sub);
+	            });
 	        });
 	    };
 	    /*
@@ -7466,6 +7559,7 @@
 	var tools_1 = __webpack_require__(3);
 	var utils_service_1 = __webpack_require__(80);
 	var attachment_service_1 = __webpack_require__(82);
+	var axios_1 = __webpack_require__(5);
 	/*
 	 * Lesson service as class
 	 * used to manipulate Lesson model
@@ -7488,7 +7582,7 @@
 	        else {
 	            urlGetLessons += '%20';
 	        }
-	        return entcore_1.$http.get(urlGetLessons).then(function (result) {
+	        return axios_1.default.get(urlGetLessons).then(function (result) {
 	            return _this.mappLessons(result.data);
 	        });
 	    };
@@ -7503,7 +7597,7 @@
 	        var type = teacher ? "teacher" : "audience";
 	        var id = teacher ? teacher.key : audience.key;
 	        var urlGetLessons = "/diary/lesson/external/" + userStructuresIds + "/" + start + "/" + end + "/" + type + "/" + id;
-	        return entcore_1.$http.get(urlGetLessons).then(function (result) {
+	        return axios_1.default.get(urlGetLessons).then(function (result) {
 	            return _this.mappLessons(result.data);
 	        });
 	    };
@@ -7789,6 +7883,600 @@
 	    return AudienceService;
 	}());
 	exports.AudienceService = AudienceService;
+	;
+
+
+/***/ }),
+/* 86 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	Object.defineProperty(exports, "__esModule", { value: true });
+	__export(__webpack_require__(87));
+	__export(__webpack_require__(89));
+
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var _this = this;
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var secure_service_1 = __webpack_require__(84);
+	var modelweek_service_1 = __webpack_require__(88);
+	var tools_1 = __webpack_require__(3);
+	exports.MainCalendarPageController = entcore_1.ng.controller('MainCalendarPageController', ['$scope', '$timeout', '$rootScope', '$location',
+	    function ($scope, $timeout, $rootScope, $location) {
+	        var vm = _this;
+	        $timeout(init);
+	        function init() {
+	            $scope.getModel();
+	            vm.isUserParent = entcore_1.model.isUserParent();
+	            $scope.child = entcore_1.model.child;
+	            $scope.children = entcore_1.model.childs;
+	        }
+	        $scope.showCalendarForChild = function (childd) {
+	            console.log("broadcast");
+	            $scope.children.forEach(function (theChild) {
+	                theChild.selected = (theChild.id === childd.id);
+	            });
+	            childd.selected = true;
+	            $scope.child = childd;
+	            entcore_1.model.child = childd;
+	            $rootScope.$broadcast('show-child', childd);
+	        };
+	        $scope.goToListView = function () {
+	            $location.path('/listView');
+	        };
+	        $scope.goToCalendarView = function () {
+	            $location.path('/calendarView/' + entcore_1.moment(entcore_1.model.mondayOfWeek).format(tools_1.CONSTANTS.CAL_DATE_PATTERN));
+	        };
+	        $scope.setModel = function (alias) {
+	            modelweek_service_1.ModelWeekService.setModelWeek(alias, entcore_1.model.mondayOfWeek).then(function (modelWeek) {
+	                $scope.modelWeekCurrentWeek = alias;
+	                $scope.isModelWeek = true;
+	                $rootScope.$broadcast('calendar.refreshCalendar');
+	                $scope.getModel();
+	            });
+	            entcore_1.notify.info(entcore_1.idiom.translate('diary.model.week.choice.effective') + " " + alias);
+	        };
+	        $scope.invert = function () {
+	            modelweek_service_1.ModelWeekService.invertModelsWeek().then(function () {
+	                $rootScope.$broadcast('calendar.refreshCalendar');
+	                $scope.getModel();
+	            });
+	        };
+	        $scope.getModel = function () {
+	            if (secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.MANAGE_MODEL_WEEK)) {
+	                modelweek_service_1.ModelWeekService.getModelWeeks().then(function (modelweeks) {
+	                    $scope.modelWeeks = modelweeks;
+	                });
+	            }
+	        };
+	    }]);
+
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var tools_1 = __webpack_require__(3);
+	var courses_service_1 = __webpack_require__(78);
+	var axios_1 = __webpack_require__(5);
+	var ModelWeekService = (function () {
+	    function ModelWeekService() {
+	    }
+	    ModelWeekService.setModelWeek = function (alias, date) {
+	        var dateParam = entcore_1.moment(date).format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        var url = "/diary/modelweek/" + alias + "/" + dateParam;
+	        this.promiseGetmodelWeek = undefined;
+	        return axios_1.default.post(url);
+	    };
+	    ModelWeekService.getModelWeeks = function () {
+	        var url = "/diary/modelweek/list";
+	        if (!this.promiseGetmodelWeek) {
+	            this.promiseGetmodelWeek = axios_1.default.get(url).then(function (result) {
+	                var modelWeeks = result.data;
+	                entcore_1._.each(modelWeeks, function (modelWeek) {
+	                    modelWeek.startDate = entcore_1.moment(modelWeek.startDate).toDate();
+	                    modelWeek.endDate = entcore_1.moment(modelWeek.endDate).toDate();
+	                });
+	                var transformedResult = {
+	                    "A": entcore_1._.findWhere(modelWeeks, { "weekAlias": "A" }),
+	                    "B": entcore_1._.findWhere(modelWeeks, { "weekAlias": "B" }),
+	                };
+	                return transformedResult;
+	            });
+	        }
+	        return this.promiseGetmodelWeek;
+	    };
+	    ModelWeekService.invertModelsWeek = function () {
+	        var url = "/diary/modelweek/invert";
+	        this.promiseGetmodelWeek = undefined;
+	        return axios_1.default.post(url).then(function (result) {
+	            return result.data;
+	        });
+	    };
+	    ModelWeekService.getCoursesModel = function (date) {
+	        var _this = this;
+	        var dateParam = entcore_1.moment(date).format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        var url = "/diary/modelweek/items/" + dateParam;
+	        return axios_1.default.get(url).then(function (result) {
+	            var courses = result.data;
+	            if (!courses) {
+	                courses = [];
+	            }
+	            _this.mappModelWeekToCourse(courses);
+	            return courses;
+	        });
+	    };
+	    ModelWeekService.mappModelWeekToCourse = function (courses) {
+	        entcore_1._.each(courses, function (course) {
+	            var date = entcore_1.moment(course.date);
+	            var begin = entcore_1.moment(date);
+	            begin.set('hour', Number(course.startHour.split(":")[0]));
+	            begin.set('minute', Number(course.startHour.split(":")[1]));
+	            begin.set('second', Number(course.startHour.split(":")[2]));
+	            var end = entcore_1.moment(date);
+	            end.set('hour', Number(course.endHour.split(":")[0]));
+	            end.set('minute', Number(course.endHour.split(":")[1]));
+	            end.set('second', Number(course.endHour.split(":")[2]));
+	            course.startDate = begin.toDate();
+	            course.endDate = end.toDate();
+	            courses_service_1.CourseService.mappCourse(course);
+	            course.subject = entcore_1.model.subjects.findWhere({ id: course.subjectId });
+	            course.subject.subjectLabel = course.subjectLabel;
+	            course.subjectId = course.subjectId;
+	        });
+	        return courses;
+	    };
+	    return ModelWeekService;
+	}());
+	exports.ModelWeekService = ModelWeekService;
+
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var _this = this;
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var Teacher_model_1 = __webpack_require__(90);
+	var utils_service_1 = __webpack_require__(80);
+	var secure_service_1 = __webpack_require__(84);
+	var modelweek_service_1 = __webpack_require__(88);
+	var tools_1 = __webpack_require__(3);
+	var lessons_service_1 = __webpack_require__(81);
+	var homework_service_1 = __webpack_require__(91);
+	var courses_service_1 = __webpack_require__(78);
+	var subject_service_1 = __webpack_require__(79);
+	exports.CalendarController = entcore_1.ng.controller('CalendarController', ['$scope', '$timeout', '$rootScope', '$location', '$routeParams', '$q',
+	    function ($scope, $timeout, $rootScope, $location, $routeParams, $q) {
+	        var vm = _this;
+	        $timeout(init);
+	        /*
+	         * initialisation calendar function
+	         */
+	        function init() {
+	            //view controls
+	            $scope.display.showList = false;
+	            //calendarDailyEvent directive options
+	            $scope.display.bShowCalendar = true;
+	            $scope.display.bShowHomeworks = true;
+	            $scope.display.bShowHomeworksMinified = false;
+	            if (!entcore_1.model.selectedViewMode) {
+	                $scope.goToCalendarView(); //model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+	            }
+	            //calendar Params
+	            $scope.calendarParams = {
+	                isUserTeacher: $scope.isUserTeacher
+	            };
+	            //handler calendar updates :
+	            $scope.$on('calendar.refreshItems', function (_, item) {
+	                item.calendarUpdate();
+	            });
+	            //handler calendar updates :
+	            $scope.$on('calendar.refreshCalendar', function () {
+	                refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, entcore_1.model.isUserParent, entcore_1.model.child ? entcore_1.model.child.id : undefined);
+	            });
+	            if (secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.SHOW_OTHER_TEACHER)) {
+	                //vm.teacher = model.filters.teacher;
+	                //vm.audience = model.filters.audience;
+	                $scope.$watch(function () {
+	                    return entcore_1.model.filters.teacher;
+	                }, function (n, o) {
+	                    if (n !== o && n) {
+	                        $timeout(function () {
+	                            //model.filters.teacher = vm.teacher;
+	                            //model.filters.audience = vm.audience;
+	                            refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, entcore_1.model.isUserParent, entcore_1.model.child ? entcore_1.model.child.id : undefined);
+	                        });
+	                    }
+	                });
+	                $scope.$watch(function () {
+	                    return entcore_1.model.filters.audience;
+	                }, function (n, o) {
+	                    if (n !== o && n) {
+	                        $timeout(function () {
+	                            //model.filters.teacher = vm.teacher;
+	                            //model.filters.audience = vm.audience;
+	                            refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, entcore_1.model.isUserParent, entcore_1.model.child ? entcore_1.model.child.id : undefined);
+	                        });
+	                    }
+	                });
+	            }
+	        }
+	        //watch delete or add
+	        $scope.$watch(function () {
+	            if (entcore_1.model && entcore_1.model.lessons && entcore_1.model.lessons.all) {
+	                return entcore_1.model.lessons.all.length;
+	            }
+	            else {
+	                return 0;
+	            }
+	        }, function () {
+	            $scope.itemsCalendar = [].concat(entcore_1.model.lessons.all).concat($scope.courses);
+	        });
+	        $scope.$watch('routeParams', function (n, o) {
+	            if ($location.path().indexOf("calendarView") === -1 && $location.path() !== "") {
+	                return;
+	            }
+	            var mondayOfWeek = entcore_1.moment();
+	            // mondayOfWeek as string date formatted YYYY-MM-DD
+	            if ($scope.routeParams.mondayOfWeek) {
+	                mondayOfWeek = entcore_1.moment($scope.routeParams.mondayOfWeek);
+	            }
+	            else {
+	                if (entcore_1.model.mondayOfWeek) {
+	                    mondayOfWeek = entcore_1.model.mondayOfWeek;
+	                }
+	                else {
+	                    mondayOfWeek = mondayOfWeek.weekday(0);
+	                }
+	            }
+	            entcore_1.model.mondayOfWeek = mondayOfWeek;
+	            $scope.showCalendar(mondayOfWeek);
+	        }, true);
+	        $scope.routeParams = $routeParams;
+	        /**
+	         * Opens the next week view of calendar
+	         */
+	        $scope.nextWeek = function () {
+	            var nextMonday = entcore_1.moment($scope.mondayOfWeek).add(7, 'd');
+	            $location.path('/calendarView/' + nextMonday.format(tools_1.CONSTANTS.CAL_DATE_PATTERN));
+	        };
+	        /**
+	         * Opens the previous week view of calendar
+	         */
+	        $scope.previousWeek = function () {
+	            var nextMonday = entcore_1.moment($scope.mondayOfWeek).add(-7, 'd');
+	            $location.path('/calendarView/' + nextMonday.format(tools_1.CONSTANTS.CAL_DATE_PATTERN));
+	        };
+	        /**
+	         * Load related data to lessons and homeworks from database
+	         * @param cb Callback function
+	         * @param bShowTemplates if true loads calendar templates after data loaded
+	         * might be used when
+	         */
+	        var initialization = function (bShowTemplates, cb) {
+	            // will force quick search panel to load (e.g: when returning to calendar view)
+	            // see ng-extensions.js -> quickSearch directive
+	            entcore_1.model.lessonsDropHandled = false;
+	            entcore_1.model.homeworksDropHandled = false;
+	            $scope.countdown = 2;
+	            // auto creates diary.teacher
+	            if ("ENSEIGNANT" === entcore_1.model.me.type) {
+	                var teacher = new Teacher_model_1.Teacher();
+	                teacher.create(decrementCountdown(bShowTemplates, cb), $rootScope.validationError);
+	            }
+	            else {
+	                decrementCountdown(bShowTemplates, cb);
+	            }
+	            // subjects and audiences needed to fill in
+	            // homeworks and lessons props
+	            entcore_1.model.childs.syncChildren(function () {
+	                vm.child = entcore_1.model.child;
+	                vm.children = entcore_1.model.childs;
+	                subject_service_1.SubjectService.getCustomSubjects(entcore_1.model.isUserTeacher()).then(function (subjects) {
+	                    entcore_1.model.subjects.all = [];
+	                    if (subjects) {
+	                        entcore_1.model.subjects.addRange(subjects);
+	                    }
+	                }).then(function () {
+	                    decrementCountdown(bShowTemplates, cb);
+	                    entcore_1.model.homeworkTypes.syncHomeworkTypes(function () {
+	                        // call lessons/homework sync after audiences sync since
+	                        // lesson and homework objects needs audience data to be built
+	                        refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, entcore_1.model.isUserParent, entcore_1.model.child ? entcore_1.model.child.id : undefined);
+	                    }, $rootScope.validationError);
+	                }).catch(function (e) {
+	                    $rootScope.validationError();
+	                    throw e;
+	                });
+	            });
+	        };
+	        var decrementCountdown = function (bShowTemplates, cb) {
+	            $scope.countdown--;
+	            if ($scope.countdown == 0) {
+	                $scope.calendarLoaded = true;
+	                $scope.currentSchool = entcore_1.model.currentSchool;
+	                if (bShowTemplates) {
+	                    showTemplates();
+	                }
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	            }
+	        };
+	        /**
+	         *
+	         * @param momentMondayOfWeek First day (monday) of week to display lessons and homeworks
+	         */
+	        $scope.showCalendar = function (mondayOfWeek) {
+	            $scope.display.showList = false;
+	            $scope.mondayOfWeek = mondayOfWeek;
+	            if (!$scope.calendarLoaded) {
+	                initialization(true);
+	                return;
+	            }
+	            if (!$scope.mondayOfWeek) {
+	                $scope.mondayOfWeek = entcore_1.moment();
+	            }
+	            $scope.mondayOfWeek = $scope.mondayOfWeek.weekday(0);
+	            entcore_1.model.lessonsDropHandled = false;
+	            entcore_1.model.homeworksDropHandled = false;
+	            $scope.display.showList = false;
+	            // need reload lessons or homeworks if week changed
+	            var syncItems = true; //momentMondayOfWeek.week() != model.calendar.week;
+	            refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, entcore_1.model.isUserParent, entcore_1.model.child ? entcore_1.model.child.id : undefined);
+	        };
+	        function refreshDatas(structureIds, mondayOfWeek, isUserParent, childId) {
+	            var p1;
+	            var p2;
+	            if (secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.SHOW_OTHER_TEACHER)) {
+	                var teacherItem = entcore_1.model.filters.teacher ? entcore_1.model.filters.teacher.item : undefined;
+	                if (!teacherItem && !entcore_1.model.filters.audience) {
+	                    p1 = $q.when([]);
+	                    p2 = $q.when([]);
+	                }
+	                else {
+	                    p1 = lessons_service_1.LessonService.getOtherLessons([entcore_1.model.filters.structure.id], mondayOfWeek, teacherItem, entcore_1.model.filters.audience);
+	                    p2 = homework_service_1.HomeworkService.getOtherHomeworks([entcore_1.model.filters.structure.id], mondayOfWeek, teacherItem, entcore_1.model.filters.audience);
+	                }
+	            }
+	            else {
+	                p1 = lessons_service_1.LessonService.getLessons(structureIds, mondayOfWeek, isUserParent, childId);
+	                p2 = homework_service_1.HomeworkService.getHomeworks(structureIds, mondayOfWeek, isUserParent, childId);
+	            }
+	            //dont load courses if is not at teacher
+	            var p3 = $q.when([]);
+	            var p4 = $q.when([]);
+	            if (entcore_1.model.isUserTeacher()) {
+	                //TODO use structureIds
+	                p3 = courses_service_1.CourseService.getMergeCourses(entcore_1.model.me.structures[0], entcore_1.model.me.userId, mondayOfWeek);
+	                if (secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.MANAGE_MODEL_WEEK)) {
+	                    p4 = modelweek_service_1.ModelWeekService.getModelWeeks();
+	                }
+	            }
+	            return $q.all([p1, p2, p3, p4]).then(function (results) {
+	                var lessons = results[0];
+	                var homeworks = results[1];
+	                $scope.courses = results[2];
+	                var modelWeeks = results[3];
+	                var p = $q.when();
+	                if ((!$scope.courses || $scope.courses.length === 0) && secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.MANAGE_MODEL_WEEK)) {
+	                    //dont get model if the current week is the model
+	                    if (modelWeeks.A || modelWeeks.B) {
+	                        if ((!modelWeeks.A || !entcore_1.moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) &&
+	                            (!modelWeeks.B || !entcore_1.moment(modelWeeks.B.beginDate).isSame(mondayOfWeek))) {
+	                            p = modelweek_service_1.ModelWeekService.getCoursesModel($scope.mondayOfWeek).then(function (modelCourses) {
+	                                $scope.courses = modelCourses;
+	                            });
+	                            $scope.isModelWeek = false;
+	                        }
+	                        else {
+	                            if (modelWeeks.A && entcore_1.moment(modelWeeks.A.beginDate).isSame(mondayOfWeek)) {
+	                                $scope.modelWeekCurrentWeek = 'A';
+	                            }
+	                            else {
+	                                $scope.modelWeekCurrentWeek = 'B';
+	                            }
+	                            $scope.isModelWeek = true;
+	                        }
+	                    }
+	                }
+	                p.then(function () {
+	                    $scope.currentModelWeekIndicator = entcore_1.moment($scope.mondayOfWeek).weeks() % 2 ? "B" : "A";
+	                    entcore_1.model.lessons.all.splice(0, entcore_1.model.lessons.all.length);
+	                    entcore_1.model.lessons.addRange(lessons);
+	                    entcore_1.model.homeworks.all.splice(0, entcore_1.model.homeworks.all.length);
+	                    entcore_1.model.homeworks.addRange(homeworks);
+	                    $scope.itemsCalendar = [].concat(entcore_1.model.lessons.all).concat($scope.courses);
+	                });
+	            });
+	        }
+	        $scope.setChildFilter = function (child, cb) {
+	            refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+	        };
+	        $scope.showCalendarForChild = function (child) {
+	            $scope.setChildFilter(child);
+	        };
+	        $scope.$on('show-child', function (_, child) {
+	            refreshDatas(utils_service_1.UtilsService.getUserStructuresIdsAsString(), $scope.mondayOfWeek, true, child.id);
+	        });
+	        var showTemplates = function () {
+	            entcore_1.template.open('main', 'main');
+	            entcore_1.template.open('main-view', 'calendar');
+	            entcore_1.template.open('create-lesson', 'create-lesson');
+	            entcore_1.template.open('create-homework', 'create-homework');
+	            entcore_1.template.open('daily-event-details', 'daily-event-details');
+	            entcore_1.template.open('daily-event-item', 'daily-event-item');
+	        };
+	        /**
+	         * Display or hide the homework panel
+	         * in calendar view
+	         */
+	        $scope.toggleHomeworkPanel = function () {
+	            $scope.display.bShowHomeworks = !$scope.display.bShowHomeworks;
+	            if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+	                $scope.display.bShowCalendar = true;
+	            }
+	        };
+	        /**
+	         * Display/hide calendar
+	         */
+	        $scope.toggleCalendar = function () {
+	            $scope.display.bShowCalendar = !$scope.display.bShowCalendar;
+	            if (!$scope.display.bShowHomeworks && !$scope.display.bShowCalendar) {
+	                $scope.display.bShowHomeworks = true;
+	            }
+	        };
+	        $scope.$watch(function () {
+	            return $rootScope.currentRightPanelVisible;
+	        }, function (n) {
+	            $scope.currentRightPanelVisible = n;
+	        });
+	        $scope.redirect = function (path) {
+	            $location.path(path);
+	        };
+	    }]);
+
+
+/***/ }),
+/* 90 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var axios_1 = __webpack_require__(5);
+	function Teacher() { }
+	exports.Teacher = Teacher;
+	;
+	Teacher.prototype.create = function (cb, cbe) {
+	    entcore_1.model.me.structures.forEach(function (structureId) {
+	        axios_1.default.post('/diary/teacher/' + structureId).then(function (e) {
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        }).catch(function (e) {
+	            if (typeof cbe === 'function') {
+	                cbe(entcore_1.model.parseError(e));
+	            }
+	        });
+	    });
+	};
+
+
+/***/ }),
+/* 91 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var tools_1 = __webpack_require__(3);
+	var axios_1 = __webpack_require__(5);
+	/*
+	* Homework service as class
+	* used to manipulate Homework model
+	*/
+	var HomeworkService = (function () {
+	    function HomeworkService() {
+	    }
+	    HomeworkService.getHomeworks = function (userStructuresIds, mondayOfWeek, isUserParent, childId, fromDate, toDate) {
+	        var _this = this;
+	        var start = entcore_1.moment(mondayOfWeek).day(1).format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        var end = entcore_1.moment(mondayOfWeek).day(1).add(1, 'week').format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        if (fromDate) {
+	            start = fromDate.format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	            end = toDate.format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        }
+	        var urlGetHomeworks = "/diary/homework/" + userStructuresIds + "/" + start + "/" + end + "/";
+	        if (isUserParent && childId) {
+	            urlGetHomeworks += childId;
+	        }
+	        else {
+	            urlGetHomeworks += '%20';
+	        }
+	        return axios_1.default.get(urlGetHomeworks).then(function (result) {
+	            return _this.mappHomework(result.data);
+	        });
+	    };
+	    HomeworkService.getOtherHomeworks = function (userStructuresIds, mondayOfWeek, teacher, audience, fromDate, toDate) {
+	        var _this = this;
+	        var start = entcore_1.moment(mondayOfWeek).day(1).format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        var end = entcore_1.moment(mondayOfWeek).day(1).add(1, 'week').format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        if (fromDate) {
+	            start = fromDate.format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	            end = toDate.format(tools_1.CONSTANTS.CAL_DATE_PATTERN);
+	        }
+	        var type = teacher ? "teacher" : "audience";
+	        var id = teacher ? teacher.key : audience.key;
+	        var urlGetHomeworks = "/diary/homework/external/" + userStructuresIds + "/" + start + "/" + end + "/" + type + "/" + id;
+	        return axios_1.default.get(urlGetHomeworks).then(function (result) {
+	            return _this.mappHomework(result.data);
+	        });
+	    };
+	    /*
+	    *   Mapp homeworks
+	    */
+	    HomeworkService.mappHomework = function (homeworks) {
+	        return entcore_1._.map(homeworks, function (sqlHomework) {
+	            var homework = {
+	                //for share directive you must have _id
+	                _id: sqlHomework.id,
+	                id: sqlHomework.id,
+	                description: sqlHomework.homework_description,
+	                audienceId: sqlHomework.audience_id,
+	                audience: entcore_1.model.audiences.findWhere({ id: sqlHomework.audience_id }),
+	                subject: entcore_1.model.subjects.findWhere({ id: sqlHomework.subject_id }),
+	                subjectId: sqlHomework.subject_id,
+	                subjectLabel: sqlHomework.subject_label,
+	                type: entcore_1.model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
+	                typeId: sqlHomework.homework_type_id,
+	                typeLabel: sqlHomework.homework_type_label,
+	                teacherId: sqlHomework.teacher_id,
+	                structureId: sqlHomework.structureId,
+	                audienceType: sqlHomework.audience_type,
+	                audienceLabel: sqlHomework.audience_label,
+	                teacherName: sqlHomework.teacher_display_name,
+	                // TODO delete dueDate? (seems redondant info vs date field)
+	                dueDate: entcore_1.moment(sqlHomework.homework_due_date),
+	                date: entcore_1.moment(sqlHomework.homework_due_date),
+	                title: sqlHomework.homework_title,
+	                color: sqlHomework.homework_color,
+	                startMoment: entcore_1.moment(sqlHomework.homework_due_date),
+	                endMoment: entcore_1.moment(sqlHomework.homework_due_date),
+	                state: sqlHomework.homework_state,
+	                is_periodic: false,
+	                lesson_id: sqlHomework.lesson_id
+	            };
+	            if (sqlHomework.attachments) {
+	                homework.attachments = entcore_1._.map(JSON.parse(sqlHomework.attachments), tools_1.jsonToJsAttachment);
+	            }
+	            if ('group' === homework.audienceType) {
+	                homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.group');
+	            }
+	            else {
+	                homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.class');
+	            }
+	            return homework;
+	        });
+	    };
+	    return HomeworkService;
+	}());
+	exports.HomeworkService = HomeworkService;
 	;
 
 

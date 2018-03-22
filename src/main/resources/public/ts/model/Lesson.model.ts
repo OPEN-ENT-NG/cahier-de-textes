@@ -6,7 +6,6 @@ import { Subject } from './Subject.model';
 import { Audience } from '../model';
 
 export function Lesson (data?) {
-
     this.selected = false;
     //this.collection(Attachment);
     // initialize homeworks collection (see lib.js)

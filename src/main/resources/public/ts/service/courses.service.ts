@@ -1,6 +1,7 @@
-import { moment, model, _, $q, $http} from 'entcore';
+import { moment, model, _ } from 'entcore';
 import { CONSTANTS} from '../tools';
 import {SubjectService} from "./subject.service";
+import http from 'axios';
 
 /*
 * Course service as class
@@ -9,7 +10,7 @@ import {SubjectService} from "./subject.service";
 export class CourseService {
 
    static getMergeCourses(structureId, teacherId, firstDayOfWeek){
-        return $q.all([
+        return Promise.all([
             this.getScheduleCourses(structureId, teacherId, firstDayOfWeek),
             SubjectService.getStructureSubjectsAsMap(structureId)
         ]).then(results =>{
@@ -65,7 +66,7 @@ export class CourseService {
                 teacherId : teacherId
             }
         };
-        return $http.get(url,config).then(result =>{
+        return http.get(url,config).then(result =>{
             return result.data;
         });
     }

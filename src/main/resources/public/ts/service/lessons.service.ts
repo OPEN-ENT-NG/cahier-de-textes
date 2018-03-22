@@ -1,9 +1,10 @@
-import {_, idiom as lang, moment, model, $http} from 'entcore';
+import { _, idiom as lang, moment, model } from 'entcore';
 import { Homework } from '../model/Homework.model';
 import { Subject } from '../model/Subject.model';
 import { CONSTANTS } from '../tools';
-import {UtilsService} from "./utils.service";
-import {AttachmentService} from "./attachment.service";
+import { UtilsService } from "./utils.service";
+import { AttachmentService } from "./attachment.service";
+import http from 'axios';
 
 
 /*
@@ -12,7 +13,7 @@ import {AttachmentService} from "./attachment.service";
  */
 export class LessonService {
 
-    static getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate) {
+    static getLessons(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate?, toDate?) {
 
         var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
         var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
@@ -30,12 +31,12 @@ export class LessonService {
             urlGetLessons += '%20';
         }
 
-        return $http.get(urlGetLessons).then((result)=>{
+        return http.get(urlGetLessons).then((result)=>{
             return this.mappLessons(result.data);
         });
     }
 
-    static getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate) {
+    static getOtherLessons(userStructuresIds,mondayOfWeek,teacher,audience, fromDate?, toDate?) {
 
         var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
         var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
@@ -48,7 +49,7 @@ export class LessonService {
 
         var urlGetLessons = `/diary/lesson/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
 
-        return $http.get(urlGetLessons).then((result)=>{
+        return http.get(urlGetLessons).then((result)=>{
             return this.mappLessons(result.data);
         });
     }

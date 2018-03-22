@@ -201,12 +201,12 @@ export let DiaryController = ng.controller('DiaryController', [
             template.open('main', 'main');
             template.open('main-view', 'calendar');
             template.open('daily-event-details', 'daily-event-details');
-            model.selectedViewMode = '/diary/public/js/calendar/calendar-view.template.html';
+            model.selectedViewMode = '/diary/public/template/calendar/calendar-view.template.html';
         },
         listView: function(){
             template.open('main', 'main');
             template.open('main-view', 'calendar');
-            model.selectedViewMode = '/diary/public/js/calendar/list-view.template.html';
+            model.selectedViewMode = '/diary/public/template/calendar/list-view.template.html';
         },
         mainView: function(){
             if ($scope.display.showList) {

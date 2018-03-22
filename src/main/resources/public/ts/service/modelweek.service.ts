@@ -1,6 +1,7 @@
-import {_, moment, model, $http} from 'entcore';
+import {_, moment, model } from 'entcore';
 import {CONSTANTS} from "../tools";
 import {CourseService} from "./courses.service";
+import http from 'axios';
 
 
 export class ModelWeekService {
@@ -10,13 +11,13 @@ export class ModelWeekService {
         let dateParam = moment(date).format(CONSTANTS.CAL_DATE_PATTERN);
         let url = `/diary/modelweek/${alias}/${dateParam}`;
         this.promiseGetmodelWeek = undefined;
-        return $http.post(url);
+        return http.post(url);
     }
 
     static getModelWeeks(){
         let url = `/diary/modelweek/list`;
         if ( !this.promiseGetmodelWeek){
-            this.promiseGetmodelWeek = $http.get(url).then((result)=>{
+            this.promiseGetmodelWeek = http.get(url).then((result)=>{
                 let modelWeeks = result.data;
                 _.each(modelWeeks,modelWeek =>{
                     modelWeek.startDate = moment(modelWeek.startDate).toDate();
@@ -37,7 +38,7 @@ export class ModelWeekService {
     static invertModelsWeek(){
         let url = `/diary/modelweek/invert`;
         this.promiseGetmodelWeek = undefined;
-        return $http.post(url).then((result)=>{
+        return http.post(url).then((result)=>{
             return result.data;
         });
     }
@@ -46,7 +47,7 @@ export class ModelWeekService {
         let dateParam = moment(date).format(CONSTANTS.CAL_DATE_PATTERN);
         let url = `/diary/modelweek/items/${dateParam}`;
 
-        return $http.get(url).then((result)=>{
+        return http.get(url).then((result)=>{
             let courses=result.data;
             if (!courses){
                 courses=[];

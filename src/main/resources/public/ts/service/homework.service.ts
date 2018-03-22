@@ -1,6 +1,6 @@
-import { _, idiom as lang, moment, model, $http } from 'entcore';
+import { _, idiom as lang, moment, model } from 'entcore';
 import { jsonToJsAttachment, CONSTANTS } from '../tools';
-
+import http from 'axios';
 
 
 /*
@@ -9,7 +9,7 @@ import { jsonToJsAttachment, CONSTANTS } from '../tools';
 */
 export class HomeworkService {
 
-    static getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate, toDate){
+    static getHomeworks(userStructuresIds,mondayOfWeek,isUserParent,childId, fromDate?, toDate?){
         var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
         var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
         if (fromDate){
@@ -24,12 +24,12 @@ export class HomeworkService {
             urlGetHomeworks += '%20';
         }
 
-        return $http.get(urlGetHomeworks).then((result)=>{
+        return http.get(urlGetHomeworks).then((result)=>{
             return this.mappHomework(result.data);
         });
     }
 
-    static getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience, fromDate, toDate){
+    static getOtherHomeworks(userStructuresIds,mondayOfWeek,teacher,audience, fromDate?, toDate?){
         var start = moment(mondayOfWeek).day(1).format(CONSTANTS.CAL_DATE_PATTERN);
         var end = moment(mondayOfWeek).day(1).add(1, 'week').format(CONSTANTS.CAL_DATE_PATTERN);
         if (fromDate){
@@ -41,7 +41,7 @@ export class HomeworkService {
 
         var urlGetHomeworks = `/diary/homework/external/${userStructuresIds}/${start}/${end}/${type}/${id}`;
 
-        return $http.get(urlGetHomeworks).then((result)=>{
+        return http.get(urlGetHomeworks).then((result)=>{
             return this.mappHomework(result.data);
         });
     }
