@@ -94,7 +94,7 @@ export const CalendarController = ng.controller('CalendarController',
                 return 0;
             }
         }, () => {
-            $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses);
+            $scope.itemsCalendar = [].concat(model.lessons.all).concat($scope.courses || []);
         });
 
         $scope.$watch('routeParams', function(n, o) {
