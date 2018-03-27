@@ -2,7 +2,7 @@ import { angular, model, moment, _, idiom as lang, Model, calendar } from 'entco
 import http from 'axios';
 import * as tools from './tools';
 
-import {Homework, PedagogicDay, Child, Subject, SearchForm} from './models/index';
+import {Homework, Homeworks, PedagogicDay, Child, Subject, SearchForm} from './models/index';
 import { Lesson } from './models/Lesson.model';
 import {AudienceService} from "./services/audiences.service";
 
@@ -95,8 +95,7 @@ export const InitBuild = function () {
 
     this.collection(HomeworkType, {
         loading: false,
-        syncHomeworkTypes: function (cb, cbe) {
-
+        syncHomeworkTypes: async function () {
             var homeworkTypes = [];
             var that = this;
 
@@ -110,25 +109,21 @@ export const InitBuild = function () {
             var urlGetHomeworkTypes = url;
 
             that.loading = true;
-            return model.getHttp()({
-                method: 'GET',
-                url: urlGetHomeworkTypes
-            }).then(function (result) {
-
-                homeworkTypes = homeworkTypes.concat(result.data);
+            try {
+                const { data } = await model.getHttp()({
+                    method: 'GET',
+                    url: urlGetHomeworkTypes
+                });
+                homeworkTypes = homeworkTypes.concat(data);
                 that.addRange(
                     _.map(homeworkTypes, tools.sqlToJsHomeworkType)
                 );
-                if (typeof cb === 'function') {
-                    cb();
-                }
                 that.loading = false;
                 return homeworkTypes;
-            }).catch(function (e) {
+            } catch (e) {
                 that.loading = false;
                 throw e;
-            });
-
+            }
         }, pushAll: function (datas) {
             if (datas) {
                 this.all = _.union(this.all, datas);
@@ -136,54 +131,7 @@ export const InitBuild = function () {
         }, behaviours: 'diary'
     });
 
-    this.collection(Homework, {
-        loading: false,
-        syncHomeworks: function (cb, cbe) {
-
-            var homeworks = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format(tools.DATE_FORMAT);
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(tools.DATE_FORMAT);
-            var that = this;
-
-            if (that.loading)
-                return;
-
-            model.homeworks.all.splice(0, model.homeworks.all.length);
-
-            var urlGetHomeworks = '/diary/homework/' + tools.getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
-
-            if (model.isUserParent() && model.child) {
-                urlGetHomeworks += model.child.id;
-            } else {
-                urlGetHomeworks += '%20';
-            }
-
-
-            that.loading = true;
-            return model.getHttp()({
-                method: 'GET',
-                url: urlGetHomeworks
-            }).then(function (result) {
-                homeworks = homeworks.concat(result.data);
-                that.addRange(
-                    _.map(homeworks, tools.sqlToJsHomework)
-                );
-                if (typeof cb === 'function') {
-                    cb();
-                }
-                that.loading = false;
-                return homeworks;
-            }).catch(function (e) {
-                that.loading = false;
-                throw e;
-            });
-
-        }, pushAll: function (datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
-    });
+    model.homeworks = new Homeworks();
 
     this.collection(PedagogicDay, {
         reset: function () {

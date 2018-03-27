@@ -1,6 +1,8 @@
-import {model, moment} from 'entcore';
+import { model, moment, _ } from 'entcore';
+import { Mix } from 'entcore-toolkit';
 import http from 'axios';
 import {DATE_FORMAT, sqlToJsHomework} from '../tools';
+import * as tools from "../tools";
 
 export class Homework {
 
@@ -38,7 +40,7 @@ export class Homework {
     /**
      * Delete calendar references of current homework
      */
-    deleteModelReferences = function () {
+    deleteModelReferences () {
         var idxHomeworkToDelete = model.homeworks.indexOf(this);
 
         // delete homework in calendar cache
@@ -52,7 +54,7 @@ export class Homework {
      * Adds an attachment
      * @param attachment
      */
-    addAttachment = function (attachment) {
+    addAttachment (attachment) {
         this.attachments.push(attachment);
     };
 
@@ -62,7 +64,7 @@ export class Homework {
      * @param cb
      * @param cbe
      */
-    detachAttachment = function (attachment, cb, cbe) {
+    detachAttachment (attachment, cb, cbe) {
         attachment.detachFromItem(this.id, 'lesson', cb, cbe);
     };
 
@@ -71,7 +73,7 @@ export class Homework {
         delete: '/diary/homework/:id'
     };
 
-    save = function (cb, cbe) {
+    save (cb, cbe) {
 
         var that = this;
         var promise = model.$q().when({});
@@ -95,15 +97,15 @@ export class Homework {
      * Returns true if current homework is attached to a lesson
      * @returns {boolean}
      */
-    isAttachedToLesson = function () {
+    isAttachedToLesson () {
         return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
     };
 
-    isDraft = function () {
+    isDraft () {
         return this.state === "draft";
     };
 
-    isPublished = function () {
+    isPublished () {
         return !this.isDraft();
     };
 
@@ -112,15 +114,15 @@ export class Homework {
      * @param toPublish
      * @returns {*|boolean} true if homework can be published directly
      */
-    isPublishable = function (toPublish) {
+    isPublishable (toPublish) {
         return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
     };
 
-    changeState = function (toPublish) {
+    changeState (toPublish) {
         this.state = toPublish ? 'published' : 'draft';
     };
 
-    update = function (cb, cbe) {
+    update (cb, cbe) {
         var url = '/diary/homework/' + this.id;
 
         var homework = this;
@@ -139,24 +141,20 @@ export class Homework {
         });
     };
 
-    create = function (cb, cbe) {
-        var homework = this;
-        model.getHttp()({
-            method: 'POST',
-            url: '/diary/homework',
-            data: homework
-        }).then(function (result) {
-            homework.updateData(result.data);
-            model.homeworks.pushAll([homework]);
-            if (typeof cb === 'function') {
-                cb();
-            }
-            return result.data;
-        }).catch(function (e) {
-            if (cbe) {
-                cbe();
-            }
-        });
+    async create () {
+        try {
+            const { data } = await model.getHttp()({
+                method: 'POST',
+                url: '/diary/homework',
+                data: this
+            });
+            Mix.extend(this, data);
+            model.homeworks.all.push(this);
+            return data
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
     };
 
     /**
@@ -164,11 +162,8 @@ export class Homework {
      * @param cb Callback function
      * @param cbe Callback on error function
      */
-    load = function (cb, cbe) {
-
+    load (cb, cbe) {
         var homework = this;
-
-
         http.get('/diary/homework/' + homework.id)
             .then(function (res) {
                 homework.updateData(sqlToJsHomework(res.data));
@@ -190,7 +185,7 @@ export class Homework {
      * @param cb Callback
      * @param cbe Callback on error
      */
-    deleteList = function (homeworks, cb, cbe) {
+    deleteList (homeworks, cb, cbe) {
         model.deleteItemList(homeworks, 'homework', cb, cbe);
     };
 
@@ -201,7 +196,7 @@ export class Homework {
      * @param cb Callback after delete
      * @param cbe Callback on error
      */
-    delete = function (lesson, cb, cbe) {
+    delete (lesson, cb, cbe) {
 
         var homework = this;
 
@@ -244,7 +239,7 @@ export class Homework {
     };
 
 
-    toJSON = function () {
+    toJSON () {
 
         let json: any = {
             homework_title: this.title,
@@ -275,3 +270,50 @@ export class Homework {
         return json;
     };
 };
+
+export class Homeworks {
+    all: [Homework];
+
+    loading: boolean;
+
+    constructor () {
+        this.all = [];
+    }
+
+    async sync () {
+
+        var homeworks = [];
+        var start = moment(model.calendar.dayForWeek).day(1).format(tools.DATE_FORMAT);
+        var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(tools.DATE_FORMAT);
+        var that = this;
+
+        if (that.loading)
+            return;
+
+        model.homeworks.all.splice(0, model.homeworks.all.length);
+
+        var urlGetHomeworks = '/diary/homework/' + tools.getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+
+        if (model.isUserParent() && model.child) {
+            urlGetHomeworks += model.child.id;
+        } else {
+            urlGetHomeworks += '%20';
+        }
+
+
+        that.loading = true;
+        try {
+            const { data } = await model.getHttp()({
+                method: 'GET',
+                url: urlGetHomeworks
+            });
+            homeworks = homeworks.concat(data);
+            this.all = _.union(this.all, Mix.castArrayAs(Homework, data));
+            that.loading = false;
+            return homeworks;
+        } catch (e) {
+            that.loading = false;
+            throw e;
+        }
+    }
+}

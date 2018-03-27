@@ -11,69 +11,109 @@ export const EditLessonController = ng.controller('EditLessonController',
         var vm = this;
         init();
 
-        function init() {
+        async function init() {
             //existing lesson
             $scope.tabs.showAnnotations = false;
-            $q.all([
-                //need subjects
-                loadSubjects(),
-                //need homework types
-                loadHomeworkTypes()
-            ]).then(()=>{
-                if ($routeParams.idLesson) {
-                    model.newLesson = null;
-                    loadExistingLesson();
-                } else if(model.newLesson){
-                    createNewLessonFromPedagogicItem();
-                }else if ($routeParams.progressionId){
-                    //show the EditProgressionLessonController
-                    loadNewLesson();
-                    return ;
-                }else{
-                    //new lesson
-                    loadNewLesson();
+            await loadSubjects();
+            await loadHomeworkTypes();
+
+            if ($routeParams.idLesson) {
+                model.newLesson = null;
+                loadExistingLesson();
+            } else if(model.newLesson){
+                createNewLessonFromPedagogicItem();
+            }else if ($routeParams.progressionId){
+                //show the EditProgressionLessonController
+                loadNewLesson();
+                return ;
+            }else{
+                //new lesson
+                loadNewLesson();
+            }
+
+            $scope.data.tabSelected = 'lesson';
+
+            //add watch on selection
+            $scope.$watch('lesson.audience',()=>{
+                if(vm.lesson && vm.lesson.previousLessons){
+                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
                 }
-
-                $scope.data.tabSelected = 'lesson';
-
-                //add watch on selection
-                $scope.$watch('lesson.audience',()=>{
-                    if(vm.lesson && vm.lesson.previousLessons){
-                        $scope.loadPreviousLessonsFromLesson(vm.lesson);
-                    }
-                });
-                //add watch on selection
-                $scope.$watch('lesson.subject',()=>{
-                    if (vm.lesson && vm.lesson.previousLessons){
-                        $scope.loadPreviousLessonsFromLesson(vm.lesson);
-                    }
-                });
             });
+            //add watch on selection
+            $scope.$watch('lesson.subject',()=>{
+                if (vm.lesson && vm.lesson.previousLessons){
+                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
+                }
+            });
+            // $q.all([
+            //     //need subjects
+            //     loadSubjects(),
+            //     //need homework types
+            //     loadHomeworkTypes()
+            // ]).then(()=>{
+            //     if ($routeParams.idLesson) {
+            //         model.newLesson = null;
+            //         loadExistingLesson();
+            //     } else if(model.newLesson){
+            //         createNewLessonFromPedagogicItem();
+            //     }else if ($routeParams.progressionId){
+            //         //show the EditProgressionLessonController
+            //         loadNewLesson();
+            //         return ;
+            //     }else{
+            //         //new lesson
+            //         loadNewLesson();
+            //     }
+            //
+            //     $scope.data.tabSelected = 'lesson';
+            //
+            //     //add watch on selection
+            //     $scope.$watch('lesson.audience',()=>{
+            //         if(vm.lesson && vm.lesson.previousLessons){
+            //             $scope.loadPreviousLessonsFromLesson(vm.lesson);
+            //         }
+            //     });
+            //     //add watch on selection
+            //     $scope.$watch('lesson.subject',()=>{
+            //         if (vm.lesson && vm.lesson.previousLessons){
+            //             $scope.loadPreviousLessonsFromLesson(vm.lesson);
+            //         }
+            //     });
+            // });
         }
 
-        function loadHomeworkTypes(){
-            var deferred = $q.defer();
+        async function loadHomeworkTypes(){
+            console.log('load  Homework types');
             if (!model.homeworkTypes || !model.homeworkTypes.all || model.homeworkTypes.all.length === 0){
-                model.homeworkTypes.syncHomeworkTypes(function() {
-                    deferred.resolve();
-                }, $rootScope.validationError);
-            }else{
-                deferred.resolve();
+                try {
+                    await model.homeworkTypes.syncHomeworkTypes();
+                } catch  (e) {
+                    $rootScope.validationError(e);
+                }
             }
-            return deferred.promise;
+            return;
         }
 
-        function loadSubjects(){
-            if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){
-                return SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects)=>{
-                    model.subjects.all=[];
-                    if(subjects){
-                        model.subjects.addRange(subjects);
-                    }
-                });
-            }else{
-                return $q.when();
+        async function loadSubjects(){
+            if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0) {
+                const subjects = await SubjectService.getCustomSubjects(model.isUserTeacher());
+                model.subjects.all = [];
+                if (subjects) {
+                    model.subjects.addRange(subjects);
+                }
+            } else {
+                return false;
             }
+            // if (!model.subjects || !model.subjects.all || model.subjects.all.length === 0){
+            //     return SubjectService.getCustomSubjects(model.isUserTeacher()).then((subjects)=>{
+            //         model.subjects.all=[];
+            //         if(subjects){
+            //             model.subjects.addRange(subjects);
+            //         }
+            //     });
+            // }else{
+            //     return $q.when();
+            // }
         }
 
         function createNewLessonFromPedagogicItem (){

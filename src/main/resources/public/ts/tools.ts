@@ -116,7 +116,7 @@ export const sqlToJsPedagogicItem = (data) => {
 };
 
 
-export const syncHomeworks = function (cb?) {
+export const syncHomeworks = async function (cb) {
     return model.homeworks.syncHomeworks().then(() => {
         if (typeof cb === 'function') {
             cb();

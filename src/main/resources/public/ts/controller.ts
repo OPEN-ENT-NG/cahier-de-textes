@@ -868,41 +868,25 @@ export let DiaryController = ng.controller('DiaryController', [
         $scope.homework = null;
     };
 
-    $scope.createOrUpdateHomework = function (goToMainView, cb) {
-
+    $scope.createOrUpdateHomework = async function (goToMainView) {
         $scope.currentErrors = [];
         if ($scope.newItem) {
             $scope.homework.dueDate = $scope.newItem.date;
         }
-
-        var postHomeworkSave = function () {
-            //$scope.showCal = !$scope.showCal;
+        try {
+            await model.homeworks.sync();
             notify.info('homework.saved');
             $scope.homework.audience = model.audiences.findWhere({id: $scope.homework.audience.id});
-
-            if (typeof cb === 'function') {
-                cb();
-            }
 
             if (goToMainView) {
                 $rootScope.back();
                 $scope.lesson = null;
                 $scope.homework = null;
             }
-        };
-
-        return $scope.homework.save(function () {
-            if (this.lesson_id) {
-                return syncHomeworks().then(()=>{
-                    postHomeworkSave();
-                });
-            } else {
-                return syncLessonsAndHomeworks(postHomeworkSave);
-            }
-        },function(e) {
+        } catch (e) {
             $scope.homework.errorValid = true;
             throw e;
-        });
+        }
     };
 
 
