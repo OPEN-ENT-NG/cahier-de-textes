@@ -1,0 +1,64 @@
+.popup-visa-lesson-list{
+
+  .item-description{
+    margin :0px ;
+    margin-right :25px ;
+    padding-top: 10px;
+  }
+  .prev-lesson-summary{
+    margin-right: -15px;
+    margin-left: -15px;
+    padding : 10px 20px;
+    a{
+      color: white;      
+      transition:none;
+    }
+
+    &:hover a{
+      color:#FF8351 !important;
+    }
+  }
+  .right-magnet{
+    margin-right: 20px;
+    margin-top: -4px;
+  }
+  .left-magnet{
+    margin-top: -4px;
+    margin-right: 10px;
+  }
+
+ .item-detail{
+   float: left;
+   margin-top: 15px;
+ }
+ .alf{
+    width: 50%;
+    box-sizing: border-box;
+    &.homework-visa-detail{
+      &>div{
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: solid #2a9cc8 1px ;
+        &:hover{
+          opacity: 0.7
+        }
+        &:last-child{
+          margin-bottom: 0px;
+          border-bottom : none;
+        }
+      }
+    }
+
+
+ }
+
+ .full{
+   width: 100%;
+ }
+ .lesson-detail{
+
+ }
+ .lesson-list{
+        overflow-y: auto;
+  }
+}

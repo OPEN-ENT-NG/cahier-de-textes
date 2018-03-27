@@ -22,7 +22,7 @@
           <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar" b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="homeworks.all" ng-if="!display.hideHomeworkPanel" on-create-open="redirect('/createHomeworkView')" style="z-index: 1000; margin-top: 8px;">
           </calendar-daily-events>
           <div class="row ">
-              <diary-calendar
+              <calendar
                   id="calendar" class="twelve cell"
                   display-template="'<item-calendar></item-calendar>'"
                   create-template="create-lesson"
@@ -30,7 +30,7 @@
                   on-create-open-action="redirect('/createLessonView/timeFromCalendar')"
                   params="calendarParams"
                   monday-of-week="mondayOfWeek" items="itemsCalendar">
-              </diary-calendar>
+              </calendar>
           </div>
       </div>
   </div>

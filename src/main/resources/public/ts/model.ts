@@ -1,56 +1,38 @@
 import { angular, model, moment, _, idiom as lang, Model, calendar } from 'entcore';
-import { Collection } from 'entcore-toolkit'
 import http from 'axios';
-import { DATE_FORMAT, sansAccent, sqlToJsPedagogicItem, sqlToJsHomework, sqlToJsHomeworkType, sqlToJsHomeworkLoad } from './tools';
+import * as tools from './tools';
 
-import { Homework } from './model/Homework.model';
-import { Lesson } from './model/Lesson.model';
-import { PedagogicDay } from './model/PedagogicDay.model';
-import { Child } from './model/Child.model';
-import { Subject } from './model/Subject.model';
-import { SearchForm } from './model/SearchForm.model';
+import {Homework, PedagogicDay, Child, Subject, SearchForm} from './models/index';
+import { Lesson } from './models/Lesson.model';
+import {AudienceService} from "./services/audiences.service";
 
 /**
  * Model from table
  * diary.lesson_has_attachmentH
  * @constructor
  */
-export function LessonAttachment() {}
-export function Audience(audience?) {};
-export function HomeworksLoad(){}
-export function HomeworkType(){}
-
-
-/**
- * Default color of lesson and homeworks
- * @type {string}
- */
-const DEFAULT_ITEM_COLOR = '#CECEF6';
-
-/**
- * Default state of lesson or homework when created
- * @type {string}
- */
-const DEFAULT_STATE = 'draft';
-
-
-/**
- * Get school ids of current authenticated user as string
- * seperated with ':'
- * @returns {string} schoolid_1:schoolid_2:...
- */
-export function getUserStructuresIdsAsString () {
-    var structureIds = "";
-
-    model.me.structures.forEach(function (structureId) {
-        structureIds += structureId + ":";
-    });
-
-    return structureIds;
+export class LessonAttachment extends Model {
+    constructor() {
+        super();
+    }
+};
+export class Audience extends Model {
+    constructor(audience?) {
+        super();
+    }
+};
+export class HomeworksLoad extends Model {
+    constructor() {
+        super();
+    }
+};
+export class HomeworkType extends Model{
+    constructor() {
+        super();
+    }
 };
 
-
-model.build = function () {
+export const InitBuild = function () {
 
     calendar.startOfDay = 8;
     calendar.endOfDay = 19;
@@ -60,12 +42,22 @@ model.build = function () {
     });
     */
 
+    this.makeModels([
+        HomeworkType,
+        Audience,
+        Subject,
+        Lesson,
+        Homework,
+        PedagogicDay,
+        Child
+    ]);
+
+
     // keeping start/end day values in cache so we can detect dropped zones (see ng-extensions.js)
     // note: model.calendar.startOfDay does not work in console.
     model.startOfDay = calendar.startOfDay;
     model.endOfDay = calendar.endOfDay;
 
-    this.makeModels([HomeworkType, Audience, Subject, Lesson, Homework, PedagogicDay, Child]);
     Model.prototype.inherits(Lesson, calendar.ScheduleItem); // will allow to bind item.selected for checkbox
 
     this.searchForm = new SearchForm(false);
@@ -76,45 +68,7 @@ model.build = function () {
         syncLessons: function (cb, cbe) {
             console.warn("deprecated");
             return;
-            /*var that = this;
-            if (that.loading)
-                return;
 
-            var lessons = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
-
-            model.lessons.all.splice(0, model.lessons.all.length);
-
-            var urlGetLessons = '/diary/lesson/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
-
-            if (model.isUserParent() && model.child) {
-                urlGetLessons += model.child.id;
-            } else {
-                urlGetLessons += '%20';
-            }
-
-            that.loading = true;
-            model.getHttp()({
-                method : 'GET',
-                url : urlGetLessons
-            }).then(function (data) {
-                lessons = lessons.concat(data);
-                that.addRange(
-                    _.map(lessons, function (lesson) {
-                        return sqlToJsLesson(lesson);
-                    })
-                );
-                if(typeof cb === 'function'){
-                    cb();
-                }
-                that.loading = false;
-            },function (e) {
-                if (typeof cbe === 'function') {
-                    cbe(model.parseError(e));
-                }
-                that.loading = false;
-            });*/
         }, pushAll: function (datas) {
 
             if (datas) {
@@ -128,112 +82,15 @@ model.build = function () {
         syncSubjects: function (cb, cbe) {
             console.warn("deprecated");
             return;
-            /*
-            this.all = [];
-            var that = this;
-            if (that.loading)
-                return;
-
-            that.loading = true;
-
-            if (model.isUserTeacher()) {
-                http().get('/diary/subject/initorlist').done(function (data) {
-                if (data ===""){
-                data = [];
-                }
-                    model.subjects.addRange(data);
-                    if (typeof cb === 'function') {
-                        cb();
-                    }
-                    that.loading = false;
-                }.bind(that))
-                    .error(function (e) {
-                        if (typeof cbe === 'function') {
-                            cbe(model.parseError(e));
-                        }
-                        that.loading = false;
-                    });
-            } else {
-                http().get('/diary/subject/list/' + getUserStructuresIdsAsString()).done(function (data) {
-                    model.subjects.addRange(data);
-                    if (typeof cb === 'function') {
-                        cb();
-                    }
-                    that.loading = false;
-                }.bind(that))
-                    .error(function (e) {
-                        if (typeof cbe === 'function') {
-                            cbe(model.parseError(e));
-                        }
-                        that.loading = false;
-                    });
-            }*/
-
         }
     });
 
     this.collection(Audience, {
         loading: false,
-        syncAudiences: function (cb, cbe) {
+        syncAudiences: function syncAudiences(cb, cbe) {
             console.warn("deprecated");
             return;
-            /*this.all = [];
-            var nbStructures = model.me.structures.length;
-            var that = this;
-            if (that.loading)
-                return;
-
-            model.currentSchool = model.me.structures[0];
-            that.loading = true;
-
-            model.getAudienceService().getAudiences(model.me.structures).then((audiences)=>{
-                this.addRange(structureData.classes);
-                // TODO get groups
-                nbStructures--;
-                if (nbStructures === 0) {
-                    this.trigger('sync');
-                    this.trigger('change');
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
-                }
-
-                that.loading = false;
-            });
-            */
-            /*model.me.structures.forEach(function (structureId) {
-                http().get('/userbook/structure/' + structureId).done(function (structureData) {
-                    structureData.classes = _.map(structureData.classes, function (audience) {
-                        audience.structureId = structureId;
-                        audience.type = 'class';
-                        audience.typeLabel = lang.translate('diary.audience.class');
-                        return audience;
-                    });
-                    this.addRange(structureData.classes);
-                    // TODO get groups
-                    nbStructures--;
-                    if (nbStructures === 0) {
-                        this.trigger('sync');
-                        this.trigger('change');
-                        if(typeof cb === 'function'){
-                            cb();
-                        }
-                    }
-
-                    that.loading = false;
-                }.bind(that))
-                .error(function (e) {
-                    if (typeof cbe === 'function') {
-                        cbe(model.parseError(e));
-                    }
-                    that.loading = false;
-                });
-            });*/
-        }, pushAll: function (datas) {
-            if (datas) {
-                this.all = _.union(this.all, datas);
-            }
-        }, behaviours: 'diary'
+        }
     });
 
     this.collection(HomeworkType, {
@@ -260,7 +117,7 @@ model.build = function () {
 
                 homeworkTypes = homeworkTypes.concat(result.data);
                 that.addRange(
-                    _.map(homeworkTypes, sqlToJsHomeworkType)
+                    _.map(homeworkTypes, tools.sqlToJsHomeworkType)
                 );
                 if (typeof cb === 'function') {
                     cb();
@@ -284,8 +141,8 @@ model.build = function () {
         syncHomeworks: function (cb, cbe) {
 
             var homeworks = [];
-            var start = moment(model.calendar.dayForWeek).day(1).format(DATE_FORMAT);
-            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(DATE_FORMAT);
+            var start = moment(model.calendar.dayForWeek).day(1).format(tools.DATE_FORMAT);
+            var end = moment(model.calendar.dayForWeek).day(1).add(1, 'week').format(tools.DATE_FORMAT);
             var that = this;
 
             if (that.loading)
@@ -293,7 +150,7 @@ model.build = function () {
 
             model.homeworks.all.splice(0, model.homeworks.all.length);
 
-            var urlGetHomeworks = '/diary/homework/' + getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+            var urlGetHomeworks = '/diary/homework/' + tools.getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
 
             if (model.isUserParent() && model.child) {
                 urlGetHomeworks += model.child.id;
@@ -309,7 +166,7 @@ model.build = function () {
             }).then(function (result) {
                 homeworks = homeworks.concat(result.data);
                 that.addRange(
-                    _.map(homeworks, sqlToJsHomework)
+                    _.map(homeworks, tools.sqlToJsHomework)
                 );
                 if (typeof cb === 'function') {
                     cb();
@@ -392,10 +249,6 @@ model.getUtilsService = function(){
     return angular.element($('html')).injector().get("UtilsService");
 };
 
-model.getConstants = function(){
-    return angular.injector(['ng','app']).get("constants");
-};
-
 model.homeworksPerDayDisplayed = 1;
 /**
  * Says whether or not current user can edit an homework
@@ -433,9 +286,9 @@ model.publishHomeworks = function (itemArray, isPublish, cb, cbe) {
     var url = isPublish ? "/diary/publishHomeworks" : "/diary/unPublishHomeworks";
 
     return model.getHttp()({
-            method : 'POST',
-            url : url,
-            data : itemArray
+        method : 'POST',
+        url : url,
+        data : itemArray
     }).then(function (r) {
         if (typeof cb === 'function') {
             cb();
@@ -526,9 +379,9 @@ model.publishLessons = function (itemArray, isPublish, cb, cbe) {
     var url = isPublish ? "/diary/publishLessons" : "/diary/unPublishLessons";
 
     return model.getHttp()({
-            method : 'POST',
-            url : url,
-            data : itemArray
+        method : 'POST',
+        url : url,
+        data : itemArray
     }).then(function (r) {
         var updateLessons = new Array();
 
@@ -596,7 +449,7 @@ model.loadHomeworksLoad = function (homework, date, audienceId, cb, cbe) {
         homework.weekhomeworksload = [];
 
         sqlHomeworksLoads.forEach(function (homeworkLoad) {
-            homework.weekhomeworksload.push(sqlToJsHomeworkLoad(homeworkLoad));
+            homework.weekhomeworksload.push(tools.sqlToJsHomeworkLoad(homeworkLoad));
         });
 
         if (typeof cb === 'function') {
@@ -628,9 +481,9 @@ model.loadHomeworksForLesson = function (lesson, cb, cbe) {
         url : url + lesson.id
     }).then(function (result) {
         var sqlHomeworks = result.data;
-        lesson.homeworks = new Collection(Homework);
+        lesson.homeworks = this.collection(Homework);
         sqlHomeworks.forEach(function (sqlHomework) {
-            lesson.homeworks.push(sqlToJsHomework(sqlHomework));
+            lesson.homeworks.push(tools.sqlToJsHomework(sqlHomework));
         });
         if (typeof cb === 'function') {
             cb();
@@ -702,15 +555,14 @@ model.initHomework = function (dueDate, lesson) {
         homework.audience = {}; //sets the default audience to undefined
         homework.subject = model.subjects.first();
         homework.audienceType = homework.audience.type;
-        homework.color = DEFAULT_ITEM_COLOR;
-        homework.state = DEFAULT_STATE;
+        homework.color = tools.DEFAULT_ITEM_COLOR;
+        homework.state = tools.DEFAULT_STATE;
     }
 
-    model.loadHomeworksLoad(homework, moment(homework.date).format(DATE_FORMAT), homework.audience.id);
+    model.loadHomeworksLoad(homework, moment(homework.date).format(tools.DATE_FORMAT), homework.audience.id);
 
     return homework;
 };
-
 
 /**
  * Init lesson
@@ -722,8 +574,8 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
     lesson.audience = {}; //sets the default audience to undefined
     lesson.subject = model.subjects.first();
     lesson.audienceType = lesson.audience.type;
-    lesson.color = DEFAULT_ITEM_COLOR;
-    lesson.state = DEFAULT_STATE;
+    lesson.color = tools.DEFAULT_ITEM_COLOR;
+    lesson.state = tools.DEFAULT_STATE;
     lesson.title = lang.translate('diary.lesson.label');
 
     let newItem:any;
@@ -735,8 +587,8 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
         newItem.beginning = newItem.beginning.second(0);
         newItem.date = newItem.beginning;
         if (!newItem.beginning.isBefore(newItem.end)){
-          newItem.end = moment(newItem.beginning);
-          newItem.end.minute(0).second(0).add(1, 'hours');
+            newItem.end = moment(newItem.beginning);
+            newItem.end.minute(0).second(0).add(1, 'hours');
         }
         if (newItem.audience){
             lesson.audience = newItem.audience;
@@ -784,119 +636,6 @@ model.getPreviousLessonsFromLesson = function (lesson, useDeltaStep, cb, cbe) {
 
     console.warn("deprecated");
     return;
-
-
-    // if (useDeltaStep) {
-    //     if (lesson.allPreviousLessonsLoaded) {
-    //         return;
-    //     }
-    // }/* else if (lesson.previousLessonsLoaded || lesson.previousLessonsLoading == true) {
-    //     return;
-    // }*/
-    //
-    // if (!useDeltaStep) {
-    //     lesson.allPreviousLessonsLoaded = false;
-    // }
-    //
-    // var defaultCount = 6;
-    //
-    // var idx_start = 0;
-    // var idx_end = idx_start + defaultCount;
-    //
-    // if (useDeltaStep) {
-    //     idx_start += defaultCount;
-    //     idx_end += defaultCount;
-    // }
-    //
-    // var params = {};
-    //
-    // params.offset = idx_start;
-    // params.limit = idx_end;
-    //
-    // if (lesson.id) {
-    //     params.excludeLessonId = lesson.id;
-    // }
-    //
-    // // tricky way to detect if string date or moment date ...
-    // // 12:00:00
-    // if (lesson.endTime.length === 8) {
-    //     params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + lesson.endTime;
-    // } else {
-    //     params.endDateTime = lesson.date.format(DATE_FORMAT) + ' ' + moment(lesson.endTime).format("HH:mm");
-    // }
-    //
-    // var clonedLessonMoment = moment(new Date(lesson.date));
-    // //params.startDate = clonedLessonMoment.add(-2, 'month').format(DATE_FORMAT);
-    // params.subject = lesson.subject.id;
-    // params.audienceId = lesson.audience.id;
-    // params.returnType = 'lesson'; // will allow get lessons first, then homeworks later
-    // params.homeworkLinkedToLesson = "true";
-    // params.sortOrder = "DESC";
-    //
-    // if (!lesson.previousLessons) {
-    //     lesson.previousLessons = new Array();
-    // }
-    // lesson.previousLessonsDisplayed = new Array();
-    //
-    // lesson.previousLessonsLoading = true;
-    // http().postJson('/diary/pedagogicItems/list', params).done(function (items) {
-    //
-    //     // all lessons loaded
-    //     if (items.length < defaultCount) {
-    //         lesson.allPreviousLessonsLoaded = true;
-    //     }
-    //
-    //     var previousLessonsAndHomeworks = _.map(items, sqlToJsPedagogicItem);
-    //
-    //     var groupByItemType = _.groupBy(previousLessonsAndHomeworks, 'type_item');
-    //
-    //     var previousLessons = groupByItemType.lesson;
-    //
-    //     if (previousLessons) {
-    //         var previousLessonIds = new Array();
-    //
-    //         previousLessons.forEach(function (lesson) {
-    //             previousLessonIds.push(lesson.id);
-    //         });
-    //
-    //
-    //         // load linked homeworks of previous lessons
-    //         var paramsHomeworks = {};
-    //         paramsHomeworks.returnType = 'homework';
-    //         paramsHomeworks.homeworkLessonIds = previousLessonIds;
-    //
-    //         http().postJson('/diary/pedagogicItems/list', paramsHomeworks).done(function (items2) {
-    //
-    //             var previousHomeworks = _.map(items2, sqlToJsPedagogicItem);
-    //
-    //             previousLessons.forEach(function (lesson) {
-    //                 lesson.homeworks = _.where(previousHomeworks, {lesson_id: lesson.id});
-    //             });
-    //
-    //             lesson.previousLessons = lesson.previousLessons.concat(previousLessons);
-    //             lesson.previousLessonsLoaded = true;
-    //             lesson.previousLessonsLoading = false;
-    //             lesson.previousLessonsDisplayed = lesson.previousLessons;
-    //
-    //             if (typeof cb === 'function') {
-    //                 cb();
-    //             }
-    //         });
-    //     } else {
-    //         lesson.previousLessons = new Array();
-    //         lesson.previousLessonsLoaded = true;
-    //         lesson.previousLessonsLoading = false;
-    //         lesson.previousLessonsDisplayed = lesson.previousLessons;
-    //         if (typeof cb === 'function') {
-    //             cb();
-    //         }
-    //     }
-    //
-    // }).error(function (e) {
-    //     if (typeof cbe === 'function') {
-    //         cbe(model.parseError(e));
-    //     }
-    // });
 };
 
 
@@ -921,7 +660,7 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
         data : params
     }).then( (result) => {
         var items = result.data;
-        var pedagogicItemsFromDB = _.map(items, sqlToJsPedagogicItem);
+        var pedagogicItemsFromDB = _.map(items, tools.sqlToJsPedagogicItem);
 
         var days = _.groupBy(pedagogicItemsFromDB, 'day');
 
@@ -989,7 +728,6 @@ model.performPedagogicItemSearch = function (params, isTeacher, cb, cbe) {
  * @param cbe Callback error function
  */
 model.listChildren = function (cb, cbe) {
-
     // no children - abort
     if (!model.me.childrenIds || model.me.childrenIds.length == 0) {
         if (typeof cb === 'function') {
@@ -997,25 +735,22 @@ model.listChildren = function (cb, cbe) {
         }
         return;
     }
-
-    
-
     return model.getHttp()({
         method : 'GET',
         url : '/diary/children/list'
     }).then(function (result) {
         model.childs.removeAll();
-            model.childs.addRange(result.data);
+        model.childs.addRange(result.data);
 
-            if(model.childs.all.length > 0) {
-                model.child = model.childs.all[0];
-                model.child.selected = true;
-            }
+        if(model.childs.all.length > 0) {
+            model.child = model.childs.all[0];
+            model.child.selected = true;
+        }
 
-            if (typeof cb === 'function') {
-                cb();
-            }
-        });
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
 };
 
 //builds the set of different subjects encountered in the pedagogic items of the list
@@ -1025,9 +760,9 @@ model.initSubjects = function () {
 
     model.pedagogicDays.forEach(function(pedagogicDay) {
         pedagogicDay.pedagogicItemsOfTheDay.forEach(function(pedagogicItem) {
-          if (!pedagogicItem){
-            return;
-          }
+            if (!pedagogicItem){
+                return;
+            }
             var subjectName = pedagogicItem.subject;
             if (!_.contains(subjects, subjectName)) {
                 subjects.push(subjectName);
@@ -1066,10 +801,10 @@ model.findSubjectsByLabel = function (label) {
     var subjectsFound = new Array();
 
     if (label.length > 0) {
-        var labelLowerCaseNoAccent = sansAccent(label).toLowerCase();
+        var labelLowerCaseNoAccent = tools.sansAccent(label).toLowerCase();
 
         model.subjects.all.forEach(function (subject) {
-            var labelSubjectLowerCaseNoAccent = sansAccent(subject.label.toLowerCase());
+            var labelSubjectLowerCaseNoAccent = tools.sansAccent(subject.label.toLowerCase());
 
             if (labelSubjectLowerCaseNoAccent.indexOf(labelLowerCaseNoAccent) != -1) {
                 subjectsFound.push(subject);

@@ -1,0 +1,14 @@
+.habilitation{
+  &>div.row>div.cell{
+    padding : 15px;
+  }
+  .teacher-list{
+    article{
+      padding-right: 50px;
+      i{
+        position: absolute;
+        right: 25px;
+      }
+    }
+  }
+}

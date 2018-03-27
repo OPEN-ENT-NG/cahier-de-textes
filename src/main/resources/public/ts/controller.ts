@@ -2,22 +2,13 @@ import { ng, angular, model, moment, _, notify, template } from 'entcore';
 import { syncLessonsAndHomeworks, syncHomeworks} from './tools';
 
 
-import { Homework } from './model/Homework.model';
-import { Lesson } from './model/Lesson.model';
-import { PedagogicItem } from './model/PedagogicItem.model';
-import { CourseService } from "./service/courses.service";
-import { LessonService } from "./service/lessons.service";
-import { SecureService } from "./directives/secure/secure.service";
-import { AudienceService } from "./service/audiences.service";
-import {Audience} from './model';
-import {CONSTANTS} from './tools';
+import { Homework, Lesson, PedagogicItem } from './models/';
+import { CourseService } from "./services/courses.service";
+import { LessonService } from "./services/lessons.service";
+import { SecureService } from "./services/secure.service";
+import * as tools from './tools';
+import {AudienceService} from "./services/audiences.service";
 
-
-/**
- * Date calendar pattern for url date parsing
- * @type {string}
- */
-const CAL_DATE_PATTERN = "YYYY-MM-DD";
 
 /**
  *
@@ -32,11 +23,10 @@ const CAL_DATE_PATTERN = "YYYY-MM-DD";
 export let DiaryController = ng.controller('DiaryController', [
     '$scope', '$rootScope', 'model', 'route', '$location', '$window', '$sce',
     function ($scope, $rootScope, model, route, $location, $window, $sce) {
-
     model.CourseService = CourseService;
     model.LessonService = LessonService;
-    $scope.constants = CONSTANTS;
-    $scope.RIGHTS = CONSTANTS.RIGHTS;
+    $scope.constants = tools.CONSTANTS;
+    $scope.RIGHTS = tools.CONSTANTS.RIGHTS;
     $rootScope.model = model;
 
     $rootScope.currentRightPanelVisible = undefined ;//= 'test';
@@ -152,7 +142,6 @@ export let DiaryController = ng.controller('DiaryController', [
 
     $scope.selectedDueDate = undefined; // date selected in list view. It can allow to init homework on a different due_date.
 
-    initAudiences();
     route({
         showHistoryView:function(params){
             template.open('main', 'show-history');
@@ -173,7 +162,7 @@ export let DiaryController = ng.controller('DiaryController', [
                 //$scope.openLessonView(null, params);
 
                 template.open('main', 'main');
-                if (SecureService.hasRight(CONSTANTS.RIGHTS.CREATE_LESSON)){
+                if (SecureService.hasRight(tools.CONSTANTS.RIGHTS.CREATE_LESSON)){
                   template.open('main-view', 'create-lesson');
               }
         },
@@ -184,7 +173,7 @@ export let DiaryController = ng.controller('DiaryController', [
         },
         editLessonView: function(params) {
             template.open('main', 'main');
-            if (SecureService.hasRight(CONSTANTS.RIGHTS.CREATE_LESSON)){
+            if (SecureService.hasRight(tools.CONSTANTS.RIGHTS.CREATE_LESSON)){
               template.open('main-view', 'create-lesson');
             }else{
                 template.open('main-view', 'view-lesson');
@@ -430,9 +419,9 @@ export let DiaryController = ng.controller('DiaryController', [
             calendarViewPath += '/' + firstMonday;
         } else {
             if (model.calendar && model.calendar.week) {
-                calendarViewPath += '/' + moment().week(model.calendar.week).weekday(0).format(CAL_DATE_PATTERN);
+                calendarViewPath += '/' + moment().week(model.calendar.week).weekday(0).format(tools.CONSTANTS.CAL_DATE_PATTERN);
             } else {
-                calendarViewPath += '/' + moment().weekday(0).format(CAL_DATE_PATTERN);
+                calendarViewPath += '/' + moment().weekday(0).format(tools.CONSTANTS.CAL_DATE_PATTERN);
             }
         }
 
@@ -657,39 +646,6 @@ export let DiaryController = ng.controller('DiaryController', [
     $scope.loadHomeworksForCurrentLesson = function (cb) {
         console.warn("deprecated");
         return;
-        /*
-        // lesson not yet created do not retrieve homeworks
-        if(!$scope.lesson.id){
-            return;
-        }
-
-        var needSqlSync = false;
-
-        // if homeworks ever retrieved from db don't do it again!
-        $scope.lesson.homeworks.forEach(function (homework) {
-            if (!homework.loaded) {
-                needSqlSync = true;
-            }
-        });
-
-        // only reload homeworks if necessary
-        if (needSqlSync) {
-            model.loadHomeworksForLesson($scope.lesson,
-
-                function () {
-                    if (typeof cb !== 'undefined') {
-                        cb();
-                    }
-                    $scope.$apply();
-                }, function (e) {
-                    $rootScope.validationError(e);
-                });
-        } else {
-            if (typeof cb !== 'undefined') {
-                cb();
-            }
-        }*/
-
     };
 
     // Date functions
@@ -863,11 +819,15 @@ export let DiaryController = ng.controller('DiaryController', [
     };
 
     var getSelectedHomeworks = function(){
-        return model.homeworks.selection();
+        if (model && model.homeworks && model.homeworks.selection)
+            return model.homeworks.selection();
+        return [];
     };
 
     var getSelectedLessons = function(){
-        return model.lessons.selection();
+        if(model && model.lessons && model.lessons.selection)
+            return model.lessons.selection();
+        return [];
     };
 
 
@@ -1231,22 +1191,26 @@ export let DiaryController = ng.controller('DiaryController', [
         */
     };
 
-
-    function initAudiences(cb?){
+        /**
+         * Init audience
+         * @returns {Lesson}
+         */
+        function initAudiences (cb ?) {
             model.audiences.all = [];
             //var nbStructures = model.me.structures.length;
 
             model.currentSchool = model.me.structures[0];
 
-            AudienceService.getAudiences(model.me.structures).then((audiences)=>{
+            AudienceService.getAudiences(model.me.structures).then((audiences) => {
 
-                //model.audiences.addRange(audiences);
-                    model.audiences.trigger('sync');
-                    model.audiences.trigger('change');
-                    if(typeof cb === 'function'){
-                        cb();
-                    }
+                model.audiences.addRange(audiences);
+                model.audiences.trigger('sync');
+                model.audiences.trigger('change');
+                if (typeof cb === 'function') {
+                    cb();
+                }
             });
-    }
+        };
+        initAudiences();
 }
 ]);

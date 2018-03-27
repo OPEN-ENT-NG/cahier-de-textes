@@ -1,26 +1,26 @@
 ﻿import { angular, ng, model, moment, _, calendar, Model, routes } from 'entcore';
-import {DiaryController} from './controller';
-import * as controllers from './controller/index';
-
+import { DiaryController } from './controller';
+import * as controllers from './controllers/index';
+import * as directives from './directives/index';
+import * as filters from './filters/index';
+import {InitBuild} from './model';
+import {AudienceService} from "./services/audiences.service";
 declare let module: any;
 
-ng.controllers.push(DiaryController);
 for (let controller in controllers) {
     ng.controllers.push(controllers[controller]);
 }
 
-export const AngularExtensions = {
-    moduleConfigs : [],
-    addModuleConfig : function(callBack){
-        this.moduleConfigs.push(callBack);
-    },
-    init: function (module) {
-        angular.forEach(this.moduleConfigs,function(moduleConfig){
-            moduleConfig.apply(this,[module]);
+for (let directive in directives) {
+    ng.directives.push(directives[directive]);
+}
 
-        });
-    }
-};
+for (let filter in filters) {
+    ng.filters.push(filters[filter]);
+}
+model.build = InitBuild;
+
+ng.controllers.push(DiaryController);
 
 routes.define(($routeProvider) => {
     $routeProvider

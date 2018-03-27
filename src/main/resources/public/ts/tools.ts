@@ -1,5 +1,5 @@
 import {angular, moment, _, idiom as lang, model } from 'entcore';
-import { PedagogicItem } from "./model/PedagogicItem.model";
+import { PedagogicItem } from "./models/PedagogicItem.model";
 
 export const DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -299,4 +299,33 @@ export const CONSTANTS = {
         MANAGE_INSPECTOR: "diary.manageInspect.apply",
         SHOW_OTHER_TEACHER: "diary.view.otherteacher"
     }
+};
+
+
+/**
+ * Default color of lesson and homeworks
+ * @type {string}
+ */
+export const DEFAULT_ITEM_COLOR = '#CECEF6';
+
+/**
+ * Default state of lesson or homework when created
+ * @type {string}
+ */
+export const DEFAULT_STATE = 'draft';
+
+
+/**
+ * Get school ids of current authenticated user as string
+ * seperated with ':'
+ * @returns {string} schoolid_1:schoolid_2:...
+ */
+export function getUserStructuresIdsAsString() {
+    var structureIds = "";
+
+    model.me.structures.forEach(function (structureId) {
+        structureIds += structureId + ":";
+    });
+
+    return structureIds;
 };

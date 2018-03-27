@@ -1,45 +1,33 @@
-import { angular } from 'entcore';
-import {AngularExtensions} from '../../app';
+import {ng, angular} from 'entcore';
 
-(function() {
-	'use strict';
+export const quickSearchItem = ng.directive('quickSearchItem', function () {
+    return {
+        restrict: "E",
+        templateUrl: "/diary/public/template/directives/quick-search/quick-search-item.html",
+        scope: false,
+        link: function (scope, element) {
 
-	AngularExtensions.addModuleConfig(function(module){
+            var angElement = angular.element(element);
 
-        /**
-         * Directive for result items
-         */
-        module.directive('quickSearchItem', function () {
-            return {
-                restrict: "E",
-                templateUrl: "/diary/public/js/directives/quick-search/quick-search-item.html",
-                scope: false,
-                link: function (scope, element) {
+            angElement.on('drag', function(event){
+                angElement.css('opacity', 0.9);
+            });
 
-                    var angElement = angular.element(element);
+            scope.dragCondition = function (item) {
+                return true;
+            };
 
-                    angElement.on('drag', function(event){
-                        angElement.css('opacity', 0.9);
-                    });
+            scope.dropCondition = function (targetItem) {
+                return false;
+            };
 
-                    scope.dragCondition = function (item) {
-                        return true;
-                    };
-
-                    scope.dropCondition = function (targetItem) {
-                        return false;
-                    };
-
-                    scope.drag = function(item, $originalEvent) {
-                        try {
-                            $originalEvent.dataTransfer.setData('application/json', JSON.stringify(item));
-                        } catch (e) {
-                            $originalEvent.dataTransfer.setData('Text', JSON.stringify(item));														
-                        }
-                    };
+            scope.drag = function(item, $originalEvent) {
+                try {
+                    $originalEvent.dataTransfer.setData('application/json', JSON.stringify(item));
+                } catch (e) {
+                    $originalEvent.dataTransfer.setData('Text', JSON.stringify(item));
                 }
             };
-        });
-	});
-
-})();
+        }
+    };
+});

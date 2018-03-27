@@ -1,0 +1,49 @@
+.diary-item-calendar {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+
+
+
+    &.diary-schedule {
+        background-color: rgba(0,0,0,0.15);
+        border-color: rgba(0,0,0,0.5);
+        border-style: dashed;
+        border-width: 1px;
+    }
+
+    .diary-item-calendar-container {
+      height: 100%;
+        .subjectlabel {}
+        .item-line {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            padding-bottom: 0 !important;
+            overflow: hidden;
+
+            .hour {
+                white-space: nowrap;
+                overflow: hidden;
+                width : 40px;
+            }
+
+            .item-checkbox {
+                float: right;
+                margin-left: auto;
+                overflow: hidden;
+                white-space: nowrap;
+                min-width: 1em;
+                margin-right:3px;
+            }
+
+            .rom {
+                white-space: nowrap;
+                margin-left: 0.5em;
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}

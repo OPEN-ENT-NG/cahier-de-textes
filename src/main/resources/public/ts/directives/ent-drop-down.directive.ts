@@ -1,120 +1,113 @@
-import {model, idiom as lang, _} from 'entcore';
-import {AngularExtensions} from '../app';
+import { angular, ng, model, idiom as lang, _} from 'entcore';
 import http from 'axios';
 
-(function() {
-	'use strict';
 
-	AngularExtensions.addModuleConfig(function(module){
-		module.directive('entDropdown', function () {
-				return {
-						restrict: "E",
-						templateUrl: "diary/public/template/ent-dropdown.html",
-						scope: {
-								placeholder: "@",
-								list: "=",
-								selected: "=",
-								property: "@",
-								school: "=",
-								refreshFunc: "&",
-								loadPreviousFunc: "&",
-								lesson: "=",
-								homework: "="
-						},
-						link: function(scope, element, attrs) {
-								scope.listVisible = false;
-								scope.isPlaceholder = true;
-								scope.searchPerformed = false;
-								scope.otherAudiences = [];
-								scope.translated_placeholder = lang.translate(scope.placeholder);
+export const entDropdown = ng.directive('entDropdown', function () {
+    return {
+        restrict: "E",
+        templateUrl: "diary/public/template/ent-dropdown.html",
+        scope: {
+            placeholder: "@",
+            list: "=",
+            selected: "=",
+            property: "@",
+            school: "=",
+            refreshFunc: "&",
+            loadPreviousFunc: "&",
+            lesson: "=",
+            homework: "="
+        },
+        link: function(scope, element, attrs) {
+            scope.listVisible = false;
+            scope.isPlaceholder = true;
+            scope.searchPerformed = false;
+            scope.otherAudiences = [];
+            scope.translated_placeholder = lang.translate(scope.placeholder);
 
-								scope.select = function(audience) {
-										scope.isPlaceholder = false;
-										scope.selected = audience;
-										scope.listVisible = false;
-								};
+            scope.select = function(audience) {
+                scope.isPlaceholder = false;
+                scope.selected = audience;
+                scope.listVisible = false;
+            };
 
-								scope.isSelected = function(audience) {
-										return scope.selected !== undefined && scope.selected != null && audience[scope.property] === scope.selected[scope.property];
-								};
+            scope.isSelected = function(audience) {
+                return scope.selected !== undefined && scope.selected != null && audience[scope.property] === scope.selected[scope.property];
+            };
 
-								scope.show = function() {
-										scope.listVisible = true;
-								};
+            scope.show = function() {
+                scope.listVisible = true;
+            };
 
-								scope.searchAudiences = function (cbe?) {
-									http.get('diary/classes/list/' + scope.school)
-										.then(function (res) {
-												let structureData = res.data;
-												scope.otherAudiences = _.map(structureData, function (data) {
-														let audience:any = {};
-														audience.structureId = scope.school;
-														audience.type = 'class';
-														audience.typeLabel = (data.className === 'class') ? lang.translate('diary.audience.class') :  lang.translate('diary.audience.group');
-														audience.id= data.classId;
-														audience.name = data.className;
-														return audience;
-												});
+            scope.searchAudiences = function (cbe?) {
+                http.get('diary/classes/list/' + scope.school)
+                    .then(function (res) {
+                        let structureData = res.data;
+                        scope.otherAudiences = _.map(structureData, function (data) {
+                            let audience:any = {};
+                            audience.structureId = scope.school;
+                            audience.type = 'class';
+                            audience.typeLabel = (data.className === 'class') ? lang.translate('diary.audience.class') :  lang.translate('diary.audience.group');
+                            audience.id= data.classId;
+                            audience.name = data.className;
+                            return audience;
+                        });
 
-												scope.otherAudiences = _.reject(scope.otherAudiences, function(audience) {
-														return _.contains(_.pluck(scope.list, 'name') , audience.name);
-												});
+                        scope.otherAudiences = _.reject(scope.otherAudiences, function(audience) {
+                            return _.contains(_.pluck(scope.list, 'name') , audience.name);
+                        });
 
-												scope.searchPerformed = true;
-												scope.listVisible = true;
-												scope.$apply();
-										}).catch(function (error) {
-											if (typeof cbe === 'function') {
-												cbe(model.parseError(error));
-											}
-										})
+                        scope.searchPerformed = true;
+                        scope.listVisible = true;
+                        scope.$apply();
+                    }).catch(function (error) {
+                    if (typeof cbe === 'function') {
+                        cbe(model.parseError(error));
+                    }
+                })
 
-								};
+            };
 
-								scope.$watch("selected", function(value) {
-										scope.isPlaceholder = true;
-										if (scope.selected !== null && scope.selected !== undefined) {
-												scope.isPlaceholder = scope.selected[scope.property] === undefined;
-												scope.display = scope.selected[scope.property];
+            scope.$watch("selected", function(value) {
+                scope.isPlaceholder = true;
+                if (scope.selected !== null && scope.selected !== undefined) {
+                    scope.isPlaceholder = scope.selected[scope.property] === undefined;
+                    scope.display = scope.selected[scope.property];
 
-												if (scope.lesson && scope.lesson.audience && scope.lesson.audience.id && scope.lesson.endTime) {
-														if (scope.lesson.homeworks.all.length > 0) {
-																scope.$parent.refreshHomeworkLoads(scope.lesson);
-														}
+                    if (scope.lesson && scope.lesson.audience && scope.lesson.audience.id && scope.lesson.endTime) {
+                        if (scope.lesson.homeworks.all.length > 0) {
+                            scope.$parent.refreshHomeworkLoads(scope.lesson);
+                        }
 
-														scope.lesson.previousLessonsLoaded = false;
-														//scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
-												}
+                        scope.lesson.previousLessonsLoaded = false;
+                        //scope.$parent.loadPreviousLessonsFromLesson(scope.lesson);
+                    }
 
-												if (scope.homework && scope.homework.audience) {
-														scope.$parent.showHomeworksLoad(scope.homework, null, null);
-												}
-										}
-								});
+                    if (scope.homework && scope.homework.audience) {
+                        scope.$parent.showHomeworksLoad(scope.homework, null, null);
+                    }
+                }
+            });
 
-					 
-								function handler(event) {
-										var isClickedElementChildOfPopup = element
-												.find(event.target)
-												.length > 0;
 
-										if (isClickedElementChildOfPopup)
-												return;
+            function handler(event) {
+                var isClickedElementChildOfPopup = element
+                    .find(event.target)
+                    .length > 0;
 
-										scope.$apply(function() {
-												scope.listVisible = false;
-										});
-								}
-								$(document).bind('click',handler );
+                if (isClickedElementChildOfPopup)
+                    return;
 
-								//free on detraoy element & handlers
-								scope.$on("$destroy", function() {
-										$(document).unbind('click',handler );
-								});
+                scope.$apply(function() {
+                    scope.listVisible = false;
+                });
+            }
+            $(document).bind('click',handler );
 
-						}
-				};
-		});
-	});
+            //free on detraoy element & handlers
+            scope.$on("$destroy", function() {
+                $(document).unbind('click',handler );
+            });
 
-})();
+        }
+    };
+});
