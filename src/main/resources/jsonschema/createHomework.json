@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "homework_title": {
+      "id": "http://jsonschema.net/homework_title",
+      "type": "string"
+    },
+    "subject_code": {
+      "id": "http://jsonschema.net/subject_id",
+      "type": "string"
+    },
+    "homework_type_id": {
+      "id": "http://jsonschema.net/homework_type_id",
+      "type": "integer"
+    },
+    "teacher_id": {
+      "id": "http://jsonschema.net/teacher_id",
+      "type": "string"
+    },
+    "school_id": {
+      "id": "http://jsonschema.net/school_id",
+      "type": "string"
+    },
+    "lesson_id": {
+      "id": "http://jsonschema.net/lesson_id",
+      "type": "integer"
+    },
+    "audience_id": {
+      "id": "http://jsonschema.net/audience_id",
+      "type": "string"
+    },
+    "homework_due_date": {
+      "id": "http://jsonschema.net/homework_due_date",
+      "type": "string"
+    },
+    "homework_description": {
+      "id": "http://jsonschema.net/homework_description",
+      "type": "string"
+    },
+    "homework_color": {
+      "id": "http://jsonschema.net/homework_color",
+      "type": "string"
+    },
+    "attachments": {
+      "id": "http://jsonschema.net/attachments",
+      "type": "array"
+    },
+    "created": {
+      "id": "http://jsonschema.net/created",
+      "type": "string"
+    }
+  },
+  "required": [
+    "subject_id",
+    "homework_type_id",
+    "teacher_id",
+    "school_id",
+    "audience_id",
+    "homework_due_date",
+    "homework_description",
+    "homework_color"
+  ]
+}
