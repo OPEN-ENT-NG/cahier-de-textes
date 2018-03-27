@@ -13,13 +13,11 @@ export const diaryMultiCalendarFilter = ng.directive('diaryMultiCalendarFilter',
             teacher: '='
         },
         controller: function ($scope) {
-
-            let vm = this;
             let promiseFilter;
             $scope.RIGHTS = CONSTANTS.RIGHTS;
-            vm.filters = {};
+            $scope.filters = {};
 
-            vm.getFilters = function (structureId) {
+            $scope.getFilters = function (structureId) {
                 if (!promiseFilter) {
                     if (SecureService.hasRight(CONSTANTS.RIGHTS.VISA_ADMIN)) {
                         promiseFilter = VisaService.getFilters(structureId);
@@ -29,7 +27,7 @@ export const diaryMultiCalendarFilter = ng.directive('diaryMultiCalendarFilter',
                 }
                 if (promiseFilter) {
                     promiseFilter.then((filters) => {
-                        vm.filters = filters;
+                        $scope.filters = filters;
                     });
                 }
             };
@@ -49,11 +47,11 @@ export const diaryMultiCalendarFilter = ng.directive('diaryMultiCalendarFilter',
                 });
                 $scope.$watch("structure", (n, o) => {
                     if (n !== o && n) {
-                        vm.getFilters(n.id);
+                        $scope.getFilters(n.id);
                     }
                 });
                 if ($scope.structure) {
-                    vm.getFilters($scope.structure.id);
+                    $scope.getFilters($scope.structure.id);
                 }
             }
 
