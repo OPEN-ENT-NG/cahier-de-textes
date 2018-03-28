@@ -31,11 +31,11 @@
     <div class="contener-slide" ng-init="progressionRightPanelCtrl.selected='main'">
         <div class="slide"
             ng-class="{ 'left-slide' : progressionRightPanelCtrl.selected !== 'main'}">
-                <ng-include src="'/diary/public/js/progression/right-panel/content/sequence-list.template.html'"></ng-include>
+                <ng-include src="'/diary/public/template/progression/right-panel/content/sequence-list.template.html'"></ng-include>
             </div>
         <div class="slide"
            ng-class="{'right-slide': progressionRightPanelCtrl.selected === 'main'}">
-            <ng-include src="'/diary/public/js/progression/right-panel/content/lessons-list.template.html'"></ng-include>
+            <ng-include src="'/diary/public/template/progression/right-panel/content/lessons-list.template.html'"></ng-include>
          </div>
 
     </div>

@@ -87,7 +87,7 @@ export class Homework {
                 return that.update(cb, cbe);
             }
             else {
-                return that.create(cb, cbe);
+                return that.create();
             }
         });
 
@@ -166,7 +166,7 @@ export class Homework {
         var homework = this;
         http.get('/diary/homework/' + homework.id)
             .then(function (res) {
-                homework.updateData(sqlToJsHomework(res.data));
+                Mix.extend(this, sqlToJsHomework(res.data));
 
                 if (typeof cb === 'function') {
                     cb();
@@ -272,7 +272,7 @@ export class Homework {
 };
 
 export class Homeworks {
-    all: [Homework];
+    all: Homework[];
 
     loading: boolean;
 

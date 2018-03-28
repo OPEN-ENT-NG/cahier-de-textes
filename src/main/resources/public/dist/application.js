@@ -51,7 +51,7 @@
 	var controllers = __webpack_require__(88);
 	var directives = __webpack_require__(109);
 	var filters = __webpack_require__(127);
-	var model_1 = __webpack_require__(41);
+	var model_1 = __webpack_require__(80);
 	for (var controller in controllers) {
 	    entcore_1.ng.controllers.push(controllers[controller]);
 	}
@@ -124,14 +124,48 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var _1 = __webpack_require__(32);
-	var courses_service_1 = __webpack_require__(42);
+	var _1 = __webpack_require__(3);
+	var courses_service_1 = __webpack_require__(81);
 	var lessons_service_1 = __webpack_require__(84);
 	var secure_service_1 = __webpack_require__(86);
-	var tools = __webpack_require__(3);
+	var tools = __webpack_require__(73);
 	var audiences_service_1 = __webpack_require__(87);
 	/**
 	 *
@@ -878,36 +912,37 @@
 	                $scope.lesson = null;
 	            $scope.homework = null;
 	        };
-	        $scope.createOrUpdateHomework = function (goToMainView, cb) {
-	            $scope.currentErrors = [];
-	            if ($scope.newItem) {
-	                $scope.homework.dueDate = $scope.newItem.date;
-	            }
-	            var postHomeworkSave = function () {
-	                //$scope.showCal = !$scope.showCal;
-	                entcore_1.notify.info('homework.saved');
-	                $scope.homework.audience = model.audiences.findWhere({ id: $scope.homework.audience.id });
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                if (goToMainView) {
-	                    $rootScope.back();
-	                    $scope.lesson = null;
-	                    $scope.homework = null;
-	                }
-	            };
-	            return $scope.homework.save(function () {
-	                if (this.lesson_id) {
-	                    return tools_1.syncHomeworks().then(function () {
-	                        postHomeworkSave();
-	                    });
-	                }
-	                else {
-	                    return tools_1.syncLessonsAndHomeworks(postHomeworkSave);
-	                }
-	            }, function (e) {
-	                $scope.homework.errorValid = true;
-	                throw e;
+	        $scope.createOrUpdateHomework = function (goToMainView) {
+	            return __awaiter(this, void 0, void 0, function () {
+	                var e_1;
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            $scope.currentErrors = [];
+	                            if ($scope.newItem) {
+	                                $scope.homework.dueDate = $scope.newItem.date;
+	                            }
+	                            _a.label = 1;
+	                        case 1:
+	                            _a.trys.push([1, 3, , 4]);
+	                            return [4 /*yield*/, model.homeworks.sync()];
+	                        case 2:
+	                            _a.sent();
+	                            entcore_1.notify.info('homework.saved');
+	                            $scope.homework.audience = model.audiences.findWhere({ id: $scope.homework.audience.id });
+	                            if (goToMainView) {
+	                                $rootScope.back();
+	                                $scope.lesson = null;
+	                                $scope.homework = null;
+	                            }
+	                            return [3 /*break*/, 4];
+	                        case 3:
+	                            e_1 = _a.sent();
+	                            $scope.homework.errorValid = true;
+	                            throw e_1;
+	                        case 4: return [2 /*return*/];
+	                    }
+	                });
 	            });
 	        };
 	        /**
@@ -1172,427 +1207,927 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var entcore_1 = __webpack_require__(1);
-	var PedagogicItem_model_1 = __webpack_require__(4);
-	exports.DATE_FORMAT = 'YYYY-MM-DD';
-	/**
-	 * removes accent from any string
-	 * @param str
-	 * @returns {*}
-	 */
-	exports.sansAccent = function (str) {
-	    if (!str) {
-	        return;
-	    }
-	    var accent = [
-	        /[\300-\306]/g, /[\340-\346]/g,
-	        /[\310-\313]/g, /[\350-\353]/g,
-	        /[\314-\317]/g, /[\354-\357]/g,
-	        /[\322-\330]/g, /[\362-\370]/g,
-	        /[\331-\334]/g, /[\371-\374]/g,
-	        /[\321]/g, /[\361]/g,
-	        /[\307]/g, /[\347]/g // C, c
-	    ];
-	    var noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
-	    for (var i = 0; i < accent.length; i++) {
-	        str = str.replace(accent[i], noaccent[i]);
-	    }
-	    return str;
-	};
-	/**
-	 * Transform sql homework data (table diary.homework)
-	 * to json
-	 * @param sqlHomework
-	 * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
-	 */
-	exports.sqlToJsHomework = function (sqlHomework) {
-	    var homework = {
-	        //for share directive you must have _id
-	        _id: sqlHomework.id,
-	        id: sqlHomework.id,
-	        description: sqlHomework.homework_description,
-	        audienceId: sqlHomework.audience_id,
-	        audience: entcore_1.model.audiences.findWhere({ id: sqlHomework.audience_id }),
-	        subject: entcore_1.model.subjects.findWhere({ id: sqlHomework.subject_id }),
-	        subjectId: sqlHomework.subject_id,
-	        subjectLabel: sqlHomework.subject_label,
-	        type: entcore_1.model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
-	        typeId: sqlHomework.homework_type_id,
-	        typeLabel: sqlHomework.homework_type_label,
-	        teacherId: sqlHomework.teacher_id,
-	        structureId: sqlHomework.structureId,
-	        audienceType: sqlHomework.audience_type,
-	        audienceLabel: sqlHomework.audience_label,
-	        // TODO delete dueDate? (seems redondant info vs date field)
-	        dueDate: entcore_1.moment(sqlHomework.homework_due_date),
-	        date: entcore_1.moment(sqlHomework.homework_due_date),
-	        title: sqlHomework.homework_title,
-	        color: sqlHomework.homework_color,
-	        startMoment: entcore_1.moment(sqlHomework.homework_due_date),
-	        endMoment: entcore_1.moment(sqlHomework.homework_due_date),
-	        state: sqlHomework.homework_state,
-	        is_periodic: false,
-	        lesson_id: sqlHomework.lesson_id
-	    };
-	    if (sqlHomework.attachments) {
-	        homework.attachments = JSON.parse(sqlHomework.attachments);
-	    }
-	    if ('group' === homework.audienceType) {
-	        homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.group');
-	    }
-	    else {
-	        homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.class');
-	    }
-	    return homework;
-	};
-	/** Converts sql pedagogic item to js data */
-	exports.sqlToJsPedagogicItem = function (data) {
-	    //TODO use service
-	    var item = new PedagogicItem_model_1.PedagogicItem();
-	    item.type_item = data.type_item;
-	    item.id = data.id;
-	    //for share directive you must have _id
-	    item._id = data.id;
-	    item.lesson_id = data.lesson_id;
-	    item.title = data.title;
-	    item.subject = data.subject;
-	    item.audience = data.audience;
-	    item.start_hour = (data.type_item == "lesson") ? entcore_1.moment(data.day).minutes(entcore_1.model.getMinutes(data.start_time)).format("HH[h]mm") : "";
-	    item.end_hour = (data.type_item == "lesson") ? entcore_1.moment(data.day).minutes(entcore_1.model.getMinutes(data.end_time)).format("HH[h]mm") : "";
-	    item.type_homework = data.type_homework;
-	    item.teacher = data.teacher;
-	    item.description = data.description;
-	    item.expanded_description = false;
-	    item.state = data.state;
-	    item.color = data.color;
-	    item.getPreviewDescription();
-	    item.room = data.room;
-	    item.day = data.day;
-	    item.turn_in = (data.type_item == "lesson") ? "" : data.turn_in_type;
-	    item.selected = false;
-	    item.locked = data.locked;
-	    if (data.day) {
-	        item.dayFormatted = entcore_1.moment(data.day).format("DD/MM/YYYY");
-	        item.dayOfWeek = entcore_1.moment(data.day).format("dddd");
-	    }
-	    return item;
-	};
-	exports.syncHomeworks = function (cb) {
-	    return entcore_1.model.homeworks.syncHomeworks().then(function () {
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	    });
-	};
-	exports.syncLessonsAndHomeworks = function (cb) {
-	    // need sync attached lesson homeworks
-	    return entcore_1.model.homeworks.syncHomeworks().then(function () {
-	        if (typeof cb === 'function') {
-	            cb();
-	        }
-	    });
-	};
-	/**
-	 * Convert sql diary.lesson row to js row used in angular model
-	 * @param lesson Sql diary.lesson row
-	 */
-	exports.sqlToJsLesson = function (data) {
-	    console.warn("deprecated");
-	    return;
-	    /*var lessonHomeworks = new Array();
-	
-	    // only initialize homeworks attached to lesson
-	    // with only id
-	    if (data.homework_ids) {
-	        for (var i = 0; i < data.homework_ids.length; i++) {
-	            var homework = new Homework();
-	            homework.id = data.homework_ids[i];
-	            homework.lesson_id = parseInt(data.lesson_id);
-	            homework.loaded = false; // means full data from sql not loaded
-	            lessonHomeworks.push(homework);
-	        }
-	    }
-	
-	    let lesson: any = {
-	        //for share directive you must have _id
-	        _id: data.lesson_id,
-	        id: data.lesson_id,
-	        title: data.lesson_title,
-	        audience: model.audiences.findWhere({id: data.audience_id}),
-	        audienceId: data.audience_id,
-	        audienceLabel: data.audience_label,
-	        audienceType: data.audience_type,
-	        description: data.lesson_description,
-	        subject: model.subjects.findWhere({id: data.subject_id}),
-	        subjectId: data.subject_id,
-	        subjectLabel: data.subject_label,
-	        teacherId: data.teacher_display_name,
-	        teacherName: data.teacher_display_name,
-	        structureId: data.school_id,
-	        date: moment(data.lesson_date),
-	        startTime: data.lesson_start_time,
-	        endTime: data.lesson_end_time,
-	        color: data.lesson_color,
-	        room: data.lesson_room,
-	        annotations: data.lesson_annotation,
-	        startMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_start_time),
-	        endMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_end_time),
-	        state: data.lesson_state,
-	        is_periodic: false,
-	        homeworks: lessonHomeworks,
-	        tooltipText: '',
-	        locked: (!model.canEdit()) ? true : false
-	    };
-	
-	    if ('group' === lesson.audienceType) {
-	        lesson.audienceTypeLabel = lang.translate('diary.audience.group');
-	    } else {
-	        lesson.audienceTypeLabel = lang.translate('diary.audience.class');
-	    }
-	
-	    if (data.attachments) {
-	        lesson.attachments = _.map(JSON.parse(data.attachments), jsonToJsAttachment);
-	    }
-	
-	
-	    //var tooltip = getResponsiveLessonTooltipText(lesson);
-	
-	    //lesson.tooltipText = tooltip;
-	    return lesson;*/
-	};
-	exports.jsonToJsAttachment = function (data) {
-	    console.warn("deprecated");
-	    return;
-	    /*var att = new Attachment();
-	    att.id = data.id;
-	    att.user_id = data.user_id;
-	    att.creation_date = data.creation_date;
-	    att.document_id = data.document_id;
-	    att.document_label = data.document_label;
-	
-	    return att;*/
-	};
-	/**
-	 * Set lesson tooltip text depending on screen resolution.
-	 * Tricky responsive must be linked to additional.css behaviour
-	 * @param lesson
-	 */
-	exports.getResponsiveLessonTooltipText = function (lesson) {
-	    console.warn("deprecated use utils service");
-	    return;
-	    /*var tooltipText = lesson.title + ' (' + lang.translate(lesson.state) + ')';
-	    var screenWidth = window.innerWidth;
-	
-	    // < 900 px display room
-	    if (screenWidth < 900 && lesson.room) {
-	        tooltipText += '<br>' + lesson.room;
-	    }
-	
-	    // < 650 px display hour start and hour end
-	    if (screenWidth < 650) {
-	        tooltipText += '<br>' + [[lesson.startMoment.format('HH')]] + 'h' + [[lesson.startMoment.format('mm')]];
-	        tooltipText += ' -> ' + [[lesson.endMoment.format('HH')]] + 'h' + [[lesson.endMoment.format('mm')]];
-	    }
-	
-	    // < 600 px display subjectlabel
-	    if (screenWidth < 650 && lesson.subjectLabel) {
-	        tooltipText += '<br>' + lesson.subjectLabel;
-	    }
-	
-	    tooltipText = tooltipText.trim();
-	
-	    return tooltipText;*/
-	};
-	/**
-	 * Transform sql homework load data to json like
-	 * @param sqlHomeworkType
-	 */
-	exports.sqlToJsHomeworkLoad = function (sqlHomeworkload) {
-	    return {
-	        countLoad: sqlHomeworkload.countload,
-	        description: sqlHomeworkload.countload + ' ' + (sqlHomeworkload.countload > 1 ? entcore_1.idiom.translate('diary.homework.labels') : entcore_1.idiom.translate('diary.homework.label')),
-	        day: entcore_1.moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(),
-	        numDay: entcore_1.moment(sqlHomeworkload.day).format('DD') // 15
-	    };
-	};
-	/**
-	 * Transform sql homework type data to json like
-	 * @param sqlHomeworkType
-	 * @returns {{id: *, structureId: (*|T), label: *, category: *}}
-	 */
-	exports.sqlToJsHomeworkType = function (sqlHomeworkType) {
-	    return {
-	        id: sqlHomeworkType.id,
-	        structureId: sqlHomeworkType.school_id,
-	        label: sqlHomeworkType.homework_type_label,
-	        category: sqlHomeworkType.homework_type_category
-	    };
-	};
-	exports.CONSTANTS = {
-	    CAL_DATE_PATTERN: "YYYY-MM-DD",
-	    CAL_DATE_PATTERN_NG: "dd-MM-yyyy",
-	    CAL_DATE_PATTERN_SLASH: "dd/MM/yyyy",
-	    LONG_DATE_PATTERN: 'YYYY-MM-DD hh:mm:ss',
-	    RIGHTS: {
-	        CREATE_LESSON: 'diary.createLesson',
-	        VIEW: 'diary.view',
-	        CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
-	        CREATE_FREE_HOMEWORK: 'diary.createFreeHomework',
-	        MANAGE_MODEL_WEEK: 'diary.manageModelWeek.update',
-	        MANAGE_HISTORY: 'diary.manageHistory.apply',
-	        SHOW_HISTORY: 'diary.showHistory.filters',
-	        VISA_APPLY_VISA: "diary.visa.applyvisa",
-	        VISA_INSPECTOR: "diary.visa.inspect.filters",
-	        VISA_ADMIN: "diary.visa.admin.filters",
-	        MANAGE_INSPECTOR: "diary.manageInspect.apply",
-	        SHOW_OTHER_TEACHER: "diary.view.otherteacher"
-	    }
-	};
-	/**
-	 * Default color of lesson and homeworks
-	 * @type {string}
-	 */
-	exports.DEFAULT_ITEM_COLOR = '#CECEF6';
-	/**
-	 * Default state of lesson or homework when created
-	 * @type {string}
-	 */
-	exports.DEFAULT_STATE = 'draft';
-	/**
-	 * Get school ids of current authenticated user as string
-	 * seperated with ':'
-	 * @returns {string} schoolid_1:schoolid_2:...
-	 */
-	function getUserStructuresIdsAsString() {
-	    var structureIds = "";
-	    entcore_1.model.me.structures.forEach(function (structureId) {
-	        structureIds += structureId + ":";
-	    });
-	    return structureIds;
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
-	exports.getUserStructuresIdsAsString = getUserStructuresIdsAsString;
-	;
+	Object.defineProperty(exports, "__esModule", { value: true });
+	__export(__webpack_require__(4));
+	__export(__webpack_require__(5));
+	__export(__webpack_require__(6));
+	__export(__webpack_require__(75));
+	__export(__webpack_require__(74));
+	__export(__webpack_require__(76));
+	__export(__webpack_require__(77));
+	__export(__webpack_require__(78));
+	__export(__webpack_require__(79));
 
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
-	var PedagogicItem = (function () {
-	    function PedagogicItem() {
-	        this.descriptionMaxSize = 140;
-	        this.isPublished = function () { return this.state === 'published'; };
-	        this.deleteModelReferences = function () {
-	            entcore_1.model.deletePedagogicItemReferences(this.id);
+	/**
+	 }
+	 }
+	 * Model of attachment from
+	 * table diary.attachment (DB)
+	 * @constructor
+	 */
+	var Attachment = (function () {
+	    function Attachment() {
+	        /**
+	         * Attachment id as in diary.attachment table
+	         * @type {number}
+	         */
+	        this.id = null;
+	        this.user_id = null;
+	        /**
+	         * Id of stored document within the document module
+	         * (see mongodb -> Documents table)
+	         * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
+	         * @type {string}
+	         */
+	        this.document_id = null;
+	        /***
+	         * Creation date
+	         * @type {null}
+	         */
+	        this.creation_date = null;
+	        /**
+	         * Filename of attachment
+	         * @type {string}
+	         */
+	        this.document_label = null;
+	        /**
+	         * Download the attachment
+	         */
+	        this.download = function () {
+	            window.location.href = window.location.host + '/workspace/document/' + this.document_id;
 	        };
-	        this.changeState = function (toPublish) {
-	            //if item is a lesson may need to upgrade his related homework
-	            if (this.type_item === 'lesson') {
-	                var relatedToLesson = entcore_1.model.pedagogicDays.getItemsByLesson(this.id);
-	                relatedToLesson.forEach(function (item) {
-	                    item.state = toPublish ? 'published' : 'draft';
+	        /**
+	         * Detach attachment to a lesson
+	         * Attachment link will be detached to back end on lesson save
+	         * @param item Lesson or homework
+	         * @param cb Callback
+	         * @param cbe Callback on error
+	         */
+	        this.detachFromItem = function (item, cb, cbe) {
+	            var that = this;
+	            if (item && item.attachments) {
+	                var udpatedAttachments = new Array();
+	                item.attachments.forEach(function (attachment) {
+	                    if (attachment && attachment.document_id !== that.document_id) {
+	                        udpatedAttachments.push(attachment);
+	                    }
 	                });
-	            }
-	            else {
-	                this.state = toPublish ? 'published' : 'draft';
-	            }
-	        };
-	        this.getPreviewDescription = function () {
-	            if (this.description) {
-	                if (this.description.length >= this.descriptionMaxSize) {
-	                    this.preview_description = '<p class="itemPreview">' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
-	                }
-	                else {
-	                    this.preview_description = this.description;
-	                }
-	            }
-	            else {
-	                this.preview_description = this.description;
-	            }
-	        };
-	        this.isPublishable = function (toPublish) {
-	            return this.id && this.state == (toPublish ? 'draft' : 'published') && (this.lesson_id == null || this.lesson_id == this.id); // id test to detect free homeworks
-	        };
-	        this.delete = function (cb, cbe) {
-	            var url = (this.type_item == "lesson") ? '/diary/lesson/' : '/diary/homework/';
-	            var idToDelete = this.id;
-	            axios_1.default.delete(url + idToDelete, this).then(function (b) {
-	                entcore_1.model.deletePedagogicItemReferences(idToDelete);
+	                item.attachments = udpatedAttachments;
 	                if (typeof cb === 'function') {
 	                    cb();
 	                }
-	            }).catch(function (e) {
-	                if (typeof cbe === 'function') {
-	                    cbe(entcore_1.model.parseError(e));
+	                else
+	                    (typeof cbe === 'function');
+	                {
+	                    cbe();
 	                }
-	            });
-	        };
-	        this.deleteList = function (items, cb, cbe) {
-	            // split into two arrays of PedagogicItem, one for the lessons, one for the homeworks
-	            var itemsByType = []; // array of array(s)
-	            if (items.length == 1) {
-	                itemsByType.push(items);
-	            }
-	            else {
-	                itemsByType = entcore_1._.partition(items, function (item) {
-	                    return item.type_item === 'lesson';
-	                });
-	            }
-	            var countdown = 0;
-	            if (itemsByType.length > 0) {
-	                countdown = itemsByType.length;
-	                itemsByType.forEach(function (arrayForTypeItem) {
-	                    if (arrayForTypeItem.length > 0) {
-	                        entcore_1.model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function () {
-	                            countdown--;
-	                            if (countdown == 0) {
-	                                if (typeof cb === 'function') {
-	                                    cb();
-	                                }
-	                            }
-	                        }, cbe);
-	                    }
-	                    else {
-	                        countdown--;
-	                    }
-	                });
 	            }
 	        };
-	        this.isFiltered = function () {
-	            if (entcore_1.model.searchForm.selectedSubject != null) {
-	                return !(this.subject === entcore_1.model.searchForm.selectedSubject);
-	            }
-	            return false;
-	        };
-	        this.selected = false;
 	    }
-	    return PedagogicItem;
+	    return Attachment;
 	}());
-	exports.PedagogicItem = PedagogicItem;
+	exports.Attachment = Attachment;
 	;
 
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	module.exports = __webpack_require__(6);
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Child = (function () {
+	    function Child() {
+	        this.selected = false;
+	    }
+	    return Child;
+	}());
+	exports.Child = Child;
+
 
 /***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	"use strict";
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var entcore_toolkit_1 = __webpack_require__(7);
+	var axios_1 = __webpack_require__(47);
+	var tools_1 = __webpack_require__(73);
+	var tools = __webpack_require__(73);
+	var Homework = (function () {
+	    function Homework() {
+	        this.expanded = false;
+	        this.api = {
+	            delete: '/diary/homework/:id'
+	        };
+	        this.expanded = false;
+	    }
+	    /**
+	     * Delete calendar references of current homework
+	     */
+	    Homework.prototype.deleteModelReferences = function () {
+	        var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
+	        // delete homework in calendar cache
+	        if (idxHomeworkToDelete >= 0) {
+	            entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
+	        }
+	    };
+	    ;
+	    /**
+	     * Adds an attachment
+	     * @param attachment
+	     */
+	    Homework.prototype.addAttachment = function (attachment) {
+	        this.attachments.push(attachment);
+	    };
+	    ;
+	    /**
+	     * Removes attachment associated to this lesson
+	     * @param attachment
+	     * @param cb
+	     * @param cbe
+	     */
+	    Homework.prototype.detachAttachment = function (attachment, cb, cbe) {
+	        attachment.detachFromItem(this.id, 'lesson', cb, cbe);
+	    };
+	    ;
+	    Homework.prototype.save = function (cb, cbe) {
+	        var that = this;
+	        var promise = entcore_1.model.$q().when({});
+	        if (!this.subject.id) {
+	            promise = this.subject.save();
+	        }
+	        return promise.then(function () {
+	            if (that.id) {
+	                return that.update(cb, cbe);
+	            }
+	            else {
+	                return that.create();
+	            }
+	        });
+	    };
+	    ;
+	    /**
+	     * Returns true if current homework is attached to a lesson
+	     * @returns {boolean}
+	     */
+	    Homework.prototype.isAttachedToLesson = function () {
+	        return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
+	    };
+	    ;
+	    Homework.prototype.isDraft = function () {
+	        return this.state === "draft";
+	    };
+	    ;
+	    Homework.prototype.isPublished = function () {
+	        return !this.isDraft();
+	    };
+	    ;
+	    /**
+	     * A directly publishable homework must exist in database and not linked to a lesson
+	     * @param toPublish
+	     * @returns {*|boolean} true if homework can be published directly
+	     */
+	    Homework.prototype.isPublishable = function (toPublish) {
+	        return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
+	    };
+	    ;
+	    Homework.prototype.changeState = function (toPublish) {
+	        this.state = toPublish ? 'published' : 'draft';
+	    };
+	    ;
+	    Homework.prototype.update = function (cb, cbe) {
+	        var url = '/diary/homework/' + this.id;
+	        var homework = this;
+	        return entcore_1.model.getHttp()({
+	            method: 'PUT',
+	            url: url,
+	            data: homework
+	        }).then(function () {
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        }).catch(function (e) {
+	            if (cbe) {
+	                cbe();
+	            }
+	        });
+	    };
+	    ;
+	    Homework.prototype.create = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            var data, e_1;
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        _a.trys.push([0, 2, , 3]);
+	                        return [4 /*yield*/, entcore_1.model.getHttp()({
+	                                method: 'POST',
+	                                url: '/diary/homework',
+	                                data: this
+	                            })];
+	                    case 1:
+	                        data = (_a.sent()).data;
+	                        entcore_toolkit_1.Mix.extend(this, data);
+	                        entcore_1.model.homeworks.all.push(this);
+	                        return [2 /*return*/, data];
+	                    case 2:
+	                        e_1 = _a.sent();
+	                        console.error(e_1);
+	                        throw e_1;
+	                    case 3: return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
+	    ;
+	    /**
+	     * Load homework object from id
+	     * @param cb Callback function
+	     * @param cbe Callback on error function
+	     */
+	    Homework.prototype.load = function (cb, cbe) {
+	        var homework = this;
+	        axios_1.default.get('/diary/homework/' + homework.id)
+	            .then(function (res) {
+	            entcore_toolkit_1.Mix.extend(this, tools_1.sqlToJsHomework(res.data));
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        })
+	            .catch(function (e) {
+	            if (typeof cbe === 'function') {
+	                cbe(entcore_1.model.parseError(e));
+	            }
+	        });
+	    };
+	    ;
+	    /**
+	     * Deletes a list of homeworks
+	     * @param homeworks Homeworks to be deleted
+	     * @param cb Callback
+	     * @param cbe Callback on error
+	     */
+	    Homework.prototype.deleteList = function (homeworks, cb, cbe) {
+	        entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
+	    };
+	    ;
+	    /**
+	     * Deletes the homework
+	     * @param Optional lesson attached to homework
+	     * @param cb Callback after delete
+	     * @param cbe Callback on error
+	     */
+	    Homework.prototype.delete = function (lesson, cb, cbe) {
+	        var homework = this;
+	        var deleteHomeworkReferences = function () {
+	            // delete homework from calendar cache
+	            entcore_1.model.homeworks.forEach(function (modelHomework) {
+	                if (modelHomework.id === homework.id) {
+	                    entcore_1.model.homeworks.remove(modelHomework);
+	                }
+	            });
+	            if (lesson && lesson.homeworks) {
+	                lesson.homeworks.remove(homework);
+	            }
+	        };
+	        if (this.id) {
+	            axios_1.default.delete('/diary/homework/' + this.id)
+	                .then(function (b) {
+	                deleteHomeworkReferences();
+	                if (typeof cb === 'function') {
+	                    cb();
+	                }
+	            })
+	                .catch(function (error) {
+	                if (typeof cbe === 'function') {
+	                    cbe(entcore_1.model.parseError(error));
+	                }
+	            });
+	        }
+	        else {
+	            deleteHomeworkReferences();
+	            if (typeof cb === 'function') {
+	                cb();
+	            }
+	        }
+	    };
+	    ;
+	    Homework.prototype.toJSON = function () {
+	        var json = {
+	            homework_title: this.title,
+	            subject_id: this.subject.id,
+	            homework_type_id: this.type.id,
+	            teacher_id: entcore_1.model.me.userId,
+	            school_id: this.audience.structureId,
+	            audience_id: this.audience.id,
+	            homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
+	            homework_description: this.description,
+	            homework_color: this.color,
+	            homework_state: this.state,
+	            // used to auto create postgresql diary.audience if needed
+	            // not this.audience object is originally from neo4j graph (see syncAudiences function)
+	            audience_type: this.audience.type,
+	            audience_name: this.audience.name,
+	            attachments: this.attachments
+	        };
+	        if (this.lesson_id) {
+	            json.lesson_id = this.lesson_id;
+	        }
+	        /*if (!this.id) {
+	            created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
+	        }*/
+	        return json;
+	    };
+	    ;
+	    return Homework;
+	}());
+	exports.Homework = Homework;
+	;
+	var Homeworks = (function () {
+	    function Homeworks() {
+	        this.all = [];
+	    }
+	    Homeworks.prototype.sync = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            var homeworks, start, end, that, urlGetHomeworks, data, e_2;
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        homeworks = [];
+	                        start = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1).format(tools.DATE_FORMAT);
+	                        end = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1).add(1, 'week').format(tools.DATE_FORMAT);
+	                        that = this;
+	                        if (that.loading)
+	                            return [2 /*return*/];
+	                        entcore_1.model.homeworks.all.splice(0, entcore_1.model.homeworks.all.length);
+	                        urlGetHomeworks = '/diary/homework/' + tools.getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
+	                        if (entcore_1.model.isUserParent() && entcore_1.model.child) {
+	                            urlGetHomeworks += entcore_1.model.child.id;
+	                        }
+	                        else {
+	                            urlGetHomeworks += '%20';
+	                        }
+	                        that.loading = true;
+	                        _a.label = 1;
+	                    case 1:
+	                        _a.trys.push([1, 3, , 4]);
+	                        return [4 /*yield*/, entcore_1.model.getHttp()({
+	                                method: 'GET',
+	                                url: urlGetHomeworks
+	                            })];
+	                    case 2:
+	                        data = (_a.sent()).data;
+	                        homeworks = homeworks.concat(data);
+	                        this.all = entcore_1._.union(this.all, entcore_toolkit_1.Mix.castArrayAs(Homework, data));
+	                        that.loading = false;
+	                        return [2 /*return*/, homeworks];
+	                    case 3:
+	                        e_2 = _a.sent();
+	                        that.loading = false;
+	                        throw e_2;
+	                    case 4: return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
+	    return Homeworks;
+	}());
+	exports.Homeworks = Homeworks;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(8));
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(9));
+	__export(__webpack_require__(10));
+	__export(__webpack_require__(11));
+	__export(__webpack_require__(12));
+	__export(__webpack_require__(45));
+	__export(__webpack_require__(46));
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	function mapToArray(map) {
+	    var result = [];
+	    map.forEach(function (item) {
+	        result.push(item);
+	    });
+	    return result;
+	}
+	var Mix = (function () {
+	    function Mix() {
+	    }
+	    Mix.extend = function (obj, mixin, casts) {
+	        var _loop_1 = function () {
+	            var value = mixin[property];
+	            if (casts && casts[property] && value) {
+	                var castItem = casts[property];
+	                var cast_1;
+	                if (castItem instanceof Function) {
+	                    cast_1 = {
+	                        type: castItem,
+	                        deps: []
+	                    };
+	                }
+	                else {
+	                    cast_1 = {
+	                        type: castItem.type,
+	                        single: castItem.single,
+	                        deps: castItem.deps ? castItem.deps : []
+	                    };
+	                }
+	                var doCast_1 = function (v) {
+	                    var instance = new ((_a = cast_1.type).bind.apply(_a, [void 0].concat(cast_1.deps)))();
+	                    if (instance.mixin)
+	                        instance.mixin(v);
+	                    else
+	                        Mix.extend(instance, v);
+	                    return instance;
+	                    var _a;
+	                };
+	                if (value instanceof Array && cast_1.single) {
+	                    obj[property] = [];
+	                    value.forEach(function (v) {
+	                        obj[property].push(doCast_1(v));
+	                    });
+	                }
+	                else {
+	                    obj[property] = doCast_1(value);
+	                }
+	            }
+	            else if (!value || typeof value !== 'object' || value instanceof Array) {
+	                obj[property] = value;
+	            }
+	            else {
+	                if (obj[property] instanceof TypedArray) {
+	                    obj[property].load(value);
+	                }
+	                else {
+	                    if (!obj[property]) {
+	                        obj[property] = {};
+	                    }
+	                    this_1.extend(obj[property], value);
+	                }
+	            }
+	        };
+	        var this_1 = this;
+	        for (var property in mixin) {
+	            _loop_1();
+	        }
+	        if (obj && obj.fromJSON) {
+	            obj.fromJSON(mixin);
+	        }
+	    };
+	    Mix.castAs = function (className, obj, params) {
+	        if (params === void 0) { params = {}; }
+	        var newObj = new className(params);
+	        this.extend(newObj, obj);
+	        return newObj;
+	    };
+	    Mix.castArrayAs = function (className, arr, params) {
+	        if (params === void 0) { params = {}; }
+	        var newArr = [];
+	        arr.forEach(function (item) {
+	            newArr.push(Mix.castAs(className, item, params));
+	        });
+	        return newArr;
+	    };
+	    return Mix;
+	}());
+	exports.Mix = Mix;
+	var TypedArray = (function (_super) {
+	    __extends(TypedArray, _super);
+	    function TypedArray(className, mixin) {
+	        if (mixin === void 0) { mixin = {}; }
+	        var _this = _super.call(this) || this;
+	        _this.className = className;
+	        _this.mixin = mixin;
+	        return _this;
+	    }
+	    TypedArray.prototype.push = function () {
+	        var _this = this;
+	        var items = [];
+	        for (var _i = 0; _i < arguments.length; _i++) {
+	            items[_i - 0] = arguments[_i];
+	        }
+	        items.forEach(function (item) {
+	            if (!(item instanceof _this.className)) {
+	                item = Mix.castAs(_this.className, item);
+	            }
+	            for (var prop in _this.mixin) {
+	                item[prop] = _this.mixin[prop];
+	            }
+	            Array.prototype.push.call(_this, item);
+	        });
+	        return this.length;
+	    };
+	    TypedArray.prototype.load = function (data) {
+	        var _this = this;
+	        data.forEach(function (item) {
+	            _this.push(item);
+	        });
+	    };
+	    TypedArray.prototype.asArray = function () {
+	        return mapToArray(this);
+	    };
+	    TypedArray.prototype.toJSON = function () {
+	        return mapToArray(this);
+	    };
+	    return TypedArray;
+	}(Array));
+	exports.TypedArray = TypedArray;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	var Eventer = (function () {
+	    function Eventer() {
+	        this.events = new Map();
+	    }
+	    Eventer.prototype.trigger = function (eventName, data) {
+	        if (this.events[eventName]) {
+	            this.events[eventName].forEach(function (f) { return f(data); });
+	        }
+	    };
+	    Eventer.prototype.on = function (eventName, cb) {
+	        if (!this.events[eventName]) {
+	            this.events[eventName] = [];
+	        }
+	        this.events[eventName].push(cb);
+	    };
+	    Eventer.prototype.off = function (eventName, cb) {
+	        if (!this.events[eventName]) {
+	            return;
+	        }
+	        if (cb === undefined) {
+	            this.events[eventName] = [];
+	            return;
+	        }
+	        var index = this.events[eventName].indexOf(cb);
+	        if (index !== -1) {
+	            this.events[eventName].splice(index, 1);
+	        }
+	    };
+	    Eventer.prototype.once = function (eventName, cb) {
+	        var _this = this;
+	        var callback = function (data) {
+	            cb(data);
+	            _this.off(eventName, callback);
+	        };
+	        this.on(eventName, callback);
+	    };
+	    return Eventer;
+	}());
+	exports.Eventer = Eventer;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	var Selection = (function () {
+	    function Selection(arr) {
+	        this.arr = arr;
+	        this.selectedElements = [];
+	    }
+	    Object.defineProperty(Selection.prototype, "all", {
+	        get: function () {
+	            return this.arr;
+	        },
+	        set: function (all) {
+	            this.arr = all;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Selection.prototype.filter = function (filter) {
+	        return this.arr.filter(filter);
+	    };
+	    Selection.prototype.push = function (item) {
+	        this.arr.push(item);
+	    };
+	    Selection.prototype.addRange = function (arr) {
+	        for (var i = 0; i < arr.length; i++) {
+	            this.all.push(arr[i]);
+	        }
+	    };
+	    Object.defineProperty(Selection.prototype, "colLength", {
+	        get: function () {
+	            return this.arr.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Selection.prototype, "length", {
+	        get: function () {
+	            return this.selected.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Selection.prototype.forEach = function (func) {
+	        this.arr.forEach(func);
+	    };
+	    Selection.prototype.selectAll = function () {
+	        for (var i = 0; i < this.arr.length; i++) {
+	            this.arr[i].selected = true;
+	        }
+	    };
+	    Selection.prototype.select = function (filter) {
+	        for (var i = 0; i < this.arr.length; i++) {
+	            this.arr[i].selected = filter(this.arr[i]);
+	        }
+	    };
+	    Selection.prototype.deselect = function (filter) {
+	        for (var i = 0; i < this.arr.length; i++) {
+	            this.arr[i].selected = !filter(this.arr[i]);
+	        }
+	    };
+	    Selection.prototype.deselectAll = function () {
+	        for (var i = 0; i < this.arr.length; i++) {
+	            this.arr[i].selected = false;
+	        }
+	    };
+	    Selection.prototype.removeSelection = function () {
+	        var newArr = [];
+	        for (var i = 0; i < this.arr.length; i++) {
+	            if (!this.arr[i].selected) {
+	                newArr.push(this.arr[i]);
+	            }
+	        }
+	        this.arr.splice(0, this.arr.length);
+	        for (var i = 0; i < newArr.length; i++) {
+	            this.arr.push(newArr[i]);
+	        }
+	    };
+	    Selection.prototype.updateSelected = function () {
+	        for (var i = 0; i < this.arr.length; i++) {
+	            var index = this.selectedElements.indexOf(this.arr[i]);
+	            if (this.arr[i].selected && index === -1) {
+	                this.selectedElements.push(this.arr[i]);
+	            }
+	            else if (!this.arr[i].selected && index !== -1) {
+	                this.selectedElements.splice(index, 1);
+	            }
+	        }
+	        for (var i = 0; i < this.selectedElements.length; i++) {
+	            var index = this.arr.indexOf(this.selectedElements[i]);
+	            if (index === -1) {
+	                this.selectedElements.splice(index, 1);
+	            }
+	        }
+	    };
+	    Object.defineProperty(Selection.prototype, "selected", {
+	        // a specific array is maintained to avoid references breaking all the time
+	        get: function () {
+	            this.updateSelected();
+	            return this.selectedElements;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return Selection;
+	}());
+	exports.Selection = Selection;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	__export(__webpack_require__(13));
+	__export(__webpack_require__(14));
+	__export(__webpack_require__(41));
+	__export(__webpack_require__(42));
+	__export(__webpack_require__(43));
+	__export(__webpack_require__(44));
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var minicast_1 = __webpack_require__(9);
+	var AbstractCrud = (function () {
+	    function AbstractCrud(api, model, initialCast, childrenCasts, customMixin) {
+	        this.api = api;
+	        this.model = model;
+	        this.initialCast = initialCast;
+	        this.childrenCasts = childrenCasts;
+	        this.customMixin = customMixin;
+	    }
+	    AbstractCrud.prototype.parseApi = function (api, parameters) {
+	        var _this = this;
+	        if (typeof api === 'function') {
+	            api = api();
+	        }
+	        return api.split(/(:[a-zA-Z0-9_.]+)/)
+	            .map(function (fragment) {
+	            return fragment.charAt(0) === ':' ?
+	                parameters && parameters[fragment.substr(1)] ||
+	                    _this.model[fragment.substr(1)] ||
+	                    _this[fragment.substr(1)] ||
+	                    fragment :
+	                fragment;
+	        }).join('');
+	    };
+	    AbstractCrud.prototype.defaultMixin = function (payload) {
+	        var _this = this;
+	        if (payload instanceof Array && this.model instanceof Array) {
+	            this.model = [];
+	            var model_1 = this.model; //fix type inference
+	            payload.forEach(function (item) {
+	                var instance = {};
+	                if (_this.initialCast) {
+	                    if (_this.initialCast instanceof Function) {
+	                        instance = new _this.initialCast();
+	                    }
+	                    else {
+	                        instance = new ((_a = _this.initialCast.type).bind.apply(_a, [void 0].concat(_this.initialCast.deps)))();
+	                    }
+	                }
+	                minicast_1.Mix.extend(instance, item, _this.childrenCasts);
+	                model_1.push(instance);
+	                var _a;
+	            });
+	        }
+	        else {
+	            minicast_1.Mix.extend(this.model, payload, this.childrenCasts);
+	        }
+	    };
+	    AbstractCrud.prototype.create = function (item, opts) {
+	        var _this = this;
+	        if (opts === void 0) { opts = {}; }
+	        if (!this.api.create) {
+	            throw '[Crud][Api] "create" route is undefined';
+	        }
+	        return this.http.post(this.parseApi(this.api.create, item), item || this.model, opts)
+	            .then(function (response) {
+	            if (_this.model instanceof Array) {
+	                _this.model.push(item);
+	            }
+	            return response;
+	        });
+	    };
+	    AbstractCrud.prototype.sync = function (opts) {
+	        var _this = this;
+	        if (opts === void 0) { opts = {}; }
+	        if (!this.api.sync) {
+	            throw '[Crud][Api] "sync" route is undefined';
+	        }
+	        return this.http.get(this.parseApi(this.api.sync), opts)
+	            .then(function (response) {
+	            (_this.customMixin || _this.defaultMixin).bind(_this)(response.data);
+	            return response;
+	        });
+	    };
+	    AbstractCrud.prototype.update = function (item, opts) {
+	        if (opts === void 0) { opts = {}; }
+	        if (!this.api.update) {
+	            throw '[Crud][Api] "update" route is undefined';
+	        }
+	        return this.http.put(this.parseApi(this.api.update, item), item || this.model, opts);
+	    };
+	    AbstractCrud.prototype.delete = function (item, opts) {
+	        var _this = this;
+	        if (opts === void 0) { opts = {}; }
+	        if (!this.api.delete) {
+	            throw '[Crud][Api] "delete" route is undefined';
+	        }
+	        return this.http.delete(this.parseApi(this.api.delete, item), opts)
+	            .then(function (response) {
+	            if (_this.model instanceof Array) {
+	                _this.model.splice(_this.model.indexOf(item), 1);
+	            }
+	            return response;
+	        });
+	    };
+	    return AbstractCrud;
+	}());
+	exports.AbstractCrud = AbstractCrud;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var axios_1 = __webpack_require__(15);
+	var abstract_crud_1 = __webpack_require__(13);
+	var Crud = (function (_super) {
+	    __extends(Crud, _super);
+	    function Crud() {
+	        var _this = _super.apply(this, arguments) || this;
+	        _this.http = axios_1.default;
+	        return _this;
+	    }
+	    return Crud;
+	}(abstract_crud_1.AbstractCrud));
+	exports.Crud = Crud;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(16);
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
 	
-	var utils = __webpack_require__(7);
-	var bind = __webpack_require__(8);
-	var Axios = __webpack_require__(10);
-	var defaults = __webpack_require__(11);
+	var utils = __webpack_require__(17);
+	var bind = __webpack_require__(18);
+	var Axios = __webpack_require__(19);
+	var defaults = __webpack_require__(20);
 	
 	/**
 	 * Create an instance of Axios
@@ -1625,15 +2160,15 @@
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(29);
-	axios.CancelToken = __webpack_require__(30);
-	axios.isCancel = __webpack_require__(26);
+	axios.Cancel = __webpack_require__(38);
+	axios.CancelToken = __webpack_require__(39);
+	axios.isCancel = __webpack_require__(35);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(31);
+	axios.spread = __webpack_require__(40);
 	
 	module.exports = axios;
 	
@@ -1642,13 +2177,2037 @@
 
 
 /***/ }),
-/* 7 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(8);
-	var isBuffer = __webpack_require__(9);
+	var bind = __webpack_require__(18);
+	
+	/*global toString:true*/
+	
+	// utils is a library of generic helper functions non-specific to axios
+	
+	var toString = Object.prototype.toString;
+	
+	/**
+	 * Determine if a value is an Array
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an Array, otherwise false
+	 */
+	function isArray(val) {
+	  return toString.call(val) === '[object Array]';
+	}
+	
+	/**
+	 * Determine if a value is an ArrayBuffer
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+	 */
+	function isArrayBuffer(val) {
+	  return toString.call(val) === '[object ArrayBuffer]';
+	}
+	
+	/**
+	 * Determine if a value is a FormData
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an FormData, otherwise false
+	 */
+	function isFormData(val) {
+	  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+	}
+	
+	/**
+	 * Determine if a value is a view on an ArrayBuffer
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+	 */
+	function isArrayBufferView(val) {
+	  var result;
+	  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+	    result = ArrayBuffer.isView(val);
+	  } else {
+	    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+	  }
+	  return result;
+	}
+	
+	/**
+	 * Determine if a value is a String
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a String, otherwise false
+	 */
+	function isString(val) {
+	  return typeof val === 'string';
+	}
+	
+	/**
+	 * Determine if a value is a Number
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Number, otherwise false
+	 */
+	function isNumber(val) {
+	  return typeof val === 'number';
+	}
+	
+	/**
+	 * Determine if a value is undefined
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if the value is undefined, otherwise false
+	 */
+	function isUndefined(val) {
+	  return typeof val === 'undefined';
+	}
+	
+	/**
+	 * Determine if a value is an Object
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an Object, otherwise false
+	 */
+	function isObject(val) {
+	  return val !== null && typeof val === 'object';
+	}
+	
+	/**
+	 * Determine if a value is a Date
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Date, otherwise false
+	 */
+	function isDate(val) {
+	  return toString.call(val) === '[object Date]';
+	}
+	
+	/**
+	 * Determine if a value is a File
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a File, otherwise false
+	 */
+	function isFile(val) {
+	  return toString.call(val) === '[object File]';
+	}
+	
+	/**
+	 * Determine if a value is a Blob
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Blob, otherwise false
+	 */
+	function isBlob(val) {
+	  return toString.call(val) === '[object Blob]';
+	}
+	
+	/**
+	 * Determine if a value is a Function
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Function, otherwise false
+	 */
+	function isFunction(val) {
+	  return toString.call(val) === '[object Function]';
+	}
+	
+	/**
+	 * Determine if a value is a Stream
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Stream, otherwise false
+	 */
+	function isStream(val) {
+	  return isObject(val) && isFunction(val.pipe);
+	}
+	
+	/**
+	 * Determine if a value is a URLSearchParams object
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+	 */
+	function isURLSearchParams(val) {
+	  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+	}
+	
+	/**
+	 * Trim excess whitespace off the beginning and end of a string
+	 *
+	 * @param {String} str The String to trim
+	 * @returns {String} The String freed of excess whitespace
+	 */
+	function trim(str) {
+	  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+	}
+	
+	/**
+	 * Determine if we're running in a standard browser environment
+	 *
+	 * This allows axios to run in a web worker, and react-native.
+	 * Both environments support XMLHttpRequest, but not fully standard globals.
+	 *
+	 * web workers:
+	 *  typeof window -> undefined
+	 *  typeof document -> undefined
+	 *
+	 * react-native:
+	 *  typeof document.createElement -> undefined
+	 */
+	function isStandardBrowserEnv() {
+	  return (
+	    typeof window !== 'undefined' &&
+	    typeof document !== 'undefined' &&
+	    typeof document.createElement === 'function'
+	  );
+	}
+	
+	/**
+	 * Iterate over an Array or an Object invoking a function for each item.
+	 *
+	 * If `obj` is an Array callback will be called passing
+	 * the value, index, and complete array for each item.
+	 *
+	 * If 'obj' is an Object callback will be called passing
+	 * the value, key, and complete object for each property.
+	 *
+	 * @param {Object|Array} obj The object to iterate
+	 * @param {Function} fn The callback to invoke for each item
+	 */
+	function forEach(obj, fn) {
+	  // Don't bother if no value provided
+	  if (obj === null || typeof obj === 'undefined') {
+	    return;
+	  }
+	
+	  // Force an array if not already something iterable
+	  if (typeof obj !== 'object' && !isArray(obj)) {
+	    /*eslint no-param-reassign:0*/
+	    obj = [obj];
+	  }
+	
+	  if (isArray(obj)) {
+	    // Iterate over array values
+	    for (var i = 0, l = obj.length; i < l; i++) {
+	      fn.call(null, obj[i], i, obj);
+	    }
+	  } else {
+	    // Iterate over object keys
+	    for (var key in obj) {
+	      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+	        fn.call(null, obj[key], key, obj);
+	      }
+	    }
+	  }
+	}
+	
+	/**
+	 * Accepts varargs expecting each argument to be an object, then
+	 * immutably merges the properties of each object and returns result.
+	 *
+	 * When multiple objects contain the same key the later object in
+	 * the arguments list will take precedence.
+	 *
+	 * Example:
+	 *
+	 * ```js
+	 * var result = merge({foo: 123}, {foo: 456});
+	 * console.log(result.foo); // outputs 456
+	 * ```
+	 *
+	 * @param {Object} obj1 Object to merge
+	 * @returns {Object} Result of all merge properties
+	 */
+	function merge(/* obj1, obj2, obj3, ... */) {
+	  var result = {};
+	  function assignValue(val, key) {
+	    if (typeof result[key] === 'object' && typeof val === 'object') {
+	      result[key] = merge(result[key], val);
+	    } else {
+	      result[key] = val;
+	    }
+	  }
+	
+	  for (var i = 0, l = arguments.length; i < l; i++) {
+	    forEach(arguments[i], assignValue);
+	  }
+	  return result;
+	}
+	
+	/**
+	 * Extends object a by mutably adding to it the properties of object b.
+	 *
+	 * @param {Object} a The object to be extended
+	 * @param {Object} b The object to copy properties from
+	 * @param {Object} thisArg The object to bind function to
+	 * @return {Object} The resulting value of object a
+	 */
+	function extend(a, b, thisArg) {
+	  forEach(b, function assignValue(val, key) {
+	    if (thisArg && typeof val === 'function') {
+	      a[key] = bind(val, thisArg);
+	    } else {
+	      a[key] = val;
+	    }
+	  });
+	  return a;
+	}
+	
+	module.exports = {
+	  isArray: isArray,
+	  isArrayBuffer: isArrayBuffer,
+	  isFormData: isFormData,
+	  isArrayBufferView: isArrayBufferView,
+	  isString: isString,
+	  isNumber: isNumber,
+	  isObject: isObject,
+	  isUndefined: isUndefined,
+	  isDate: isDate,
+	  isFile: isFile,
+	  isBlob: isBlob,
+	  isFunction: isFunction,
+	  isStream: isStream,
+	  isURLSearchParams: isURLSearchParams,
+	  isStandardBrowserEnv: isStandardBrowserEnv,
+	  forEach: forEach,
+	  merge: merge,
+	  extend: extend,
+	  trim: trim
+	};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function bind(fn, thisArg) {
+	  return function wrap() {
+	    var args = new Array(arguments.length);
+	    for (var i = 0; i < args.length; i++) {
+	      args[i] = arguments[i];
+	    }
+	    return fn.apply(thisArg, args);
+	  };
+	};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var defaults = __webpack_require__(20);
+	var utils = __webpack_require__(17);
+	var InterceptorManager = __webpack_require__(32);
+	var dispatchRequest = __webpack_require__(33);
+	var isAbsoluteURL = __webpack_require__(36);
+	var combineURLs = __webpack_require__(37);
+	
+	/**
+	 * Create a new instance of Axios
+	 *
+	 * @param {Object} instanceConfig The default config for the instance
+	 */
+	function Axios(instanceConfig) {
+	  this.defaults = instanceConfig;
+	  this.interceptors = {
+	    request: new InterceptorManager(),
+	    response: new InterceptorManager()
+	  };
+	}
+	
+	/**
+	 * Dispatch a request
+	 *
+	 * @param {Object} config The config specific for this request (merged with this.defaults)
+	 */
+	Axios.prototype.request = function request(config) {
+	  /*eslint no-param-reassign:0*/
+	  // Allow for axios('example/url'[, config]) a la fetch API
+	  if (typeof config === 'string') {
+	    config = utils.merge({
+	      url: arguments[0]
+	    }, arguments[1]);
+	  }
+	
+	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
+	
+	  // Support baseURL config
+	  if (config.baseURL && !isAbsoluteURL(config.url)) {
+	    config.url = combineURLs(config.baseURL, config.url);
+	  }
+	
+	  // Hook up interceptors middleware
+	  var chain = [dispatchRequest, undefined];
+	  var promise = Promise.resolve(config);
+	
+	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+	  });
+	
+	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+	    chain.push(interceptor.fulfilled, interceptor.rejected);
+	  });
+	
+	  while (chain.length) {
+	    promise = promise.then(chain.shift(), chain.shift());
+	  }
+	
+	  return promise;
+	};
+	
+	// Provide aliases for supported request methods
+	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url
+	    }));
+	  };
+	});
+	
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, data, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url,
+	      data: data
+	    }));
+	  };
+	});
+	
+	module.exports = Axios;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	var utils = __webpack_require__(17);
+	var normalizeHeaderName = __webpack_require__(22);
+	
+	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
+	var DEFAULT_CONTENT_TYPE = {
+	  'Content-Type': 'application/x-www-form-urlencoded'
+	};
+	
+	function setContentTypeIfUnset(headers, value) {
+	  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+	    headers['Content-Type'] = value;
+	  }
+	}
+	
+	function getDefaultAdapter() {
+	  var adapter;
+	  if (typeof XMLHttpRequest !== 'undefined') {
+	    // For browsers use XHR adapter
+	    adapter = __webpack_require__(23);
+	  } else if (typeof process !== 'undefined') {
+	    // For node use HTTP adapter
+	    adapter = __webpack_require__(23);
+	  }
+	  return adapter;
+	}
+	
+	var defaults = {
+	  adapter: getDefaultAdapter(),
+	
+	  transformRequest: [function transformRequest(data, headers) {
+	    normalizeHeaderName(headers, 'Content-Type');
+	    if (utils.isFormData(data) ||
+	      utils.isArrayBuffer(data) ||
+	      utils.isStream(data) ||
+	      utils.isFile(data) ||
+	      utils.isBlob(data)
+	    ) {
+	      return data;
+	    }
+	    if (utils.isArrayBufferView(data)) {
+	      return data.buffer;
+	    }
+	    if (utils.isURLSearchParams(data)) {
+	      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+	      return data.toString();
+	    }
+	    if (utils.isObject(data)) {
+	      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+	      return JSON.stringify(data);
+	    }
+	    return data;
+	  }],
+	
+	  transformResponse: [function transformResponse(data) {
+	    /*eslint no-param-reassign:0*/
+	    if (typeof data === 'string') {
+	      data = data.replace(PROTECTION_PREFIX, '');
+	      try {
+	        data = JSON.parse(data);
+	      } catch (e) { /* Ignore */ }
+	    }
+	    return data;
+	  }],
+	
+	  timeout: 0,
+	
+	  xsrfCookieName: 'XSRF-TOKEN',
+	  xsrfHeaderName: 'X-XSRF-TOKEN',
+	
+	  maxContentLength: -1,
+	
+	  validateStatus: function validateStatus(status) {
+	    return status >= 200 && status < 300;
+	  }
+	};
+	
+	defaults.headers = {
+	  common: {
+	    'Accept': 'application/json, text/plain, */*'
+	  }
+	};
+	
+	utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
+	  defaults.headers[method] = {};
+	});
+	
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+	});
+	
+	module.exports = defaults;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports) {
+
+	// shim for using process in browser
+	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+	
+	process.listeners = function (name) { return [] }
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	module.exports = function normalizeHeaderName(headers, normalizedName) {
+	  utils.forEach(headers, function processHeader(value, name) {
+	    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+	      headers[normalizedName] = value;
+	      delete headers[name];
+	    }
+	  });
+	};
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	var utils = __webpack_require__(17);
+	var settle = __webpack_require__(24);
+	var buildURL = __webpack_require__(27);
+	var parseHeaders = __webpack_require__(28);
+	var isURLSameOrigin = __webpack_require__(29);
+	var createError = __webpack_require__(25);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(30);
+	
+	module.exports = function xhrAdapter(config) {
+	  return new Promise(function dispatchXhrRequest(resolve, reject) {
+	    var requestData = config.data;
+	    var requestHeaders = config.headers;
+	
+	    if (utils.isFormData(requestData)) {
+	      delete requestHeaders['Content-Type']; // Let the browser set it
+	    }
+	
+	    var request = new XMLHttpRequest();
+	    var loadEvent = 'onreadystatechange';
+	    var xDomain = false;
+	
+	    // For IE 8/9 CORS support
+	    // Only supports POST and GET calls and doesn't returns the response headers.
+	    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+	    if (process.env.NODE_ENV !== 'test' &&
+	        typeof window !== 'undefined' &&
+	        window.XDomainRequest && !('withCredentials' in request) &&
+	        !isURLSameOrigin(config.url)) {
+	      request = new window.XDomainRequest();
+	      loadEvent = 'onload';
+	      xDomain = true;
+	      request.onprogress = function handleProgress() {};
+	      request.ontimeout = function handleTimeout() {};
+	    }
+	
+	    // HTTP basic authentication
+	    if (config.auth) {
+	      var username = config.auth.username || '';
+	      var password = config.auth.password || '';
+	      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+	    }
+	
+	    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+	
+	    // Set the request timeout in MS
+	    request.timeout = config.timeout;
+	
+	    // Listen for ready state
+	    request[loadEvent] = function handleLoad() {
+	      if (!request || (request.readyState !== 4 && !xDomain)) {
+	        return;
+	      }
+	
+	      // The request errored out and we didn't get a response, this will be
+	      // handled by onerror instead
+	      // With one exception: request that using file: protocol, most browsers
+	      // will return status as 0 even though it's a successful request
+	      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+	        return;
+	      }
+	
+	      // Prepare the response
+	      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+	      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+	      var response = {
+	        data: responseData,
+	        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
+	        status: request.status === 1223 ? 204 : request.status,
+	        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+	        headers: responseHeaders,
+	        config: config,
+	        request: request
+	      };
+	
+	      settle(resolve, reject, response);
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Handle low level network errors
+	    request.onerror = function handleError() {
+	      // Real errors are hidden from us by the browser
+	      // onerror should only fire if it's a network error
+	      reject(createError('Network Error', config));
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Handle timeout
+	    request.ontimeout = function handleTimeout() {
+	      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
+	
+	      // Clean up request
+	      request = null;
+	    };
+	
+	    // Add xsrf header
+	    // This is only done if running in a standard browser environment.
+	    // Specifically not if we're in a web worker, or react-native.
+	    if (utils.isStandardBrowserEnv()) {
+	      var cookies = __webpack_require__(31);
+	
+	      // Add xsrf header
+	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+	          cookies.read(config.xsrfCookieName) :
+	          undefined;
+	
+	      if (xsrfValue) {
+	        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+	      }
+	    }
+	
+	    // Add headers to the request
+	    if ('setRequestHeader' in request) {
+	      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+	        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+	          // Remove Content-Type if data is undefined
+	          delete requestHeaders[key];
+	        } else {
+	          // Otherwise add header to the request
+	          request.setRequestHeader(key, val);
+	        }
+	      });
+	    }
+	
+	    // Add withCredentials to request if needed
+	    if (config.withCredentials) {
+	      request.withCredentials = true;
+	    }
+	
+	    // Add responseType to request if needed
+	    if (config.responseType) {
+	      try {
+	        request.responseType = config.responseType;
+	      } catch (e) {
+	        if (request.responseType !== 'json') {
+	          throw e;
+	        }
+	      }
+	    }
+	
+	    // Handle progress if needed
+	    if (typeof config.onDownloadProgress === 'function') {
+	      request.addEventListener('progress', config.onDownloadProgress);
+	    }
+	
+	    // Not all browsers support upload events
+	    if (typeof config.onUploadProgress === 'function' && request.upload) {
+	      request.upload.addEventListener('progress', config.onUploadProgress);
+	    }
+	
+	    if (config.cancelToken) {
+	      // Handle cancellation
+	      config.cancelToken.promise.then(function onCanceled(cancel) {
+	        if (!request) {
+	          return;
+	        }
+	
+	        request.abort();
+	        reject(cancel);
+	        // Clean up request
+	        request = null;
+	      });
+	    }
+	
+	    if (requestData === undefined) {
+	      requestData = null;
+	    }
+	
+	    // Send the request
+	    request.send(requestData);
+	  });
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var createError = __webpack_require__(25);
+	
+	/**
+	 * Resolve or reject a Promise based on response status.
+	 *
+	 * @param {Function} resolve A function that resolves the promise.
+	 * @param {Function} reject A function that rejects the promise.
+	 * @param {object} response The response.
+	 */
+	module.exports = function settle(resolve, reject, response) {
+	  var validateStatus = response.config.validateStatus;
+	  // Note: status is not exposed by XDomainRequest
+	  if (!response.status || !validateStatus || validateStatus(response.status)) {
+	    resolve(response);
+	  } else {
+	    reject(createError(
+	      'Request failed with status code ' + response.status,
+	      response.config,
+	      null,
+	      response
+	    ));
+	  }
+	};
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var enhanceError = __webpack_require__(26);
+	
+	/**
+	 * Create an Error with the specified message, config, error code, and response.
+	 *
+	 * @param {string} message The error message.
+	 * @param {Object} config The config.
+	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
+	 @ @param {Object} [response] The response.
+	 * @returns {Error} The created error.
+	 */
+	module.exports = function createError(message, config, code, response) {
+	  var error = new Error(message);
+	  return enhanceError(error, config, code, response);
+	};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Update an Error with the specified config, error code, and response.
+	 *
+	 * @param {Error} error The error to update.
+	 * @param {Object} config The config.
+	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
+	 @ @param {Object} [response] The response.
+	 * @returns {Error} The error.
+	 */
+	module.exports = function enhanceError(error, config, code, response) {
+	  error.config = config;
+	  if (code) {
+	    error.code = code;
+	  }
+	  error.response = response;
+	  return error;
+	};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	function encode(val) {
+	  return encodeURIComponent(val).
+	    replace(/%40/gi, '@').
+	    replace(/%3A/gi, ':').
+	    replace(/%24/g, '$').
+	    replace(/%2C/gi, ',').
+	    replace(/%20/g, '+').
+	    replace(/%5B/gi, '[').
+	    replace(/%5D/gi, ']');
+	}
+	
+	/**
+	 * Build a URL by appending params to the end
+	 *
+	 * @param {string} url The base of the url (e.g., http://www.google.com)
+	 * @param {object} [params] The params to be appended
+	 * @returns {string} The formatted url
+	 */
+	module.exports = function buildURL(url, params, paramsSerializer) {
+	  /*eslint no-param-reassign:0*/
+	  if (!params) {
+	    return url;
+	  }
+	
+	  var serializedParams;
+	  if (paramsSerializer) {
+	    serializedParams = paramsSerializer(params);
+	  } else if (utils.isURLSearchParams(params)) {
+	    serializedParams = params.toString();
+	  } else {
+	    var parts = [];
+	
+	    utils.forEach(params, function serialize(val, key) {
+	      if (val === null || typeof val === 'undefined') {
+	        return;
+	      }
+	
+	      if (utils.isArray(val)) {
+	        key = key + '[]';
+	      }
+	
+	      if (!utils.isArray(val)) {
+	        val = [val];
+	      }
+	
+	      utils.forEach(val, function parseValue(v) {
+	        if (utils.isDate(v)) {
+	          v = v.toISOString();
+	        } else if (utils.isObject(v)) {
+	          v = JSON.stringify(v);
+	        }
+	        parts.push(encode(key) + '=' + encode(v));
+	      });
+	    });
+	
+	    serializedParams = parts.join('&');
+	  }
+	
+	  if (serializedParams) {
+	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+	  }
+	
+	  return url;
+	};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	/**
+	 * Parse headers into an object
+	 *
+	 * ```
+	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
+	 * Content-Type: application/json
+	 * Connection: keep-alive
+	 * Transfer-Encoding: chunked
+	 * ```
+	 *
+	 * @param {String} headers Headers needing to be parsed
+	 * @returns {Object} Headers parsed into an object
+	 */
+	module.exports = function parseHeaders(headers) {
+	  var parsed = {};
+	  var key;
+	  var val;
+	  var i;
+	
+	  if (!headers) { return parsed; }
+	
+	  utils.forEach(headers.split('\n'), function parser(line) {
+	    i = line.indexOf(':');
+	    key = utils.trim(line.substr(0, i)).toLowerCase();
+	    val = utils.trim(line.substr(i + 1));
+	
+	    if (key) {
+	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+	    }
+	  });
+	
+	  return parsed;
+	};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs have full support of the APIs needed to test
+	  // whether the request URL is of the same origin as current location.
+	  (function standardBrowserEnv() {
+	    var msie = /(msie|trident)/i.test(navigator.userAgent);
+	    var urlParsingNode = document.createElement('a');
+	    var originURL;
+	
+	    /**
+	    * Parse a URL to discover it's components
+	    *
+	    * @param {String} url The URL to be parsed
+	    * @returns {Object}
+	    */
+	    function resolveURL(url) {
+	      var href = url;
+	
+	      if (msie) {
+	        // IE needs attribute set twice to normalize properties
+	        urlParsingNode.setAttribute('href', href);
+	        href = urlParsingNode.href;
+	      }
+	
+	      urlParsingNode.setAttribute('href', href);
+	
+	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+	      return {
+	        href: urlParsingNode.href,
+	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+	        host: urlParsingNode.host,
+	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+	        hostname: urlParsingNode.hostname,
+	        port: urlParsingNode.port,
+	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+	                  urlParsingNode.pathname :
+	                  '/' + urlParsingNode.pathname
+	      };
+	    }
+	
+	    originURL = resolveURL(window.location.href);
+	
+	    /**
+	    * Determine if a URL shares the same origin as the current location
+	    *
+	    * @param {String} requestURL The URL to test
+	    * @returns {boolean} True if URL shares the same origin, otherwise false
+	    */
+	    return function isURLSameOrigin(requestURL) {
+	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+	      return (parsed.protocol === originURL.protocol &&
+	            parsed.host === originURL.host);
+	    };
+	  })() :
+	
+	  // Non standard browser envs (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return function isURLSameOrigin() {
+	      return true;
+	    };
+	  })()
+	);
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
+	
+	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	
+	function E() {
+	  this.message = 'String contains an invalid character';
+	}
+	E.prototype = new Error;
+	E.prototype.code = 5;
+	E.prototype.name = 'InvalidCharacterError';
+	
+	function btoa(input) {
+	  var str = String(input);
+	  var output = '';
+	  for (
+	    // initialize result and counter
+	    var block, charCode, idx = 0, map = chars;
+	    // if the next str index does not exist:
+	    //   change the mapping table to "="
+	    //   check if d has no fractional digits
+	    str.charAt(idx | 0) || (map = '=', idx % 1);
+	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+	  ) {
+	    charCode = str.charCodeAt(idx += 3 / 4);
+	    if (charCode > 0xFF) {
+	      throw new E();
+	    }
+	    block = block << 8 | charCode;
+	  }
+	  return output;
+	}
+	
+	module.exports = btoa;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs support document.cookie
+	  (function standardBrowserEnv() {
+	    return {
+	      write: function write(name, value, expires, path, domain, secure) {
+	        var cookie = [];
+	        cookie.push(name + '=' + encodeURIComponent(value));
+	
+	        if (utils.isNumber(expires)) {
+	          cookie.push('expires=' + new Date(expires).toGMTString());
+	        }
+	
+	        if (utils.isString(path)) {
+	          cookie.push('path=' + path);
+	        }
+	
+	        if (utils.isString(domain)) {
+	          cookie.push('domain=' + domain);
+	        }
+	
+	        if (secure === true) {
+	          cookie.push('secure');
+	        }
+	
+	        document.cookie = cookie.join('; ');
+	      },
+	
+	      read: function read(name) {
+	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+	        return (match ? decodeURIComponent(match[3]) : null);
+	      },
+	
+	      remove: function remove(name) {
+	        this.write(name, '', Date.now() - 86400000);
+	      }
+	    };
+	  })() :
+	
+	  // Non standard browser env (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return {
+	      write: function write() {},
+	      read: function read() { return null; },
+	      remove: function remove() {}
+	    };
+	  })()
+	);
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	function InterceptorManager() {
+	  this.handlers = [];
+	}
+	
+	/**
+	 * Add a new interceptor to the stack
+	 *
+	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
+	 * @param {Function} rejected The function to handle `reject` for a `Promise`
+	 *
+	 * @return {Number} An ID used to remove interceptor later
+	 */
+	InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+	  this.handlers.push({
+	    fulfilled: fulfilled,
+	    rejected: rejected
+	  });
+	  return this.handlers.length - 1;
+	};
+	
+	/**
+	 * Remove an interceptor from the stack
+	 *
+	 * @param {Number} id The ID that was returned by `use`
+	 */
+	InterceptorManager.prototype.eject = function eject(id) {
+	  if (this.handlers[id]) {
+	    this.handlers[id] = null;
+	  }
+	};
+	
+	/**
+	 * Iterate over all the registered interceptors
+	 *
+	 * This method is particularly useful for skipping over any
+	 * interceptors that may have become `null` calling `eject`.
+	 *
+	 * @param {Function} fn The function to call for each interceptor
+	 */
+	InterceptorManager.prototype.forEach = function forEach(fn) {
+	  utils.forEach(this.handlers, function forEachHandler(h) {
+	    if (h !== null) {
+	      fn(h);
+	    }
+	  });
+	};
+	
+	module.exports = InterceptorManager;
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	var transformData = __webpack_require__(34);
+	var isCancel = __webpack_require__(35);
+	var defaults = __webpack_require__(20);
+	
+	/**
+	 * Throws a `Cancel` if cancellation has been requested.
+	 */
+	function throwIfCancellationRequested(config) {
+	  if (config.cancelToken) {
+	    config.cancelToken.throwIfRequested();
+	  }
+	}
+	
+	/**
+	 * Dispatch a request to the server using the configured adapter.
+	 *
+	 * @param {object} config The config that is to be used for the request
+	 * @returns {Promise} The Promise to be fulfilled
+	 */
+	module.exports = function dispatchRequest(config) {
+	  throwIfCancellationRequested(config);
+	
+	  // Ensure headers exist
+	  config.headers = config.headers || {};
+	
+	  // Transform request data
+	  config.data = transformData(
+	    config.data,
+	    config.headers,
+	    config.transformRequest
+	  );
+	
+	  // Flatten headers
+	  config.headers = utils.merge(
+	    config.headers.common || {},
+	    config.headers[config.method] || {},
+	    config.headers || {}
+	  );
+	
+	  utils.forEach(
+	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+	    function cleanHeaderConfig(method) {
+	      delete config.headers[method];
+	    }
+	  );
+	
+	  var adapter = config.adapter || defaults.adapter;
+	
+	  return adapter(config).then(function onAdapterResolution(response) {
+	    throwIfCancellationRequested(config);
+	
+	    // Transform response data
+	    response.data = transformData(
+	      response.data,
+	      response.headers,
+	      config.transformResponse
+	    );
+	
+	    return response;
+	  }, function onAdapterRejection(reason) {
+	    if (!isCancel(reason)) {
+	      throwIfCancellationRequested(config);
+	
+	      // Transform response data
+	      if (reason && reason.response) {
+	        reason.response.data = transformData(
+	          reason.response.data,
+	          reason.response.headers,
+	          config.transformResponse
+	        );
+	      }
+	    }
+	
+	    return Promise.reject(reason);
+	  });
+	};
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(17);
+	
+	/**
+	 * Transform the data for a request or a response
+	 *
+	 * @param {Object|String} data The data to be transformed
+	 * @param {Array} headers The headers for the request or response
+	 * @param {Array|Function} fns A single function or Array of functions
+	 * @returns {*} The resulting transformed data
+	 */
+	module.exports = function transformData(data, headers, fns) {
+	  /*eslint no-param-reassign:0*/
+	  utils.forEach(fns, function transform(fn) {
+	    data = fn(data, headers);
+	  });
+	
+	  return data;
+	};
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function isCancel(value) {
+	  return !!(value && value.__CANCEL__);
+	};
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Determines whether the specified URL is absolute
+	 *
+	 * @param {string} url The URL to test
+	 * @returns {boolean} True if the specified URL is absolute, otherwise false
+	 */
+	module.exports = function isAbsoluteURL(url) {
+	  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+	  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+	  // by any combination of letters, digits, plus, period, or hyphen.
+	  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+	};
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Creates a new URL by combining the specified URLs
+	 *
+	 * @param {string} baseURL The base URL
+	 * @param {string} relativeURL The relative URL
+	 * @returns {string} The combined URL
+	 */
+	module.exports = function combineURLs(baseURL, relativeURL) {
+	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
+	};
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * A `Cancel` is an object that is thrown when an operation is canceled.
+	 *
+	 * @class
+	 * @param {string=} message The message.
+	 */
+	function Cancel(message) {
+	  this.message = message;
+	}
+	
+	Cancel.prototype.toString = function toString() {
+	  return 'Cancel' + (this.message ? ': ' + this.message : '');
+	};
+	
+	Cancel.prototype.__CANCEL__ = true;
+	
+	module.exports = Cancel;
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var Cancel = __webpack_require__(38);
+	
+	/**
+	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
+	 *
+	 * @class
+	 * @param {Function} executor The executor function.
+	 */
+	function CancelToken(executor) {
+	  if (typeof executor !== 'function') {
+	    throw new TypeError('executor must be a function.');
+	  }
+	
+	  var resolvePromise;
+	  this.promise = new Promise(function promiseExecutor(resolve) {
+	    resolvePromise = resolve;
+	  });
+	
+	  var token = this;
+	  executor(function cancel(message) {
+	    if (token.reason) {
+	      // Cancellation has already been requested
+	      return;
+	    }
+	
+	    token.reason = new Cancel(message);
+	    resolvePromise(token.reason);
+	  });
+	}
+	
+	/**
+	 * Throws a `Cancel` if cancellation has been requested.
+	 */
+	CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+	  if (this.reason) {
+	    throw this.reason;
+	  }
+	};
+	
+	/**
+	 * Returns an object that contains a new `CancelToken` and a function that, when called,
+	 * cancels the `CancelToken`.
+	 */
+	CancelToken.source = function source() {
+	  var cancel;
+	  var token = new CancelToken(function executor(c) {
+	    cancel = c;
+	  });
+	  return {
+	    token: token,
+	    cancel: cancel
+	  };
+	};
+	
+	module.exports = CancelToken;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Syntactic sugar for invoking a function and expanding an array for arguments.
+	 *
+	 * Common use case would be to use `Function.prototype.apply`.
+	 *
+	 *  ```js
+	 *  function f(x, y, z) {}
+	 *  var args = [1, 2, 3];
+	 *  f.apply(null, args);
+	 *  ```
+	 *
+	 * With `spread` this example can be re-written.
+	 *
+	 *  ```js
+	 *  spread(function(x, y, z) {})([1, 2, 3]);
+	 *  ```
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	module.exports = function spread(callback) {
+	  return function wrap(arr) {
+	    return callback.apply(null, arr);
+	  };
+	};
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var abstract_crud_1 = __webpack_require__(13);
+	var minicast_1 = __webpack_require__(9);
+	var AbstractCollection = (function (_super) {
+	    __extends(AbstractCollection, _super);
+	    function AbstractCollection(api, initialCast, childrenCasts) {
+	        var _this = _super.call(this, api, null, initialCast, childrenCasts) || this;
+	        _this.data = [];
+	        _this.model = _this.data;
+	        _this.customMixin = _this.mixin;
+	        return _this;
+	    }
+	    AbstractCollection.prototype.mixin = function (data) {
+	        var _this = this;
+	        if (!data || !(data instanceof Array)) {
+	            throw "[Crud][Collection] An Array payload is expected.";
+	        }
+	        this.data = [];
+	        data.forEach(function (item) {
+	            var instance = {};
+	            if (_this.initialCast) {
+	                if (_this.initialCast instanceof Function) {
+	                    instance = new _this.initialCast();
+	                }
+	                else {
+	                    instance = new ((_a = _this.initialCast.type).bind.apply(_a, [void 0].concat(_this.initialCast.deps)))();
+	                }
+	            }
+	            minicast_1.Mix.extend(instance, item, _this.childrenCasts);
+	            _this.data.push(instance);
+	            var _a;
+	        });
+	    };
+	    return AbstractCollection;
+	}(abstract_crud_1.AbstractCrud));
+	exports.AbstractCollection = AbstractCollection;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var axios_1 = __webpack_require__(15);
+	var abstract_collection_1 = __webpack_require__(41);
+	var Collection = (function (_super) {
+	    __extends(Collection, _super);
+	    function Collection(api, initialCast, childrenCasts) {
+	        var _this = _super.call(this, api, initialCast, childrenCasts) || this;
+	        _this.http = axios_1.default;
+	        return _this;
+	    }
+	    return Collection;
+	}(abstract_collection_1.AbstractCollection));
+	exports.Collection = Collection;
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var abstract_crud_1 = __webpack_require__(13);
+	var minicast_1 = __webpack_require__(9);
+	var AbstractModel = (function (_super) {
+	    __extends(AbstractModel, _super);
+	    function AbstractModel(api, childrenCasts) {
+	        var _this = _super.call(this, api, null, null, childrenCasts) || this;
+	        _this.model = _this;
+	        _this.customMixin = _this.mixin;
+	        return _this;
+	    }
+	    AbstractModel.prototype.mixin = function (data) {
+	        if (!data || !(data instanceof Object)) {
+	            throw "[Crud][Collection] An Object payload is expected.";
+	        }
+	        minicast_1.Mix.extend(this, data, this.childrenCasts);
+	    };
+	    return AbstractModel;
+	}(abstract_crud_1.AbstractCrud));
+	exports.AbstractModel = AbstractModel;
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var axios_1 = __webpack_require__(15);
+	var abstract_model_1 = __webpack_require__(43);
+	var Model = (function (_super) {
+	    __extends(Model, _super);
+	    function Model(api, childrenCasts) {
+	        var _this = _super.call(this, api, childrenCasts) || this;
+	        _this.http = axios_1.default;
+	        return _this;
+	    }
+	    return Model;
+	}(abstract_model_1.AbstractModel));
+	exports.Model = Model;
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments)).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
+	    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
+	var eventer_1 = __webpack_require__(10);
+	var minicast_1 = __webpack_require__(9);
+	var axios_1 = __webpack_require__(15);
+	/*
+	 * Tool to manage a single list provider used by multiple objects (to avoid multiple call to a same path)
+	 * Usage :
+	 * let provider = new Provider<T>(path, MyClass);
+	 * function a(){
+	 *    //get data from provider
+	 *    let data = await provider.data();
+	 * }
+	 *
+	 * function b(){
+	 *    let data = await provider.data();
+	 *    //get data when a refresh happens
+	 *    provider.on('refresh', (newData) => data = newData));
+	 * }
+	 *
+	 * //force provider refresh (after data invalidation)
+	 * setTimeout(() => provider.refresh(), 50000);
+	 *
+	 * a();
+	 * b();
+	*/
+	var Provider = (function () {
+	    function Provider(path, className) {
+	        this.path = path;
+	        this.className = className;
+	        this._data = [];
+	        this.eventer = new eventer_1.Eventer();
+	    }
+	    Provider.prototype.data = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        if (!(!this.isSynced && !this.syncing))
+	                            return [3 /*break*/, 2];
+	                        return [4 /*yield*/, this.sync()];
+	                    case 1:
+	                        _a.sent();
+	                        _a.label = 2;
+	                    case 2:
+	                        if (!this.syncing)
+	                            return [3 /*break*/, 4];
+	                        return [4 /*yield*/, this.syncDone()];
+	                    case 3:
+	                        _a.sent();
+	                        _a.label = 4;
+	                    case 4: return [2 /*return*/, this._data];
+	                }
+	            });
+	        });
+	    };
+	    Provider.prototype.syncDone = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            var _this = this;
+	            return __generator(this, function (_a) {
+	                return [2 /*return*/, new Promise(function (resolve, reject) {
+	                        _this.eventer.once('sync', function () { return resolve(); });
+	                    })];
+	            });
+	        });
+	    };
+	    Provider.prototype.sync = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            var response;
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        this.syncing = true;
+	                        return [4 /*yield*/, axios_1.default.get(this.path)];
+	                    case 1:
+	                        response = _a.sent();
+	                        this._data = minicast_1.Mix.castArrayAs(this.className, response.data);
+	                        this.isSynced = true;
+	                        this.eventer.trigger('sync');
+	                        this.syncing = false;
+	                        return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
+	    Provider.prototype.refresh = function () {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        this.isSynced = false;
+	                        return [4 /*yield*/, this.sync()];
+	                    case 1:
+	                        _a.sent();
+	                        this.eventer.trigger('refresh');
+	                        return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
+	    Provider.prototype.push = function (data) {
+	        this._data.push(data);
+	    };
+	    Provider.prototype.remove = function (data) {
+	        var index = this._data.indexOf(data);
+	        this._data.splice(index, 1);
+	    };
+	    return Provider;
+	}());
+	exports.Provider = Provider;
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var axios_1 = __webpack_require__(15);
+	var autosaved = [];
+	var loopStarted = false;
+	var token;
+	var loop = function () {
+	    autosaved.forEach(function (item) {
+	        if (item._backup !== JSON.stringify(item.model)) {
+	            if (item.fn) {
+	                item.fn();
+	            }
+	            else {
+	                axios_1.default[item.method](item.path, item.model);
+	            }
+	            item._backup = JSON.stringify(item.model);
+	        }
+	    });
+	    loopStarted = true;
+	    token = setTimeout(loop, 500);
+	};
+	var Autosave = (function () {
+	    function Autosave() {
+	    }
+	    Autosave.watch = function (path, model, method) {
+	        if (method === void 0) { method = 'put'; }
+	        if (autosaved.findIndex(function (e) { return e.model === model && e.path === path; }) !== -1) {
+	            return;
+	        }
+	        var autosave;
+	        if (typeof path === 'string') {
+	            autosave = {
+	                model: model,
+	                path: path,
+	                method: method
+	            };
+	        }
+	        else {
+	            autosave = {
+	                model: model,
+	                fn: path,
+	                method: method
+	            };
+	        }
+	        autosaved.push(autosave);
+	        if (!loopStarted) {
+	            loop();
+	        }
+	    };
+	    Autosave.unwatch = function (model) {
+	        var index = autosaved.findIndex(function (e) { return e.model === model; });
+	        autosaved.splice(index, 1);
+	        if (autosaved.length === 0) {
+	            this.unwatchAll();
+	        }
+	    };
+	    Autosave.unwatchAll = function () {
+	        autosaved = [];
+	        clearTimeout(token);
+	        loopStarted = false;
+	    };
+	    return Autosave;
+	}());
+	exports.Autosave = Autosave;
+
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(48);
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(49);
+	var bind = __webpack_require__(50);
+	var Axios = __webpack_require__(52);
+	var defaults = __webpack_require__(53);
+	
+	/**
+	 * Create an instance of Axios
+	 *
+	 * @param {Object} defaultConfig The default config for the instance
+	 * @return {Axios} A new instance of Axios
+	 */
+	function createInstance(defaultConfig) {
+	  var context = new Axios(defaultConfig);
+	  var instance = bind(Axios.prototype.request, context);
+	
+	  // Copy axios.prototype to instance
+	  utils.extend(instance, Axios.prototype, context);
+	
+	  // Copy context to instance
+	  utils.extend(instance, context);
+	
+	  return instance;
+	}
+	
+	// Create the default instance to be exported
+	var axios = createInstance(defaults);
+	
+	// Expose Axios class to allow class inheritance
+	axios.Axios = Axios;
+	
+	// Factory for creating new instances
+	axios.create = function create(instanceConfig) {
+	  return createInstance(utils.merge(defaults, instanceConfig));
+	};
+	
+	// Expose Cancel & CancelToken
+	axios.Cancel = __webpack_require__(70);
+	axios.CancelToken = __webpack_require__(71);
+	axios.isCancel = __webpack_require__(67);
+	
+	// Expose all/spread
+	axios.all = function all(promises) {
+	  return Promise.all(promises);
+	};
+	axios.spread = __webpack_require__(72);
+	
+	module.exports = axios;
+	
+	// Allow use of default import syntax in TypeScript
+	module.exports.default = axios;
+
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var bind = __webpack_require__(50);
+	var isBuffer = __webpack_require__(51);
 	
 	/*global toString:true*/
 	
@@ -1951,7 +4510,7 @@
 
 
 /***/ }),
-/* 8 */
+/* 50 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -1968,7 +4527,7 @@
 
 
 /***/ }),
-/* 9 */
+/* 51 */
 /***/ (function(module, exports) {
 
 	/*!
@@ -1995,17 +4554,17 @@
 
 
 /***/ }),
-/* 10 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(11);
-	var utils = __webpack_require__(7);
-	var InterceptorManager = __webpack_require__(23);
-	var dispatchRequest = __webpack_require__(24);
-	var isAbsoluteURL = __webpack_require__(27);
-	var combineURLs = __webpack_require__(28);
+	var defaults = __webpack_require__(53);
+	var utils = __webpack_require__(49);
+	var InterceptorManager = __webpack_require__(64);
+	var dispatchRequest = __webpack_require__(65);
+	var isAbsoluteURL = __webpack_require__(68);
+	var combineURLs = __webpack_require__(69);
 	
 	/**
 	 * Create a new instance of Axios
@@ -2087,13 +4646,13 @@
 
 
 /***/ }),
-/* 11 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(7);
-	var normalizeHeaderName = __webpack_require__(13);
+	var utils = __webpack_require__(49);
+	var normalizeHeaderName = __webpack_require__(54);
 	
 	var DEFAULT_CONTENT_TYPE = {
 	  'Content-Type': 'application/x-www-form-urlencoded'
@@ -2109,10 +4668,10 @@
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(14);
+	    adapter = __webpack_require__(55);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(14);
+	    adapter = __webpack_require__(55);
 	  }
 	  return adapter;
 	}
@@ -2183,205 +4742,15 @@
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-	
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-	
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-	
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-	
-	
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-	
-	
-	
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-	
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-	
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-	
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-	
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-	
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-	
-	function noop() {}
-	
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-	process.prependListener = noop;
-	process.prependOnceListener = noop;
-	
-	process.listeners = function (name) { return [] }
-	
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-	
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 13 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -2394,18 +4763,18 @@
 
 
 /***/ }),
-/* 14 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(7);
-	var settle = __webpack_require__(15);
-	var buildURL = __webpack_require__(18);
-	var parseHeaders = __webpack_require__(19);
-	var isURLSameOrigin = __webpack_require__(20);
-	var createError = __webpack_require__(16);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(21);
+	var utils = __webpack_require__(49);
+	var settle = __webpack_require__(56);
+	var buildURL = __webpack_require__(59);
+	var parseHeaders = __webpack_require__(60);
+	var isURLSameOrigin = __webpack_require__(61);
+	var createError = __webpack_require__(57);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(62);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -2502,7 +4871,7 @@
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(22);
+	      var cookies = __webpack_require__(63);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -2578,15 +4947,15 @@
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
 
 /***/ }),
-/* 15 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(16);
+	var createError = __webpack_require__(57);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -2613,12 +4982,12 @@
 
 
 /***/ }),
-/* 16 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(17);
+	var enhanceError = __webpack_require__(58);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, request and response.
@@ -2637,7 +5006,7 @@
 
 
 /***/ }),
-/* 17 */
+/* 58 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2664,12 +5033,12 @@
 
 
 /***/ }),
-/* 18 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -2738,12 +5107,12 @@
 
 
 /***/ }),
-/* 19 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	/**
 	 * Parse headers into an object
@@ -2781,12 +5150,12 @@
 
 
 /***/ }),
-/* 20 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -2855,7 +5224,7 @@
 
 
 /***/ }),
-/* 21 */
+/* 62 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2897,12 +5266,12 @@
 
 
 /***/ }),
-/* 22 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -2956,12 +5325,12 @@
 
 
 /***/ }),
-/* 23 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -3014,15 +5383,15 @@
 
 
 /***/ }),
-/* 24 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
-	var transformData = __webpack_require__(25);
-	var isCancel = __webpack_require__(26);
-	var defaults = __webpack_require__(11);
+	var utils = __webpack_require__(49);
+	var transformData = __webpack_require__(66);
+	var isCancel = __webpack_require__(67);
+	var defaults = __webpack_require__(53);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -3099,12 +5468,12 @@
 
 
 /***/ }),
-/* 25 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(7);
+	var utils = __webpack_require__(49);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -3125,7 +5494,7 @@
 
 
 /***/ }),
-/* 26 */
+/* 67 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3136,7 +5505,7 @@
 
 
 /***/ }),
-/* 27 */
+/* 68 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3156,7 +5525,7 @@
 
 
 /***/ }),
-/* 28 */
+/* 69 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3176,7 +5545,7 @@
 
 
 /***/ }),
-/* 29 */
+/* 70 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3201,12 +5570,12 @@
 
 
 /***/ }),
-/* 30 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(29);
+	var Cancel = __webpack_require__(70);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -3264,7 +5633,7 @@
 
 
 /***/ }),
-/* 31 */
+/* 72 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -3297,339 +5666,456 @@
 
 
 /***/ }),
-/* 32 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	Object.defineProperty(exports, "__esModule", { value: true });
-	__export(__webpack_require__(33));
-	__export(__webpack_require__(34));
-	__export(__webpack_require__(35));
-	__export(__webpack_require__(36));
-	__export(__webpack_require__(4));
-	__export(__webpack_require__(37));
-	__export(__webpack_require__(38));
-	__export(__webpack_require__(39));
-	__export(__webpack_require__(40));
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	/**
-	 }
-	 }
-	 * Model of attachment from
-	 * table diary.attachment (DB)
-	 * @constructor
-	 */
-	var Attachment = (function () {
-	    function Attachment() {
-	        /**
-	         * Attachment id as in diary.attachment table
-	         * @type {number}
-	         */
-	        this.id = null;
-	        this.user_id = null;
-	        /**
-	         * Id of stored document within the document module
-	         * (see mongodb -> Documents table)
-	         * E.G: "b88a3c42-7e4f-4e1c-ab61-11c8872ef795"
-	         * @type {string}
-	         */
-	        this.document_id = null;
-	        /***
-	         * Creation date
-	         * @type {null}
-	         */
-	        this.creation_date = null;
-	        /**
-	         * Filename of attachment
-	         * @type {string}
-	         */
-	        this.document_label = null;
-	        /**
-	         * Download the attachment
-	         */
-	        this.download = function () {
-	            window.location.href = window.location.host + '/workspace/document/' + this.document_id;
-	        };
-	        /**
-	         * Detach attachment to a lesson
-	         * Attachment link will be detached to back end on lesson save
-	         * @param item Lesson or homework
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.detachFromItem = function (item, cb, cbe) {
-	            var that = this;
-	            if (item && item.attachments) {
-	                var udpatedAttachments = new Array();
-	                item.attachments.forEach(function (attachment) {
-	                    if (attachment && attachment.document_id !== that.document_id) {
-	                        udpatedAttachments.push(attachment);
-	                    }
-	                });
-	                item.attachments = udpatedAttachments;
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                else
-	                    (typeof cbe === 'function');
-	                {
-	                    cbe();
-	                }
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
 	            }
-	        };
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
 	    }
-	    return Attachment;
-	}());
-	exports.Attachment = Attachment;
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var PedagogicItem_model_1 = __webpack_require__(74);
+	exports.DATE_FORMAT = 'YYYY-MM-DD';
+	/**
+	 * removes accent from any string
+	 * @param str
+	 * @returns {*}
+	 */
+	exports.sansAccent = function (str) {
+	    if (!str) {
+	        return;
+	    }
+	    var accent = [
+	        /[\300-\306]/g, /[\340-\346]/g,
+	        /[\310-\313]/g, /[\350-\353]/g,
+	        /[\314-\317]/g, /[\354-\357]/g,
+	        /[\322-\330]/g, /[\362-\370]/g,
+	        /[\331-\334]/g, /[\371-\374]/g,
+	        /[\321]/g, /[\361]/g,
+	        /[\307]/g, /[\347]/g // C, c
+	    ];
+	    var noaccent = ['A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N', 'n', 'C', 'c'];
+	    for (var i = 0; i < accent.length; i++) {
+	        str = str.replace(accent[i], noaccent[i]);
+	    }
+	    return str;
+	};
+	/**
+	 * Transform sql homework data (table diary.homework)
+	 * to json
+	 * @param sqlHomework
+	 * @returns {{id: *, description: *, audience: *, subjectId: *, subjectLabel: *, type: *, typeId: *, typeLabel: *, teacherId: *, structureId: (*|T), audienceId: *, audienceLabel: *, dueDate: *, date: *, title: *, color: *, startMoment: *, endMoment: *, state: *, is_periodic: boolean, lesson_id: *}}
+	 */
+	exports.sqlToJsHomework = function (sqlHomework) {
+	    var homework = {
+	        //for share directive you must have _id
+	        _id: sqlHomework.id,
+	        id: sqlHomework.id,
+	        description: sqlHomework.homework_description,
+	        audienceId: sqlHomework.audience_id,
+	        audience: entcore_1.model.audiences.findWhere({ id: sqlHomework.audience_id }),
+	        subject: entcore_1.model.subjects.findWhere({ id: sqlHomework.subject_id }),
+	        subjectId: sqlHomework.subject_id,
+	        subjectLabel: sqlHomework.subject_label,
+	        type: entcore_1.model.homeworkTypes.findWhere({ id: sqlHomework.homework_type_id }),
+	        typeId: sqlHomework.homework_type_id,
+	        typeLabel: sqlHomework.homework_type_label,
+	        teacherId: sqlHomework.teacher_id,
+	        structureId: sqlHomework.structureId,
+	        audienceType: sqlHomework.audience_type,
+	        audienceLabel: sqlHomework.audience_label,
+	        // TODO delete dueDate? (seems redondant info vs date field)
+	        dueDate: entcore_1.moment(sqlHomework.homework_due_date),
+	        date: entcore_1.moment(sqlHomework.homework_due_date),
+	        title: sqlHomework.homework_title,
+	        color: sqlHomework.homework_color,
+	        startMoment: entcore_1.moment(sqlHomework.homework_due_date),
+	        endMoment: entcore_1.moment(sqlHomework.homework_due_date),
+	        state: sqlHomework.homework_state,
+	        is_periodic: false,
+	        lesson_id: sqlHomework.lesson_id
+	    };
+	    if (sqlHomework.attachments) {
+	        homework.attachments = JSON.parse(sqlHomework.attachments);
+	    }
+	    if ('group' === homework.audienceType) {
+	        homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.group');
+	    }
+	    else {
+	        homework.audienceTypeLabel = entcore_1.idiom.translate('diary.audience.class');
+	    }
+	    return homework;
+	};
+	/** Converts sql pedagogic item to js data */
+	exports.sqlToJsPedagogicItem = function (data) {
+	    //TODO use service
+	    var item = new PedagogicItem_model_1.PedagogicItem();
+	    item.type_item = data.type_item;
+	    item.id = data.id;
+	    //for share directive you must have _id
+	    item._id = data.id;
+	    item.lesson_id = data.lesson_id;
+	    item.title = data.title;
+	    item.subject = data.subject;
+	    item.audience = data.audience;
+	    item.start_hour = (data.type_item == "lesson") ? entcore_1.moment(data.day).minutes(entcore_1.model.getMinutes(data.start_time)).format("HH[h]mm") : "";
+	    item.end_hour = (data.type_item == "lesson") ? entcore_1.moment(data.day).minutes(entcore_1.model.getMinutes(data.end_time)).format("HH[h]mm") : "";
+	    item.type_homework = data.type_homework;
+	    item.teacher = data.teacher;
+	    item.description = data.description;
+	    item.expanded_description = false;
+	    item.state = data.state;
+	    item.color = data.color;
+	    item.getPreviewDescription();
+	    item.room = data.room;
+	    item.day = data.day;
+	    item.turn_in = (data.type_item == "lesson") ? "" : data.turn_in_type;
+	    item.selected = false;
+	    item.locked = data.locked;
+	    if (data.day) {
+	        item.dayFormatted = entcore_1.moment(data.day).format("DD/MM/YYYY");
+	        item.dayOfWeek = entcore_1.moment(data.day).format("dddd");
+	    }
+	    return item;
+	};
+	exports.syncHomeworks = function (cb) {
+	    return __awaiter(this, void 0, void 0, function () {
+	        return __generator(this, function (_a) {
+	            return [2 /*return*/, entcore_1.model.homeworks.syncHomeworks().then(function () {
+	                    if (typeof cb === 'function') {
+	                        cb();
+	                    }
+	                })];
+	        });
+	    });
+	};
+	exports.syncLessonsAndHomeworks = function (cb) {
+	    // need sync attached lesson homeworks
+	    return entcore_1.model.homeworks.syncHomeworks().then(function () {
+	        if (typeof cb === 'function') {
+	            cb();
+	        }
+	    });
+	};
+	/**
+	 * Convert sql diary.lesson row to js row used in angular model
+	 * @param lesson Sql diary.lesson row
+	 */
+	exports.sqlToJsLesson = function (data) {
+	    console.warn("deprecated");
+	    return;
+	    /*var lessonHomeworks = new Array();
+	
+	    // only initialize homeworks attached to lesson
+	    // with only id
+	    if (data.homework_ids) {
+	        for (var i = 0; i < data.homework_ids.length; i++) {
+	            var homework = new Homework();
+	            homework.id = data.homework_ids[i];
+	            homework.lesson_id = parseInt(data.lesson_id);
+	            homework.loaded = false; // means full data from sql not loaded
+	            lessonHomeworks.push(homework);
+	        }
+	    }
+	
+	    let lesson: any = {
+	        //for share directive you must have _id
+	        _id: data.lesson_id,
+	        id: data.lesson_id,
+	        title: data.lesson_title,
+	        audience: model.audiences.findWhere({id: data.audience_id}),
+	        audienceId: data.audience_id,
+	        audienceLabel: data.audience_label,
+	        audienceType: data.audience_type,
+	        description: data.lesson_description,
+	        subject: model.subjects.findWhere({id: data.subject_id}),
+	        subjectId: data.subject_id,
+	        subjectLabel: data.subject_label,
+	        teacherId: data.teacher_display_name,
+	        teacherName: data.teacher_display_name,
+	        structureId: data.school_id,
+	        date: moment(data.lesson_date),
+	        startTime: data.lesson_start_time,
+	        endTime: data.lesson_end_time,
+	        color: data.lesson_color,
+	        room: data.lesson_room,
+	        annotations: data.lesson_annotation,
+	        startMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_start_time),
+	        endMoment: moment(data.lesson_date.split(' ')[0] + ' ' + data.lesson_end_time),
+	        state: data.lesson_state,
+	        is_periodic: false,
+	        homeworks: lessonHomeworks,
+	        tooltipText: '',
+	        locked: (!model.canEdit()) ? true : false
+	    };
+	
+	    if ('group' === lesson.audienceType) {
+	        lesson.audienceTypeLabel = lang.translate('diary.audience.group');
+	    } else {
+	        lesson.audienceTypeLabel = lang.translate('diary.audience.class');
+	    }
+	
+	    if (data.attachments) {
+	        lesson.attachments = _.map(JSON.parse(data.attachments), jsonToJsAttachment);
+	    }
+	
+	
+	    //var tooltip = getResponsiveLessonTooltipText(lesson);
+	
+	    //lesson.tooltipText = tooltip;
+	    return lesson;*/
+	};
+	exports.jsonToJsAttachment = function (data) {
+	    console.warn("deprecated");
+	    return;
+	    /*var att = new Attachment();
+	    att.id = data.id;
+	    att.user_id = data.user_id;
+	    att.creation_date = data.creation_date;
+	    att.document_id = data.document_id;
+	    att.document_label = data.document_label;
+	
+	    return att;*/
+	};
+	/**
+	 * Set lesson tooltip text depending on screen resolution.
+	 * Tricky responsive must be linked to additional.css behaviour
+	 * @param lesson
+	 */
+	exports.getResponsiveLessonTooltipText = function (lesson) {
+	    console.warn("deprecated use utils service");
+	    return;
+	    /*var tooltipText = lesson.title + ' (' + lang.translate(lesson.state) + ')';
+	    var screenWidth = window.innerWidth;
+	
+	    // < 900 px display room
+	    if (screenWidth < 900 && lesson.room) {
+	        tooltipText += '<br>' + lesson.room;
+	    }
+	
+	    // < 650 px display hour start and hour end
+	    if (screenWidth < 650) {
+	        tooltipText += '<br>' + [[lesson.startMoment.format('HH')]] + 'h' + [[lesson.startMoment.format('mm')]];
+	        tooltipText += ' -> ' + [[lesson.endMoment.format('HH')]] + 'h' + [[lesson.endMoment.format('mm')]];
+	    }
+	
+	    // < 600 px display subjectlabel
+	    if (screenWidth < 650 && lesson.subjectLabel) {
+	        tooltipText += '<br>' + lesson.subjectLabel;
+	    }
+	
+	    tooltipText = tooltipText.trim();
+	
+	    return tooltipText;*/
+	};
+	/**
+	 * Transform sql homework load data to json like
+	 * @param sqlHomeworkType
+	 */
+	exports.sqlToJsHomeworkLoad = function (sqlHomeworkload) {
+	    return {
+	        countLoad: sqlHomeworkload.countload,
+	        description: sqlHomeworkload.countload + ' ' + (sqlHomeworkload.countload > 1 ? entcore_1.idiom.translate('diary.homework.labels') : entcore_1.idiom.translate('diary.homework.label')),
+	        day: entcore_1.moment(sqlHomeworkload.day).format('dddd').substring(0, 1).toUpperCase(),
+	        numDay: entcore_1.moment(sqlHomeworkload.day).format('DD') // 15
+	    };
+	};
+	/**
+	 * Transform sql homework type data to json like
+	 * @param sqlHomeworkType
+	 * @returns {{id: *, structureId: (*|T), label: *, category: *}}
+	 */
+	exports.sqlToJsHomeworkType = function (sqlHomeworkType) {
+	    return {
+	        id: sqlHomeworkType.id,
+	        structureId: sqlHomeworkType.school_id,
+	        label: sqlHomeworkType.homework_type_label,
+	        category: sqlHomeworkType.homework_type_category
+	    };
+	};
+	exports.CONSTANTS = {
+	    CAL_DATE_PATTERN: "YYYY-MM-DD",
+	    CAL_DATE_PATTERN_NG: "dd-MM-yyyy",
+	    CAL_DATE_PATTERN_SLASH: "dd/MM/yyyy",
+	    LONG_DATE_PATTERN: 'YYYY-MM-DD hh:mm:ss',
+	    RIGHTS: {
+	        CREATE_LESSON: 'diary.createLesson',
+	        VIEW: 'diary.view',
+	        CREATE_HOMEWORK_FOR_LESSON: 'createHomeworkForLesson',
+	        CREATE_FREE_HOMEWORK: 'diary.createFreeHomework',
+	        MANAGE_MODEL_WEEK: 'diary.manageModelWeek.update',
+	        MANAGE_HISTORY: 'diary.manageHistory.apply',
+	        SHOW_HISTORY: 'diary.showHistory.filters',
+	        VISA_APPLY_VISA: "diary.visa.applyvisa",
+	        VISA_INSPECTOR: "diary.visa.inspect.filters",
+	        VISA_ADMIN: "diary.visa.admin.filters",
+	        MANAGE_INSPECTOR: "diary.manageInspect.apply",
+	        SHOW_OTHER_TEACHER: "diary.view.otherteacher"
+	    }
+	};
+	/**
+	 * Default color of lesson and homeworks
+	 * @type {string}
+	 */
+	exports.DEFAULT_ITEM_COLOR = '#CECEF6';
+	/**
+	 * Default state of lesson or homework when created
+	 * @type {string}
+	 */
+	exports.DEFAULT_STATE = 'draft';
+	/**
+	 * Get school ids of current authenticated user as string
+	 * seperated with ':'
+	 * @returns {string} schoolid_1:schoolid_2:...
+	 */
+	function getUserStructuresIdsAsString() {
+	    var structureIds = "";
+	    entcore_1.model.me.structures.forEach(function (structureId) {
+	        structureIds += structureId + ":";
+	    });
+	    return structureIds;
+	}
+	exports.getUserStructuresIdsAsString = getUserStructuresIdsAsString;
 	;
 
 
 /***/ }),
-/* 34 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Child = (function () {
-	    function Child() {
-	        this.selected = false;
-	    }
-	    return Child;
-	}());
-	exports.Child = Child;
-
-
-/***/ }),
-/* 35 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
-	var tools_1 = __webpack_require__(3);
-	var Homework = (function () {
-	    function Homework() {
-	        this.expanded = false;
-	        /**
-	         * Delete calendar references of current homework
-	         */
+	var axios_1 = __webpack_require__(47);
+	var PedagogicItem = (function () {
+	    function PedagogicItem() {
+	        this.descriptionMaxSize = 140;
+	        this.isPublished = function () { return this.state === 'published'; };
 	        this.deleteModelReferences = function () {
-	            var idxHomeworkToDelete = entcore_1.model.homeworks.indexOf(this);
-	            // delete homework in calendar cache
-	            if (idxHomeworkToDelete >= 0) {
-	                entcore_1.model.homeworks.splice(idxHomeworkToDelete, 1);
-	            }
-	        };
-	        /**
-	         * Adds an attachment
-	         * @param attachment
-	         */
-	        this.addAttachment = function (attachment) {
-	            this.attachments.push(attachment);
-	        };
-	        /**
-	         * Removes attachment associated to this lesson
-	         * @param attachment
-	         * @param cb
-	         * @param cbe
-	         */
-	        this.detachAttachment = function (attachment, cb, cbe) {
-	            attachment.detachFromItem(this.id, 'lesson', cb, cbe);
-	        };
-	        this.api = {
-	            delete: '/diary/homework/:id'
-	        };
-	        this.save = function (cb, cbe) {
-	            var that = this;
-	            var promise = entcore_1.model.$q().when({});
-	            if (!this.subject.id) {
-	                promise = this.subject.save();
-	            }
-	            return promise.then(function () {
-	                if (that.id) {
-	                    return that.update(cb, cbe);
-	                }
-	                else {
-	                    return that.create(cb, cbe);
-	                }
-	            });
-	        };
-	        /**
-	         * Returns true if current homework is attached to a lesson
-	         * @returns {boolean}
-	         */
-	        this.isAttachedToLesson = function () {
-	            return typeof this.lesson_id !== 'undefined' && this.lesson_id != null;
-	        };
-	        this.isDraft = function () {
-	            return this.state === "draft";
-	        };
-	        this.isPublished = function () {
-	            return !this.isDraft();
-	        };
-	        /**
-	         * A directly publishable homework must exist in database and not linked to a lesson
-	         * @param toPublish
-	         * @returns {*|boolean} true if homework can be published directly
-	         */
-	        this.isPublishable = function (toPublish) {
-	            return this.id && (toPublish ? this.isDraft() : this.isPublished()) && this.lesson_id == null;
+	            entcore_1.model.deletePedagogicItemReferences(this.id);
 	        };
 	        this.changeState = function (toPublish) {
-	            this.state = toPublish ? 'published' : 'draft';
+	            //if item is a lesson may need to upgrade his related homework
+	            if (this.type_item === 'lesson') {
+	                var relatedToLesson = entcore_1.model.pedagogicDays.getItemsByLesson(this.id);
+	                relatedToLesson.forEach(function (item) {
+	                    item.state = toPublish ? 'published' : 'draft';
+	                });
+	            }
+	            else {
+	                this.state = toPublish ? 'published' : 'draft';
+	            }
 	        };
-	        this.update = function (cb, cbe) {
-	            var url = '/diary/homework/' + this.id;
-	            var homework = this;
-	            return entcore_1.model.getHttp()({
-	                method: 'PUT',
-	                url: url,
-	                data: homework
-	            }).then(function () {
+	        this.getPreviewDescription = function () {
+	            if (this.description) {
+	                if (this.description.length >= this.descriptionMaxSize) {
+	                    this.preview_description = '<p class="itemPreview">' + $('<div>' + this.description + '</div>').text().substring(0, this.descriptionMaxSize) + '...</p>';
+	                }
+	                else {
+	                    this.preview_description = this.description;
+	                }
+	            }
+	            else {
+	                this.preview_description = this.description;
+	            }
+	        };
+	        this.isPublishable = function (toPublish) {
+	            return this.id && this.state == (toPublish ? 'draft' : 'published') && (this.lesson_id == null || this.lesson_id == this.id); // id test to detect free homeworks
+	        };
+	        this.delete = function (cb, cbe) {
+	            var url = (this.type_item == "lesson") ? '/diary/lesson/' : '/diary/homework/';
+	            var idToDelete = this.id;
+	            axios_1.default.delete(url + idToDelete, this).then(function (b) {
+	                entcore_1.model.deletePedagogicItemReferences(idToDelete);
 	                if (typeof cb === 'function') {
 	                    cb();
 	                }
 	            }).catch(function (e) {
-	                if (cbe) {
-	                    cbe();
-	                }
-	            });
-	        };
-	        this.create = function (cb, cbe) {
-	            var homework = this;
-	            entcore_1.model.getHttp()({
-	                method: 'POST',
-	                url: '/diary/homework',
-	                data: homework
-	            }).then(function (result) {
-	                homework.updateData(result.data);
-	                entcore_1.model.homeworks.pushAll([homework]);
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                return result.data;
-	            }).catch(function (e) {
-	                if (cbe) {
-	                    cbe();
-	                }
-	            });
-	        };
-	        /**
-	         * Load homework object from id
-	         * @param cb Callback function
-	         * @param cbe Callback on error function
-	         */
-	        this.load = function (cb, cbe) {
-	            var homework = this;
-	            axios_1.default.get('/diary/homework/' + homework.id)
-	                .then(function (res) {
-	                homework.updateData(tools_1.sqlToJsHomework(res.data));
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	            })
-	                .catch(function (e) {
 	                if (typeof cbe === 'function') {
 	                    cbe(entcore_1.model.parseError(e));
 	                }
 	            });
 	        };
-	        /**
-	         * Deletes a list of homeworks
-	         * @param homeworks Homeworks to be deleted
-	         * @param cb Callback
-	         * @param cbe Callback on error
-	         */
-	        this.deleteList = function (homeworks, cb, cbe) {
-	            entcore_1.model.deleteItemList(homeworks, 'homework', cb, cbe);
-	        };
-	        /**
-	         * Deletes the homework
-	         * @param Optional lesson attached to homework
-	         * @param cb Callback after delete
-	         * @param cbe Callback on error
-	         */
-	        this.delete = function (lesson, cb, cbe) {
-	            var homework = this;
-	            var deleteHomeworkReferences = function () {
-	                // delete homework from calendar cache
-	                entcore_1.model.homeworks.forEach(function (modelHomework) {
-	                    if (modelHomework.id === homework.id) {
-	                        entcore_1.model.homeworks.remove(modelHomework);
-	                    }
-	                });
-	                if (lesson && lesson.homeworks) {
-	                    lesson.homeworks.remove(homework);
-	                }
-	            };
-	            if (this.id) {
-	                axios_1.default.delete('/diary/homework/' + this.id)
-	                    .then(function (b) {
-	                    deleteHomeworkReferences();
-	                    if (typeof cb === 'function') {
-	                        cb();
-	                    }
-	                })
-	                    .catch(function (error) {
-	                    if (typeof cbe === 'function') {
-	                        cbe(entcore_1.model.parseError(error));
-	                    }
-	                });
+	        this.deleteList = function (items, cb, cbe) {
+	            // split into two arrays of PedagogicItem, one for the lessons, one for the homeworks
+	            var itemsByType = []; // array of array(s)
+	            if (items.length == 1) {
+	                itemsByType.push(items);
 	            }
 	            else {
-	                deleteHomeworkReferences();
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
+	                itemsByType = entcore_1._.partition(items, function (item) {
+	                    return item.type_item === 'lesson';
+	                });
+	            }
+	            var countdown = 0;
+	            if (itemsByType.length > 0) {
+	                countdown = itemsByType.length;
+	                itemsByType.forEach(function (arrayForTypeItem) {
+	                    if (arrayForTypeItem.length > 0) {
+	                        entcore_1.model.deleteItemList(arrayForTypeItem, arrayForTypeItem[0].type_item, function () {
+	                            countdown--;
+	                            if (countdown == 0) {
+	                                if (typeof cb === 'function') {
+	                                    cb();
+	                                }
+	                            }
+	                        }, cbe);
+	                    }
+	                    else {
+	                        countdown--;
+	                    }
+	                });
 	            }
 	        };
-	        this.toJSON = function () {
-	            var json = {
-	                homework_title: this.title,
-	                subject_id: this.subject.id,
-	                homework_type_id: this.type.id,
-	                teacher_id: entcore_1.model.me.userId,
-	                school_id: this.audience.structureId,
-	                audience_id: this.audience.id,
-	                homework_due_date: entcore_1.moment(this.dueDate).format(tools_1.DATE_FORMAT),
-	                homework_description: this.description,
-	                homework_color: this.color,
-	                homework_state: this.state,
-	                // used to auto create postgresql diary.audience if needed
-	                // not this.audience object is originally from neo4j graph (see syncAudiences function)
-	                audience_type: this.audience.type,
-	                audience_name: this.audience.name,
-	                attachments: this.attachments
-	            };
-	            if (this.lesson_id) {
-	                json.lesson_id = this.lesson_id;
+	        this.isFiltered = function () {
+	            if (entcore_1.model.searchForm.selectedSubject != null) {
+	                return !(this.subject === entcore_1.model.searchForm.selectedSubject);
 	            }
-	            /*if (!this.id) {
-	                created: moment(this.created).format('YYYY-MM-DD HH:mm:ss.SSSSS'); // "2016-07-05 11:48:22.18671"
-	            }*/
-	            return json;
+	            return false;
 	        };
-	        this.expanded = false;
+	        this.selected = false;
 	    }
-	    return Homework;
+	    return PedagogicItem;
 	}());
-	exports.Homework = Homework;
+	exports.PedagogicItem = PedagogicItem;
 	;
 
 
 /***/ }),
-/* 36 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3659,13 +6145,13 @@
 
 
 /***/ }),
-/* 37 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	var SearchForm = (function () {
 	    function SearchForm(isQuickSearch) {
 	        this.startDate = {};
@@ -3717,7 +6203,7 @@
 
 
 /***/ }),
-/* 38 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -3793,13 +6279,13 @@
 
 
 /***/ }),
-/* 39 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
+	var axios_1 = __webpack_require__(47);
 	var Teacher = (function () {
 	    function Teacher() {
 	        this.create = function (cb, cbe) {
@@ -3823,16 +6309,16 @@
 
 
 /***/ }),
-/* 40 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var Homework_model_1 = __webpack_require__(35);
-	var Subject_model_1 = __webpack_require__(38);
-	var model_1 = __webpack_require__(41);
+	var tools_1 = __webpack_require__(73);
+	var Homework_model_1 = __webpack_require__(6);
+	var Subject_model_1 = __webpack_require__(77);
+	var model_1 = __webpack_require__(80);
 	var Lesson = (function () {
 	    function Lesson(data) {
 	        var _this = this;
@@ -4178,7 +6664,7 @@
 
 
 /***/ }),
-/* 41 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -4192,12 +6678,47 @@
 	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	    };
 	})();
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
-	var tools = __webpack_require__(3);
-	var index_1 = __webpack_require__(32);
-	var Lesson_model_1 = __webpack_require__(40);
+	var axios_1 = __webpack_require__(47);
+	var tools = __webpack_require__(73);
+	var index_1 = __webpack_require__(3);
+	var Lesson_model_1 = __webpack_require__(79);
 	/**
 	 * Model from table
 	 * diary.lesson_has_attachmentH
@@ -4290,29 +6811,40 @@
 	    });
 	    this.collection(HomeworkType, {
 	        loading: false,
-	        syncHomeworkTypes: function (cb, cbe) {
-	            var homeworkTypes = [];
-	            var that = this;
-	            if (that.loading)
-	                return;
-	            entcore_1.model.homeworkTypes.all.splice(0, entcore_1.model.homeworkTypes.all.length);
-	            var url = '/diary/homeworktype/initorlist';
-	            var urlGetHomeworkTypes = url;
-	            that.loading = true;
-	            return entcore_1.model.getHttp()({
-	                method: 'GET',
-	                url: urlGetHomeworkTypes
-	            }).then(function (result) {
-	                homeworkTypes = homeworkTypes.concat(result.data);
-	                that.addRange(entcore_1._.map(homeworkTypes, tools.sqlToJsHomeworkType));
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                that.loading = false;
-	                return homeworkTypes;
-	            }).catch(function (e) {
-	                that.loading = false;
-	                throw e;
+	        syncHomeworkTypes: function () {
+	            return __awaiter(this, void 0, void 0, function () {
+	                var homeworkTypes, that, url, urlGetHomeworkTypes, data, e_1;
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            homeworkTypes = [];
+	                            that = this;
+	                            if (that.loading)
+	                                return [2 /*return*/];
+	                            entcore_1.model.homeworkTypes.all.splice(0, entcore_1.model.homeworkTypes.all.length);
+	                            url = '/diary/homeworktype/initorlist';
+	                            urlGetHomeworkTypes = url;
+	                            that.loading = true;
+	                            _a.label = 1;
+	                        case 1:
+	                            _a.trys.push([1, 3, , 4]);
+	                            return [4 /*yield*/, entcore_1.model.getHttp()({
+	                                    method: 'GET',
+	                                    url: urlGetHomeworkTypes
+	                                })];
+	                        case 2:
+	                            data = (_a.sent()).data;
+	                            homeworkTypes = homeworkTypes.concat(data);
+	                            that.addRange(entcore_1._.map(homeworkTypes, tools.sqlToJsHomeworkType));
+	                            that.loading = false;
+	                            return [2 /*return*/, homeworkTypes];
+	                        case 3:
+	                            e_1 = _a.sent();
+	                            that.loading = false;
+	                            throw e_1;
+	                        case 4: return [2 /*return*/];
+	                    }
+	                });
 	            });
 	        }, pushAll: function (datas) {
 	            if (datas) {
@@ -4320,45 +6852,7 @@
 	            }
 	        }, behaviours: 'diary'
 	    });
-	    this.collection(index_1.Homework, {
-	        loading: false,
-	        syncHomeworks: function (cb, cbe) {
-	            var homeworks = [];
-	            var start = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1).format(tools.DATE_FORMAT);
-	            var end = entcore_1.moment(entcore_1.model.calendar.dayForWeek).day(1).add(1, 'week').format(tools.DATE_FORMAT);
-	            var that = this;
-	            if (that.loading)
-	                return;
-	            entcore_1.model.homeworks.all.splice(0, entcore_1.model.homeworks.all.length);
-	            var urlGetHomeworks = '/diary/homework/' + tools.getUserStructuresIdsAsString() + '/' + start + '/' + end + '/';
-	            if (entcore_1.model.isUserParent() && entcore_1.model.child) {
-	                urlGetHomeworks += entcore_1.model.child.id;
-	            }
-	            else {
-	                urlGetHomeworks += '%20';
-	            }
-	            that.loading = true;
-	            return entcore_1.model.getHttp()({
-	                method: 'GET',
-	                url: urlGetHomeworks
-	            }).then(function (result) {
-	                homeworks = homeworks.concat(result.data);
-	                that.addRange(entcore_1._.map(homeworks, tools.sqlToJsHomework));
-	                if (typeof cb === 'function') {
-	                    cb();
-	                }
-	                that.loading = false;
-	                return homeworks;
-	            }).catch(function (e) {
-	                that.loading = false;
-	                throw e;
-	            });
-	        }, pushAll: function (datas) {
-	            if (datas) {
-	                this.all = entcore_1._.union(this.all, datas);
-	            }
-	        }, behaviours: 'diary'
-	    });
+	    entcore_1.model.homeworks = new index_1.Homeworks();
 	    this.collection(index_1.PedagogicDay, {
 	        reset: function () {
 	            entcore_1.model.pedagogicDays.selectAll();
@@ -4413,9 +6907,6 @@
 	};
 	entcore_1.model.getUtilsService = function () {
 	    return entcore_1.angular.element($('html')).injector().get("UtilsService");
-	};
-	entcore_1.model.getConstants = function () {
-	    return entcore_1.angular.injector(['ng', 'app']).get("constants");
 	};
 	entcore_1.model.homeworksPerDayDisplayed = 1;
 	/**
@@ -4891,15 +7382,15 @@
 
 
 /***/ }),
-/* 42 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var subject_service_1 = __webpack_require__(43);
-	var axios_1 = __webpack_require__(5);
+	var tools_1 = __webpack_require__(73);
+	var subject_service_1 = __webpack_require__(82);
+	var axios_1 = __webpack_require__(47);
 	/*
 	* Course service as class
 	* used to manipulate Course model
@@ -4969,7 +7460,7 @@
 
 
 /***/ }),
-/* 43 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5010,10 +7501,10 @@
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Subject_model_1 = __webpack_require__(38);
-	var utils_service_1 = __webpack_require__(44);
-	var axios_1 = __webpack_require__(5);
-	var entcore_toolkit_1 = __webpack_require__(45);
+	var Subject_model_1 = __webpack_require__(77);
+	var utils_service_1 = __webpack_require__(83);
+	var axios_1 = __webpack_require__(47);
+	var entcore_toolkit_1 = __webpack_require__(7);
 	/*
 	 * Subject service as class
 	 * used to manipulate Subject model
@@ -5094,7 +7585,7 @@
 
 
 /***/ }),
-/* 44 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5153,2321 +7644,18 @@
 
 
 /***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	__export(__webpack_require__(46));
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	__export(__webpack_require__(47));
-	__export(__webpack_require__(48));
-	__export(__webpack_require__(49));
-	__export(__webpack_require__(50));
-	__export(__webpack_require__(82));
-	__export(__webpack_require__(83));
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	function mapToArray(map) {
-	    var result = [];
-	    map.forEach(function (item) {
-	        result.push(item);
-	    });
-	    return result;
-	}
-	var Mix = (function () {
-	    function Mix() {
-	    }
-	    Mix.extend = function (obj, mixin, casts) {
-	        var _loop_1 = function () {
-	            var value = mixin[property];
-	            if (casts && casts[property] && value) {
-	                var castItem = casts[property];
-	                var cast_1;
-	                if (castItem instanceof Function) {
-	                    cast_1 = {
-	                        type: castItem,
-	                        deps: []
-	                    };
-	                }
-	                else {
-	                    cast_1 = {
-	                        type: castItem.type,
-	                        single: castItem.single,
-	                        deps: castItem.deps ? castItem.deps : []
-	                    };
-	                }
-	                var doCast_1 = function (v) {
-	                    var instance = new ((_a = cast_1.type).bind.apply(_a, [void 0].concat(cast_1.deps)))();
-	                    if (instance.mixin)
-	                        instance.mixin(v);
-	                    else
-	                        Mix.extend(instance, v);
-	                    return instance;
-	                    var _a;
-	                };
-	                if (value instanceof Array && cast_1.single) {
-	                    obj[property] = [];
-	                    value.forEach(function (v) {
-	                        obj[property].push(doCast_1(v));
-	                    });
-	                }
-	                else {
-	                    obj[property] = doCast_1(value);
-	                }
-	            }
-	            else if (!value || typeof value !== 'object' || value instanceof Array) {
-	                obj[property] = value;
-	            }
-	            else {
-	                if (obj[property] instanceof TypedArray) {
-	                    obj[property].load(value);
-	                }
-	                else {
-	                    if (!obj[property]) {
-	                        obj[property] = {};
-	                    }
-	                    this_1.extend(obj[property], value);
-	                }
-	            }
-	        };
-	        var this_1 = this;
-	        for (var property in mixin) {
-	            _loop_1();
-	        }
-	        if (obj && obj.fromJSON) {
-	            obj.fromJSON(mixin);
-	        }
-	    };
-	    Mix.castAs = function (className, obj, params) {
-	        if (params === void 0) { params = {}; }
-	        var newObj = new className(params);
-	        this.extend(newObj, obj);
-	        return newObj;
-	    };
-	    Mix.castArrayAs = function (className, arr, params) {
-	        if (params === void 0) { params = {}; }
-	        var newArr = [];
-	        arr.forEach(function (item) {
-	            newArr.push(Mix.castAs(className, item, params));
-	        });
-	        return newArr;
-	    };
-	    return Mix;
-	}());
-	exports.Mix = Mix;
-	var TypedArray = (function (_super) {
-	    __extends(TypedArray, _super);
-	    function TypedArray(className, mixin) {
-	        if (mixin === void 0) { mixin = {}; }
-	        var _this = _super.call(this) || this;
-	        _this.className = className;
-	        _this.mixin = mixin;
-	        return _this;
-	    }
-	    TypedArray.prototype.push = function () {
-	        var _this = this;
-	        var items = [];
-	        for (var _i = 0; _i < arguments.length; _i++) {
-	            items[_i - 0] = arguments[_i];
-	        }
-	        items.forEach(function (item) {
-	            if (!(item instanceof _this.className)) {
-	                item = Mix.castAs(_this.className, item);
-	            }
-	            for (var prop in _this.mixin) {
-	                item[prop] = _this.mixin[prop];
-	            }
-	            Array.prototype.push.call(_this, item);
-	        });
-	        return this.length;
-	    };
-	    TypedArray.prototype.load = function (data) {
-	        var _this = this;
-	        data.forEach(function (item) {
-	            _this.push(item);
-	        });
-	    };
-	    TypedArray.prototype.asArray = function () {
-	        return mapToArray(this);
-	    };
-	    TypedArray.prototype.toJSON = function () {
-	        return mapToArray(this);
-	    };
-	    return TypedArray;
-	}(Array));
-	exports.TypedArray = TypedArray;
-
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	var Eventer = (function () {
-	    function Eventer() {
-	        this.events = new Map();
-	    }
-	    Eventer.prototype.trigger = function (eventName, data) {
-	        if (this.events[eventName]) {
-	            this.events[eventName].forEach(function (f) { return f(data); });
-	        }
-	    };
-	    Eventer.prototype.on = function (eventName, cb) {
-	        if (!this.events[eventName]) {
-	            this.events[eventName] = [];
-	        }
-	        this.events[eventName].push(cb);
-	    };
-	    Eventer.prototype.off = function (eventName, cb) {
-	        if (!this.events[eventName]) {
-	            return;
-	        }
-	        if (cb === undefined) {
-	            this.events[eventName] = [];
-	            return;
-	        }
-	        var index = this.events[eventName].indexOf(cb);
-	        if (index !== -1) {
-	            this.events[eventName].splice(index, 1);
-	        }
-	    };
-	    Eventer.prototype.once = function (eventName, cb) {
-	        var _this = this;
-	        var callback = function (data) {
-	            cb(data);
-	            _this.off(eventName, callback);
-	        };
-	        this.on(eventName, callback);
-	    };
-	    return Eventer;
-	}());
-	exports.Eventer = Eventer;
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	var Selection = (function () {
-	    function Selection(arr) {
-	        this.arr = arr;
-	        this.selectedElements = [];
-	    }
-	    Object.defineProperty(Selection.prototype, "all", {
-	        get: function () {
-	            return this.arr;
-	        },
-	        set: function (all) {
-	            this.arr = all;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Selection.prototype.filter = function (filter) {
-	        return this.arr.filter(filter);
-	    };
-	    Selection.prototype.push = function (item) {
-	        this.arr.push(item);
-	    };
-	    Selection.prototype.addRange = function (arr) {
-	        for (var i = 0; i < arr.length; i++) {
-	            this.all.push(arr[i]);
-	        }
-	    };
-	    Object.defineProperty(Selection.prototype, "colLength", {
-	        get: function () {
-	            return this.arr.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Selection.prototype, "length", {
-	        get: function () {
-	            return this.selected.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Selection.prototype.forEach = function (func) {
-	        this.arr.forEach(func);
-	    };
-	    Selection.prototype.selectAll = function () {
-	        for (var i = 0; i < this.arr.length; i++) {
-	            this.arr[i].selected = true;
-	        }
-	    };
-	    Selection.prototype.select = function (filter) {
-	        for (var i = 0; i < this.arr.length; i++) {
-	            this.arr[i].selected = filter(this.arr[i]);
-	        }
-	    };
-	    Selection.prototype.deselect = function (filter) {
-	        for (var i = 0; i < this.arr.length; i++) {
-	            this.arr[i].selected = !filter(this.arr[i]);
-	        }
-	    };
-	    Selection.prototype.deselectAll = function () {
-	        for (var i = 0; i < this.arr.length; i++) {
-	            this.arr[i].selected = false;
-	        }
-	    };
-	    Selection.prototype.removeSelection = function () {
-	        var newArr = [];
-	        for (var i = 0; i < this.arr.length; i++) {
-	            if (!this.arr[i].selected) {
-	                newArr.push(this.arr[i]);
-	            }
-	        }
-	        this.arr.splice(0, this.arr.length);
-	        for (var i = 0; i < newArr.length; i++) {
-	            this.arr.push(newArr[i]);
-	        }
-	    };
-	    Selection.prototype.updateSelected = function () {
-	        for (var i = 0; i < this.arr.length; i++) {
-	            var index = this.selectedElements.indexOf(this.arr[i]);
-	            if (this.arr[i].selected && index === -1) {
-	                this.selectedElements.push(this.arr[i]);
-	            }
-	            else if (!this.arr[i].selected && index !== -1) {
-	                this.selectedElements.splice(index, 1);
-	            }
-	        }
-	        for (var i = 0; i < this.selectedElements.length; i++) {
-	            var index = this.arr.indexOf(this.selectedElements[i]);
-	            if (index === -1) {
-	                this.selectedElements.splice(index, 1);
-	            }
-	        }
-	    };
-	    Object.defineProperty(Selection.prototype, "selected", {
-	        // a specific array is maintained to avoid references breaking all the time
-	        get: function () {
-	            this.updateSelected();
-	            return this.selectedElements;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    return Selection;
-	}());
-	exports.Selection = Selection;
-
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	__export(__webpack_require__(51));
-	__export(__webpack_require__(52));
-	__export(__webpack_require__(78));
-	__export(__webpack_require__(79));
-	__export(__webpack_require__(80));
-	__export(__webpack_require__(81));
-
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var minicast_1 = __webpack_require__(47);
-	var AbstractCrud = (function () {
-	    function AbstractCrud(api, model, initialCast, childrenCasts, customMixin) {
-	        this.api = api;
-	        this.model = model;
-	        this.initialCast = initialCast;
-	        this.childrenCasts = childrenCasts;
-	        this.customMixin = customMixin;
-	    }
-	    AbstractCrud.prototype.parseApi = function (api, parameters) {
-	        var _this = this;
-	        if (typeof api === 'function') {
-	            api = api();
-	        }
-	        return api.split(/(:[a-zA-Z0-9_.]+)/)
-	            .map(function (fragment) {
-	            return fragment.charAt(0) === ':' ?
-	                parameters && parameters[fragment.substr(1)] ||
-	                    _this.model[fragment.substr(1)] ||
-	                    _this[fragment.substr(1)] ||
-	                    fragment :
-	                fragment;
-	        }).join('');
-	    };
-	    AbstractCrud.prototype.defaultMixin = function (payload) {
-	        var _this = this;
-	        if (payload instanceof Array && this.model instanceof Array) {
-	            this.model = [];
-	            var model_1 = this.model; //fix type inference
-	            payload.forEach(function (item) {
-	                var instance = {};
-	                if (_this.initialCast) {
-	                    if (_this.initialCast instanceof Function) {
-	                        instance = new _this.initialCast();
-	                    }
-	                    else {
-	                        instance = new ((_a = _this.initialCast.type).bind.apply(_a, [void 0].concat(_this.initialCast.deps)))();
-	                    }
-	                }
-	                minicast_1.Mix.extend(instance, item, _this.childrenCasts);
-	                model_1.push(instance);
-	                var _a;
-	            });
-	        }
-	        else {
-	            minicast_1.Mix.extend(this.model, payload, this.childrenCasts);
-	        }
-	    };
-	    AbstractCrud.prototype.create = function (item, opts) {
-	        var _this = this;
-	        if (opts === void 0) { opts = {}; }
-	        if (!this.api.create) {
-	            throw '[Crud][Api] "create" route is undefined';
-	        }
-	        return this.http.post(this.parseApi(this.api.create, item), item || this.model, opts)
-	            .then(function (response) {
-	            if (_this.model instanceof Array) {
-	                _this.model.push(item);
-	            }
-	            return response;
-	        });
-	    };
-	    AbstractCrud.prototype.sync = function (opts) {
-	        var _this = this;
-	        if (opts === void 0) { opts = {}; }
-	        if (!this.api.sync) {
-	            throw '[Crud][Api] "sync" route is undefined';
-	        }
-	        return this.http.get(this.parseApi(this.api.sync), opts)
-	            .then(function (response) {
-	            (_this.customMixin || _this.defaultMixin).bind(_this)(response.data);
-	            return response;
-	        });
-	    };
-	    AbstractCrud.prototype.update = function (item, opts) {
-	        if (opts === void 0) { opts = {}; }
-	        if (!this.api.update) {
-	            throw '[Crud][Api] "update" route is undefined';
-	        }
-	        return this.http.put(this.parseApi(this.api.update, item), item || this.model, opts);
-	    };
-	    AbstractCrud.prototype.delete = function (item, opts) {
-	        var _this = this;
-	        if (opts === void 0) { opts = {}; }
-	        if (!this.api.delete) {
-	            throw '[Crud][Api] "delete" route is undefined';
-	        }
-	        return this.http.delete(this.parseApi(this.api.delete, item), opts)
-	            .then(function (response) {
-	            if (_this.model instanceof Array) {
-	                _this.model.splice(_this.model.indexOf(item), 1);
-	            }
-	            return response;
-	        });
-	    };
-	    return AbstractCrud;
-	}());
-	exports.AbstractCrud = AbstractCrud;
-
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var axios_1 = __webpack_require__(53);
-	var abstract_crud_1 = __webpack_require__(51);
-	var Crud = (function (_super) {
-	    __extends(Crud, _super);
-	    function Crud() {
-	        var _this = _super.apply(this, arguments) || this;
-	        _this.http = axios_1.default;
-	        return _this;
-	    }
-	    return Crud;
-	}(abstract_crud_1.AbstractCrud));
-	exports.Crud = Crud;
-
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(54);
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	var bind = __webpack_require__(56);
-	var Axios = __webpack_require__(57);
-	var defaults = __webpack_require__(58);
-	
-	/**
-	 * Create an instance of Axios
-	 *
-	 * @param {Object} defaultConfig The default config for the instance
-	 * @return {Axios} A new instance of Axios
-	 */
-	function createInstance(defaultConfig) {
-	  var context = new Axios(defaultConfig);
-	  var instance = bind(Axios.prototype.request, context);
-	
-	  // Copy axios.prototype to instance
-	  utils.extend(instance, Axios.prototype, context);
-	
-	  // Copy context to instance
-	  utils.extend(instance, context);
-	
-	  return instance;
-	}
-	
-	// Create the default instance to be exported
-	var axios = createInstance(defaults);
-	
-	// Expose Axios class to allow class inheritance
-	axios.Axios = Axios;
-	
-	// Factory for creating new instances
-	axios.create = function create(instanceConfig) {
-	  return createInstance(utils.merge(defaults, instanceConfig));
-	};
-	
-	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(75);
-	axios.CancelToken = __webpack_require__(76);
-	axios.isCancel = __webpack_require__(72);
-	
-	// Expose all/spread
-	axios.all = function all(promises) {
-	  return Promise.all(promises);
-	};
-	axios.spread = __webpack_require__(77);
-	
-	module.exports = axios;
-	
-	// Allow use of default import syntax in TypeScript
-	module.exports.default = axios;
-
-
-/***/ }),
-/* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var bind = __webpack_require__(56);
-	
-	/*global toString:true*/
-	
-	// utils is a library of generic helper functions non-specific to axios
-	
-	var toString = Object.prototype.toString;
-	
-	/**
-	 * Determine if a value is an Array
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an Array, otherwise false
-	 */
-	function isArray(val) {
-	  return toString.call(val) === '[object Array]';
-	}
-	
-	/**
-	 * Determine if a value is an ArrayBuffer
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an ArrayBuffer, otherwise false
-	 */
-	function isArrayBuffer(val) {
-	  return toString.call(val) === '[object ArrayBuffer]';
-	}
-	
-	/**
-	 * Determine if a value is a FormData
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an FormData, otherwise false
-	 */
-	function isFormData(val) {
-	  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-	}
-	
-	/**
-	 * Determine if a value is a view on an ArrayBuffer
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
-	 */
-	function isArrayBufferView(val) {
-	  var result;
-	  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-	    result = ArrayBuffer.isView(val);
-	  } else {
-	    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-	  }
-	  return result;
-	}
-	
-	/**
-	 * Determine if a value is a String
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a String, otherwise false
-	 */
-	function isString(val) {
-	  return typeof val === 'string';
-	}
-	
-	/**
-	 * Determine if a value is a Number
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Number, otherwise false
-	 */
-	function isNumber(val) {
-	  return typeof val === 'number';
-	}
-	
-	/**
-	 * Determine if a value is undefined
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if the value is undefined, otherwise false
-	 */
-	function isUndefined(val) {
-	  return typeof val === 'undefined';
-	}
-	
-	/**
-	 * Determine if a value is an Object
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an Object, otherwise false
-	 */
-	function isObject(val) {
-	  return val !== null && typeof val === 'object';
-	}
-	
-	/**
-	 * Determine if a value is a Date
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Date, otherwise false
-	 */
-	function isDate(val) {
-	  return toString.call(val) === '[object Date]';
-	}
-	
-	/**
-	 * Determine if a value is a File
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a File, otherwise false
-	 */
-	function isFile(val) {
-	  return toString.call(val) === '[object File]';
-	}
-	
-	/**
-	 * Determine if a value is a Blob
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Blob, otherwise false
-	 */
-	function isBlob(val) {
-	  return toString.call(val) === '[object Blob]';
-	}
-	
-	/**
-	 * Determine if a value is a Function
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Function, otherwise false
-	 */
-	function isFunction(val) {
-	  return toString.call(val) === '[object Function]';
-	}
-	
-	/**
-	 * Determine if a value is a Stream
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Stream, otherwise false
-	 */
-	function isStream(val) {
-	  return isObject(val) && isFunction(val.pipe);
-	}
-	
-	/**
-	 * Determine if a value is a URLSearchParams object
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a URLSearchParams object, otherwise false
-	 */
-	function isURLSearchParams(val) {
-	  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-	}
-	
-	/**
-	 * Trim excess whitespace off the beginning and end of a string
-	 *
-	 * @param {String} str The String to trim
-	 * @returns {String} The String freed of excess whitespace
-	 */
-	function trim(str) {
-	  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-	}
-	
-	/**
-	 * Determine if we're running in a standard browser environment
-	 *
-	 * This allows axios to run in a web worker, and react-native.
-	 * Both environments support XMLHttpRequest, but not fully standard globals.
-	 *
-	 * web workers:
-	 *  typeof window -> undefined
-	 *  typeof document -> undefined
-	 *
-	 * react-native:
-	 *  typeof document.createElement -> undefined
-	 */
-	function isStandardBrowserEnv() {
-	  return (
-	    typeof window !== 'undefined' &&
-	    typeof document !== 'undefined' &&
-	    typeof document.createElement === 'function'
-	  );
-	}
-	
-	/**
-	 * Iterate over an Array or an Object invoking a function for each item.
-	 *
-	 * If `obj` is an Array callback will be called passing
-	 * the value, index, and complete array for each item.
-	 *
-	 * If 'obj' is an Object callback will be called passing
-	 * the value, key, and complete object for each property.
-	 *
-	 * @param {Object|Array} obj The object to iterate
-	 * @param {Function} fn The callback to invoke for each item
-	 */
-	function forEach(obj, fn) {
-	  // Don't bother if no value provided
-	  if (obj === null || typeof obj === 'undefined') {
-	    return;
-	  }
-	
-	  // Force an array if not already something iterable
-	  if (typeof obj !== 'object' && !isArray(obj)) {
-	    /*eslint no-param-reassign:0*/
-	    obj = [obj];
-	  }
-	
-	  if (isArray(obj)) {
-	    // Iterate over array values
-	    for (var i = 0, l = obj.length; i < l; i++) {
-	      fn.call(null, obj[i], i, obj);
-	    }
-	  } else {
-	    // Iterate over object keys
-	    for (var key in obj) {
-	      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-	        fn.call(null, obj[key], key, obj);
-	      }
-	    }
-	  }
-	}
-	
-	/**
-	 * Accepts varargs expecting each argument to be an object, then
-	 * immutably merges the properties of each object and returns result.
-	 *
-	 * When multiple objects contain the same key the later object in
-	 * the arguments list will take precedence.
-	 *
-	 * Example:
-	 *
-	 * ```js
-	 * var result = merge({foo: 123}, {foo: 456});
-	 * console.log(result.foo); // outputs 456
-	 * ```
-	 *
-	 * @param {Object} obj1 Object to merge
-	 * @returns {Object} Result of all merge properties
-	 */
-	function merge(/* obj1, obj2, obj3, ... */) {
-	  var result = {};
-	  function assignValue(val, key) {
-	    if (typeof result[key] === 'object' && typeof val === 'object') {
-	      result[key] = merge(result[key], val);
-	    } else {
-	      result[key] = val;
-	    }
-	  }
-	
-	  for (var i = 0, l = arguments.length; i < l; i++) {
-	    forEach(arguments[i], assignValue);
-	  }
-	  return result;
-	}
-	
-	/**
-	 * Extends object a by mutably adding to it the properties of object b.
-	 *
-	 * @param {Object} a The object to be extended
-	 * @param {Object} b The object to copy properties from
-	 * @param {Object} thisArg The object to bind function to
-	 * @return {Object} The resulting value of object a
-	 */
-	function extend(a, b, thisArg) {
-	  forEach(b, function assignValue(val, key) {
-	    if (thisArg && typeof val === 'function') {
-	      a[key] = bind(val, thisArg);
-	    } else {
-	      a[key] = val;
-	    }
-	  });
-	  return a;
-	}
-	
-	module.exports = {
-	  isArray: isArray,
-	  isArrayBuffer: isArrayBuffer,
-	  isFormData: isFormData,
-	  isArrayBufferView: isArrayBufferView,
-	  isString: isString,
-	  isNumber: isNumber,
-	  isObject: isObject,
-	  isUndefined: isUndefined,
-	  isDate: isDate,
-	  isFile: isFile,
-	  isBlob: isBlob,
-	  isFunction: isFunction,
-	  isStream: isStream,
-	  isURLSearchParams: isURLSearchParams,
-	  isStandardBrowserEnv: isStandardBrowserEnv,
-	  forEach: forEach,
-	  merge: merge,
-	  extend: extend,
-	  trim: trim
-	};
-
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	module.exports = function bind(fn, thisArg) {
-	  return function wrap() {
-	    var args = new Array(arguments.length);
-	    for (var i = 0; i < args.length; i++) {
-	      args[i] = arguments[i];
-	    }
-	    return fn.apply(thisArg, args);
-	  };
-	};
-
-
-/***/ }),
-/* 57 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var defaults = __webpack_require__(58);
-	var utils = __webpack_require__(55);
-	var InterceptorManager = __webpack_require__(69);
-	var dispatchRequest = __webpack_require__(70);
-	var isAbsoluteURL = __webpack_require__(73);
-	var combineURLs = __webpack_require__(74);
-	
-	/**
-	 * Create a new instance of Axios
-	 *
-	 * @param {Object} instanceConfig The default config for the instance
-	 */
-	function Axios(instanceConfig) {
-	  this.defaults = instanceConfig;
-	  this.interceptors = {
-	    request: new InterceptorManager(),
-	    response: new InterceptorManager()
-	  };
-	}
-	
-	/**
-	 * Dispatch a request
-	 *
-	 * @param {Object} config The config specific for this request (merged with this.defaults)
-	 */
-	Axios.prototype.request = function request(config) {
-	  /*eslint no-param-reassign:0*/
-	  // Allow for axios('example/url'[, config]) a la fetch API
-	  if (typeof config === 'string') {
-	    config = utils.merge({
-	      url: arguments[0]
-	    }, arguments[1]);
-	  }
-	
-	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
-	
-	  // Support baseURL config
-	  if (config.baseURL && !isAbsoluteURL(config.url)) {
-	    config.url = combineURLs(config.baseURL, config.url);
-	  }
-	
-	  // Hook up interceptors middleware
-	  var chain = [dispatchRequest, undefined];
-	  var promise = Promise.resolve(config);
-	
-	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-	    chain.push(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  while (chain.length) {
-	    promise = promise.then(chain.shift(), chain.shift());
-	  }
-	
-	  return promise;
-	};
-	
-	// Provide aliases for supported request methods
-	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url
-	    }));
-	  };
-	});
-	
-	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, data, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url,
-	      data: data
-	    }));
-	  };
-	});
-	
-	module.exports = Axios;
-
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	
-	var utils = __webpack_require__(55);
-	var normalizeHeaderName = __webpack_require__(59);
-	
-	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-	var DEFAULT_CONTENT_TYPE = {
-	  'Content-Type': 'application/x-www-form-urlencoded'
-	};
-	
-	function setContentTypeIfUnset(headers, value) {
-	  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-	    headers['Content-Type'] = value;
-	  }
-	}
-	
-	function getDefaultAdapter() {
-	  var adapter;
-	  if (typeof XMLHttpRequest !== 'undefined') {
-	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(60);
-	  } else if (typeof process !== 'undefined') {
-	    // For node use HTTP adapter
-	    adapter = __webpack_require__(60);
-	  }
-	  return adapter;
-	}
-	
-	var defaults = {
-	  adapter: getDefaultAdapter(),
-	
-	  transformRequest: [function transformRequest(data, headers) {
-	    normalizeHeaderName(headers, 'Content-Type');
-	    if (utils.isFormData(data) ||
-	      utils.isArrayBuffer(data) ||
-	      utils.isStream(data) ||
-	      utils.isFile(data) ||
-	      utils.isBlob(data)
-	    ) {
-	      return data;
-	    }
-	    if (utils.isArrayBufferView(data)) {
-	      return data.buffer;
-	    }
-	    if (utils.isURLSearchParams(data)) {
-	      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-	      return data.toString();
-	    }
-	    if (utils.isObject(data)) {
-	      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-	      return JSON.stringify(data);
-	    }
-	    return data;
-	  }],
-	
-	  transformResponse: [function transformResponse(data) {
-	    /*eslint no-param-reassign:0*/
-	    if (typeof data === 'string') {
-	      data = data.replace(PROTECTION_PREFIX, '');
-	      try {
-	        data = JSON.parse(data);
-	      } catch (e) { /* Ignore */ }
-	    }
-	    return data;
-	  }],
-	
-	  timeout: 0,
-	
-	  xsrfCookieName: 'XSRF-TOKEN',
-	  xsrfHeaderName: 'X-XSRF-TOKEN',
-	
-	  maxContentLength: -1,
-	
-	  validateStatus: function validateStatus(status) {
-	    return status >= 200 && status < 300;
-	  }
-	};
-	
-	defaults.headers = {
-	  common: {
-	    'Accept': 'application/json, text/plain, */*'
-	  }
-	};
-	
-	utils.forEach(['delete', 'get', 'head'], function forEachMehtodNoData(method) {
-	  defaults.headers[method] = {};
-	});
-	
-	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-	  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-	});
-	
-	module.exports = defaults;
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	module.exports = function normalizeHeaderName(headers, normalizedName) {
-	  utils.forEach(headers, function processHeader(value, name) {
-	    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-	      headers[normalizedName] = value;
-	      delete headers[name];
-	    }
-	  });
-	};
-
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	
-	var utils = __webpack_require__(55);
-	var settle = __webpack_require__(61);
-	var buildURL = __webpack_require__(64);
-	var parseHeaders = __webpack_require__(65);
-	var isURLSameOrigin = __webpack_require__(66);
-	var createError = __webpack_require__(62);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(67);
-	
-	module.exports = function xhrAdapter(config) {
-	  return new Promise(function dispatchXhrRequest(resolve, reject) {
-	    var requestData = config.data;
-	    var requestHeaders = config.headers;
-	
-	    if (utils.isFormData(requestData)) {
-	      delete requestHeaders['Content-Type']; // Let the browser set it
-	    }
-	
-	    var request = new XMLHttpRequest();
-	    var loadEvent = 'onreadystatechange';
-	    var xDomain = false;
-	
-	    // For IE 8/9 CORS support
-	    // Only supports POST and GET calls and doesn't returns the response headers.
-	    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-	    if (process.env.NODE_ENV !== 'test' &&
-	        typeof window !== 'undefined' &&
-	        window.XDomainRequest && !('withCredentials' in request) &&
-	        !isURLSameOrigin(config.url)) {
-	      request = new window.XDomainRequest();
-	      loadEvent = 'onload';
-	      xDomain = true;
-	      request.onprogress = function handleProgress() {};
-	      request.ontimeout = function handleTimeout() {};
-	    }
-	
-	    // HTTP basic authentication
-	    if (config.auth) {
-	      var username = config.auth.username || '';
-	      var password = config.auth.password || '';
-	      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-	    }
-	
-	    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-	
-	    // Set the request timeout in MS
-	    request.timeout = config.timeout;
-	
-	    // Listen for ready state
-	    request[loadEvent] = function handleLoad() {
-	      if (!request || (request.readyState !== 4 && !xDomain)) {
-	        return;
-	      }
-	
-	      // The request errored out and we didn't get a response, this will be
-	      // handled by onerror instead
-	      // With one exception: request that using file: protocol, most browsers
-	      // will return status as 0 even though it's a successful request
-	      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-	        return;
-	      }
-	
-	      // Prepare the response
-	      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-	      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-	      var response = {
-	        data: responseData,
-	        // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-	        status: request.status === 1223 ? 204 : request.status,
-	        statusText: request.status === 1223 ? 'No Content' : request.statusText,
-	        headers: responseHeaders,
-	        config: config,
-	        request: request
-	      };
-	
-	      settle(resolve, reject, response);
-	
-	      // Clean up request
-	      request = null;
-	    };
-	
-	    // Handle low level network errors
-	    request.onerror = function handleError() {
-	      // Real errors are hidden from us by the browser
-	      // onerror should only fire if it's a network error
-	      reject(createError('Network Error', config));
-	
-	      // Clean up request
-	      request = null;
-	    };
-	
-	    // Handle timeout
-	    request.ontimeout = function handleTimeout() {
-	      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED'));
-	
-	      // Clean up request
-	      request = null;
-	    };
-	
-	    // Add xsrf header
-	    // This is only done if running in a standard browser environment.
-	    // Specifically not if we're in a web worker, or react-native.
-	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(68);
-	
-	      // Add xsrf header
-	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-	          cookies.read(config.xsrfCookieName) :
-	          undefined;
-	
-	      if (xsrfValue) {
-	        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-	      }
-	    }
-	
-	    // Add headers to the request
-	    if ('setRequestHeader' in request) {
-	      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-	        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-	          // Remove Content-Type if data is undefined
-	          delete requestHeaders[key];
-	        } else {
-	          // Otherwise add header to the request
-	          request.setRequestHeader(key, val);
-	        }
-	      });
-	    }
-	
-	    // Add withCredentials to request if needed
-	    if (config.withCredentials) {
-	      request.withCredentials = true;
-	    }
-	
-	    // Add responseType to request if needed
-	    if (config.responseType) {
-	      try {
-	        request.responseType = config.responseType;
-	      } catch (e) {
-	        if (request.responseType !== 'json') {
-	          throw e;
-	        }
-	      }
-	    }
-	
-	    // Handle progress if needed
-	    if (typeof config.onDownloadProgress === 'function') {
-	      request.addEventListener('progress', config.onDownloadProgress);
-	    }
-	
-	    // Not all browsers support upload events
-	    if (typeof config.onUploadProgress === 'function' && request.upload) {
-	      request.upload.addEventListener('progress', config.onUploadProgress);
-	    }
-	
-	    if (config.cancelToken) {
-	      // Handle cancellation
-	      config.cancelToken.promise.then(function onCanceled(cancel) {
-	        if (!request) {
-	          return;
-	        }
-	
-	        request.abort();
-	        reject(cancel);
-	        // Clean up request
-	        request = null;
-	      });
-	    }
-	
-	    if (requestData === undefined) {
-	      requestData = null;
-	    }
-	
-	    // Send the request
-	    request.send(requestData);
-	  });
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
-
-/***/ }),
-/* 61 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var createError = __webpack_require__(62);
-	
-	/**
-	 * Resolve or reject a Promise based on response status.
-	 *
-	 * @param {Function} resolve A function that resolves the promise.
-	 * @param {Function} reject A function that rejects the promise.
-	 * @param {object} response The response.
-	 */
-	module.exports = function settle(resolve, reject, response) {
-	  var validateStatus = response.config.validateStatus;
-	  // Note: status is not exposed by XDomainRequest
-	  if (!response.status || !validateStatus || validateStatus(response.status)) {
-	    resolve(response);
-	  } else {
-	    reject(createError(
-	      'Request failed with status code ' + response.status,
-	      response.config,
-	      null,
-	      response
-	    ));
-	  }
-	};
-
-
-/***/ }),
-/* 62 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var enhanceError = __webpack_require__(63);
-	
-	/**
-	 * Create an Error with the specified message, config, error code, and response.
-	 *
-	 * @param {string} message The error message.
-	 * @param {Object} config The config.
-	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
-	 @ @param {Object} [response] The response.
-	 * @returns {Error} The created error.
-	 */
-	module.exports = function createError(message, config, code, response) {
-	  var error = new Error(message);
-	  return enhanceError(error, config, code, response);
-	};
-
-
-/***/ }),
-/* 63 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Update an Error with the specified config, error code, and response.
-	 *
-	 * @param {Error} error The error to update.
-	 * @param {Object} config The config.
-	 * @param {string} [code] The error code (for example, 'ECONNABORTED').
-	 @ @param {Object} [response] The response.
-	 * @returns {Error} The error.
-	 */
-	module.exports = function enhanceError(error, config, code, response) {
-	  error.config = config;
-	  if (code) {
-	    error.code = code;
-	  }
-	  error.response = response;
-	  return error;
-	};
-
-
-/***/ }),
-/* 64 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	function encode(val) {
-	  return encodeURIComponent(val).
-	    replace(/%40/gi, '@').
-	    replace(/%3A/gi, ':').
-	    replace(/%24/g, '$').
-	    replace(/%2C/gi, ',').
-	    replace(/%20/g, '+').
-	    replace(/%5B/gi, '[').
-	    replace(/%5D/gi, ']');
-	}
-	
-	/**
-	 * Build a URL by appending params to the end
-	 *
-	 * @param {string} url The base of the url (e.g., http://www.google.com)
-	 * @param {object} [params] The params to be appended
-	 * @returns {string} The formatted url
-	 */
-	module.exports = function buildURL(url, params, paramsSerializer) {
-	  /*eslint no-param-reassign:0*/
-	  if (!params) {
-	    return url;
-	  }
-	
-	  var serializedParams;
-	  if (paramsSerializer) {
-	    serializedParams = paramsSerializer(params);
-	  } else if (utils.isURLSearchParams(params)) {
-	    serializedParams = params.toString();
-	  } else {
-	    var parts = [];
-	
-	    utils.forEach(params, function serialize(val, key) {
-	      if (val === null || typeof val === 'undefined') {
-	        return;
-	      }
-	
-	      if (utils.isArray(val)) {
-	        key = key + '[]';
-	      }
-	
-	      if (!utils.isArray(val)) {
-	        val = [val];
-	      }
-	
-	      utils.forEach(val, function parseValue(v) {
-	        if (utils.isDate(v)) {
-	          v = v.toISOString();
-	        } else if (utils.isObject(v)) {
-	          v = JSON.stringify(v);
-	        }
-	        parts.push(encode(key) + '=' + encode(v));
-	      });
-	    });
-	
-	    serializedParams = parts.join('&');
-	  }
-	
-	  if (serializedParams) {
-	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-	  }
-	
-	  return url;
-	};
-
-
-/***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	/**
-	 * Parse headers into an object
-	 *
-	 * ```
-	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
-	 * Content-Type: application/json
-	 * Connection: keep-alive
-	 * Transfer-Encoding: chunked
-	 * ```
-	 *
-	 * @param {String} headers Headers needing to be parsed
-	 * @returns {Object} Headers parsed into an object
-	 */
-	module.exports = function parseHeaders(headers) {
-	  var parsed = {};
-	  var key;
-	  var val;
-	  var i;
-	
-	  if (!headers) { return parsed; }
-	
-	  utils.forEach(headers.split('\n'), function parser(line) {
-	    i = line.indexOf(':');
-	    key = utils.trim(line.substr(0, i)).toLowerCase();
-	    val = utils.trim(line.substr(i + 1));
-	
-	    if (key) {
-	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-	    }
-	  });
-	
-	  return parsed;
-	};
-
-
-/***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs have full support of the APIs needed to test
-	  // whether the request URL is of the same origin as current location.
-	  (function standardBrowserEnv() {
-	    var msie = /(msie|trident)/i.test(navigator.userAgent);
-	    var urlParsingNode = document.createElement('a');
-	    var originURL;
-	
-	    /**
-	    * Parse a URL to discover it's components
-	    *
-	    * @param {String} url The URL to be parsed
-	    * @returns {Object}
-	    */
-	    function resolveURL(url) {
-	      var href = url;
-	
-	      if (msie) {
-	        // IE needs attribute set twice to normalize properties
-	        urlParsingNode.setAttribute('href', href);
-	        href = urlParsingNode.href;
-	      }
-	
-	      urlParsingNode.setAttribute('href', href);
-	
-	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-	      return {
-	        href: urlParsingNode.href,
-	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-	        host: urlParsingNode.host,
-	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-	        hostname: urlParsingNode.hostname,
-	        port: urlParsingNode.port,
-	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-	                  urlParsingNode.pathname :
-	                  '/' + urlParsingNode.pathname
-	      };
-	    }
-	
-	    originURL = resolveURL(window.location.href);
-	
-	    /**
-	    * Determine if a URL shares the same origin as the current location
-	    *
-	    * @param {String} requestURL The URL to test
-	    * @returns {boolean} True if URL shares the same origin, otherwise false
-	    */
-	    return function isURLSameOrigin(requestURL) {
-	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-	      return (parsed.protocol === originURL.protocol &&
-	            parsed.host === originURL.host);
-	    };
-	  })() :
-	
-	  // Non standard browser envs (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return function isURLSameOrigin() {
-	      return true;
-	    };
-	  })()
-	);
-
-
-/***/ }),
-/* 67 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-	
-	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-	
-	function E() {
-	  this.message = 'String contains an invalid character';
-	}
-	E.prototype = new Error;
-	E.prototype.code = 5;
-	E.prototype.name = 'InvalidCharacterError';
-	
-	function btoa(input) {
-	  var str = String(input);
-	  var output = '';
-	  for (
-	    // initialize result and counter
-	    var block, charCode, idx = 0, map = chars;
-	    // if the next str index does not exist:
-	    //   change the mapping table to "="
-	    //   check if d has no fractional digits
-	    str.charAt(idx | 0) || (map = '=', idx % 1);
-	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-	  ) {
-	    charCode = str.charCodeAt(idx += 3 / 4);
-	    if (charCode > 0xFF) {
-	      throw new E();
-	    }
-	    block = block << 8 | charCode;
-	  }
-	  return output;
-	}
-	
-	module.exports = btoa;
-
-
-/***/ }),
-/* 68 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs support document.cookie
-	  (function standardBrowserEnv() {
-	    return {
-	      write: function write(name, value, expires, path, domain, secure) {
-	        var cookie = [];
-	        cookie.push(name + '=' + encodeURIComponent(value));
-	
-	        if (utils.isNumber(expires)) {
-	          cookie.push('expires=' + new Date(expires).toGMTString());
-	        }
-	
-	        if (utils.isString(path)) {
-	          cookie.push('path=' + path);
-	        }
-	
-	        if (utils.isString(domain)) {
-	          cookie.push('domain=' + domain);
-	        }
-	
-	        if (secure === true) {
-	          cookie.push('secure');
-	        }
-	
-	        document.cookie = cookie.join('; ');
-	      },
-	
-	      read: function read(name) {
-	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-	        return (match ? decodeURIComponent(match[3]) : null);
-	      },
-	
-	      remove: function remove(name) {
-	        this.write(name, '', Date.now() - 86400000);
-	      }
-	    };
-	  })() :
-	
-	  // Non standard browser env (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return {
-	      write: function write() {},
-	      read: function read() { return null; },
-	      remove: function remove() {}
-	    };
-	  })()
-	);
-
-
-/***/ }),
-/* 69 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	function InterceptorManager() {
-	  this.handlers = [];
-	}
-	
-	/**
-	 * Add a new interceptor to the stack
-	 *
-	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
-	 * @param {Function} rejected The function to handle `reject` for a `Promise`
-	 *
-	 * @return {Number} An ID used to remove interceptor later
-	 */
-	InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-	  this.handlers.push({
-	    fulfilled: fulfilled,
-	    rejected: rejected
-	  });
-	  return this.handlers.length - 1;
-	};
-	
-	/**
-	 * Remove an interceptor from the stack
-	 *
-	 * @param {Number} id The ID that was returned by `use`
-	 */
-	InterceptorManager.prototype.eject = function eject(id) {
-	  if (this.handlers[id]) {
-	    this.handlers[id] = null;
-	  }
-	};
-	
-	/**
-	 * Iterate over all the registered interceptors
-	 *
-	 * This method is particularly useful for skipping over any
-	 * interceptors that may have become `null` calling `eject`.
-	 *
-	 * @param {Function} fn The function to call for each interceptor
-	 */
-	InterceptorManager.prototype.forEach = function forEach(fn) {
-	  utils.forEach(this.handlers, function forEachHandler(h) {
-	    if (h !== null) {
-	      fn(h);
-	    }
-	  });
-	};
-	
-	module.exports = InterceptorManager;
-
-
-/***/ }),
-/* 70 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	var transformData = __webpack_require__(71);
-	var isCancel = __webpack_require__(72);
-	var defaults = __webpack_require__(58);
-	
-	/**
-	 * Throws a `Cancel` if cancellation has been requested.
-	 */
-	function throwIfCancellationRequested(config) {
-	  if (config.cancelToken) {
-	    config.cancelToken.throwIfRequested();
-	  }
-	}
-	
-	/**
-	 * Dispatch a request to the server using the configured adapter.
-	 *
-	 * @param {object} config The config that is to be used for the request
-	 * @returns {Promise} The Promise to be fulfilled
-	 */
-	module.exports = function dispatchRequest(config) {
-	  throwIfCancellationRequested(config);
-	
-	  // Ensure headers exist
-	  config.headers = config.headers || {};
-	
-	  // Transform request data
-	  config.data = transformData(
-	    config.data,
-	    config.headers,
-	    config.transformRequest
-	  );
-	
-	  // Flatten headers
-	  config.headers = utils.merge(
-	    config.headers.common || {},
-	    config.headers[config.method] || {},
-	    config.headers || {}
-	  );
-	
-	  utils.forEach(
-	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-	    function cleanHeaderConfig(method) {
-	      delete config.headers[method];
-	    }
-	  );
-	
-	  var adapter = config.adapter || defaults.adapter;
-	
-	  return adapter(config).then(function onAdapterResolution(response) {
-	    throwIfCancellationRequested(config);
-	
-	    // Transform response data
-	    response.data = transformData(
-	      response.data,
-	      response.headers,
-	      config.transformResponse
-	    );
-	
-	    return response;
-	  }, function onAdapterRejection(reason) {
-	    if (!isCancel(reason)) {
-	      throwIfCancellationRequested(config);
-	
-	      // Transform response data
-	      if (reason && reason.response) {
-	        reason.response.data = transformData(
-	          reason.response.data,
-	          reason.response.headers,
-	          config.transformResponse
-	        );
-	      }
-	    }
-	
-	    return Promise.reject(reason);
-	  });
-	};
-
-
-/***/ }),
-/* 71 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(55);
-	
-	/**
-	 * Transform the data for a request or a response
-	 *
-	 * @param {Object|String} data The data to be transformed
-	 * @param {Array} headers The headers for the request or response
-	 * @param {Array|Function} fns A single function or Array of functions
-	 * @returns {*} The resulting transformed data
-	 */
-	module.exports = function transformData(data, headers, fns) {
-	  /*eslint no-param-reassign:0*/
-	  utils.forEach(fns, function transform(fn) {
-	    data = fn(data, headers);
-	  });
-	
-	  return data;
-	};
-
-
-/***/ }),
-/* 72 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	module.exports = function isCancel(value) {
-	  return !!(value && value.__CANCEL__);
-	};
-
-
-/***/ }),
-/* 73 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Determines whether the specified URL is absolute
-	 *
-	 * @param {string} url The URL to test
-	 * @returns {boolean} True if the specified URL is absolute, otherwise false
-	 */
-	module.exports = function isAbsoluteURL(url) {
-	  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-	  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-	  // by any combination of letters, digits, plus, period, or hyphen.
-	  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-	};
-
-
-/***/ }),
-/* 74 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Creates a new URL by combining the specified URLs
-	 *
-	 * @param {string} baseURL The base URL
-	 * @param {string} relativeURL The relative URL
-	 * @returns {string} The combined URL
-	 */
-	module.exports = function combineURLs(baseURL, relativeURL) {
-	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
-	};
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * A `Cancel` is an object that is thrown when an operation is canceled.
-	 *
-	 * @class
-	 * @param {string=} message The message.
-	 */
-	function Cancel(message) {
-	  this.message = message;
-	}
-	
-	Cancel.prototype.toString = function toString() {
-	  return 'Cancel' + (this.message ? ': ' + this.message : '');
-	};
-	
-	Cancel.prototype.__CANCEL__ = true;
-	
-	module.exports = Cancel;
-
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var Cancel = __webpack_require__(75);
-	
-	/**
-	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
-	 *
-	 * @class
-	 * @param {Function} executor The executor function.
-	 */
-	function CancelToken(executor) {
-	  if (typeof executor !== 'function') {
-	    throw new TypeError('executor must be a function.');
-	  }
-	
-	  var resolvePromise;
-	  this.promise = new Promise(function promiseExecutor(resolve) {
-	    resolvePromise = resolve;
-	  });
-	
-	  var token = this;
-	  executor(function cancel(message) {
-	    if (token.reason) {
-	      // Cancellation has already been requested
-	      return;
-	    }
-	
-	    token.reason = new Cancel(message);
-	    resolvePromise(token.reason);
-	  });
-	}
-	
-	/**
-	 * Throws a `Cancel` if cancellation has been requested.
-	 */
-	CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-	  if (this.reason) {
-	    throw this.reason;
-	  }
-	};
-	
-	/**
-	 * Returns an object that contains a new `CancelToken` and a function that, when called,
-	 * cancels the `CancelToken`.
-	 */
-	CancelToken.source = function source() {
-	  var cancel;
-	  var token = new CancelToken(function executor(c) {
-	    cancel = c;
-	  });
-	  return {
-	    token: token,
-	    cancel: cancel
-	  };
-	};
-	
-	module.exports = CancelToken;
-
-
-/***/ }),
-/* 77 */
-/***/ (function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Syntactic sugar for invoking a function and expanding an array for arguments.
-	 *
-	 * Common use case would be to use `Function.prototype.apply`.
-	 *
-	 *  ```js
-	 *  function f(x, y, z) {}
-	 *  var args = [1, 2, 3];
-	 *  f.apply(null, args);
-	 *  ```
-	 *
-	 * With `spread` this example can be re-written.
-	 *
-	 *  ```js
-	 *  spread(function(x, y, z) {})([1, 2, 3]);
-	 *  ```
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	module.exports = function spread(callback) {
-	  return function wrap(arr) {
-	    return callback.apply(null, arr);
-	  };
-	};
-
-
-/***/ }),
-/* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var abstract_crud_1 = __webpack_require__(51);
-	var minicast_1 = __webpack_require__(47);
-	var AbstractCollection = (function (_super) {
-	    __extends(AbstractCollection, _super);
-	    function AbstractCollection(api, initialCast, childrenCasts) {
-	        var _this = _super.call(this, api, null, initialCast, childrenCasts) || this;
-	        _this.data = [];
-	        _this.model = _this.data;
-	        _this.customMixin = _this.mixin;
-	        return _this;
-	    }
-	    AbstractCollection.prototype.mixin = function (data) {
-	        var _this = this;
-	        if (!data || !(data instanceof Array)) {
-	            throw "[Crud][Collection] An Array payload is expected.";
-	        }
-	        this.data = [];
-	        data.forEach(function (item) {
-	            var instance = {};
-	            if (_this.initialCast) {
-	                if (_this.initialCast instanceof Function) {
-	                    instance = new _this.initialCast();
-	                }
-	                else {
-	                    instance = new ((_a = _this.initialCast.type).bind.apply(_a, [void 0].concat(_this.initialCast.deps)))();
-	                }
-	            }
-	            minicast_1.Mix.extend(instance, item, _this.childrenCasts);
-	            _this.data.push(instance);
-	            var _a;
-	        });
-	    };
-	    return AbstractCollection;
-	}(abstract_crud_1.AbstractCrud));
-	exports.AbstractCollection = AbstractCollection;
-
-
-/***/ }),
-/* 79 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var axios_1 = __webpack_require__(53);
-	var abstract_collection_1 = __webpack_require__(78);
-	var Collection = (function (_super) {
-	    __extends(Collection, _super);
-	    function Collection(api, initialCast, childrenCasts) {
-	        var _this = _super.call(this, api, initialCast, childrenCasts) || this;
-	        _this.http = axios_1.default;
-	        return _this;
-	    }
-	    return Collection;
-	}(abstract_collection_1.AbstractCollection));
-	exports.Collection = Collection;
-
-
-/***/ }),
-/* 80 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var abstract_crud_1 = __webpack_require__(51);
-	var minicast_1 = __webpack_require__(47);
-	var AbstractModel = (function (_super) {
-	    __extends(AbstractModel, _super);
-	    function AbstractModel(api, childrenCasts) {
-	        var _this = _super.call(this, api, null, null, childrenCasts) || this;
-	        _this.model = _this;
-	        _this.customMixin = _this.mixin;
-	        return _this;
-	    }
-	    AbstractModel.prototype.mixin = function (data) {
-	        if (!data || !(data instanceof Object)) {
-	            throw "[Crud][Collection] An Object payload is expected.";
-	        }
-	        minicast_1.Mix.extend(this, data, this.childrenCasts);
-	    };
-	    return AbstractModel;
-	}(abstract_crud_1.AbstractCrud));
-	exports.AbstractModel = AbstractModel;
-
-
-/***/ }),
-/* 81 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var axios_1 = __webpack_require__(53);
-	var abstract_model_1 = __webpack_require__(80);
-	var Model = (function (_super) {
-	    __extends(Model, _super);
-	    function Model(api, childrenCasts) {
-	        var _this = _super.call(this, api, childrenCasts) || this;
-	        _this.http = axios_1.default;
-	        return _this;
-	    }
-	    return Model;
-	}(abstract_model_1.AbstractModel));
-	exports.Model = Model;
-
-
-/***/ }),
-/* 82 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments)).next());
-	    });
-	};
-	var __generator = (this && this.__generator) || function (thisArg, body) {
-	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
-	    return { next: verb(0), "throw": verb(1), "return": verb(2) };
-	    function verb(n) { return function (v) { return step([n, v]); }; }
-	    function step(op) {
-	        if (f) throw new TypeError("Generator is already executing.");
-	        while (_) try {
-	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-	            if (y = 0, t) op = [0, t.value];
-	            switch (op[0]) {
-	                case 0: case 1: t = op; break;
-	                case 4: _.label++; return { value: op[1], done: false };
-	                case 5: _.label++; y = op[1]; op = [0]; continue;
-	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-	                default:
-	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-	                    if (t[2]) _.ops.pop();
-	                    _.trys.pop(); continue;
-	            }
-	            op = body.call(thisArg, _);
-	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-	    }
-	};
-	var eventer_1 = __webpack_require__(48);
-	var minicast_1 = __webpack_require__(47);
-	var axios_1 = __webpack_require__(53);
-	/*
-	 * Tool to manage a single list provider used by multiple objects (to avoid multiple call to a same path)
-	 * Usage :
-	 * let provider = new Provider<T>(path, MyClass);
-	 * function a(){
-	 *    //get data from provider
-	 *    let data = await provider.data();
-	 * }
-	 *
-	 * function b(){
-	 *    let data = await provider.data();
-	 *    //get data when a refresh happens
-	 *    provider.on('refresh', (newData) => data = newData));
-	 * }
-	 *
-	 * //force provider refresh (after data invalidation)
-	 * setTimeout(() => provider.refresh(), 50000);
-	 *
-	 * a();
-	 * b();
-	*/
-	var Provider = (function () {
-	    function Provider(path, className) {
-	        this.path = path;
-	        this.className = className;
-	        this._data = [];
-	        this.eventer = new eventer_1.Eventer();
-	    }
-	    Provider.prototype.data = function () {
-	        return __awaiter(this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        if (!(!this.isSynced && !this.syncing))
-	                            return [3 /*break*/, 2];
-	                        return [4 /*yield*/, this.sync()];
-	                    case 1:
-	                        _a.sent();
-	                        _a.label = 2;
-	                    case 2:
-	                        if (!this.syncing)
-	                            return [3 /*break*/, 4];
-	                        return [4 /*yield*/, this.syncDone()];
-	                    case 3:
-	                        _a.sent();
-	                        _a.label = 4;
-	                    case 4: return [2 /*return*/, this._data];
-	                }
-	            });
-	        });
-	    };
-	    Provider.prototype.syncDone = function () {
-	        return __awaiter(this, void 0, void 0, function () {
-	            var _this = this;
-	            return __generator(this, function (_a) {
-	                return [2 /*return*/, new Promise(function (resolve, reject) {
-	                        _this.eventer.once('sync', function () { return resolve(); });
-	                    })];
-	            });
-	        });
-	    };
-	    Provider.prototype.sync = function () {
-	        return __awaiter(this, void 0, void 0, function () {
-	            var response;
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        this.syncing = true;
-	                        return [4 /*yield*/, axios_1.default.get(this.path)];
-	                    case 1:
-	                        response = _a.sent();
-	                        this._data = minicast_1.Mix.castArrayAs(this.className, response.data);
-	                        this.isSynced = true;
-	                        this.eventer.trigger('sync');
-	                        this.syncing = false;
-	                        return [2 /*return*/];
-	                }
-	            });
-	        });
-	    };
-	    Provider.prototype.refresh = function () {
-	        return __awaiter(this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        this.isSynced = false;
-	                        return [4 /*yield*/, this.sync()];
-	                    case 1:
-	                        _a.sent();
-	                        this.eventer.trigger('refresh');
-	                        return [2 /*return*/];
-	                }
-	            });
-	        });
-	    };
-	    Provider.prototype.push = function (data) {
-	        this._data.push(data);
-	    };
-	    Provider.prototype.remove = function (data) {
-	        var index = this._data.indexOf(data);
-	        this._data.splice(index, 1);
-	    };
-	    return Provider;
-	}());
-	exports.Provider = Provider;
-
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var axios_1 = __webpack_require__(53);
-	var autosaved = [];
-	var loopStarted = false;
-	var token;
-	var loop = function () {
-	    autosaved.forEach(function (item) {
-	        if (item._backup !== JSON.stringify(item.model)) {
-	            if (item.fn) {
-	                item.fn();
-	            }
-	            else {
-	                axios_1.default[item.method](item.path, item.model);
-	            }
-	            item._backup = JSON.stringify(item.model);
-	        }
-	    });
-	    loopStarted = true;
-	    token = setTimeout(loop, 500);
-	};
-	var Autosave = (function () {
-	    function Autosave() {
-	    }
-	    Autosave.watch = function (path, model, method) {
-	        if (method === void 0) { method = 'put'; }
-	        if (autosaved.findIndex(function (e) { return e.model === model && e.path === path; }) !== -1) {
-	            return;
-	        }
-	        var autosave;
-	        if (typeof path === 'string') {
-	            autosave = {
-	                model: model,
-	                path: path,
-	                method: method
-	            };
-	        }
-	        else {
-	            autosave = {
-	                model: model,
-	                fn: path,
-	                method: method
-	            };
-	        }
-	        autosaved.push(autosave);
-	        if (!loopStarted) {
-	            loop();
-	        }
-	    };
-	    Autosave.unwatch = function (model) {
-	        var index = autosaved.findIndex(function (e) { return e.model === model; });
-	        autosaved.splice(index, 1);
-	        if (autosaved.length === 0) {
-	            this.unwatchAll();
-	        }
-	    };
-	    Autosave.unwatchAll = function () {
-	        autosaved = [];
-	        clearTimeout(token);
-	        loopStarted = false;
-	    };
-	    return Autosave;
-	}());
-	exports.Autosave = Autosave;
-
-
-/***/ }),
 /* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Homework_model_1 = __webpack_require__(35);
-	var Subject_model_1 = __webpack_require__(38);
-	var tools_1 = __webpack_require__(3);
-	var utils_service_1 = __webpack_require__(44);
+	var Homework_model_1 = __webpack_require__(6);
+	var Subject_model_1 = __webpack_require__(77);
+	var tools_1 = __webpack_require__(73);
+	var utils_service_1 = __webpack_require__(83);
 	var attachment_service_1 = __webpack_require__(85);
-	var axios_1 = __webpack_require__(5);
+	var axios_1 = __webpack_require__(47);
 	/*
 	 * Lesson service as class
 	 * used to manipulate Lesson model
@@ -7592,7 +7780,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Attachment_model_1 = __webpack_require__(33);
+	var Attachment_model_1 = __webpack_require__(4);
 	/*
 	 * Attachement service as class
 	 * used to manipulate Attachement model
@@ -7651,7 +7839,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
+	var axios_1 = __webpack_require__(47);
 	/*
 	* Audience service as class
 	* used to manipulate Audience model
@@ -7751,7 +7939,7 @@
 	var entcore_1 = __webpack_require__(1);
 	var secure_service_1 = __webpack_require__(86);
 	var modelweek_service_1 = __webpack_require__(90);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	exports.MainCalendarPageController = entcore_1.ng.controller('MainCalendarPageController', ['$scope', '$timeout', '$rootScope', '$location',
 	    function ($scope, $timeout, $rootScope, $location) {
 	        var vm = _this;
@@ -7810,9 +7998,9 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var courses_service_1 = __webpack_require__(42);
-	var axios_1 = __webpack_require__(5);
+	var tools_1 = __webpack_require__(73);
+	var courses_service_1 = __webpack_require__(81);
+	var axios_1 = __webpack_require__(47);
 	var ModelWeekService = (function () {
 	    function ModelWeekService() {
 	    }
@@ -7893,15 +8081,15 @@
 	var _this = this;
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Teacher_model_1 = __webpack_require__(39);
-	var utils_service_1 = __webpack_require__(44);
+	var Teacher_model_1 = __webpack_require__(78);
+	var utils_service_1 = __webpack_require__(83);
 	var secure_service_1 = __webpack_require__(86);
 	var modelweek_service_1 = __webpack_require__(90);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	var lessons_service_1 = __webpack_require__(84);
 	var homework_service_1 = __webpack_require__(92);
-	var courses_service_1 = __webpack_require__(42);
-	var subject_service_1 = __webpack_require__(43);
+	var courses_service_1 = __webpack_require__(81);
+	var subject_service_1 = __webpack_require__(82);
 	exports.CalendarController = entcore_1.ng.controller('CalendarController', ['$scope', '$timeout', '$rootScope', '$location', '$routeParams', '$q',
 	    function ($scope, $timeout, $rootScope, $location, $routeParams, $q) {
 	        var vm = _this;
@@ -7967,7 +8155,7 @@
 	                return 0;
 	            }
 	        }, function () {
-	            $scope.itemsCalendar = [].concat(entcore_1.model.lessons.all).concat($scope.courses);
+	            $scope.itemsCalendar = [].concat(entcore_1.model.lessons.all).concat($scope.courses || []);
 	        });
 	        $scope.$watch('routeParams', function (n, o) {
 	            if ($location.path().indexOf("calendarView") === -1 && $location.path() !== "") {
@@ -8201,8 +8389,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var axios_1 = __webpack_require__(5);
+	var tools_1 = __webpack_require__(73);
+	var axios_1 = __webpack_require__(47);
 	/*
 	* Homework service as class
 	* used to manipulate Homework model
@@ -8590,9 +8778,9 @@
 	var entcore_1 = __webpack_require__(1);
 	var homework_service_1 = __webpack_require__(92);
 	var lessons_service_1 = __webpack_require__(84);
-	var utils_service_1 = __webpack_require__(44);
+	var utils_service_1 = __webpack_require__(83);
 	var secure_service_1 = __webpack_require__(86);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	exports.CalendarListViewController = entcore_1.ng.controller('CalendarListViewController', ['$scope', '$timeout', '$q', '$location', function ($scope, $timeout, $q, $location) {
 	        var vm = _this;
 	        $timeout(init);
@@ -8760,80 +8948,142 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
 	var _this = this;
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var index_1 = __webpack_require__(32);
-	var subject_service_1 = __webpack_require__(43);
+	var tools_1 = __webpack_require__(73);
+	var index_1 = __webpack_require__(3);
+	var subject_service_1 = __webpack_require__(82);
 	var pedagogic_item_service_1 = __webpack_require__(96);
 	exports.EditLessonController = entcore_1.ng.controller('EditLessonController', ['$scope', '$rootScope', '$routeParams', function ($scope, $rootScope, $routeParams) {
 	        var vm = _this;
 	        init();
 	        function init() {
-	            //existing lesson
-	            $scope.tabs.showAnnotations = false;
-	            entcore_1.$q.all([
-	                //need subjects
-	                loadSubjects(),
-	                //need homework types
-	                loadHomeworkTypes()
-	            ]).then(function () {
-	                if ($routeParams.idLesson) {
-	                    entcore_1.model.newLesson = null;
-	                    loadExistingLesson();
-	                }
-	                else if (entcore_1.model.newLesson) {
-	                    createNewLessonFromPedagogicItem();
-	                }
-	                else if ($routeParams.progressionId) {
-	                    //show the EditProgressionLessonController
-	                    loadNewLesson();
-	                    return;
-	                }
-	                else {
-	                    //new lesson
-	                    loadNewLesson();
-	                }
-	                $scope.data.tabSelected = 'lesson';
-	                //add watch on selection
-	                $scope.$watch('lesson.audience', function () {
-	                    if (vm.lesson && vm.lesson.previousLessons) {
-	                        $scope.loadPreviousLessonsFromLesson(vm.lesson);
-	                    }
-	                });
-	                //add watch on selection
-	                $scope.$watch('lesson.subject', function () {
-	                    if (vm.lesson && vm.lesson.previousLessons) {
-	                        $scope.loadPreviousLessonsFromLesson(vm.lesson);
+	            return __awaiter(this, void 0, void 0, function () {
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            //existing lesson
+	                            $scope.tabs.showAnnotations = false;
+	                            return [4 /*yield*/, loadSubjects()];
+	                        case 1:
+	                            _a.sent();
+	                            return [4 /*yield*/, loadHomeworkTypes()];
+	                        case 2:
+	                            _a.sent();
+	                            if ($routeParams.idLesson) {
+	                                entcore_1.model.newLesson = null;
+	                                loadExistingLesson();
+	                            }
+	                            else if (entcore_1.model.newLesson) {
+	                                createNewLessonFromPedagogicItem();
+	                            }
+	                            else if ($routeParams.progressionId) {
+	                                //show the EditProgressionLessonController
+	                                loadNewLesson();
+	                                return [2 /*return*/];
+	                            }
+	                            else {
+	                                //new lesson
+	                                loadNewLesson();
+	                            }
+	                            $scope.data.tabSelected = 'lesson';
+	                            //add watch on selection
+	                            $scope.$watch('lesson.audience', function () {
+	                                if (vm.lesson && vm.lesson.previousLessons) {
+	                                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
+	                                }
+	                            });
+	                            //add watch on selection
+	                            $scope.$watch('lesson.subject', function () {
+	                                if (vm.lesson && vm.lesson.previousLessons) {
+	                                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
+	                                }
+	                            });
+	                            return [2 /*return*/];
 	                    }
 	                });
 	            });
 	        }
 	        function loadHomeworkTypes() {
-	            var deferred = entcore_1.$q.defer();
-	            if (!entcore_1.model.homeworkTypes || !entcore_1.model.homeworkTypes.all || entcore_1.model.homeworkTypes.all.length === 0) {
-	                entcore_1.model.homeworkTypes.syncHomeworkTypes(function () {
-	                    deferred.resolve();
-	                }, $rootScope.validationError);
-	            }
-	            else {
-	                deferred.resolve();
-	            }
-	            return deferred.promise;
-	        }
-	        function loadSubjects() {
-	            if (!entcore_1.model.subjects || !entcore_1.model.subjects.all || entcore_1.model.subjects.all.length === 0) {
-	                return subject_service_1.SubjectService.getCustomSubjects(entcore_1.model.isUserTeacher()).then(function (subjects) {
-	                    entcore_1.model.subjects.all = [];
-	                    if (subjects) {
-	                        entcore_1.model.subjects.addRange(subjects);
+	            return __awaiter(this, void 0, void 0, function () {
+	                var e_1;
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            console.log('load  Homework types');
+	                            if (!(!entcore_1.model.homeworkTypes || !entcore_1.model.homeworkTypes.all || entcore_1.model.homeworkTypes.all.length === 0)) return [3 /*break*/, 4];
+	                            _a.label = 1;
+	                        case 1:
+	                            _a.trys.push([1, 3, , 4]);
+	                            return [4 /*yield*/, entcore_1.model.homeworkTypes.syncHomeworkTypes()];
+	                        case 2:
+	                            _a.sent();
+	                            return [3 /*break*/, 4];
+	                        case 3:
+	                            e_1 = _a.sent();
+	                            $rootScope.validationError(e_1);
+	                            return [3 /*break*/, 4];
+	                        case 4: return [2 /*return*/];
 	                    }
 	                });
-	            }
-	            else {
-	                return entcore_1.$q.when();
-	            }
+	            });
+	        }
+	        function loadSubjects() {
+	            return __awaiter(this, void 0, void 0, function () {
+	                var subjects;
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            if (!(!entcore_1.model.subjects || !entcore_1.model.subjects.all || entcore_1.model.subjects.all.length === 0)) return [3 /*break*/, 2];
+	                            return [4 /*yield*/, subject_service_1.SubjectService.getCustomSubjects(entcore_1.model.isUserTeacher())];
+	                        case 1:
+	                            subjects = _a.sent();
+	                            entcore_1.model.subjects.all = [];
+	                            if (subjects) {
+	                                entcore_1.model.subjects.addRange(subjects);
+	                            }
+	                            return [3 /*break*/, 3];
+	                        case 2: return [2 /*return*/, false];
+	                        case 3: return [2 /*return*/];
+	                    }
+	                });
+	            });
 	        }
 	        function createNewLessonFromPedagogicItem() {
 	            vm.lesson = entcore_1.model.newLesson;
@@ -9047,8 +9297,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var PedagogicItem_model_1 = __webpack_require__(4);
-	var axios_1 = __webpack_require__(5);
+	var PedagogicItem_model_1 = __webpack_require__(74);
+	var axios_1 = __webpack_require__(47);
 	var PedagogicItemService = (function () {
 	    function PedagogicItemService() {
 	    }
@@ -9571,7 +9821,7 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var FileSaver = __webpack_require__(103);
-	var axios_1 = __webpack_require__(5);
+	var axios_1 = __webpack_require__(47);
 	/*
 	 * Visa service as class
 	 * used to manipulate Visa modelH
@@ -9891,7 +10141,7 @@
 	var entcore_1 = __webpack_require__(1);
 	var secure_service_1 = __webpack_require__(86);
 	var visa_service_1 = __webpack_require__(102);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	exports.VisaManagerController = entcore_1.ng.controller('VisaManagerController', ['$scope', '$timeout', '$rootScope', function ($scope, $timeout, $rootScope) {
 	        var vm = _this;
 	        vm.items = [{ name: 'teacher1' }, { name: 'teacher2' }];
@@ -10278,7 +10528,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var axios_1 = __webpack_require__(5);
+	var axios_1 = __webpack_require__(47);
 	exports.entDropdown = entcore_1.ng.directive('entDropdown', function () {
 	    return {
 	        restrict: "E",
@@ -10397,7 +10647,7 @@
 	var entcore_1 = __webpack_require__(1);
 	var visa_service_1 = __webpack_require__(102);
 	var secure_service_1 = __webpack_require__(86);
-	var tools_1 = __webpack_require__(3);
+	var tools_1 = __webpack_require__(73);
 	exports.diaryMultiCalendarFilter = entcore_1.ng.directive('diaryMultiCalendarFilter', function () {
 	    return {
 	        restrict: "E",
@@ -10408,11 +10658,10 @@
 	            teacher: '='
 	        },
 	        controller: function ($scope) {
-	            var vm = this;
 	            var promiseFilter;
 	            $scope.RIGHTS = tools_1.CONSTANTS.RIGHTS;
-	            vm.filters = {};
-	            vm.getFilters = function (structureId) {
+	            $scope.filters = {};
+	            $scope.getFilters = function (structureId) {
 	                if (!promiseFilter) {
 	                    if (secure_service_1.SecureService.hasRight(tools_1.CONSTANTS.RIGHTS.VISA_ADMIN)) {
 	                        promiseFilter = visa_service_1.VisaService.getFilters(structureId);
@@ -10423,7 +10672,7 @@
 	                }
 	                if (promiseFilter) {
 	                    promiseFilter.then(function (filters) {
-	                        vm.filters = filters;
+	                        $scope.filters = filters;
 	                    });
 	                }
 	            };
@@ -10441,11 +10690,11 @@
 	                });
 	                $scope.$watch("structure", function (n, o) {
 	                    if (n !== o && n) {
-	                        vm.getFilters(n.id);
+	                        $scope.getFilters(n.id);
 	                    }
 	                });
 	                if ($scope.structure) {
-	                    vm.getFilters($scope.structure.id);
+	                    $scope.getFilters($scope.structure.id);
 	                }
 	            }
 	        }
@@ -10663,8 +10912,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var tools_1 = __webpack_require__(3);
-	var Subject_model_1 = __webpack_require__(38);
+	var tools_1 = __webpack_require__(73);
+	var Subject_model_1 = __webpack_require__(77);
 	exports.subjectPicker = entcore_1.ng.directive('subjectPicker', function () {
 	    return {
 	        scope: {
@@ -10842,8 +11091,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var Homework_model_1 = __webpack_require__(35);
-	var Lesson_model_1 = __webpack_require__(40);
+	var Homework_model_1 = __webpack_require__(6);
+	var Lesson_model_1 = __webpack_require__(79);
 	var audiences_service_1 = __webpack_require__(87);
 	exports.diaryTimeslotItem = entcore_1.ng.directive('diaryTimeslotItem', function ($rootScope) {
 	    return {
@@ -11058,9 +11307,9 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var index_1 = __webpack_require__(32);
+	var index_1 = __webpack_require__(3);
 	var pedagogic_item_service_1 = __webpack_require__(96);
-	exports.addModuleConfig = entcore_1.ng.directive('addModuleConfig', function () {
+	exports.quickSearch = entcore_1.ng.directive('quickSearch', function () {
 	    return {
 	        restrict: "E",
 	        templateUrl: "/diary/public/template/directives/quick-search/quick-search.html",
@@ -11543,7 +11792,7 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var index_1 = __webpack_require__(32);
+	var index_1 = __webpack_require__(3);
 	exports.attachmentsx = entcore_1.ng.directive('attachmentsx', function () {
 	    return {
 	        restrict: "E",

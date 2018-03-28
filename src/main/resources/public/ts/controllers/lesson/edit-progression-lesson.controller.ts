@@ -6,9 +6,9 @@ export const EditProgressionLessonController = ng.controller('EditProgressionLes
 
             let vm = this;
 
-            $timeout(init);
+            init();
 
-            function init() {
+            async function init() {
 
                 if ($routeParams.progressionId) {
                     $scope.data.tabSelected = 'lesson';

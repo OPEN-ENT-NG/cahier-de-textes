@@ -11,7 +11,7 @@
            class="diary-ico-button"
           confirm-popup
           confirm-class="fullscreen popup-visa-habilitation"
-      confirm-template="/diary/public/js/visa/inspector-habilitations/habilitations.template.html" >
+      confirm-template="/diary/public/template/visa/inspector-habilitations/habilitations.template.html" >
           <i class="icon lock-alt" ></i>Gérer les habilitations
       </button>
     </div>
@@ -61,11 +61,11 @@
         </div>
     </div>
     <div ng-if="visaManagerCtrl.agregatedVisa.length > 0">
-        <div ng-include="'/diary/public/js/visa/visa-list.template.html'"></div>
+        <div ng-include="'/diary/public/template/visa/visa-list.template.html'"></div>
     </div>
     <div ng-if="!visaManagerCtrl.agregatedVisa || visaManagerCtrl.agregatedVisa.length === 0">
-        <div ng-include="'/diary/public/js/visa/visa-list-empty-instructions.template.html'"></div>
+        <div ng-include="'/diary/public/template/visa/visa-list-empty-instructions.template.html'"></div>
     </div>
-    <div ng-include="'/diary/public/js/visa/toggle-selected.template.html'"></div>
+    <div ng-include="'/diary/public/template/visa/toggle-selected.template.html'"></div>
 
 </div>
