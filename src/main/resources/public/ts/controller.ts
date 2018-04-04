@@ -156,7 +156,7 @@ export let DiaryController = ng.controller('DiaryController', [
             template.open('main', 'progression-manager');
         },
         createLessonView: function (params) {
-                //$scope.lesson = null;
+                $scope.createLesson = new Lesson();
                 $scope.lessonDescriptionIsReadOnly = false;
                 $scope.homeworkDescriptionIsReadOnly = false;
                 //$scope.openLessonView(null, params);

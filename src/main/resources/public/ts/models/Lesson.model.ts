@@ -1,9 +1,9 @@
 import {model, moment, collection} from 'entcore';
 import { Selectable } from "entcore-toolkit";
-import {DATE_FORMAT, syncLessonsAndHomeworks} from '../tools';
+import * as tools from '../tools';
+import {Mix} from 'entcore-toolkit';
 
-import {Homework} from './Homework.model';
-import {Subject} from './Subject.model';
+import {Homework, Homeworks, Subject} from './';
 import {Audience} from '../model';
 
 export class Lesson implements Selectable {
@@ -14,13 +14,13 @@ export class Lesson implements Selectable {
     subject: any;
     audience: any;
     title: any;
-    color: any;
+    color: any = tools.DEFAULT_ITEM_COLOR;
     date: any;
     startTime: any;
     endTime: any;
     description: any;
     annotations: any;
-    state: any;
+    state: any = tools.DEFAULT_STATE;
     attachments: any;
 
     newItem: any;
@@ -28,6 +28,11 @@ export class Lesson implements Selectable {
     audienceType: any;
 
     selected: boolean;
+    startMoment: any;
+    endMoment: any;
+    end: any;
+    beginning: any;
+    structureId:any;
 
     constructor(data?) {
 
@@ -35,7 +40,7 @@ export class Lesson implements Selectable {
         //this.collection(Attachment);
         // initialize homeworks collection (see lib.js)
         if (!this.homeworks) {
-           model.collection(Homework);
+           this.homeworks = new Homeworks();
         }
         this.subject = (data) ? data.subject : new Subject();
         this.audience = (data) ? data.audience : new Audience();
@@ -55,7 +60,7 @@ export class Lesson implements Selectable {
      * Adds an attachment
      * @param attachment
      */
-    addAttachment = function (attachment) {
+    addAttachment (attachment) {
         this.attachments.push(attachment);
     };
 
@@ -63,7 +68,7 @@ export class Lesson implements Selectable {
     /**
      * Delete calendar references of current lesson
      */
-    deleteModelReferences = () => {
+    deleteModelReferences () {
         var that = this;
         model.lessons.forEach(function (lesson) {
             if (lesson.id === that.id) {
@@ -87,7 +92,7 @@ export class Lesson implements Selectable {
      * @param cb
      * @param cbe
      */
-    calendarUpdate = function (cb, cbe) {
+    calendarUpdate (cb, cbe) {
 
         // TODO date fields types are kinda messy
         // toJson method needs date fields to be in some specific format
@@ -112,7 +117,7 @@ export class Lesson implements Selectable {
      * @param cb Callback
      * @param cbe Callback on error
      */
-    saveHomeworks = function (cb, cbe) {
+    saveHomeworks (cb, cbe) {
 
         var deferred = model.$q().defer();
 
@@ -155,7 +160,7 @@ export class Lesson implements Selectable {
      * @param cb
      * @param cbe
      */
-    save = function (cb, cbe) {
+    save (cb, cbe) {
 
 
 
@@ -172,15 +177,15 @@ export class Lesson implements Selectable {
 
         return subjectPromise.then(() => {
             if (that.id) {
-                lessonPromise = that.update();
+                lessonPromise = that.update(cb, cbe);
             }
             else {
-                lessonPromise = that.create();
+                lessonPromise = that.create(cb, cbe);
             }
 
             return lessonPromise.then(() => {
-                return that.saveHomeworks().then(() => {
-                    return syncLessonsAndHomeworks(cb);
+                return that.saveHomeworks(cb, cbe).then(() => {
+                    return tools.syncLessonsAndHomeworks(cb);
                 });
             });
         });
@@ -191,7 +196,7 @@ export class Lesson implements Selectable {
      * @param idHomework
      * @returns {boolean}
      */
-    hasHomeworkWithId = function (idHomework) {
+    hasHomeworkWithId (idHomework) {
 
         var found = false;
 
@@ -210,7 +215,7 @@ export class Lesson implements Selectable {
     };
 
 
-    update = function (cb, cbe) {
+    update (cb, cbe) {
         var url = '/diary/lesson/' + this.id;
 
         var lesson = this;
@@ -226,7 +231,7 @@ export class Lesson implements Selectable {
         });
     };
 
-    create = function (cb, cbe) {
+    create (cb, cbe) {
         var lesson = this;
 
         let subject = model.subjects.all.find((l) => {
@@ -248,8 +253,8 @@ export class Lesson implements Selectable {
                 method: 'POST',
                 url: '/diary/lesson',
                 data: lesson
-            }).then(function (result) {
-                lesson.updateData(result.data);
+            }).then((result) => {
+                Mix.extend(this, result.data);
                 model.lessons.pushAll([lesson]);
                 if (typeof cb === 'function') {
                     cb();
@@ -264,7 +269,7 @@ export class Lesson implements Selectable {
      * @param cb Callback
      * @param cbe Callback on error
      */
-    delete = function (cb, cbe) {
+    delete (cb, cbe) {
 
         var lesson = this;
 
@@ -286,7 +291,7 @@ export class Lesson implements Selectable {
      * @param cb Callback
      * @param cbe Callback on error
      */
-    deleteList = function (lessons, cb, cbe) {
+    deleteList (lessons, cb, cbe) {
         model.deleteItemList(lessons, 'lesson', cb, cbe);
     };
 
@@ -295,7 +300,7 @@ export class Lesson implements Selectable {
      * @param cb Callback function
      * @param cbe Callback on error function
      */
-    load = function (loadHomeworks, cb, cbe) {
+    load (loadHomeworks, cb, cbe) {
 
         var lesson = this;
 
@@ -308,8 +313,9 @@ export class Lesson implements Selectable {
         return model.getHttp()({
             method: 'GET',
             url: url + lesson.id
-        }).then(function (result) {
-            lesson.updateData(model.LessonService.mapLesson(result.data));
+        }).then((result) => {
+            Mix.extend(this, model.LessonService.mapLesson(result.data));
+
 
             if (loadHomeworks) {
                 model.loadHomeworksForLesson(lesson, cb, cbe);
@@ -328,7 +334,7 @@ export class Lesson implements Selectable {
      * @param cb Callback
      * @param cbe Callback on error
      */
-    publish = function (cb, cbe) {
+    publish (cb, cbe) {
 
         var jsonLesson = new Lesson();
         jsonLesson.id = this.id;
@@ -350,7 +356,7 @@ export class Lesson implements Selectable {
      *
      * JSON object corresponding to sql diary.lesson table columns
      */
-    toJSON = function () {
+    toJSON () {
 
         let json: any = {
             lesson_id: this.id,
@@ -360,7 +366,7 @@ export class Lesson implements Selectable {
             audience_id: this.audience.id,
             lesson_title: this.title,
             lesson_color: this.color,
-            lesson_date: moment(this.date).format(DATE_FORMAT),
+            lesson_date: moment(this.date).format(tools.DATE_FORMAT),
             lesson_start_time: moment(this.startTime).format('HH:mm'),
             lesson_end_time: moment(this.endTime).format('HH:mm'),
             lesson_description: this.description,
@@ -379,14 +385,14 @@ export class Lesson implements Selectable {
         return json;
     };
 
-    addHomework = function (cb) {
+    addHomework (cb) {
         let date = moment.isMoment(this.startTime) ? this.startTime : (this.startMoment ? this.startMoment : moment());
         let dueDate = date.second(0);
         var homework = model.initHomework(dueDate, this);
         this.homeworks.push(homework);
     };
 
-    deleteHomework = function (homework) {
+    deleteHomework (homework) {
 
         homework.delete();
 
@@ -396,15 +402,15 @@ export class Lesson implements Selectable {
         this.homeworks.push(homework);
     };
 
-    isDraft = function () {
+    isDraft () {
         return this.state === "draft";
     };
 
-    isPublished = function () {
+    isPublished () {
         return !this.isDraft();
     };
 
-    isPublishable = function (toPublish) {
+    isPublishable (toPublish) {
         return this.id && this.state == (toPublish ? 'draft' : 'published')
     };
 
@@ -412,7 +418,7 @@ export class Lesson implements Selectable {
      * Change state of current and associated homeworks
      * @param isPublished
      */
-    changeState = function (isPublished) {
+    changeState (isPublished) {
         this.state = isPublished ? 'published' : 'draft';
         let that = this;
         // change state of associated homeworks

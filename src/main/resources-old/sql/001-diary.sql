@@ -1,6 +1,0 @@
-CREATE SCHEMA diary;
-
-CREATE TABLE diary.scripts (
-filename VARCHAR(255) NOT NULL PRIMARY KEY,
-passed TIMESTAMP NOT NULL DEFAULT NOW()
-);

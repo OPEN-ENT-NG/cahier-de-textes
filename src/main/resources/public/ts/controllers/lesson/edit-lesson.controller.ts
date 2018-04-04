@@ -1,17 +1,20 @@
-import {ng, model, moment, _, notify, $q } from 'entcore';
+import {ng, model, moment, _, notify, idiom as lang } from 'entcore';
 import {DATE_FORMAT } from '../../tools';
 import { Lesson } from '../../models/index';
 import {SubjectService} from "../../services/subject.service";
 import {PedagogicItemService} from "../../services/pedagogic-item.service";
+import {ProgressionService} from "../../services/progression.service";
 
 
 export const EditLessonController = ng.controller('EditLessonController',
     ['$scope', '$rootScope', '$routeParams', ($scope, $rootScope, $routeParams) => {
 
-        var vm = this;
+        let vm = this;
         init();
 
         async function init() {
+            this.lesson = new Lesson();
+            $scope.lesson = this.lesson;
             //existing lesson
             $scope.tabs.showAnnotations = false;
             await loadSubjects();
@@ -35,14 +38,14 @@ export const EditLessonController = ng.controller('EditLessonController',
 
             //add watch on selection
             $scope.$watch('lesson.audience',()=>{
-                if(vm.lesson && vm.lesson.previousLessons){
-                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
+                if($scope.lesson && $scope.lesson.previousLessons){
+                    $scope.loadPreviousLessonsFromLesson($scope.lesson);
                 }
             });
             //add watch on selection
             $scope.$watch('lesson.subject',()=>{
-                if (vm.lesson && vm.lesson.previousLessons){
-                    $scope.loadPreviousLessonsFromLesson(vm.lesson);
+                if ($scope.lesson && $scope.lesson.previousLessons){
+                    $scope.loadPreviousLessonsFromLesson($scope.lesson);
                 }
             });
             // $q.all([
@@ -69,17 +72,28 @@ export const EditLessonController = ng.controller('EditLessonController',
             //
             //     //add watch on selection
             //     $scope.$watch('lesson.audience',()=>{
-            //         if(vm.lesson && vm.lesson.previousLessons){
-            //             $scope.loadPreviousLessonsFromLesson(vm.lesson);
+            //         if($scope.lesson && $scope.lesson.previousLessons){
+            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
             //         }
             //     });
             //     //add watch on selection
             //     $scope.$watch('lesson.subject',()=>{
-            //         if (vm.lesson && vm.lesson.previousLessons){
-            //             $scope.loadPreviousLessonsFromLesson(vm.lesson);
+            //         if ($scope.lesson && $scope.lesson.previousLessons){
+            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
             //         }
             //     });
             // });
+
+            //progression init
+            if ($routeParams.progressionId) {
+                $scope.data.tabSelected = 'lesson';
+                $scope.isProgressionLesson = true;
+
+                if ($routeParams.editProgressionLessonId !== 'new') {
+                    loadLesson($routeParams.editProgressionLessonId);
+                }
+            }
+            //end progression init
         }
 
         async function loadHomeworkTypes(){
@@ -117,32 +131,32 @@ export const EditLessonController = ng.controller('EditLessonController',
         }
 
         function createNewLessonFromPedagogicItem (){
-            vm.lesson = model.newLesson;
+            $scope.lesson = model.newLesson;
             model.newLesson=null;
-            //$scope.newItem = vm.lesson.newItem;
+            //$scope.newItem = $scope.lesson.newItem;
             populateExistingLesson();
         }
 
         function populateExistingLesson(){
             $scope.tabs.createLesson = $routeParams.idHomework ? 'homeworks' : 'lesson';
 
-            $scope.tabs.showAnnotations = !!vm.lesson.annotations;
+            $scope.tabs.showAnnotations = !!$scope.lesson.annotations;
             // open existing lesson for edit
 
-            vm.lesson.previousLessonsLoaded = false; // will force reload
+            $scope.lesson.previousLessonsLoaded = false; // will force reload
             $scope.newItem = {
-                date: moment(vm.lesson.date),
-                beginning: vm.lesson.startMoment, //moment(vm.lesson.beginning),
-                end: vm.lesson.endMoment //moment(vm.lesson.end)
+                date: moment($scope.lesson.date),
+                beginning: $scope.lesson.startMoment, //moment($scope.lesson.beginning),
+                end: $scope.lesson.endMoment //moment($scope.lesson.end)
             };
 
             $scope.loadHomeworksForCurrentLesson(function() {
-                vm.lesson.homeworks.forEach(function(homework) {
-                    if (vm.lesson.homeworks.length || ($routeParams.idHomework && $routeParams.idHomework == homework.id)) {
+                $scope.lesson.homeworks.forEach(function(homework) {
+                    if ($scope.lesson.homeworks.length || ($routeParams.idHomework && $routeParams.idHomework == homework.id)) {
                         homework.expanded = true;
                     }
 
-                    model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), vm.lesson.audience.id);
+                    model.loadHomeworksLoad(homework, moment(homework.date).format("YYYY-MM-DD"), $scope.lesson.audience.id);
                 });
             });
 
@@ -157,7 +171,7 @@ export const EditLessonController = ng.controller('EditLessonController',
 
             $scope.lessonDescriptionIsReadOnly = false;
             $scope.homeworkDescriptionIsReadOnly = false;
-            vm.lesson = lesson;
+            $scope.lesson = lesson;
             lesson.load(true, ()=> {
                 populateExistingLesson();
             }, function(cbe) {
@@ -168,9 +182,44 @@ export const EditLessonController = ng.controller('EditLessonController',
         function loadNewLesson(){
             var selectedDate = $scope.selectedDateInTheFuture();
 
-            vm.lesson = model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
-            $scope.newItem = vm.lesson.newItem;
+            $scope.lesson = model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
+            $scope.newItem = $scope.lesson.newItem;
         }
+
+        /** Progression Part **/
+        function loadLesson(lessonId) {
+            ProgressionService.getLessonProgression(lessonId).then((lesson) => {
+
+                $scope.$parent.editLessonCtrl.lesson = lesson;
+            });
+        }
+
+        function cancel() {
+            $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
+        };
+
+        function saveLesson(lesson) {
+            if (!lesson.progressionId) {
+                lesson.progressionId = $routeParams.progressionId;
+            }
+            ProgressionService.saveLessonProgression(lesson).then((newLesson) => {
+                notify.info(lang.translate('progression.content.saved'));
+                lesson.id = newLesson.id;
+                $rootScope.redirect('/progressionManagerView/' + $routeParams.progressionId);
+            });
+        };
+
+        function addHomework(lesson) {
+            if (!lesson.homeworks) {
+                lesson.homeworks = [];
+            }
+            let homework = model.initHomework();
+            lesson.homeworks.push(homework);
+        };
+
+        /** End Progression Part **/
+
+
         /**
          * Load homeworks for current lesson being edited
          * @param cb Callback function
@@ -178,14 +227,14 @@ export const EditLessonController = ng.controller('EditLessonController',
         $scope.loadHomeworksForCurrentLesson = function(cb) {
 
             // lesson not yet created do not retrieve homeworks
-            if (!vm.lesson.id) {
+            if (!$scope.lesson.id) {
                 return;
             }
 
             var needSqlSync = false;
 
             // if homeworks ever retrieved from db don't do it again!
-            vm.lesson.homeworks.forEach(function(homework) {
+            $scope.lesson.homeworks.forEach(function(homework) {
                 if (!homework.loaded) {
                     needSqlSync = true;
                 }
@@ -193,7 +242,7 @@ export const EditLessonController = ng.controller('EditLessonController',
 
             // only reload homeworks if necessary
             if (needSqlSync) {
-                model.loadHomeworksForLesson(vm.lesson,
+                model.loadHomeworksForLesson($scope.lesson,
 
                     function() {
                         if (typeof cb !== 'undefined') {
@@ -219,17 +268,17 @@ export const EditLessonController = ng.controller('EditLessonController',
 
             $scope.currentErrors = [];
 
-            vm.lesson.startTime = $scope.newItem.beginning;
-            vm.lesson.endTime = $scope.newItem.end;
-            vm.lesson.date = $scope.newItem.date;
+            $scope.lesson.startTime = $scope.newItem.begFinning;
+            $scope.lesson.endTime = $scope.newItem.end;
+            $scope.lesson.date = $scope.newItem.date;
 
-            return vm.lesson.save(function() {
+            return $scope.lesson.save(function() {
                 notify.info('lesson.saved');
-                vm.lesson.audience = model.audiences.findWhere({
-                    id: vm.lesson.audience.id
+                $scope.lesson.audience = model.audiences.findWhere({
+                    id: $scope.lesson.audience.id
                 });
                 if (goMainView) {
-                    vm.lesson = null;
+                    $scope.lesson = null;
                     $scope.homework = null;
                 }
                 if (typeof cb === 'function') {

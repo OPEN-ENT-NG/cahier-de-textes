@@ -525,6 +525,8 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
     lesson.color = tools.DEFAULT_ITEM_COLOR;
     lesson.state = tools.DEFAULT_STATE;
     lesson.title = lang.translate('diary.lesson.label');
+    lesson.description = ''
+    lesson.annotations = ''
 
     let newItem:any;
 
@@ -567,6 +569,7 @@ model.initLesson = function (timeFromCalendar, selectedDate) {
     lesson.startTime = newItem.beginning;
     lesson.endTime = newItem.end;
     lesson.date = newItem.date;
+    lesson.date = newItem.description;
 
     return lesson;
 };

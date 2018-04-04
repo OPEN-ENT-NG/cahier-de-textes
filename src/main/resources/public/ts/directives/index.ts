@@ -9,13 +9,10 @@ export * from './right-panel.directive';
 export * from './search-drop-down.directive';
 export * from './secure.directive';
 export * from './structure-selector.directive';
+export * from './time-picker.directive';
 export * from './subject-picker.directive';
 export * from './quick-search/diary-timeslot-item.directive';
 export * from './quick-search/quick-search.directive';
 export * from './quick-search/quick-search-item.directive';
 export * from './attachment/attachment.directive';
-export * from './attachment/attachmentsx.directive';/*
-export * from './common/calendar/calendar.directive';
-export * from './common/calendar/schedule-item.directive';
-export * from './common/sortable-list/diary-sortable-list.directive';
-export * from './common/tooltip.directive';*/
+export * from './attachment/attachmentsx.directive';

@@ -32,7 +32,7 @@
         <!-- lessons -->
         <article ng-repeat="lesson in visaManagerCtrl.selectedLessons | filter : { title : visaManagerCtrl.searchFilter} | sameDate : {date : visaManagerCtrl.searchFilterDate}"
             overflow-y="scroll" on-finish-render="visaManagerCtrl.resize()"
-            bottom-scroll="loadMorePreviousLessonsFromLesson(editLessonCtrl.lesson)">
+            bottom-scroll="loadMorePreviousLessonsFromLesson(lesson)">
             <div class="prev-lesson-summary">
                 <a href="/diary#/showLessonView/[[lesson.lessonId]]" target="_blank">
                     [[lesson.date | date : constants.CAL_DATE_PATTERN_NG ]] - [[lesson.startTime]] - [[lesson.endTime]] - [[lesson.subject]] - [[lesson.audienceLabel]]
