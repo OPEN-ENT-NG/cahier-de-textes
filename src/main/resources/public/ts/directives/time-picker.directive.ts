@@ -86,7 +86,7 @@ export const timePicker = ng.directive('timePicker', function () {
 
             element.on('show.timepicker', function () {
                 element.parents().find('lightbox').on('click.timepicker', function (e) {
-                    if (!(element.parent().find(e.target).length ||
+                    if (timepicker && !(element.parent().find(e.target).length ||
                             timepicker.$widget.is(e.target) ||
                             timepicker.$widget.find(e.target).length)) {
                         timepicker.hideWidget();

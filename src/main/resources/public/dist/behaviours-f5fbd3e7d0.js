@@ -88,7 +88,9 @@
 	    workflow: {
 	        createLesson: "fr.openent.diary.controllers.LessonController|createLesson",
 	        createHomeworkForLesson: "fr.openent.diary.controllers.HomeworkController|createHomeworkForLesson",
-	        createFreeHomework: "fr.openent.diary.controllers.HomeworkController|createFreeHomework"
+	        createFreeHomework: "fr.openent.diary.controllers.HomeworkController|createFreeHomework",
+	        manageModelWeek: "fr.openent.diary.controllers.ModelWeekController|setModelWeek",
+	        applyVisa: "fr.openent.diary.controllers.VisaController|applyVisa"
 	    }
 	};
 	entcore_1.Behaviours.register('diary', {

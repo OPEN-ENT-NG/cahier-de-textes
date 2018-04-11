@@ -4,26 +4,27 @@ import { Lesson } from '../../models/index';
 import {SubjectService} from "../../services/subject.service";
 import {PedagogicItemService} from "../../services/pedagogic-item.service";
 import {ProgressionService} from "../../services/progression.service";
+import * as tools from "../../tools";
 
 
 export const EditLessonController = ng.controller('EditLessonController',
     ['$scope', '$rootScope', '$routeParams', ($scope, $rootScope, $routeParams) => {
 
         let vm = this;
+        let newLesson = true;
         init();
 
         async function init() {
-            this.lesson = new Lesson();
-            $scope.lesson = this.lesson;
+            $scope.lesson = await initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), new Date());
             //existing lesson
             $scope.tabs.showAnnotations = false;
             await loadSubjects();
             await loadHomeworkTypes();
 
             if ($routeParams.idLesson) {
-                model.newLesson = null;
+                $scope.newLesson = null;
                 loadExistingLesson();
-            } else if(model.newLesson){
+            } else if($scope.newLesson){
                 createNewLessonFromPedagogicItem();
             }else if ($routeParams.progressionId){
                 //show the EditProgressionLessonController
@@ -48,41 +49,6 @@ export const EditLessonController = ng.controller('EditLessonController',
                     $scope.loadPreviousLessonsFromLesson($scope.lesson);
                 }
             });
-            // $q.all([
-            //     //need subjects
-            //     loadSubjects(),
-            //     //need homework types
-            //     loadHomeworkTypes()
-            // ]).then(()=>{
-            //     if ($routeParams.idLesson) {
-            //         model.newLesson = null;
-            //         loadExistingLesson();
-            //     } else if(model.newLesson){
-            //         createNewLessonFromPedagogicItem();
-            //     }else if ($routeParams.progressionId){
-            //         //show the EditProgressionLessonController
-            //         loadNewLesson();
-            //         return ;
-            //     }else{
-            //         //new lesson
-            //         loadNewLesson();
-            //     }
-            //
-            //     $scope.data.tabSelected = 'lesson';
-            //
-            //     //add watch on selection
-            //     $scope.$watch('lesson.audience',()=>{
-            //         if($scope.lesson && $scope.lesson.previousLessons){
-            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
-            //         }
-            //     });
-            //     //add watch on selection
-            //     $scope.$watch('lesson.subject',()=>{
-            //         if ($scope.lesson && $scope.lesson.previousLessons){
-            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
-            //         }
-            //     });
-            // });
 
             //progression init
             if ($routeParams.progressionId) {
@@ -95,6 +61,64 @@ export const EditLessonController = ng.controller('EditLessonController',
             }
             //end progression init
         }
+
+        async function initLesson(timeFromCalendar, selectedDate){
+            var lesson = new Lesson();
+
+            lesson.audience = {}; //sets the default audience to undefined
+            lesson.subject = model.subjects.first();
+            lesson.audienceType = lesson.audience.type;
+            lesson.color = tools.DEFAULT_ITEM_COLOR;
+            lesson.state = tools.DEFAULT_STATE;
+            lesson.title = lang.translate('diary.lesson.label');
+            lesson.description = ''
+            lesson.annotations = ''
+
+            let newItem: any;
+
+            if (timeFromCalendar) {
+                newItem = model.calendar.newItem;
+
+                // force to HH:00 -> HH:00 + 1 hour
+                newItem.beginning = newItem.beginning.second(0);
+                newItem.date = newItem.beginning;
+                if (!newItem.beginning.isBefore(newItem.end)) {
+                    newItem.end = moment(newItem.beginning);
+                    newItem.end.minute(0).second(0).add(1, 'hours');
+                }
+                if (newItem.audience) {
+                    lesson.audience = newItem.audience;
+                    lesson.audienceType = lesson.audience.type;
+                }
+
+                if (newItem.room) {
+                    lesson.room = newItem.room;
+                }
+
+                if (newItem.subject) {
+                    lesson.subject = newItem.subject;
+                }
+
+            }
+            // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
+            else {
+                var itemDate = (selectedDate) ? moment(selectedDate) : moment();
+
+                newItem = {
+                    date: itemDate,
+                    beginning: moment().minute(0).second(0),
+                    end: moment().minute(0).second(0).add(1, 'hours')
+                };
+            }
+
+            lesson.newItem = newItem;
+            lesson.startTime = newItem.beginning;
+            lesson.endTime = newItem.end;
+            lesson.date = newItem.date;
+            lesson.date = newItem.description;
+
+            return lesson;
+        };
 
         async function loadHomeworkTypes(){
             console.log('load  Homework types');
@@ -131,8 +155,7 @@ export const EditLessonController = ng.controller('EditLessonController',
         }
 
         function createNewLessonFromPedagogicItem (){
-            $scope.lesson = model.newLesson;
-            model.newLesson=null;
+            $scope.newLesson=null;
             //$scope.newItem = $scope.lesson.newItem;
             populateExistingLesson();
         }
@@ -182,7 +205,7 @@ export const EditLessonController = ng.controller('EditLessonController',
         function loadNewLesson(){
             var selectedDate = $scope.selectedDateInTheFuture();
 
-            $scope.lesson = model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
+            $scope.lesson = this.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
             $scope.newItem = $scope.lesson.newItem;
         }
 

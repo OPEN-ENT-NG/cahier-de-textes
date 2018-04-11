@@ -516,63 +516,6 @@ model.initHomework = function (dueDate, lesson) {
  * Init lesson
  * @returns {Lesson}
  */
-model.initLesson = function (timeFromCalendar, selectedDate) {
-    var lesson = new Lesson();
-
-    lesson.audience = {}; //sets the default audience to undefined
-    lesson.subject = model.subjects.first();
-    lesson.audienceType = lesson.audience.type;
-    lesson.color = tools.DEFAULT_ITEM_COLOR;
-    lesson.state = tools.DEFAULT_STATE;
-    lesson.title = lang.translate('diary.lesson.label');
-    lesson.description = ''
-    lesson.annotations = ''
-
-    let newItem:any;
-
-    if(timeFromCalendar) {
-        newItem = model.calendar.newItem;
-
-        // force to HH:00 -> HH:00 + 1 hour
-        newItem.beginning = newItem.beginning.second(0);
-        newItem.date = newItem.beginning;
-        if (!newItem.beginning.isBefore(newItem.end)){
-            newItem.end = moment(newItem.beginning);
-            newItem.end.minute(0).second(0).add(1, 'hours');
-        }
-        if (newItem.audience){
-            lesson.audience = newItem.audience;
-            lesson.audienceType = lesson.audience.type;
-        }
-
-        if (newItem.room){
-            lesson.room = newItem.room;
-        }
-
-        if (newItem.subject){
-            lesson.subject = newItem.subject;
-        }
-
-    }
-    // init start/end time to now (HH:00) -> now (HH:00) + 1 hour or selectedDate ->
-    else {
-        var itemDate = (selectedDate) ? moment(selectedDate): moment();
-
-        newItem = {
-            date: itemDate,
-            beginning: moment().minute(0).second(0),
-            end: moment().minute(0).second(0).add(1, 'hours')
-        };
-    }
-
-    lesson.newItem = newItem;
-    lesson.startTime = newItem.beginning;
-    lesson.endTime = newItem.end;
-    lesson.date = newItem.date;
-    lesson.date = newItem.description;
-
-    return lesson;
-};
 
 
 /**

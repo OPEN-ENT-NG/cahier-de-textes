@@ -7191,52 +7191,6 @@
 	 * Init lesson
 	 * @returns {Lesson}
 	 */
-	entcore_1.model.initLesson = function (timeFromCalendar, selectedDate) {
-	    var lesson = new Lesson_model_1.Lesson();
-	    lesson.audience = {}; //sets the default audience to undefined
-	    lesson.subject = entcore_1.model.subjects.first();
-	    lesson.audienceType = lesson.audience.type;
-	    lesson.color = tools.DEFAULT_ITEM_COLOR;
-	    lesson.state = tools.DEFAULT_STATE;
-	    lesson.title = entcore_1.idiom.translate('diary.lesson.label');
-	    lesson.description = '';
-	    lesson.annotations = '';
-	    var newItem;
-	    if (timeFromCalendar) {
-	        newItem = entcore_1.model.calendar.newItem;
-	        // force to HH:00 -> HH:00 + 1 hour
-	        newItem.beginning = newItem.beginning.second(0);
-	        newItem.date = newItem.beginning;
-	        if (!newItem.beginning.isBefore(newItem.end)) {
-	            newItem.end = entcore_1.moment(newItem.beginning);
-	            newItem.end.minute(0).second(0).add(1, 'hours');
-	        }
-	        if (newItem.audience) {
-	            lesson.audience = newItem.audience;
-	            lesson.audienceType = lesson.audience.type;
-	        }
-	        if (newItem.room) {
-	            lesson.room = newItem.room;
-	        }
-	        if (newItem.subject) {
-	            lesson.subject = newItem.subject;
-	        }
-	    }
-	    else {
-	        var itemDate = (selectedDate) ? entcore_1.moment(selectedDate) : entcore_1.moment();
-	        newItem = {
-	            date: itemDate,
-	            beginning: entcore_1.moment().minute(0).second(0),
-	            end: entcore_1.moment().minute(0).second(0).add(1, 'hours')
-	        };
-	    }
-	    lesson.newItem = newItem;
-	    lesson.startTime = newItem.beginning;
-	    lesson.endTime = newItem.end;
-	    lesson.date = newItem.date;
-	    lesson.date = newItem.description;
-	    return lesson;
-	};
 	/**
 	 * Load previous lessons from current one
 	 * Attached homeworks to lessons are also loaded
@@ -9020,29 +8974,34 @@
 	var subject_service_1 = __webpack_require__(82);
 	var pedagogic_item_service_1 = __webpack_require__(96);
 	var progression_service_1 = __webpack_require__(97);
+	var tools = __webpack_require__(73);
 	exports.EditLessonController = entcore_1.ng.controller('EditLessonController', ['$scope', '$rootScope', '$routeParams', function ($scope, $rootScope, $routeParams) {
 	        var vm = _this;
+	        var newLesson = true;
 	        init();
 	        function init() {
 	            return __awaiter(this, void 0, void 0, function () {
-	                return __generator(this, function (_a) {
-	                    switch (_a.label) {
+	                var _a;
+	                return __generator(this, function (_b) {
+	                    switch (_b.label) {
 	                        case 0:
-	                            this.lesson = new index_1.Lesson();
-	                            $scope.lesson = this.lesson;
+	                            _a = $scope;
+	                            return [4 /*yield*/, initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), new Date())];
+	                        case 1:
+	                            _a.lesson = _b.sent();
 	                            //existing lesson
 	                            $scope.tabs.showAnnotations = false;
 	                            return [4 /*yield*/, loadSubjects()];
-	                        case 1:
-	                            _a.sent();
-	                            return [4 /*yield*/, loadHomeworkTypes()];
 	                        case 2:
-	                            _a.sent();
+	                            _b.sent();
+	                            return [4 /*yield*/, loadHomeworkTypes()];
+	                        case 3:
+	                            _b.sent();
 	                            if ($routeParams.idLesson) {
-	                                entcore_1.model.newLesson = null;
+	                                $scope.newLesson = null;
 	                                loadExistingLesson();
 	                            }
-	                            else if (entcore_1.model.newLesson) {
+	                            else if ($scope.newLesson) {
 	                                createNewLessonFromPedagogicItem();
 	                            }
 	                            else if ($routeParams.progressionId) {
@@ -9067,41 +9026,6 @@
 	                                    $scope.loadPreviousLessonsFromLesson($scope.lesson);
 	                                }
 	                            });
-	                            // $q.all([
-	                            //     //need subjects
-	                            //     loadSubjects(),
-	                            //     //need homework types
-	                            //     loadHomeworkTypes()
-	                            // ]).then(()=>{
-	                            //     if ($routeParams.idLesson) {
-	                            //         model.newLesson = null;
-	                            //         loadExistingLesson();
-	                            //     } else if(model.newLesson){
-	                            //         createNewLessonFromPedagogicItem();
-	                            //     }else if ($routeParams.progressionId){
-	                            //         //show the EditProgressionLessonController
-	                            //         loadNewLesson();
-	                            //         return ;
-	                            //     }else{
-	                            //         //new lesson
-	                            //         loadNewLesson();
-	                            //     }
-	                            //
-	                            //     $scope.data.tabSelected = 'lesson';
-	                            //
-	                            //     //add watch on selection
-	                            //     $scope.$watch('lesson.audience',()=>{
-	                            //         if($scope.lesson && $scope.lesson.previousLessons){
-	                            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
-	                            //         }
-	                            //     });
-	                            //     //add watch on selection
-	                            //     $scope.$watch('lesson.subject',()=>{
-	                            //         if ($scope.lesson && $scope.lesson.previousLessons){
-	                            //             $scope.loadPreviousLessonsFromLesson($scope.lesson);
-	                            //         }
-	                            //     });
-	                            // });
 	                            //progression init
 	                            if ($routeParams.progressionId) {
 	                                $scope.data.tabSelected = 'lesson';
@@ -9115,6 +9039,57 @@
 	                });
 	            });
 	        }
+	        function initLesson(timeFromCalendar, selectedDate) {
+	            return __awaiter(this, void 0, void 0, function () {
+	                var lesson, newItem, itemDate;
+	                return __generator(this, function (_a) {
+	                    lesson = new index_1.Lesson();
+	                    lesson.audience = {}; //sets the default audience to undefined
+	                    lesson.subject = entcore_1.model.subjects.first();
+	                    lesson.audienceType = lesson.audience.type;
+	                    lesson.color = tools.DEFAULT_ITEM_COLOR;
+	                    lesson.state = tools.DEFAULT_STATE;
+	                    lesson.title = entcore_1.idiom.translate('diary.lesson.label');
+	                    lesson.description = '';
+	                    lesson.annotations = '';
+	                    if (timeFromCalendar) {
+	                        newItem = entcore_1.model.calendar.newItem;
+	                        // force to HH:00 -> HH:00 + 1 hour
+	                        newItem.beginning = newItem.beginning.second(0);
+	                        newItem.date = newItem.beginning;
+	                        if (!newItem.beginning.isBefore(newItem.end)) {
+	                            newItem.end = entcore_1.moment(newItem.beginning);
+	                            newItem.end.minute(0).second(0).add(1, 'hours');
+	                        }
+	                        if (newItem.audience) {
+	                            lesson.audience = newItem.audience;
+	                            lesson.audienceType = lesson.audience.type;
+	                        }
+	                        if (newItem.room) {
+	                            lesson.room = newItem.room;
+	                        }
+	                        if (newItem.subject) {
+	                            lesson.subject = newItem.subject;
+	                        }
+	                    }
+	                    else {
+	                        itemDate = (selectedDate) ? entcore_1.moment(selectedDate) : entcore_1.moment();
+	                        newItem = {
+	                            date: itemDate,
+	                            beginning: entcore_1.moment().minute(0).second(0),
+	                            end: entcore_1.moment().minute(0).second(0).add(1, 'hours')
+	                        };
+	                    }
+	                    lesson.newItem = newItem;
+	                    lesson.startTime = newItem.beginning;
+	                    lesson.endTime = newItem.end;
+	                    lesson.date = newItem.date;
+	                    lesson.date = newItem.description;
+	                    return [2 /*return*/, lesson];
+	                });
+	            });
+	        }
+	        ;
 	        function loadHomeworkTypes() {
 	            return __awaiter(this, void 0, void 0, function () {
 	                var e_1;
@@ -9161,8 +9136,7 @@
 	            });
 	        }
 	        function createNewLessonFromPedagogicItem() {
-	            $scope.lesson = entcore_1.model.newLesson;
-	            entcore_1.model.newLesson = null;
+	            $scope.newLesson = null;
 	            //$scope.newItem = $scope.lesson.newItem;
 	            populateExistingLesson();
 	        }
@@ -9203,7 +9177,7 @@
 	        }
 	        function loadNewLesson() {
 	            var selectedDate = $scope.selectedDateInTheFuture();
-	            $scope.lesson = entcore_1.model.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
+	            $scope.lesson = this.initLesson(("timeFromCalendar" === $routeParams.timeFromCalendar), selectedDate);
 	            $scope.newItem = $scope.lesson.newItem;
 	        }
 	        /** Progression Part **/
@@ -11776,7 +11750,7 @@
 	            });
 	            element.on('show.timepicker', function () {
 	                element.parents().find('lightbox').on('click.timepicker', function (e) {
-	                    if (!(element.parent().find(e.target).length ||
+	                    if (timepicker && !(element.parent().find(e.target).length ||
 	                        timepicker.$widget.is(e.target) ||
 	                        timepicker.$widget.find(e.target).length)) {
 	                        timepicker.hideWidget();
