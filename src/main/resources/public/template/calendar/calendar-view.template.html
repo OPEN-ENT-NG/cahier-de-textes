@@ -1,6 +1,6 @@
 <div ng-controller="CalendarController as calendarController">
 
-<div  class="mainDiaryContainer" style="float: left " ng-init="model.display.showList=false" ng-class="{'active': currentRightPanelVisible }" >
+<div  class="mainDiaryContainer" ng-init="model.display.showList=false" ng-class="{'active': currentRightPanelVisible }" >
       <div class="row diary-container" ng-class="{'diary-show-homeworks' : display.bShowHomeworks,'diary-show-calendar' : display.bShowCalendar}">
           <filters style="padding-bottom: 0.8em;">
               <ul>
