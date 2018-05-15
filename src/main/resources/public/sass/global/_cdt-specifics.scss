@@ -1,0 +1,21 @@
+@import './specifics/mixins';
+
+body.cdt {
+  @import './specifics/select';
+  @import './specifics/utils';
+  @import './specifics/custom';
+  @import './specifics/switch';
+}
+
+.edt-settings {
+  @import './specifics/switch';
+  table {
+    th {
+      i::before {
+        font-size: 10px !important;
+        margin-left: 5px;
+        position: absolute;
+      }
+    }
+  }
+}

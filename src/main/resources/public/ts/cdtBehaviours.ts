@@ -3,7 +3,7 @@ import http from 'axios';
 import { SETTINGS_SNIPPLET } from './snipplets';
 import { Exclusion, Exclusions } from './model';
 
-export const edtBehaviours = {
+export const cdtBehaviours = {
     rights: {
         workflow: {
             view: 'fr.cgi.edt.controllers.EdtController|view',
@@ -23,7 +23,7 @@ export const edtBehaviours = {
         }
     },
     loadResources: function(callback){
-        http.get('/edt/list').then(function(edt){
+        http.get('/cdt/list').then(function(edt){
             this.resources = _.map(_.where(edt, { trashed: 0 }), function(edt){
                 edt.icon = edt.icon || '/img/illustrations/edt-default.png';
                 return {

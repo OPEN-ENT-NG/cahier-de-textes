@@ -1,8 +1,8 @@
 {
 	"main" : "fr.openent.diary.Diary",
 	"port" : 8025,
-	"app-name" : "Diary",
-	"app-address" : "/diary",
+	"app-name" : "Cahier de texte",
+	"app-address" : "/cdt",
 	"app-icon" : "Diary-large",
 	"app-displayName" : "Diary",
 	"mode": "dev",

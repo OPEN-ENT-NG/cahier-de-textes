@@ -47,22 +47,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var controllers = __webpack_require__(2);
-	for (var controller in controllers) {
-	    entcore_1.ng.controllers.push(controllers[controller]);
-	}
-	entcore_1.routes.define(function ($routeProvider) {
-	    $routeProvider
-	        .when('/', {
-	        action: 'main'
-	    })
-	        .when('/create', {
-	        action: 'create'
-	    })
-	        .otherwise({
-	        redirectTo: '/'
-	    });
-	});
+	var cdtBehaviours_1 = __webpack_require__(84);
+	entcore_1.Behaviours.register('edt', cdtBehaviours_1.cdtBehaviours);
 
 
 /***/ }),
@@ -72,299 +58,8 @@
 	module.exports = entcore;
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	function __export(m) {
-	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-	}
-	Object.defineProperty(exports, "__esModule", { value: true });
-	__export(__webpack_require__(3));
-	__export(__webpack_require__(83));
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	var __generator = (this && this.__generator) || function (thisArg, body) {
-	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-	    function verb(n) { return function (v) { return step([n, v]); }; }
-	    function step(op) {
-	        if (f) throw new TypeError("Generator is already executing.");
-	        while (_) try {
-	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-	            if (y = 0, t) op = [0, t.value];
-	            switch (op[0]) {
-	                case 0: case 1: t = op; break;
-	                case 4: _.label++; return { value: op[1], done: false };
-	                case 5: _.label++; y = op[1]; op = [0]; continue;
-	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-	                default:
-	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-	                    if (t[2]) _.ops.pop();
-	                    _.trys.pop(); continue;
-	            }
-	            op = body.call(thisArg, _);
-	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-	    }
-	};
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var entcore_1 = __webpack_require__(1);
-	var model_1 = __webpack_require__(4);
-	exports.main = entcore_1.ng.controller('EdtController', ['$scope', 'route', '$location', function ($scope, route, $location) {
-	        return __awaiter(this, void 0, void 0, function () {
-	            var _this = this;
-	            var initTriggers;
-	            return __generator(this, function (_a) {
-	                $scope.structures = new model_1.Structures();
-	                $scope.structures.sync();
-	                $scope.structure = $scope.structures.first();
-	                $scope.calendarLoader = {
-	                    show: false,
-	                    display: function () {
-	                        $scope.calendarLoader.show = true;
-	                        $scope.safeApply();
-	                    },
-	                    hide: function () {
-	                        $scope.calendarLoader.show = false;
-	                        $scope.safeApply();
-	                    }
-	                };
-	                /**
-	                 * Synchronize a structure.
-	                 */
-	                $scope.syncStructure = function (structure) { return __awaiter(_this, void 0, void 0, function () {
-	                    var externalClassId;
-	                    return __generator(this, function (_a) {
-	                        switch (_a.label) {
-	                            case 0:
-	                                $scope.structure = structure;
-	                                $scope.structure.eventer.once('refresh', function () { return $scope.safeApply(); });
-	                                return [4 /*yield*/, $scope.structure.sync()];
-	                            case 1:
-	                                _a.sent();
-	                                switch (entcore_1.model.me.type) {
-	                                    case model_1.USER_TYPES.teacher:
-	                                        {
-	                                            $scope.params.user = entcore_1.model.me.userId;
-	                                        }
-	                                        break;
-	                                    case model_1.USER_TYPES.student:
-	                                        {
-	                                            $scope.params.group = entcore_1._.findWhere($scope.structure.groups.all, { id: entcore_1.model.me.classes[0] });
-	                                        }
-	                                        break;
-	                                    case model_1.USER_TYPES.relative: {
-	                                        if ($scope.structure.students.all.length > 0) {
-	                                            externalClassId = $scope.structure.students.all[0].classes[0];
-	                                            $scope.params.group = entcore_1._.findWhere($scope.structure.groups.all, { externalId: externalClassId });
-	                                            $scope.currentStudent = $scope.structure.students.all[0];
-	                                        }
-	                                    }
-	                                }
-	                                if (!$scope.isPersonnel()) {
-	                                    $scope.getTimetable();
-	                                }
-	                                else {
-	                                    $scope.safeApply();
-	                                }
-	                                return [2 /*return*/];
-	                        }
-	                    });
-	                }); };
-	                $scope.syncStructure($scope.structure);
-	                $scope.switchStructure = function (structure) {
-	                    $scope.syncStructure(structure);
-	                };
-	                /**
-	                 * Returns if current user is a personnel
-	                 * @returns {boolean}
-	                 */
-	                $scope.isPersonnel = function () { return entcore_1.model.me.type === model_1.USER_TYPES.personnel; };
-	                /**
-	                 * Returns if current user is a teacher
-	                 * @returns {boolean}
-	                 */
-	                $scope.isTeacher = function () { return entcore_1.model.me.type === model_1.USER_TYPES.teacher; };
-	                /**
-	                 * Returns if current user is a student
-	                 * @returns {boolean}
-	                 */
-	                $scope.isStudent = function () { return entcore_1.model.me.type === model_1.USER_TYPES.student; };
-	                /**
-	                 * Returns if current user is a relative profile
-	                 * @returns {boolean}
-	                 */
-	                $scope.isRelative = function () { return entcore_1.model.me.type === model_1.USER_TYPES.relative; };
-	                /**
-	                 * Returns student group
-	                 * @param {Student} user user group
-	                 * @returns {Group}
-	                 */
-	                $scope.getStudentGroup = function (user) {
-	                    return entcore_1._.findWhere($scope.structure.groups.all, { externalId: user.classes[0] });
-	                };
-	                /**
-	                 * Get timetable bases on $scope.params object
-	                 * @returns {Promise<void>}
-	                 */
-	                $scope.getTimetable = function () { return __awaiter(_this, void 0, void 0, function () {
-	                    return __generator(this, function (_a) {
-	                        switch (_a.label) {
-	                            case 0:
-	                                if (!($scope.params.user !== null
-	                                    && $scope.params.group !== null)) return [3 /*break*/, 1];
-	                                entcore_1.notify.error('');
-	                                return [3 /*break*/, 3];
-	                            case 1:
-	                                $scope.calendarLoader.display();
-	                                $scope.structure.courses.all = [];
-	                                return [4 /*yield*/, $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group)];
-	                            case 2:
-	                                _a.sent();
-	                                $scope.calendarLoader.hide();
-	                                _a.label = 3;
-	                            case 3: return [2 /*return*/];
-	                        }
-	                    });
-	                }); };
-	                $scope.getTeacherTimetable = function () {
-	                    $scope.params.group = null;
-	                    $scope.params.user = entcore_1.model.me.userId;
-	                    $scope.getTimetable();
-	                };
-	                $scope.params = {
-	                    user: null,
-	                    group: null,
-	                    updateItem: null,
-	                    dateFromCalendar: null
-	                };
-	                if ($scope.isRelative()) {
-	                    $scope.currentStudent = null;
-	                }
-	                $scope.safeApply = function () {
-	                    return new Promise(function (resolve, reject) {
-	                        var phase = $scope.$root.$$phase;
-	                        if (phase === '$apply' || phase === '$digest') {
-	                            if (resolve && (typeof (resolve) === 'function')) {
-	                                resolve();
-	                            }
-	                        }
-	                        else {
-	                            if (resolve && (typeof (resolve) === 'function')) {
-	                                $scope.$apply(resolve);
-	                            }
-	                            else {
-	                                $scope.$apply()();
-	                            }
-	                        }
-	                    });
-	                };
-	                /**
-	                 * Course creation
-	                 */
-	                $scope.createCourse = function () {
-	                    var edtRights = entcore_1.Behaviours.applicationsBehaviours.edt.rights;
-	                    if (entcore_1.model.me.hasWorkflow(edtRights.workflow.create)) {
-	                        $scope.goTo('/create');
-	                    }
-	                };
-	                $scope.goTo = function (state) {
-	                    $location.path(state);
-	                    $scope.safeApply();
-	                };
-	                $scope.translate = function (key) { return entcore_1.idiom.translate(key); };
-	                $scope.calendarUpdateItem = function (item) {
-	                    $scope.params.updateItem = item;
-	                    $scope.goTo('/create');
-	                };
-	                $scope.calendarDropItem = function (item) {
-	                    $scope.calendarUpdateItem(item);
-	                };
-	                $scope.calendarResizedItem = function (item) {
-	                    $scope.calendarUpdateItem(item);
-	                };
-	                initTriggers = function () {
-	                    entcore_1.model.calendar.eventer.off('calendar.create-item');
-	                    entcore_1.model.calendar.eventer.on('calendar.create-item', function () {
-	                        if ($location.path() !== '/create') {
-	                            $scope.createCourse();
-	                        }
-	                    });
-	                    entcore_1.model.calendar.eventer.off('calendar.drop-item');
-	                    entcore_1.model.calendar.eventer.on('calendar.drop-item', function (item) {
-	                        $scope.calendarDropItem(item);
-	                    });
-	                    entcore_1.model.calendar.eventer.off('calendar.resize-item');
-	                    entcore_1.model.calendar.eventer.on('calendar.resize-item', function (item) {
-	                        $scope.calendarResizedItem(item);
-	                    });
-	                };
-	                initTriggers();
-	                /**
-	                 * Subscriber to directive calendar changes event
-	                 */
-	                $scope.$watch(function () { return entcore_1.model.calendar; }, function (oldVal, newVal) {
-	                    initTriggers();
-	                    if (entcore_1.moment(oldVal.dayForWeek).format('DD/MM/YYYY') !== entcore_1.moment(newVal.dayForWeek).format('DD/MM/YYYY')) {
-	                        $scope.getTimetable();
-	                    }
-	                });
-	                route({
-	                    main: function () {
-	                        entcore_1.template.open('main', 'main');
-	                    },
-	                    create: function () {
-	                        var startDate = new Date();
-	                        var endDate = new Date();
-	                        if (entcore_1.model && entcore_1.model.calendar && entcore_1.model.calendar.newItem) {
-	                            var dateFromCalendar = entcore_1.model.calendar.newItem;
-	                            if (dateFromCalendar.beginning)
-	                                startDate = dateFromCalendar.beginning = dateFromCalendar.beginning;
-	                            if (dateFromCalendar.end)
-	                                endDate = dateFromCalendar.end = dateFromCalendar.end;
-	                            $scope.params.dateFromCalendar = dateFromCalendar;
-	                        }
-	                        if ($scope.params.updateItem) {
-	                            $scope.course = new model_1.Course($scope.params.updateItem);
-	                        }
-	                        else {
-	                            $scope.course = new model_1.Course({
-	                                teachers: [],
-	                                groups: [],
-	                                courseOccurrences: [],
-	                                startDate: startDate,
-	                                endDate: endDate,
-	                            }, startDate, endDate);
-	                            if ($scope.structure && $scope.structures.all.length === 1)
-	                                $scope.course.structureId = $scope.structure.id;
-	                        }
-	                        entcore_1.template.open('main', 'course-create');
-	                    }
-	                });
-	                return [2 /*return*/];
-	            });
-	        });
-	    }]);
-
-
-/***/ }),
+/* 2 */,
+/* 3 */,
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3130,6 +2825,7 @@
 	                        if (teacher === null && group !== null)
 	                            filter += "group=" + group.name;
 	                        uri = "/directory/timetable/courses/" + structure.id + "/" + firstDate + "/" + endDate + "?" + filter;
+	                        entcore_1.model.me.userId;
 	                        return [4 /*yield*/, axios_1.default.get(uri)];
 	                    case 1:
 	                        courses = _a.sent();
@@ -5584,7 +5280,74 @@
 
 
 /***/ }),
-/* 83 */
+/* 83 */,
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var entcore_1 = __webpack_require__(1);
+	var axios_1 = __webpack_require__(47);
+	var snipplets_1 = __webpack_require__(85);
+	var model_1 = __webpack_require__(4);
+	exports.cdtBehaviours = {
+	    rights: {
+	        workflow: {
+	            view: 'fr.cgi.edt.controllers.EdtController|view',
+	            create: 'fr.cgi.edt.controllers.EdtController|create',
+	            manage: 'fr.cgi.edt.controllers.EdtController|createExclusion'
+	        },
+	        resource: {
+	            read: {
+	                right: "fr-cgi-edt-controllers-EdtController|getEdt"
+	            },
+	            contrib: {
+	                right: "fr-cgi-edt-controllers-EdtController|updateEdt"
+	            },
+	            manager: {
+	                right: "fr-cgi-edt-controllers-EdtController|addRights"
+	            }
+	        }
+	    },
+	    loadResources: function (callback) {
+	        axios_1.default.get('/cdt/list').then(function (edt) {
+	            this.resources = entcore_1._.map(entcore_1._.where(edt, { trashed: 0 }), function (edt) {
+	                edt.icon = edt.icon || '/img/illustrations/edt-default.png';
+	                return {
+	                    title: edt.title,
+	                    owner: edt.owner,
+	                    icon: edt.icon,
+	                    path: '/edt#/view-edt/' + edt._id,
+	                    _id: edt._id
+	                };
+	            });
+	            callback(this.resources);
+	        }.bind(this));
+	    },
+	    model: {
+	        Exclusion: model_1.Exclusion,
+	        Exclusions: model_1.Exclusions
+	    },
+	    sniplets: {
+	        settings: snipplets_1.SETTINGS_SNIPPLET
+	    }
+	};
+
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	function __export(m) {
+	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+	}
+	Object.defineProperty(exports, "__esModule", { value: true });
+	__export(__webpack_require__(86));
+
+
+/***/ }),
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5625,199 +5388,132 @@
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
+	var entcore_toolkit_1 = __webpack_require__(6);
 	var model_1 = __webpack_require__(4);
-	exports.creationController = entcore_1.ng.controller('CreationController', ['$scope', function ($scope) {
-	        var _this = this;
-	        $scope.daysOfWeek = model_1.DAYS_OF_WEEK;
-	        $scope.comboLabels = model_1.COMBO_LABELS;
-	        $scope.courseOccurrenceForm = new model_1.CourseOccurrence(); //Init courseOccurence needed for the table form
-	        $scope.isAnUpdate = false;
-	        $scope.is_recurrent = false;
-	        /**
-	         * Init Courses
-	         */
-	        if ($scope.params.updateItem) {
-	            /**
-	             * Init Form with data form an update
-	             */
-	            $scope.isAnUpdate = true;
-	            var item = $scope.params.updateItem;
-	            $scope.params.updateItem = null;
-	            $scope.course.courseOccurrences = [];
-	            $scope.course.teachers = [];
-	            for (var i = 0; i < $scope.course.teacherIds.length; i++) {
-	                $scope.course.teachers.push(entcore_1._.findWhere($scope.structure.teachers.all, { id: $scope.course.teacherIds[i] }));
-	            }
-	            var groups = $scope.course.groups;
-	            $scope.course.groups = [];
-	            for (var i = 0; i < groups.length; i++) {
-	                $scope.course.groups.push(entcore_1._.findWhere($scope.structure.groups.all, { name: groups[i] }));
-	            }
-	            for (var i = 0; i < $scope.course.classes.length; i++) {
-	                $scope.course.groups.push(entcore_1._.findWhere($scope.structure.groups.all, { name: $scope.course.classes[i] }));
-	            }
-	            $scope.is_recurrent = entcore_1.moment(item.endDate).diff(item.startDate, 'days') != 0;
-	            if ($scope.is_recurrent) {
-	                if (item.dayOfWeek && item.startDate && item.endDate) {
-	                    $scope.course.courseOccurrences = [
-	                        new model_1.CourseOccurrence(item["dayOfWeek"], item["roomLabels"][0], new Date(item.startDate), new Date(item.endDate))
-	                    ];
-	                }
-	            }
-	            else {
-	                $scope.courseOccurrenceForm.startTime = entcore_1.moment(item.startDate).seconds(0).millisecond(0).toDate();
-	                $scope.courseOccurrenceForm.endTime = entcore_1.moment(item.endDate).seconds(0).millisecond(0).toDate();
-	                $scope.courseOccurrenceForm.dayOfWeek = entcore_1.moment(item.startDate).day();
-	                $scope.courseOccurrenceForm.roomLabels = item["roomLabels"];
-	            }
-	        }
-	        else {
-	            if ($scope.params.group)
-	                $scope.course.groups.push($scope.params.group);
-	            if ($scope.params.user)
-	                $scope.course.teachers.push($scope.params.user);
-	            if ($scope.structures.all.length === 1)
-	                $scope.course.structureId = $scope.structure.id;
-	        }
-	        if ($scope.params.dateFromCalendar) {
-	            var dateFromCalendar = $scope.params.dateFromCalendar;
-	            $scope.params.dateFromCalendar = null;
-	            $scope.courseOccurrenceForm.startTime = dateFromCalendar.beginning.seconds(0).millisecond(0).toDate();
-	            $scope.courseOccurrenceForm.endTime = dateFromCalendar.end.seconds(0).millisecond(0).toDate();
-	            $scope.courseOccurrenceForm.dayOfWeek = dateFromCalendar.beginning.day();
-	        }
-	        /**
-	         * Drop a teacher in teachers list
-	         * @param {Teacher} teacher Teacher to drop
-	         */
-	        $scope.dropTeacher = function (teacher) {
-	            $scope.course.teachers = entcore_1._.without($scope.course.teachers, teacher);
-	        };
-	        /**
-	         * Drop a group in groups list
-	         * @param {Group} group Group to drop
-	         */
-	        $scope.dropGroup = function (group) {
-	            $scope.course.groups = entcore_1._.without($scope.course.groups, group);
-	        };
-	        /**
-	         * Drop a course occurrence from the table
-	         * @param {CourseOccurrence} occurrence Course occurrence to drop.
-	         */
-	        $scope.dropOccurrence = function (occurrence) {
-	            $scope.course.courseOccurrences = entcore_1._.without($scope.course.courseOccurrences, occurrence);
-	        };
-	        /**
-	         * Create a course occurrence
-	         */
-	        $scope.submit_CourseOccurrence_Form = function () {
-	            $scope.changeDate();
-	            $scope.course.courseOccurrences.push(entcore_1._.clone($scope.courseOccurrenceForm));
-	            $scope.courseOccurrenceForm = new model_1.CourseOccurrence();
-	        };
-	        /**
-	         * Function canceling course creation
-	         */
-	        $scope.cancelCreation = function () {
-	            $scope.goTo('/');
-	            delete $scope.course;
-	        };
-	        /**
-	         * Returns time formatted
-	         * @param date Date to format
-	         */
-	        $scope.getTime = function (date) {
-	            return entcore_1.moment(date).format("HH:mm");
-	        };
-	        /**
-	         *
-	         */
-	        $scope.changeDate = function () {
-	            var startDate = entcore_1.moment($scope.course.startDate).format("YYYY-MM-DD"), startTime = entcore_1.moment($scope.courseOccurrenceForm.startTime).format("HH:mm:ss"), endDate = entcore_1.moment($scope.course.endDate).format("YYYY-MM-DD"), endTime = entcore_1.moment($scope.courseOccurrenceForm.endTime).format("HH:mm:ss");
-	            if (!$scope.is_recurrent)
-	                endDate = startDate;
-	            $scope.course.startMoment = entcore_1.moment(startDate + 'T' + startTime);
-	            $scope.course.endMoment = entcore_1.moment(endDate + 'T' + endTime);
-	            $scope.courseOccurrenceForm.startTime = $scope.course.startDate = ($scope.course.startMoment.toDate());
-	            $scope.courseOccurrenceForm.endTime = $scope.course.endDate = ($scope.course.endMoment.toDate());
-	        };
-	        /**
-	         * Save course based on parameter
-	         * @param {Course} course course to save
-	         * @returns {Promise<void>} Returns a promise
-	         */
-	        $scope.saveCourse = function (course) { return __awaiter(_this, void 0, void 0, function () {
-	            var coursesToSave, newCourses;
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        $scope.form_is_not_valid = !$scope.isValidForm();
-	                        if (!$scope.is_recurrent) {
-	                            $scope.course.courseOccurrences = [];
-	                            $scope.courseOccurrenceForm.dayOfWeek = entcore_1.moment($scope.course.startDate).day();
-	                            $scope.submit_CourseOccurrence_Form();
-	                        }
-	                        if (!course._id) return [3 /*break*/, 6];
-	                        coursesToSave = [];
-	                        if (!(course.courseOccurrences.length === 0)) return [3 /*break*/, 1];
-	                        entcore_1.notify.error('edt.notify.update.err');
-	                        return [2 /*return*/];
-	                    case 1:
-	                        if (!(course.courseOccurrences.length === 1)) return [3 /*break*/, 2];
-	                        course = model_1.Utils.cleanCourseValuesWithFirstOccurence(course);
-	                        coursesToSave.push(model_1.Utils.cleanCourseForSave(course));
-	                        return [3 /*break*/, 4];
-	                    case 2:
-	                        newCourses = entcore_1._.clone(course);
-	                        newCourses.courseOccurrences = entcore_1._.map(course.courseOccurrences, entcore_1._.clone);
-	                        delete newCourses._id; // provoque la création
-	                        newCourses.courseOccurrences.shift(); // la première occurence sera dans la mise a jour
-	                        course.courseOccurrences = [course.courseOccurrences[0]]; // on enlève les occurences qui seront créées via newCourses
-	                        course = model_1.Utils.cleanCourseValuesWithFirstOccurence(course);
-	                        coursesToSave.push(model_1.Utils.cleanCourseForSave(course));
-	                        // not working coursesToSave.push(Utils.cleanCourseForSave(newCourses));
-	                        return [4 /*yield*/, $scope.structure.courses.create(newCourses)];
-	                    case 3:
-	                        // not working coursesToSave.push(Utils.cleanCourseForSave(newCourses));
-	                        _a.sent();
-	                        _a.label = 4;
-	                    case 4: return [4 /*yield*/, $scope.structure.courses.update(coursesToSave)];
-	                    case 5:
-	                        _a.sent();
-	                        return [3 /*break*/, 8];
-	                    case 6: return [4 /*yield*/, $scope.structure.courses.create(course)];
-	                    case 7:
-	                        _a.sent();
-	                        _a.label = 8;
-	                    case 8:
-	                        delete $scope.course;
-	                        $scope.goTo('/');
-	                        $scope.getTimetable();
-	                        return [2 /*return*/];
-	                }
+	exports.SETTINGS_SNIPPLET = {
+	    hidden: true,
+	    controller: {
+	        init: function () {
+	            return __awaiter(this, void 0, void 0, function () {
+	                var _this = this;
+	                return __generator(this, function (_a) {
+	                    this.display = {
+	                        exclusionForm: false,
+	                        DropLightbox: false
+	                    };
+	                    this.current = { exclusion: null };
+	                    this.sort = {
+	                        type: 'start_date',
+	                        reverse: false
+	                    };
+	                    this.exclusions = new entcore_1.Behaviours.applicationsBehaviours.edt.model.Exclusions();
+	                    this.$watch(function () { return _this.structure; }, function () { return __awaiter(_this, void 0, void 0, function () {
+	                        return __generator(this, function (_a) {
+	                            switch (_a.label) {
+	                                case 0:
+	                                    if (!(this.structure !== undefined)) return [3 /*break*/, 2];
+	                                    return [4 /*yield*/, this.exclusions.sync(this.structure.id)];
+	                                case 1:
+	                                    _a.sent();
+	                                    this.$apply();
+	                                    _a.label = 2;
+	                                case 2: return [2 /*return*/];
+	                            }
+	                        });
+	                    }); });
+	                    return [2 /*return*/];
+	                });
 	            });
-	        }); };
-	        /**
-	         * Function triggered on step 3 activation
-	         */
-	        $scope.isValidForm = function () {
-	            return $scope.course
-	                && $scope.course.teachers
-	                && $scope.course.groups
-	                && $scope.course.teachers.length > 0
-	                && $scope.course.groups.length > 0
-	                && $scope.course.subjectId !== undefined
-	                && (($scope.is_recurrent
-	                    && $scope.course.courseOccurrences
-	                    && $scope.course.courseOccurrences.length > 0)
-	                    ||
-	                        (!$scope.is_recurrent
-	                            && isNaN($scope.courseOccurrenceForm.startTime._d)
-	                            && isNaN($scope.courseOccurrenceForm.endTime._d)));
-	        };
-	    }]);
+	        },
+	        addExclusion: function () {
+	            this.openExclusionForm(new entcore_1.Behaviours.applicationsBehaviours.edt.model.Exclusion(this.structure.id));
+	        },
+	        openExclusionForm: function (exclusion) {
+	            console.log('opening');
+	            this.current.exclusion = exclusion;
+	            if (exclusion.id) {
+	                this.current.tmpExclusion = new model_1.Exclusion();
+	                this.current.tmpExclusion = entcore_toolkit_1.Mix.castAs(model_1.Exclusion, exclusion);
+	            }
+	            this.display.exclusionForm = true;
+	        },
+	        cancelExclusionForm: function () {
+	            if (this.current.tmpExclusion) {
+	                for (var key in this.current.tmpExclusion) {
+	                    this.current.exclusion[key] = this.current.tmpExclusion[key];
+	                }
+	                delete this.current.tmpExclusion;
+	            }
+	            this.display.exclusionForm = false;
+	        },
+	        createExclusion: function () {
+	            return __awaiter(this, void 0, void 0, function () {
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0:
+	                            this.current.exclusion.loading = true;
+	                            return [4 /*yield*/, this.current.exclusion.save()];
+	                        case 1:
+	                            _a.sent();
+	                            this.display.exclusionForm = false;
+	                            this.current.exclusion.loading = false;
+	                            return [4 /*yield*/, this.exclusions.sync(this.structure.id)];
+	                        case 2:
+	                            _a.sent();
+	                            this.$apply();
+	                            return [2 /*return*/];
+	                    }
+	                });
+	            });
+	        },
+	        validDeletion: function (ex) {
+	            return __awaiter(this, void 0, void 0, function () {
+	                return __generator(this, function (_a) {
+	                    switch (_a.label) {
+	                        case 0: return [4 /*yield*/, ex.delete()];
+	                        case 1:
+	                            _a.sent();
+	                            this.display.DropLightbox = false;
+	                            return [4 /*yield*/, this.exclusions.sync(this.structure.id)];
+	                        case 2:
+	                            _a.sent();
+	                            this.$apply();
+	                            return [2 /*return*/];
+	                    }
+	                });
+	            });
+	        },
+	        cancelDeletion: function () {
+	            this.display.DropLightbox = false;
+	            delete this.current.exclusion;
+	        },
+	        dropExclusion: function (ex) {
+	            this.current.exclusion = ex;
+	            this.display.DropLightbox = true;
+	        },
+	        formatDate: function (date) {
+	            return entcore_1.moment(date).format('DD/MM/YYYY');
+	        },
+	        currentExclusionValidation: function () {
+	            if (this.current.exclusion) {
+	                return this.current.exclusion.description.trim() !== ''
+	                    && entcore_1.moment(this.current.exclusion.end_date)
+	                        .diff(entcore_1.moment(this.current.exclusion.start_date)) >= 0;
+	            }
+	        },
+	        updateExclusion: function (exclusion) {
+	            var _this = this;
+	            exclusion.save().then(function () {
+	                exclusion.loading = false;
+	                _this.$apply();
+	            });
+	            exclusion.loading = true;
+	            this.$apply();
+	        }
+	    }
+	};
 
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=application.js.map
+//# sourceMappingURL=behaviours.js.map

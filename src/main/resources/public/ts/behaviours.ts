@@ -1,4 +1,4 @@
 import { Behaviours } from 'entcore';
-import { edtBehaviours } from './edtBehaviours';
+import { cdtBehaviours } from './cdtBehaviours';
 
-Behaviours.register('edt', edtBehaviours);
+Behaviours.register('edt', cdtBehaviours);

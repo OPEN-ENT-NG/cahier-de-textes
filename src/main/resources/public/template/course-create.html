@@ -5,7 +5,7 @@
     </h1>
     <form>
         <article>
-            <h3><i18n>edt.utils.configuration</i18n></h3>
+            <h3><i18n>cdt.utils.configuration</i18n></h3>
             <div ng-if="structures.all.length > 1" class="row form-row">
                 <label for="select-structure" class="cell two twelve-mobile asterisk obligatoire">
                     Structure
@@ -13,7 +13,7 @@
                 <div class="cell twelve-mobile ten">
                     <select ng-model="course.structureId" id="select-structure" required
                             ng-options="structure.name for structure in structures.all">
-                        <option value="" disabled selected>[[translate('edt.creation.structure.choose')]]</option>
+                        <option value="" disabled selected>[[translate('cdt.creation.structure.choose')]]</option>
                     </select>
                 </div>
             </div>
@@ -22,7 +22,7 @@
                     <i18n>utils.teachers</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
-                    <multi-combo title="[[translate('edt.creation.teachers.choose')]]" id="combo-teacher" combo-model="structure.teachers.all"
+                    <multi-combo title="[[translate('cdt.creation.teachers.choose')]]" id="combo-teacher" combo-model="structure.teachers.all"
                                  search-on="displayName" order-by="displayName" filtered-model="course.teachers"
                                  labels="comboLabels"></multi-combo>
                     <div class="select-blocks">
@@ -36,7 +36,7 @@
                     <i18n>utils.groups</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
-                    <multi-combo title="[[translate('edt.creation.groups.choose')]]" id="combo-groups" combo-model="structure.groups.all"
+                    <multi-combo title="[[translate('cdt.creation.groups.choose')]]" id="combo-groups" combo-model="structure.groups.all"
                                  search-on="name" order-by="name" filtered-model="course.groups"
                                  labels="comboLabels"></multi-combo>
                     <div class="select-blocks">
@@ -52,22 +52,22 @@
                 <div class="cell twelve-mobile ten">
                     <select class="twelve-mobile six" id="select-subject" ng-model="course.subjectId" required
                             ng-options="subject.subjectId as subject.subjectLabel for subject in structure.subjects.all">
-                        <option value="" disabled selected>[[translate('edt.creation.subject.choose')]]</option>
+                        <option value="" disabled selected>[[translate('cdt.creation.subject.choose')]]</option>
                     </select>
                 </div>
             </div>
             <div class="row row-form">
                 <label class="cell row-form two twelve-mobile">
-                    <i18n>edt.type</i18n>*
+                    <i18n>cdt.type</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <label>
                         <input type="radio" ng-model="is_recurrent" ng-value="false">
-                        <i18n>edt.type.punctual</i18n>
+                        <i18n>cdt.type.punctual</i18n>
                     </label>
                     <label>
                         <input type="radio" ng-model="is_recurrent" ng-value="true">
-                        <i18n>edt.type.recurrent</i18n>
+                        <i18n>cdt.type.recurrent</i18n>
                     </label>
                 </div>
             </div>
@@ -90,7 +90,7 @@
             </div>
             <div ng-if="!is_recurrent" class="row form-row">
                 <label class="cell two twelve-mobile">
-                    <i18n>edt.utils.room</i18n>
+                    <i18n>cdt.utils.room</i18n>
                 </label>
                 <div class="cell twelve-mobile ten"><input ng-model="courseOccurrenceForm.roomLabels[0]"/>
                 </div>
@@ -115,16 +115,16 @@
                             <thead>
                             <tr>
                                 <td>
-                                    <i18n>edt.utils.day</i18n>*
+                                    <i18n>cdt.utils.day</i18n>*
                                 </td>
                                 <td>
-                                    <i18n>edt.utils.start.time</i18n>*
+                                    <i18n>cdt.utils.start.time</i18n>*
                                 </td>
                                 <td>
-                                    <i18n>edt.utils.end.time</i18n>*
+                                    <i18n>cdt.utils.end.time</i18n>*
                                 </td>
                                 <td>
-                                    <i18n>edt.utils.room</i18n>
+                                    <i18n>cdt.utils.room</i18n>
                                 </td>
                                 <td>&nbsp;</td>
                             </tr>
@@ -152,7 +152,7 @@
                                 <td><input ng-model="courseOccurrenceForm.roomLabels[0]"/></td>
                                 <td>
                                     <button ng-click="submit_CourseOccurrence_Form()">
-                                        <i18n>edt.utils.add</i18n>
+                                        <i18n>cdt.utils.add</i18n>
                                     </button>
                                 </td>
                             </tr>
@@ -164,9 +164,9 @@
 
         </article>
         <div class="right-magnet vertical-spacing">
-            <div ng-if="form_is_not_valid" class="warning"> <i18n>edt.creation.error</i18n></div>
+            <div ng-if="form_is_not_valid" class="warning"> <i18n>cdt.creation.error</i18n></div>
             <button class="cancel" type="button" ng-click="cancelCreation()">
-                <i18n>edt.utils.cancel</i18n>
+                <i18n>cdt.utils.cancel</i18n>
             </button>
             <button ng-disabled="!isValidForm()" type="submit" ng-click="saveCourse(course)">
                 <i18n ng-if="isAnUpdate">edt.utils.modify</i18n>

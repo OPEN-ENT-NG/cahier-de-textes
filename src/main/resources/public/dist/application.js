@@ -127,7 +127,7 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
 	var model_1 = __webpack_require__(4);
-	exports.main = entcore_1.ng.controller('EdtController', ['$scope', 'route', '$location', function ($scope, route, $location) {
+	exports.main = entcore_1.ng.controller('CdtController', ['$scope', 'route', '$location', function ($scope, route, $location) {
 	        return __awaiter(this, void 0, void 0, function () {
 	            var _this = this;
 	            var initTriggers;
@@ -3130,6 +3130,7 @@
 	                        if (teacher === null && group !== null)
 	                            filter += "group=" + group.name;
 	                        uri = "/directory/timetable/courses/" + structure.id + "/" + firstDate + "/" + endDate + "?" + filter;
+	                        entcore_1.model.me.userId;
 	                        return [4 /*yield*/, axios_1.default.get(uri)];
 	                    case 1:
 	                        courses = _a.sent();

@@ -47,8 +47,8 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var entcore_1 = __webpack_require__(1);
-	var edtBehaviours_1 = __webpack_require__(84);
-	entcore_1.Behaviours.register('edt', edtBehaviours_1.edtBehaviours);
+	var cdtBehaviours_1 = __webpack_require__(84);
+	entcore_1.Behaviours.register('edt', cdtBehaviours_1.cdtBehaviours);
 
 
 /***/ }),
@@ -2825,6 +2825,7 @@
 	                        if (teacher === null && group !== null)
 	                            filter += "group=" + group.name;
 	                        uri = "/directory/timetable/courses/" + structure.id + "/" + firstDate + "/" + endDate + "?" + filter;
+	                        entcore_1.model.me.userId;
 	                        return [4 /*yield*/, axios_1.default.get(uri)];
 	                    case 1:
 	                        courses = _a.sent();
@@ -5289,7 +5290,7 @@
 	var axios_1 = __webpack_require__(47);
 	var snipplets_1 = __webpack_require__(85);
 	var model_1 = __webpack_require__(4);
-	exports.edtBehaviours = {
+	exports.cdtBehaviours = {
 	    rights: {
 	        workflow: {
 	            view: 'fr.cgi.edt.controllers.EdtController|view',
@@ -5309,7 +5310,7 @@
 	        }
 	    },
 	    loadResources: function (callback) {
-	        axios_1.default.get('/edt/list').then(function (edt) {
+	        axios_1.default.get('/cdt/list').then(function (edt) {
 	            this.resources = entcore_1._.map(entcore_1._.where(edt, { trashed: 0 }), function (edt) {
 	                edt.icon = edt.icon || '/img/illustrations/edt-default.png';
 	                return {

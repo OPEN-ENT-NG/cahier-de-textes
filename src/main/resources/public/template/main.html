@@ -7,7 +7,7 @@
         </div>
         <div ng-if="isTeacher()">
             <h4>
-                <i18n>edt.timetable.of.group</i18n>
+                <i18n>cdt.timetable.of.group</i18n>
                 <select ng-model="params.group"
                         ng-change="params.user = null; getTimetable()"
                         ng-options="group as group.name for group in structure.groups.all">
@@ -17,15 +17,15 @@
             </h4>
         </div>
         <div ng-if="isRelative() && structure.students.all.length > 0">
-            <h4 ng-if="structure.students.all.length === 1"><i18n>edt.timetable.of</i18n> [[currentStudent.displayName]]</h4>
+            <h4 ng-if="structure.students.all.length === 1"><i18n>cdt.timetable.of</i18n> [[currentStudent.displayName]]</h4>
             <div ng-if="structure.students.all.length > 1">
                 <h4>
-                    <i18n>edt.timetable.of</i18n>
+                    <i18n>cdt.timetable.of</i18n>
                     <select id="students-list"
                             ng-model="currentStudent"
                             ng-change="params.group = getStudentGroup(currentStudent); getTimetable();"
                             ng-options="student as student.displayName for student in structure.students.all">
-                        <option value="" disabled selected>[[translate('edt.student.choose')]]</option>
+                        <option value="" disabled selected>[[translate('cdt.student.choose')]]</option>
                     </select>
                 </h4>
             </div>
@@ -65,14 +65,14 @@
             </select>
         </div>
         <div class="row cell" workflow="edt.create">
-            <button class="twelve" ng-click="createCourse()"><i18n>edt.schedule.create</i18n></button>
+            <button class="twelve" ng-click="createCourse()"><i18n>cdt.schedule.create</i18n></button>
         </div>
     </article>
     <div id="calendar-view" class="cell horizontal-spacing twelve-mobile" ng-class="{twelve: !isPersonnel(), ten: isPersonnel()}">
         <div class="loader" ng-if="calendarLoader.show">
             <div>
                 <p><i class="spinner"></i></p>
-                <h4><i18n>edt.calendar.loading</i18n></h4>
+                <h4><i18n>cdt.calendar.loading</i18n></h4>
             </div>
         </div>
         <calendar
