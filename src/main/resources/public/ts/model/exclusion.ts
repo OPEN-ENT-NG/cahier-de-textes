@@ -29,7 +29,7 @@ export class Exclusion {
         try {
             await http.post('/edt/settings/exclusion', this.toJSON());
         } catch (e) {
-            notify.error("edt.notify.exclusion.create.err")
+            notify.error("cdt.notify.exclusion.create.err")
         }
     }
 
@@ -37,7 +37,7 @@ export class Exclusion {
         try {
             await http.put(`/edt/settings/exclusion/${this.id}`, this.toJSON());
         } catch (e) {
-            notify.error("edt.notify.exclusion.update.err")
+            notify.error("cdt.notify.exclusion.update.err")
         }
     }
 
@@ -45,7 +45,7 @@ export class Exclusion {
         try {
             await http.delete(`/edt/settings/exclusion/${this.id}`);
         } catch (e) {
-            notify.error("edt.notify.exclusion.delete.err")
+            notify.error("cdt.notify.exclusion.delete.err")
         }
     }
 

@@ -15,3 +15,9 @@ node_modules
 .bowerrc
 yarn-error.log
 /src/.vscode
+src/main/resources/public/dist
+src/main/resources/public/js
+src/main/resources/public/view
+rev-manifest.json
+package-lock.json
+error.log

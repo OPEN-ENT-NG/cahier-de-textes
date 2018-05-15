@@ -1,13 +1,12 @@
 import { model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import { USER_TYPES, Structure, Teacher, Group, CourseOccurrence, Utils} from './index';
+import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
 export class Course {
     _id: string;
-    _occurenceId?: string;
     structureId: string;
     startDate: string | object;
     endDate: string | object;
@@ -28,7 +27,6 @@ export class Course {
     endMomentDate: string;
     endMomentTime: string;
     subjectLabel: string;
-    courseOccurrences: CourseOccurrence[];
     teachers: Teacher[];
     originalStartMoment?: any;
     originalEndMoment?: any;
@@ -74,7 +72,7 @@ export class Course {
             await http.post('/edt/course', arr);
             return;
         } catch (e) {
-            notify.error('edt.notify.create.err');
+            notify.error('cdt.notify.create.err');
             console.error(e);
             throw e;
         }
@@ -124,50 +122,11 @@ export class Courses {
         if (group === null) filter += `teacherId=${model.me.type === USER_TYPES.personnel ? teacher.id : model.me.userId}`;
         if (teacher === null && group !== null) filter += `group=${group.name}`;
         let uri = `/directory/timetable/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
-
-        model.me.userId
         let courses = await http.get(uri);
         if (courses.data.length > 0) {
             this.all = Utils.formatCourses(courses.data, structure);
             this.origin = Mix.castArrayAs(Course, courses.data);
         }
         return;
-    }
-
-    /**
-     * Create course with occurrences
-     * @param {Course} course course to Create
-     * @returns {Promise<void>}
-     */
-    async create (course: Course): Promise<void> {
-        try {
-            let courses = [], occurrence: any;
-            for (let i = 0; i < course.courseOccurrences.length; i++) {
-                occurrence = course.courseOccurrences[i].toJSON();
-                occurrence.structureId = course.structureId;
-                occurrence.subjectId = course.subjectId;
-                occurrence.teacherIds = Utils.getValues(course.teachers, 'id');
-                occurrence.groups = course.groups;
-                occurrence.startDate = Utils.getOccurrenceStartDate(course.startDate, course.courseOccurrences[i].startTime, occurrence.dayOfWeek);
-                occurrence.endDate = Utils.getOccurrenceEndDate(course.endDate, course.courseOccurrences[i].endTime, occurrence.dayOfWeek);
-                occurrence.manual = true;
-                courses.push(Utils.cleanCourseForSave(occurrence));
-            }
-            await http.post('/edt/course', courses);
-            return;
-        } catch (e) {
-            notify.error('edt.notify.create.err');
-            console.error(e);
-            throw e;
-        }
-    }
-
-    async update (courses: Course[]): Promise<void> {
-        try {
-            await http.put('/edt/course', courses);
-            return;
-        } catch (e) {
-            notify.error('edt.notify.update.err');
-        }
     }
 }

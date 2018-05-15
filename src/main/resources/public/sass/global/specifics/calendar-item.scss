@@ -1,0 +1,12 @@
+.schedule-item-content {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  &.edt-origin-course {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.5);
+    border-style: dashed;
+    border-width: 1px;
+  }
+}
