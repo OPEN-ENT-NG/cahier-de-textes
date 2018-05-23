@@ -143,10 +143,11 @@ export let main = ng.controller('CdtController',
          * Course creation
          */
         $scope.createCourse = () => {
-            const edtRights = Behaviours.applicationsBehaviours.edt.rights;
-            if (model.me.hasWorkflow(edtRights.workflow.create)) {
+            const cdtRights = Behaviours.applicationsBehaviours.cdt.rights;
+            /*if (model.me.hasWorkflow(cdtRights.workflow.create)) {
                 $scope.goTo('/create');
-            }
+            }*/
+            $scope.goTo('/create');
         };
 
         $scope.goTo = (state: string) => {

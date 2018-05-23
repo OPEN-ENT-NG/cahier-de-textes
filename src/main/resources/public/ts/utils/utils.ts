@@ -82,11 +82,11 @@ export class Utils {
      */
     static formatCourses (courses: any[], structure: Structure): Course[] {
         const arr = [];
-        const edtRights = Behaviours.applicationsBehaviours.edt.rights;
+        const cdtRights = Behaviours.applicationsBehaviours.cdt.rights;
         courses.forEach((course) => {
             course.startDate = this.mapStartMomentWithDayOfWeek(moment(course.startDate), course.dayOfWeek);
             let numberWeek = Math.floor(moment(course.endDate).diff(course.startDate, 'days') / 7);
-            if (!model.me.hasWorkflow(edtRights.workflow.create)) course.locked = true;
+            //if (!model.me.hasWorkflow(cdtRights.workflow.create)) course.locked = true;
             if (numberWeek > 0) {
                 let startMoment = moment(course.startDate);
                 // let endMoment = moment(course.endDate).add(moment(course.startDate).diff(course.endDate, 'days'), 'days');
