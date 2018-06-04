@@ -14,14 +14,14 @@ import fr.wseduc.webutils.request.RequestUtils;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.Object;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -123,9 +123,9 @@ public class SqlMapper<T> {
                 try{
                     if ("ok".equals(event.body().getString("status"))){
 
-                        List<Object> fields = rewriteKey(event.body().getArray("fields").toList(),clazz);
+                        List<Object> fields = rewriteKey(event.body().getJsonArray("fields").getList(),clazz);
 
-                        event.body().putArray("fields", new JsonArray(fields));
+                        event.body().put("fields", new fr.wseduc.webutils.collections.JsonArray(fields));
 
                         Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
@@ -156,7 +156,7 @@ public class SqlMapper<T> {
                     if (json!=null){
                         List<T> result = new ArrayList<T>();
                         //JsonArray array = (JsonArray) json;
-                        for (Object obj : json.toList()){
+                        for (Object obj : json.getList()){
                             result.add((T)mapper.convertValue(obj, clazz));
                         }
                         response.setResult(result);
@@ -243,9 +243,9 @@ public class SqlMapper<T> {
                 try{
                     if ("ok".equals(event.body().getString("status"))){
 
-                        List<Object> fields = rewriteKey(event.body().getArray("fields").toList());
+                        List<Object> fields = rewriteKey(event.body().getJsonArray("fields").getList());
 
-                        event.body().putArray("fields", new JsonArray(fields));
+                        event.body().put("fields", new fr.wseduc.webutils.collections.JsonArray(fields));
 
                         Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
@@ -380,9 +380,9 @@ public class SqlMapper<T> {
         return (Long)method.invoke(obj);
     }
 
-    public static JsonElement objectToJson(Object obj,SimpleDateFormat dateFormat) throws Exception {
+    public static Object objectToJson(Object obj,SimpleDateFormat dateFormat) throws Exception {
         if (obj instanceof  ArrayList){
-            JsonArray jsonArray = new JsonArray();
+            JsonArray jsonArray = new fr.wseduc.webutils.collections.JsonArray();
             for (Object e : (ArrayList) obj){
                 ((JsonArray)jsonArray).addElement(objectToJson(e,dateFormat));
             }
@@ -400,7 +400,7 @@ public class SqlMapper<T> {
                     continue;
                 }
                 if (value instanceof ArrayList){
-                    result.putArray(key,(JsonArray) objectToJson(value,dateFormat));
+                    result.put(key,(JsonArray) objectToJson(value,dateFormat));
                     continue;
                 }
                 if (value instanceof Date) {
@@ -412,7 +412,7 @@ public class SqlMapper<T> {
         }
         return result;
     }
-    public static JsonElement objectToJson(Object obj) throws Exception {
+    public static Object objectToJson(Object obj) throws Exception {
         return objectToJson(obj,DateUtils.getSimpleDateFormatSql());
     }
 
@@ -455,7 +455,7 @@ public class SqlMapper<T> {
 
     public SqlQuery prepareUpdateStatement(T obj) throws Exception {
         StringBuilder sb =  new StringBuilder();
-        JsonArray values = new JsonArray();
+        JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
 
         BeanInfo info = Introspector.getBeanInfo(obj.getClass());
         String prefix ="";

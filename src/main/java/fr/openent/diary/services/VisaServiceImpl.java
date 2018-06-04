@@ -12,10 +12,10 @@ import fr.openent.diary.utils.*;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.*;
 
@@ -95,7 +95,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
     public void getTeachers(String structureId, String inspectorId, final Handler<HandlerResponse<List<KeyValueModel>>> handler) {
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         query.append("  select distinct t.id as key, t.teacher_display_name as value")
                 .append("  from diary.teacher t ")
                 .append(" join  diary.lesson l ON t.id = l.teacher_id ");
@@ -103,14 +103,14 @@ public class VisaServiceImpl extends SqlCrudService {
         if (inspectorId!=null){
             query.append(" join diary.inspector_habilitation ih on ih.teacherId = t.id ");
             query.append(" WHERE ih.inspectorId = ? ");
-            parameters.addString(inspectorId);
+            parameters.add(inspectorId);
         }else{
             query.append(" WHERE 1 = 1 ");
         }
 
         query.append(" AND l.school_id = ?");
 
-        parameters.addString(structureId);
+        parameters.add(structureId);
 
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
@@ -123,7 +123,7 @@ public class VisaServiceImpl extends SqlCrudService {
                 .append(" from diary.subject s ")
                 .append(" where s.school_id = ?");
 
-        JsonArray parameters = new JsonArray().addString(structureId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(structureId);
 
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
@@ -136,7 +136,7 @@ public class VisaServiceImpl extends SqlCrudService {
                 .append(" from diary.audience a ")
                 .append(" where a.school_id =  ?");
 
-        JsonArray parameters = new JsonArray().addString(structureId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(structureId);
 
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
@@ -144,7 +144,7 @@ public class VisaServiceImpl extends SqlCrudService {
     public void getAllAgregatedVisas(final String structureId,String teacherId, String audienceId, String subjectId, final String statut, final Handler<HandlerResponse<List<ResultVisaList>>> handler) {
 
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray().addString(structureId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(structureId);
         query.append(" select * from ( ")
                 .append(" select  t.id as teacherId,")
                 .append("  s.school_id as structureId, ")
@@ -180,16 +180,16 @@ public class VisaServiceImpl extends SqlCrudService {
 
         if (teacherId != null && !teacherId.isEmpty()){
             query.append(" AND agvisas.teacherId = ?");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
         if (audienceId != null && !audienceId.isEmpty()){
             query.append(" AND agvisas.audienceId = ?");
-            parameters.addString(audienceId);
+            parameters.add(audienceId);
         }
 
         if (subjectId != null && !subjectId.isEmpty()){
             query.append(" AND agvisas.subjectId = ?");
-            parameters.addString(subjectId);
+            parameters.add(subjectId);
         }
 
 
@@ -293,7 +293,7 @@ public class VisaServiceImpl extends SqlCrudService {
     private SqlQuery createLockQuery(VisaModel visa){
         validateVisa(visa);
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         query.append("update diary.lesson  set locked = TRUE  where id in (select v.lesson_id from diary.visa_lesson v where v.visa_id = ?) ");
         parameters.addNumber(visa.getId());
         return new SqlQuery(query.toString(),parameters);
@@ -303,20 +303,20 @@ public class VisaServiceImpl extends SqlCrudService {
         validateVisa(visa);
 
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
 
         parameters.addNumber(visa.getId());
-        parameters.addString(visa.getStructureId());
-        parameters.addString(visa.getAudienceId());
-        parameters.addString(visa.getSubjectId());
-        parameters.addString(visa.getTeacherId());
+        parameters.add(visa.getStructureId());
+        parameters.add(visa.getAudienceId());
+        parameters.add(visa.getSubjectId());
+        parameters.add(visa.getTeacherId());
 
         parameters.addNumber(visa.getId());
-        parameters.addString(visa.getStructureId());
-        parameters.addString(visa.getAudienceId());
-        parameters.addString(visa.getSubjectId());
-        parameters.addString(visa.getTeacherId());
+        parameters.add(visa.getStructureId());
+        parameters.add(visa.getAudienceId());
+        parameters.add(visa.getSubjectId());
+        parameters.add(visa.getTeacherId());
 
         query.append(" INSERT INTO diary.visa_lesson ")
                 .append(" select distinct ? as visa_id , l2.id as lesson_id ")
@@ -374,7 +374,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
         public void getVisaModel(String structureId,String teacherId, String audienceId, String subjectId,final Handler<HandlerResponse<List<VisaModel>>> handler){
             StringBuilder query = new StringBuilder();
-            JsonArray parameters = new JsonArray();
+            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
             query.append(" select v.id,v.comment,v.dateCreate,v.structureId,v.teacherId,v.teacherName,v.subjectId,v.subjectName,v.audienceId,v.audienceName,v.ownerId,v.ownerName,v.ownerType , ")
                     .append(" max(l.modified) as lastModifiedLesson , ")
@@ -399,10 +399,10 @@ public class VisaServiceImpl extends SqlCrudService {
                     .append("  group by v.id,v.comment,v.dateCreate,v.structureId,v.teacherId,v.teacherName,v.subjectId,v.subjectName,v.audienceId,v.audienceName,v.ownerId,v.ownerName,v.ownerType")
                     .append("  order by v.dateCreate desc");
 
-            parameters.addString(structureId);
-            parameters.addString(teacherId);
-            parameters.addString(audienceId);
-            parameters.addString(subjectId);
+            parameters.add(structureId);
+            parameters.add(teacherId);
+            parameters.add(audienceId);
+            parameters.add(subjectId);
 
             sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, VisaModel.class));
         }
@@ -451,7 +451,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
     private void getVisaSelectHomework(List<VisaModel> visaModels, final Handler<HandlerResponse<Map<String,List<HomeworkModel>>>> handler){
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         for (VisaModel visaModel : visaModels){
             if (query.length()!=0){
@@ -486,13 +486,13 @@ public class VisaServiceImpl extends SqlCrudService {
                     .append(" ) tovise ")
                     .append(" join diary.homework h on tovise.lessonId = h.lesson_id ");
 
-            parameters.addString(visaModel.getAudienceId());
-            parameters.addString(visaModel.getSubjectId());
-            parameters.addString(visaModel.getTeacherId());
+            parameters.add(visaModel.getAudienceId());
+            parameters.add(visaModel.getSubjectId());
+            parameters.add(visaModel.getTeacherId());
 
-            parameters.addString(visaModel.getAudienceId());
-            parameters.addString(visaModel.getSubjectId());
-            parameters.addString(visaModel.getTeacherId());
+            parameters.add(visaModel.getAudienceId());
+            parameters.add(visaModel.getSubjectId());
+            parameters.add(visaModel.getTeacherId());
         }
 
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(new Handler<HandlerResponse<List<HomeworkModel>>>() {
@@ -519,7 +519,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
     private void getVisaSelectLesson(List<VisaModel> visaModels, final Handler<HandlerResponse<List<LessonModel>>> handler){
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (VisaModel visaModel : visaModels){
             if (query.length()!=0){
                 query.append(" UNION ");
@@ -564,13 +564,13 @@ public class VisaServiceImpl extends SqlCrudService {
 
 
 
-            parameters.addString(visaModel.getAudienceId());
-            parameters.addString(visaModel.getSubjectId());
-            parameters.addString(visaModel.getTeacherId());
+            parameters.add(visaModel.getAudienceId());
+            parameters.add(visaModel.getSubjectId());
+            parameters.add(visaModel.getTeacherId());
 
-            parameters.addString(visaModel.getAudienceId());
-            parameters.addString(visaModel.getSubjectId());
-            parameters.addString(visaModel.getTeacherId());
+            parameters.add(visaModel.getAudienceId());
+            parameters.add(visaModel.getSubjectId());
+            parameters.add(visaModel.getTeacherId());
         }
         query.append(" order by date desc");
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, LessonModel.class));
@@ -611,7 +611,7 @@ public class VisaServiceImpl extends SqlCrudService {
             @Override
             public void handle(Message<JsonObject> event) {
                 if ("ok".equals(event.body().getString("status"))) {
-                    final JsonArray result = event.body().getArray("result", new JsonArray());
+                    final JsonArray result = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
 
                     if (result.size() > 0) {
                         for (int i = 0; i < result.size(); i++) {
@@ -668,15 +668,15 @@ public class VisaServiceImpl extends SqlCrudService {
 
     public void getTeachersOnInspector(String inspectorId, String structureId, final Handler<HandlerResponse<List<KeyValueModel>>> handler){
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         query.append(" select i.teacherId as key, i.teacherName as value ")
                 .append(" from diary.inspector_habilitation i ")
                 .append(" where i.inspectorid = ? ")
                 .append(" and structureid = ? ");
 
-        parameters.addString(inspectorId);
-        parameters.addString(structureId);
+        parameters.add(inspectorId);
+        parameters.add(structureId);
 
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
@@ -690,9 +690,9 @@ public class VisaServiceImpl extends SqlCrudService {
                     .append(" DELETE from diary.inspector_habilitation ")
                     .append(" where structureId = ? ")
                     .append(" and inspectorId = ? ");
-            JsonArray parameters = new JsonArray()
-                    .addString(structureId)
-                    .addString(inspectorId);
+            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray()
+                    .add(structureId)
+                    .add(inspectorId);
 
             queries.add(new SqlQuery(query.toString(),parameters));
         }
@@ -704,11 +704,11 @@ public class VisaServiceImpl extends SqlCrudService {
                     .append ( " ( inspectorId,teacherId,teacherName,structureId ) " )
                     .append(" values ( ?,?,?,? ) ");
 
-            JsonArray parameters = new JsonArray()
-                    .addString(inspectorId)
-                    .addString(teacher.getKey())
-                    .addString(teacher.getValue())
-                    .addString(structureId);
+            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray()
+                    .add(inspectorId)
+                    .add(teacher.getKey())
+                    .add(teacher.getValue())
+                    .add(structureId);
 
             queries.add(new SqlQuery(query.toString(),parameters));
         }

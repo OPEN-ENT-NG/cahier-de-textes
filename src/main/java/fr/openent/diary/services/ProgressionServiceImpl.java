@@ -14,8 +14,8 @@ import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 .append(" FROM diary.progression as p")
                 .append(" WHERE p.teacherId = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(teacherId));
 
         sql.prepared(query.toString(), parameters,progressionMapper.listMapper(handler));
 
@@ -93,7 +93,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 .append(" WHERE lp.teacherId = ?" )
                 .append(" and lp.id = ? " );
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).addNumber(lessonId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(teacherId)).addNumber(lessonId);
         sql.prepared(query.toString(), parameters,lessonProgressionMapper.objectMapper(handler));
     }
 
@@ -119,7 +119,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 .append(" WHERE lp.teacherId = ?" )
                 .append(" and lp.progressionId = ? " );
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId)).addNumber(progressionId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(teacherId)).addNumber(progressionId);
 
         sql.prepared(query.toString(), parameters,lessonProgressionMapper.listMapper(handler));
 
@@ -166,7 +166,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
         StringBuilder query = new StringBuilder();
         query.append("DELETE FROM diary.progression ")
                 .append("  where id = ?");
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         parameters.add(progressionId);
 
         queries.add(new SqlQuery(query.toString(),parameters));
@@ -175,7 +175,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
         StringBuilder queryProgression = new StringBuilder();
         queryProgression.append("DELETE FROM diary.lessonprogression ")
                 .append("  where progressionid = ?");
-        JsonArray parametersProgression = new JsonArray();
+        JsonArray parametersProgression = new fr.wseduc.webutils.collections.JsonArray();
         parametersProgression.add(progressionId);
 
         queries.add(new SqlQuery(queryProgression.toString(),parametersProgression));
@@ -189,7 +189,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
         queryProgression.append("DELETE FROM diary.lessonprogression ")
                 .append("  where id in ").append(Sql.listPrepared(lessonsIds.toArray()));
 
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (Long id : lessonsIds) {
             parameters.add(id);
         }
@@ -201,7 +201,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
         List<SqlQuery> queries = new ArrayList<>();
 
         for (OrderLesson orderLesson : orderLessons){
-            JsonArray parameters = new JsonArray();
+            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
             parameters.add(orderLesson.getOrderIndex());
             parameters.add(orderLesson.getId());
             StringBuilder query = new StringBuilder();
@@ -228,7 +228,7 @@ public class ProgressionServiceImpl extends SqlCrudService {
                 .append(" WHERE progressionId = ?");
 
 
-        JsonArray parameters = new JsonArray().addNumber(progressionId);
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().addNumber(progressionId);
 
         sql.prepared(query.toString(), parameters,SqlMapper.objectMapper(handler,CountModel.class));
     }

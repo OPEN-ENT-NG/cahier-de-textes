@@ -17,9 +17,9 @@ import org.entcore.common.user.UserInfos;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -52,7 +52,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                 .append(" FROM diary.modelweek as m")
                 .append(" WHERE m.teacherId = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(teacherId));
 
         sql.prepared(query.toString(), parameters,modelWeekMapper.listMapper(handler));
 

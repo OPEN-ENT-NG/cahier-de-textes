@@ -1,8 +1,8 @@
 package fr.openent.diary.utils;
 
 
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class SqlQuery {
     private String query;

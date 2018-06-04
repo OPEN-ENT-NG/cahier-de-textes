@@ -6,15 +6,15 @@ import fr.openent.diary.model.lessonview.LessonModel;
 import fr.openent.diary.model.visa.VisaModel;
 import fr.openent.diary.utils.SqlMapper;
 import fr.wseduc.webutils.http.Renders;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -48,14 +48,14 @@ public class PdfServiceImpl {
 
                 final Map<String,String> stats = visaService.getVisaSelectLessonStats(lessons);
                 for (String key : stats.keySet()){
-                    templateProps.putString(key,stats.get(key));
+                    templateProps.put(key,stats.get(key));
                 }
 
 
-                templateProps.putString("nbLesson",lessons.size()+"");
+                templateProps.put("nbLesson",lessons.size()+"");
 
                 try {
-                    templateProps.putArray("lessons",(JsonArray) SqlMapper.objectToJson(lessons, fr.openent.diary.utils.DateUtils.getFrenchSimpleDateFormat()));
+                    templateProps.put("lessons",(JsonArray) SqlMapper.objectToJson(lessons, fr.openent.diary.utils.DateUtils.getFrenchSimpleDateFormat()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -100,7 +100,7 @@ public class PdfServiceImpl {
                                             request.response().putHeader("Content-Type", "application/pdf");
                                             request.response().putHeader("Content-Disposition",
                                                     "attachment; filename=file.pdf");
-                                            request.response().end(new Buffer(pdf));
+                                            request.response().end(Buffer.buffer(pdf));
                                         }
                                     });
                                 }

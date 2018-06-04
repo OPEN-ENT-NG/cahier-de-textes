@@ -7,8 +7,8 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 
 
 public class Diary extends BaseServer {
@@ -20,7 +20,7 @@ public class Diary extends BaseServer {
     public final static String HOMEWORK_SHARE_TABLE = "homework_shares";
 
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		super.start();
         final EventBus eb = getEventBus(vertx);
 
@@ -46,7 +46,7 @@ public class Diary extends BaseServer {
         LessonController lessonController = new LessonController(lessonService, homeworkService, diaryService, audienceService);
 
         SqlCrudService lessonSqlCrudService = new SqlCrudService(DATABASE_SCHEMA, LESSON_TABLE, LESSON_SHARE_TABLE,
-                new JsonArray().addString("*"), new JsonArray().add("*"), true);
+                new fr.wseduc.webutils.collections.JsonArray().add("*"), new JsonArray().add("*"), true);
         lessonController.setCrudService(lessonSqlCrudService);
         lessonController.setShareService(new SqlShareService(DATABASE_SCHEMA, LESSON_SHARE_TABLE, eb,
                 securedActions, null));
@@ -60,7 +60,7 @@ public class Diary extends BaseServer {
         HomeworkController homeworkController = new HomeworkController(homeworkService, lessonService, audienceService,diaryService);
 
         SqlCrudService homeworkSqlCrudService = new SqlCrudService(DATABASE_SCHEMA, HOMEWORK_TABLE, HOMEWORK_SHARE_TABLE,
-                new JsonArray().addString("*"), new JsonArray().add("*"), true);
+                new fr.wseduc.webutils.collections.JsonArray().add("*"), new JsonArray().add("*"), true);
         homeworkController.setCrudService(homeworkSqlCrudService);
         homeworkController.setShareService(new SqlShareService(DATABASE_SCHEMA, HOMEWORK_SHARE_TABLE, eb,
                 securedActions, null));

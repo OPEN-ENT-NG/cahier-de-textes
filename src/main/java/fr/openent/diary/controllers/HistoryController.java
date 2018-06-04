@@ -20,9 +20,9 @@ import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;
@@ -102,7 +102,7 @@ public class HistoryController extends ControllerHelper {
 
             JsonObject specificDatas = new JsonObject();
 
-            specificDatas.putString("yearLabel",yearLabel);
+            specificDatas.put("yearLabel",yearLabel);
 
             historyService.getLessons(yearLabel,teacherId,audienceId,pdfService.lessonPdfGenerator(this,specificDatas,request,vertx,eb));
 

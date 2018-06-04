@@ -6,11 +6,11 @@ import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
@@ -71,7 +71,7 @@ public class AudienceServiceImpl extends SqlCrudService implements AudienceServi
         query.append("SELECT * FROM ").append(DiaryController.DATABASE_SCHEMA).append(".").append(AUDIENCE_TABLE);
         query.append(" as t WHERE t.").append(AUDIENCE_ID_FIELD_NAME).append(" = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(audienceId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(audienceId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
@@ -87,10 +87,10 @@ public class AudienceServiceImpl extends SqlCrudService implements AudienceServi
         if (StringUtils.isValidIdentifier(audience.getId())) {
 
             JsonObject audienceParams = new JsonObject();
-            audienceParams.putString(AUDIENCE_ID_FIELD_NAME, audience.getId());
-            audienceParams.putString(AUDIENCE_SCHOOL_ID_FIELD_NAME, audience.getSchoolId());
-            audienceParams.putString(AUDIENCE_LABEL_FIELD_NAME, audience.getAudienceLabel());
-            audienceParams.putString(AUDIENCE_TYPE_FIELD_NAME, audience.getAudienceType().name().toLowerCase());
+            audienceParams.put(AUDIENCE_ID_FIELD_NAME, audience.getId());
+            audienceParams.put(AUDIENCE_SCHOOL_ID_FIELD_NAME, audience.getSchoolId());
+            audienceParams.put(AUDIENCE_LABEL_FIELD_NAME, audience.getAudienceLabel());
+            audienceParams.put(AUDIENCE_TYPE_FIELD_NAME, audience.getAudienceType().name().toLowerCase());
 
             sql.insert(DiaryController.DATABASE_SCHEMA + "." + AUDIENCE_TABLE, audienceParams, AUDIENCE_ID_FIELD_NAME, validUniqueResultHandler(handler));
         } else {
@@ -119,7 +119,7 @@ public class AudienceServiceImpl extends SqlCrudService implements AudienceServi
                             createAudience(audience, handler);
                         } else {
                             log.debug("Audience found");
-                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().putBoolean("teacherFound", true)));
+                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().put("teacherFound", true)));
                         }
                     } else {
                         log.debug("error while retrieve teacher");

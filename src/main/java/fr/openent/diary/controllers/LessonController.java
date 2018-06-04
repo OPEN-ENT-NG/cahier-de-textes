@@ -19,13 +19,13 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VoidHandler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.Handler<Void>;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -330,7 +330,7 @@ public class LessonController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "publishLessons", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<String> ids = data.getJsonArray("ids").getList();
 
                             lessonService.publishLessons(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
@@ -365,7 +365,7 @@ public class LessonController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "unPublishLessons", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<String> ids = data.getJsonArray("ids").getList();
 
                             lessonService.unPublishLessons(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
@@ -508,7 +508,7 @@ public class LessonController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "deleteLessons", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<String> ids = data.getJsonArray("ids").getList();
 
                             lessonService.deleteLessons(ids, notEmptyResponseHandler(request, 201));
                         }
@@ -540,10 +540,10 @@ public class LessonController extends ControllerHelper {
         //test if lesson has homework to share
         final String lessonId = request.params().get("id");
 
-        request.expectMultiPart(true);
-        request.endHandler(new VoidHandler() {
+        request.setExpectMultipart(true);
+        request.endHandler(new Handler<Void>() {
             @Override
-            protected void handle() {
+            public void handle(Void v) {
                 final List<String> actions = request.formAttributes().getAll("actions");
                 final String groupId = request.formAttributes().get("groupId");
                 final String userId = request.formAttributes().get("userId");
@@ -559,14 +559,14 @@ public class LessonController extends ControllerHelper {
                                 @Override
                                 public void handle(Either<String, JsonArray> event) {
                                     if (event.isRight()) {
-                                        JsonArray homeworkIds = new JsonArray();
+                                        JsonArray homeworkIds = new fr.wseduc.webutils.collections.JsonArray();
                                         for (Object jsonObject: event.right().getValue()) {
                                             homeworkIds.add(((JsonObject)jsonObject).getLong("id"));
                                         }
 
                                         //share related homework if there is any
                                         if (homeworkIds.size() > 0) {
-                                            sharedService.shareOrUpdateLinkedResources(homeworkIds.toList(), userId, groupId, actions, new Handler<Either<String, JsonObject>>() {
+                                            sharedService.shareOrUpdateLinkedResources(homeworkIds.getList(), userId, groupId, actions, new Handler<Either<String, JsonObject>>() {
                                                 @Override
                                                 public void handle(Either<String, JsonObject> event) {
                                                     if (event.isRight()) {
@@ -606,10 +606,10 @@ public class LessonController extends ControllerHelper {
         //test if lesson has homework to share
         final String lessonId = request.params().get("id");
 
-        request.expectMultiPart(true);
-        request.endHandler(new VoidHandler() {
+        request.setExpectMultipart(true);
+        request.endHandler(new Handler<Void>() {
             @Override
-            protected void handle() {
+            public void handle(Void v) {
                 final List<String> actions = request.formAttributes().getAll("actions");
                 final String groupId = request.formAttributes().get("groupId");
                 final String userId = request.formAttributes().get("userId");
@@ -622,7 +622,7 @@ public class LessonController extends ControllerHelper {
                                 @Override
                                 public void handle(Either<String, JsonArray> event) {
                                     if (event.isRight()) {
-                                        JsonArray homeworkIds = new JsonArray();
+                                        JsonArray homeworkIds = new fr.wseduc.webutils.collections.JsonArray();
                                         for (Object jsonObject: event.right().getValue()) {
                                             homeworkIds.add(((JsonObject)jsonObject).getLong("id"));
                                         }
@@ -632,7 +632,7 @@ public class LessonController extends ControllerHelper {
 
                                             final String memberId = (groupId == null) ? userId: groupId ;
 
-                                            sharedService.removeLinkedHomeworks(homeworkIds.toList(), memberId, actions, new Handler<Either<String, JsonObject>>() {
+                                            sharedService.removeLinkedHomeworks(homeworkIds.getList(), memberId, actions, new Handler<Either<String, JsonObject>>() {
                                                 @Override
                                                 public void handle(Either<String, JsonObject> event) {
                                                     if (event.isRight()) {

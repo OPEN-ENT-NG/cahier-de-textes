@@ -8,11 +8,11 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.utils.StringUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -80,7 +80,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             homeworkAggregate.append(") from diary.homework h where h.lesson_id = l.id) as homework_ids");
 
 
-            final JsonArray parameters = new JsonArray();
+            final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
@@ -172,7 +172,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
-                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
                         String groupId  = ((Map <String,String>)result).get("groupId");
                         memberIds.add(groupId);
                     }
@@ -233,10 +233,10 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      */
     private void stripNonLessonFields(final JsonObject lessonObject) {
 
-        lessonObject.removeField("audience_type");
-        lessonObject.removeField("audience_name");
-        lessonObject.removeField("lesson_id");
-        lessonObject.removeField("attachments");
+        lessonObject.remove("audience_type");
+        lessonObject.remove("audience_name");
+        lessonObject.remove("lesson_id");
+        lessonObject.remove("attachments");
     }
 
     /**
@@ -256,9 +256,9 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
                 // audience exists or created we can then create lesson
                 if (event.isRight()) {
-                    final JsonArray attachments = lessonObject.getArray("attachments");
-                    lessonObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
-                    lessonObject.putString(ID_OWNER_FIELD_NAME, teacherId);
+                    final JsonArray attachments = lessonObject.getJsonArray("attachments");
+                    lessonObject.put(ID_TEACHER_FIELD_NAME, teacherId);
+                    lessonObject.put(ID_OWNER_FIELD_NAME, teacherId);
 
                     //strip non sql field
                     stripNonLessonFields(lessonObject);
@@ -292,7 +292,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                  if (event.isRight()) {
                      log.debug(event.right().getValue());
                      final Long nextLessonId = event.right().getValue().getLong("next_id");
-                     lessonObject.putNumber(ID_LESSON_FIELD_NAME, nextLessonId);
+                     lessonObject.put(ID_LESSON_FIELD_NAME, nextLessonId);
 
 
                      //check if attachment(s) exists
@@ -316,7 +316,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                      queryAttachments.append("SELECT document_id, id FROM diary.attachment WHERE document_id in ");
                      queryAttachments.append(sql.listPrepared(attachmentIds.toArray()));
 
-                     JsonArray parameters = new JsonArray(attachmentIds.toArray());
+                     JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray(attachmentIds.toArray());
 
                      sql.prepared(queryAttachments.toString(), parameters, validResultHandler(new Handler<Either<String, JsonArray>>() {
                          @Override
@@ -428,7 +428,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         query.append(DiaryController.DATABASE_SCHEMA).append(".").append(SQL_LESSON_HAS_ATTACHMENT_TABLE_NAME);
         query.append(" VALUES (?,?);");
 
-        final JsonArray values = new JsonArray();
+        final JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
         values.add(lessonId);
         values.add(attachment.getId());
 
@@ -452,7 +452,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 .append(" WHERE la.lesson_id = l.id) att ON TRUE")
                 .append(" WHERE l.id = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(lessonId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(lessonId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
@@ -470,12 +470,12 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         stripNonLessonFields(lessonObject);
         // FIXME have to remove lesson_state field since SQL error on update enum/character varying
-        lessonObject.removeField("lesson_state");
+        lessonObject.remove("lesson_state");
 
         StringBuilder sb = new StringBuilder();
-        JsonArray values = new JsonArray();
+        JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
         //TODO query without loops
-        for (String attr : lessonObject.getFieldNames()) {
+        for (String attr : lessonObject.fieldNames()) {
             if (attr.equals("lesson_date")) {
                 sb.append(attr).append(" = to_date(?, 'YYYY-MM-DD'), ");
             } else if (attr.equals("lesson_start_time") || attr.equals("lesson_end_time")) {
@@ -505,7 +505,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         query.append("DELETE FROM diary.lesson as l where l.id in ");
         query.append(sql.listPrepared(lessonIds.toArray()));
 
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (Object id: lessonIds) {
             parameters.add(id);
         }
@@ -552,7 +552,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      */
     private void changeLessonsState(List<String> lessonIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
         StringBuilder lessonSb = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         for (Object id : lessonIds) {
             parameters.add(id);

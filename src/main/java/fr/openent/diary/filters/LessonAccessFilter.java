@@ -11,11 +11,11 @@ import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class LessonAccessFilter implements ResourcesProvider {
                     @Override
                     public void handle(Either<String, JsonArray> event) {
                         if (event.isRight()) {
-                            for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                            for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
                                 String groupId  = ((Map<String,String>)result).get("groupId");
                                 groupsAndUserIds.add(groupId);
                             }
@@ -82,7 +82,7 @@ public class LessonAccessFilter implements ResourcesProvider {
         from.append(" ON t.id = st.resource_id");
 
         StringBuilder query = new StringBuilder();
-        JsonArray values = new JsonArray();
+        JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
         query.append("SELECT count(*)")
                 .append(" FROM ").append(from.toString())
                 .append(" WHERE t.id = ? AND t.owner = ? OR (st.resource_id = ? AND st.member_id IN ").append(Sql.listPrepared(groupsAndUserIds.toArray()))

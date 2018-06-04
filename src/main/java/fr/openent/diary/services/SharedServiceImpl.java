@@ -4,12 +4,12 @@ import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.sql.*;
 import org.entcore.common.utils.StringUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class SharedServiceImpl implements SharedService {
 
     private final Neo4j neo = Neo4j.getInstance();
     private final Sql sql = Sql.getInstance();
-    private final JsonArray profileNamesToShare = new JsonArray(new String[] {"Teacher","Student","Relative"});
+    private final JsonArray profileNamesToShare = new fr.wseduc.webutils.collections.JsonArray(new String[] {"Teacher","Student","Relative"});
 
     private final static Logger log = LoggerFactory.getLogger(SharedServiceImpl.class);
     private String schema;
@@ -54,7 +54,7 @@ public class SharedServiceImpl implements SharedService {
                 @Override
                 public void handle(Message<JsonObject> event) {
                     if ("ok".equals(event.body().getString("status"))) {
-                        JsonArray r = event.body().getArray("result", new JsonArray());
+                        JsonArray r = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                         //fixme TODO CHECK VISIBILITY IF NECESSARY
                         massGroupShare(resourceId, getListFromNeoResult(r), actions, handler);
                     } else {
@@ -88,7 +88,7 @@ public class SharedServiceImpl implements SharedService {
                         "(SELECT * FROM " + shareTable + " WHERE member_id = ? AND resource_id = ? AND action = ?);";
         for (String action : actions) {
             for (String shareId : groupShareIds) {
-                JsonArray ar = new JsonArray()
+                JsonArray ar = new fr.wseduc.webutils.collections.JsonArray()
                         .add(shareId).add(rId).add(action).add(shareId).add(rId).add(action);
                 s.prepared(query, ar);
             }
@@ -106,7 +106,7 @@ public class SharedServiceImpl implements SharedService {
         //find all subgroup of the classroom
         String query = "MATCH (:Class {id:{classId}})<-[:DEPENDS]-(g:ProfileGroup)-[:DEPENDS]->(ProfileGroup)-[:HAS_PROFILE]-(p:Profile) " +
                 "WHERE p.name IN {profileNames} return g.id";
-        final JsonObject params = new JsonObject().putString("classId", classGroupId).putArray("profileNames", profileNamesToShare);
+        final JsonObject params = new JsonObject().put("classId", classGroupId).put("profileNames", profileNamesToShare);
 
         neo.execute(query, params, handler);
     }
@@ -122,7 +122,7 @@ public class SharedServiceImpl implements SharedService {
                     @Override
                     public void handle(Message<JsonObject> event) {
                         if ("ok".equals(event.body().getString("status"))) {
-                            final JsonArray result = event.body().getArray("result", new JsonArray());
+                            final JsonArray result = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                             final List<String> groupShareIds = getListFromNeoResult(result);
                             removeAndCreateShareResource((isOldGroup ? Arrays.asList(oldClassGroupId) : groupShareIds),
                                     (isNewGroup ? Arrays.asList(newClassGroupId) : groupShareIds), resourceId, actions, handler);
@@ -136,13 +136,13 @@ public class SharedServiceImpl implements SharedService {
                     @Override
                     public void handle(Message<JsonObject> event) {
                         if ("ok".equals(event.body().getString("status"))) {
-                            final JsonArray oldResult = event.body().getArray("result", new JsonArray());
+                            final JsonArray oldResult = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                             final List<String> oldGroupShareIds = getListFromNeoResult(oldResult);
                             findAllSubGroup(newClassGroupId, new Handler<Message<JsonObject>>() {
                                 @Override
                                 public void handle(Message<JsonObject> event) {
                                     if ("ok".equals(event.body().getString("status"))) {
-                                        final JsonArray newResult = event.body().getArray("result", new JsonArray());
+                                        final JsonArray newResult = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                                         removeAndCreateShareResource(oldGroupShareIds, getListFromNeoResult(newResult), resourceId, actions, handler);
                                     } else {
                                         handler.handle(new Either.Left<String, JsonObject>(event.body().getString("message")));
@@ -182,7 +182,7 @@ public class SharedServiceImpl implements SharedService {
                 @Override
                 public void handle(Message<JsonObject> event) {
                     if ("ok".equals(event.body().getString("status"))) {
-                        JsonArray r = event.body().getArray("result", new JsonArray());
+                        JsonArray r = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                         removeMassGroupShare(resourceId, getListFromNeoResult(r), handler);
                     } else {
                         handler.handle(new Either.Left<String, JsonObject>(event.body().getString("message")));
@@ -197,7 +197,7 @@ public class SharedServiceImpl implements SharedService {
         final Object[] g = groupShareIds.toArray();
 
         final String query = "DELETE FROM " + shareTable + " WHERE member_id IN " + Sql.listPrepared(g) + " AND resource_id = ? ";
-        final JsonArray values = new JsonArray(g);
+        final JsonArray values = new fr.wseduc.webutils.collections.JsonArray(g);
         values.add(Sql.parseId(resourceId));
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
@@ -249,10 +249,10 @@ public class SharedServiceImpl implements SharedService {
         if (actions != null && actions.size() > 0) {
             Object[] a = actions.toArray();
             actionFilter = "action IN " + Sql.listPrepared(a) + " AND ";
-            parameters = new JsonArray(a);
+            parameters = new fr.wseduc.webutils.collections.JsonArray(a);
         } else {
             actionFilter = "";
-            parameters = new JsonArray();
+            parameters = new fr.wseduc.webutils.collections.JsonArray();
         }
 
         for (Long homeworkId: homeworkIds) {
@@ -292,7 +292,7 @@ public class SharedServiceImpl implements SharedService {
 
         for (String action : actions) {
             for (Long resourceId: resourceIds) {
-                JsonArray queryParams = new JsonArray();
+                JsonArray queryParams = new fr.wseduc.webutils.collections.JsonArray();
                 queryParams.add(memberId).add(resourceId).add(action).add(memberId).add(resourceId).add(action);
                 s.prepared(query.toString(), queryParams);
             }

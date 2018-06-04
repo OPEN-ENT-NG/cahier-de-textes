@@ -9,11 +9,11 @@ import fr.wseduc.webutils.Either;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         final String DATE_FORMAT = "YYYY-MM-DD";
 
         memberIds.add(userId);
-        final JsonArray parameters = new JsonArray();
+        final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
@@ -118,7 +118,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                     .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
 
             for (final String g : memberIds) {
-                parameters.addString(g);
+                parameters.add(g);
             }
             parameters.add(userId);
         }
@@ -137,7 +137,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                     .append(" WHERE h.id = hs.resource_id")
                     .append(" AND (hs.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR h.owner = ?) ");
             for (final String g : memberIds) {
-                parameters.addString(g);
+                parameters.add(g);
             }
             parameters.add(userId);
         }
@@ -186,7 +186,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
-                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
                         String groupId  = ((Map<String,String>)result).get("groupId");
                         memberIds.add(groupId);
                     }
@@ -223,7 +223,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 .append(" WHERE ha.homework_id = h.id) att ON TRUE")
                 .append(" WHERE h.id = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(homeworkId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(homeworkId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
@@ -240,9 +240,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
-                                    final JsonArray attachments = homeworkObject.getArray("attachments");
-                                    homeworkObject.putString(ID_TEACHER_FIELD_NAME, teacherId);
-                                    homeworkObject.putString(ID_OWNER_FIELD_NAME, teacherId);
+                                    final JsonArray attachments = homeworkObject.getJsonArray("attachments");
+                                    homeworkObject.put(ID_TEACHER_FIELD_NAME, teacherId);
+                                    homeworkObject.put(ID_OWNER_FIELD_NAME, teacherId);
                                     // TPE disabled until working done
                                     if (false && attachments != null && attachments.size() > 0) {
                                         //get next on the sequence to add the homework and value in FK on attachment
@@ -253,9 +253,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                                 if (event.isRight()) {
                                                     log.debug(event.right().getValue());
                                                     Long nextId = event.right().getValue().getLong("next_id");
-                                                    homeworkObject.putNumber("id", nextId);
+                                                    homeworkObject.put("id", nextId);
 
-                                                    JsonArray parameters = new JsonArray().add(nextId);
+                                                    JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(nextId);
                                                     for (Object id : attachments) {
                                                         parameters.add(id);
                                                     }
@@ -271,7 +271,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                         }));
                                     } else {
                                         //insert homework
-                                        homeworkObject.removeField("attachments");
+                                        homeworkObject.remove("attachments");
                                         sql.insert("diary.homework", homeworkObject, "id", validUniqueResultHandler(handler));
                                     }
                                 } else {
@@ -299,24 +299,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      */
     private void stripNonHomeworkFields(final JsonObject homeworkObject) {
 
-        homeworkObject.removeField("audience_type");
-        homeworkObject.removeField("audience_name");
+        homeworkObject.remove("audience_type");
+        homeworkObject.remove("audience_name");
     }
 
     @Override
     public void updateHomework(String homeworkId, JsonObject homeworkObject, Handler<Either<String, JsonObject>> handler) {
 
         // FIXME json sql do not work if SQL enum column
-        homeworkObject.removeField("homework_state");
+        homeworkObject.remove("homework_state");
 
         // TPE 14022017
-        homeworkObject.removeField("attachments");
+        homeworkObject.remove("attachments");
         stripNonHomeworkFields(homeworkObject);
 
         StringBuilder sb = new StringBuilder();
-        JsonArray values = new JsonArray();
+        JsonArray values = new fr.wseduc.webutils.collections.JsonArray();
         //TODO query without loops
-        for (String attr : homeworkObject.getFieldNames()) {
+        for (String attr : homeworkObject.fieldNames()) {
             if (attr.equals("homework_due_date")) {
                 sb.append(attr).append(" = to_date(?, 'YYYY-MM-DD'), ");
             } else {
@@ -343,7 +343,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query.append("DELETE FROM diary.homework as h where h.id in ");
         query.append(sql.listPrepared(homeworkIds.toArray()));
 
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (Object id : homeworkIds) {
             parameters.add(id);
         }
@@ -382,7 +382,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      */
     private void changeHomeworksState(List<Integer> homeworkIds, ResourceState initialState, ResourceState finalState, Handler<Either<String, JsonObject>> handler) {
         StringBuilder sb = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (Integer id : homeworkIds) {
             parameters.add(id);
         }
@@ -414,10 +414,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                     for (final String schoolId : schoolIds) {
                         for (HomeworkType homeworkTypeVal : HomeworkType.values()) {
                             JsonObject homeworkType = new JsonObject();
-                            homeworkType.putNumber("id", nextId);
-                            homeworkType.putString("school_id", schoolId);
-                            homeworkType.putString("homework_type_label", homeworkTypeVal.getLabel());
-                            homeworkType.putString("homework_type_category", homeworkTypeVal.getCategory());
+                            homeworkType.put("id", nextId);
+                            homeworkType.put("school_id", schoolId);
+                            homeworkType.put("homework_type_label", homeworkTypeVal.getLabel());
+                            homeworkType.put("homework_type_category", homeworkTypeVal.getCategory());
 
                             sb.insert("diary.homework_type", homeworkType, "id");
                             nextId += 1;
@@ -440,10 +440,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         StringBuilder query = new StringBuilder();
         query.append("SELECT * FROM diary.homework_type as ht WHERE ht.school_id IN " + Sql.listPrepared(schoolIds.toArray()));
 
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         for (final String schoolId : schoolIds) {
-            parameters.addString(schoolId);
+            parameters.add(schoolId);
         }
 
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
@@ -469,7 +469,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" left outer join diary.homework h on h.homework_due_date = z.day and h.audience_id = ? " );
             query.append(" group by z.day order by z.day " );
 
-            JsonArray parameters = new JsonArray();
+            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
             parameters.add(currentDateFormatted);
             parameters.add(audienceId);
 

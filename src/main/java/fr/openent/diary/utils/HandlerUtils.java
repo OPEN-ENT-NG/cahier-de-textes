@@ -4,8 +4,8 @@ import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.lessonview.HomeworkModel;
 import fr.wseduc.webutils.http.Renders;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 
 import java.util.List;
 import java.util.Map;

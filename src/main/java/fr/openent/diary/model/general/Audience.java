@@ -1,6 +1,6 @@
 package fr.openent.diary.model.general;
 
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Created by a629001 on 19/04/2016.

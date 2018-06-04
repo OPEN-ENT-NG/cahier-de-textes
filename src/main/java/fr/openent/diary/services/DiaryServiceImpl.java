@@ -17,12 +17,12 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.sql.SqlStatementsBuilder;
 import org.entcore.common.user.UserInfos;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                             createTeacher(teacherId, teacherDisplayName, handler);
                         } else {
                             log.debug("Teacher found");
-                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().putBoolean("teacherFound", true)));
+                            handler.handle(new Either.Right<String, JsonObject>(event.right().getValue().put("teacherFound", true)));
                         }
                     } else {
                         log.debug("error while retrieve teacher");
@@ -89,7 +89,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * FROM diary.teacher as t WHERE t.id = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(teacherId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(teacherId));
 
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
@@ -99,8 +99,8 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         if(StringUtils.isValidIdentifier(teacherId)) { //TODO change to StringUtils/UUID utils?
             //insert teacher
             JsonObject teacherParams = new JsonObject();
-            teacherParams.putString(TEACHER_ID_FIELD_NAME, teacherId);
-            teacherParams.putString(TEACHER_DISPLAY_NAME_FIELD_NAME, teacherDisplayName);
+            teacherParams.put(TEACHER_ID_FIELD_NAME, teacherId);
+            teacherParams.put(TEACHER_DISPLAY_NAME_FIELD_NAME, teacherDisplayName);
             sql.insert("diary.teacher", teacherParams, "id", validUniqueResultHandler(handler));
         } else {
             String errorMessage = "Invalid teacher identifier.";
@@ -122,9 +122,9 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                 if (event.isRight()) {
                     log.debug(event.right().getValue());
                     Long nextId = event.right().getValue().getLong("next_id");
-                    subjectObject.putNumber("id", nextId);
+                    subjectObject.put("id", nextId);
 
-                    JsonArray parameters = new JsonArray().add(nextId);
+                    JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(nextId);
 
                     SqlStatementsBuilder sb = new SqlStatementsBuilder();
                     sb.insert("diary.subject", subjectObject, "id");
@@ -150,7 +150,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         .append(" WHERE s.school_id in")
         .append(sql.listPrepared(schoolIds.toArray()));
 
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         for (String schoolId : schoolIds) {
             parameters.add(Sql.parseId(schoolId));
         }
@@ -169,7 +169,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT * FROM diary.audience as s WHERE s.school_id = ?");
 
-        JsonArray parameters = new JsonArray().add(Sql.parseId(schoolId));
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(schoolId));
 
         sql.prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
     }
@@ -196,7 +196,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
         memberIds.add(userInfos.getUserId());
         String queryReturnType = "";
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         StringBuilder queryLessons = new StringBuilder();
         queryLessons.append("SELECT distinct 'lesson' as type_item, '' as type_homework, l.id as id, s.subject_label as subject, s.original_subject_id as originalSubjectId, l.id as lesson_id,")
@@ -225,8 +225,8 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
 
         StringBuilder whereLessons = new StringBuilder(" WHERE 1=1 ");
         StringBuilder whereHomeworks = new StringBuilder(" WHERE 1=1 ");
-        JsonArray parametersLessons = new JsonArray();
-        JsonArray parametersHomeworks = new JsonArray();
+        JsonArray parametersLessons = new fr.wseduc.webutils.collections.JsonArray();
+        JsonArray parametersHomeworks = new fr.wseduc.webutils.collections.JsonArray();
         Integer maxResults = null;
         Integer offset = null;
         boolean isAscSortOrder = true;
@@ -411,7 +411,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         sb.append(" MATCH gp-[:DEPENDS]->(c:Class) ");
         sb.append(" RETURN distinct  child.id as id, child.displayName as displayName, c.id as classId, c.name as className ");
 
-        JsonObject params = new JsonObject().putString("id", parentId);
+        JsonObject params = new JsonObject().put("id", parentId);
         neo.execute(sb.toString(), params, Neo4jResult.validResultHandler(handler));
 
     }
@@ -430,12 +430,12 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder sb = new StringBuilder("");
         sb.append(" match (u:User {id : {id}})-[TEACHES]->(s:Subject) return s.label, s.id ;");
 
-        JsonObject params = new JsonObject().putString("id", teacherId);
+        JsonObject params = new JsonObject().put("id", teacherId);
         neo.execute(sb.toString(), params, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> event) {
                 if ("ok".equals(event.body().getString("status"))) {
-                    final JsonArray result = event.body().getArray("result", new JsonArray());
+                    final JsonArray result = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
 
 
                     sql.raw("select nextval('diary.subject_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
@@ -455,11 +455,11 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                             final String subjectTaught = jo.getString("s.label");
                                             final String originalSubjectId = jo.getString("s.id");
                                             JsonObject joSubject = new JsonObject();
-                                            joSubject.putString("subject_label", subjectTaught);
-                                            joSubject.putString("school_id", schoolId);
-                                            joSubject.putString("teacher_id", teacherId);
-                                            joSubject.putString("original_subject_id", originalSubjectId);
-                                            joSubject.putNumber("id", nextId);
+                                            joSubject.put("subject_label", subjectTaught);
+                                            joSubject.put("school_id", schoolId);
+                                            joSubject.put("teacher_id", teacherId);
+                                            joSubject.put("original_subject_id", originalSubjectId);
+                                            joSubject.put("id", nextId);
 
                                             subjectLabels.add(joSubject);
 
@@ -470,10 +470,10 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                     // if none does not exist in neo graph db
                                     else {
                                         JsonObject joSubject = new JsonObject();
-                                        joSubject.putString("subject_label", DEFAULT_SUBJECT_LABEL);
-                                        joSubject.putString("school_id", schoolId);
-                                        joSubject.putString("teacher_id", teacherId);
-                                        joSubject.putNumber("id", nextId);
+                                        joSubject.put("subject_label", DEFAULT_SUBJECT_LABEL);
+                                        joSubject.put("school_id", schoolId);
+                                        joSubject.put("teacher_id", teacherId);
+                                        joSubject.put("id", nextId);
 
                                         subjectLabels.add(joSubject);
                                     }
@@ -500,7 +500,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void listClasses(final String schoolId, final Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder("");
         query.append(" match (c:Class)-[BELONGS]->(s:Structure) where s.id={id} return c.id as classId, c.name as className");
-        JsonObject params = new JsonObject().putString("id", schoolId);
+        JsonObject params = new JsonObject().put("id", schoolId);
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 
@@ -511,7 +511,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         query.append(" match (mg:ManualGroup)-[BELONGS]->(s:Structure) where s.id={id} return mg.id as groupId, mg.name as groupName ");
         query.append(" UNION ");
         query.append(" match (mg:ManualGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) where s.id={id} return mg.id as groupId, mg.name as groupName ");
-        JsonObject params = new JsonObject().putString("id", schoolId).putString("id", schoolId);
+        JsonObject params = new JsonObject().put("id", schoolId).put("id", schoolId);
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 
@@ -519,7 +519,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler){
         StringBuilder query = new StringBuilder("");
         query.append("MATCH (n:User) - [IN] -> (g:Group) where n.id IN {id} RETURN g.id as groupId ");
-        JsonObject params = new JsonObject().putArray("id",new JsonArray(childIds.toArray()));
+        JsonObject params = new JsonObject().put("id",new fr.wseduc.webutils.collections.JsonArray(childIds.toArray()));
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 
@@ -530,14 +530,14 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         StringBuilder query = new StringBuilder("");
         query.append("match (g:Group)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) where s.id={id} and c.id = {audienceId} return g.id as key, g.name as value");
         JsonObject params = new JsonObject()
-                .putString("id",schoolId)
-                .putString("audienceId",audienceId);
+                .put("id",schoolId)
+                .put("audienceId",audienceId);
         neo.execute(query.toString(), params, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> event) {
                 if ("ok".equals(event.body().getString("status"))) {
                     try {
-                        List<KeyValueModel> groups = SqlMapper.mapper.readValue(event.body().getArray("result").toString(),new TypeReference<List<KeyValueModel>>(){});
+                        List<KeyValueModel> groups = SqlMapper.mapper.readValue(event.body().getJsonArray("result").toString(),new TypeReference<List<KeyValueModel>>(){});
                         HandlerResponse<List<KeyValueModel>> response = new HandlerResponse<List<KeyValueModel>>();
                         response.setResult(groups);
                         handler.handle(response);

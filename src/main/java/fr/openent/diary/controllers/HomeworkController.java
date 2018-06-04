@@ -16,12 +16,12 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -152,7 +152,7 @@ public class HomeworkController extends ControllerHelper {
                         public void handle(Either<String, JsonArray> event) {
                             if (event.isRight()) {
                                 List<String> memberIds = new ArrayList<>();
-                                for (Object result : ((JsonArray) ((Either.Right) event).getValue()).toList()){
+                                for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
                                     String groupId  = ((Map<String,String>)result).get("groupId");
                                     memberIds.add(groupId);
                                 }
@@ -495,7 +495,7 @@ public class HomeworkController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "unPublishHomeworks", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<Integer> ids = data.getArray("ids").toList();
+                            final List<Integer> ids = data.getJsonArray("ids").getList();
 
                             homeworkService.unPublishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
@@ -530,7 +530,7 @@ public class HomeworkController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "publishHomeworks", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<Integer> ids = data.getArray("ids").toList();
+                            final List<Integer> ids = data.getJsonArray("ids").getList();
 
                             homeworkService.publishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
@@ -595,7 +595,7 @@ public class HomeworkController extends ControllerHelper {
                 if (user != null) {
                     RequestUtils.bodyToJson(request, pathPrefix + "deleteHomeworks", new Handler<JsonObject>() {
                         public void handle(JsonObject data) {
-                            final List<String> ids = data.getArray("ids").toList();
+                            final List<String> ids = data.getJsonArray("ids").getList();
 
                             homeworkService.deleteHomeworks(ids, notEmptyResponseHandler(request, 201));
                         }

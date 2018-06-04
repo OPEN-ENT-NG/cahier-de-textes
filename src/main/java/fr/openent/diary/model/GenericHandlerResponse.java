@@ -3,11 +3,11 @@ package fr.openent.diary.model;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Created by A664240 on 16/05/2017.
@@ -50,7 +50,7 @@ public class GenericHandlerResponse {
                                     .putHeader("content-type", "application/json; charset=utf-8")
                                     .end(StringUtils.encodeJson(event.getResult()));
                         }else{
-                            Renders.renderJson(request, new JsonObject().putString("status","ok"));
+                            Renders.renderJson(request, new JsonObject().put("status","ok"));
                         }
 
                     }else{
@@ -71,7 +71,7 @@ public class GenericHandlerResponse {
             @Override
             public void handle(GenericHandlerResponse event) {
                 if (!event.hasError()){
-                    Renders.renderJson(request, new JsonObject().putString("status","ok"));
+                    Renders.renderJson(request, new JsonObject().put("status","ok"));
                 }else{
                     ControllerHelper.badRequest(request,event.getMessage());
                 }

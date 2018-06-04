@@ -2,8 +2,8 @@ package fr.openent.diary.services;
 
 import fr.openent.diary.model.general.Audience;
 import fr.wseduc.webutils.Either;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 /**
  * Created by a629001 on 12/04/2016.

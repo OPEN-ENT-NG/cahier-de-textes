@@ -15,8 +15,8 @@ import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.SqlQuery;
 import fr.openent.diary.utils.StringUtils;
 import org.entcore.common.service.impl.SqlCrudService;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 
 import java.util.*;
 
@@ -55,7 +55,7 @@ public class HistoryServiceImpl extends SqlCrudService {
         final List<SqlQuery> queries = new ArrayList<>();
 
         StringBuilder queryLesson = new StringBuilder();
-        JsonArray parametersLesson = new JsonArray().addString(yearLabel);
+        JsonArray parametersLesson = new fr.wseduc.webutils.collections.JsonArray().add(yearLabel);
         /*
            Lesson part
         */
@@ -88,7 +88,7 @@ public class HistoryServiceImpl extends SqlCrudService {
 
 
         StringBuilder queryHomework = new StringBuilder();
-        JsonArray parametersHomework = new JsonArray().addString(yearLabel);
+        JsonArray parametersHomework = new fr.wseduc.webutils.collections.JsonArray().add(yearLabel);
         /*
            Homework part
         */
@@ -121,7 +121,7 @@ public class HistoryServiceImpl extends SqlCrudService {
 
 
         StringBuilder queryVisa = new StringBuilder();
-        JsonArray parametersVisa = new JsonArray().addString(yearLabel);
+        JsonArray parametersVisa = new fr.wseduc.webutils.collections.JsonArray().add(yearLabel);
         /*
            visa part
         */
@@ -136,7 +136,7 @@ public class HistoryServiceImpl extends SqlCrudService {
 
 
         StringBuilder queryVisaLesson = new StringBuilder();
-        JsonArray parametersVisaLesson = new JsonArray().addString(yearLabel);
+        JsonArray parametersVisaLesson = new fr.wseduc.webutils.collections.JsonArray().add(yearLabel);
         /*
            visa lesson part
         */
@@ -174,7 +174,7 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append("delete from  diary.visa_lesson;")
                 .append("delete from  diary.visa;")
                 .toString()
-                ,new JsonArray());
+                ,new fr.wseduc.webutils.collections.JsonArray());
     }
 
 
@@ -210,36 +210,36 @@ public class HistoryServiceImpl extends SqlCrudService {
     private void queryFilters(String structureId,String teacherId,final Handler<HandlerResponse<List<HistoryFilterMapping>>> handler){
 
         StringBuffer query = new StringBuffer();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         query.append("select distinct yearLabel as yearLabel ,'teacher' as type, teacherId as id, teacherName as label from diary.histo_lesson where structureId = ? ");
-        parameters.addString(structureId);
+        parameters.add(structureId);
         if (teacherId!=null){
             query.append(" and teacherId = ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         query.append(" union ");
         query.append(" select distinct yearLabel as yearLabel,'teacher' as type, teacherId as id,  teacherName as label from diary.histo_homework where structureId = ? ");
-        parameters.addString(structureId);
+        parameters.add(structureId);
         if (teacherId!=null){
             query.append(" and teacherId = ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         query.append(" union ");
         query.append(" select distinct yearLabel as yearLabel ,'audience' as type, audienceId as id,  audienceLabel as label from diary.histo_lesson where structureId = ? ");
-        parameters.addString(structureId);
+        parameters.add(structureId);
         if (teacherId!=null){
             query.append(" and teacherId = ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         query.append(" union ");
         query.append(" select distinct yearLabel as yearLabel,'audience' as type,  audienceId as id,  audienceLabel as label from diary.histo_homework where structureId = ? ");
-        parameters.addString(structureId);
+        parameters.add(structureId);
         if (teacherId!=null){
             query.append(" and teacherId = ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         query.append(" order by yearLabel ");
@@ -293,7 +293,7 @@ public class HistoryServiceImpl extends SqlCrudService {
 
     private void getVisaSelectHomework(String yearLabel, String teacherId, String audienceId, final Handler<HandlerResponse<Map<String,List<HomeworkModel>>>> handler){
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
 
         query.append(" select ")
@@ -305,17 +305,17 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append(" where lessonId is not null ")
                 .append(" and  yearLabel = ?  ");
 
-        parameters.addString(yearLabel);
+        parameters.add(yearLabel);
 
 
         if (teacherId != null ){
             query.append(" and teacherId= ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         if (audienceId != null ){
             query.append(" and audienceId= ? ");
-            parameters.addString(audienceId);
+            parameters.add(audienceId);
         }
 
         query.append(" order by date desc");
@@ -344,7 +344,7 @@ public class HistoryServiceImpl extends SqlCrudService {
 
     private void getVisaSelectLesson(String yearLabel, String teacherId, String audienceId, final Handler<HandlerResponse<List<LessonModel>>> handler){
         StringBuilder query = new StringBuilder();
-        JsonArray parameters = new JsonArray();
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         query.append(" select l.lessonId , ")
                 .append(" l.audienceLabel as audienceLabel, ")
@@ -365,17 +365,17 @@ public class HistoryServiceImpl extends SqlCrudService {
                 .append(" where l.yearLabel = ? ");
 
 
-        parameters.addString(yearLabel);
+        parameters.add(yearLabel);
 
 
         if (teacherId != null ){
             query.append(" and l.teacherId= ? ");
-            parameters.addString(teacherId);
+            parameters.add(teacherId);
         }
 
         if (audienceId != null ){
             query.append(" and l.audienceId= ? ");
-            parameters.addString(audienceId);
+            parameters.add(audienceId);
         }
 
         query.append(" order by date desc");
