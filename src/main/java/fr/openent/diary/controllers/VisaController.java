@@ -1,46 +1,25 @@
 package fr.openent.diary.controllers;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
-import fr.openent.diary.model.ModelWeek;
 import fr.openent.diary.model.lessonview.LessonModel;
-import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.services.PdfServiceImpl;
 import fr.openent.diary.services.VisaServiceImpl;
-import fr.openent.diary.utils.*;
-import fr.wseduc.rs.*;
-import fr.wseduc.security.ActionType;
+import fr.openent.diary.utils.DiaryLambda;
+import fr.openent.diary.utils.SqlMapper;
+import fr.wseduc.rs.Get;
+import fr.wseduc.rs.Post;
 import fr.wseduc.security.SecuredAction;
-
 import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
-
-import org.entcore.common.http.filter.AdmlOfStructure;
-import org.entcore.common.http.filter.ResourceFilter;
-import org.entcore.common.user.UserInfos;
-import org.entcore.common.user.UserUtils;
-import org.entcore.common.utils.DateUtils;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServerRequest;
-
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

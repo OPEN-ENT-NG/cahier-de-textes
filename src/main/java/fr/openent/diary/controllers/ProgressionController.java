@@ -7,19 +7,15 @@ import fr.openent.diary.model.progression.OrderLesson;
 import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.services.ProgressionServiceImpl;
 import fr.openent.diary.utils.SqlMapper;
-import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
-import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 

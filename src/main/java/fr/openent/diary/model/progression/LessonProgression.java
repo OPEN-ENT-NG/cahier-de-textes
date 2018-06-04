@@ -1,7 +1,5 @@
 package fr.openent.diary.model.progression;
 
-import java.util.Date;
-
 /**
  * Created by A664240 on 26/05/2017.
  */

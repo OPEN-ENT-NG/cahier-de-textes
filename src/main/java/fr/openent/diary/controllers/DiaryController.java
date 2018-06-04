@@ -1,11 +1,9 @@
 package fr.openent.diary.controllers;
 
-import fr.openent.diary.model.GenericHandlerResponse;
-import fr.openent.diary.model.visa.VisaFilters;
+import fr.openent.diary.model.general.CriteriaSearchType;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
-import fr.openent.diary.model.general.CriteriaSearchType;
 import fr.openent.diary.utils.SearchCriterion;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
@@ -20,11 +18,8 @@ import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import io.vertx.core.json.JsonArray;
@@ -33,12 +28,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.*;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -74,9 +63,9 @@ public class DiaryController extends BaseController {
     }
 
     @Override
-    public void init(Vertx vertx, Container container, RouteMatcher rm,
+    public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
                      Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions) {
-        super.init(vertx, container, rm, securedActions);
+        super.init(vertx, config, rm, securedActions);
         this.neo = new Neo(vertx, eb, log);
     }
 
@@ -232,7 +221,7 @@ public class DiaryController extends BaseController {
                             if (json != null) {
 
                                 final List<SearchCriterion> criteria = new ArrayList<SearchCriterion>();
-                                Set<Map.Entry<String, Object>> entries = json.toMap().entrySet();
+                                Set<Map.Entry<String, Object>> entries = json.getMap().entrySet();
                                 for (Map.Entry<String, Object> entry: entries) {
                                     SearchCriterion criterion = SearchCriterion.convertParameterToSearchCriterion(entry);
                                     if (criterion != null) {

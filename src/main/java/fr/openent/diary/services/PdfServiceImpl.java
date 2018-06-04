@@ -3,7 +3,6 @@ package fr.openent.diary.services;
 import fr.openent.diary.controllers.VisaController;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.lessonview.LessonModel;
-import fr.openent.diary.model.visa.VisaModel;
 import fr.openent.diary.utils.SqlMapper;
 import fr.wseduc.webutils.http.Renders;
 import io.vertx.core.AsyncResult;
@@ -40,7 +39,7 @@ public class PdfServiceImpl {
             @Override
             public void handle(HandlerResponse<List<LessonModel>> event) {
                 final String templatePath = "./pdf/lesson.pdf.xhtml";
-                final String node  = (String) vertx.sharedData().getMap("server").get("node");
+                final String node  = (String) vertx.sharedData().getLocalMap("server").get("node");
 
                 List<LessonModel> lessons = event.getResult();
 
@@ -85,11 +84,11 @@ public class PdfServiceImpl {
 
                                     JsonObject actionObject = new JsonObject();
                                     actionObject
-                                            .putBinary("content", processedTemplate.getBytes());
+                                            .put("content", processedTemplate.getBytes());
 
-                                    eb.send(node + "entcore.pdf.generator", actionObject, new Handler<Message<JsonObject>>() {
-                                        public void handle(Message<JsonObject> reply) {
-                                            JsonObject pdfResponse = reply.body();
+                                    eb.send(node + "entcore.pdf.generator", actionObject, new Handler<AsyncResult<Message<JsonObject>>>() {
+                                        public void handle(AsyncResult<Message<JsonObject>> reply) {
+                                            JsonObject pdfResponse = reply.result().body();
                                             if(!"ok".equals(pdfResponse.getString("status"))){
                                                 Renders.badRequest(request, pdfResponse.getString("message"));
                                                 return;

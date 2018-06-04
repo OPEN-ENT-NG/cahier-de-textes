@@ -2,7 +2,6 @@ package fr.openent.diary.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -18,7 +17,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.Object;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -27,7 +25,6 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -102,7 +99,7 @@ public class SqlMapper<T> {
                 if ("ok".equals(event.body().getString("status"))){
                     Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
-                    Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).get(0);
+                    Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).getJsonArray(0);
                     resultHandler.setResult((T) decode(obj.toString(),clazz));
 
                 }else{
@@ -307,7 +304,7 @@ public class SqlMapper<T> {
                 if ("ok".equals(event.body().getString("status"))){
                     Either<String, JsonArray> resultJson = SqlResult.validResult(event);
 
-                    Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).get(0);
+                    Object obj = ((JsonArray) (((Either.Right) resultJson).getValue())).getJsonArray(0);
                     resultHandler.setResult((T) decode(obj.toString(),clazz));
 
                 }else{
@@ -384,7 +381,7 @@ public class SqlMapper<T> {
         if (obj instanceof  ArrayList){
             JsonArray jsonArray = new fr.wseduc.webutils.collections.JsonArray();
             for (Object e : (ArrayList) obj){
-                ((JsonArray)jsonArray).addElement(objectToJson(e,dateFormat));
+                jsonArray.add(objectToJson(e,dateFormat));
             }
             return jsonArray;
         }
@@ -406,7 +403,7 @@ public class SqlMapper<T> {
                 if (value instanceof Date) {
                     value = dateFormat.format((Date) value);
                 }
-                result.putValue(key, value);
+                result.put(key, value);
 
             }
         }

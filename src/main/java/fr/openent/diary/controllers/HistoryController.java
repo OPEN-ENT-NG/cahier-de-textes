@@ -1,22 +1,12 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.model.GenericHandlerResponse;
-import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.history.HistoryModel;
-import fr.openent.diary.model.progression.LessonProgression;
-import fr.openent.diary.model.progression.OrderLesson;
-import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.services.HistoryServiceImpl;
 import fr.openent.diary.services.PdfServiceImpl;
-import fr.openent.diary.services.ProgressionServiceImpl;
 import fr.openent.diary.utils.DiaryLambda;
-import fr.openent.diary.utils.SqlMapper;
-import fr.openent.diary.utils.StringUtils;
-import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
-import fr.wseduc.rs.Post;
 import fr.wseduc.security.SecuredAction;
-import fr.wseduc.webutils.http.Renders;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;

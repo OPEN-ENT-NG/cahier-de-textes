@@ -1,13 +1,10 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.LessonAccessFilter;
-import fr.openent.diary.model.GenericHandlerResponse;
 import fr.openent.diary.model.HandlerResponse;
-import fr.openent.diary.model.general.Context;
+import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.services.*;
-import fr.openent.diary.model.general.Audience;
-import fr.openent.diary.utils.HandlerUtils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -20,7 +17,6 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.entcore.common.utils.StringUtils;
 import io.vertx.core.Handler;
-import io.vertx.core.Handler<Void>;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -237,7 +233,7 @@ public class LessonController extends ControllerHelper {
                                             final String resourceId = String.valueOf(result.getLong("id"));
 
                                             if(!StringUtils.isEmpty(audience.getId())) {
-                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                sharedService.shareResource(user, audience.getId(), resourceId, audience.isGroup(),
                                                         actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
                                                             @Override
                                                             public void handle(Either<String, JsonObject> event) {
@@ -292,7 +288,7 @@ public class LessonController extends ControllerHelper {
                             if(user.getStructures().contains(json.getString("school_id",""))){
                                 String lessonId = String.valueOf(json.getInteger("lesson_id"));
                                 if (isValidLessonId(lessonId)) {
-                                    lessonService.publishLesson(lessonId, new Handler<Either<String, JsonObject>>() {
+                                    lessonService.publishLesson(lessonId, user, new Handler<Either<String, JsonObject>>() {
                                         @Override
                                         public void handle(Either<String, JsonObject> event) {
                                             if (event.isRight()) {
@@ -332,7 +328,7 @@ public class LessonController extends ControllerHelper {
                         public void handle(JsonObject data) {
                             final List<String> ids = data.getJsonArray("ids").getList();
 
-                            lessonService.publishLessons(ids, new Handler<Either<String, JsonObject>>() {
+                            lessonService.publishLessons(ids, user, new Handler<Either<String, JsonObject>>() {
                                 @Override
                                 public void handle(Either<String, JsonObject> event) {
                                     if (event.isRight()) {
@@ -425,7 +421,7 @@ public class LessonController extends ControllerHelper {
                                                                     final JsonObject result = event.right().getValue();
 
                                                                     if(!StringUtils.isEmpty(newAudience.getId())) {
-                                                                        sharedService.updateShareResource(oldAudience.getId(), newAudience.getId(), lessonId,
+                                                                        sharedService.updateShareResource(user,oldAudience.getId(), newAudience.getId(), lessonId,
                                                                                 oldAudience.isGroup(), newAudience.isGroup(), actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
                                                                                     @Override
                                                                                     public void handle(Either<String, JsonObject> event) {
@@ -566,7 +562,7 @@ public class LessonController extends ControllerHelper {
 
                                         //share related homework if there is any
                                         if (homeworkIds.size() > 0) {
-                                            sharedService.shareOrUpdateLinkedResources(homeworkIds.getList(), userId, groupId, actions, new Handler<Either<String, JsonObject>>() {
+                                            sharedService.shareOrUpdateLinkedResources(Long.parseLong(lessonId),homeworkIds.getList(), user, groupId, actions, new Handler<Either<String, JsonObject>>() {
                                                 @Override
                                                 public void handle(Either<String, JsonObject> event) {
                                                     if (event.isRight()) {

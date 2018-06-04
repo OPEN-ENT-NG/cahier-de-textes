@@ -2,9 +2,9 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.filters.HomeworkAccessFilter;
 import fr.openent.diary.model.HandlerResponse;
+import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.services.*;
-import fr.openent.diary.model.general.Audience;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -26,7 +26,6 @@ import io.vertx.core.logging.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.*;
 
@@ -304,7 +303,7 @@ public class HomeworkController extends ControllerHelper {
                                             final String resourceId = String.valueOf(result.getLong("id"));
 
                                             if (!StringUtils.isEmpty(audience.getId())) {
-                                                sharedService.shareResource(user.getUserId(), audience.getId(), resourceId, audience.isGroup(),
+                                                sharedService.shareResource(user, audience.getId(), resourceId, audience.isGroup(),
                                                         actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
                                                             @Override
                                                             public void handle(Either<String, JsonObject> event) {
@@ -412,7 +411,7 @@ public class HomeworkController extends ControllerHelper {
                                                                         final JsonObject result = event.right().getValue();
 
                                                                         if (!StringUtils.isEmpty(newAudience.getId())) {
-                                                                            sharedService.updateShareResource(oldAudience.getId(), newAudience.getId(), homeworkId,
+                                                                            sharedService.updateShareResource(user,oldAudience.getId(), newAudience.getId(), homeworkId,
                                                                                     oldAudience.isGroup(), newAudience.isGroup(), actionsForAutomaticSharing, new Handler<Either<String, JsonObject>>() {
                                                                                         @Override
                                                                                         public void handle(Either<String, JsonObject> event) {
@@ -532,7 +531,8 @@ public class HomeworkController extends ControllerHelper {
                         public void handle(JsonObject data) {
                             final List<Integer> ids = data.getJsonArray("ids").getList();
 
-                            homeworkService.publishHomeworks(ids, new Handler<Either<String, JsonObject>>() {
+                            //TODO notify lesson?
+                            homeworkService.publishHomeworks(user,null, ids, new Handler<Either<String, JsonObject>>() {
                                 @Override
                                 public void handle(Either<String, JsonObject> event) {
                                     if (event.isRight()) {

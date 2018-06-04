@@ -3,6 +3,7 @@ package fr.openent.diary.services;
 import fr.openent.diary.model.general.Audience;
 import fr.wseduc.webutils.Either;
 import org.entcore.common.service.CrudService;
+import org.entcore.common.user.UserInfos;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -90,14 +91,14 @@ public interface LessonService extends CrudService {
      * @param lessonId
      * @param handler
      */
-    void publishLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
+    void publishLesson(final String lessonId, final UserInfos userInfos,final Handler<Either<String, JsonObject>> handler);
 
     /**
      * Publishes lessons
      * @param lessonIds
      * @param handler
      */
-    void publishLessons(final List<String> lessonIds, final Handler<Either<String, JsonObject>> handler);
+    void publishLessons(final List<String> lessonIds,final UserInfos userInfos, final Handler<Either<String, JsonObject>> handler);
 
     /**
      * Un-publishes lessons

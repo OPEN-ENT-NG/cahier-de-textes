@@ -9,7 +9,6 @@ import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.utils.*;
-import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
 import io.vertx.core.Handler;
@@ -18,8 +17,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.*;
-
-import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 
 public class VisaServiceImpl extends SqlCrudService {
@@ -295,7 +292,7 @@ public class VisaServiceImpl extends SqlCrudService {
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
         query.append("update diary.lesson  set locked = TRUE  where id in (select v.lesson_id from diary.visa_lesson v where v.visa_id = ?) ");
-        parameters.addNumber(visa.getId());
+        parameters.add(visa.getId());
         return new SqlQuery(query.toString(),parameters);
     }
 
@@ -306,13 +303,13 @@ public class VisaServiceImpl extends SqlCrudService {
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
 
-        parameters.addNumber(visa.getId());
+        parameters.add(visa.getId());
         parameters.add(visa.getStructureId());
         parameters.add(visa.getAudienceId());
         parameters.add(visa.getSubjectId());
         parameters.add(visa.getTeacherId());
 
-        parameters.addNumber(visa.getId());
+        parameters.add(visa.getId());
         parameters.add(visa.getStructureId());
         parameters.add(visa.getAudienceId());
         parameters.add(visa.getSubjectId());
@@ -615,7 +612,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
                     if (result.size() > 0) {
                         for (int i = 0; i < result.size(); i++) {
-                            JsonObject jo = result.get(i);
+                            JsonObject jo = result.getJsonObject(i);
                             final String id = jo.getString("u.id");
                             final String name = jo.getString("u.displayName");
                             resultHandler.add(new KeyValueModel(id,name));

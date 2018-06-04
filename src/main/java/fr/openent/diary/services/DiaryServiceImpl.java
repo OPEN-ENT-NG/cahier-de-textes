@@ -9,7 +9,6 @@ import fr.openent.diary.utils.SearchCriterion;
 import fr.openent.diary.utils.SqlMapper;
 import fr.openent.diary.utils.StringUtils;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.collections.Joiner;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -26,7 +25,6 @@ import io.vertx.core.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
@@ -123,8 +121,6 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                     log.debug(event.right().getValue());
                     Long nextId = event.right().getValue().getLong("next_id");
                     subjectObject.put("id", nextId);
-
-                    JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(nextId);
 
                     SqlStatementsBuilder sb = new SqlStatementsBuilder();
                     sb.insert("diary.subject", subjectObject, "id");
@@ -451,7 +447,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
                                 for (String schoolId : schoolIds) {
                                     if (result.size() > 0) {
                                         for (int i = 0; i < result.size(); i++) {
-                                            JsonObject jo = result.get(i);
+                                            JsonObject jo = result.getJsonObject(i);
                                             final String subjectTaught = jo.getString("s.label");
                                             final String originalSubjectId = jo.getString("s.id");
                                             JsonObject joSubject = new JsonObject();
@@ -519,7 +515,7 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
     public void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler){
         StringBuilder query = new StringBuilder("");
         query.append("MATCH (n:User) - [IN] -> (g:Group) where n.id IN {id} RETURN g.id as groupId ");
-        JsonObject params = new JsonObject().put("id",new fr.wseduc.webutils.collections.JsonArray(childIds.toArray()));
+        JsonObject params = new JsonObject().put("id",new fr.wseduc.webutils.collections.JsonArray(childIds));
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 

@@ -1,15 +1,23 @@
 package fr.openent.diary.services;
 
 import fr.openent.diary.controllers.DiaryController;
+import fr.openent.diary.model.GenericHandlerResponse;
+import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.general.Context;
 import fr.openent.diary.model.general.HomeworkType;
 import fr.openent.diary.model.general.ResourceState;
+import fr.openent.diary.model.util.KeyValueModel;
+import fr.openent.diary.utils.HandlerUtils;
+import fr.openent.diary.utils.SqlMapper;
 import fr.wseduc.webutils.Either;
+import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
+import org.entcore.common.user.UserInfos;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -29,6 +37,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     private DiaryService diaryService;
     private AudienceService audienceService;
+    private NotifyServiceImpl notificationService;
 
     private final static String DATABASE_TABLE ="homework";
     private final static Logger log = LoggerFactory.getLogger(HomeworkServiceImpl.class);
@@ -37,15 +46,18 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private static final String GESTIONNAIRE_RIGHT = "fr-openent-diary-controllers-HomeworkController|modifyHomework";
     private static final String GESTIONNAIRE_RIGHT_LESSON = "fr-openent-diary-controllers-LessonController|modifyLesson";
 
+
+    private final Neo4j neo = Neo4j.getInstance();
     /**
      *
      * @param diaryService
      * @param audienceService
      */
-    public HomeworkServiceImpl(final DiaryService diaryService, final AudienceService audienceService) {
+    public HomeworkServiceImpl(final DiaryService diaryService, final AudienceService audienceService,  NotifyServiceImpl notificationService) {
         super(DiaryController.DATABASE_SCHEMA, DATABASE_TABLE);
         this.diaryService = diaryService;
         this.audienceService = audienceService;
+        this.notificationService=notificationService;
     }
 
     /**
@@ -263,7 +275,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                                     SqlStatementsBuilder sb = new SqlStatementsBuilder();
                                                     sb.insert("diary.homework", homeworkObject, "id");
                                                     sb.prepared("update diary.attachment set homework_id = ? where id in " +
-                                                            sql.listPrepared(attachments.toArray()), parameters);
+                                                            sql.listPrepared(attachments.getList()), parameters);
 
                                                     sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
                                                 }
@@ -352,15 +364,32 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void publishHomework(Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
+    public void publishHomework(final UserInfos userInfos, final Long lessonId,final Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(homeworkId);
-        publishHomeworks(ids, handler);
+        publishHomeworks(userInfos,lessonId,ids, handler);
     }
 
     @Override
-    public void publishHomeworks(List<Integer> homeworkIds, Handler<Either<String, JsonObject>> handler) {
-        changeHomeworksState(homeworkIds, ResourceState.DRAFT, ResourceState.PUBLISHED, handler);
+    public void publishHomeworks(final UserInfos userInfos, final Long lessonId, final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler) {
+        changeHomeworksState(homeworkIds, ResourceState.DRAFT, ResourceState.PUBLISHED, new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(final Either<String, JsonObject> event) {
+                for (Integer homeWorkId : homeworkIds){
+                    notifyHomeworkShare(lessonId, new Long(homeWorkId), userInfos, new Handler<GenericHandlerResponse>() {
+                        @Override
+                        public void handle(GenericHandlerResponse eventGeneric) {
+                            if (!eventGeneric.hasError()){
+                                handler.handle(event);
+                            }else{
+                                handler.handle(event.left());
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     /**
@@ -476,5 +505,119 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             sql.prepared(query.toString(), parameters, validResultHandler(handler));
         }
     }
+
+
+    private void getProfileGroupIdsFromResource(Long lessonId, Long homeworkId, final Handler<HandlerResponse<List<KeyValueModel>>> handler){
+
+        String query;
+        JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
+
+        /*query = "select distinct 'id' as key,  member_id as value from diary.homework_shares s where s.resource_id in ( " +
+                "select distinct id from diary.homework where homework_state = 'published' " +
+                " and homework_title = 'Devoir Maison' " +
+                "and lesson_id = ? " +
+                ") " +
+                "union " +
+                "select distinct 'id' as key, member_id as value from diary.homework_shares s where s.resource_id in ( " +
+                "select distinct id from diary.homework where" +
+                " homework_state = 'published' " +
+                " and homework_title = 'Devoir Maison' " +
+                "and id = ?" +
+                ")";
+        */
+
+        query = "select distinct to_char(homework_due_date,'DD-MM-YYYY') as key,member_id as value " +
+                "  from diary.homework_shares s, " +
+                "    diary.homework h     " +
+                "  where s.resource_id = ? " +
+                "  and s.resource_id = h.id " +
+                "  and h.homework_state = 'published'" +
+                " union " +
+                "select distinct to_char(homework_due_date,'DD-MM-YYYY') as key,member_id as value " +
+                "  from diary.homework_shares s, " +
+                "    diary.homework h     " +
+                "  where h.lesson_id = ? " +
+                "  and s.resource_id = h.id " +
+                "  and h.homework_state = 'published'";
+
+        parameters.add(homeworkId);
+        parameters.add(lessonId);
+
+        sql.prepared(query, parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
+    }
+
+    private void getSharedWithUserIdsFromHomeworkId(final List<KeyValueModel> profileGroupIds,final Handler<HandlerResponse<List<String>>> handler  ){
+
+        if (profileGroupIds.size() == 0 ){
+            handler.handle(new HandlerResponse<List<String>>());
+        }
+
+        JsonArray profileGroupIdsJson = new fr.wseduc.webutils.collections.JsonArray();
+        for (KeyValueModel keyValueModel : profileGroupIds){
+            profileGroupIdsJson.add(keyValueModel.getValue());
+        }
+
+        String query = "MATCH (p:ProfileGroup) <-[:COMMUNIQUE]-(u:User)  " +
+                " where p.id  in {profileGroupsIds} return distinct 'id' as key , u.id as value";
+        final JsonObject params = new JsonObject().put("profileGroupsIds", profileGroupIdsJson);
+
+        neo.execute(query, params, new Handler<Message<JsonObject>>() {
+                    @Override
+                    public void handle(Message<JsonObject> event) {
+                        if ("ok".equals(event.body().getString("status"))) {
+                            JsonArray r = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
+                           // massGroupShare(userInfos,resourceId, getListFromNeoResult(r), actions, handler);
+                            List<String> resultList = new ArrayList<String>();
+                            for (Object values : r.getList()){
+                                resultList.add((String) ((Map<String,String>)values).get("value")) ;
+                            }
+                            HandlerResponse<List<String>> response = new HandlerResponse<List<String>>();
+                            response.setResult(resultList);
+                            handler.handle(response);
+                        } else {
+                            handler.handle(new HandlerResponse<List<String>>("error when trying to get profile groups"));
+                        }
+                    }
+                }
+        );
+
+
+          //      SqlMapper.listMapper(handler, KeyValueModel.class));
+    }
+
+    public void notifyHomeworkShare(final Long lessonId,final Long homeworkId,  final UserInfos userInfos ,final Handler<GenericHandlerResponse> handler ){
+
+        getProfileGroupIdsFromResource(lessonId, homeworkId, new Handler<HandlerResponse<List<KeyValueModel>>>() {
+            @Override
+            public void handle(HandlerResponse<List<KeyValueModel>> event) {
+                HandlerUtils.checkGenericError(event,handler);
+
+                if (event.getResult().size() == 0){
+                    handler.handle(new GenericHandlerResponse());
+                }else{
+                    final String date = event.getResult().get(0).getKey();
+                    getSharedWithUserIdsFromHomeworkId(event.getResult(), new Handler<HandlerResponse<List<String>>>() {
+                        @Override
+                        public void handle(HandlerResponse<List<String>> event) {
+
+                            HandlerUtils.checkGenericError(event,handler);
+
+                            List<String> userIds = new ArrayList<String>();
+
+                            for (String value : event.getResult()){
+                                userIds.add(value);
+                            }
+
+                            notificationService.notifyHomeworks(date,homeworkId,lessonId,userInfos, userIds, NotifyServiceImpl.NotifyEventType.HOMEWORK_EVENT_TYPE);
+
+                            handler.handle(new GenericHandlerResponse());
+                        }
+                    });
+                }
+            }
+        });
+
+    }
+
 }
 
