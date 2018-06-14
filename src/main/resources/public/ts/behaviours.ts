@@ -1,6 +1,4 @@
 import { Behaviours } from 'entcore';
-import {Exclusion, Exclusions} from "./model";
-import {SETTINGS_SNIPPLET} from "./snipplets";
 
 const cdtBehaviours = {
     workflow: {
@@ -45,15 +43,6 @@ const cdtBehaviours = {
     },
 
     loadResources: function (callback) {
-    },
-
-    model: {
-        Exclusion: Exclusion,
-        Exclusions: Exclusions
-    },
-
-    sniplets: {
-        settings: SETTINGS_SNIPPLET
     }
 };
 

@@ -142,12 +142,12 @@ export let main = ng.controller('CdtController',
         /**
          * Course creation
          */
-        $scope.createCourse = () => {
+        $scope.createSession = () => {
             const cdtRights = Behaviours.applicationsBehaviours.cdt.rights;
             /*if (model.me.hasWorkflow(cdtRights.workflow.create)) {
-                $scope.goTo('/create');
+                $scope.goTo('/session/create');
             }*/
-            $scope.goTo('/create');
+            $scope.goTo('/session/create');
         };
 
         $scope.goTo = (state: string) => {
@@ -173,21 +173,8 @@ export let main = ng.controller('CdtController',
         let initTriggers = () => {
             model.calendar.eventer.off('calendar.create-item');
             model.calendar.eventer.on('calendar.create-item', () => {
-                if ($location.path() !== '/create') {
-                    $scope.createCourse();
-                }
+                console.log("clic dans un item ?")
             });
-
-            model.calendar.eventer.off('calendar.drop-item');
-            model.calendar.eventer.on('calendar.drop-item', (item) => {
-                $scope.calendarDropItem(item);
-            });
-
-            model.calendar.eventer.off('calendar.resize-item');
-            model.calendar.eventer.on('calendar.resize-item', (item) => {
-                $scope.calendarResizedItem(item);
-            });
-
         };
 
         initTriggers();
@@ -207,31 +194,7 @@ export let main = ng.controller('CdtController',
             main: () => {
                 template.open('main', 'main');
             },
-            create: () => {
-                let startDate = new Date();
-                let endDate = new Date();
-                if (model && model.calendar && model.calendar.newItem) {
-                    let dateFromCalendar = model.calendar.newItem;
-                    if (dateFromCalendar.beginning)
-                        startDate = dateFromCalendar.beginning = dateFromCalendar.beginning;
-                    if (dateFromCalendar.end)
-                        endDate = dateFromCalendar.end = dateFromCalendar.end;
-                    $scope.params.dateFromCalendar = dateFromCalendar;
-                }
-                if ($scope.params.updateItem) {
-                    $scope.course = new Course($scope.params.updateItem);
-                }
-                else {
-                    $scope.course = new Course({
-                        teachers: [],
-                        groups: [],
-                        courseOccurrences: [],
-                        startDate: startDate,
-                        endDate: endDate,
-                    }, startDate, endDate);
-                    if ($scope.structure && $scope.structures.all.length === 1)
-                        $scope.course.structureId = $scope.structure.id;
-                }
+            createSession: () => {
                 template.open('main', 'course-create');
             }
         });

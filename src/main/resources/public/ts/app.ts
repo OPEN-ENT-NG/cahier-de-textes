@@ -10,8 +10,8 @@ routes.define(($routeProvider) => {
         .when('/', {
             action: 'main'
         })
-        .when('/create', {
-            action: 'create'
+        .when('/session/create', {
+            action: 'createSession'
         })
         .otherwise({
             redirectTo: '/'

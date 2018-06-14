@@ -5,7 +5,6 @@ export * from './subject';
 export * from './group';
 export * from './teacher';
 export * from './student';
-export * from './exclusion';
 export * from '../utils/const/user-types';
 export * from '../utils/const/daysOfWeek';
 export * from '../utils/const/comboLabels';

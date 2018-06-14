@@ -1,145 +1,100 @@
-plugins {
-id 'java'
-id 'scala'
-id 'maven'
-id 'maven-publish'
-id 'com.github.johnrengelman.shadow' version '2.0.1'
-}
+<div class="row">
+    <div class="twelve cell">
 
-if (!hasProperty('odeUsername')) {
-ext.odeUsername = ''
-}
-if (!hasProperty('odePassword')) {
-ext.odePassword = ''
-}
+        <div class="seven cell">
+            <app-title class="zero-mobile">
+                <h1 class="application-title">
+                    <i18n>diary.title</i18n></span>
+                </h1>
+            </app-title>
 
-repositories {
-mavenLocal()
-maven {
-url "https://maven.opendigitaleducation.com/nexus/content/groups/public"
-}
-mavenCentral()
-maven {
-url "https://oss.sonatype.org/content/repositories/iovertx-3720/"
-}
-maven {
-url "https://oss.sonatype.org/content/repositories/snapshots"
-}
-}
+        </div>
 
-configurations {
-provided
-runtime.exclude module: 'vertx-core'
-}
+        <div class="contextual-buttons five cell">
+            <button ng-if="isPersonnel() || isTeacher()" ng-click="createSession">
+                <i18n>cdt.schedule.create</i18n>
+            </button>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
 
-sourceSets {
-main { compileClasspath += configurations.provided }
-}
-
-configurations.all {
-resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-compileJava {
-sourceCompatibility = project.sourceCompatibility
-targetCompatibility = project.targetCompatibility
-}
-
-compileTestJava {
-sourceCompatibility = project.sourceCompatibility
-targetCompatibility = project.targetCompatibility
-}
-
-dependencies {
-compileOnly "io.vertx:vertx-core:$vertxVersion"
-compile "org.entcore:common:$entCoreVersion"
-testCompile "org.entcore:tests:$entCoreVersion"
-testCompile 'io.gatling.highcharts:gatling-charts-highcharts:2.2.2'
-}
-
-jar {
-manifest {
-attributes(
-"Main-Verticle": "service:mod"
-)
-}
-}
-
-shadowJar {
-classifier = 'fat'
-archiveName = "${modowner}~${modname}~$version-$classifier.$extension"
-mergeServiceFiles {
-include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
-}
-}
-
-publishing {
-repositories {
-if (version.endsWith("SNAPSHOT")) {
-maven {
-name 'Snapshots'
-url 'https://maven.opendigitaleducation.com/nexus/content/repositories/snapshots/'
-credentials {
-username "${odeUsername}"
-password "${odePassword}"
-}
-}
-} else {
-maven {
-name 'Releases'
-url 'https://maven.opendigitaleducation.com/nexus/content/repositories/releases/'
-credentials {
-username "${odeUsername}"
-password "${odePassword}"
-}
-}
-}
-}
-publications {
-maven(MavenPublication) {
-groupId "${modowner}"
-artifactId "${modname}"
-artifact("build/libs/${modowner}~${modname}~$version-fat.jar") { classifier "fat" }
-}
-maven(MavenPublication) {
-groupId "${modowner}"
-artifactId "${modname}"
-artifact("build/libs/${modname}-$version-deployment.jar") { classifier "deployment" }
-}
-maven(MavenPublication) {
-groupId "${modowner}"
-artifactId "${modname}"
-artifact("build/libs/${modname}-$version-tests.jar") { classifier "tests" }
-}
-}
-}
-
-
-javadoc {
-options.encoding = 'UTF-8'
-classpath = configurations.provided
-classpath += configurations.compile
-}
-
-test {
-}
-
-task testJar(type: Jar) {
-classifier = 'tests'
-baseName = "${modname}"
-from sourceSets.test.output
-}
-
-task deploymentJar(type: Jar) {
-classifier = 'deployment'
-baseName = "${modname}"
-from 'deployment'
-}
-
-artifacts {
-archives testJar
-archives deploymentJar
-}
+<article class="row twelve" ng-if="isRelative() || isTeacher()">
+    <div ng-if="structures.all.length > 1">
+        <select ng-model="structure"
+                ng-change="switchStructure(structure)"
+                ng-options="structure as structure.name for structure in structures.all"></select>
+    </div>
+    <div ng-if="isTeacher()">
+        <h4>
+            <i18n>cdt.timetable.of.group</i18n>
+            <select ng-model="params.group"
+                    ng-change="params.user = null; getTimetable()"
+                    ng-options="group as group.name for group in structure.groups.all">
+                <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
+            </select>
+            <i class="refused-icon" ng-click="getTeacherTimetable()"></i>
+        </h4>
+    </div>
+    <div ng-if="isRelative() && structure.students.all.length > 0">
+        <h4 ng-if="structure.students.all.length === 1"><i18n>cdt.timetable.of</i18n> [[currentStudent.displayName]]</h4>
+        <div ng-if="structure.students.all.length > 1">
+            <h4>
+                <i18n>cdt.timetable.of</i18n>
+                <select id="students-list"
+                        ng-model="currentStudent"
+                        ng-change="params.group = getStudentGroup(currentStudent); getTimetable();"
+                        ng-options="student as student.displayName for student in structure.students.all">
+                    <option value="" disabled selected>[[translate('cdt.student.choose')]]</option>
+                </select>
+            </h4>
+        </div>
+    </div>
+</article>
+<article class="cell two twelve-mobile" ng-if="isPersonnel()">
+    <div ng-if="structures.all.length > 1">
+        <label for="structure-list"><i18n>utils.structures</i18n></label>
+        <select ng-model="structure"
+                id="structure-list"
+                class="twelve"
+                ng-change="switchStructure(structure)"
+                ng-options="structure as structure.name for structure in structures.all">
+            <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+        </select>
+    </div>
+    <div>
+        <label for="user-list">
+            <div><i18n>utils.teachers</i18n></div>
+            <select ng-model="params.user"
+                    id="user-list"
+                    class="twelve"
+                    ng-change="params.group = null; getTimetable()"
+                    ng-options="teacher as teacher.displayName for teacher in structure.teachers.all">
+                <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+            </select>
+        </label>
+    </div>
+    <div>
+        <label for="group-list"><i18n>utils.groups</i18n></label>
+        <select ng-model="params.group"
+                id="group-list"
+                class="twelve"
+                ng-change="params.user = null; getTimetable()"
+                ng-options="group as group.name for group in structure.groups.all">
+            <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
+        </select>
+    </div>
+</article>
+<div id="calendar-view" class="cell horizontal-spacing twelve-mobile" ng-class="{twelve: !isPersonnel(), ten: isPersonnel()}">
+    <div class="loader" ng-if="calendarLoader.show">
+        <div>
+            <p><i class="spinner"></i></p>
+            <h4><i18n>cdt.calendar.loading</i18n></h4>
+        </div>
+    </div>
+    <calendar
+            display-template="calendar/course-item"
+            items="structure.courses.all">
+    </calendar>
+</div>
+</div> 
