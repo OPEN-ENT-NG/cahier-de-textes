@@ -186,20 +186,31 @@ export let main = ng.controller('CdtController',
         /**
          * Subscriber to directive calendar changes event
          */
-        $scope.$watch(() => model.calendar, function (oldVal, newVal) {
-            initTriggers();
-            if (moment(oldVal.dayForWeek).format('DD/MM/YYYY') !== moment(newVal.dayForWeek).format('DD/MM/YYYY')) {
+        $scope.$watch(() => {
+            return model.calendar.firstDay
+        }, function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                initTriggers();
+                if (moment(oldValue).format('DD/MM/YYYY') !== moment(newValue).format('DD/MM/YYYY')) {
+                    $scope.getTimetable();
+                }
+            }
+        }, true);
+
+        $scope.$watch(() => { return model.calendar.increment }, function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                initTriggers();
                 $scope.getTimetable();
             }
-
-        });
+        }, true);
 
         route({
             main: () => {
                 template.open('main', 'main');
             },
             createSession: () => {
-                template.open('main', 'course-create');
+                $scope.params.group;
+                template.open('main', 'createSession');
             },
             manageHomework: () => {
                 console.log('route.manageHomework');

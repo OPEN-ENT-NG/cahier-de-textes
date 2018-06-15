@@ -17,6 +17,7 @@ export class Course {
     classes: string[];
     groups: string[];
     color: string;
+    locked: boolean = true;
     is_periodic: boolean;
     startMoment: any;
     startMomentDate: string;
@@ -121,10 +122,17 @@ export class Courses {
         let filter = '';
         if (group === null) filter += `teacherId=${model.me.type === USER_TYPES.personnel ? teacher.id : model.me.userId}`;
         if (teacher === null && group !== null) filter += `group=${group.name}`;
-        let uri = `/directory/timetable/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
+        let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
         let courses = await http.get(uri);
         if (courses.data.length > 0) {
-            this.all = Utils.formatCourses(courses.data, structure);
+            this.all = _.map(courses.data, (course) => {
+                course = new Course(course, course.startDate, course.endDate);
+                course.subjectLabel = structure.subjects.mapping[course.subjectId];
+                course.teachers = _.map(course.teacherIds, (ids) => {
+                        return _.findWhere(structure.teachers.all, {id: ids});
+                    });
+                return course;
+            });
             this.origin = Mix.castArrayAs(Course, courses.data);
         }
         return;

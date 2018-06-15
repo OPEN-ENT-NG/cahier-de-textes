@@ -4,7 +4,7 @@ import {DAYS_OF_WEEK, COMBO_LABELS, Teacher, Group} from '../../model';
 export let createSessionCtrl = ng.controller('createSessionCtrl',
     ['$scope', function ($scope) {
         console.log("createSessionCtrl");
-
+        $scope.session = {};
         $scope.daysOfWeek = DAYS_OF_WEEK;
         $scope.comboLabels = COMBO_LABELS;
 
@@ -30,7 +30,6 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
          * Function triggered on step 3 activation
          */
         $scope.isValidForm = () => {
-
             return $scope.course
                 && $scope.course.teachers
                 && $scope.course.groups
