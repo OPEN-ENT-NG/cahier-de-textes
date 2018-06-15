@@ -7,7 +7,7 @@ import {FORMAT} from '../utils/const/dateFormat';
 import {Course} from './course';
 
 export class Homework {
-    _id: string;
+    id: string;
     title: string;
     description: string;
     dueDate: Date;
@@ -26,7 +26,12 @@ export class Homework {
     endMoment: any;
     is_periodic: boolean;
 
-    constructor () {
+    constructor (structure?: Structure) {
+        if(!!structure)
+        {
+            this.structure = structure;
+        }
+        this.color = 'pink';
         this.type = new HomeworkType();
         this.dueDate = moment().toDate();
     }
@@ -37,35 +42,56 @@ export class Homework {
             subject_id: this.subject.id,
             homework_type_id: this.type.id,
             teacher_id: model.me.userId,
-            school_id: this.audience.structureId,
+            school_id: this.structure.id,
             audience_id: this.audience.id,
-            homework_due_date: Utils.getFormatedTime(this.dueDate),
+            homework_due_date: Utils.getFormatedDate(this.dueDate),
             homework_description: this.description,
             homework_color: this.color,
             homework_state: this.state,
-            audience_type: this.audience.type,
+            audience_type: this.audience.type_groupe == 0 ? 'class': 'group',
             audience_name: this.audience.name,
             attachments: this.attachments
+
+        };
+    }
+
+    formatSqlDataToModel(data: any){
+
+        let subject = new Subject();
+        subject.id = data.subject_id;
+        subject.label = data.subject_label;
+
+        let type = new HomeworkType();
+        type.label = data.homework_type_label;
+        type.id = data.homework_type_id;
+
+        return {
+            audience: this.structure.groups.all.find(t => t.id === data.audience_id),
+            teacher: this.structure.teachers.all.find(t => t.id === data.teacher_id),
+            subject: this.structure.subjects.all.find(t => t.id === data.subject_id),
+            id: data.id,
+            type: type,
+            title: data.homework_title,
+            color: data.homework_color,
+            dueDate: moment(data.homework_due_date).toDate(),
+            description: data.homework_description,
+            state: data.homework_state,
         };
     }
 
     async save () {
-        await this.create();
-        return;
+        return await this.create();
     }
 
-    async sync(): Promise<void> {
-        console.log('Get info homework with id');
-        return;
+    async sync (): Promise<void> {
+        let { data } = await http.get('/diary/homework/' + this.id);
+        Mix.extend(this, this.formatSqlDataToModel(data));
     }
 
     async create () {
         try {
             console.log('createHomework', this.toJson());
-            // let arr = [];
-            // arr.push(this.toJson());
-            // await http.post('/edt/course', arr);
-            return;
+            return await http.post('/diary/homework', this.toJson());
         } catch (e) {
             notify.error('cdt.notify.create.err');
             console.error(e);

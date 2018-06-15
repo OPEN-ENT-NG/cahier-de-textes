@@ -6,6 +6,7 @@ export let main = ng.controller('CdtController',
         $scope.structures = new Structures();
         $scope.structures.sync();
         $scope.structure = $scope.structures.first();
+        $scope.notifications = [];
 
         $scope.calendarLoader = {
             show: false,

@@ -72,8 +72,8 @@ public class HomeworkController extends ControllerHelper {
 
     @Get("/homework/:id")
     @ApiDoc("Get a homework using its identifier")
-    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = view_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(HomeworkAccessFilter.class)
     public void getHomework(final HttpServerRequest request) {
         final String homeworkId = request.params().get("id");
 

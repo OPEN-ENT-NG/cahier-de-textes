@@ -1,9 +1,23 @@
 @import './specifics/mixins';
 
-body.cddddt {
+body.cdt {
   @import './specifics/select';
   @import './specifics/utils';
   @import './specifics/custom';
   @import './specifics/switch';
   @import './specifics/calendar-item';
+  @import './specifics/toasts';
+}
+
+.edt-settings {
+  @import './specifics/switch';
+  table {
+    th {
+      i::before {
+        font-size: 10px !important;
+        margin-left: 5px;
+        position: absolute;
+      }
+    }
+  }
 }

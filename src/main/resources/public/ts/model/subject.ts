@@ -8,7 +8,7 @@ export class Subject {
     code: string;
     teacherId: string;
 
-    constructor (subjectId: string, subjectLabel: string, subjectCode: string, teacherId: string) {
+    constructor (subjectId?: string, subjectLabel?: string, subjectCode?: string, teacherId?: string) {
         this.id = subjectId;
         this.label = subjectLabel;
         this.code = subjectCode;
