@@ -1,5 +1,6 @@
 import { moment, model, me, Behaviours, _ } from 'entcore';
 import { Course, Structure } from '../model/index';
+import {FORMAT} from './const/dateFormat';
 
 export class Utils {
 
@@ -198,5 +199,29 @@ export class Utils {
             courseToSave.push(this.cleanCourseForSave(_end));
         }
         return courseToSave;
+    }
+
+    static getFormatedDate(date) {
+        return moment(date).format(FORMAT.formattedDate);
+    }
+
+    static getFormatedTime(date) {
+        return moment(date).format(FORMAT.formattedTime);
+    }
+
+    static getFormattedDateTime(date) {
+        return moment(date).format(FORMAT.formattedDateTime);
+    }
+
+    static getDisplayDate(date) {
+        return moment(date).format(FORMAT.displayDate);
+    }
+
+    static getDisplayTime(date) {
+        return moment(date).format(FORMAT.displayTime);
+    }
+
+    static getDisplayDateTime(date) {
+        return moment(date).format(FORMAT.displayDateTime);
     }
 }

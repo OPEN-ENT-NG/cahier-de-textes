@@ -49,7 +49,7 @@
                 </label>
                 <div class="cell twelve-mobile ten">
                     <select class="twelve-mobile six" id="select-subject" ng-model="session.subjectId" required
-                            ng-options="subject.subjectId as subject.subjectLabel for subject in structure.subjects.all">
+                            ng-options="subject.id as subject.label for subject in structure.subjects.all">
                         <option value="" disabled selected>[[translate('cdt.creation.subject.choose')]]</option>
                     </select>
                 </div>

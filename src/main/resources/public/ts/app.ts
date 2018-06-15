@@ -13,6 +13,12 @@ routes.define(($routeProvider) => {
         .when('/session/create', {
             action: 'createSession'
         })
+        .when('/homework/update/:id', {
+            action: 'manageHomework'
+        })
+        .when('/homework/create/', {
+            action: 'manageHomework'
+        })
         .otherwise({
             redirectTo: '/'
         });

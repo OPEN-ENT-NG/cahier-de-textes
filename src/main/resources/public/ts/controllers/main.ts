@@ -150,6 +150,10 @@ export let main = ng.controller('CdtController',
             $scope.goTo('/session/create');
         };
 
+        $scope.createHomework = () => {
+            $scope.goTo('/homework/create/');
+        };
+
         $scope.goTo = (state: string) => {
             $location.path(state);
             $scope.safeApply();
@@ -196,6 +200,10 @@ export let main = ng.controller('CdtController',
             },
             createSession: () => {
                 template.open('main', 'course-create');
+            },
+            manageHomework: () => {
+                console.log('route.manageHomework');
+                template.open('main', 'manageHomework');
             }
         });
     }]);

@@ -1,0 +1,92 @@
+<div ng-controller="manageHomeworkCtrl" id="occurrences-creation">
+    <h1 class="centered eight row">
+        <span ng-if="!homework.id">Créer un travail à faire</span>
+        <span ng-if="!!homework.id">Modifier un travail à faire</span>
+    </h1>
+    <form>
+        <article>
+            <h3>Matière et Classe</h3>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Matière
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required>
+                        <option value="1" disabled selected>M1</option>
+                        <option value="2" disabled selected>M2</option>
+                    </select>
+                </div>
+            </div>
+            <select ng-model="test" ng-options="structure.name for structure in structures.all track by structure.id">
+            </select>
+            <select ng-model="test2" ng-options="structure.name for structure in structures.all">
+            </select>
+            <select ng-model="test3" ng-options="structure as structure.name for structure in structures.all">
+            </select>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Structure
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required ng-model="homework.structure" ng-options="structure.name for structure in structures.all">
+                    </select>
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Classe
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required ng-model="homework.audience" ng-options="group.name for group in structure.groups.all">
+                    </select>
+                </div>
+            </div>
+
+            <h3>Devoir</h3>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Titre du devoir
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <input ng-model="homework.title" type="text">
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    A faire pour le
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <input ng-model="homework.dueDate" type="date">
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Type de travail
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required ng-model="homework.type" ng-options="homeworkType.label for homeworkType in homeworkTypes.all">
+                    </select>
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    Description du devoir
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <textarea ng-model="homework.description" style="resize: vertical; min-height: 60px;"></textarea>
+                </div>
+            </div>
+
+        </article>
+        <div class="right-magnet vertical-spacing">
+            <div ng-if="form_is_not_valid" class="warning"> <i18n>cdt.creation.error</i18n></div>
+            <button class="cancel" type="button" ng-click="cancelCreation()">
+                Annuler
+            </button>
+            <button type="submit" ng-click="saveSession(session)">
+                Créer
+            </button>
+        </div>
+    </form>
+
+</div>
