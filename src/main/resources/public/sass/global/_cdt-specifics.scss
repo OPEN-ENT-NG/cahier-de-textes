@@ -1,6 +1,8 @@
 @import './specifics/mixins';
 
 body.cdt {
+  @import './specifics/atomic';
+  @import './specifics/loader';
   @import './specifics/select';
   @import './specifics/utils';
   @import './specifics/custom';

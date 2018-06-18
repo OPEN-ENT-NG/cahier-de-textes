@@ -26,7 +26,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.saveHomework = async () => {
             let { status } = await $scope.homework.save();
             if (status === 200) {
-                $scope.notifications.push(new Notification('Homework créer', 'confirm'));
+                $scope.notifications.push(new Notification('Homework créé', 'confirm'));
             }
             $scope.safeApply();
         };

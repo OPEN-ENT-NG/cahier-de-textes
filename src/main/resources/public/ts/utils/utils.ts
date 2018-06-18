@@ -201,7 +201,7 @@ export class Utils {
         return courseToSave;
     }
 
-    static getFormatedDate(date) {
+    static getFormattedDate(date) {
         return moment(date).format(FORMAT.formattedDate);
     }
 

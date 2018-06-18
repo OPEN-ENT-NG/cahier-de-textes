@@ -14,6 +14,8 @@ export class Homework {
     color: string;
     state: any;
 
+    lesson_id: any; // Todo: n'utiliser que le champ 'lesson'
+
     structure: Structure;
     type: HomeworkType;
     teacher: Teacher;
@@ -44,7 +46,7 @@ export class Homework {
             teacher_id: model.me.userId,
             school_id: this.structure.id,
             audience_id: this.audience.id,
-            homework_due_date: Utils.getFormatedDate(this.dueDate),
+            homework_due_date: Utils.getFormattedDate(this.dueDate),
             homework_description: this.description,
             homework_color: this.color,
             homework_state: this.state,
@@ -55,7 +57,7 @@ export class Homework {
         };
     }
 
-    formatSqlDataToModel(data: any){
+    static formatSqlDataToModel(data: any, structure: Structure){
 
         let subject = new Subject();
         subject.id = data.subject_id;
@@ -66,14 +68,15 @@ export class Homework {
         type.id = data.homework_type_id;
 
         return {
-            audience: this.structure.groups.all.find(t => t.id === data.audience_id),
-            teacher: this.structure.teachers.all.find(t => t.id === data.teacher_id),
-            subject: this.structure.subjects.all.find(t => t.id === data.subject_id),
+            audience: structure.groups.all.find(t => t.id === data.audience_id),
+            teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
+            subject: structure.subjects.all.find(t => t.id === data.subject_id),
+            lesson_id: data.lesson_id,
             id: data.id,
             type: type,
             title: data.homework_title,
             color: data.homework_color,
-            dueDate: moment(data.homework_due_date).toDate(),
+            dueDate: data.homework_due_date,
             description: data.homework_description,
             state: data.homework_state,
         };
@@ -85,7 +88,7 @@ export class Homework {
 
     async sync (): Promise<void> {
         let { data } = await http.get('/diary/homework/' + this.id);
-        Mix.extend(this, this.formatSqlDataToModel(data));
+        Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
     }
 
     async create () {
@@ -103,15 +106,35 @@ export class Homework {
 export class Homeworks {
     all: Homework[];
     origin: Homework[];
+    structure: Structure;
 
-    constructor () {
+    constructor (structure: Structure) {
+        this.structure = structure;
         this.all = [];
         this.origin = [];
     }
 
-    async sync(structure: Structure, teacher: Teacher | null, group: Group | null): Promise<void> {
+    static formatSqlDataToModel(data: any, structure: Structure){
+        let dataModel = [];
+        data.forEach(i => dataModel.push(Homework.formatSqlDataToModel(i, structure)));
+        return dataModel;
+    }
 
-        return;
+    async sync (startMoment: any, endMoment: any): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/null`;
+
+        let { data } = await http.get(url);
+
+        this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
+        this.all.forEach(i => {
+            i.dueDate = moment(i.dueDate).toDate();
+            i.startMoment = !!i.lesson_id ? moment(): moment(i.dueDate).hour(8).minute(0).second(0);
+            i.endMoment = !!i.lesson_id ? moment(): moment(i.dueDate).hour(10).minute(0).second(0);
+        });
+
     }
 }
 

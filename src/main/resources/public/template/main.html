@@ -14,46 +14,22 @@
             <button ng-if="isPersonnel() || isTeacher()" ng-click="createSession">
                 <i18n>cdt.schedule.create</i18n>
             </button>
-            <button ng-click="createHomework()">
-                Créer Homework 2 z
-            </button>
         </div>
     </div>
     <div class="clear"></div>
 </div>
 
-<article class="row twelve" ng-if="isRelative() || isTeacher()">
-    <div ng-if="structures.all.length > 1">
-        <select ng-model="structure"
-                ng-change="switchStructure(structure)"
-                ng-options="structure as structure.name for structure in structures.all"></select>
+<div class="row card" style="padding: 10px;">
+    <button ng-click="goTo('/homework/create/')">
+        Créer un travail à faire
+    </button>
+
+    <div>
+        <i ng-click="display.listView = true" class="show-list" ng-class="{ selected: display.listView === true }" tooltip="diary.icon.show.list"></i>
+        <i ng-click="display.listView = false" class="show-calendar selected" ng-class="{ selected: display.listView === false }" tooltip="diary.icon.show.calendar"></i>
     </div>
-    <div ng-if="isTeacher()">
-        <h4>
-            <i18n>cdt.timetable.of.group</i18n>
-            <select ng-model="params.group"
-                    ng-change="params.user = null; getTimetable()"
-                    ng-options="group as group.name for group in structure.groups.all">
-                <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
-            </select>
-            <i class="refused-icon" ng-click="getTeacherTimetable()"></i>
-        </h4>
-    </div>
-    <div ng-if="isRelative() && structure.students.all.length > 0">
-        <h4 ng-if="structure.students.all.length === 1"><i18n>cdt.timetable.of</i18n> [[currentStudent.displayName]]</h4>
-        <div ng-if="structure.students.all.length > 1">
-            <h4>
-                <i18n>cdt.timetable.of</i18n>
-                <select id="students-list"
-                        ng-model="currentStudent"
-                        ng-change="params.group = getStudentGroup(currentStudent); getTimetable();"
-                        ng-options="student as student.displayName for student in structure.students.all">
-                    <option value="" disabled selected>[[translate('cdt.student.choose')]]</option>
-                </select>
-            </h4>
-        </div>
-    </div>
-</article>
+</div>
+
 <article class="cell two twelve-mobile" ng-if="isPersonnel()">
     <div ng-if="structures.all.length > 1">
         <label for="structure-list"><i18n>utils.structures</i18n></label>
@@ -88,19 +64,9 @@
         </select>
     </div>
 </article>
-<div id="calendar-view" class="cell horizontal-spacing twelve-mobile" ng-class="{twelve: !isPersonnel(), ten: isPersonnel()}">
-    <div class="loader" ng-if="calendarLoader.show">
-        <div>
-            <p><i class="spinner"></i></p>
-            <h4><i18n>cdt.calendar.loading</i18n></h4>
-        </div>
-    </div>
-    <calendar
-            enable-display-modes="true"
-            display-template="calendar/course-item"
-            display-month-template="calendar/course-item"
-            items="structure.courses.all"
-            show-next-previous-button="true">
-    </calendar>
-</div>
-</div> 
+
+
+<!-- Calendar View -->
+<div ng-if="!display.listView" class="includedTemplate" ng-include="'/diary/public/template/main/calendar-view.html'"></div>
+<div ng-if="display.listView" class="includedTemplate" ng-include="'/diary/public/template/main/list-view.html'"></div>
+

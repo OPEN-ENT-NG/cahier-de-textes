@@ -46,7 +46,7 @@ export class Session {
     lesson_state: "draft";
     audience_type: "class";
     audience_name: "3ème";
-    attachments: [];
+    attachments: any;
     lesson_room: "99";
 
 
@@ -114,45 +114,5 @@ export class Session {
             o._id = this._id;
         }
         return o;
-    }
-}
-
-export class Courses {
-    all: Course[];
-    origin: Course[];
-
-    constructor() {
-        this.all = [];
-        this.origin = [];
-    }
-
-    /**
-     * Synchronize courses.
-     * @param structure structure
-     * @param teacher teacher. Can be null. If null, group need to be provide.
-     * @param group group. Can be null. If null, teacher needs to be provide.
-     * @returns {Promise<void>} Returns a promise.
-     */
-    async sync(structure: Structure, teacher: Teacher | null, group: Group | null): Promise<void> {
-        if (teacher === null && group === null) return;
-        let firstDate = moment(model.calendar.dayForWeek).hour(0).minute(0).format('YYYY-MM-DD');
-        let endDate = moment(model.calendar.dayForWeek).add(7, 'day').hour(0).minute(0).format('YYYY-MM-DD');
-        let filter = '';
-        if (group === null) filter += `teacherId=${model.me.type === USER_TYPES.personnel ? teacher.id : model.me.userId}`;
-        if (teacher === null && group !== null) filter += `group=${group.name}`;
-        let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
-        let courses = await http.get(uri);
-        if (courses.data.length > 0) {
-            this.all = _.map(courses.data, (course) => {
-                course = new Course(course, course.startDate, course.endDate);
-                course.subjectLabel = structure.subjects.mapping[course.subjectId];
-                course.teachers = _.map(course.teacherIds, (ids) => {
-                    return _.findWhere(structure.teachers.all, {id: ids});
-                });
-                return course;
-            });
-            this.origin = Mix.castArrayAs(Course, courses.data);
-        }
-        return;
     }
 }

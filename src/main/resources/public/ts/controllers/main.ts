@@ -1,12 +1,24 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model } from 'entcore';
 import { Structures, USER_TYPES, Course, Student, Group, Structure } from '../model';
+import {Homeworks} from '../model/homework';
 
-export let main = ng.controller('CdtController',
+export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', async function ($scope, route, $location) {
-        $scope.structures = new Structures();
-        $scope.structures.sync();
-        $scope.structure = $scope.structures.first();
+
         $scope.notifications = [];
+
+        $scope.display = {
+            calendarLoader: true,
+            listView: false // Show listView if true, otherwise show calendarView
+        };
+
+        $scope.ITEM_HOMEWORK = 1;
+        $scope.ITEM_SESSION = 2;
+
+        $scope.filters = {
+            startDate: moment().startOf('isoWeek').toDate(),
+            endDate: moment().endOf('isoWeek').toDate()
+        };
 
         $scope.calendarLoader = {
             show: false,
@@ -51,7 +63,36 @@ export let main = ng.controller('CdtController',
             }
         };
 
-        $scope.syncStructure($scope.structure);
+        async function initializeData(){
+            $scope.structures = new Structures();
+            await $scope.structures.sync();
+            $scope.structure = $scope.structures.first();
+            await $scope.syncStructure($scope.structure);
+
+            $scope.homeworks = new Homeworks($scope.structure);
+            await $scope.syncHomework();
+            $scope.loadCalendarItems();
+            console.log('Homework synced', $scope.homeworks);
+            $scope.safeApply();
+        }
+
+        $scope.syncHomework = async () => {
+            await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+        };
+
+        $scope.loadCalendarItems = () => {
+            $scope.calendarItems = [];
+            $scope.homeworks.all.forEach(i => i.itemType = $scope.ITEM_HOMEWORK);
+            $scope.calendarItems = $scope.calendarItems.concat($scope.homeworks.all);
+
+            $scope.calendarItems.forEach(i => {
+                i.locked = true;
+                i.is_periodic = false;
+            });
+        };
+
+
+        initializeData();
 
         $scope.switchStructure = (structure: Structure) => {
             $scope.syncStructure(structure);
@@ -215,7 +256,7 @@ export let main = ng.controller('CdtController',
             },
             manageHomework: () => {
                 console.log('route.manageHomework');
-                template.open('main', 'manageHomework');
+                template.open('main', 'homework/manage-homework');
             }
         });
     }]);
