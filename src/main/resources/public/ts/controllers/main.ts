@@ -7,19 +7,6 @@ export let main = ng.controller('MainController',
 
         $scope.notifications = [];
 
-        $scope.display = {
-            calendarLoader: true,
-            listView: false // Show listView if true, otherwise show calendarView
-        };
-
-        $scope.ITEM_HOMEWORK = 1;
-        $scope.ITEM_SESSION = 2;
-
-        $scope.filters = {
-            startDate: moment().startOf('isoWeek').toDate(),
-            endDate: moment().endOf('isoWeek').toDate()
-        };
-
         $scope.calendarLoader = {
             show: false,
             display: () => {
@@ -31,6 +18,15 @@ export let main = ng.controller('MainController',
                 $scope.safeApply();
             }
         };
+
+        $scope.ITEM_HOMEWORK = 1;
+        $scope.ITEM_SESSION = 2;
+
+        $scope.filters = {
+            startDate: moment().startOf('isoWeek').toDate(),
+            endDate: moment().endOf('isoWeek').toDate()
+        };
+
 
         /**
          * Synchronize a structure.
@@ -71,8 +67,10 @@ export let main = ng.controller('MainController',
 
             $scope.homeworks = new Homeworks($scope.structure);
             await $scope.syncHomework();
-            $scope.loadCalendarItems();
-            console.log('Homework synced', $scope.homeworks);
+
+
+            $scope.loadPedagogicItems();
+
             $scope.safeApply();
         }
 
@@ -80,17 +78,65 @@ export let main = ng.controller('MainController',
             await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
         };
 
-        $scope.loadCalendarItems = () => {
-            $scope.calendarItems = [];
-            $scope.homeworks.all.forEach(i => i.itemType = $scope.ITEM_HOMEWORK);
-            $scope.calendarItems = $scope.calendarItems.concat($scope.homeworks.all);
+        $scope.loadPedagogicItems = () =>{
+            $scope.pedagogicItems = [];
 
+            $scope.homeworks.all.forEach(i => i.itemType = $scope.ITEM_HOMEWORK);
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.homeworks.all);
+
+            console.log('pedagogicItems', $scope.pedagogicItems);
+
+            $scope.loadCalendarItems();
+            $scope.loadPedagogicDays();
+        };
+
+        $scope.loadCalendarItems = () => {
+            $scope.calendarItems = $scope.pedagogicItems;
             $scope.calendarItems.forEach(i => {
                 i.locked = true;
                 i.is_periodic = false;
             });
         };
 
+        $scope.loadPedagogicDays = () => {
+
+            $scope.pedagogicItems.sort(function (a, b) {
+                return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+            });
+
+            let group_to_values = $scope.pedagogicItems.reduce(function (obj, item) {
+                let date = item.startMoment.format('YYYY-MM-DD');
+                obj[date] = obj[date] || [];
+                obj[date].push(item);
+                return obj;
+            }, {});
+
+            let pedagogicDays = Object.keys(group_to_values).map(function (key) {
+                let pedagogicItems = group_to_values[key];
+                return {
+                    descriptionMaxSize: 140,
+                    date: moment(key),
+                    pedagogicItems: pedagogicItems,
+                    shortDate: moment(key).format('DD/MM'),
+                    dayName: moment(key).format('dddd'),
+                    nbHomework: pedagogicItems.filter(i => i.itemType == $scope.ITEM_HOMEWORK).length,
+                    nbSession: pedagogicItems.filter(i => i.itemType == $scope.ITEM_SESSION).length,
+                };
+            });
+
+            pedagogicDays.sort(function (a, b) {
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
+            });
+
+            $scope.pedagogicDays = pedagogicDays;
+            console.log('pedagogicDays', pedagogicDays);
+        };
+
+        $scope.selectPedagogicDay = (pedagogicDay) => {
+            $scope.pedagogicDays.forEach(p => p.selected = false);
+            pedagogicDay.selected = true;
+            $scope.selectedPedagogicDay = pedagogicDay;
+        };
 
         initializeData();
 

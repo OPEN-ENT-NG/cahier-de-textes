@@ -8,20 +8,20 @@ import {Course} from './course';
 
 export class Homework {
     id: string;
-    title: string;
-    description: string;
+    title: string = '';
+    description: string = '';
     dueDate: Date;
     color: string;
     state: any;
 
-    lesson_id: any; // Todo: n'utiliser que le champ 'lesson'
+    session_id: any; // Todo: n'utiliser que le champ 'lesson'
 
     structure: Structure;
     type: HomeworkType;
     teacher: Teacher;
     subject: Subject;
     audience: any;
-    lesson: any;
+    session: any;
     attachments: any[];
 
     startMoment: any;
@@ -71,7 +71,7 @@ export class Homework {
             audience: structure.groups.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
-            lesson_id: data.lesson_id,
+            session_id: data.lesson_id,
             id: data.id,
             type: type,
             title: data.homework_title,
@@ -131,8 +131,8 @@ export class Homeworks {
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.dueDate = moment(i.dueDate).toDate();
-            i.startMoment = !!i.lesson_id ? moment(): moment(i.dueDate).hour(8).minute(0).second(0);
-            i.endMoment = !!i.lesson_id ? moment(): moment(i.dueDate).hour(10).minute(0).second(0);
+            i.startMoment = !!i.session_id ? moment(): moment(i.dueDate).hour(8).minute(0).second(0);
+            i.endMoment = !!i.session_id ? moment(): moment(i.dueDate).hour(10).minute(0).second(0);
         });
 
     }

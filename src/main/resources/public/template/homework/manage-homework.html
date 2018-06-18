@@ -75,10 +75,10 @@
         </article>
         <div class="right-magnet vertical-spacing">
             <div ng-if="form_is_not_valid" class="warning"> <i18n>cdt.creation.error</i18n></div>
-            <button class="cancel" type="button" ng-click="cancelCreation()">
+            <button class="cancel" type="button" ng-click="$scope.goTo('/');">
                 Annuler
             </button>
-            <button type="submit" ng-click="saveHomework()">
+            <button type="submit" ng-click="saveHomework();">
                 Créer
             </button>
         </div>

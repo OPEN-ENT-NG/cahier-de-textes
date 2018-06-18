@@ -29,6 +29,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.notifications.push(new Notification('Homework créé', 'confirm'));
             }
             $scope.safeApply();
+            $scope.goTo('/');
         };
 
         initData();
