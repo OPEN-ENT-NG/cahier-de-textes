@@ -231,13 +231,8 @@ export let main = ng.controller('MainController',
          * Course creation
          */
         $scope.createSession = () => {
-            const cdtRights = Behaviours.applicationsBehaviours.cdt.rights;
-            /*if (model.me.hasWorkflow(cdtRights.workflow.create)) {
-                $scope.goTo('/session/create');
-            }*/
-            $scope.goTo('/session/create');
+            $scope.goTo('/session/create/');
         };
-
         $scope.createHomework = () => {
             $scope.goTo('/homework/create/');
         };
@@ -296,9 +291,8 @@ export let main = ng.controller('MainController',
             main: () => {
                 template.open('main', 'main');
             },
-            createSession: () => {
-                $scope.params.group;
-                template.open('main', 'createSession');
+            manageSession: () => {
+                template.open('main', 'manageSession');
             },
             manageHomework: () => {
                 console.log('route.manageHomework');

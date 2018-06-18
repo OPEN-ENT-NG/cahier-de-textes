@@ -1,3 +1,3 @@
 export * from './main';
-export * from './session/createSession';
+export * from './session/manageSession';
 export * from './homework/manageHomework';

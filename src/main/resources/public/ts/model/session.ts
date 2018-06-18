@@ -1,53 +1,25 @@
 import {model, moment, _, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {USER_TYPES, Structure, Teacher, Group, Utils} from './index';
+import { Subject, Structure, Teacher, Group, Utils} from './index';
 
-const colors = [/*'cyan', 'green', 'orange', 'pink', 'yellow', 'purple',*/ 'grey'];
+const colors = ['grey'];
 
 export class Session {
-    _id: string;
-    structureId: string;
-    startDate: string | object;
-    endDate: string | object;
-    dayOfWeek: number;
-    teacherIds: string[];
-    subjectId: string;
-    roomLabels: string[];
-    classes: string[];
-    groups: string[];
-    color: string;
-    locked: boolean = true;
-    is_periodic: boolean;
-    startMoment: any;
-    startMomentDate: string;
-    startMomentTime: string;
-    startCalendarHour: Date;
-    endCalendarHour: Date;
-    endMoment: any;
-    endMomentDate: string;
-    endMomentTime: string;
-    subjectLabel: string;
-    teachers: Teacher[];
-    originalStartMoment?: any;
-    originalEndMoment?: any;
-
-
-    subject_id: "2";
-    school_id: "c82df58d-b036-465c-ab11-fddf6826e8cd";
-    audience_id: "dabc2e8d-9dbb-422b-88c9-eb41c4c2c803";
-    lesson_title: "Séance";
-    lesson_color: "#ff0000";
-    lesson_date: "2018-06-12";
-    lesson_start_time: "11:00";
-    lesson_end_time: "12:00";
-    lesson_description: "<div>Seance de test de couleur rouge le 12 juin 2018 de 11 a 12h en salle 99 avec les 3eme en cours de physique&nbsp;</div>";
-    lesson_annotation: "<div>Annotation de séance de test&nbsp;</div>";
-    lesson_state: "draft";
-    audience_type: "class";
-    audience_name: "3ème";
-    attachments: any;
-    lesson_room: "99";
+    id: string;
+    subject: Subject;
+    structure: Structure;
+    audience: any;
+    title: string;
+    color: string = _.first(colors);
+    date: any = moment().toDate();
+    startTime: any = (moment().set({'hour': '08', 'minute':'00'})).seconds(0).millisecond(0).toDate();
+    endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
+    description: string = "";
+    annotation: string = "";
+    state: string = "draft";
+    attachments: any = [];
+    room: string = "99";
 
 
     constructor(obj: object, startDate?: string | object, endDate?: string | object) {
@@ -56,21 +28,25 @@ export class Session {
                 this[key] = obj[key];
             }
         }
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.is_periodic = false;
+    }
 
-        if (startDate) {
-            this.startMoment = moment(startDate);
-            this.startCalendarHour = this.startMoment.seconds(0).millisecond(0).toDate();
-            this.startMomentDate = this.startMoment.format('DD/MM/YYYY');
-            this.startMomentTime = this.startMoment.format('hh:mm');
-        }
-        if (endDate) {
-            this.endMoment = moment(endDate);
-            this.endCalendarHour = this.endMoment.seconds(0).millisecond(0).toDate();
-            this.endMomentDate = this.endMoment.format('DD/MM/YYYY');
-            this.endMomentTime = this.endMoment.format('hh:mm');
-        }
+    toJSON() {
+        return {
+            subject_id: this.subject.id,
+            school_id: this.structure.id,
+            lesson_title: this.title,
+            lesson_color: this.color,
+            lesson_date: this.date,
+            lesson_start_time: moment(this.startTime).format("hh:mm"),
+            lesson_end_time: moment(this.endTime).format("hh:mm"),
+            lesson_description: this.description,
+            lesson_annotation: this.annotation,
+            lesson_state: this.state,
+            audience_id: this.audience.id,
+            audience_type: this.audience.type_groupe == 0 ? 'class' : 'group',
+            attachments: this.attachments,
+            lesson_room: this.room
+        };
     }
 
     async save() {
@@ -80,16 +56,8 @@ export class Session {
 
     async create() {
         try {
-            let arr = [];
-            this.teacherIds = Utils.getValues(this.teachers, 'id');
-            this.startDate = moment(this.startMoment).format('YYYY-MM-DDTHH:mm:ss');
-            this.endDate = moment(this.endMoment).format('YYYY-MM-DDTHH:mm:ss');
-            this.classes = Utils.getValues(_.where(this.groups, {type_groupe: Utils.getClassGroupTypeMap()['CLASS']}), 'name');
-            this.groups = Utils.getValues(_.where(this.groups, {type_groupe: Utils.getClassGroupTypeMap()['FUNCTIONAL_GROUP']}), 'name');
-            this.startDate = Utils.mapStartMomentWithDayOfWeek(this.startDate, this.dayOfWeek);
-            arr.push(this.toJSON());
-            await http.post('/edt/course', arr);
-            return;
+            console.log('createSession', this.toJSON());
+            return await http.post('/diary/lesson', this.toJSON());
         } catch (e) {
             notify.error('cdt.notify.create.err');
             console.error(e);
@@ -97,22 +65,7 @@ export class Session {
         }
     }
 
-    toJSON() {
-        let o: any = {
-            structureId: this.structureId,
-            subjectId: this.subjectId,
-            teacherIds: this.teacherIds,
-            classes: this.classes,
-            groups: this.groups,
-            endDate: this.endDate,
-            startDate: this.startDate,
-            roomLabels: this.roomLabels,
-            dayOfWeek: this.dayOfWeek,
-            manual: true
-        };
-        if (this._id) {
-            o._id = this._id;
-        }
-        return o;
+    async sync(): Promise<void> {
+        let {data} = await http.get('/diary/lesson/' + this.id);
     }
 }

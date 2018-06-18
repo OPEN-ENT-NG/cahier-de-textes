@@ -16,7 +16,10 @@ routes.define(($routeProvider) => {
             action: 'main'
         })
         .when('/session/create', {
-            action: 'createSession'
+            action: 'manageSession'
+        })
+        .when('/session/create/:id', {
+            action: 'manageSession'
         })
         .when('/homework/update/:id', {
             action: 'manageHomework'
