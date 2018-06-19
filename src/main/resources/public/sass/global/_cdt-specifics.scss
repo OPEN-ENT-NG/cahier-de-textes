@@ -1,26 +1,16 @@
 @import './specifics/mixins';
 
 body.cdt {
+  @import './entcore-css-lib/css-lib';
   @import './specifics/list-view';
   @import './specifics/atomic';
   @import './specifics/loader';
-  @import './specifics/select';
+
   @import './specifics/utils';
   @import './specifics/custom';
-  @import './specifics/switch';
-  @import './specifics/calendar-item';
-  @import './specifics/toasts';
-}
 
-.edt-settings {
+  @import './specifics/calendar-item';
+  @import './specifics/select';
   @import './specifics/switch';
-  table {
-    th {
-      i::before {
-        font-size: 10px !important;
-        margin-left: 5px;
-        position: absolute;
-      }
-    }
-  }
+  @import './specifics/toasts';
 }

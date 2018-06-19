@@ -2,10 +2,8 @@
   ul {
     list-style-type: none;
     margin-top: 0;
-    width: 99%;
-    border-left: 5px solid transparent !important;
-    padding-left: 10px;
-    padding-right: 15px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   ul li i.icon {
@@ -41,7 +39,6 @@
   .pedagogic-day-card {
     box-sizing: border-box;
     border: 1px solid #2a9cc8;
-    box-shadow: 0 1px 3px;
     color: #2a9cc8;
     width: 99%;
     height: 55px;
@@ -58,14 +55,17 @@
     border: 0px;
   }
 
+  .pedagogic-item-card {
+    display: flex;
+    align-items: center;
+  }
+
   .thumbnail {
     box-sizing: border-box;
     color: #2a9cc8;
-    width: 25%;
     height: 100%;
     float: left;
-    font-size: 45px;
-    font-weight: bold;
+    font-size: 30px;
     padding: 14px;
     text-transform: capitalize;
     border-right: 1px;
@@ -79,12 +79,11 @@
 
   .summary {
     color: #2a9cc8;
-    width: 75%;
     height: 100%;
-    padding: 15px 0px 0px 15px;
-    font-size: 30px;
+    font-size: 22px;
     box-sizing: border-box;
-    display: inline-block;
+    display: flex;
+    align-items: center;
   }
 
   .sum-selected {
@@ -93,8 +92,8 @@
   }
 
   .day-card-icon {
-    font-size: 26px;
-    line-height: 24px;
+    font-size: 18px;
+    line-height: 18px;
     text-align: center;
     display: inline-block;
     padding: 0px 0px 0px 5px;
@@ -111,7 +110,7 @@
     float: left;
   }
 
-  .pedagogic-item-card {
+  .list-pedagogic-item-card {
     box-sizing: border-box;
     width: 99%;
     float: right;

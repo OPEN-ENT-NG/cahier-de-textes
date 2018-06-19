@@ -7,7 +7,7 @@
   box-sizing: border-box;
 
   .toast-content {
-    @include material-card();
+    //@include material-card();
     margin-bottom: 10px;
     position: relative;
     opacity: 0;
@@ -24,7 +24,7 @@
       line-height: 28px;
 
       &:before {
-        @include fonticon();
+        //@include fonticon();
         margin-right: 10px;
       }
     }

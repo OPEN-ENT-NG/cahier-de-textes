@@ -119,6 +119,7 @@ export let main = ng.controller('MainController',
                     pedagogicItems: pedagogicItems,
                     shortDate: moment(key).format('DD/MM'),
                     dayName: moment(key).format('dddd'),
+                    shortDayName: moment(key).format('dd'),
                     nbHomework: pedagogicItems.filter(i => i.itemType == $scope.ITEM_HOMEWORK).length,
                     nbSession: pedagogicItems.filter(i => i.itemType == $scope.ITEM_SESSION).length,
                 };

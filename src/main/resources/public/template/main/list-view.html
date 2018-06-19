@@ -25,84 +25,53 @@
         <div class="pedagogic-day-container">
                 <ul>
                     <li ng-repeat="day in pedagogicDays | orderBy : 'shortDate' ">
-                        <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" ng-click="selectPedagogicDay(day)">
-                            <div ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">[[day.dayName]]</div>
-                            <div ng-class="day.selected ? 'summary sum-selected' : 'summary'">
-                                [[day.shortDate]]&nbsp; [[day.nbHomework]]
-                                <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbSession]]
-                                <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i>
+                        <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" class="text-center" ng-click="selectPedagogicDay(day)">
+                            <div class="six zero-mobile" ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">
+                                <span class="zero-tablet">[[day.dayName]]</span>
+                                <!--<span class="five-tablet">[[day.shortDayName]]</span>-->
+                            </div>
+                            <div class="six seven-tablet twelve-mobile" ng-class="day.selected ? 'summary sum-selected' : 'summary'">
+                                <div class="padding-sm six">[[day.shortDate]]</div>
+                                <div class="padding-sm six">
+                                    <div>
+                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbHomework]]
+                                    </div>
+                                    <div>
+                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i> [[day.nbSession]]
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </li>
                 </ul>
             </div>
         <div class="pedagogic-item-container">
-            <div class="pedagogic-item-card">
-                <ul style="margin-bottom: 60px;">
-                    <!--<li ng-repeat="pedagogicItem in filteredDays = (model.selectedDay.items | filter : {'item.subjectLabel' : model.filters.selectedSubject})">-->
-                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems">
-                        <article class="notification">
-                            <div ng-if="(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize)" class="row hover-orange" ng-click="pedagogicItem.expanded_description = !pedagogicItem.expanded_description">
-                                <div class="cell" style="margin-left: 90px;">
-                                    <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                    <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
-                                </div>
-                                <!-- FOLDING -->
-                                <div class="cell right-magnet">
-                                    <i ng-show="!pedagogicItem.expanded_description" data-tooltip="Déplier" class="down-open"></i>
-                                    <i ng-hide="!pedagogicItem.expanded_description" data-tooltip="Plier" class="up-open"></i>
-                                </div>
+            <div class="list-pedagogic-item-card">
+                <ul>
+                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems" class="card pedagogic-item-card padding-md margin-bottom-md">
+                        <div class="one cell text-center">
+                            <label class="checkbox">
+                                <input type="checkbox" ng-model="pedagogicItem.selected"/>
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="nine cell">
+                            <div class="row">
+                                <i ng-if="!pedagogicItem.isPublished"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
+                                <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.name]]</b>
                             </div>
-                            <div ng-if="!(pedagogicItem.description.length >= pedagogicItem.descriptionMaxSize)" class="row">
-                                <div class="cell" style="margin-left: 90px;">
-                                    <i ng-if="!pedagogicItem.isPublished()"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                    <em style="font-weight: bold; font-style: normal;">[[pedagogicItem.subject]] &nbsp; [[pedagogicItem.audience]] &nbsp; [[pedagogicItem.teacher]]</em><br/>
-                                </div>
+                            <div class="row medium-importance">
+                                [[pedagogicItem.title]]
                             </div>
                             <div class="row">
-                                <div class="one cell" style="padding: 5px 0px 0px 20px">
-                                    <label class="checkbox" ng-if="!pedagogicItem.locked">
-                                        <input type="checkbox" ng-model="pedagogicItem.selected" ng-click="updatePedagogicItemsSelected('[[pedagogicItem.type_item]]')" />
-                                        <span></span>
-                                    </label>
-                                    <label class="checkbox" ng-if="pedagogicItem.locked">
-                                        <!-- TODO Traduction -->
-                                        <i class="icon lock-alt"
-                                           diary-tooltip="Un visa a vérouillé cette séance"
-                                        ></i>
-                                    </label>
-                                </div>
-
-                                <div class="ten cell">
-                                    <div class="tooltip-detail" ng-click="goToItemDetail(pedagogicItem)">
-                                        <em class="medium-importance" ng-if="pedagogicItem.type_item === 'lesson'">
-                                            <p style="display:inline">[[pedagogicItem.start_hour]] - [[pedagogicItem.end_hour]]&nbsp;</p>
-                                            <p style="display:inline" ng-if="pedagogicItem.room">(<i18n>room</i18n> - [[pedagogicItem.room]])&nbsp;</p>
-                                            [[pedagogicItem.title]]
-                                        </em>
-                                        <em class="medium-importance" ng-if="pedagogicItem.type_item === 'homework'">
-                                            <p style="display:inline">[[pedagogicItem.type_homework]]&nbsp;</p>
-                                            [[pedagogicItem.title]]
-                                        </em>
-                                        <span ng-show="!pedagogicItem.expanded_description">
-												 <span bind-html="pedagogicItem.preview_description"></span>
-                                            </span>
-                                        <span ng-show="pedagogicItem.expanded_description">
-												 <span bind-html="pedagogicItem.description"></span>
-                                            </span>
-                                        <span class="tooltiptext-detail" ng-style="{'background-color':pedagogicItem.color}"><i18n>diary.view.item.detail</i18n></span>
-                                    </div>
-                                </div>
-
-                                <div class="one cell float:right">
-                                    <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'" ng-style="{'color':pedagogicItem.color}"></i>
-                                </div>
+                                [[pedagogicItem.description]]
                             </div>
-                        </article>
+                        </div>
+                        <div class="two cell text-right">
+                            <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'"
+                               ng-style="{'color':pedagogicItem.color}"></i>
+                        </div>
                     </li>
-                    <p  class="row info tuto">
-                        <i18n>diary.filter.no.result</i18n>
-                    </p>
                 </ul>
             </div>
 

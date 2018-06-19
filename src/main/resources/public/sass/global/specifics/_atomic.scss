@@ -1,3 +1,53 @@
+// Below not working, need to find why
+@media screen and (max-width: 960px) {
+  body .zero-tablet {
+    display: none !important;
+  }
+  body .one-tablet {
+    width: 8.33333%;
+  }
+  body .two-tablet {
+    width: 16.66667%;
+  }
+  body .three-tablet {
+    width: 25%;
+  }
+  body .four-tablet {
+    width: 33.33333%;
+  }
+  body .five-tablet {
+    width: 41.66667%;
+  }
+  body .six-tablet {
+    width: 50%;
+  }
+  body .seven-tablet {
+    width: 58.33333%;
+  }
+  body .eight-tablet {
+    width: 66.66667%;
+  }
+  body .nine-tablet {
+    width: 75%;
+  }
+  body .ten-tablet {
+    width: 83.33333%;
+  }
+  body .eleven-tablet {
+    width: 91.66667%;
+  }
+  body .twelve-tablet {
+    width: 100%;
+  }
+}
+
+
+@media screen and (max-width: 1024px) {
+  .yourClass {
+    display: none !important;
+  }
+}
+
 .display-table {
   display: table;
 }
@@ -139,6 +189,7 @@
   padding: 5px;
 }
 
+
 .padding-bottom-sm {
   padding-bottom: 5px;
 }
@@ -150,6 +201,10 @@
 }
 .padding-right-sm {
   padding-right: 5px;
+}
+
+.padding-md {
+  padding: 10px;
 }
 
 .padding-bottom-md {
