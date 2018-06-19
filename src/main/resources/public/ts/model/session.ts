@@ -22,12 +22,8 @@ export class Session {
     room: string = "99";
 
 
-    constructor(obj: object, startDate?: string | object, endDate?: string | object) {
-        if (obj instanceof Object) {
-            for (let key in obj) {
-                this[key] = obj[key];
-            }
-        }
+    constructor(structure) {
+        this.structure = structure;
     }
 
     toJSON() {
@@ -50,8 +46,7 @@ export class Session {
     }
 
     async save() {
-        await this.create();
-        return;
+        return await this.create();
     }
 
     async create() {

@@ -119,9 +119,9 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             }
 
             query.append(" AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
-            .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
-            .append(" WHERE l.id = ls.resource_id")
-            .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
+                    .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
+                    .append(" WHERE l.id = ls.resource_id")
+                    .append(" AND (ls.member_id IN " + Sql.listPrepared(memberIds.toArray())).append(" OR l.owner = ?) ");
 
 
             for (String memberId: memberIds) {
@@ -148,7 +148,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         }
     }
 
-        /**
+    /**
      *
      * @param schoolIds Schools the teacher belong to
      * @param startDate
@@ -213,17 +213,20 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         if (lessonObject != null) {
             // auto-creates teacher if it does not exists
-            diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, new Handler<Either<String, JsonObject>>() {
-
-                @Override
-                public void handle(Either<String, JsonObject> event) {
-
-                    if (event.isRight()) {
-                        getOrCreateAudienceAndCreateLesson(lessonObject, teacherId, audience, handler);
-                    } else {
-                        log.error("Teacher couldn't be retrieved or created.");
-                        handler.handle(event.left());
-                    }
+            diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, event -> {
+                if (event.isRight()) {
+                    diaryService.getOrCreateSubject(lessonObject.getString("school_id"), teacherId, lessonObject.getString("subject_id"), event12 -> {
+                        if (event12.isRight()) {
+                            getOrCreateAudienceAndCreateLesson(lessonObject, teacherId, audience, handler);
+                        }
+                        else {
+                            log.error("Subject couldn't be retrieved or created.");
+                            handler.handle(event.left());
+                        }
+                    });
+                }  else {
+                    log.error("Teacher couldn't be retrieved or created.");
+                    handler.handle(event.left());
                 }
             });
         }
@@ -294,109 +297,109 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     private void createLessonWithAttachments(final JsonArray attachments, final JsonObject lessonObject, final String teacherId, final Handler<Either<String, JsonObject>> handler) {
 
         sql.raw("select nextval('diary.lesson_id_seq') as next_id", validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-             @Override
-             public void handle(Either<String, JsonObject> event) {
-                 if (event.isRight()) {
-                     log.debug(event.right().getValue());
-                     final Long nextLessonId = event.right().getValue().getLong("next_id");
-                     lessonObject.put(ID_LESSON_FIELD_NAME, nextLessonId);
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    log.debug(event.right().getValue());
+                    final Long nextLessonId = event.right().getValue().getLong("next_id");
+                    lessonObject.put(ID_LESSON_FIELD_NAME, nextLessonId);
 
 
-                     //check if attachment(s) exists
-                     final Set<String> attachmentIds = new HashSet<>();
-                     final Map<String, String> documents = new HashMap<String, String>();
+                    //check if attachment(s) exists
+                    final Set<String> attachmentIds = new HashSet<>();
+                    final Map<String, String> documents = new HashMap<String, String>();
 
-                     Iterator<Object> it = attachments.iterator();
-                     while (it.hasNext()) {
-                         Object object = it.next();
-                         if (object instanceof JsonObject) {
-                             JsonObject attachment = (JsonObject) object;
-                             String entId = attachment.getString(JSON_KEY_DOCUMENT_ID);
-                             attachmentIds.add(entId);
+                    Iterator<Object> it = attachments.iterator();
+                    while (it.hasNext()) {
+                        Object object = it.next();
+                        if (object instanceof JsonObject) {
+                            JsonObject attachment = (JsonObject) object;
+                            String entId = attachment.getString(JSON_KEY_DOCUMENT_ID);
+                            attachmentIds.add(entId);
 
-                             String documentLabel = attachment.getString(JSON_KEY_DOCUMENT_LABEL);
-                             documents.put(entId, documentLabel);
-                         }
-                     }
+                            String documentLabel = attachment.getString(JSON_KEY_DOCUMENT_LABEL);
+                            documents.put(entId, documentLabel);
+                        }
+                    }
 
-                     StringBuilder queryAttachments = new StringBuilder();
-                     queryAttachments.append("SELECT document_id, id FROM diary.attachment WHERE document_id in ");
-                     queryAttachments.append(sql.listPrepared(attachmentIds.toArray()));
+                    StringBuilder queryAttachments = new StringBuilder();
+                    queryAttachments.append("SELECT document_id, id FROM diary.attachment WHERE document_id in ");
+                    queryAttachments.append(sql.listPrepared(attachmentIds.toArray()));
 
-                     JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray(new ArrayList(attachmentIds));
+                    JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray(new ArrayList(attachmentIds));
 
-                     sql.prepared(queryAttachments.toString(), parameters, validResultHandler(new Handler<Either<String, JsonArray>>() {
-                         @Override
-                         public void handle(Either<String, JsonArray> event) {
-                             if (event.isRight()) {
-                                 final JsonArray attachments = event.right().getValue();
-                                 final Map<String, Long> attachedDocuments = getAttachedDocumentMap(attachmentIds, attachments);
+                    sql.prepared(queryAttachments.toString(), parameters, validResultHandler(new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                final JsonArray attachments = event.right().getValue();
+                                final Map<String, Long> attachedDocuments = getAttachedDocumentMap(attachmentIds, attachments);
 
-                                 int nbNewAttachments = attachmentIds.size() - attachments.size();
-                                 //get as many nextval as needed
-                                 StringBuilder nextValQuery = new StringBuilder("SELECT ");
-                                 for (int i=0; i < nbNewAttachments; i++) {
-                                     if (i>0) {
-                                         nextValQuery.append(",");
-                                     }
-                                     nextValQuery.append("nextval('").append(SQL_ATTACHMENT_SEQ_NAME).append("') as ");
-                                     nextValQuery.append(SQL_ATTACHMENT_NEXT_VAL_ALIAS).append(i);
-                                 }
-                                 nextValQuery.append(";");
+                                int nbNewAttachments = attachmentIds.size() - attachments.size();
+                                //get as many nextval as needed
+                                StringBuilder nextValQuery = new StringBuilder("SELECT ");
+                                for (int i=0; i < nbNewAttachments; i++) {
+                                    if (i>0) {
+                                        nextValQuery.append(",");
+                                    }
+                                    nextValQuery.append("nextval('").append(SQL_ATTACHMENT_SEQ_NAME).append("') as ");
+                                    nextValQuery.append(SQL_ATTACHMENT_NEXT_VAL_ALIAS).append(i);
+                                }
+                                nextValQuery.append(";");
 
-                                 sql.raw(nextValQuery.toString(), validResultHandler(new Handler<Either<String, JsonArray>>() {
-                                      @Override
-                                      public void handle(Either<String, JsonArray> event) {
-                                          if (event.isRight()) {
-                                              //nextIds is a json array with as many columns as next val needed
-                                              final JsonArray nextIds = event.right().getValue();
+                                sql.raw(nextValQuery.toString(), validResultHandler(new Handler<Either<String, JsonArray>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonArray> event) {
+                                        if (event.isRight()) {
+                                            //nextIds is a json array with as many columns as next val needed
+                                            final JsonArray nextIds = event.right().getValue();
 
-                                              SqlStatementsBuilder sb = new SqlStatementsBuilder();
+                                            SqlStatementsBuilder sb = new SqlStatementsBuilder();
 
-                                              sb.insert("diary.lesson", lessonObject, "id");
+                                            sb.insert("diary.lesson", lessonObject, "id");
 
-                                              int nextValIndex = 0;
-                                              List<Attachment> attachments = new ArrayList<Attachment>();
+                                            int nextValIndex = 0;
+                                            List<Attachment> attachments = new ArrayList<Attachment>();
 
-                                              Iterator<String> entIds = attachedDocuments.keySet().iterator();
-                                              while (entIds.hasNext()) {
-                                                  String entId = entIds.next();
-                                                  Long sqlId = attachedDocuments.get(entId);
-                                                  Attachment att = new Attachment(entId, teacherId);
-                                                  att.setDocumentLabel(documents.get(entId));
+                                            Iterator<String> entIds = attachedDocuments.keySet().iterator();
+                                            while (entIds.hasNext()) {
+                                                String entId = entIds.next();
+                                                Long sqlId = attachedDocuments.get(entId);
+                                                Attachment att = new Attachment(entId, teacherId);
+                                                att.setDocumentLabel(documents.get(entId));
 
-                                                  if (sqlId == null) {
-                                                      Object object = nextIds.getJsonObject(0);
-                                                      if (object instanceof JsonObject) {
-                                                          JsonObject nextVal = (JsonObject) object;
-                                                          String alias = SQL_ATTACHMENT_NEXT_VAL_ALIAS + nextValIndex;
-                                                          Long id = nextVal.getLong(alias);
-                                                          att.setId(id);
-                                                          //add the new attached document
-                                                          sb.raw(att.toQuery(DiaryController.DATABASE_SCHEMA, SQL_ATTACHMENT_TABLE_NAME));
-                                                      }
-                                                      nextValIndex++;
-                                                  } else {
-                                                      att.setId(sqlId);
-                                                  }
-                                                  attachments.add(att);
-                                              }
+                                                if (sqlId == null) {
+                                                    Object object = nextIds.getJsonObject(0);
+                                                    if (object instanceof JsonObject) {
+                                                        JsonObject nextVal = (JsonObject) object;
+                                                        String alias = SQL_ATTACHMENT_NEXT_VAL_ALIAS + nextValIndex;
+                                                        Long id = nextVal.getLong(alias);
+                                                        att.setId(id);
+                                                        //add the new attached document
+                                                        sb.raw(att.toQuery(DiaryController.DATABASE_SCHEMA, SQL_ATTACHMENT_TABLE_NAME));
+                                                    }
+                                                    nextValIndex++;
+                                                } else {
+                                                    att.setId(sqlId);
+                                                }
+                                                attachments.add(att);
+                                            }
 
-                                              // create rows in lesson_has_attachement
-                                              for (Attachment att: attachments) {
-                                                  createLessonHasAttachment(sb, att, nextLessonId);
-                                              }
+                                            // create rows in lesson_has_attachement
+                                            for (Attachment att: attachments) {
+                                                createLessonHasAttachment(sb, att, nextLessonId);
+                                            }
 
-                                              sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
-                                          }
+                                            sql.transaction(sb.build(), validUniqueResultHandler(0, handler));
                                         }
-                                 }));
-                             }
-                         }
-                     }));
-                 }
-             }
-         }));
+                                    }
+                                }));
+                            }
+                        }
+                    }));
+                }
+            }
+        }));
     }
 
     /**

@@ -242,50 +242,6 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         sql.prepared(query.toString(), parameters, validUniqueResultHandler(handler));
     }
 
-
-    private void getOrCreateSubject(final String structureId, final String teacherId, final String subjectId, final Handler<Either<String, JsonObject>> handler){
-        String queryGetSQL = "SELECT * FROM diary.subject WHERE id = ? ";
-        JsonArray values = new JsonArray().add(subjectId);
-        Sql.getInstance().prepared(queryGetSQL, values,  SqlResult.validUniqueResultHandler(response -> {
-            if(response.isRight()){
-                if(!response.right().getValue().isEmpty()){
-                    // the subject already exists
-                    handler.handle(new Either.Right<>(new JsonObject()));
-                } else {
-                    log.info("Subject Non trouvé, on l'insert un");
-                    String neo4jQuery = "MATCH(s:Subject {id: {subjectId} }) return s";
-                    JsonObject params = new JsonObject().put("subjectId", subjectId);
-                    Neo4j.getInstance().execute(neo4jQuery, params, Neo4jResult.validUniqueResultHandler(response2 -> {
-                        if(response2.isRight()){
-                            JsonObject subject = response2.right().getValue().getJsonObject("s").getJsonObject("data");
-                            String queryInsertSQL = "INSERT INTO diary.subject (id, school_id, subject_label, teacher_id, original_subject_id) " +
-                                    "VALUES (?, ?, ?, ?, ?);";
-                            JsonArray valuesInsert = new JsonArray();
-                            valuesInsert.add(subjectId);
-                            valuesInsert.add(structureId);
-                            valuesInsert.add(subject.getString("label"));
-                            valuesInsert.add(teacherId);
-                            valuesInsert.add(subjectId);
-
-                            Sql.getInstance().prepared(queryInsertSQL, valuesInsert, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if(event.isRight()){
-                                        log.info("subject created");
-                                        handler.handle(new Either.Right<>(new JsonObject()));
-                                    } else {
-                                        log.info(event.left().getValue());
-                                    }
-                                }
-                            }));
-
-                        }
-                    }));
-                }
-            }
-        }));
-    }
-
     @Override
     public void createHomework(final JsonObject homeworkObject, final String teacherId, final String teacherDisplayName, final Audience audience, final Handler<Either<String, JsonObject>> handler) {
         if (homeworkObject != null) {
@@ -293,7 +249,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             audienceService.getOrCreateAudience(audience, event -> {
                 if(event.isRight()){
                     log.info("getOrCreateSubject");
-                    getOrCreateSubject(homeworkObject.getString("school_id"), teacherId, homeworkObject.getString("subject_id"), event12 -> {
+                    diaryService.getOrCreateSubject(homeworkObject.getString("school_id"), teacherId, homeworkObject.getString("subject_id"), event12 -> {
                         if (event12.isRight()) {
                             diaryService.getOrCreateTeacher(teacherId, teacherDisplayName, event1 -> {
                                 if (event1.isRight()) {

@@ -5,9 +5,9 @@ import {Session} from "../../model";
 export let createSessionCtrl = ng.controller('createSessionCtrl',
     ['$scope', '$routeParams', function ($scope, $routeParams) {
         console.log("createSessionCtrl");
-        $scope.session = new Session({struture: $scope.structure});
+        $scope.session = new Session($scope.structure);
         $scope.subjects = new Subjects();
-        $scope.teacher = {id: model.me.userId};
+        $scope.session.teacher = {id: model.me.userId};
 
         async function initData() {
             await Promise.all([
@@ -36,9 +36,9 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
          */
         $scope.isValidForm = () => {
             return $scope.session
-                && $scope.session.subjects
+                && $scope.session.subject
                 && $scope.session.audience
-                && $scope.session.teacher
+                && $scope.session.title
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime;

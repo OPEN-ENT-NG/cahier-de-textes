@@ -32,6 +32,8 @@ public interface DiaryService {
 
     void getOrCreateTeacher(final String teacherId, final String teacherDisplayName, final Handler<Either<String, JsonObject>> handler);
 
+    void getOrCreateSubject(final String structureId, final String teacherId, final String subjectId, final Handler<Either<String, JsonObject>> handler);
+
     void initTeacherSubjects(final String teacherId, final List<String> schoolIds, final Handler<Either<String, JsonObject>> handler);
 
     /**
