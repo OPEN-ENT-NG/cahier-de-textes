@@ -22,3 +22,4 @@ src/main/resources/public/view
 rev-manifest.json
 package-lock.json
 error.log
+/src/main/resources/public/sass/global/entcore-css-lib/
