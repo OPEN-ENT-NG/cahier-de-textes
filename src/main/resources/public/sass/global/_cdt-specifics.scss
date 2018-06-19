@@ -1,7 +1,5 @@
-@import './specifics/mixins';
-
 body.cdt {
-  @import './entcore-css-lib/css-lib';
+  @import './specifics/mixins';
   @import './specifics/list-view';
   @import './specifics/atomic';
   @import './specifics/loader';
