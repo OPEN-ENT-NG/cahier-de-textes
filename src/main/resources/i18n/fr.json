@@ -63,6 +63,8 @@
   "cdt.utils.configuration": "Configuration",
   "cdt.utils.type": "type",
   "cdt.utils.create": "Créer",
+  "cdt.utils.publish": "Enregistrer",
+  "cdt.utils.save": "Publier",
   "cdt.utils.add": "Ajouter",
   "cdt.utils.cancel": "Annuler",
   "cdt.utils.save": "Sauvegarder",

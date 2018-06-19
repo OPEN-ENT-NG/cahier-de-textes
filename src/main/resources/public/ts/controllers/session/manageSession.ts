@@ -44,15 +44,27 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
                 && $scope.session.endTime;
         };
 
-        $scope.saveSession = async () => {
+        $scope.saveSession = async (publish) => {
             if(!$scope.isValidForm){
                 $scope.notifications.push(new Notification("cdt.creation.error"));
             }
-            let {status} = await $scope.session.save();
-            if (status === 200) {
-                $scope.notifications.push(new Notification('Homework créer', 'confirm'));
+            else {
+                let {data, status} = await $scope.session.save();
+                if (status === 200) {
+                    if (publish && data && data.id) {
+                        $scope.session.id = data.id;
+                        let {status} = await $scope.session.publish();
+                        if (status === 200) {
+                            $scope.notifications.push(new Notification('session créée et publiée', 'confirm'));
+                        }
+                    }
+                    else {
+                        $scope.notifications.push(new Notification('session créé', 'confirm'));
+                    }
+                }
+                $scope.safeApply();
+                $scope.goTo('/');
             }
-            $scope.safeApply();
         };
 
 

@@ -51,8 +51,18 @@ export class Session {
 
     async create() {
         try {
-            console.log('createSession', this.toJSON());
             return await http.post('/diary/lesson', this.toJSON());
+        } catch (e) {
+            notify.error('cdt.notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async publish() {
+        try {
+            let ids = {ids: [this.id]};
+            return await http.post('/diary/publishLesson', ids);
         } catch (e) {
             notify.error('cdt.notify.create.err');
             console.error(e);

@@ -89,9 +89,11 @@
             <button class="cancel" type="button" ng-click="cancelCreation()">
                 <i18n>cdt.utils.cancel</i18n>
             </button>
-            <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession()">
-                <i18n ng-if="isAnUpdate">cdt.utils.modify</i18n>
-                <i18n ng-if="!isAnUpdate">cdt.utils.create</i18n>
+            <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession(false)">
+                <i18n>cdt.utils.save</i18n>
+            </button>
+            <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession(true)">
+                <i18n>cdt.utils.publish</i18n>
             </button>
         </div>
     </form>
