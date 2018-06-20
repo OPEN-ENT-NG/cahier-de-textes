@@ -4,16 +4,14 @@
         <div class="seven cell">
             <app-title class="zero-mobile">
                 <h1 class="application-title">
-                    <i18n>cdt.title</i18n></span>
+                    <i18n>title</i18n></span>
                 </h1>
             </app-title>
 
         </div>
 
         <div class="contextual-buttons five cell">
-            <button ng-if="isPersonnel() || isTeacher()" ng-click="createSession()">
-                <i18n>cdt.schedule.create</i18n>
-            </button>
+
         </div>
     </div>
     <div class="clear"></div>
@@ -23,7 +21,9 @@
     <button ng-click="goTo('/homework/create/')">
         Créer un travail à faire
     </button>
-
+    <button ng-click="goTo('/session/create/')">
+        Créer une session
+    </button>
     <div>
         <i ng-click="display.listView = true" class="show-list" ng-class="{ selected: display.listView === true }" tooltip="diary.icon.show.list"></i>
         <i ng-click="display.listView = false" class="show-calendar selected" ng-class="{ selected: display.listView === false }" tooltip="diary.icon.show.calendar"></i>

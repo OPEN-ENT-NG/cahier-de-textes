@@ -1,9 +1,9 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model } from 'entcore';
-import { Structures, USER_TYPES, Course, Student, Group, Structure } from '../model';
+import {Structures, PEDAGOGIC_TYPES, USER_TYPES, Course, Student, Group, Structure, Sessions} from '../model';
 import {Homeworks} from '../model/homework';
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', async function ($scope, route, $location) {
+    ['$scope', 'route', '$location', '$timeout', async function ($scope, route, $location, $timeout) {
 
         $scope.notifications = [];
 
@@ -19,14 +19,14 @@ export let main = ng.controller('MainController',
             }
         };
 
-        $scope.ITEM_HOMEWORK = 1;
-        $scope.ITEM_SESSION = 2;
+        $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+        $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
+        $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
 
         $scope.filters = {
             startDate: moment().startOf('isoWeek').toDate(),
             endDate: moment().endOf('isoWeek').toDate()
         };
-
 
         /**
          * Synchronize a structure.
@@ -63,26 +63,38 @@ export let main = ng.controller('MainController',
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.first();
+
             await $scope.syncStructure($scope.structure);
 
-            $scope.homeworks = new Homeworks($scope.structure);
-            await $scope.syncHomework();
+            await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group);
 
+            $scope.homeworks = new Homeworks($scope.structure);
+            await $scope.syncHomeworks();
+
+            $scope.sessions = new Sessions($scope.structure);
+            await $scope.syncSessions();
 
             $scope.loadPedagogicItems();
-
             $scope.safeApply();
         }
 
-        $scope.syncHomework = async () => {
+        $scope.syncHomeworks = async () => {
             await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+        };
+
+        $scope.syncSessions = async () => {
+            await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
         };
 
         $scope.loadPedagogicItems = () =>{
             $scope.pedagogicItems = [];
 
-            $scope.homeworks.all.forEach(i => i.itemType = $scope.ITEM_HOMEWORK);
+
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.homeworks.all);
+
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.sessions.all);
+
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.courses.all);
 
             console.log('pedagogicItems', $scope.pedagogicItems);
 
@@ -90,16 +102,15 @@ export let main = ng.controller('MainController',
             $scope.loadPedagogicDays();
         };
 
+        $timeout(function () {
+            $( '#loader-calendar').appendTo( '.drawing-zone');
+        }, 100);
+
         $scope.loadCalendarItems = () => {
             $scope.calendarItems = $scope.pedagogicItems;
-            $scope.calendarItems.forEach(i => {
-                i.locked = true;
-                i.is_periodic = false;
-            });
         };
 
         $scope.loadPedagogicDays = () => {
-
             $scope.pedagogicItems.sort(function (a, b) {
                 return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
             });
@@ -113,6 +124,12 @@ export let main = ng.controller('MainController',
 
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
+
+                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length;
+                let nbSession = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_SESSION).length;
+                let nbCourse = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_COURSE).length;
+                let nbCourseAndSession = nbSession + nbCourse;
+
                 return {
                     descriptionMaxSize: 140,
                     date: moment(key),
@@ -120,14 +137,16 @@ export let main = ng.controller('MainController',
                     shortDate: moment(key).format('DD/MM'),
                     dayName: moment(key).format('dddd'),
                     shortDayName: moment(key).format('dd'),
-                    nbHomework: pedagogicItems.filter(i => i.itemType == $scope.ITEM_HOMEWORK).length,
-                    nbSession: pedagogicItems.filter(i => i.itemType == $scope.ITEM_SESSION).length,
+                    nbHomework: nbHomework,
+                    nbSession: nbSession,
+                    nbCourse: nbCourse,
+                    nbCourseAndSession: nbCourseAndSession,
                 };
             });
 
-            pedagogicDays.sort(function (a, b) {
-                return new Date(a.date).getTime() - new Date(b.date).getTime();
-            });
+            // pedagogicDays.sort(function (a, b) {
+            //     return new Date(b.date).getTime() - new Date(a.date).getTime();
+            // });
 
             $scope.pedagogicDays = pedagogicDays;
             console.log('pedagogicDays', pedagogicDays);
@@ -194,11 +213,6 @@ export let main = ng.controller('MainController',
             }
         };
 
-        $scope.getTeacherTimetable = () => {
-            $scope.params.group = null;
-            $scope.params.user = model.me.userId;
-            $scope.getTimetable();
-        };
 
         $scope.params = {
             user: null,
@@ -228,16 +242,6 @@ export let main = ng.controller('MainController',
             });
         };
 
-        /**
-         * Course creation
-         */
-        $scope.createSession = () => {
-            $scope.goTo('/session/create/');
-        };
-        $scope.createHomework = () => {
-            $scope.goTo('/homework/create/');
-        };
-
         $scope.goTo = (state: string) => {
             $location.path(state);
             $scope.safeApply();
@@ -257,36 +261,6 @@ export let main = ng.controller('MainController',
         $scope.calendarResizedItem = (item) => {
             $scope.calendarUpdateItem(item);
         };
-
-        let initTriggers = () => {
-            model.calendar.eventer.off('calendar.create-item');
-            model.calendar.eventer.on('calendar.create-item', () => {
-                console.log("clic dans un item ?")
-            });
-        };
-
-        initTriggers();
-
-        /**
-         * Subscriber to directive calendar changes event
-         */
-        $scope.$watch(() => {
-            return model.calendar.firstDay
-        }, function (newValue, oldValue) {
-            if (newValue !== oldValue) {
-                initTriggers();
-                if (moment(oldValue).format('DD/MM/YYYY') !== moment(newValue).format('DD/MM/YYYY')) {
-                    $scope.getTimetable();
-                }
-            }
-        }, true);
-
-        $scope.$watch(() => { return model.calendar.increment }, function (newValue, oldValue) {
-            if (newValue !== oldValue) {
-                initTriggers();
-                $scope.getTimetable();
-            }
-        }, true);
 
         route({
             main: () => {

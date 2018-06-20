@@ -205,12 +205,16 @@ export class Utils {
         return moment(date).format(FORMAT.formattedDate);
     }
 
-    static getFormatedTime(date) {
+    static getFormattedTime(date) {
         return moment(date).format(FORMAT.formattedTime);
     }
 
-    static getFormattedDateTime(date) {
-        return moment(date).format(FORMAT.formattedDateTime);
+    static getFormattedDateTime(date, time?) {
+        if(!!time){
+            return moment(Utils.getFormattedDate(date) + ' ' + Utils.getFormattedTime(time)).format(FORMAT.formattedDateTime);
+        } else {
+            return moment(date).format(FORMAT.formattedDateTime);
+        }
     }
 
     static getDisplayDate(date) {

@@ -5,6 +5,7 @@ import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
 import {Subject} from './subject';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Course} from './course';
+import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 
 export class Homework {
     id: string;
@@ -26,16 +27,20 @@ export class Homework {
 
     startMoment: any;
     endMoment: any;
-    is_periodic: boolean;
+    is_periodic: boolean = false;
+    locked: boolean = true;
 
-    constructor (structure?: Structure) {
-        if(!!structure)
-        {
-            this.structure = structure;
-        }
+    pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+
+    constructor (structure: Structure) {
+        this.structure = structure;
         this.color = 'pink';
         this.type = new HomeworkType();
         this.dueDate = moment().toDate();
+    }
+
+    isPublished(){
+        return this.state === 'published';
     }
 
     toJson () {
@@ -89,6 +94,7 @@ export class Homework {
     async sync (): Promise<void> {
         let { data } = await http.get('/diary/homework/' + this.id);
         Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+        this.dueDate = moment(this.dueDate).toDate();
     }
 
     async create () {
@@ -96,7 +102,7 @@ export class Homework {
             console.log('createHomework', this.toJson());
             return await http.post('/diary/homework', this.toJson());
         } catch (e) {
-            notify.error('cdt.notify.create.err');
+            notify.error('notify.create.err');
             console.error(e);
             throw e;
         }

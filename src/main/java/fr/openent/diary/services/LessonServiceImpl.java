@@ -90,7 +90,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name,")
+            query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
                     .append(" s.original_subject_id as original_subject_id , ")

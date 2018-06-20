@@ -1,0 +1,32 @@
+<div class="one cell text-center">
+    <label class="checkbox">
+        <input type="checkbox" ng-model="pedagogicItem.selected"/>
+        <span></span>
+    </label>
+</div>
+<div class="nine cell">
+    <div ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK || pedagogicItem.pedagogicType == TYPE_SESSION">
+        <div class="row">
+            <span ng-if="!pedagogicItem.isPublished()" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
+            <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.name]]</b>
+        </div>
+        <div class="row medium-importance">
+            [[pedagogicItem.title]]
+        </div>
+        <div class="row">
+            [[pedagogicItem.description]]
+        </div>
+    </div>
+    <div ng-if="pedagogicItem.pedagogicType == TYPE_COURSE">
+        <div class="row"><b>[[pedagogicItem.subjectLabel]] &nbsp;
+            <span ng-repeat="className in pedagogicItem.classes">[[className]]&nbsp;</span>
+            <span ng-repeat="groupName in pedagogicItem.groups">[[groupName]]&nbsp;</span>
+            <span ng-repeat="teacher in pedagogicItem.teachers">[[teacher.firstName]]&nbsp;[[teacher.lastName]]&nbsp;</span></b>
+        </div>
+    </div>
+
+</div>
+<div class="two cell text-right">
+    <i ng-class="pedagogicItem.pedagogicType == TYPE_HOMEWORK ? 'rack2' : 'cahier-textes2'"
+       ng-style="{'color':pedagogicItem.color}" class="icon table-cell-left"></i>
+</div>

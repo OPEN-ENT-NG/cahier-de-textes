@@ -37,7 +37,7 @@
                                         <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbHomework]]
                                     </div>
                                     <div>
-                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i> [[day.nbSession]]
+                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i> [[day.nbCourseAndSession]]
                                     </div>
                                 </div>
                             </div>
@@ -48,29 +48,9 @@
         <div class="pedagogic-item-container">
             <div class="list-pedagogic-item-card">
                 <ul>
-                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems" class="card pedagogic-item-card padding-md margin-bottom-md">
-                        <div class="one cell text-center">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="pedagogicItem.selected"/>
-                                <span></span>
-                            </label>
-                        </div>
-                        <div class="nine cell">
-                            <div class="row">
-                                <i ng-if="!pedagogicItem.isPublished"><em class="low-importance"><i18n>diary.not.published</i18n>&nbsp;</em></i>
-                                <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.name]]</b>
-                            </div>
-                            <div class="row medium-importance">
-                                [[pedagogicItem.title]]
-                            </div>
-                            <div class="row">
-                                [[pedagogicItem.description]]
-                            </div>
-                        </div>
-                        <div class="two cell text-right">
-                            <i ng-class="pedagogicItem.type_item === 'homework'?'icon rack2 table-cell-left':'icon cahier-textes2 table-cell-left'"
-                               ng-style="{'color':pedagogicItem.color}"></i>
-                        </div>
+                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems"
+                        static-include="/diary/public/template/main/list-pedagogic-item.html"
+                        class="card pedagogic-item-card padding-md margin-bottom-md">
                     </li>
                 </ul>
             </div>

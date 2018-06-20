@@ -46,7 +46,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
 
         $scope.saveSession = async (publish) => {
             if(!$scope.isValidForm){
-                $scope.notifications.push(new Notification("cdt.creation.error"));
+                $scope.notifications.push(new Notification("creation.error"));
             }
             else {
                 let {data, status} = await $scope.session.save();

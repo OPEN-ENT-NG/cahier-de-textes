@@ -42,12 +42,6 @@
 }
 
 
-@media screen and (max-width: 1024px) {
-  .yourClass {
-    display: none !important;
-  }
-}
-
 .display-table {
   display: table;
 }
@@ -130,6 +124,10 @@
 
 .gray-text {
   color: #999;
+}
+
+.bg-lightgrey {
+  background-color: lightgrey;
 }
 
 // Margin

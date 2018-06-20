@@ -1,8 +1,13 @@
+<!-- Loader calendrier -->
+<div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
+    <div class="loader"></div>
+</div>
+
 <div id="calendar-view" class="cell horizontal-spacing twelve">
     <calendar
             enable-display-modes="true"
-            display-template="main/calendar-course-item"
-            display-month-template="main/calendar-course-item"
+            display-template="main/calendar-item"
+            display-month-template="main/calendar-item"
             items="calendarItems"
             show-next-previous-button="true">
     </calendar>

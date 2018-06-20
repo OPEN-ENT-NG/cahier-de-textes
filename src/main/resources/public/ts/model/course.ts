@@ -2,6 +2,7 @@ import { model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
 import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
+import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -31,6 +32,8 @@ export class Course {
     teachers: Teacher[];
     originalStartMoment?: any;
     originalEndMoment?: any;
+
+    pedagogicType: number = PEDAGOGIC_TYPES.TYPE_COURSE;
 
     constructor (obj: object, startDate?: string | object, endDate?: string | object) {
         if (obj instanceof Object) {
@@ -73,7 +76,7 @@ export class Course {
             await http.post('/edt/course', arr);
             return;
         } catch (e) {
-            notify.error('cdt.notify.create.err');
+            notify.error('notify.create.err');
             console.error(e);
             throw e;
         }

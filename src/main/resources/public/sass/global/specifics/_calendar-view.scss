@@ -1,0 +1,25 @@
+.schedule-item-content {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  &.edt-origin-course {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.5);
+    border-style: dashed;
+    border-width: 1px;
+  }
+}
+
+.overlay-loader-calendar {
+  display: flex;
+  align-items: center;
+  background: #ffffff87;
+  position: absolute;
+  z-index: 1000;
+  width: 100%;
+  vertical-align: middle;
+  justify-content: center;
+  top:40px;
+  height: calc(100% - 40px);
+}
