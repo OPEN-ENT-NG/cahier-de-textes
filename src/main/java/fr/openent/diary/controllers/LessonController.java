@@ -275,8 +275,8 @@ public class LessonController extends ControllerHelper {
      */
     @Post("/lesson/publish")
     @ApiDoc("Publishes a lesson")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = publish_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void publishLesson(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override

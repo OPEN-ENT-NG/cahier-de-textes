@@ -588,8 +588,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             @Override
             public void handle(Message<JsonObject> event) {
                 if (finalState == ResourceState.PUBLISHED ){
-                    for (Object lessonId :  lessonIds ){
-                        homeworkService.notifyHomeworkShare(new Long((Integer)lessonId), null, userInfos, new Handler<GenericHandlerResponse>() {
+                    for (String lessonId :  lessonIds ){
+                        homeworkService.notifyHomeworkShare(Long.parseLong(lessonId), null, userInfos, new Handler<GenericHandlerResponse>() {
                             @Override
                             public void handle(GenericHandlerResponse event) {
                             }

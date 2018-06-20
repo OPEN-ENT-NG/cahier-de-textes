@@ -63,6 +63,7 @@ export class Session {
 
     toJSON() {
         return {
+            lesson_id: this.id ? this.id : null,
             subject_id: this.subject.id,
             school_id: this.structure.id,
             lesson_title: this.title,
@@ -96,8 +97,7 @@ export class Session {
 
     async publish() {
         try {
-            let ids = {ids: [this.id]};
-            return await http.post('/diary/publishLesson', ids);
+            return await http.post('/diary/lesson/publish', this.toJSON());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
