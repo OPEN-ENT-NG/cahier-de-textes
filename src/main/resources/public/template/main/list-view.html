@@ -1,5 +1,8 @@
 <div class="list-view" ng-init="model.display.showList=true">
-
+    <div class="row card">
+        <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"></date-picker>
+        <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"></date-picker>
+    </div>
     <!--<div ng-model="searchForm" class="search-form-box">-->
         <!--<i class="[[(searchForm.displayLesson == false) ? 'filter2 diary' : 'filter2 diary selected' ]]" ng-click="toggleFilterOnLesson()" tooltip="diary.icon.show.lessons"></i>-->
 

@@ -53,33 +53,72 @@ export let main = ng.controller('MainController',
                 }
             }
             if (!$scope.isPersonnel()) {
-                $scope.getTimetable();
+                //$scope.getTimetable();
             } else {
                 $scope.safeApply();
             }
         };
 
+        $timeout(async function () {
+            await placingLoader();
+            initializeData();
+        }, 100);
+
+        async function placingLoader(){
+            while (true) {
+                console.log('while');
+                let loaderHasGoodPosition = false;
+                await $timeout(function () {
+                    if (!!$('#loader-calendar').parent().prop('className')) {
+                        if ($('#loader-calendar').parent().prop('className').includes('drawing-zone')) {
+                            console.log('GOOD place');
+                            loaderHasGoodPosition = true;
+                        } else {
+                            console.log('Bad place');
+                            $('#loader-calendar').appendTo('.drawing-zone');
+                        }
+                    }
+                }, 100);
+
+                if (loaderHasGoodPosition) break;
+            }
+        }
+
         async function initializeData(){
+            console.log('initializeData');
+            $scope.isRefreshingCalendar = true;
+
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.first();
-
             await $scope.syncStructure($scope.structure);
 
-            await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group);
-
             $scope.homeworks = new Homeworks($scope.structure);
-            await $scope.syncHomeworks();
-
             $scope.sessions = new Sessions($scope.structure);
-            await $scope.syncSessions();
 
-            $scope.loadPedagogicItems();
+            await $scope.syncPedagogicItems();
+
             $scope.safeApply();
         }
 
+        $scope.syncPedagogicItems = async () => {
+            console.log('syncPedagogicItems');
+            $scope.isRefreshingCalendar = true;
+            $scope.safeApply();
+
+            await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncHomeworks()]);
+
+            $scope.loadPedagogicItems();
+            $scope.isRefreshingCalendar = false;
+            $scope.safeApply();
+        };
+
         $scope.syncHomeworks = async () => {
             await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+        };
+
+        $scope.syncCourses = async () => {
+            await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate);
         };
 
         $scope.syncSessions = async () => {
@@ -89,11 +128,8 @@ export let main = ng.controller('MainController',
         $scope.loadPedagogicItems = () =>{
             $scope.pedagogicItems = [];
 
-
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.homeworks.all);
-
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.sessions.all);
-
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.courses.all);
 
             console.log('pedagogicItems', $scope.pedagogicItems);
@@ -102,12 +138,10 @@ export let main = ng.controller('MainController',
             $scope.loadPedagogicDays();
         };
 
-        $timeout(function () {
-            $( '#loader-calendar').appendTo( '.drawing-zone');
-        }, 100);
-
         $scope.loadCalendarItems = () => {
             $scope.calendarItems = $scope.pedagogicItems;
+
+            $scope.isRefreshingCalendar = false;
         };
 
         $scope.loadPedagogicDays = () => {
@@ -158,7 +192,13 @@ export let main = ng.controller('MainController',
             $scope.selectedPedagogicDay = pedagogicDay;
         };
 
-        initializeData();
+        $scope.$watch(() => model.calendar.dayForWeek, () => {
+            let momentInWeek = moment(model.calendar.dayForWeek);
+            $scope.filters.startDate = momentInWeek.clone().startOf('isoWeek').toDate();
+            $scope.filters.endDate = momentInWeek.clone().endOf('isoWeek').toDate();
+            model.calendar.setDate(momentInWeek);
+            $scope.syncPedagogicItems();
+        });
 
         $scope.switchStructure = (structure: Structure) => {
             $scope.syncStructure(structure);
@@ -201,17 +241,17 @@ export let main = ng.controller('MainController',
          * Get timetable bases on $scope.params object
          * @returns {Promise<void>}
          */
-        $scope.getTimetable = async () => {
-            if ($scope.params.user !== null
-                && $scope.params.group !== null) {
-                notify.error('');
-            } else  {
-                $scope.calendarLoader.display();
-                $scope.structure.courses.all = [];
-                await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group);
-                $scope.calendarLoader.hide();
-            }
-        };
+        // $scope.getTimetable = async () => {
+        //     if ($scope.params.user !== null
+        //         && $scope.params.group !== null) {
+        //         notify.error('');
+        //     } else  {
+        //         $scope.calendarLoader.display();
+        //         $scope.structure.courses.all = [];
+        //         await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group);
+        //         $scope.calendarLoader.hide();
+        //     }
+        // };
 
 
         $scope.params = {

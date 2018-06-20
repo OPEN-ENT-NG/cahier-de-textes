@@ -8,7 +8,7 @@
     <div ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK || pedagogicItem.pedagogicType == TYPE_SESSION">
         <div class="row">
             <span ng-if="!pedagogicItem.isPublished()" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
-            <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.name]]</b>
+            <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]</b>
         </div>
         <div class="row medium-importance">
             [[pedagogicItem.title]]

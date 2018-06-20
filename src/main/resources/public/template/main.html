@@ -67,6 +67,6 @@
 
 
 <!-- Calendar View -->
-<div ng-if="!display.listView" class="includedTemplate" ng-include="'/diary/public/template/main/calendar-view.html'"></div>
-<div ng-if="display.listView" class="includedTemplate" ng-include="'/diary/public/template/main/list-view.html'"></div>
+<div ng-if="!display.listView" static-include="/diary/public/template/main/calendar-view.html"></div>
+<div ng-if="display.listView" static-include="/diary/public/template/main/list-view.html"></div>
 

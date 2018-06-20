@@ -83,7 +83,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
                 .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label,")
-                .append(" teacher.teacher_display_name as teacher_display_name,")
+                .append(" teacher.teacher_display_name as teacher_display_name, h.teacher_id, ")
                 .append(" att.attachments ")
                 .append(" FROM diary.homework AS h")
 
