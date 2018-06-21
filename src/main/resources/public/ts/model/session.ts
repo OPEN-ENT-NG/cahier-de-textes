@@ -26,6 +26,13 @@ export class Session {
 
     startMoment: any;
     endMoment: any;
+
+    startDisplayDate: string;
+    startDisplayTime: string;
+
+    endDisplayDate: string;
+    endDisplayTime: string;
+
     is_periodic: boolean = false;
     locked: boolean;
 
@@ -139,7 +146,12 @@ export class Sessions {
         this.all.forEach(i => {
             i.date = moment(i.date).toDate();
             i.startMoment = moment(Utils.getFormattedDateTime(i.date, moment(i.startTime, FORMAT.formattedTime)));
+            i.startDisplayDate = Utils.getDisplayDate(i.startMoment);
+            i.startDisplayTime = Utils.getDisplayTime(i.startMoment);
+
             i.endMoment = moment(Utils.getFormattedDateTime(i.date, moment(i.endTime, FORMAT.formattedTime)));
+            i.endDisplayDate = Utils.getDisplayTime(i.endMoment);
+            i.endDisplayTime = Utils.getDisplayTime(i.endMoment);
         });
 
     }

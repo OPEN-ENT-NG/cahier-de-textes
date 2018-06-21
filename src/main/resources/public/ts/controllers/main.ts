@@ -98,15 +98,19 @@ export let main = ng.controller('MainController',
 
             await $scope.syncPedagogicItems();
 
+            $scope.sceneInitialized = true;
             $scope.safeApply();
         }
 
         $scope.syncPedagogicItems = async () => {
-            console.log('syncPedagogicItems');
+            if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
+                // Dates incorrectes
+                return;
+            }
             $scope.isRefreshingCalendar = true;
             $scope.safeApply();
 
-            await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncHomeworks()]);
+            await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncCourses()]);
 
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
@@ -114,14 +118,17 @@ export let main = ng.controller('MainController',
         };
 
         $scope.syncHomeworks = async () => {
+            $scope.homeworks.all = [];
             await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
         };
 
         $scope.syncCourses = async () => {
+            $scope.structure.courses.all = [];
             await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate);
         };
 
         $scope.syncSessions = async () => {
+            $scope.sessions.all = [];
             await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
         };
 
@@ -178,10 +185,7 @@ export let main = ng.controller('MainController',
                 };
             });
 
-            // pedagogicDays.sort(function (a, b) {
-            //     return new Date(b.date).getTime() - new Date(a.date).getTime();
-            // });
-
+            $scope.selectedPedagogicDay = undefined;
             $scope.pedagogicDays = pedagogicDays;
             console.log('pedagogicDays', pedagogicDays);
         };
@@ -193,6 +197,7 @@ export let main = ng.controller('MainController',
         };
 
         $scope.$watch(() => model.calendar.dayForWeek, () => {
+            if(!$scope.sceneInitialized) return;
             let momentInWeek = moment(model.calendar.dayForWeek);
             $scope.filters.startDate = momentInWeek.clone().startOf('isoWeek').toDate();
             $scope.filters.endDate = momentInWeek.clone().endOf('isoWeek').toDate();

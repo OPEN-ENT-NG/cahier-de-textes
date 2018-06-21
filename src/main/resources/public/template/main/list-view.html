@@ -1,30 +1,11 @@
-<div class="list-view" ng-init="model.display.showList=true">
-    <div class="row card">
+<div class="list-view">
+    <div class="row card padding-sm margin-bottom-md">
+        <i18n>from</i18n>
         <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"></date-picker>
+        <i18n>to</i18n>
         <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"></date-picker>
     </div>
-    <!--<div ng-model="searchForm" class="search-form-box">-->
-        <!--<i class="[[(searchForm.displayLesson == false) ? 'filter2 diary' : 'filter2 diary selected' ]]" ng-click="toggleFilterOnLesson()" tooltip="diary.icon.show.lessons"></i>-->
-
-        <!--<i class="[[(searchForm.displayHomework == false) ? 'filter2 homework' : 'filter2 homework selected' ]]" ng-click="toggleFilterOnHomework()" tooltip="diary.icon.show.homeworks"></i>-->
-
-        <!--<p style="padding-left: 20px; display:inline;">-->
-            <!--<label style="vertical-align:center">Période du </label>-->
-            <!--<date-picker ng-model="model.filters.startDate" style="width: 80px" ng-change="calendarListViewCtrl.getDatas()"></date-picker>-->
-            <!--<label style="vertical-align:center"> au </label>-->
-            <!--<date-picker ng-model="model.filters.endDate" style="width: 80px" ng-change="calendarListViewCtrl.getDatas()"></date-picker>-->
-        <!--</p>-->
-
-        <!--<p ng-if="model.filters.subjects.length>0" style="padding-left: 20px; display:inline;">-->
-            <!--<select class="subjects" ng-options="subjectName for subjectName in model.filters.subjects" ng-model="model.filters.selectedSubject">-->
-                <!--<option value="" translate content="diary.filter.all.subjects"></option>-->
-            <!--</select>-->
-        <!--</p>-->
-
-        <!--<input type="hidden" ng-model="searchForm.audienceId" />-->
-    <!--</div>-->
     <section>
-
         <div class="pedagogic-day-container">
                 <ul>
                     <li ng-repeat="day in pedagogicDays | orderBy : 'shortDate' ">
@@ -57,7 +38,6 @@
                     </li>
                 </ul>
             </div>
-
         </div>
     </section>
 </div>

@@ -21,13 +21,12 @@ export class Course {
     locked: boolean = true;
     is_periodic: boolean;
     startMoment: any;
-    startMomentDate: string;
-    startMomentTime: string;
-    startCalendarHour: Date;
-    endCalendarHour: Date;
+    startDisplayDate: string;
+    startDisplayTime: string;
+
     endMoment: any;
-    endMomentDate: string;
-    endMomentTime: string;
+    endDisplayDate: string;
+    endDisplayTime: string;
     subjectLabel: string;
     teachers: Teacher[];
     originalStartMoment?: any;
@@ -46,15 +45,13 @@ export class Course {
 
         if (startDate) {
             this.startMoment = moment(startDate);
-            this.startCalendarHour = this.startMoment.seconds(0).millisecond(0).toDate();
-            this.startMomentDate = this.startMoment.format('DD/MM/YYYY');
-            this.startMomentTime = this.startMoment.format('hh:mm');
+            this.startDisplayDate = Utils.getDisplayDate(this.startMoment);
+            this.startDisplayTime = Utils.getDisplayTime(this.startMoment);
         }
         if (endDate) {
             this.endMoment = moment(endDate);
-            this.endCalendarHour = this.endMoment.seconds(0).millisecond(0).toDate();
-            this.endMomentDate = this.endMoment.format('DD/MM/YYYY');
-            this.endMomentTime = this.endMoment.format('hh:mm');
+            this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
+            this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
         }
     }
 

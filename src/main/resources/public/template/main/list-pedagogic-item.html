@@ -5,23 +5,29 @@
     </label>
 </div>
 <div class="nine cell">
+    <!-- Homework et Session -->
     <div ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK || pedagogicItem.pedagogicType == TYPE_SESSION">
         <div class="row">
             <span ng-if="!pedagogicItem.isPublished()" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
             <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]</b>
         </div>
         <div class="row medium-importance">
-            [[pedagogicItem.title]]
+            <span ng-if="pedagogicItem.pedagogicType == TYPE_SESSION">[[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]</span>
+            &nbsp;[[pedagogicItem.title]]
         </div>
         <div class="row">
             [[pedagogicItem.description]]
         </div>
     </div>
+    <!-- Course -->
     <div ng-if="pedagogicItem.pedagogicType == TYPE_COURSE">
         <div class="row"><b>[[pedagogicItem.subjectLabel]] &nbsp;
             <span ng-repeat="className in pedagogicItem.classes">[[className]]&nbsp;</span>
             <span ng-repeat="groupName in pedagogicItem.groups">[[groupName]]&nbsp;</span>
             <span ng-repeat="teacher in pedagogicItem.teachers">[[teacher.firstName]]&nbsp;[[teacher.lastName]]&nbsp;</span></b>
+        </div>
+        <div class="row medium-importance">
+            [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
         </div>
     </div>
 

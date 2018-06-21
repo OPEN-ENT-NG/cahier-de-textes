@@ -1,17 +1,12 @@
-<div class="row">
+<div class="row" ng-init="display.listView = false">
     <div class="twelve cell">
 
         <div class="seven cell">
             <app-title class="zero-mobile">
                 <h1 class="application-title">
-                    <i18n>title</i18n></span>
+                    <i18n>diary</i18n>
                 </h1>
             </app-title>
-
-        </div>
-
-        <div class="contextual-buttons five cell">
-
         </div>
     </div>
     <div class="clear"></div>
@@ -26,7 +21,7 @@
     </button>
     <div>
         <i ng-click="display.listView = true" class="show-list" ng-class="{ selected: display.listView === true }" tooltip="diary.icon.show.list"></i>
-        <i ng-click="display.listView = false" class="show-calendar selected" ng-class="{ selected: display.listView === false }" tooltip="diary.icon.show.calendar"></i>
+        <i ng-click="display.listView = false" class="show-calendar" ng-class="{ selected: display.listView === false }" tooltip="diary.icon.show.calendar"></i>
     </div>
 </div>
 

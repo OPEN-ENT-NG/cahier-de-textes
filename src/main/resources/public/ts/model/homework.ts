@@ -27,6 +27,7 @@ export class Homework {
 
     startMoment: any;
     endMoment: any;
+
     is_periodic: boolean = false;
     locked: boolean = true;
 

@@ -1,4 +1,5 @@
 {
+  "diary": "Cahier de textes",
   "notify.saved": "La donnée a été sauvegardée",
   "notify.modified": "La donnée a été modifiée",
   "notify.deleted": "La donnée a été supprimée",
@@ -43,7 +44,7 @@
   "seemore": "Voir la suite",
   "utils.teachers": "Enseignants",
   "utils.teacher.choose.one": "Choisissez un enseignant",
-  "utils.personnels": "Personnels",lessonId
+  "utils.personnels": "Personnels",
   "utils.groups": "Classes/Groupes",
   "utils.group.choose.one": "Choisissez un(e) classe/groupe",
   "utils.structure": "Structures",
