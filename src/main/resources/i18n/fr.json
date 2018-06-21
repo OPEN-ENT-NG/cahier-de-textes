@@ -105,5 +105,8 @@
   "settings.exclusion.description": "Description",
   "settings.exclusion.start_date": "Date de début",
   "settings.exclusion.end_date": "Date de Fin",
-  "settings.exclusion.title": "Exclusion de périodes"
+  "settings.exclusion.title": "Exclusion de périodes",
+  "calendar.mode.day":"Jour",
+  "calendar.mode.week":"Semaine",
+  "calendar.mode.month":"Mois"
 }

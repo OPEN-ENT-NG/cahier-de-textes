@@ -98,7 +98,7 @@ export let main = ng.controller('MainController',
 
             await $scope.syncPedagogicItems();
 
-            $scope.sceneInitialized = true;
+            $scope.pageInitialized = true;
             $scope.safeApply();
         }
 
@@ -196,12 +196,27 @@ export let main = ng.controller('MainController',
             $scope.selectedPedagogicDay = pedagogicDay;
         };
 
-        $scope.$watch(() => model.calendar.dayForWeek, () => {
-            if(!$scope.sceneInitialized) return;
-            let momentInWeek = moment(model.calendar.dayForWeek);
-            $scope.filters.startDate = momentInWeek.clone().startOf('isoWeek').toDate();
-            $scope.filters.endDate = momentInWeek.clone().endOf('isoWeek').toDate();
-            model.calendar.setDate(momentInWeek);
+        $scope.$watch(() => model.calendar.firstDay, () => {
+            if(!$scope.pageInitialized) return;
+            
+            console.log('Watch model.calendar.firstDay : increment=' + model.calendar.increment);
+            let calendarMode = model.calendar.increment;
+            let momentFirstDay = moment(model.calendar.firstDay);
+
+            switch(calendarMode){
+                case 'month':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('month');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('month');
+                    break;
+                case 'week':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
+                    break;
+                case 'day':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('day');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('day');
+                    break;
+            }
             $scope.syncPedagogicItems();
         });
 
