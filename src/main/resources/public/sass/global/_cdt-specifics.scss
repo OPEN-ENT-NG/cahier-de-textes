@@ -1,14 +1,14 @@
 body.cdt {
   @import './specifics/mixins';
+  @import './specifics/diary';
   @import './specifics/list-view';
   @import './specifics/atomic';
-  @import './specifics/loader';
+  @import 'components/loader';
 
   @import './specifics/utils';
-  @import './specifics/custom';
 
   @import './specifics/calendar-view';
   @import './specifics/select';
-  @import './specifics/switch';
-  @import './specifics/toasts';
+  @import 'components/switch';
+  @import 'components/toasts';
 }
