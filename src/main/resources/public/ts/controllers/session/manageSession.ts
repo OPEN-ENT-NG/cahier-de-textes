@@ -5,6 +5,7 @@ import {Session} from "../../model";
 export let createSessionCtrl = ng.controller('createSessionCtrl',
     ['$scope', '$routeParams', function ($scope, $routeParams) {
         console.log("createSessionCtrl");
+
         $scope.session = new Session($scope.structure);
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
@@ -24,17 +25,11 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
 
         initData();
 
-        /**
-         * Function canceling course creation
-         */
         $scope.cancelCreation = () => {
             $scope.goTo('/');
             delete $scope.course;
         };
 
-        /**
-         * Function triggered on step 3 activation
-         */
         $scope.isValidForm = () => {
             return $scope.session
                 && $scope.session.subject
@@ -49,6 +44,15 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             this.saveSession(true);
         };
 
+        $scope.unpublishSession = async () => {
+            let {status} = await $scope.session.unpublish();
+            if (status === 200) {
+                $scope.notifications.push(new Notification(lang.translate('session.manage.unpublished'), 'confirm'));
+                $scope.safeApply();
+                $scope.goTo('/');
+            }
+        };
+        
         $scope.deleteSession = async () => {
             let {status} = await $scope.session.delete();
             if (status === 200) {
@@ -58,18 +62,9 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             }
         };
 
-        $scope.unpublishSession = async () => {
-            let {status} = await $scope.session.unpublish();
-            if (status === 200) {
-                $scope.notifications.push(new Notification(lang.translate('session.manage.unpublished'), 'confirm'));
-                $scope.safeApply();
-                $scope.goTo('/');
-            }
-        };
-
         $scope.saveSession = async (publish = false) => {
             if(!$scope.isValidForm){
-                $scope.notifications.push(new Notification(lang.translate('session.manage.unvalidForm')), 'error');
+                $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
             }
             else {
                 let {data, status} = await $scope.session.save();

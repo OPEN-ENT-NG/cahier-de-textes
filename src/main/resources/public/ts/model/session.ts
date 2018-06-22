@@ -14,7 +14,7 @@ export class Session {
     audience: any;
     title: string;
     color: string = _.first(colors);
-    date: any = moment().toDate();
+    date: Date = moment().toDate();
     startTime: any = (moment().set({'hour': '08', 'minute':'00'})).seconds(0).millisecond(0).toDate();
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     description: string = "";
@@ -22,7 +22,7 @@ export class Session {
     state: string = "draft";
     attachments: any = [];
     homeworkIds: any = [];
-    room: string = "99";
+    room: string = "";
 
     startMoment: any;
     endMoment: any;
@@ -58,11 +58,20 @@ export class Session {
             color: data.lesson_color,
             state: data.lesson_state,
             date: data.lesson_date,
-            startTime: data.lesson_start_time,
-            endTime: data.lesson_end_time,
+            startTime: (moment().set({
+                    'hour': data.lesson_start_time.substr(0, 2),
+                    'minute': data.lesson_start_time.substr(0, 2),
+                    seconds: '00',
+                    millisecond : '00'
+                })).toDate(),
+            endTime: (moment().set({
+                    'hour': data.lesson_end_time.substr(0, 2),
+                    'minute': data.lesson_end_time.substr(0, 2),
+                    seconds: '00',
+                    millisecond: '00'
+                })).toDate(),
             description: data.lesson_description,
             annotation: data.lesson_annotation,
-            locked: data.locked,
             attachments: data.attachments,
             homeworkIds: data.homework_ids,
         };
@@ -83,7 +92,7 @@ export class Session {
             lesson_state: this.state,
             audience_id: this.audience.id,
             audience_type: this.audience.type_groupe == 0 ? 'class' : 'group',
-            attachments: this.attachments,
+            attachments: this.attachments ? this.attachments : [],
             lesson_room: this.room
         };
     }
@@ -95,7 +104,7 @@ export class Session {
     async createOrUpdate() {
         try {
             if(this.id)
-                return await http.put('/diary/lesson' + this.id, this.toJSON());
+                return await http.put('/diary/lesson/' + this.id, this.toJSON());
             else
                 return await http.post('/diary/lesson', this.toJSON());
         } catch (e) {

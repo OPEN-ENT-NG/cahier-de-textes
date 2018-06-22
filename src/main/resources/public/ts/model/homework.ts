@@ -11,9 +11,9 @@ export class Homework {
     id: string;
     title: string = '';
     description: string = '';
-    dueDate: Date;
+    dueDate: Date = moment().toDate();
     color: string;
-    state: any;
+    state: string = "draft";
 
     session_id: any; // Todo: n'utiliser que le champ 'lesson'
 
@@ -23,7 +23,7 @@ export class Homework {
     subject: Subject;
     audience: any;
     session: any;
-    attachments: any[];
+    attachments: any = [];
 
     startMoment: any;
     endMoment: any;
@@ -44,7 +44,7 @@ export class Homework {
         return this.state === 'published';
     }
 
-    toJson () {
+    toJSON () {
         return {
             homework_title: this.title,
             subject_id: this.subject.id,
@@ -82,31 +82,64 @@ export class Homework {
             type: type,
             title: data.homework_title,
             color: data.homework_color,
-            dueDate: data.homework_due_date,
+            dueDate: moment(data.homework_due_date).toDate(),
             description: data.homework_description,
             state: data.homework_state,
         };
     }
 
     async save () {
-        return await this.create();
+        return await this.createOrUpdate();
     }
 
-    async sync (): Promise<void> {
-        let { data } = await http.get('/diary/homework/' + this.id);
-        Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
-        this.dueDate = moment(this.dueDate).toDate();
-    }
-
-    async create () {
+    async createOrUpdate () {
         try {
-            console.log('createHomework', this.toJson());
-            return await http.post('/diary/homework', this.toJson());
+            if (this.id)
+                return await http.put('/diary/homework/' + this.id, this.toJSON());
+            else
+                return await http.post('/diary/homework', this.toJSON());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
             throw e;
         }
+    }
+
+
+    async delete() {
+        try {
+            return await http.delete('/diary/homework/' + this.id);
+        } catch (e) {
+            notify.error('notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async publish() {
+        try {
+            return await http.post('/diary/homework/publish', this.toJSON());
+        } catch (e) {
+            notify.error('notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+
+    async unpublish() {
+        try {
+            return await http.post('/diary/homework/unpublish', this.toJSON());
+        } catch (e) {
+            notify.error('notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async sync(): Promise<void> {
+        let {data} = await http.get('/diary/homework/' + this.id);
+        Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
     }
 }
 

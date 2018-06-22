@@ -1,14 +1,35 @@
 <div ng-controller="manageHomeworkCtrl" id="occurrences-creation">
     <h1 class="centered eight row">
-        <span ng-if="!homework.id">Créer un travail à faire</span>
-        <span ng-if="!!homework.id">Modifier un travail à faire</span>
+        <i18n ng-if="session.id">hommework.manage.update</i18n>
+        <i18n ng-if="!session.id">hommework.manage.create</i18n>
     </h1>
     <form>
         <article>
-            <h3>Matière et Classe</h3>
+            <h3><i18n>utils.subject_and_audience</i18n></h3>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
-                    Matière
+                    <i18n>creation.structure.choose</i18n>*
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required ng-model="homework.structure"
+                            ng-options="structure.name for structure in structures.all track by structure.id">
+                    </select>
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    <i18n>utils.groups</i18n>*
+                </label>
+                <div class="cell twelve-mobile ten">
+                    <select required ng-model="homework.audience"
+                            ng-options="group.name for group in structure.groups.all track by group.id">
+                    </select>
+                </div>
+            </div>
+
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    <i18n>subject</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <div class="cell twelve-mobile ten">
@@ -18,37 +39,20 @@
                 </div>
             </div>
             </select>
-            <div class="row form-row">
-                <label class="cell two twelve-mobile">
-                    Structure
-                </label>
-                <div class="cell twelve-mobile ten">
-                    <select required ng-model="homework.structure" ng-options="structure.name for structure in structures.all track by structure.id">
-                    </select>
-                </div>
-            </div>
-            <div class="row form-row">
-                <label class="cell two twelve-mobile">
-                    Classe
-                </label>
-                <div class="cell twelve-mobile ten">
-                    <select required ng-model="homework.audience" ng-options="group.name for group in structure.groups.all track by group.id">
-                    </select>
-                </div>
-            </div>
 
-            <h3>Devoir</h3>
+            <h3><i18n>homework.manage.config</i18n></h3>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
-                    Titre du devoir
+                    <i18n>title</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <input ng-model="homework.title" type="text">
                 </div>
             </div>
+
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
-                    A faire pour le
+                    <i18n>homework.manage.date</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <input ng-model="homework.dueDate" type="date">
@@ -56,7 +60,26 @@
             </div>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
-                    Type de travail
+                    <i18n>state</i18n>*
+                </label>
+                <div class="cell twelve-mobile five">
+                    <p>[[homework.state]]</p>
+                </div>
+                <div class="cell twelve-mobile five">
+                    <button ng-if="homework.state == 'published'" ng-disabled="!isValidForm()" type="submit"
+                            ng-click="publishHomework()">
+                        <i18n>publish</i18n>
+                    </button>
+                    <button ng-if="homework.state == 'draft'" ng-disabled="!isValidForm()" type="submit"
+                            ng-click="unpublishHomework()">
+                        <i18n>unpublish</i18n>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    <i18n>homework.manage.type</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <select required ng-model="homework.type" ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
@@ -65,7 +88,7 @@
             </div>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
-                    Description du devoir
+                    <i18n>utils.description</i18n>*
                 </label>
                 <div class="cell twelve-mobile ten">
                     <textarea ng-model="homework.description" style="resize: vertical; min-height: 60px;"></textarea>
@@ -73,13 +96,21 @@
             </div>
 
         </article>
-        <div class="right-magnet vertical-spacing">
-            <div ng-if="form_is_not_valid" class="warning"> <i18n>creation.error</i18n></div>
-            <button class="cancel" type="button" ng-click="$scope.goTo('/');">
-                Annuler
+
+        <div ng-if="session.id" class="left-magnet vertical-spacing">
+            <button class="cancel" type="button" ng-click="deleteHomework()">
+                <i18n>utils.delete</i18n>
             </button>
-            <button type="submit" ng-click="saveHomework();">
-                Créer
+        </div>
+        <div class="right-magnet vertical-spacing">
+            <div ng-if="form_is_not_valid" class="warning">
+                <i18n>creation.error</i18n>
+            </div>
+            <button class="cancel" type="button" ng-click="cancelCreation()">
+                <i18n>utils.cancel</i18n>
+            </button>
+            <button ng-disabled="!isValidForm()" type="submit" ng-click="saveHomework()">
+                <i18n>utils.save</i18n>
             </button>
         </div>
     </form>

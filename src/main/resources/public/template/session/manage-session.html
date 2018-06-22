@@ -1,7 +1,7 @@
 <div ng-controller="createSessionCtrl" id="occurrences-creation">
     <h1 class="centered eight row">
-        <i18n ng-if="isAnUpdate">schedule.update</i18n>
-        <i18n ng-if="!isAnUpdate">schedule.create</i18n>
+        <i18n ng-if="session.id">session.manage.update</i18n>
+        <i18n ng-if="!session.id">session.manage.create</i18n>
     </h1>
     <form>
         <article>
@@ -31,7 +31,14 @@
                 </div>
             </div>
 
-            <h3><i18n>utils.config_session</i18n></h3>
+            <h3><i18n>session.manage.config</i18n></h3>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile">
+                    <i18n>title</i18n>*
+                </label>
+                <div class="cell twelve-mobile ten"><input ng-model="session.title"/>
+                </div>
+            </div>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
                     <i18n>date</i18n>*
@@ -53,23 +60,17 @@
                     <p>[[session.state]]</p>
                 </div>
                 <div class="cell twelve-mobile five">
-                    <button ng-if="session.state = 'published'" ng-disabled="!isValidForm()" type="submit"
+                    <button ng-if="session.state == 'published'" ng-disabled="!isValidForm()" type="submit"
                             ng-click="publishSession()">
-                        <i18n>utils.publish</i18n>
+                        <i18n>publish</i18n>
                     </button>
-                    <button ng-if="session.state = 'draft'" ng-disabled="!isValidForm()" type="submit"
+                    <button ng-if="session.state == 'draft'" ng-disabled="!isValidForm()" type="submit"
                             ng-click="unpublishSession()">
-                        <i18n>utils.publish</i18n>
+                        <i18n>unpublish</i18n>
                     </button>
                 </div>
             </div>
-            <div class="row form-row">
-                <label class="cell two twelve-mobile">
-                    <i18n>title</i18n>*
-                </label>
-                <div class="cell twelve-mobile ten"><input ng-model="session.title"/>
-                </div>
-            </div>
+            
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
                     <i18n>utils.room</i18n>
@@ -98,7 +99,7 @@
             
 
         </article>
-        <div class="left-magnet vertical-spacing">
+        <div ng-if="session.id" class="left-magnet vertical-spacing">
             <button class="cancel" type="button" ng-click="deleteSession()">
                 <i18n>utils.delete </i18n>
             </button>

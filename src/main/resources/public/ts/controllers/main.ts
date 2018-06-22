@@ -337,7 +337,7 @@ export let main = ng.controller('MainController',
             },
             manageSession: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'manageSession');
+                template.open('main', 'session/manage-session');
             },
             manageHomework: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
