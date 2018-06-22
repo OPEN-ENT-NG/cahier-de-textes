@@ -89,12 +89,25 @@ export class Session {
     }
 
     async save() {
-        return await this.create();
+        return await this.createOrUpdate();
     }
 
-    async create() {
+    async createOrUpdate() {
         try {
-            return await http.post('/diary/lesson', this.toJSON());
+            if(this.id)
+                return await http.put('/diary/lesson' + this.id, this.toJSON());
+            else
+                return await http.post('/diary/lesson', this.toJSON());
+        } catch (e) {
+            notify.error('notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async delete() {
+        try {
+            return await http.delete('/diary/lesson/' + this.id);
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -112,8 +125,25 @@ export class Session {
         }
     }
 
-    async sync(): Promise<void> {
-        let {data} = await http.get('/diary/lesson/' + this.id);
+
+    async unpublish() {
+        try {
+            return await http.post('/diary/lesson/unpublish', this.toJSON());
+        } catch (e) {
+            notify.error('notify.create.err');
+            console.error(e);
+            throw e;
+        }
+    }
+
+    async sync() {
+        try {
+            let {data} = await http.get('/diary/lesson/' + this.id);
+            Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
+
+        } catch (e) {
+            notify.error('session.sync.err');
+        }
     }
 }
 

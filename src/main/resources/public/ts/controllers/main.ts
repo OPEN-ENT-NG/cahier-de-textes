@@ -78,6 +78,9 @@ export let main = ng.controller('MainController',
                             $('#loader-calendar').appendTo('.drawing-zone');
                         }
                     }
+                    else {
+                        loaderHasGoodPosition = true;
+                    }
                 }, 100);
 
                 if (loaderHasGoodPosition) break;

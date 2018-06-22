@@ -70,8 +70,8 @@ public class LessonController extends ControllerHelper {
 
     @Get("/lesson/:id")
     @ApiDoc("Get a lesson using its identifier")
-    @SecuredAction(value = view_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = view_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void getLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
 
@@ -278,6 +278,26 @@ public class LessonController extends ControllerHelper {
     @SecuredAction(value = publish_resource, type = ActionType.WORKFLOW)
     //@ResourceFilter(LessonAccessFilter.class)
     public void publishLesson(final HttpServerRequest request) {
+        checkPublishOrUnpublish(request, true);
+    }
+
+    /**
+     *
+     * @param request
+     */
+    @Post("/lesson/unpublish")
+    @ApiDoc("unPublishes a lesson")
+    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
+    //@ResourceFilter(LessonAccessFilter.class)
+    public void unPublishLesson(final HttpServerRequest request) {
+        checkPublishOrUnpublish(request, false);
+    }
+
+    /**
+     *
+     * @param request
+     */
+    private void checkPublishOrUnpublish(final HttpServerRequest request, final boolean publish) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(final UserInfos user) {
@@ -285,24 +305,28 @@ public class LessonController extends ControllerHelper {
                     RequestUtils.bodyToJson(request, pathPrefix + "lesson", new Handler<JsonObject>() {
                         @Override
                         public void handle(final JsonObject json) {
-                            if(user.getStructures().contains(json.getString("school_id",""))){
+                            if (user.getStructures().contains(json.getString("school_id", ""))) {
                                 String lessonId = String.valueOf(json.getInteger("lesson_id"));
                                 if (isValidLessonId(lessonId)) {
-                                    lessonService.publishLesson(lessonId, user, new Handler<Either<String, JsonObject>>() {
-                                        @Override
-                                        public void handle(Either<String, JsonObject> event) {
-                                            if (event.isRight()) {
-                                                request.response().setStatusCode(200).end();
-                                            } else {
-                                                leftToResponse(request, event.left());
-                                            }
+                                    Handler<Either<String, JsonObject>> callback = event23 -> {
+                                        if (event23.isRight()) {
+                                            request.response().setStatusCode(200).end();
+                                        } else {
+                                            leftToResponse(request, event23.left());
                                         }
-                                    });
+                                    };
+                                    if(publish){
+                                        lessonService.publishLesson(lessonId, user, callback);
+                                    }
+                                    else {
+                                        lessonService.unPublishLesson(lessonId, callback);
+                                    }
+
                                 } else {
                                     badRequest(request, "Invalid lesson identifier.");
                                 }
                             } else {
-                                badRequest(request,"Invalid school identifier.");
+                                badRequest(request, "Invalid school identifier.");
                             }
                         }
                     });
@@ -312,7 +336,6 @@ public class LessonController extends ControllerHelper {
                 }
             }
         });
-
     }
 
     //TODO : change action.type to resource + add filter
@@ -387,8 +410,8 @@ public class LessonController extends ControllerHelper {
 
     @Put("/lesson/:id")
     @ApiDoc("Modify a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = manage_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(LessonAccessFilter.class)
     public void modifyLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -468,7 +491,7 @@ public class LessonController extends ControllerHelper {
 
     @Delete("/lesson/:id")
     @ApiDoc("Delete a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = manage_resource, type = ActionType.WORKFLOW)
     @ResourceFilter(LessonAccessFilter.class)
     public void deleteLesson(final HttpServerRequest request) {
 

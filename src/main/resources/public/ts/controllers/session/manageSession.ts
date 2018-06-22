@@ -1,5 +1,5 @@
-import { ng, _, model, moment, notify } from 'entcore';
-import {DAYS_OF_WEEK, COMBO_LABELS, Teacher, Group, Subjects, Notification} from '../../model';
+import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
+import { Subjects, Notification } from '../../model';
 import {Session} from "../../model";
 
 export let createSessionCtrl = ng.controller('createSessionCtrl',
@@ -16,6 +16,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             if (!!$routeParams.id) {
                 $scope.session.id = $routeParams.id;
                 await $scope.session.sync();
+                $scope.safeApply();
             }
 
             $scope.safeApply();
@@ -44,9 +45,31 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
                 && $scope.session.endTime;
         };
 
-        $scope.saveSession = async (publish) => {
+        $scope.publishSession = async () => {
+            this.saveSession(true);
+        };
+
+        $scope.deleteSession = async () => {
+            let {status} = await $scope.session.delete();
+            if (status === 200) {
+                $scope.notifications.push(new Notification(lang.translate('session.manage.delete'), 'confirm'));
+                $scope.safeApply();
+                $scope.goTo('/');
+            }
+        };
+
+        $scope.unpublishSession = async () => {
+            let {status} = await $scope.session.unpublish();
+            if (status === 200) {
+                $scope.notifications.push(new Notification(lang.translate('session.manage.unpublished'), 'confirm'));
+                $scope.safeApply();
+                $scope.goTo('/');
+            }
+        };
+
+        $scope.saveSession = async (publish = false) => {
             if(!$scope.isValidForm){
-                $scope.notifications.push(new Notification("creation.error"));
+                $scope.notifications.push(new Notification(lang.translate('session.manage.unvalidForm')), 'error');
             }
             else {
                 let {data, status} = await $scope.session.save();
@@ -55,11 +78,11 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
                         $scope.session.id = data.id;
                         let {status} = await $scope.session.publish();
                         if (status === 200) {
-                            $scope.notifications.push(new Notification('session créée et publiée', 'confirm'));
+                            $scope.notifications.push(new Notification(lang.translate('session.manage.published'), 'confirm'));
                         }
                     }
                     else {
-                        $scope.notifications.push(new Notification('session créé', 'confirm'));
+                        $scope.notifications.push(new Notification(lang.translate('session.manage.confirm'), 'confirm'));
                     }
                 }
                 $scope.safeApply();

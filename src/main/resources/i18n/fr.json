@@ -59,6 +59,8 @@
   "schedule.update": "Modifier un cours",
   "draft": "Brouillon",
   "published": "Publié",
+  "unpublished": "dépublié",
+  "state": "État",
   "type": "Type de cours",
   "type.punctual": "Ponctuel",
   "type.recurrent": "Récurrent",
@@ -84,8 +86,8 @@
   "utils.day.7": "Dimanche",
   "utils.subject_and_audience": "Matière et Classe",
   "utils.config_session": "Configuration de la session",
-  "utils.annotation": "annotation",
-  "utils.description": "description",
+  "utils.annotation": "Annotation",
+  "utils.description": "Description",
   "creation.error": "Tous les champs * sont obligatoires.",
   "creation.structure.choose": "Choisissez la structure",
   "creation.subject.choose": "Choisissez la matière",
@@ -108,5 +110,9 @@
   "settings.exclusion.title": "Exclusion de périodes",
   "calendar.mode.day":"Jour",
   "calendar.mode.week":"Semaine",
-  "calendar.mode.month":"Mois"
+  "calendar.mode.month":"Mois",
+  "session.manage.published": "Session publiée",
+  "session.manage.unpublished": "Publication enlevée, session passée en brouillon",
+  "session.manage.confirm": "Session enregistrée",
+  "session.manage.unvalidForm": "Veuillez remplir les champs obligatoires."
 }

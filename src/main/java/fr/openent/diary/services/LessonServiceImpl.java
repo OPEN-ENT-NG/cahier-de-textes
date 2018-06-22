@@ -531,10 +531,23 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param lessonId Id of lesson to be deleted
      * @param handler
      */
-    public void publishLesson(String lessonId, final UserInfos userInfos,Handler<Either<String, JsonObject>> handler) {
+    public void publishLesson(String lessonId, final UserInfos userInfos, Handler<Either<String, JsonObject>> handler) {
         List<String> idLessonsToDelete = new ArrayList<String>();
         idLessonsToDelete.add(lessonId);
-        publishLessons(idLessonsToDelete, userInfos,handler);
+        publishLessons(idLessonsToDelete, userInfos, handler);
+    }
+
+    /**
+     * Unpublishes a lesson (changing status from published to draft)
+     * Linked homeworks are also unpublished
+     *
+     * @param lessonId Id of lesson to be deleted
+     * @param handler
+     */
+    public void unPublishLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
+        List<String> idLessonsToDelete = new ArrayList<String>();
+        idLessonsToDelete.add(lessonId);
+        unPublishLessons(idLessonsToDelete, handler);
     }
 
     /**
