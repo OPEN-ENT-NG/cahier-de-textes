@@ -1,15 +1,18 @@
-<div ng-if="item.pedagogicType == TYPE_HOMEWORK" ng-click="goTo('/homework/update/' + item.id)" class="schedule-item-content [[item.color]]">
+<div ng-if="item.pedagogicType == TYPE_HOMEWORK" class="schedule-item-content [[item.color]]">
+<!--<div ng-if="item.pedagogicType == TYPE_HOMEWORK" ng-click="goTo('/homework/update/' + item.id)" class="schedule-item-content [[item.color]]">-->
     <div>[[item.subject.label]]</div>
     <div>[[item.audience.name]]</div>
     <div>([[item.type.label]])</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="goTo('/session/update/' + item.id)" class="schedule-item-content [[item.color]]">
+<div ng-if="item.pedagogicType == TYPE_SESSION" class="schedule-item-content [[item.color]]">
+<!--<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="goTo('/session/update/' + item.id)" class="schedule-item-content [[item.color]]">-->
     <div>[[item.subject.label]]</div>
     <div>[[item.audience.name]]</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="calendarUpdateItem(item)" class="schedule-item-content bg-lightgrey">
+<div ng-if="item.pedagogicType == TYPE_COURSE" class="schedule-item-content bg-lightgrey">
+<!--<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="calendarUpdateItem(item)" class="schedule-item-content bg-lightgrey">-->
     <div>[[item.subjectLabel]]</div>
     <em class="metadata">
         <span ng-repeat="className in item.classes">[[className]]</span>

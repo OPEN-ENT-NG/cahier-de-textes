@@ -1,9 +1,10 @@
 package fr.openent.diary.controllers;
 
-import fr.openent.diary.filters.LessonAccessFilter;
+import fr.openent.diary.security.filters.LessonAccessFilter;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.util.KeyValueModel;
+import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.services.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -491,8 +492,7 @@ public class LessonController extends ControllerHelper {
 
     @Delete("/lesson/:id")
     @ApiDoc("Delete a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.WORKFLOW)
-    @ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = WorkflowUtils.LESSON_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     public void deleteLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");

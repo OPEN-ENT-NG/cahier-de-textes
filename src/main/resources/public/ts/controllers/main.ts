@@ -87,14 +87,19 @@ export let main = ng.controller('MainController',
             }
         }
 
-        async function initializeData(){
-            console.log('initializeData');
-            $scope.isRefreshingCalendar = true;
-
+        async function initializeStructure(){
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.first();
             await $scope.syncStructure($scope.structure);
+            $scope.structureInitialized = true;
+        }
+
+        async function initializeData(){
+            console.log('initializeData');
+            $scope.isRefreshingCalendar = true;
+
+            await initializeStructure();
 
             $scope.homeworks = new Homeworks($scope.structure);
             $scope.sessions = new Sessions($scope.structure);
@@ -326,13 +331,16 @@ export let main = ng.controller('MainController',
         };
 
         route({
-            main: () => {
+            main: async () => {
+                if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'main');
             },
-            manageSession: () => {
+            manageSession: async () => {
+                if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'manageSession');
             },
-            manageHomework: () => {
+            manageHomework: async () => {
+                if(!$scope.structureInitialized) await initializeStructure();
                 console.log('route.manageHomework');
                 template.open('main', 'homework/manage-homework');
             }

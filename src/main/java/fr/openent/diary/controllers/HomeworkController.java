@@ -1,9 +1,11 @@
 package fr.openent.diary.controllers;
 
-import fr.openent.diary.filters.HomeworkAccessFilter;
+import fr.openent.diary.security.WorkflowUtils;
+import fr.openent.diary.security.filters.HomeworkAccessFilter;
 import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.util.KeyValueModel;
+import fr.openent.diary.security.workflow.HomeworkManage;
 import fr.openent.diary.services.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -45,6 +47,7 @@ public class HomeworkController extends ControllerHelper {
     //Permissions
     private static final String view_resource = "diary.read";
     private static final String manage_resource = "diary.manager";
+
     private static final String publish_resource = "diary.publish";
     private static final String list_homeworks = "diary.list.homeworks";
     private static final String list_homework_types = "diary.list.homeworktypes";
@@ -375,8 +378,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework/:id")
     @ApiDoc("Modify a homework")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @SecuredAction(value = WorkflowUtils.HOMEWORK_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     public void modifyHomework(final HttpServerRequest request) {
 
         final String homeworkId = request.params().get("id");
@@ -461,7 +463,7 @@ public class HomeworkController extends ControllerHelper {
     @Delete("/homework/:id")
     @ApiDoc("Delete a homework")
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @ResourceFilter(HomeworkManage.class)
     public void deleteHomework(final HttpServerRequest request) {
 
         final String homeworkId = request.params().get("id");
@@ -557,7 +559,7 @@ public class HomeworkController extends ControllerHelper {
     @Get("/homework/share/json/:id")
     @ApiDoc("List rights for a given resource")
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @ResourceFilter(HomeworkManage.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
     }
@@ -565,7 +567,7 @@ public class HomeworkController extends ControllerHelper {
     @Put("/homework/share/json/:id")
     @ApiDoc("Add rights for a given resource")
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @ResourceFilter(HomeworkManage.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
     }
@@ -573,7 +575,7 @@ public class HomeworkController extends ControllerHelper {
     @Put("/homework/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
     @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkAccessFilter.class)
+    @ResourceFilter(HomeworkManage.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);
     }
