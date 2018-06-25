@@ -54,7 +54,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.deleteHomework= async () => {
             let {status} = await $scope.homework.delete();
-            if (status === 200) {
+            if (status === 201) {
                 $scope.notifications.push(new Notification(lang.translate('homework.manage.delete'), 'confirm'));
                 $scope.safeApply();
                 $scope.goTo('/');

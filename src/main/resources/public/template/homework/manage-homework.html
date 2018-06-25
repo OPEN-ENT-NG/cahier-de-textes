@@ -62,15 +62,18 @@
                 <label class="cell two twelve-mobile">
                     <i18n>state</i18n>*
                 </label>
-                <div class="cell twelve-mobile five">
-                    <p>[[homework.state]]</p>
-                </div>
-                <div class="cell twelve-mobile five">
-                    <button ng-if="homework.state == 'published'" ng-disabled="!isValidForm()" type="submit"
+                <div ng-if="homework.state == 'draft'" class="cell twelve-mobile ten">
+                    <i18n>draft</i18n>
+                    <br/>
+                    <button ng-disabled="!isValidForm()" type="submit"
                             ng-click="publishHomework()">
                         <i18n>publish</i18n>
                     </button>
-                    <button ng-if="homework.state == 'draft'" ng-disabled="!isValidForm()" type="submit"
+                </div>
+                <div ng-if="homework.state == 'published'" class="cell twelve-mobile ten">
+                    <i18n>published</i18n>
+                    <br/>
+                    <button ng-disabled="!isValidForm()" type="submit"
                             ng-click="unpublishHomework()">
                         <i18n>unpublish</i18n>
                     </button>

@@ -54,7 +54,7 @@
   "timetable.of.group": "Emploi du temps de la classe ",
   "draft": "Brouillon",
   "published": "Publié",
-  "unpublished": "dépublié",
+  "unpublished": "Dépublié",
   "state": "État",
   "type": "Type de cours",
   "type.punctual": "Ponctuel",
@@ -112,6 +112,7 @@
   "session.manage.create": "Ajouter une session",
   "session.manage.update": "Modifier une session",
   "session.manage.config": "Configuration de la session",
+  "session.manage.delete": "la session a été supprimée",
   "homework.manage.config": "Configuration du travail à faire",
   "homework.manage.create": "Ajouter un travail à faire",
   "homework.manage.update": "Modifier un travail à faire",
@@ -119,5 +120,6 @@
   "homework.manage.type": "Type",
   "homework.manage.published": "Travail à faire publié",
   "homework.manage.unpublished": "Publication enlevée, travail à faire passée en brouillon",
-  "homework.manage.confirm": "Travail à faire enregistré"
+  "homework.manage.confirm": "Travail à faire enregistré",
+  "homework.manage.delete": "Le travail à faire a été supprimé"
 }

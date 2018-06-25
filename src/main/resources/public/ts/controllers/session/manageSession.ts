@@ -55,7 +55,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
         
         $scope.deleteSession = async () => {
             let {status} = await $scope.session.delete();
-            if (status === 200) {
+            if (status === 201) {
                 $scope.notifications.push(new Notification(lang.translate('session.manage.delete'), 'confirm'));
                 $scope.safeApply();
                 $scope.goTo('/');
