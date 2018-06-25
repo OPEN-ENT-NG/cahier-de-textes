@@ -1,0 +1,23 @@
+<div class="days" style="z-index: 1000;" >
+    <div class="day homeworkpanel" ng-repeat="day in calendar.days.all" >
+        <div ng-if="day.dailyEvents.length <= 1">
+            <div ng-repeat="dailyEvent in day.dailyEvents">
+                <!--<static-include template="daily-event-item" ></static-include>-->
+                <div static-include="/diary/public/template/directives/daily-event-item.html" style="padding: 1px;"></div>
+            </div>
+        </div>
+
+        <div class="opener" ng-if="day.dailyEvents.length > 1" ng-click="toggleShowHwDetail(day)">
+            <span id="dailyeventlongtitle"><i18n>homeworks</i18n></span>
+            <span id="dailyeventshorttitle">TAF</span>
+            ([[day.dailyEvents.length]])
+        </div>
+        <div class=" daily-events" style="z-index: 1000;"
+            ng-if="day.dailyEvents.length > 0"
+            id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">
+            <div ng-repeat="dailyEvent in day.dailyEvents">
+                <div static-include="/diary/public/template/directives/daily-event-item.html" style="padding: 1px;"></div>
+            </div>
+        </div>
+    </div>
+</div>

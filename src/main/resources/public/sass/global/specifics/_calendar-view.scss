@@ -27,3 +27,153 @@
   top:60px;
   height: calc(100% - 60px);
 }
+
+@media  (max-width: 1125px) {
+  #dailyeventlongtitle {
+    display: none;
+  }
+
+  #dailyeventshorttitle {
+    display: inline;
+  }
+}
+
+@media (min-width: 1125px) {
+  #dailyeventlongtitle {
+    display: inline;
+  }
+
+  #dailyeventshorttitle {
+    display: none;
+  }
+}
+
+.diary-container button.previous-timeslots, .diary-container button.next-timeslots {
+  left: -3px; }
+
+
+.diary-container calendar-daily-events .days .day {
+  height: auto;
+  min-height: 100px; }
+
+.diary-container .timeslots {
+  display: none; }
+
+.diary-container.diary-show-calendar .timeslots {
+  display: initial; }
+
+.diary-container.diary-show-calendar .homeworkpanel {
+  padding: 0px !important; }
+
+
+.diary-container.diary-show-homeworks:not(.diary-show-calendar) .daily-events {
+  display: none;
+}
+
+.diary-container.diary-show-homeworks calendar-daily-events {
+  display: initial;
+}
+
+.diary-container.diary-show-homeworks .schedule-item {
+  margin-top: 38px;
+}
+
+.diary-container.diary-show-homeworks .day .timeslots .timeslot:first-child {
+  margin-top: 38px;
+}
+
+.diary-container .day .timeslots .timeslot:last-child {
+  height: 58px;
+}
+
+.diary-container .next-timeslots {
+  bottom: -10px;
+}
+
+.diary-container .previous-timeslots {
+  height:20px;
+}
+
+.diary-container.diary-show-homeworks legend.timeslots {
+  margin-top: 118px;
+}
+
+.diary-container .schedule .days {
+  height: auto;
+}
+
+.diary-container .schedule-item {
+  margin-top: 0px;
+}
+
+.diary-container [resizable] {
+  transition: none !important;
+}
+
+.diary-container.diary-show-calendar calendar-daily-events .days .day {
+  height: 40px;
+  min-height: 40px;
+  width: calc(100% / 7) !important;
+  background: #ddd !important;
+}
+
+.diary-container.diary-show-calendar.calendar-day-mode calendar-daily-events .days .day {
+  height: 40px;
+  min-height: 40px;
+  width: calc(100%) !important;
+  background: #ddd !important;
+}
+
+.diary-container calendar-daily-events {
+  display: none;
+  margin-left: 130px !important;
+  width: calc(100% - 130px);
+}
+
+calendar-daily-events {
+  padding-left: 0px !important;
+  top: 79px !important;
+}
+.homework-content {
+  height: 32px;
+  border: solid 2px;
+  background-color: white;
+  border-radius: 5px;
+  padding-left: 5px;
+  font-size: 12px;
+  line-height: 12px;
+  text-align: left;
+}
+
+
+.filter2 {
+  height: 39px;
+  font-size : 30px;
+  line-height: 42px;
+  text-align: center;
+  width: 50px !important;
+  display: inline-block;
+  border-radius: 2px;
+  box-shadow: none;
+  background: #AAA;
+  color : #fff;
+}
+
+i.homework::before {
+  content: "\e80d";
+  font-family:"generic-icons";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:none;
+  color : #fff;
+}
+
+.filter2.diary.selected {
+  box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+  background-color: #763294;
+}
+
+.filter2.homework.selected {
+  box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+  background-color: #46bfaf;
+}

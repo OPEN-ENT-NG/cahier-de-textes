@@ -50,7 +50,7 @@ export class Course {
         }
         if (endDate) {
             this.endMoment = moment(endDate);
-            this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
+            this.endDisplayDate = Utils.getDisplayDate(this.endMoment);
             this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
         }
     }

@@ -1,14 +1,21 @@
-<!-- Loader calendrier -->
-<div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
-    <div class="loader"></div>
-</div>
-
-<div id="calendar-view" class="cell horizontal-spacing twelve">
-    <calendar
-            enable-display-modes="true"
-            display-template="main/calendar-week-item"
-            display-month-template="main/calendar-month-item"
-            items="calendarItems"
-            show-next-previous-button="true">
-    </calendar>
+<div class="row diary-container diary-show-calendar"
+     ng-class="{'diary-show-homeworks': display.dailyEvents && calendar.increment !== 'month', 'calendar-day-mode': calendar.increment === 'day'}">
+    <!-- Loader calendrier -->
+    <div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
+        <div class="loader"></div>
+    </div>
+    <div class="row">
+        <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
+                               b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="homeworks.all">
+        </calendar-daily-events>
+        <div id="calendar-view" class="twelve">
+            <calendar
+                    enable-display-modes="true"
+                    display-template="main/calendar-week-item"
+                    display-month-template="main/calendar-month-item"
+                    items="calendarItems"
+                    show-next-previous-button="true">
+            </calendar>
+        </div>
+    </div>
 </div>

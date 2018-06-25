@@ -1,11 +1,17 @@
-import { ng, template, notify, moment, idiom as lang, _, Behaviours, model } from 'entcore';
+import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
 import {Structures, PEDAGOGIC_TYPES, USER_TYPES, Course, Student, Group, Structure, Sessions} from '../model';
 import {Homeworks} from '../model/homework';
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout', async function ($scope, route, $location, $timeout) {
+    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
 
+        $scope.calendar = model.calendar;
         $scope.notifications = [];
+
+        $scope.display = {
+            dailyEvents: false,
+            listView: false,
+        };
 
         $scope.calendarLoader = {
             show: false,
@@ -61,29 +67,40 @@ export let main = ng.controller('MainController',
 
         $timeout(async function () {
             await placingLoader();
+            await placingButtons();
             initializeData();
         }, 100);
 
         async function placingLoader(){
-            while (true) {
-                console.log('while');
-                let loaderHasGoodPosition = false;
+            let exit = false;
+            for(let i = 0; i < 20 && !exit; i++){
+                console.log('placingLoader');
                 await $timeout(function () {
-                    if (!!$('#loader-calendar').parent().prop('className')) {
-                        if ($('#loader-calendar').parent().prop('className').includes('drawing-zone')) {
-                            console.log('GOOD place');
-                            loaderHasGoodPosition = true;
-                        } else {
-                            console.log('Bad place');
-                            $('#loader-calendar').appendTo('.drawing-zone');
-                        }
+                    if ($('.drawing-zone').length > 0){
+                        $('#loader-calendar').appendTo('.drawing-zone');
+                        console.log('Good');
+                        exit = true;
                     }
-                    else {
-                        loaderHasGoodPosition = true;
-                    }
-                }, 100);
+                }, 200);
+            }
+        }
 
-                if (loaderHasGoodPosition) break;
+        async function placingButtons(){
+            let exit = false;
+            for(let i = 0; i < 20 && !exit; i++){
+                console.log('placingButtons');
+                await $timeout(function () {
+                    let modeButtonsElements = $('.changeDisplayModeButtons ');
+                    if(modeButtonsElements.length > 0) {
+                        let html = '<i ng-class="{\'selected\':display.dailyEvents}" ' +
+                            'class="filter2 homework" ' +
+                            'ng-click="display.dailyEvents = !display.dailyEvents" ' +
+                            'diary-tooltip="diary.icon.show.homeworkpanel"></i>';
+                        var compiledHtml = $compile(html)($scope);
+                        modeButtonsElements.append(compiledHtml);
+                        exit = true;
+                    }
+                }, 200);
             }
         }
 
@@ -147,14 +164,12 @@ export let main = ng.controller('MainController',
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.sessions.all);
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.courses.all);
 
-            console.log('pedagogicItems', $scope.pedagogicItems);
-
             $scope.loadCalendarItems();
             $scope.loadPedagogicDays();
         };
 
         $scope.loadCalendarItems = () => {
-            $scope.calendarItems = $scope.pedagogicItems;
+            $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
 
             $scope.isRefreshingCalendar = false;
         };
@@ -195,7 +210,6 @@ export let main = ng.controller('MainController',
 
             $scope.selectedPedagogicDay = undefined;
             $scope.pedagogicDays = pedagogicDays;
-            console.log('pedagogicDays', pedagogicDays);
         };
 
         $scope.selectPedagogicDay = (pedagogicDay) => {
@@ -204,12 +218,12 @@ export let main = ng.controller('MainController',
             $scope.selectedPedagogicDay = pedagogicDay;
         };
 
-        $scope.$watch(() => model.calendar.firstDay, () => {
+        $scope.$watch(() => $scope.calendar.firstDay, () => {
             if(!$scope.pageInitialized) return;
-            
-            console.log('Watch model.calendar.firstDay : increment=' + model.calendar.increment);
-            let calendarMode = model.calendar.increment;
-            let momentFirstDay = moment(model.calendar.firstDay);
+
+            console.log('Watch $scope.calendar.firstDay : increment=' + $scope.calendar.increment);
+            let calendarMode = $scope.calendar.increment;
+            let momentFirstDay = moment($scope.calendar.firstDay);
 
             switch(calendarMode){
                 case 'month':

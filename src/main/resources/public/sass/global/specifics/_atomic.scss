@@ -41,6 +41,13 @@
   }
 }
 
+.text-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
 
 .display-table {
   display: table;

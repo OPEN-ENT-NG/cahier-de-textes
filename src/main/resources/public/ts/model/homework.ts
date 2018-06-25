@@ -15,7 +15,7 @@ export class Homework {
     color: string;
     state: string = "draft";
 
-    session_id: any; // Todo: n'utiliser que le champ 'lesson'
+    session_id: any; // Todo: n'utiliser que le champ 'session'
 
     structure: Structure;
     type: HomeworkType;
@@ -82,7 +82,7 @@ export class Homework {
             type: type,
             title: data.homework_title,
             color: data.homework_color,
-            dueDate: moment(data.homework_due_date).toDate(),
+            dueDate: Utils.getFormattedDate(data.homework_due_date),
             description: data.homework_description,
             state: data.homework_state,
         };

@@ -1,0 +1,16 @@
+<div class="schedule-item-content homework-content" ng-style="{'border-color': dailyEvent.color, 'color': dailyEvent.color}"
+           ng-click="editSelectedHomework(dailyEvent, $event);" >
+
+    <div class="row text-ellipsis overflow-hidden">
+        [[dailyEvent.subject.label]]
+    </div>
+
+    <div class="row">
+        <span>[[dailyEvent.audience.name]]</span>
+        <input type="checkbox" ng-model="dailyEvent.selected"  style="float: right; margin-right: 5%; margin-top: 0px;"/>
+
+        <span ng-if="[[dailyEvent.state]]=='draft'" style="float: right; margin-top: 0px;">
+            <i class="icon pencil"></i>
+		</span>
+    </div>
+</div>
