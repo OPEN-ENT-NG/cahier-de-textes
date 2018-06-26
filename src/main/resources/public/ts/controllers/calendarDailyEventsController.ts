@@ -318,6 +318,20 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             $scope.safeApply();
         });
 
+        $scope.test = (number : number) => {
+            console.log('scope.test' + number);
+        };
+
+        $scope.updateHomework = (homeworkId) => {
+            console.log('goTo' + homeworkId);
+            $scope.goTo('/homework/update/' + homeworkId);
+        };
+
+        $scope.goTo = (state: string) => {
+            $location.path(state);
+            $scope.safeApply();
+        };
+
 
         $scope.safeApply = (): Promise<any> => {
             return new Promise((resolve, reject) => {

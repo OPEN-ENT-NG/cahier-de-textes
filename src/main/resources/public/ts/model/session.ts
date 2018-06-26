@@ -34,7 +34,7 @@ export class Session {
     endDisplayTime: string;
 
     is_periodic: boolean = false;
-    locked: boolean;
+    locked: boolean = true;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
 
@@ -58,8 +58,8 @@ export class Session {
             color: data.lesson_color,
             state: data.lesson_state,
             date: Utils.getFormattedDate(data.lesson_date),
-            startTime: Utils.getFormattedTime(data.lesson_start_time),
-            endTime: Utils.getFormattedTime(data.lesson_end_time),
+            startTime: data.lesson_start_time,
+            endTime: data.lesson_end_time,
             description: data.lesson_description,
             annotation: data.lesson_annotation,
             attachments: data.attachments,
@@ -85,6 +85,20 @@ export class Session {
             attachments: this.attachments ? this.attachments : [],
             lesson_room: this.room
         };
+    }
+
+
+    initDates(){
+        this.date = moment(this.date).toDate();
+        this.startMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
+        this.startTime = moment(this.startTime, FORMAT.formattedTime).toDate();
+        this.startDisplayDate = Utils.getDisplayDate(this.startMoment);
+        this.startDisplayTime = Utils.getDisplayTime(this.startMoment);
+
+        this.endMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.endTime, FORMAT.formattedTime)));
+        this.endTime = moment(this.endTime, FORMAT.formattedTime).toDate();
+        this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
+        this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
     }
 
     async save() {
@@ -139,7 +153,7 @@ export class Session {
         try {
             let {data} = await http.get('/diary/lesson/' + this.id);
             Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
-
+            this.initDates();
         } catch (e) {
             notify.error('session.sync.err');
         }
@@ -173,14 +187,7 @@ export class Sessions {
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
-            i.date = moment(i.date).toDate();
-            i.startMoment = moment(Utils.getFormattedDateTime(i.date, moment(i.startTime, FORMAT.formattedTime)));
-            i.startDisplayDate = Utils.getDisplayDate(i.startMoment);
-            i.startDisplayTime = Utils.getDisplayTime(i.startMoment);
-
-            i.endMoment = moment(Utils.getFormattedDateTime(i.date, moment(i.endTime, FORMAT.formattedTime)));
-            i.endDisplayDate = Utils.getDisplayTime(i.endMoment);
-            i.endDisplayTime = Utils.getDisplayTime(i.endMoment);
+            i.initDates();
         });
 
     }

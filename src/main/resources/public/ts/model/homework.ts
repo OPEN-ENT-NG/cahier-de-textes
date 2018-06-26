@@ -46,7 +46,6 @@ export class Homework {
 
     toJSON () {
         return {
-            homework_id: this.id ? this.id : null,
             homework_title: this.title,
             subject_id: this.subject.id,
             homework_type_id: this.type.id,
@@ -119,7 +118,7 @@ export class Homework {
 
     async publish() {
         try {
-            return await http.post('/diary/homework/publish', this.toJSON());
+            return await http.post('/diary/publishHomeworks', {ids:[this.id]});
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -130,7 +129,7 @@ export class Homework {
 
     async unpublish() {
         try {
-            return await http.post('/diary/homework/unpublish', this.toJSON());
+            return await http.post('/diary/unPublishHomeworks', {ids:[this.id]});
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -141,6 +140,12 @@ export class Homework {
     async sync(): Promise<void> {
         let {data} = await http.get('/diary/homework/' + this.id);
         Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+        this.initDates();
+    }
+
+    initDates(){
+        this.dueDate = moment(this.dueDate).toDate();
+        this.startMoment = moment(this.dueDate);
     }
 }
 
@@ -171,9 +176,7 @@ export class Homeworks {
 
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
-            i.dueDate = moment(i.dueDate).toDate();
-            i.startMoment = !!i.session_id ? moment(): moment(i.dueDate).hour(8).minute(0).second(0);
-            i.endMoment = !!i.session_id ? moment(): moment(i.dueDate).hour(10).minute(0).second(0);
+            i.initDates();
         });
 
     }

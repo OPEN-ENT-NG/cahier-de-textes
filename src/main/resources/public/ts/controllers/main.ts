@@ -9,20 +9,8 @@ export let main = ng.controller('MainController',
         $scope.notifications = [];
 
         $scope.display = {
-            dailyEvents: false,
+            dailyEvents: true,
             listView: false,
-        };
-
-        $scope.calendarLoader = {
-            show: false,
-            display: () => {
-                $scope.calendarLoader.show = true;
-                $scope.safeApply();
-            },
-            hide: () => {
-                $scope.calendarLoader.show = false;
-                $scope.safeApply();
-            }
         };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -59,7 +47,6 @@ export let main = ng.controller('MainController',
                 }
             }
             if (!$scope.isPersonnel()) {
-                //$scope.getTimetable();
             } else {
                 $scope.safeApply();
             }
@@ -281,23 +268,6 @@ export let main = ng.controller('MainController',
         $scope.getStudentGroup = (user: Student): Group => {
             return _.findWhere($scope.structure.groups.all, { externalId: user.classes[0] });
         };
-
-        /**
-         * Get timetable bases on $scope.params object
-         * @returns {Promise<void>}
-         */
-        // $scope.getTimetable = async () => {
-        //     if ($scope.params.user !== null
-        //         && $scope.params.group !== null) {
-        //         notify.error('');
-        //     } else  {
-        //         $scope.calendarLoader.display();
-        //         $scope.structure.courses.all = [];
-        //         await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group);
-        //         $scope.calendarLoader.hide();
-        //     }
-        // };
-
 
         $scope.params = {
             user: null,

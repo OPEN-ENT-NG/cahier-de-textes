@@ -1,4 +1,4 @@
-<div class="days" style="z-index: 1000;" >
+<div class="days">
     <div class="day homeworkpanel" ng-repeat="day in calendar.days.all" >
         <div ng-if="day.dailyEvents.length <= 1">
             <div ng-repeat="dailyEvent in day.dailyEvents">
@@ -15,7 +15,7 @@
         <div class=" daily-events" style="z-index: 1000;"
             ng-if="day.dailyEvents.length > 0"
             id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">
-            <div ng-repeat="dailyEvent in day.dailyEvents">
+            <div ng-repeat="dailyEvent in day.dailyEvents" ng-click="test(1)">
                 <div static-include="/diary/public/template/directives/daily-event-item.html" style="padding: 1px;"></div>
             </div>
         </div>

@@ -576,14 +576,15 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                             JsonArray r = event.body().getJsonArray("result", new fr.wseduc.webutils.collections.JsonArray());
                            // massGroupShare(userInfos,resourceId, getListFromNeoResult(r), actions, handler);
                             List<String> resultList = new ArrayList<String>();
-                            for (Object values : r.getList()){
-                                resultList.add((String) ((Map<String,String>)values).get("value")) ;
+                            for (int i = 0; i < r.size(); i++) {
+                                JsonObject item = r.getJsonObject(i);
+                                resultList.add(item.getString("value"));
                             }
-                            HandlerResponse<List<String>> response = new HandlerResponse<List<String>>();
+                            HandlerResponse<List<String>> response = new HandlerResponse<>();
                             response.setResult(resultList);
                             handler.handle(response);
                         } else {
-                            handler.handle(new HandlerResponse<List<String>>("error when trying to get profile groups"));
+                            handler.handle(new HandlerResponse<>("error when trying to get profile groups"));
                         }
                     }
                 }

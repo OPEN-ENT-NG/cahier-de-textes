@@ -20,7 +20,7 @@
   align-items: center;
   background: #ffffff87;
   position: absolute;
-  z-index: 1000;
+  z-index: 999;
   width: 100%;
   vertical-align: middle;
   justify-content: center;
@@ -55,6 +55,10 @@
 .diary-container calendar-daily-events .days .day {
   height: auto;
   min-height: 100px; }
+
+.diary-container calendar-daily-events .days {
+  z-index: 998;
+}
 
 .diary-container .timeslots {
   display: none; }

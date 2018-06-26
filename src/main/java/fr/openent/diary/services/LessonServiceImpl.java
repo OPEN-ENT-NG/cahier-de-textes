@@ -577,7 +577,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         StringBuilder lessonSb = new StringBuilder();
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
-        for (Object id : lessonIds) {
+        for (String id : lessonIds) {
             parameters.add(id);
         }
 
