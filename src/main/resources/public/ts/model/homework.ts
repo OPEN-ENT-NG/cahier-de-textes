@@ -46,6 +46,7 @@ export class Homework {
 
     toJSON () {
         return {
+            homework_id: this.id ? this.id : null,
             homework_title: this.title,
             subject_id: this.subject.id,
             homework_type_id: this.type.id,

@@ -394,6 +394,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     }
 
+    @Override
+    public void unpublishHomework(final Integer homeworkId, Handler<Either<String, JsonObject>> handler) {
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(homeworkId);
+        unPublishHomeworks(ids, handler);
+    }
     /**
      * Unpublishes homeworks
      * @param homeworkIds Array of id homeworks

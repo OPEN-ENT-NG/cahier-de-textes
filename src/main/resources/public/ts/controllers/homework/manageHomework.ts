@@ -35,12 +35,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 && $scope.homework.subject
                 && $scope.homework.audience
                 && $scope.homework.dueDate
-                && $scope.session.title
-                && $scope.session.type;
+                && $scope.homework.title
+                && $scope.homework.type;
         };
 
         $scope.publishHomework = async () => {
-            this.saveHomework(true);
+            $scope.saveHomework(true);
         };
 
         $scope.unpublishHomework = async () => {
@@ -68,8 +68,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             else {
                 let {data, status} = await $scope.homework.save();
                 if (status === 200) {
-                    if (publish && data && data.id) {
-                        $scope.homework.id = data.id;
+                    if (publish && ($scope.homework.id || (data && data.id))) {
+                        $scope.homework.id = data.id ? data.id : $scope.homework.id;
                         let {status} = await $scope.homework.publish();
                         if (status === 200) {
                             $scope.notifications.push(new Notification(lang.translate('homework.manage.published'), 'confirm'));

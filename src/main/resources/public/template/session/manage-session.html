@@ -58,19 +58,9 @@
                 </label>
                 <div ng-if="session.state == 'draft'" class="cell twelve-mobile ten">
                     <i18n>draft</i18n>
-                    <br/>
-                    <button ng-disabled="!isValidForm()" type="submit"
-                            ng-click="publishSession()">
-                        <i18n>publish</i18n>
-                    </button>
                 </div>
                 <div ng-if="session.state == 'published'" class="cell twelve-mobile ten">
                     <i18n>published</i18n>
-                    <br/>
-                    <buttonng-disabled="!isValidForm()" type="submit"
-                            ng-click="unpublishSession()">
-                        <i18n>unpublish</i18n>
-                    </button>
                 </div>
             </div>
             
@@ -116,6 +106,17 @@
             </button>
             <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession()">
                 <i18n>utils.save</i18n>
+            </button>
+
+            <button ng-if="session.state == 'draft'"
+                    ng-disabled="!isValidForm()" type="submit"
+                    ng-click="publishSession()">
+                <i18n>publish</i18n>
+            </button>
+            <button ng-if="session.state == 'published'"
+                    ng-disabled="!isValidForm()" type="submit"
+                    ng-click="unpublishSession()">
+                <i18n>unpublish</i18n>
             </button>
         </div>
     </form>

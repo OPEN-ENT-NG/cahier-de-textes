@@ -5,6 +5,7 @@ import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.security.WorkflowUtils;
+import fr.openent.diary.security.workflow.LessonManage;
 import fr.openent.diary.services.*;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -71,7 +72,7 @@ public class LessonController extends ControllerHelper {
 
     @Get("/lesson/:id")
     @ApiDoc("Get a lesson using its identifier")
-    @SecuredAction(value = view_resource, type = ActionType.WORKFLOW)
+    @SecuredAction(value = WorkflowUtils.LESSON_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     //@ResourceFilter(LessonAccessFilter.class)
     public void getLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
@@ -276,8 +277,8 @@ public class LessonController extends ControllerHelper {
      */
     @Post("/lesson/publish")
     @ApiDoc("Publishes a lesson")
-    @SecuredAction(value = publish_resource, type = ActionType.WORKFLOW)
-    //@ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(LessonManage.class)    //@ResourceFilter(LessonAccessFilter.class)
     public void publishLesson(final HttpServerRequest request) {
         checkPublishOrUnpublish(request, true);
     }
@@ -288,8 +289,8 @@ public class LessonController extends ControllerHelper {
      */
     @Post("/lesson/unpublish")
     @ApiDoc("unPublishes a lesson")
-    @SecuredAction(value = publish_resource, type = ActionType.RESOURCE)
-    //@ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(LessonManage.class)
     public void unPublishLesson(final HttpServerRequest request) {
         checkPublishOrUnpublish(request, false);
     }

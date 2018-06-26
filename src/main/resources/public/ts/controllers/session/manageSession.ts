@@ -41,7 +41,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
         };
 
         $scope.publishSession = async () => {
-            this.saveSession(true);
+            $scope.saveSession(true);
         };
 
         $scope.unpublishSession = async () => {
@@ -69,8 +69,8 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             else {
                 let {data, status} = await $scope.session.save();
                 if (status === 200) {
-                    if (publish && data && data.id) {
-                        $scope.session.id = data.id;
+                    if (publish && ($scope.session.id || (data && data.id)) )  {
+                        $scope.session.id = data.id ? data.id : $scope.session.id;
                         let {status} = await $scope.session.publish();
                         if (status === 200) {
                             $scope.notifications.push(new Notification(lang.translate('session.manage.published'), 'confirm'));

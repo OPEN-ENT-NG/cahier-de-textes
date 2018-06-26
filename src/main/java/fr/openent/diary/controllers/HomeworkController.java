@@ -462,7 +462,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Delete("/homework/:id")
     @ApiDoc("Delete a homework")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkManage.class)
     public void deleteHomework(final HttpServerRequest request) {
 
@@ -484,6 +484,75 @@ public class HomeworkController extends ControllerHelper {
             badRequest(request, "Invalid homework identifier.");
         }
     }
+
+    /**
+     * Publishes a lesson
+     *
+     * @param request
+     */
+    @Post("/homework/publish")
+    @ApiDoc("Publishes an homework")
+    @SecuredAction(value = publish_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(LessonAccessFilter.class)
+    public void publishHomework(final HttpServerRequest request) {
+        checkPublishOrUnpublish(request, true);
+    }
+
+    /**
+     * @param request
+     */
+    @Post("/homework/unpublish")
+    @ApiDoc("unPublishes an homework")
+    @SecuredAction(value = publish_resource, type = ActionType.WORKFLOW)
+    //@ResourceFilter(LessonAccessFilter.class)
+    public void unPublishHomework(final HttpServerRequest request) {
+        checkPublishOrUnpublish(request, false);
+    }
+
+    /**
+     * @param request
+     */
+    private void checkPublishOrUnpublish(final HttpServerRequest request, final boolean publish) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    RequestUtils.bodyToJson(request, pathPrefix + "lesson", new Handler<JsonObject>() {
+                        @Override
+                        public void handle(final JsonObject json) {
+                            if (user.getStructures().contains(json.getString("school_id", ""))) {
+                                String homeworkId = String.valueOf(json.getInteger("homework_id"));
+                                if (isValidHomeworkId(homeworkId)) {
+                                    Handler<Either<String, JsonObject>> callback = event23 -> {
+                                        if (event23.isRight()) {
+                                            request.response().setStatusCode(200).end();
+                                        } else {
+                                            leftToResponse(request, event23.left());
+                                        }
+                                    };
+                                    Integer homeworkIdFormat = Integer.parseInt(homeworkId);
+                                    if (publish) {
+                                        homeworkService.publishHomework(user, null, homeworkIdFormat, callback);
+                                    } else {
+                                        homeworkService.unpublishHomework(homeworkIdFormat, callback);
+                                    }
+
+                                } else {
+                                    badRequest(request, "Invalid lesson identifier.");
+                                }
+                            } else {
+                                badRequest(request, "Invalid school identifier.");
+                            }
+                        }
+                    });
+                } else {
+                    log.debug("User not found in session.");
+                    unauthorized(request, "No user found in session.");
+                }
+            }
+        });
+    }
+
 
     //TODO : change action.type to resource + add filter
     @Post("/unPublishHomeworks")
@@ -558,7 +627,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Get("/homework/share/json/:id")
     @ApiDoc("List rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkManage.class)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
@@ -566,7 +635,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework/share/json/:id")
     @ApiDoc("Add rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkManage.class)
     public void shareSubmit(final HttpServerRequest request) {
         super.shareJsonSubmit(request, null, false);
@@ -574,7 +643,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework/share/remove/:id")
     @ApiDoc("Remove rights for a given resource")
-    @SecuredAction(value = manage_resource, type = ActionType.RESOURCE)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkManage.class)
     public void shareRemove(final HttpServerRequest request) {
         super.removeShare(request, false);

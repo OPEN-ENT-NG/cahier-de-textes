@@ -89,8 +89,11 @@ public interface HomeworkService {
 
     void publishHomeworks(final UserInfos userInfos, final Long lessonId, final List<Integer> homeworkIds, final Handler<Either<String, JsonObject>> handler);
 
+    void unpublishHomework(final Integer homeworkId, final Handler<Either<String, JsonObject>> handler);
+
     /**
      * Un-publishes homeworks
+     *
      * @param homeworkIds Array of id homeworks
      * @param handler
      */
