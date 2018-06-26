@@ -65,20 +65,20 @@ export let main = ng.controller('MainController',
             }
         };
 
-        $timeout(async function () {
-            await placingLoader();
-            await placingButtons();
-            initializeData();
-        }, 100);
+        function init(){
+            $timeout(async function () {
+                await placingLoader();
+                await placingButtons();
+                initializeData();
+            }, 100);
+        }
 
         async function placingLoader(){
             let exit = false;
             for(let i = 0; i < 20 && !exit; i++){
-                console.log('placingLoader');
                 await $timeout(function () {
                     if ($('.drawing-zone').length > 0){
                         $('#loader-calendar').appendTo('.drawing-zone');
-                        console.log('Good');
                         exit = true;
                     }
                 }, 200);
@@ -88,12 +88,15 @@ export let main = ng.controller('MainController',
         async function placingButtons(){
             let exit = false;
             for(let i = 0; i < 20 && !exit; i++){
-                console.log('placingButtons');
                 await $timeout(function () {
+                    // Si le bouton existe déjà, alors on ne fait rien
+                    if($('#daily-event-filter').length > 0){
+                        return;
+                    }
                     let modeButtonsElements = $('.changeDisplayModeButtons ');
                     if(modeButtonsElements.length > 0) {
                         let html = '<i ng-class="{\'selected\':display.dailyEvents}" ' +
-                            'class="filter2 homework" ' +
+                            'id="daily-event-filter" class="filter2 homework" ' +
                             'ng-click="display.dailyEvents = !display.dailyEvents" ' +
                             'diary-tooltip="diary.icon.show.homeworkpanel"></i>';
                         var compiledHtml = $compile(html)($scope);
@@ -348,6 +351,7 @@ export let main = ng.controller('MainController',
             main: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'main');
+                init();
             },
             manageSession: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();

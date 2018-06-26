@@ -57,19 +57,9 @@ export class Session {
             room: data.lesson_room,
             color: data.lesson_color,
             state: data.lesson_state,
-            date: data.lesson_date,
-            startTime: (moment().set({
-                    'hour': data.lesson_start_time.substr(0, 2),
-                    'minute': data.lesson_start_time.substr(0, 2),
-                    seconds: '00',
-                    millisecond : '00'
-                })).toDate(),
-            endTime: (moment().set({
-                    'hour': data.lesson_end_time.substr(0, 2),
-                    'minute': data.lesson_end_time.substr(0, 2),
-                    seconds: '00',
-                    millisecond: '00'
-                })).toDate(),
+            date: Utils.getFormattedDate(data.lesson_date),
+            startTime: Utils.getFormattedTime(data.lesson_start_time),
+            endTime: Utils.getFormattedTime(data.lesson_end_time),
             description: data.lesson_description,
             annotation: data.lesson_annotation,
             attachments: data.attachments,
