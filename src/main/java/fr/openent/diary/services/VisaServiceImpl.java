@@ -9,17 +9,21 @@ import fr.openent.diary.model.progression.Progression;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.utils.*;
+import fr.wseduc.webutils.Either;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.service.impl.SqlCrudService;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.sql.Sql;
+import org.entcore.common.sql.SqlResult;
+import org.entcore.common.user.UserInfos;
 
 import java.util.*;
 
 
-public class VisaServiceImpl extends SqlCrudService {
+public class VisaServiceImpl extends SqlCrudService implements VisaService {
     private final static String PROGRESION_DATABASE_TABLE = "lesson";
     //private final static String PROGRESION_DATABASE_TABLE_SC ="diary.lesson";
 
@@ -30,7 +34,8 @@ public class VisaServiceImpl extends SqlCrudService {
         super(DiaryController.DATABASE_SCHEMA, PROGRESION_DATABASE_TABLE);
     }
 
-    public void getFilters(final String structureId,final String inspectorId, final Handler<HandlerResponse<VisaFilters>> handler) {
+    @Override
+    public void getFilters(final String structureId, final String inspectorId, final Handler<HandlerResponse<VisaFilters>> handler) {
         final VisaFilters visaFilters = new VisaFilters();
         visaFilters.setStructureId(structureId);
 
@@ -90,6 +95,7 @@ public class VisaServiceImpl extends SqlCrudService {
     }
 
 
+    @Override
     public void getTeachers(String structureId, String inspectorId, final Handler<HandlerResponse<List<KeyValueModel>>> handler) {
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
@@ -112,6 +118,7 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
 
+    @Override
     public void getSubjects(String structureId, final Handler<HandlerResponse<List<KeyValueModel>>> handler) {
         StringBuilder query = new StringBuilder();
 
@@ -125,6 +132,7 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
 
+    @Override
     public void getAudiences(String structureId, final Handler<HandlerResponse<List<KeyValueModel>>> handler) {
         StringBuilder query = new StringBuilder();
 
@@ -138,7 +146,8 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
 
-    public void getAllAgregatedVisas(final String structureId,String teacherId, String audienceId, String subjectId, final String statut, final Handler<HandlerResponse<List<ResultVisaList>>> handler) {
+    @Override
+    public void getAllAgregatedVisas(final String structureId, String teacherId, String audienceId, String subjectId, final String statut, final Handler<HandlerResponse<List<ResultVisaList>>> handler) {
 
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(structureId);
@@ -248,6 +257,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
     }
 
+    @Override
     public void applyVisas(final ApplyVisaModel applyVisa, final Boolean lock, final Handler<GenericHandlerResponse> handler) {
         try {
             final Integer nbQueries = lock ? 3 : 2;
@@ -369,7 +379,8 @@ public class VisaServiceImpl extends SqlCrudService {
         }
     }
 
-        public void getVisaModel(String structureId,String teacherId, String audienceId, String subjectId,final Handler<HandlerResponse<List<VisaModel>>> handler){
+        @Override
+        public void getVisaModel(String structureId, String teacherId, String audienceId, String subjectId, final Handler<HandlerResponse<List<VisaModel>>> handler){
             StringBuilder query = new StringBuilder();
             JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
@@ -406,6 +417,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
 
 
+    @Override
     public void getLessons(List<VisaModel> visaModels, final Handler<HandlerResponse<List<LessonModel>>> handler) {
         final Map<String,Object> promisesResult = new HashMap<>();
 
@@ -432,7 +444,8 @@ public class VisaServiceImpl extends SqlCrudService {
         });
     }
 
-    public List<LessonModel> attachHomeworkLesson(Map<String,Object> promisesResult ){
+    @Override
+    public List<LessonModel> attachHomeworkLesson(Map<String, Object> promisesResult){
         List<LessonModel> lessons =  (List<LessonModel>)promisesResult.get("LESSON");
         Map<String, List<HomeworkModel>> homeWorks =  (Map<String, List<HomeworkModel>>)promisesResult.get("HOMEWORK");
 
@@ -574,6 +587,7 @@ public class VisaServiceImpl extends SqlCrudService {
     }
 
 
+    @Override
     public Map<String,String> getVisaSelectLessonStats(List<LessonModel> lessonModels){
         Map<String,String> result = new HashMap<>();
 
@@ -597,6 +611,7 @@ public class VisaServiceImpl extends SqlCrudService {
     }
 
 
+    @Override
     public void getAllInspector(final Handler<HandlerResponse<List<KeyValueModel>>> handler){
         StringBuilder sb = new StringBuilder("");
         sb.append(" match (u:User)-[IN]->(g:Group)-[AUTHORIZED]->(r:Role)-[AUTHORIZE]->(a:Action)\n" +
@@ -629,6 +644,7 @@ public class VisaServiceImpl extends SqlCrudService {
     }
 
 
+    @Override
     public void getTeacherForManageInspectors(String inspectorId, String structureId, final Handler<HandlerResponse<TeacherToInspectorManagement>> handler){
 
         final TeacherToInspectorManagement teacherToInspectorManagement = new TeacherToInspectorManagement();
@@ -663,6 +679,7 @@ public class VisaServiceImpl extends SqlCrudService {
 
     }
 
+    @Override
     public void getTeachersOnInspector(String inspectorId, String structureId, final Handler<HandlerResponse<List<KeyValueModel>>> handler){
         StringBuilder query = new StringBuilder();
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
@@ -678,6 +695,7 @@ public class VisaServiceImpl extends SqlCrudService {
         sql.prepared(query.toString(), parameters, SqlMapper.listMapper(handler, KeyValueModel.class));
     }
 
+    @Override
     public void updateInspector(String structureId, String inspectorId, List<KeyValueModel> teachers, final Handler<GenericHandlerResponse> handler){
         List<SqlQuery> queries = new ArrayList<>();
 
@@ -712,5 +730,19 @@ public class VisaServiceImpl extends SqlCrudService {
 
         visaMapper.executeTransactionnalQueries(queries,handler);
 
+    }
+
+    @Override
+    public void createVisa(JsonObject visa, UserInfos user, Handler<Either<String, JsonArray>> handler) {
+        JsonArray values = new JsonArray();
+        String query = "INSERT INTO diary.visa (comment, timestamp_at, structure_id, session_id, owner_id) " +
+               "VALUES (?, to_timestamp(?, 'YYYY-MM-DD HH24:MI:SS'), ?, ?, ?) RETURNING id";
+        values.add(visa.getString("comment"));
+        values.add(visa.getString("timestamp_at"));
+        values.add(visa.getString("structure_id"));
+        values.add(visa.getInteger("session_id"));
+        values.add(user.getUserId());
+
+        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(handler));
     }
 }

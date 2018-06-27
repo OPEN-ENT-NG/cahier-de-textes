@@ -1,6 +1,7 @@
 import { model } from 'entcore';
 import { Courses, Subjects, Groups, Teachers, Students, USER_TYPES } from './index';
 import { Eventer } from 'entcore-toolkit';
+import {Personnels} from './Personnel';
 
 export class Structure {
     id: string;
@@ -10,6 +11,7 @@ export class Structure {
     groups: Groups;
     teachers: Teachers;
     students: Students;
+    personnels: Personnels;
     eventer: Eventer = new Eventer();
 
     /**
@@ -24,6 +26,7 @@ export class Structure {
         this.groups = new Groups();
         this.courses = new Courses();
         this.teachers = new Teachers();
+        this.personnels = new Personnels();
         if (model.me.type === USER_TYPES.relative) {
             this.students = new Students();
         }
@@ -40,6 +43,7 @@ export class Structure {
                 subjects: false,
                 groups: false,
                 teachers: false,
+                personnels: false,
                 students: model.me.type !== USER_TYPES.relative
             };
 
@@ -47,6 +51,7 @@ export class Structure {
                 let _b: boolean = syncedCollections.subjects
                 && syncedCollections.groups
                 && syncedCollections.teachers
+                && syncedCollections.personnels
                 && syncedCollections.students;
                 if (_b) {
                     resolve();
@@ -57,6 +62,8 @@ export class Structure {
             this.subjects.sync(this.id).then(() => { syncedCollections.subjects = true; endSync(); });
             this.groups.sync(this.id).then(() => { syncedCollections.groups = true; endSync(); });
             this.teachers.sync(this).then(() => { syncedCollections.teachers = true; endSync(); });
+            this.personnels.sync(this).then(() => { syncedCollections.personnels = true; endSync(); });
+
             if (model.me.type === USER_TYPES.relative) {
                 this.students.sync().then(() => { syncedCollections.students = true; endSync(); });
             }

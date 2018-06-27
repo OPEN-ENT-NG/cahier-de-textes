@@ -1,6 +1,7 @@
 import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
 import { Subjects, Notification } from '../../model';
 import {Session} from "../../model";
+import {Visa} from '../../model/visa';
 
 export let createSessionCtrl = ng.controller('createSessionCtrl',
     ['$scope', '$routeParams', function ($scope, $routeParams) {
@@ -17,9 +18,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             if (!!$routeParams.id) {
                 $scope.session.id = $routeParams.id;
                 await $scope.session.sync();
-                $scope.safeApply();
             }
-
             $scope.safeApply();
         }
 
@@ -38,6 +37,24 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime;
+        };
+
+        $scope.visaForm = {};
+
+        $scope.saveVisa = async () => {
+            console.log('createVisa');
+            let visa = new Visa($scope.structure);
+            visa.comment = $scope.visaForm.comment;
+            visa.moment = moment();
+            visa.session_id = $scope.session.id;
+
+            let { status } = await visa.save();
+            if (status === 200) {
+                $scope.notifications.push(new Notification(lang.translate('visa.created'), 'confirm'));
+                $scope.safeApply();
+                await $scope.session.sync();
+                $scope.safeApply();
+            }
         };
 
         $scope.publishSession = async () => {

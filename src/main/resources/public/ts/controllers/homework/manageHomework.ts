@@ -21,7 +21,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
 
             $scope.safeApply();
-        };
+        }
+
         initData();
 
         $scope.cancelCreation = () => {

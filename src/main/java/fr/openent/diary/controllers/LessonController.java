@@ -141,22 +141,22 @@ public class LessonController extends ControllerHelper {
                             break;
                         }
                         case "audience": {
-
-                            diaryService.listGroupsFromClassId(schoolIds[0], id, new Handler<HandlerResponse<List<KeyValueModel>>>() {
-                                @Override
-                                public void handle(HandlerResponse<List<KeyValueModel>> event) {
-                                    if (event.hasError()){
-                                        badRequest(request,event.getMessage());
-                                    }else{
-                                        List<String> memberIds = new ArrayList<>();
-                                        for (KeyValueModel group : event.getResult()){
-                                            memberIds.add(group.getKey());
-                                        }
-                                        lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
-                                    }
-
-                                }
-                            });
+                            lessonService.getAllLessonsForAudience(schoolIds[0], id, startDate, endDate, true, arrayResponseHandler(request));
+//                            diaryService.listGroupsFromClassId(schoolIds[0], id, new Handler<HandlerResponse<List<KeyValueModel>>>() {
+//                                @Override
+//                                public void handle(HandlerResponse<List<KeyValueModel>> event) {
+//                                    if (event.hasError()){
+//                                        badRequest(request,event.getMessage());
+//                                    }else{
+//                                        List<String> memberIds = new ArrayList<>();
+//                                        for (KeyValueModel group : event.getResult()){
+//                                            memberIds.add(group.getKey());
+//                                        }
+//                                        lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), memberIds, startDate, endDate, arrayResponseHandler(request));
+//                                    }
+//
+//                                }
+//                            });
                         }
                     }
                 } else {

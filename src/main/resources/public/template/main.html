@@ -12,7 +12,7 @@
     <div class="clear"></div>
 </div>
 
-<div class="row card" style="padding: 10px;">
+<div class="row card padding-sm margin-bottom-md" style="padding: 10px;">
     <button ng-click="goTo('/homework/create/')">
         Créer un travail à faire
     </button>
@@ -25,8 +25,8 @@
     </div>
 </div>
 
-<article class="cell two twelve-mobile" ng-if="isPersonnel()">
-    <div ng-if="structures.all.length > 1">
+<div class="row card padding-sm" ng-if="isPersonnel()">
+    <div class="display-inline-block" ng-if="structures.all.length > 1">
         <label for="structure-list"><i18n>utils.structures</i18n></label>
         <select ng-model="structure"
                 id="structure-list"
@@ -36,29 +36,29 @@
             <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
         </select>
     </div>
-    <div>
+    <div class="display-inline-block">
         <label for="user-list">
             <div><i18n>utils.teachers</i18n></div>
             <select ng-model="params.user"
                     id="user-list"
                     class="twelve"
-                    ng-change="params.group = null; getTimetable()"
+                    ng-change="params.group = null;syncPedagogicItems(params.user.id, 'teacher')"
                     ng-options="teacher as teacher.displayName for teacher in structure.teachers.all">
                 <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
             </select>
         </label>
     </div>
-    <div>
+    <div class="display-inline-block">
         <label for="group-list"><i18n>utils.groups</i18n></label>
         <select ng-model="params.group"
                 id="group-list"
                 class="twelve"
-                ng-change="params.user = null; getTimetable()"
+                ng-change="params.user = null;syncPedagogicItems(params.group.id, 'audience')"
                 ng-options="group as group.name for group in structure.groups.all">
             <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
         </select>
     </div>
-</article>
+</div>
 
 
 <!-- Calendar View -->

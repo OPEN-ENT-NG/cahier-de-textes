@@ -117,34 +117,51 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         }
 
-        $scope.syncPedagogicItems = async () => {
+        $scope.syncPedagogicItems = async (typeId?: string, type?: string) => {
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // Dates incorrectes
                 return;
             }
             $scope.isRefreshingCalendar = true;
             $scope.safeApply();
+            if(!!typeId && !!type){
+                await Promise.all([await $scope.syncHomeworks(typeId, type),await $scope.syncSessions(typeId, type), await $scope.syncCourses(typeId, type)]);
+            } else {
+                await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncCourses()]);
+            }
 
-            await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncCourses()]);
 
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
             $scope.safeApply();
         };
 
-        $scope.syncHomeworks = async () => {
+        $scope.syncHomeworks = async (typeId?: string, type?: string) => {
             $scope.homeworks.all = [];
-            await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+            if(!!typeId && !!type){
+                await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
+            } else {
+                await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+            }
         };
 
-        $scope.syncCourses = async () => {
+        $scope.syncCourses = async (typeId?: string, type?: string) => {
             $scope.structure.courses.all = [];
-            await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate);
+            if(!!typeId && !!type){
+                await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate);
+            } else {
+                await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate);
+            }
         };
 
-        $scope.syncSessions = async () => {
+        $scope.syncSessions = async (typeId?: string, type?: string) => {
             $scope.sessions.all = [];
-            await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
+            if(!!typeId && !!type){
+                await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
+            } else {
+                await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
+            }
+
         };
 
         $scope.loadPedagogicItems = () =>{

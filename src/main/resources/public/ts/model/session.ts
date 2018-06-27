@@ -4,6 +4,7 @@ import {Mix} from 'entcore-toolkit';
 import { Subject, Structure, Teacher, Group, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
+import {Visa} from './visa';
 
 const colors = ['grey'];
 
@@ -23,6 +24,8 @@ export class Session {
     attachments: any = [];
     homeworkIds: any = [];
     room: string = "";
+
+    visas: Visa[];
 
     startMoment: any;
     endMoment: any;
@@ -64,6 +67,7 @@ export class Session {
             annotation: data.lesson_annotation,
             attachments: data.attachments,
             homeworkIds: data.homework_ids,
+            visas: JSON.parse(data.visas)
         };
     }
 
@@ -154,6 +158,9 @@ export class Session {
             let {data} = await http.get('/diary/lesson/' + this.id);
             Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
             this.initDates();
+            this.visas = Mix.castArrayAs(Visa, this.visas);
+            this.visas.forEach(v => v.init(this.structure));
+
         } catch (e) {
             notify.error('session.sync.err');
         }
@@ -177,17 +184,29 @@ export class Sessions {
         return dataModel;
     }
 
-    async sync (startMoment: any, endMoment: any): Promise<void> {
+    async sync (startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
+
+        let url = '';
+        if(!!typeId && !!type){
+            url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+        } else {
+            url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
+        }
 
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.initDates();
+            if(!!i.visas){
+                i.visas = Mix.castArrayAs(Visa, i.visas);
+                i.visas.forEach(v => {
+                    v.init(this.structure);
+                });
+            }
         });
 
     }

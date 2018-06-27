@@ -51,6 +51,10 @@ public interface LessonService extends CrudService {
      */
     void getAllLessonsForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
+
+    void getAllLessonsForAudience(final String schoolId, final String audienceId, final String startDate, final String endDate, boolean onlyPublished, final Handler<Either<String, JsonArray>> handler);
+
+
     void retrieveLesson(final String lessonId, final Handler<Either<String, JsonObject>> handler);
 
     //return {idLesson=value} or error

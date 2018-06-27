@@ -166,11 +166,16 @@ export class Homeworks {
         return dataModel;
     }
 
-    async sync (startMoment: any, endMoment: any): Promise<void> {
+    async sync(startMoment: any, endMoment: any, typeId?: string, type?: string){
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/null`;
+        let url = '';
+        if(!!typeId && !!type){
+            url = `/diary/homework/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+        } else {
+            url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/null`;
+        }
 
         let { data } = await http.get(url);
 
@@ -178,8 +183,8 @@ export class Homeworks {
         this.all.forEach(i => {
             i.initDates();
         });
-
     }
+
 }
 
 export class HomeworkType {

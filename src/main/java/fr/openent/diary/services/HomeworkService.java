@@ -54,7 +54,7 @@ public interface HomeworkService {
      */
     void getAllHomeworksForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
 
-
+    void getAllHomeworksForAudience(final String schoolId, final String audienceId, final String startDate, final String endDate, boolean onlyPublished, final Handler<Either<String, JsonArray>> handler);
 
     void retrieveHomework(final String homeworkId, final Handler<Either<String, JsonObject>> handler);
 

@@ -125,6 +125,13 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" AND h.homework_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
         }
 
+        if(ctx == Context.EXTERNAL && !memberIds.isEmpty()){
+            query.append(" AND (h.owner IN " + Sql.listPrepared(memberIds.toArray()) + ") ");
+            for (final String g : memberIds) {
+                parameters.add(g);
+            }
+        }
+
         if (ctx != Context.EXTERNAL){
             query.append(" AND ((h.lesson_id IS NOT NULL AND EXISTS (SELECT 1 FROM diary.lesson_shares ls  ")
                     .append(" LEFT JOIN diary.members AS m ON (ls.member_id = m.id AND m.group_id IS NOT NULL)")
@@ -169,6 +176,49 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query.append(" ORDER BY h.homework_due_date ASC, h.created ASC ");
 
         log.debug(query);
+        sql.prepared(query.toString(), parameters, validResultHandler(handler));
+    }
+
+    public void getAllHomeworksForAudience(final String schoolId, final String audienceId, final String startDate, final String endDate, boolean onlyPublished, final Handler<Either<String, JsonArray>> handler){
+        final String DATE_FORMAT = "YYYY-MM-DD";
+        final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
+                .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
+                .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label,")
+                .append(" teacher.teacher_display_name as teacher_display_name, h.teacher_id, ")
+                .append(" att.attachments ")
+                .append(" FROM diary.homework AS h")
+                .append(" INNER JOIN diary.homework_type as th ON h.homework_type_id = th.id")
+                .append(" LEFT OUTER JOIN diary.lesson as l ON l.id = h.lesson_id")
+                .append(" INNER JOIN diary.subject as s ON s.id = h.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = h.audience_id")
+                .append(" INNER JOIN diary.teacher as teacher ON teacher.id = h.teacher_id")
+                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
+                .append(" FROM diary.homework_has_attachment as ha INNER JOIN diary.attachment a ON ha.attachment_id = a.id")
+                .append(" WHERE ha.homework_id = h.id) att ON TRUE");
+
+        query.append(" WHERE h.school_id = ? ");
+        parameters.add(schoolId);
+
+        query.append(" AND h.audience_id = ? ");
+        parameters.add(audienceId);
+
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            query.append(" AND h.homework_due_date >= to_date(?,'").append(DATE_FORMAT).append("') ");
+            parameters.add(startDate.trim());
+        }
+
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            query.append(" AND h.homework_due_date <= to_date(?,'").append(DATE_FORMAT).append("') ");
+            parameters.add(endDate.trim());
+        }
+
+        if (onlyPublished) {
+            query.append(" AND h.homework_state = 'published' ");
+        }
+
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }
 

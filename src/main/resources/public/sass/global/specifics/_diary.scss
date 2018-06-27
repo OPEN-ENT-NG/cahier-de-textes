@@ -1,3 +1,6 @@
+.min-height-textarea {
+  min-height: 60px;
+}
 
 i.rack2::before {
   content: "\e80d";
@@ -6,7 +9,6 @@ i.rack2::before {
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
 }
-
 
 i.cahier-textes2::before {
   content: "\e86f";

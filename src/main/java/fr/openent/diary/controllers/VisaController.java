@@ -6,18 +6,28 @@ import fr.openent.diary.model.lessonview.LessonModel;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.services.PdfServiceImpl;
+import fr.openent.diary.services.VisaService;
 import fr.openent.diary.services.VisaServiceImpl;
 import fr.openent.diary.utils.DiaryLambda;
 import fr.openent.diary.utils.SqlMapper;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.rs.Put;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
+import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.http.response.DefaultResponseHandler;
+import org.entcore.common.user.UserInfos;
+import org.entcore.common.user.UserUtils;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -33,7 +43,7 @@ public class VisaController extends ControllerHelper {
     }
 
     private final static Logger log = LoggerFactory.getLogger(VisaController.class);
-    private VisaServiceImpl visaService;
+    private VisaService visaService;
     private PdfServiceImpl pdfService;
 
     public VisaController(VisaServiceImpl visaService, PdfServiceImpl pdfService) {
@@ -124,6 +134,20 @@ public class VisaController extends ControllerHelper {
 
         });
 
+    }
+
+    @Put("/visa")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void createVisa(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                RequestUtils.bodyToJson(request, visa -> {
+                    Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
+                    visaService.createVisa(visa, user, handler);
+                });
+            }
+        });
     }
 
     @Post("/visa/lessons")

@@ -93,16 +93,13 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
-                    .append(" s.original_subject_id as original_subject_id , ")
-                    .append(" att.attachments, ")
+                    .append(" s.original_subject_id as original_subject_id , array_to_json(array_agg(distinct visa)) as visas, ")
                     .append(homeworkAggregate.toString())
                     .append(" FROM diary.lesson AS l")
                     .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
+                    .append(" LEFT JOIN diary.visa as visa ON visa.session_id = l.id")
                     .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
                     .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
-                    .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
-                    .append(" FROM diary.lesson_has_attachment as la INNER JOIN diary.attachment a ON la.attachment_id = a.id")
-                    .append(" WHERE la.lesson_id = l.id) att ON TRUE")
                     .append(" WHERE l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD') ");
 
             parameters.add(startDate).add(endDate);
@@ -138,6 +135,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             }
 
             query.append(")");
+            query.append(" GROUP BY l.id, s.id, t.teacher_display_name, a.audience_type, a.audience_label ");
             query.append(" ORDER BY l.lesson_date ASC");
 
             sql.prepared(query.toString(), parameters, validResultHandler(handler));
@@ -196,6 +194,40 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     @Override
     public void getAllLessonsForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
         getLessons(Context.STUDENT, userId, schoolIds, memberIds, startDate, endDate, handler);
+    }
+
+    @Override
+    public void getAllLessonsForAudience(String schoolId, String audienceId, String startDate, String endDate, boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
+        final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
+
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
+                .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
+                .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
+                .append(" s.original_subject_id as original_subject_id , ")
+                .append(" att.attachments ")
+                .append(" FROM diary.lesson AS l")
+                .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
+                .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
+                .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
+                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
+                .append(" FROM diary.lesson_has_attachment as la INNER JOIN diary.attachment a ON la.attachment_id = a.id")
+                .append(" WHERE la.lesson_id = l.id) att ON TRUE")
+                .append(" WHERE l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD') ");
+
+        parameters.add(startDate).add(endDate);
+
+        query.append(" AND l.school_id = ? ");
+        parameters.add(schoolId);
+
+        query.append(" AND l.audience_id = ? ");
+        parameters.add(audienceId);
+
+        if (onlyPublished) {
+            query.append(" AND l.lesson_state = 'published' ");
+        }
+
+        sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }
 
     /**
@@ -451,16 +483,15 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT l.id as lesson_id, s.subject_label, l.subject_id, l.school_id, l.teacher_id, t.teacher_display_name, a.audience_type,")
                 .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
-                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state,")
-                .append(" att.attachments ")
+                .append(" array_to_json(array_agg(DISTINCT visa)) AS visas, ")
+                .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state ")
                 .append(" FROM diary.lesson as l")
                 .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
                 .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
                 .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
-                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
-                .append(" FROM diary.lesson_has_attachment as la INNER JOIN diary.attachment a ON la.attachment_id = a.id")
-                .append(" WHERE la.lesson_id = l.id) att ON TRUE")
-                .append(" WHERE l.id = ?");
+                .append(" LEFT JOIN diary.visa AS visa ON visa.session_id = l.id")
+                .append(" WHERE l.id = ? ")
+                .append(" GROUP BY l.id, s.id, t.teacher_display_name, a.audience_type, a.audience_label ");
 
         JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray().add(Sql.parseId(lessonId));
 
