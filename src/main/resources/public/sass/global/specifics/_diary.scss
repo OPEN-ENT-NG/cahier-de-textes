@@ -26,3 +26,23 @@ i.cahier-textes2::before {
   top: 4px;
   border: 1px solid black;
 }
+
+.show-i-hover:hover {
+  i {
+    display: initial;
+  }
+}
+.show-i-hover {
+  i {
+    display: none;
+  }
+}
+
+.edit-visa-icons{
+  font-size: 20px;
+  color: #888;
+}
+
+.visa-being-updated {
+  background-color: #ff850061;
+}

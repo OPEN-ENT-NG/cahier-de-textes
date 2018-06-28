@@ -6,11 +6,13 @@ import fr.openent.diary.model.lessonview.LessonModel;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
 import fr.openent.diary.security.WorkflowUtils;
+import fr.openent.diary.security.workflow.VisaManage;
 import fr.openent.diary.services.PdfServiceImpl;
 import fr.openent.diary.services.VisaService;
 import fr.openent.diary.services.VisaServiceImpl;
 import fr.openent.diary.utils.DiaryLambda;
 import fr.openent.diary.utils.SqlMapper;
+import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
 import fr.wseduc.rs.Put;
@@ -26,6 +28,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -52,7 +55,7 @@ public class VisaController extends ControllerHelper {
         this.pdfService = pdfService;
     }
 
-    @Put("/visa")
+    @Post("/visa")
     @SecuredAction(value = WorkflowUtils.VISA_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     public void createVisa(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -63,6 +66,26 @@ public class VisaController extends ControllerHelper {
                     visaService.createVisa(visa, user, handler);
                 });
             }
+        });
+    }
+
+    @Put("/visa/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(VisaManage.class)
+    public void updateVisa(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, visa -> {
+            Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
+            visaService.updateVisa(Long.parseLong(request.params().get("id")), visa, handler);
+        }));
+    }
+
+    @Delete("/visa/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(VisaManage.class)
+    public void deleteVisa(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
+            visaService.deleteVisa(Long.parseLong(request.params().get("id")), handler);
         });
     }
 

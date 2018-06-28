@@ -44,4 +44,8 @@ public interface VisaService {
     void updateInspector(String structureId, String inspectorId, List<KeyValueModel> teachers, Handler<GenericHandlerResponse> handler);
 
     void createVisa(JsonObject visa, UserInfos user, Handler<Either<String, JsonArray>> handler);
+
+    void updateVisa(long visaId, JsonObject visa, Handler<Either<String, JsonArray>> handler);
+
+    void deleteVisa(long visaId, Handler<Either<String, JsonArray>> handler);
 }

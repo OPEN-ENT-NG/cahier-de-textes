@@ -8,13 +8,16 @@ export class Visa {
 
     id: number;
     comment: string = '';
-    timestamp_at: string;
+    created: string;
+    modified: string;
     session_id: number;
     structure: Structure;
     owner_id: string;
     owner: Personnel;
     moment: any;
     displayDateTime: string;
+
+    isBeingUpdated: boolean;
 
     constructor (structure: Structure) {
         this.structure = structure;
@@ -26,14 +29,13 @@ export class Visa {
         }
 
         this.owner = this.structure.personnels.all.find(p => p.id === this.owner_id);
-        this.moment = moment(this.timestamp_at);
+        this.moment = moment(this.created);
         this.displayDateTime = Utils.getDisplayDateTime(this.moment);
     }
 
     toJSON () {
         return {
             comment: this.comment,
-            timestamp_at: Utils.getFormattedDateTime(this.moment),
             session_id: this.session_id,
             structure_id: this.structure.id
         };
@@ -49,7 +51,7 @@ export class Visa {
 
     async create () {
         try {
-            return await http.put('/diary/visa', this.toJSON());
+            return await http.post('/diary/visa', this.toJSON());
         } catch (e) {
             notify.error('visa.create.err');
         }
@@ -57,7 +59,7 @@ export class Visa {
 
     async update () {
         try {
-            return await http.post('/diary/visa', this.toJSON());
+            return await http.put(`/diary/visa/${this.id}`, this.toJSON());
         } catch (e) {
             notify.error('visa.update.err');
             throw e;
@@ -68,7 +70,7 @@ export class Visa {
         try {
             return await http.delete('/diary/visa/' + this.id);
         } catch (e) {
-            notify.error('visa.create.err');
+            notify.error('visa.delete.err');
             console.error(e);
             throw e;
         }

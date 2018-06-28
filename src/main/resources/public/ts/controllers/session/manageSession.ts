@@ -53,18 +53,43 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
 
         $scope.visaForm = {};
 
-        $scope.saveVisa = async () => {
-            console.log('createVisa');
-            let visa = new Visa($scope.structure);
-            visa.comment = $scope.visaForm.comment;
-            visa.moment = moment();
-            visa.session_id = $scope.session.id;
+        $scope.startCreatingVisa = () => {
+            $scope.visaForm.visa = new Visa($scope.structure);
+            $scope.visaForm.visa.session_id = $scope.session.id;
 
-            let { status } = await visa.save();
+            $scope.visaForm.visa.comment = '';
+            $scope.safeApply();
+        };
+
+        $scope.startUpdatingVisa = async (visa: Visa) => {
+            $scope.visaForm.visa = _.clone(visa);
+            $scope.visaForm.visa.isBeingUpdated = true;
+            $scope.safeApply();
+        };
+
+        $scope.saveVisa = async () => {
+            let { status } = await $scope.visaForm.visa.save();
             if (status === 200) {
-                $scope.notifications.push(new Notification(lang.translate('visa.created'), 'confirm'));
-                $scope.safeApply();
+                let notificationText = $scope.visaForm.visa.id ? 'visa.updated' : 'visa.created';
+
+                $scope.visaForm.visa = undefined;
                 await $scope.session.sync();
+                $scope.notifications.push(new Notification(lang.translate(notificationText), 'confirm'));
+
+                $scope.safeApply();
+            }
+        };
+
+        $scope.cancelVisaCreateOrUpdate = async () => {
+            $scope.visaForm.visa.isBeingUpdated = false;
+            $scope.visaForm.visa = undefined;
+        };
+
+        $scope.deleteVisa = async (visa: Visa) => {
+            let { status } = await visa.delete();
+            if (status === 200) {
+                await $scope.session.sync();
+                $scope.notifications.push(new Notification(lang.translate('visa.deleted'), 'confirm'));
                 $scope.safeApply();
             }
         };
