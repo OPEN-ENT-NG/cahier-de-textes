@@ -72,7 +72,7 @@ public class LessonController extends ControllerHelper {
 
     @Get("/lesson/:id")
     @ApiDoc("Get a lesson using its identifier")
-    @SecuredAction(value = WorkflowUtils.LESSON_MANAGE_RIGHT, type = ActionType.WORKFLOW)
+    @SecuredAction(value = WorkflowUtils.LESSON_READ_RIGHT, type = ActionType.WORKFLOW)
     //@ResourceFilter(LessonAccessFilter.class)
     public void getLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
@@ -412,8 +412,7 @@ public class LessonController extends ControllerHelper {
 
     @Put("/lesson/:id")
     @ApiDoc("Modify a lesson")
-    @SecuredAction(value = manage_resource, type = ActionType.WORKFLOW)
-    //@ResourceFilter(LessonAccessFilter.class)
+    @SecuredAction(value = WorkflowUtils.LESSON_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     public void modifyLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");
@@ -493,7 +492,8 @@ public class LessonController extends ControllerHelper {
 
     @Delete("/lesson/:id")
     @ApiDoc("Delete a lesson")
-    @SecuredAction(value = WorkflowUtils.LESSON_MANAGE_RIGHT, type = ActionType.WORKFLOW)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(LessonManage.class)
     public void deleteLesson(final HttpServerRequest request) {
 
         final String lessonId = request.params().get("id");

@@ -4,7 +4,7 @@ import {Homeworks} from '../model/homework';
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
-
+        const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
 
@@ -317,6 +317,14 @@ export let main = ng.controller('MainController',
         $scope.goTo = (state: string) => {
             $location.path(state);
             $scope.safeApply();
+        };
+
+        $scope.openSession = (sessionId: number) => {
+            if(model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)){
+                $scope.goTo('/session/update/' + sessionId);
+            } else {
+                $scope.goTo('/session/view/' + sessionId);
+            }
         };
 
         $scope.translate = (key: string) => lang.translate(key);

@@ -1,10 +1,12 @@
-<div ng-if="item.pedagogicType == TYPE_HOMEWORK" ng-click="goTo('/homework/update/' + item.id)" class="schedule-item-content [[item.color]]">
+<div ng-if="item.pedagogicType == TYPE_HOMEWORK" ng-click="goTo('/homework/update/' + item.id)"
+     class="schedule-item-content"  ng-style="{'background-color': item.color}">
     <div><i class="icon rack2"></i> [[item.subject.label]]</div>
     <div>[[item.audience.name]]</div>
     <div>([[item.type.label]])</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="goTo('/session/update/' + item.id)" class="schedule-item-content [[item.color]]">
+<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="goTo('/session/update/' + item.id)"
+     class="schedule-item-content" ng-style="{'background-color': item.color}">
     <div><i class="icon cahier-textes2"></i> [[item.subject.label]]</div>
     <div>[[item.audience.name]]</div>
 </div>

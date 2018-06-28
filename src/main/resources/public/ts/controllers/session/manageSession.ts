@@ -4,9 +4,16 @@ import {Session} from "../../model";
 import {Visa} from '../../model/visa';
 
 export let createSessionCtrl = ng.controller('createSessionCtrl',
-    ['$scope', '$routeParams', function ($scope, $routeParams) {
+    ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
         console.log("createSessionCtrl");
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
+
+        $scope.isReadOnly = modeIsReadOnly();
+
+        function modeIsReadOnly() {
+            let currentPath = $location.path();
+            return currentPath.includes('view');
+        }
 
         $scope.session = new Session($scope.structure);
         $scope.subjects = new Subjects();

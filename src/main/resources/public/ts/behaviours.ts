@@ -6,7 +6,8 @@ const diaryBehaviours = {
             createLesson: "fr.openent.diary.controllers.LessonController|createLesson",
             manageVisa: "fr.openent.diary.controllers.VisaController|createVisa",
             createHomeworkForLesson: "fr.openent.diary.controllers.HomeworkController|createHomeworkForLesson",
-            createFreeHomework: "fr.openent.diary.controllers.HomeworkController|createFreeHomework"
+            createFreeHomework: "fr.openent.diary.controllers.HomeworkController|createFreeHomework",
+            manageSession: "fr-openent-diary-controllers-LessonController|modifyLesson",
         },
         resources: {
             //lessons

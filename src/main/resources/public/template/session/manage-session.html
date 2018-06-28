@@ -7,126 +7,136 @@
     <!-- Create / Update / View-->
     <div class="cell" ng-class="hasManageVisaRight() ? 'eight' : 'twelve'">
         <!-- Create / Update-->
-        <form>
-            <article>
-                <h3><i18n>utils.subject_and_audience</i18n></h3>
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>utils.groups</i18n>*
+        <div ng-if="!isReadOnly">
+            <form>
+                <article>
+                    <h3><i18n>utils.subject_and_audience</i18n></h3>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>utils.groups</i18n>*
 
-                    </label>
-                    <div class="cell twelve-mobile ten">
-                        <select required ng-model="session.audience"
-                                ng-options="group.name for group in structure.groups.all track by group.id">
-                            <option value="" disabled selected>[[translate('creation.groups.choose')]]</option>
-                        </select>
+                        </label>
+                        <div class="cell twelve-mobile ten">
+                            <select required ng-model="session.audience"
+                                    ng-options="group.name for group in structure.groups.all track by group.id">
+                                <option value="" disabled selected>[[translate('creation.groups.choose')]]</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>subject</i18n>*
-                    </label>
-                    <div class="cell twelve-mobile ten">
-                        <select required ng-model="session.subject"
-                                ng-options="subject.label for subject in subjects.all track by subject.id">
-                            <option value="" disabled selected>[[translate('creation.subject.choose')]]</option>
-                        </select>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>subject</i18n>*
+                        </label>
+                        <div class="cell twelve-mobile ten">
+                            <select required ng-model="session.subject"
+                                    ng-options="subject.label for subject in subjects.all track by subject.id">
+                                <option value="" disabled selected>[[translate('creation.subject.choose')]]</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <h3><i18n>session.manage.config</i18n></h3>
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>title</i18n>*
-                    </label>
-                    <div class="cell twelve-mobile ten"><input ng-model="session.title"/>
+                    <h3><i18n>session.manage.config</i18n></h3>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>title</i18n>*
+                        </label>
+                        <div class="cell twelve-mobile ten"><input ng-model="session.title"/>
+                        </div>
                     </div>
-                </div>
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>date</i18n>*
-                    </label>
-                    <div class="cell twelve-mobile ten">
-                        <i18n>the</i18n>
-                        <date-picker ng-model="session.date"></date-picker>
-                        <i18n>from2</i18n>
-                        <input type="time" ng-model="session.startTime" required/>
-                        <i18n>to2</i18n>
-                        <input type="time" ng-model="session.endTime" required/>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>date</i18n>*
+                        </label>
+                        <div class="cell twelve-mobile ten">
+                            <i18n>the</i18n>
+                            <date-picker ng-model="session.date"></date-picker>
+                            <i18n>from2</i18n>
+                            <input type="time" ng-model="session.startTime" required/>
+                            <i18n>to2</i18n>
+                            <input type="time" ng-model="session.endTime" required/>
+                        </div>
                     </div>
-                </div>
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>state</i18n>*
-                    </label>
-                    <div ng-if="session.state == 'draft'" class="cell twelve-mobile ten">
-                        <i18n>draft</i18n>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>state</i18n>*
+                        </label>
+                        <div ng-if="session.state == 'draft'" class="cell twelve-mobile ten">
+                            <i18n>draft</i18n>
+                        </div>
+                        <div ng-if="session.state == 'published'" class="cell twelve-mobile ten">
+                            <i18n>published</i18n>
+                        </div>
                     </div>
-                    <div ng-if="session.state == 'published'" class="cell twelve-mobile ten">
-                        <i18n>published</i18n>
-                    </div>
-                </div>
 
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>utils.room</i18n>
-                    </label>
-                    <div class="cell twelve-mobile ten"><input ng-model="session.roomLabels[0]"/>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>utils.room</i18n>
+                        </label>
+                        <div class="cell twelve-mobile ten"><input ng-model="session.roomLabels[0]"/>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>utils.description</i18n>
-                    </label>
-                    <div class="cell twelve-mobile ten">
-                        <textarea ng-model="session.description"></textarea>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>utils.description</i18n>
+                        </label>
+                        <div class="cell twelve-mobile ten">
+                            <textarea ng-model="session.description"></textarea>
+                        </div>
                     </div>
-                </div>
 
-                <div class="row form-row">
-                    <label class="cell two twelve-mobile">
-                        <i18n>utils.annotation</i18n>
-                    </label>
-                    <div class="cell twelve-mobile ten">
-                        <textarea ng-model="session.annotation"></textarea>
+                    <div class="row form-row">
+                        <label class="cell two twelve-mobile">
+                            <i18n>utils.annotation</i18n>
+                        </label>
+                        <div class="cell twelve-mobile ten">
+                            <textarea ng-model="session.annotation"></textarea>
+                        </div>
                     </div>
+
+
+                </article>
+                <div ng-if="session.id" class="left-magnet vertical-spacing">
+                    <button class="cancel" type="button" ng-click="deleteSession()">
+                        <i18n>utils.delete </i18n>
+                    </button>
                 </div>
+                <div class="right-magnet vertical-spacing">
+                    <div ng-if="form_is_not_valid" class="warning">
+                        <i18n>creation.error</i18n>
+                    </div>
+                    <button class="cancel" type="button" ng-click="cancelCreation()">
+                        <i18n>utils.cancel</i18n>
+                    </button>
+                    <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession()">
+                        <i18n>utils.save</i18n>
+                    </button>
 
-
-            </article>
-            <div ng-if="session.id" class="left-magnet vertical-spacing">
-                <button class="cancel" type="button" ng-click="deleteSession()">
-                    <i18n>utils.delete </i18n>
-                </button>
-            </div>
-            <div class="right-magnet vertical-spacing">
-                <div ng-if="form_is_not_valid" class="warning">
-                    <i18n>creation.error</i18n>
+                    <button ng-if="session.state == 'draft'"
+                            ng-disabled="!isValidForm()" type="submit"
+                            ng-click="publishSession()">
+                        <i18n>publish</i18n>
+                    </button>
+                    <button ng-if="session.state == 'published'"
+                            ng-disabled="!isValidForm()" type="submit"
+                            ng-click="unpublishSession()">
+                        <i18n>unpublish</i18n>
+                    </button>
                 </div>
-                <button class="cancel" type="button" ng-click="cancelCreation()">
-                    <i18n>utils.cancel</i18n>
-                </button>
-                <button ng-disabled="!isValidForm()" type="submit" ng-click="saveSession()">
-                    <i18n>utils.save</i18n>
-                </button>
-
-                <button ng-if="session.state == 'draft'"
-                        ng-disabled="!isValidForm()" type="submit"
-                        ng-click="publishSession()">
-                    <i18n>publish</i18n>
-                </button>
-                <button ng-if="session.state == 'published'"
-                        ng-disabled="!isValidForm()" type="submit"
-                        ng-click="unpublishSession()">
-                    <i18n>unpublish</i18n>
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
 
         <!-- View -->
-
+        <div ng-if="isReadOnly">
+            <div class="row margin-bottom-md">
+                <span class="color-bloc" ng-style="{'background-color': session.color}"></span> &nbsp; <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.firstName]] [[session.teacher.lastName]]</b>
+            </div>
+            <div class="row">
+                <span class="gray">[[session.startDisplayDate]] &nbsp; [[session.startDisplayTime]] - [[session.endDisplayTime]]</span> &nbsp; <b>[[session.title]]</b>
+            </div>
+            <textarea readonly class="min-height-textarea resize-none">[[session.description]]</textarea>
+        </div>
     </div>
 
     <!-- Visas -->
