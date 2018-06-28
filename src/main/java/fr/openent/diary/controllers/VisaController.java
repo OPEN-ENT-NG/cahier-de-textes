@@ -5,6 +5,7 @@ import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.lessonview.LessonModel;
 import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.model.visa.*;
+import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.services.PdfServiceImpl;
 import fr.openent.diary.services.VisaService;
 import fr.openent.diary.services.VisaServiceImpl;
@@ -51,6 +52,19 @@ public class VisaController extends ControllerHelper {
         this.pdfService = pdfService;
     }
 
+    @Put("/visa")
+    @SecuredAction(value = WorkflowUtils.VISA_MANAGE_RIGHT, type = ActionType.WORKFLOW)
+    public void createVisa(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                RequestUtils.bodyToJson(request, visa -> {
+                    Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
+                    visaService.createVisa(visa, user, handler);
+                });
+            }
+        });
+    }
 
     @Post("/inspect/right/:structureId/:inspectorId")
     @SecuredAction("diary.manageInspect.apply")
@@ -134,20 +148,6 @@ public class VisaController extends ControllerHelper {
 
         });
 
-    }
-
-    @Put("/visa")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void createVisa(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                RequestUtils.bodyToJson(request, visa -> {
-                    Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
-                    visaService.createVisa(visa, user, handler);
-                });
-            }
-        });
     }
 
     @Post("/visa/lessons")

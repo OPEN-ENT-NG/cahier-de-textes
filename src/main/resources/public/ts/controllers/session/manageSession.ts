@@ -1,4 +1,4 @@
-import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
+import { ng, _, model, moment, Behaviours, notify, idiom as lang } from 'entcore';
 import { Subjects, Notification } from '../../model';
 import {Session} from "../../model";
 import {Visa} from '../../model/visa';
@@ -6,6 +6,7 @@ import {Visa} from '../../model/visa';
 export let createSessionCtrl = ng.controller('createSessionCtrl',
     ['$scope', '$routeParams', function ($scope, $routeParams) {
         console.log("createSessionCtrl");
+        const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.session = new Session($scope.structure);
         $scope.subjects = new Subjects();
@@ -27,6 +28,10 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
         $scope.cancelCreation = () => {
             $scope.goTo('/');
             delete $scope.course;
+        };
+
+        $scope.hasManageVisaRight = () => {
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageVisa);
         };
 
         $scope.isValidForm = () => {

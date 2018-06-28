@@ -3,7 +3,10 @@
         <i18n ng-if="session.id">session.manage.update</i18n>
         <i18n ng-if="!session.id">session.manage.create</i18n>
     </h1>
-    <div class="eight cell">
+
+    <!-- Create / Update / View-->
+    <div class="cell" ng-class="hasManageVisaRight() ? 'eight' : 'twelve'">
+        <!-- Create / Update-->
         <form>
             <article>
                 <h3><i18n>utils.subject_and_audience</i18n></h3>
@@ -121,8 +124,13 @@
                 </button>
             </div>
         </form>
+
+        <!-- View -->
+
     </div>
-    <div class="four cell padding-left-md">
+
+    <!-- Visas -->
+    <div class="four cell padding-left-md" workflow="diary.manageVisa">
         <div class="card padding-md margin-bottom-md">
             <h3>Apposer un visa</h3>
             <form ng-submit="saveVisa()">
