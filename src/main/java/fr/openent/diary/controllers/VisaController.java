@@ -58,22 +58,17 @@ public class VisaController extends ControllerHelper {
     @Post("/visa")
     @SecuredAction(value = WorkflowUtils.VISA_MANAGE_RIGHT, type = ActionType.WORKFLOW)
     public void createVisa(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                RequestUtils.bodyToJson(request, visa -> {
-                    Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
-                    visaService.createVisa(visa, user, handler);
-                });
-            }
-        });
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "createVisa", visa -> {
+            Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
+            visaService.createVisa(visa, user, handler);
+        }));
     }
 
     @Put("/visa/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(VisaManage.class)
     public void updateVisa(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, visa -> {
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "updateVisa", visa -> {
             Handler<Either<String, JsonArray>> handler = DefaultResponseHandler.arrayResponseHandler(request);
             visaService.updateVisa(Long.parseLong(request.params().get("id")), visa, handler);
         }));

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "comment": {
+      "type": "string"
+    },
+    "structure_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "comment",
+    "structure_id",
+    "session_id"
+  ]
+}

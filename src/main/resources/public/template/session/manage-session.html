@@ -146,7 +146,7 @@
                 <h3 ng-if="!visaForm.visa.id"><i18n>visa.apply.visa</i18n></h3>
                 <h3 ng-if="visaForm.visa.id"><i18n>visa.update</i18n></h3>
                 <form ng-submit="saveVisa()">
-                    <textarea class="resize-vertical min-height-textarea" ng-model="visaForm.visa.comment"></textarea>
+                    <textarea i18n-placeholder="comment" class="resize-vertical min-height-textarea" ng-model="visaForm.visa.comment"></textarea>
                     <div class="row text-center">
                         <button class="display-inline-block float-none cancel four cell" type="button" ng-click="cancelVisaCreateOrUpdate()">
                             <i18n>utils.cancel</i18n>
