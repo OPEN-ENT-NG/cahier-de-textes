@@ -158,8 +158,14 @@ export class Session {
             let {data} = await http.get('/diary/lesson/' + this.id);
             Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
             this.initDates();
-            this.visas = Mix.castArrayAs(Visa, this.visas);
-            this.visas.forEach(v => v.init(this.structure));
+            if(this.visas.every(v => v === null)){
+                this.visas = [];
+            } else {
+                this.visas = Mix.castArrayAs(Visa, this.visas);
+                this.visas.forEach(v => v.init(this.structure));
+            }
+
+
 
         } catch (e) {
             notify.error('session.sync.err');
@@ -202,10 +208,12 @@ export class Sessions {
         this.all.forEach(i => {
             i.initDates();
             if(!!i.visas){
-                i.visas = Mix.castArrayAs(Visa, i.visas);
-                i.visas.forEach(v => {
-                    v.init(this.structure);
-                });
+                if(i.visas.every(v => v === null)){
+                    i.visas = [];
+                } else {
+                    i.visas = Mix.castArrayAs(Visa, i.visas);
+                    i.visas.forEach(v => v.init(this.structure));
+                }
             }
         });
 

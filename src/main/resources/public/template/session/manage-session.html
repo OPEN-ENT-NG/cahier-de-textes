@@ -143,22 +143,23 @@
     <div class="four cell padding-left-md" workflow="diary.manageVisa">
         <div class="card padding-md margin-bottom-md">
             <div ng-if="visaForm.visa">
-                <h3 ng-if="!visaForm.visa.id">Apposer un visa</h3>
-                <h3 ng-if="visaForm.visa.id">Modifier un visa</h3>
-                <h3>Apposer un visa</h3>
+                <h3 ng-if="!visaForm.visa.id"><i18n>visa.apply.visa</i18n></h3>
+                <h3 ng-if="visaForm.visa.id"><i18n>visa.update</i18n></h3>
                 <form ng-submit="saveVisa()">
                     <textarea class="resize-vertical min-height-textarea" ng-model="visaForm.visa.comment"></textarea>
-                    <button class="float-none cancel six cell" type="button" ng-click="cancelVisaCreateOrUpdate()">
-                        <i18n>utils.cancel</i18n>
-                    </button>
-                    <button class="twelve float-none six cell" type="submit"><i18n>save</i18n></button>
+                    <div class="row text-center">
+                        <button class="display-inline-block float-none cancel four cell" type="button" ng-click="cancelVisaCreateOrUpdate()">
+                            <i18n>utils.cancel</i18n>
+                        </button>
+                        <button class="display-inline-block float-none seven cell" type="submit"><i18n>visa.apply</i18n></button>
+                    </div>
                 </form>
             </div>
-            <button ng-if="!visaForm.visa" class="twelve float-none" ng-click="startCreatingVisa()"><i18n>Apposer un visa</i18n></button>
+            <button ng-if="!visaForm.visa" class="twelve float-none" ng-click="startCreatingVisa()"><i18n>visa.apply.visa</i18n></button>
         </div>
         <div class="card padding-md">
-            <h3>Visas</h3>
-            <table class="twelve">
+            <h3 class="remove-margin">Visas</h3>
+            <table ng-if="session.visas.length > 0" class="twelve remove-margin">
                 <tbody>
                 <tr ng-repeat="visa in session.visas | orderBy : '-moment'" class="show-i-hover" ng-class="{'visa-being-updated': visa.isBeingUpdated}">
                     <td>
@@ -173,13 +174,13 @@
                             </div>
                         </div>
                         <div class="row">
-                            <b>Commentaire: </b> [[visa.comment]]
+                            <b><i18n>comment</i18n>: </b> [[visa.comment]]
                         </div>
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <div ng-if="session.visas.length == 0" class="sub-text text-center">Aucun visa apposé à cette séance</div>
+            <div ng-if="session.visas.length === 0" class="sub-text text-center"><i18n>visa.none.applied</i18n></div>
         </div>
     </div>
 

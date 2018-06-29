@@ -122,5 +122,13 @@
   "homework.manage.unpublished": "Publication enlevée, travail à faire passée en brouillon",
   "homework.manage.confirm": "Travail à faire enregistré",
   "homeworks": "Travails à faire",
-  "homework.manage.delete": "Le travail à faire a été supprimé"
+  "homework.manage.delete": "Le travail à faire a été supprimé",
+  "visa.apply.visa": "Apposer un visa",
+  "visa.apply": "Apposer",
+  "visa.update": "Modifier un visa",
+  "visa.created": "Visa créé",
+  "visa.updated": "Visa modifié",
+  "visa.deleted": "Visa supprimé",
+  "visa.none.applied": "Aucun visa apposé à cette séance",
+  "comment": "Commentaire"
 }

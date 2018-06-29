@@ -62,8 +62,8 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
         };
 
         $scope.startUpdatingVisa = async (visa: Visa) => {
+            visa.isBeingUpdated = true;
             $scope.visaForm.visa = _.clone(visa);
-            $scope.visaForm.visa.isBeingUpdated = true;
             $scope.safeApply();
         };
 
@@ -81,7 +81,7 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
         };
 
         $scope.cancelVisaCreateOrUpdate = async () => {
-            $scope.visaForm.visa.isBeingUpdated = false;
+            $scope.session.visas.forEach(v => v.isBeingUpdated = false);
             $scope.visaForm.visa = undefined;
         };
 

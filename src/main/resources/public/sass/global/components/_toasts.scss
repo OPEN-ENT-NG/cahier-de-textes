@@ -24,7 +24,7 @@
       line-height: 28px;
 
       &:before {
-        //@include fonticon();
+        @include fonticon();
         margin-right: 10px;
       }
     }
