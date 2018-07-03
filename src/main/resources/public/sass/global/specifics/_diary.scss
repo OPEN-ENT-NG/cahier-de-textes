@@ -1,5 +1,27 @@
+.small { font-size: 0.9em; }
+.normal { font-size: 1em; }
+.large { font-size: 1.1em; }
+.float-left { float:left; }
+.pointer {cursor:pointer;}
+.margin10v {margin: 10px 0;}
+
 .min-height-textarea {
   min-height: 60px;
+}
+
+.diary-container, .list-view {
+  margin-top: 0;
+  padding-left: 15px;
+}
+
+.sidebar switch {
+  section .row { margin: 5px 0;}
+  .switch .tick {
+    background: #78daff;
+    &:before {
+      background: #2a9cc8;
+    }
+  }
 }
 
 i.rack2::before {

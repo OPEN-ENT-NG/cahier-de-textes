@@ -55,40 +55,18 @@ export let main = ng.controller('MainController',
         function init(){
             $timeout(async function () {
                 await placingLoader();
-                await placingButtons();
                 initializeData();
             }, 100);
         }
 
-        async function placingLoader(){
-            let exit = false;
-            for(let i = 0; i < 20 && !exit; i++){
+        async function placingLoader(exit:number = 0){
+            if(exit < 20 ){
                 await $timeout(function () {
                     if ($('.drawing-zone').length > 0){
                         $('#loader-calendar').appendTo('.drawing-zone');
-                        exit = true;
                     }
-                }, 200);
-            }
-        }
-
-        async function placingButtons(){
-            let exit = false;
-            for(let i = 0; i < 20 && !exit; i++){
-                await $timeout(function () {
-                    // Si le bouton existe déjà, alors on ne fait rien
-                    if($('#daily-event-filter').length > 0){
-                        return;
-                    }
-                    let modeButtonsElements = $('.changeDisplayModeButtons ');
-                    if(modeButtonsElements.length > 0) {
-                        let html = '<i ng-class="{\'selected\':display.dailyEvents}" ' +
-                            'id="daily-event-filter" class="filter2 homework" ' +
-                            'ng-click="display.dailyEvents = !display.dailyEvents" ' +
-                            'diary-tooltip="diary.icon.show.homeworkpanel"></i>';
-                        var compiledHtml = $compile(html)($scope);
-                        modeButtonsElements.append(compiledHtml);
-                        exit = true;
+                    else {
+                        placingLoader(++exit);
                     }
                 }, 200);
             }

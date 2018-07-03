@@ -1,4 +1,4 @@
-body.cdt {
+body.cdt_develop {
   @import './specifics/mixins';
   @import './specifics/responsive';
   @import './specifics/diary';
@@ -9,7 +9,7 @@ body.cdt {
   @import './specifics/utils';
 
   @import './specifics/calendar-view';
+  @import './components/_checkbox';
   @import './specifics/select';
-  @import 'components/switch';
-  @import 'components/toasts';
+  @import './components/toasts';
 }

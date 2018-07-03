@@ -11,57 +11,12 @@
     </div>
     <div class="clear"></div>
 </div>
+<div class="row" ng-init="display.listView = false">
 
-<div class="row card padding-sm margin-bottom-md" style="padding: 10px;">
-    <button ng-click="goTo('/homework/create/')">
-        Créer un travail à faire
-    </button>
-    <button ng-click="goTo('/session/create/')">
-        Créer une session
-    </button>
-    <div>
-        <i ng-click="display.listView = true" class="show-list" ng-class="{ selected: display.listView === true }" tooltip="diary.icon.show.list"></i>
-        <i ng-click="display.listView = false" class="show-calendar" ng-class="{ selected: display.listView === false }" tooltip="diary.icon.show.calendar"></i>
-    </div>
+    <article class="cell two twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></article>
+
+    <!-- Calendar View -->
+    <div class="cell ten twelve-mobile" ng-if="!display.listView" static-include="/diary/public/template/main/calendar-view.html"></div>
+    <div class="cell ten twelve-mobile" ng-if="display.listView" static-include="/diary/public/template/main/list-view.html"></div>
+
 </div>
-
-<div class="row card padding-sm" ng-if="isPersonnel()">
-    <div class="display-inline-block" ng-if="structures.all.length > 1">
-        <label for="structure-list"><i18n>utils.structures</i18n></label>
-        <select ng-model="structure"
-                id="structure-list"
-                class="twelve"
-                ng-change="switchStructure(structure)"
-                ng-options="structure as structure.name for structure in structures.all">
-            <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-        </select>
-    </div>
-    <div class="display-inline-block">
-        <label for="user-list">
-            <div><i18n>utils.teachers</i18n></div>
-            <select ng-model="params.user"
-                    id="user-list"
-                    class="twelve"
-                    ng-change="params.group = null;syncPedagogicItems(params.user.id, 'teacher')"
-                    ng-options="teacher as teacher.displayName for teacher in structure.teachers.all">
-                <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
-            </select>
-        </label>
-    </div>
-    <div class="display-inline-block">
-        <label for="group-list"><i18n>utils.groups</i18n></label>
-        <select ng-model="params.group"
-                id="group-list"
-                class="twelve"
-                ng-change="params.user = null;syncPedagogicItems(params.group.id, 'audience')"
-                ng-options="group as group.name for group in structure.groups.all">
-            <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
-        </select>
-    </div>
-</div>
-
-
-<!-- Calendar View -->
-<div ng-if="!display.listView" static-include="/diary/public/template/main/calendar-view.html"></div>
-<div ng-if="display.listView" static-include="/diary/public/template/main/list-view.html"></div>
-

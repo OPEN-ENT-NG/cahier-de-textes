@@ -1,0 +1,77 @@
+<div class="sidebar ">
+
+    <div class="row">
+        <section id="display-section" class="cell twelve">
+            <h5 class="large">
+                <i18n>sidebar.display_mode</i18n> :
+            </h5>
+            <div class="row">
+                <label class="cell twelve small">
+                    <span class="float-left"><i18n>calendar</i18n></span>
+                    <switch ng-model="display.listView" ng-click="display.listView = !display.listView"></switch>
+                    <i18n>list</i18n>
+                </label>
+            </div>
+            <div class="row margin10v">
+                <div class="cell twelve" ng-click="display.dailyEvents = !display.dailyEvents">
+                    <div class="magic-checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="display.dailyEvents"/>
+                            <i class="pointer input-helper"></i>
+                            <span class="small pointer"><i18n>homeworks</i18n></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="isPersonnel() && structures.all.length > 1">
+                <select ng-model="structure"
+                        id="structure-list"
+                        class="twelve"
+                        ng-change="switchStructure(structure)"
+                        ng-options="structure as structure.name for structure in structures.all">
+                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+                </select>
+            </div>
+            <div class="row display-inline-block">
+                <label class="cell twelve small" for="user-list">
+                    <select ng-model="params.user"
+                            id="user-list"
+                            class="twelve"
+                            ng-change="params.group = null;syncPedagogicItems(params.user.id, 'teacher')"
+                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all">
+                        <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+                    </select>
+                </label>
+            </div>
+            <div class="row display-inline-block">
+                <label class="cell twelve small" for="user-list">
+                    <select ng-model="params.group"
+                            id="group-list"
+                            class="twelve"
+                            ng-change="params.user = null;syncPedagogicItems(params.group.id, 'audience')"
+                            ng-options="group as group.name for group in structure.groups.all">
+                        <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
+                    </select>
+                </label>
+            </div>
+        </section>
+    </div>
+    <section id="add-section" class="row">
+        <div class="cell twelve ">
+            <h5 class="large">
+                <i18n>utils.add</i18n> :
+            </h5>
+            <div class="row cell">
+                <div class="twelve cell small">
+                    <button class="twelve padding-sm" ng-click="goTo('/homework/create/')"> <!--workflow="diary.manageHomework"-->
+                        <i18n>homework.create</i18n>
+                    </button>
+                    <br/>
+                    <button class="twelve padding-sm" ng-click="goTo('/session/create/')"><!-- workflow="diary.manageSession"-->
+                        <i18n>session.create</i18n>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
