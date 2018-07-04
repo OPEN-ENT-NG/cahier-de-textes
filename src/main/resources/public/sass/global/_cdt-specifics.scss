@@ -1,15 +1,15 @@
-body.cdt_develop {
-  @import './specifics/mixins';
-  @import './specifics/responsive';
-  @import './specifics/diary';
-  @import './specifics/list-view';
-  @import './specifics/atomic';
+body.cdt {
+  @import 'specifics/mixins';
+  @import 'specifics/responsive';
+  @import 'specifics/diary';
+  @import 'specifics/list-view';
+  @import 'specifics/atomic';
+  @import 'specifics/utils';
+  @import 'specifics/calendar-view';
+  @import 'specifics/select';
+
   @import 'components/loader';
-
-  @import './specifics/utils';
-
-  @import './specifics/calendar-view';
-  @import './components/_checkbox';
-  @import './specifics/select';
-  @import './components/toasts';
+  @import 'components/checkbox';
+  @import 'components/switch';
+  @import 'components/toasts';
 }
