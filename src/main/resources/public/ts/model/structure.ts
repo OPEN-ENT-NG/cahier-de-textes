@@ -1,5 +1,5 @@
 import { model } from 'entcore';
-import { Courses, Subjects, Groups, Teachers, Students, USER_TYPES } from './index';
+import { Courses, Subjects, Sessions, Homeworks, Groups, Teachers, Students, USER_TYPES } from './index';
 import { Eventer } from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 
@@ -7,6 +7,8 @@ export class Structure {
     id: string;
     name: string;
     courses: Courses;
+    sessions: Sessions;
+    homeworks: Homeworks;
     subjects: Subjects;
     groups: Groups;
     teachers: Teachers;
@@ -25,6 +27,8 @@ export class Structure {
         this.subjects = new Subjects();
         this.groups = new Groups();
         this.courses = new Courses();
+        this.sessions = new Sessions(this);
+        this.homeworks = new Homeworks(this);
         this.teachers = new Teachers();
         this.personnels = new Personnels();
         if (model.me.type === USER_TYPES.relative) {

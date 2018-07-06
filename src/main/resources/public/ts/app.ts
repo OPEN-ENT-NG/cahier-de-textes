@@ -24,7 +24,7 @@ routes.define(($routeProvider) => {
         .when('/session/view/:id', {
             action: 'manageSession'
         })
-        .when('/homework/create/', {
+        .when('/homework/create', {
             action: 'manageHomework'
         })
         .when('/homework/update/:id', {

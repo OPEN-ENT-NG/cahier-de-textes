@@ -3,6 +3,7 @@ export * from './structure';
 export * from './course';
 export * from './subject';
 export * from './session';
+export * from './homework';
 export * from './group';
 export * from './teacher';
 export * from './student';

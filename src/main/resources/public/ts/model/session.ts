@@ -153,23 +153,29 @@ export class Session {
         }
     }
 
-    async sync() {
-        try {
-            let {data} = await http.get('/diary/lesson/' + this.id);
-            Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
+    async sync(structure?: Structure) {
+        let session = structure.sessions.all.find(t => t.id === this.id);
+        if (session) {
+            Mix.extend(this, session);
             this.initDates();
-            if(this.visas.every(v => v === null)){
-                this.visas = [];
-            } else {
-                this.visas = Mix.castArrayAs(Visa, this.visas);
-                this.visas.forEach(v => v.init(this.structure));
-            }
-
-
-
-        } catch (e) {
-            notify.error('session.sync.err');
         }
+        else {
+            try {
+                let {data} = await http.get('/diary/lesson/' + this.id);
+                Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
+                this.initDates();
+                if (this.visas.every(v => v === null)) {
+                    this.visas = [];
+                } else {
+                    this.visas = Mix.castArrayAs(Visa, this.visas);
+                    this.visas.forEach(v => v.init(this.structure));
+                }
+
+            } catch (e) {
+                notify.error('session.sync.err');
+            }
+        }
+
     }
 }
 

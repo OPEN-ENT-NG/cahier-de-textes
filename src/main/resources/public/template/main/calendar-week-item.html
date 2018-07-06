@@ -1,16 +1,16 @@
-<div ng-if="item.pedagogicType == TYPE_HOMEWORK" class="schedule-item-content" ng-style="{'background-color': item.color}">
+<div ng-if="item.pedagogicType == TYPE_HOMEWORK" class="schedule-item-content pointer" ng-style="{'background-color': item.color}">
     <div>[[item.subject.label]]</div>
     <div>[[item.audience.name]]</div>
     <div>([[item.type.label]])</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)" class="schedule-item-content" ng-style="{'background-color': item.color}">
+<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)" class="schedule-item-content pointer" ng-style="{'background-color': item.color}">
     <div>[[item.startDisplayTime]] &nbsp; [[item.subject.label]]</div>
     <div>[[item.endDisplayTime]] &nbsp; [[item.audience.name]]</div>
     <div>[[item.state]]</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_COURSE" class="schedule-item-content bg-lightgrey">
+<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSession(item._id, true)" class="schedule-item-content bg-lightgrey pointer">
     <div>[[item.startDisplayTime]] &nbsp; [[item.subjectLabel]]</div>
     <div>
         [[item.endDisplayTime]] &nbsp;

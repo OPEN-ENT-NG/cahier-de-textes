@@ -1,8 +1,10 @@
 import { model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
+import {USER_TYPES, Structure, Teacher, Group, Utils, Subject} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
+import {Session} from "./session";
+import {Visa} from "./visa";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -79,6 +81,15 @@ export class Course {
         }
     }
 
+    static formatSqlDataToModel(data: any, structure: Structure) {
+        let course = new Course(data, data.startDate, data.endDate);
+        course.subjectLabel = structure.subjects.mapping[data.subjectId];
+        course.teachers = _.map(data.teacherIds, (ids) => {
+            return _.findWhere(structure.teachers.all, {id: ids});
+        });
+        return course;
+    }
+
     toJSON () {
         let o: any = {
             structureId: this.structureId,
@@ -96,6 +107,24 @@ export class Course {
             o._id = this._id;
         }
         return o;
+    }
+
+    async sync(structure?: Structure) {
+        if(!this._id)
+            return;
+        let course = structure.courses.all.find(t => t._id === this._id);
+        if(course){
+            Mix.extend(this, course);
+        }
+        else {
+            try {
+                let {data} = await http.get('/viescolaire/common/course/' + this._id);
+                Mix.extend(this, Course.formatSqlDataToModel(data, structure));
+
+            } catch (e) {
+                notify.error('session.sync.err');
+            }
+        }
     }
 }
 
@@ -132,12 +161,7 @@ export class Courses {
         let courses = await http.get(uri);
         if (courses.data.length > 0) {
             this.all = _.map(courses.data, (course) => {
-                course = new Course(course, course.startDate, course.endDate);
-                course.subjectLabel = structure.subjects.mapping[course.subjectId];
-                course.teachers = _.map(course.teacherIds, (ids) => {
-                        return _.findWhere(structure.teachers.all, {id: ids});
-                    });
-                return course;
+                return Course.formatSqlDataToModel(course, structure);
             });
             this.origin = Mix.castArrayAs(Course, courses.data);
         }

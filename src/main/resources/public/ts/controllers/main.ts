@@ -86,8 +86,8 @@ export let main = ng.controller('MainController',
 
             await initializeStructure();
 
-            $scope.homeworks = new Homeworks($scope.structure);
-            $scope.sessions = new Sessions($scope.structure);
+            $scope.structure.homeworks = new Homeworks($scope.structure);
+            $scope.structure.sessions = new Sessions($scope.structure);
 
             await $scope.syncPedagogicItems();
 
@@ -103,9 +103,17 @@ export let main = ng.controller('MainController',
             $scope.isRefreshingCalendar = true;
             $scope.safeApply();
             if(!!typeId && !!type){
-                await Promise.all([await $scope.syncHomeworks(typeId, type),await $scope.syncSessions(typeId, type), await $scope.syncCourses(typeId, type)]);
+                await Promise.all([
+                    await $scope.syncHomeworks(typeId, type),
+                    await $scope.syncSessions(typeId, type),
+                    await $scope.syncCourses(typeId, type)
+                ]);
             } else {
-                await Promise.all([await $scope.syncHomeworks(),await $scope.syncSessions(), await $scope.syncCourses()]);
+                await Promise.all([
+                    await $scope.syncHomeworks(),
+                    await $scope.syncSessions(),
+                    await $scope.syncCourses()
+                ]);
             }
 
 
@@ -115,11 +123,11 @@ export let main = ng.controller('MainController',
         };
 
         $scope.syncHomeworks = async (typeId?: string, type?: string) => {
-            $scope.homeworks.all = [];
+            $scope.structure.homeworks.all = [];
             if(!!typeId && !!type){
-                await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
+                await $scope.structure.homeworks.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
             } else {
-                await $scope.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
+                await $scope.structure.homeworks.sync($scope.filters.startDate, $scope.filters.endDate);
             }
         };
 
@@ -133,11 +141,11 @@ export let main = ng.controller('MainController',
         };
 
         $scope.syncSessions = async (typeId?: string, type?: string) => {
-            $scope.sessions.all = [];
+            $scope.structure.sessions.all = [];
             if(!!typeId && !!type){
-                await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
+                await $scope.structure.sessions.sync($scope.filters.startDate, $scope.filters.endDate, typeId, type);
             } else {
-                await $scope.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
+                await $scope.structure.sessions.sync($scope.filters.startDate, $scope.filters.endDate);
             }
 
         };
@@ -145,8 +153,8 @@ export let main = ng.controller('MainController',
         $scope.loadPedagogicItems = () =>{
             $scope.pedagogicItems = [];
 
-            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.homeworks.all);
-            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.sessions.all);
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.courses.all);
 
             $scope.loadCalendarItems();
@@ -297,9 +305,12 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         };
 
-        $scope.openSession = (sessionId: number) => {
-            if(model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)){
-                $scope.goTo('/session/update/' + sessionId);
+        $scope.openSession = (sessionId: number, fromCourse: Boolean = false) => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
+                if(fromCourse)
+                    $scope.goTo('/session/create?courseId=' + sessionId);
+                else
+                    $scope.goTo('/session/update/' + sessionId);
             } else {
                 $scope.goTo('/session/view/' + sessionId);
             }
