@@ -139,14 +139,25 @@ calendar-daily-events {
   top: 79px !important;
 }
 .homework-content {
-  height: 32px;
+  //height: 32px;
+  padding: 5px;
   border: solid 2px;
   background-color: white;
   border-radius: 5px;
-  padding-left: 5px;
   font-size: 12px;
   line-height: 12px;
   text-align: left;
+}
+.homework-content-sm {
+  padding: 5px;
+  border: solid 2px;
+  background-color: white;
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 12px;
+  text-align: center;
+  width: 40px;
+  margin-right: 2px;
 }
 
 
@@ -180,4 +191,19 @@ i.homework::before {
 .filter2.homework.selected {
   box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
   background-color: #46bfaf;
+}
+
+.week-item {
+  position: relative;
+
+  .left-side {
+    position:absolute;
+    left: 0px;
+    right: 30px;
+  }
+  .right-side {
+    position:absolute;
+    right: 0px;
+    width: 30px;
+  }
 }

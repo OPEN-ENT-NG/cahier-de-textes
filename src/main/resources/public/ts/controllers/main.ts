@@ -9,7 +9,7 @@ export let main = ng.controller('MainController',
         $scope.notifications = [];
 
         $scope.display = {
-            dailyEvents: true,
+            dailyHomeworks: true,
             listView: false,
         };
 
@@ -116,7 +116,8 @@ export let main = ng.controller('MainController',
                 ]);
             }
 
-
+            // On lie les homeworks à leur session
+            $scope.structure.sessions.all.forEach(s => s.homeworks = $scope.structure.homeworks.all.filter(h => h.session_id === s.id));
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
             $scope.safeApply();
@@ -162,6 +163,8 @@ export let main = ng.controller('MainController',
         };
 
         $scope.loadCalendarItems = () => {
+            $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
+
             $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
 
             $scope.isRefreshingCalendar = false;
@@ -339,12 +342,11 @@ export let main = ng.controller('MainController',
             },
             manageSession: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'session/manage-session');
+                template.open('main', 'session/page-session');
             },
             manageHomework: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                console.log('route.manageHomework');
-                template.open('main', 'homework/manage-homework');
+                template.open('main', 'homework/page-homework');
             }
         });
     }]);

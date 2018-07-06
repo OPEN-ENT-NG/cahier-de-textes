@@ -1,22 +1,21 @@
 <div class="days">
     <div class="day homeworkpanel" ng-repeat="day in calendar.days.all" >
-        <div ng-if="day.dailyEvents.length <= 1">
-            <div ng-repeat="dailyEvent in day.dailyEvents">
-                <!--<static-include template="daily-event-item" ></static-include>-->
-                <div static-include="/diary/public/template/directives/daily-event-item.html" style="padding: 1px;"></div>
+        <div ng-if="day.dailyHomeworks.length <= 1">
+            <div ng-repeat="homework in day.dailyHomeworks">
+                <div static-include="/diary/public/template/directives/daily-homework-item.html" style="padding: 1px;"></div>
             </div>
         </div>
 
-        <div class="opener" ng-if="day.dailyEvents.length > 1" ng-click="toggleShowHwDetail(day)">
+        <div class="opener" ng-if="day.dailyHomeworks.length > 1" ng-click="toggleShowHwDetail(day)">
             <span id="dailyeventlongtitle"><i18n>homeworks</i18n></span>
             <span id="dailyeventshorttitle">TAF</span>
-            ([[day.dailyEvents.length]])
+            ([[day.dailyHomeworks.length]])
         </div>
         <div class=" daily-events" style="z-index: 1000;"
-            ng-if="day.dailyEvents.length > 0"
-            id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyEvents.length > 1 }">
-            <div ng-repeat="dailyEvent in day.dailyEvents" ng-click="test(1)">
-                <div static-include="/diary/public/template/directives/daily-event-item.html" style="padding: 1px;"></div>
+            ng-if="day.dailyHomeworks.length > 0"
+            id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyHomeworks.length > 1 }">
+            <div ng-repeat="homework in day.dailyHomeworks">
+                <div static-include="/diary/public/template/directives/daily-homework-item.html" style="padding: 1px;"></div>
             </div>
         </div>
     </div>

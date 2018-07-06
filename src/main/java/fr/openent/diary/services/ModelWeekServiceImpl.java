@@ -180,7 +180,7 @@ public class ModelWeekServiceImpl extends SqlCrudService {
                         user.getStructures(),
                         user.getGroupsIds(),
                         DateUtils.formatDate(refWeek.getBeginDate()),
-                        DateUtils.formatDate(refWeek.getEndDate()),
+                        DateUtils.formatDate(refWeek.getEndDate()), null, null,
                         new Handler<Either<String, JsonArray>>() {
                             @Override
                             public void handle(Either<String, JsonArray> event) {

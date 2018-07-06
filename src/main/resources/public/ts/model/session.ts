@@ -5,6 +5,7 @@ import { Subject, Structure, Teacher, Group, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
+import {Homework, Homeworks} from './homework';
 
 const colors = ['grey'];
 
@@ -23,6 +24,7 @@ export class Session {
     state: string = "draft";
     attachments: any = [];
     homeworkIds: any = [];
+    homeworks: Homework[] = [];
     room: string = "";
 
     visas: Visa[];
@@ -66,12 +68,13 @@ export class Session {
             description: data.lesson_description,
             annotation: data.lesson_annotation,
             attachments: data.attachments,
-            homeworkIds: data.homework_ids,
+            //homeworkIds: JSON.parse(data.homework_ids),
+            homeworks: JSON.parse(data.homeworks),
             visas: JSON.parse(data.visas)
         };
     }
 
-    toJSON() {
+    toSendFormat() {
         return {
             lesson_id: this.id ? this.id : null,
             subject_id: this.subject.id,
@@ -112,9 +115,9 @@ export class Session {
     async createOrUpdate() {
         try {
             if(this.id)
-                return await http.put('/diary/lesson/' + this.id, this.toJSON());
+                return await http.put('/diary/lesson/' + this.id, this.toSendFormat());
             else
-                return await http.post('/diary/lesson', this.toJSON());
+                return await http.post('/diary/lesson', this.toSendFormat());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -134,7 +137,7 @@ export class Session {
 
     async publish() {
         try {
-            return await http.post('/diary/lesson/publish', this.toJSON());
+            return await http.post('/diary/lesson/publish', this.toSendFormat());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -145,7 +148,7 @@ export class Session {
 
     async unpublish() {
         try {
-            return await http.post('/diary/lesson/unpublish', this.toJSON());
+            return await http.post('/diary/lesson/unpublish', this.toSendFormat());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);
@@ -153,8 +156,9 @@ export class Session {
         }
     }
 
-    async sync(structure?: Structure) {
+    async sync(structure: Structure) {
         let session = structure.sessions.all.find(t => t.id === this.id);
+
         if (session) {
             Mix.extend(this, session);
             this.initDates();
@@ -169,6 +173,13 @@ export class Session {
                 } else {
                     this.visas = Mix.castArrayAs(Visa, this.visas);
                     this.visas.forEach(v => v.init(this.structure));
+            }
+
+            if(this.homeworks.every(v => v === null)){
+                this.homeworks = [];
+            }
+            if(this.homeworks){
+                this.homeworks = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(this.homeworks, this.structure));
                 }
 
             } catch (e) {
@@ -196,18 +207,17 @@ export class Sessions {
         return dataModel;
     }
 
-    async sync (startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
+    async syncWithAudienceAndSubject(startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
+        let url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
 
-        let url = '';
-        if(!!typeId && !!type){
-            url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
-        } else {
-            url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
-        }
 
+        await this.syncSessions(url);
+    }
+
+    async syncSessions (url: string){
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
@@ -222,6 +232,19 @@ export class Sessions {
                 }
             }
         });
+    }
 
+    async sync (startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = '';
+        if(!!typeId && !!type){
+            url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+        } else {
+            url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
+        }
+
+        await this.syncSessions(url);
     }
 }

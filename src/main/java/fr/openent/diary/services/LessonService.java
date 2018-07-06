@@ -24,7 +24,7 @@ public interface LessonService extends CrudService {
      * @param endDate ending date of the period from which to retrieve the lessons.
      * @param handler
      */
-    void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);
+    void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final String audienceId, final String subjectId, final Handler<Either<String, JsonArray>> handler);
 
 
     void getAllLessonsForExternal(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler);

@@ -1,13 +1,8 @@
-<div ng-controller="createSessionCtrl" id="occurrences-creation">
-    <h1 class="centered eight row">
-        <i18n ng-if="session.id">session.manage.update</i18n>
-        <i18n ng-if="!session.id">session.manage.create</i18n>
-    </h1>
-
+<div id="occurrences-creation">
     <!-- Create / Update / View-->
     <div class="cell" ng-class="hasManageVisaRight() ? 'eight' : 'twelve'">
-        <!-- Create / Update-->
         <div ng-if="!isReadOnly">
+            <!-- Create / Update-->
             <form>
                 <article>
                     <h3><i18n>utils.subject_and_audience</i18n></h3>
@@ -87,6 +82,54 @@
                     </div>
 
                     <div class="row form-row">
+                        <div class="row">
+                            <label class="cell two twelve-mobile">
+                                <i18n><i18n>homeworks.attached</i18n></i18n>
+                            </label>
+                            <!-- Attached homeworks -->
+                            <div class="ten cell twelve-mobile accordions ng-scope" ng-init="session.openedHomework = -1">
+                                <!--<table class="twelve">-->
+                                    <!--<tbody>-->
+                                        <!--<tr ng-repeat="homework in session.homeworks" class="accordion" ng-class="{ opened: session.openedHomework === $index }">-->
+                                            <!--<td>-->
+                                                <!--<h2 ng-click="session.openedHomework = $index;">-->
+                                                    <!--[[$index]]-->
+                                                    <!--<span ng-if="!homework.id">(<i18n>creation</i18n>) <i18n>homework</i18n></span>-->
+                                                    <!--<span ng-if="homework.id"><i18n>homework</i18n> - [[homework.title]]</span>-->
+                                                <!--</h2>-->
+                                                <!--<div class="toggle">-->
+                                                    <!--<div class="content">-->
+                                                        <!--<div inside-session-form="true" ng-controller="manageHomeworkCtrl"-->
+                                                             <!--static-include="/diary/public/template/homework/manage-homework.html" style="padding: 1px;">-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                <!--</div>-->
+                                            <!--</td>-->
+                                        <!--</tr>-->
+                                    <!--</tbody>-->
+                                <!--</table>-->
+                                <!-- todo: update css -->
+                                <article ng-repeat="homework in session.homeworks" class="accordion" ng-class="{ opened: session.openedHomework === $index }">
+                                    <h2 ng-click="session.openedHomework = $index;">
+                                        [[$index]]
+                                        <span ng-if="!homework.id">(<i18n>creation</i18n>) <i18n>homework</i18n></span>
+                                        <span ng-if="homework.id"><i18n>homework</i18n> - [[homework.title]]</span>
+                                    </h2>
+                                    <div class="toggle">
+                                        <div class="content">
+                                            <div inside-session-form="true" ng-controller="manageHomeworkCtrl"
+                                                 static-include="/diary/public/template/homework/manage-homework.html" style="padding: 1px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                                <button ng-click="addHomework()"><i18n>utils.add</i18n></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row form-row">
                         <label class="cell two twelve-mobile">
                             <i18n>utils.annotation</i18n>
                         </label>
@@ -94,9 +137,8 @@
                             <textarea ng-model="session.annotation"></textarea>
                         </div>
                     </div>
-
-
                 </article>
+
                 <div ng-if="session.id" class="left-magnet vertical-spacing">
                     <button class="cancel" type="button" ng-click="deleteSession()">
                         <i18n>utils.delete </i18n>
@@ -183,5 +225,4 @@
             <div ng-if="session.visas.length === 0" class="sub-text text-center"><i18n>visa.none.applied</i18n></div>
         </div>
     </div>
-
 </div>

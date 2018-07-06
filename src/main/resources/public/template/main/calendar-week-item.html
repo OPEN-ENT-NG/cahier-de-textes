@@ -1,13 +1,15 @@
-<div ng-if="item.pedagogicType == TYPE_HOMEWORK" class="schedule-item-content pointer" ng-style="{'background-color': item.color}">
-    <div>[[item.subject.label]]</div>
-    <div>[[item.audience.name]]</div>
-    <div>([[item.type.label]])</div>
-</div>
-
-<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)" class="schedule-item-content pointer" ng-style="{'background-color': item.color}">
-    <div>[[item.startDisplayTime]] &nbsp; [[item.subject.label]]</div>
-    <div>[[item.endDisplayTime]] &nbsp; [[item.audience.name]]</div>
-    <div>[[item.state]]</div>
+<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)"
+     class="schedule-item-content" ng-style="{'background-color': item.color}">
+    <div class="week-item">
+        <div class="left-side">
+            <div class="text-ellipsis overflow-hidden">[[item.startDisplayTime]]&nbsp;[[item.subject.label]]</div>
+            <div class="text-ellipsis overflow-hidden">[[item.endDisplayTime]]&nbsp;[[item.audience.name]]</div>
+        </div>
+        <div class="right-side text-center">
+            <i ng-if="item.state === 'draft'">&#xe858;</i>
+            <div ng-if="item.homeworks.length > 0" class="row">[[item.homeworks.length]] <i>&#xe80d;</i></div>
+        </div>
+    </div>
 </div>
 
 <div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSession(item._id, true)" class="schedule-item-content bg-lightgrey pointer">

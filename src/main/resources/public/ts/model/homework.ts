@@ -6,6 +6,7 @@ import {Subject} from './subject';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Course} from './course';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
+import {Session} from './session';
 
 export class Homework {
     id: string;
@@ -15,14 +16,14 @@ export class Homework {
     color: string;
     state: string = "draft";
 
-    session_id: any; // Todo: n'utiliser que le champ 'session'
+    session_id: number;
 
     structure: Structure;
     type: HomeworkType;
     teacher: Teacher;
     subject: Subject;
     audience: any;
-    session: any;
+    session: Session;
     attachments: any = [];
 
     startMoment: any;
@@ -44,13 +45,14 @@ export class Homework {
         return this.state === 'published';
     }
 
-    toJSON () {
+    toSendFormat () {
         return {
             homework_title: this.title,
             subject_id: this.subject.id,
             homework_type_id: this.type.id,
             teacher_id: model.me.userId,
             school_id: this.structure.id,
+            lesson_id: this.session ? this.session.id : undefined,
             audience_id: this.audience.id,
             homework_due_date: Utils.getFormattedDate(this.dueDate),
             homework_description: this.description,
@@ -95,9 +97,9 @@ export class Homework {
     async createOrUpdate () {
         try {
             if (this.id)
-                return await http.put('/diary/homework/' + this.id, this.toJSON());
+                return await http.put('/diary/homework/' + this.id, this.toSendFormat());
             else
-                return await http.post('/diary/homework', this.toJSON());
+                return await http.post('/diary/homework', this.toSendFormat());
         } catch (e) {
             notify.error('notify.create.err');
             console.error(e);

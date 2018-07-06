@@ -28,6 +28,7 @@
   "homework": "Travail à faire",
   "session": "Session",
   "title": "Titre",
+  "creation": "Création",
   "from": "Du",
   "to": "au",
   "to2": "à",
@@ -108,6 +109,7 @@
   "calendar.mode.week":"Semaine",
   "calendar.mode.month": "Mois",
   "session.manage.published": "Séance publiée",
+  "session": "Séance",
   "session.manage.unpublished": "Publication enlevée, séance passée en brouillon",
   "calendar": "Calendrier",
   "list": "Liste",
@@ -120,6 +122,7 @@
   "session.manage.delete": "la séance a été supprimée",
   "session.create": "Créer une session",
   "homework.manage.config": "Configuration du travail à faire",
+  "homework": "Travail à faire",
   "homework.manage.create": "Ajouter un travail à faire",
   "homework.manage.update": "Modifier un travail à faire",
   "homework.manage.date": "A faire pour le ",
@@ -127,6 +130,7 @@
   "homework.manage.published": "Travail à faire publié",
   "homework.manage.unpublished": "Publication enlevée, travail à faire passée en brouillon",
   "homework.manage.confirm": "Travail à faire enregistré",
+  "homeworks.attached": "Travails à faire attachés",
   "homework.manage.delete": "Le travail à faire a été supprimé",
   "homework.create": "Créer un travail",
   "sidebar.display_mode": "Mode d'affichage",
@@ -136,5 +140,6 @@
   "visa.updated": "Visa modifié",
   "visa.deleted": "Visa supprimé",
   "visa.none.applied": "Aucun visa apposé à cette séance",
-  "comment": "Commentaire"
+  "comment": "Commentaire",
+  "back": "Retour"
 }

@@ -68,3 +68,36 @@ i.cahier-textes2::before {
 .visa-being-updated {
   background-color: rgba(255, 133, 0, 0.3803921569);
 }
+
+
+.tab-button {
+  display: inline-block;
+  text-align: right;
+  border: 2px solid #4bafd5;
+  border-radius: 5px;
+  padding: 0 5px 0 5px;
+
+  &.selected {
+    background: #4bafd5 !important;
+    color: #fff;
+  }
+}
+
+
+.accordion {
+  h2 {
+    margin: 0;
+  }
+
+  .toggle {
+    padding: 0;
+    border: none;
+  }
+
+  &.opened {
+    .toggle {
+      border: 2px solid gray;
+      border-radius: 0px;
+    }
+  }
+}

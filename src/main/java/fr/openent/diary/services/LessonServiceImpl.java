@@ -72,7 +72,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param endDate Homework due date before this date
      * @param handler
      */
-    private void getLessons(final Context ctx, final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
+    private void getLessons(final Context ctx, final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate,
+                            final String audienceId, final String subjectId, final Handler<Either<String, JsonArray>> handler) {
 
         if (isDateValid(startDate) && isDateValid(endDate)) {
 
@@ -90,7 +91,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
             StringBuilder query = new StringBuilder();
-            query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
+            query.append("SELECT l.id as lesson_id, array_to_json(array_agg(distinct homework)) as homeworks, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                     .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
                     .append(" s.original_subject_id as original_subject_id , array_to_json(array_agg(distinct visa)) as visas, ")
@@ -99,6 +100,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                     .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
                     .append(" LEFT JOIN diary.visa as visa ON visa.session_id = l.id")
                     .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
+                    .append(" LEFT JOIN diary.homework AS homework ON homework.lesson_id = l.id")
                     .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
                     .append(" WHERE l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD') ");
 
@@ -106,6 +108,16 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
             if (ctx == Context.STUDENT || ctx == Context.PARENT || ctx == Context.EXTERNAL) {
                 query.append(" AND l.lesson_state = '").append(ResourceState.PUBLISHED.toString()).append("' ");
+            }
+
+            if(audienceId != null){
+                query.append(" AND l.audience_id = ?");
+                parameters.add(audienceId);
+            }
+
+            if(subjectId != null){
+                query.append(" AND l.subject_id = ?");
+                parameters.add(subjectId);
             }
 
             if (schoolIds != null && !schoolIds.isEmpty()) {
@@ -154,8 +166,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      * @param handler
      */
     @Override
-    public void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, handler);
+    public void getAllLessonsForTeacher(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final String audienceId, final String subjectId, final Handler<Either<String, JsonArray>> handler) {
+        getLessons(Context.TEACHER, userId, schoolIds, memberIds, startDate, endDate, audienceId, subjectId,  handler);
     }
 
     /**
@@ -167,7 +179,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
      */
     @Override
     public void getAllLessonsForExternal(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.EXTERNAL, userId, schoolIds, memberIds, startDate, endDate, handler);
+        getLessons(Context.EXTERNAL, userId, schoolIds, memberIds, startDate, endDate, null, null, handler);
     }
 
     @Override
@@ -181,7 +193,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                         String groupId  = ((Map <String,String>)result).get("groupId");
                         memberIds.add(groupId);
                     }
-                    getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, handler);
+                    getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, null, handler);
                 } else {
                     log.error("Teacher couldn't be retrieved or created.");
                     handler.handle(event.left());
@@ -193,7 +205,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
     @Override
     public void getAllLessonsForStudent(final String userId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
-        getLessons(Context.STUDENT, userId, schoolIds, memberIds, startDate, endDate, handler);
+        getLessons(Context.STUDENT, userId, schoolIds, memberIds, startDate, endDate,null, null, handler);
     }
 
     @Override
@@ -481,7 +493,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     public void retrieveLesson(String lessonId, Handler<Either<String, JsonObject>> handler) {
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT l.id as lesson_id, s.subject_label, l.subject_id, l.school_id, l.teacher_id, t.teacher_display_name, a.audience_type,")
+        query.append("SELECT l.id as lesson_id, array_to_json(array_agg(distinct homework)) as homeworks, s.subject_label, l.subject_id, l.school_id, l.teacher_id, t.teacher_display_name, a.audience_type,")
                 .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
                 .append(" array_to_json(array_agg(DISTINCT visa)) AS visas, ")
                 .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state ")
@@ -490,6 +502,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
                 .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
                 .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
                 .append(" LEFT JOIN diary.visa AS visa ON visa.session_id = l.id")
+                .append(" LEFT JOIN diary.homework AS homework ON homework.lesson_id = l.id")
                 .append(" WHERE l.id = ? ")
                 .append(" GROUP BY l.id, s.id, t.teacher_display_name, a.audience_type, a.audience_label ");
 

@@ -176,6 +176,9 @@ public class LessonController extends ControllerHelper {
         final String endDate = request.params().get("endDate");
         final String childId = request.params().get("childId");
 
+        final String audienceId = request.params().get("audienceId");
+        final String subjectId = request.params().get("subjectId");
+
         log.debug("listLessons on schools : " + schoolIds);
 
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -186,7 +189,7 @@ public class LessonController extends ControllerHelper {
                     // see UserInfoAdapterV1_0Json.java from entcore for user types
                     switch (user.getType()) {
                         case "Teacher":
-                            lessonService.getAllLessonsForTeacher(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));
+                            lessonService.getAllLessonsForTeacher(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, audienceId, subjectId, arrayResponseHandler(request));
                             break;
                         case "Student":
                             lessonService.getAllLessonsForStudent(user.getUserId(), Arrays.asList(schoolIds), user.getGroupsIds(), startDate, endDate, arrayResponseHandler(request));

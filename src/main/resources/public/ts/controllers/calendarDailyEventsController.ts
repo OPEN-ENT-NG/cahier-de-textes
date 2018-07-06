@@ -73,7 +73,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
          * @param unselectHomeworksOnHide
          */
         var hideOrShowHwDetail = function hideOrShowHwDetail(day, hideHomeworks, unselectHomeworksOnHide) {
-            if (!day.dailyEvents) {
+            if (!day.dailyHomeworks) {
                 return;
             }
             var hwDayDetail = $('#hw-detail-' + day.index);
@@ -91,7 +91,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             }
 
             if (hideHomeworks && unselectHomeworksOnHide) {
-                day.dailyEvents.forEach(function (dailyEvent) {
+                day.dailyHomeworks.forEach(function (dailyEvent) {
                     dailyEvent.selected = false;
                 });
             }
@@ -104,8 +104,8 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             var max = 0;
 
             $scope.calendar.days.all.forEach(function (day) {
-                if (day.dailyEvents && day.dailyEvents.length > max) {
-                    max = day.dailyEvents.length;
+                if (day.dailyHomeworks && day.dailyHomeworks.length > max) {
+                    max = day.dailyHomeworks.length;
                 }
             });
 
@@ -129,7 +129,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
          * @returns {Number|boolean}
          */
         $scope.showNotAllHomeworks = function (day) {
-            return day.dailyEvents && day.dailyEvents.length && !$scope.showAllHomeworks(day);
+            return day.dailyHomeworks && day.dailyHomeworks.length && !$scope.showAllHomeworks(day);
         };
 
         /**
@@ -140,15 +140,15 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
          */
         $scope.showAllHomeworks = function (day) {
 
-            if (!day.dailyEvents || day.dailyEvents && day.dailyEvents.length == 0) {
+            if (!day.dailyHomeworks || day.dailyHomeworks && day.dailyHomeworks.length == 0) {
                 return false;
             }
 
             // calendar hidden and homework panel maximized -> show all
             if (!$scope.bShowHomeworksMinified) {
-                return !$scope.bShowCalendar || day.dailyEvents.length <= 1;
+                return !$scope.bShowCalendar || day.dailyHomeworks.length <= 1;
             } else {
-                return day.dailyEvents.length == 1;
+                return day.dailyHomeworks.length == 1;
             }
         };
 
@@ -261,7 +261,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
 
         function setDaysContent() {
             model.calendar.days.forEach(function (day) {
-                day.dailyEvents = [];
+                day.dailyHomeworks = [];
             });
 
             if(!!$scope.ngModel){
@@ -270,7 +270,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
                     model.calendar.days.forEach(function (day) {
 
                         if (item.dueDate && moment(item.dueDate).format('YYYY-MM-DD') === refDay.format('YYYY-MM-DD')) {
-                            day.dailyEvents.push(item);
+                            day.dailyHomeworks.push(item);
                         }
 
                         refDay.add(1, 'day');

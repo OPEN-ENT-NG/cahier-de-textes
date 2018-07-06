@@ -2,10 +2,11 @@ import { ng, _, model, moment, Behaviours, notify, idiom as lang } from 'entcore
 import { Subjects, Notification } from '../../model';
 import {Session} from "../../model";
 import {Visa} from '../../model/visa';
+import {Homework} from '../../model/homework';
 
-export let createSessionCtrl = ng.controller('createSessionCtrl',
+export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
-        console.log("createSessionCtrl");
+        console.log("manageSessionCtrl");
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.isReadOnly = modeIsReadOnly();
@@ -23,9 +24,9 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             await Promise.all([
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
 
-            if (!!$routeParams.id) {
+            if ($routeParams.id) {
                 $scope.session.id = $routeParams.id;
-                await $scope.session.sync();
+                await $scope.session.sync($scope.structure);
             }
             $scope.safeApply();
         }
@@ -94,6 +95,15 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             }
         };
 
+        $scope.addHomework = () => {
+            let newHomework = new Homework($scope.structure);
+            newHomework.audience = $scope.session.audience;
+            newHomework.subject = $scope.session.subject;
+
+            $scope.session.homeworks.push(newHomework);
+            $scope.safeApply();
+        };
+
         $scope.publishSession = async () => {
             $scope.saveSession(true);
         };
@@ -116,13 +126,34 @@ export let createSessionCtrl = ng.controller('createSessionCtrl',
             }
         };
 
+        $scope.localSyncHomework = (homework: Homework, originalHomework: Homework) => {
+            console.log('Local Sync');
+            let foundIndex = $scope.session.homeworks.findIndex(x => x.id == homework.id);
+            if(foundIndex === -1) {
+                $scope.session.homeworks.push(homework);
+                $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item !== originalHomework);
+            } else {
+                $scope.session.homeworks[foundIndex] = homework;
+            }
+
+            $scope.session.openedHomework = -1;
+            $scope.safeApply();
+        };
+
+        $scope.localRemoveHomework = (deletedHomework: Homework) => {
+            console.log('localRemoveHomework');
+            $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
+            $scope.session.openedHomework = -1;
+            $scope.safeApply();
+        };
+
         $scope.saveSession = async (publish = false) => {
             if(!$scope.isValidForm){
                 $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
             }
             else {
                 let {data, status} = await $scope.session.save();
-                if (status === 200) {
+                if (status === 200 || status === 201) {
                     if (publish && ($scope.session.id || (data && data.id)) )  {
                         $scope.session.id = data.id ? data.id : $scope.session.id;
                         let {status} = await $scope.session.publish();

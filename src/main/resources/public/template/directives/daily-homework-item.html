@@ -1,0 +1,11 @@
+<div class="homework-content" ng-style="{'border-color': homework.color, 'color': homework.color}"
+           ng-click="updateHomework(homework.id)" >
+
+    <div class="row text-ellipsis overflow-hidden">
+        [[homework.subject.label]]
+    </div>
+
+    <div class="row">
+        <span>[[homework.audience.name]] <i ng-if="homework.state === 'draft'">&#xe858;</i></span>
+    </div>
+</div>
