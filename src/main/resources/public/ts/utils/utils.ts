@@ -1,6 +1,7 @@
 import { moment, model, me, Behaviours, _ } from 'entcore';
 import { Course, Structure } from '../model/index';
 import {FORMAT} from './const/dateFormat';
+import {Notification} from '../model';
 
 export class Utils {
 
@@ -27,6 +28,17 @@ export class Utils {
             CLASS: 0,
             FUNCTIONAL_GROUP: 1,
         };
+    }
+
+    static setToastMessage(response, message, errorMessage){
+        if(response.status === 200 || response.status === 201){
+            response.succeed = true;
+            response.toastMessage = message;
+        } else {
+            response.succeed = false;
+            response.toastMessage = errorMessage;
+        }
+        return response;
     }
 
     /**

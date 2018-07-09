@@ -1,5 +1,8 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
-import {Structures, PEDAGOGIC_TYPES, USER_TYPES, Course, Student, Group, Structure, Sessions} from '../model';
+import {
+    Structures, PEDAGOGIC_TYPES, USER_TYPES, Course, Student, Group, Structure, Sessions,
+    Notification
+} from '../model';
 import {Homeworks} from '../model/homework';
 
 export let main = ng.controller('MainController',
@@ -237,6 +240,16 @@ export let main = ng.controller('MainController',
             }
             $scope.syncPedagogicItems();
         });
+
+        $scope.toastHttpCall = (response) => {
+            if(response.succeed) {
+                $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'confirm'));
+            } else {
+                $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'error'));
+            }
+            $scope.safeApply();
+            return response;
+        };
 
         $scope.switchStructure = (structure: Structure) => {
             $scope.syncStructure(structure);

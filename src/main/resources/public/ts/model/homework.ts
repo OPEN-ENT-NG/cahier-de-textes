@@ -29,6 +29,7 @@ export class Homework {
     startMoment: any;
     endMoment: any;
 
+    opened: boolean;
     is_periodic: boolean = false;
     locked: boolean = true;
 
@@ -39,10 +40,6 @@ export class Homework {
         this.color = 'pink';
         this.type = new HomeworkType();
         this.dueDate = moment().toDate();
-    }
-
-    isPublished(){
-        return this.state === 'published';
     }
 
     toSendFormat () {
@@ -91,41 +88,31 @@ export class Homework {
     }
 
     async save () {
-        return await this.createOrUpdate();
-    }
-
-    async createOrUpdate () {
-        try {
-            if (this.id)
-                return await http.put('/diary/homework/' + this.id, this.toSendFormat());
-            else
-                return await http.post('/diary/homework', this.toSendFormat());
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
+        if (this.id) {
+            return await this.update();
+        } else {
+            return await this.create();
         }
     }
 
+    async create () {
+        let response = await http.post('/diary/homework', this.toSendFormat());
+        return Utils.setToastMessage(response, 'homework.created','homework.created.error');
+    }
+
+    async update () {
+        let response = await http.put('/diary/homework/' + this.id, this.toSendFormat());
+        return Utils.setToastMessage(response, 'homework.updated','homework.updated.error');
+    }
 
     async delete() {
-        try {
-            return await http.delete('/diary/homework/' + this.id);
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.delete('/diary/homework/' + this.id);
+        return Utils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
     }
 
     async publish() {
-        try {
-            return await http.post('/diary/publishHomeworks', {ids:[this.id]});
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.post('/diary/publishHomeworks', {ids:[this.id]});
+        return Utils.setToastMessage(response, 'homework.published','homework.published.error');
     }
 
 

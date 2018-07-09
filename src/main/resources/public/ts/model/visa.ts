@@ -50,30 +50,18 @@ export class Visa {
     }
 
     async create () {
-        try {
-            return await http.post('/diary/visa', this.toJSON());
-        } catch (e) {
-            notify.error('visa.create.err');
-        }
+        let response = await http.post('/diary/visa', this.toJSON());
+        return Utils.setToastMessage(response, 'visa.created','visa.created.error');
     }
 
     async update () {
-        try {
-            return await http.put(`/diary/visa/${this.id}`, this.toJSON());
-        } catch (e) {
-            notify.error('visa.update.err');
-            throw e;
-        }
+        let response = await http.put(`/diary/visa/${this.id}`, this.toJSON());
+        return Utils.setToastMessage(response, 'visa.updated','visa.updated.error');
     }
 
     async delete() {
-        try {
-            return await http.delete('/diary/visa/' + this.id);
-        } catch (e) {
-            notify.error('visa.delete.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.delete('/diary/visa/' + this.id);
+        return Utils.setToastMessage(response, 'visa.delete','visa.delete.error');
     }
 
     async sync(): Promise<void> {

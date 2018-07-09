@@ -23,7 +23,6 @@ export class Session {
     annotation: string = "";
     state: string = "draft";
     attachments: any = [];
-    homeworkIds: any = [];
     homeworks: Homework[] = [];
     room: string = "";
 
@@ -68,7 +67,6 @@ export class Session {
             description: data.lesson_description,
             annotation: data.lesson_annotation,
             attachments: data.attachments,
-            //homeworkIds: JSON.parse(data.homework_ids),
             homeworks: JSON.parse(data.homeworks),
             visas: JSON.parse(data.visas)
         };
@@ -94,8 +92,8 @@ export class Session {
         };
     }
 
-
-    initDates(){
+    init(structure: Structure){
+        this.structure = structure;
         this.date = moment(this.date).toDate();
         this.startMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
         this.startTime = moment(this.startTime, FORMAT.formattedTime).toDate();
@@ -106,87 +104,58 @@ export class Session {
         this.endTime = moment(this.endTime, FORMAT.formattedTime).toDate();
         this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
         this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
+
+        if (this.visas.every(v => v === null)) {
+            this.visas = [];
+        } else {
+            this.visas = Mix.castArrayAs(Visa, this.visas);
+            this.visas.forEach(v => v.init(this.structure));
+        }
+
+        if(this.homeworks.every(v => v === null)){
+            this.homeworks = [];
+        }
+        if(this.homeworks){
+            this.homeworks = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(this.homeworks, this.structure));
+            this.homeworks.forEach(h => {
+                h.structure = this.structure;
+            });
+        }
     }
 
     async save() {
-        return await this.createOrUpdate();
-    }
-
-    async createOrUpdate() {
-        try {
-            if(this.id)
-                return await http.put('/diary/lesson/' + this.id, this.toSendFormat());
-            else
-                return await http.post('/diary/lesson', this.toSendFormat());
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
+        if(this.id) {
+            let response = await http.put('/diary/lesson/' + this.id, this.toSendFormat());
+            return Utils.setToastMessage(response, 'session.updated','session.updated.error');
+        } else {
+            let response = await http.post('/diary/lesson', this.toSendFormat());
+            return Utils.setToastMessage(response, 'session.create','session.create.error');
         }
     }
 
     async delete() {
-        try {
-            return await http.delete('/diary/lesson/' + this.id);
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.delete('/diary/lesson/' + this.id);
+        return Utils.setToastMessage(response, 'session.delete','session.delete.error');
     }
 
     async publish() {
-        try {
-            return await http.post('/diary/lesson/publish', this.toSendFormat());
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.post('/diary/lesson/publish', this.toSendFormat());
+        return Utils.setToastMessage(response, 'session.published','session.published.error');
     }
-
 
     async unpublish() {
-        try {
-            return await http.post('/diary/lesson/unpublish', this.toSendFormat());
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.post('/diary/lesson/unpublish', this.toSendFormat());
+        return Utils.setToastMessage(response, 'session.unpublished','session.unpublished.error');
     }
 
-    async sync(structure: Structure) {
-        let session = structure.sessions.all.find(t => t.id === this.id);
-
-        if (session) {
-            Mix.extend(this, session);
-            this.initDates();
+    async sync() {
+        try {
+            let {data} = await http.get('/diary/lesson/' + this.id);
+            Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
+            this.init(this.structure);
+        } catch (e) {
+            notify.error('session.sync.err');
         }
-        else {
-            try {
-                let {data} = await http.get('/diary/lesson/' + this.id);
-                Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
-                this.initDates();
-                if (this.visas.every(v => v === null)) {
-                    this.visas = [];
-                } else {
-                    this.visas = Mix.castArrayAs(Visa, this.visas);
-                    this.visas.forEach(v => v.init(this.structure));
-            }
-
-            if(this.homeworks.every(v => v === null)){
-                this.homeworks = [];
-            }
-            if(this.homeworks){
-                this.homeworks = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(this.homeworks, this.structure));
-                }
-
-            } catch (e) {
-                notify.error('session.sync.err');
-            }
-        }
-
     }
 }
 
@@ -213,7 +182,6 @@ export class Sessions {
 
         let url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
 
-
         await this.syncSessions(url);
     }
 
@@ -222,15 +190,7 @@ export class Sessions {
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
-            i.initDates();
-            if(!!i.visas){
-                if(i.visas.every(v => v === null)){
-                    i.visas = [];
-                } else {
-                    i.visas = Mix.castArrayAs(Visa, i.visas);
-                    i.visas.forEach(v => v.init(this.structure));
-                }
-            }
+            i.init(this.structure);
         });
     }
 

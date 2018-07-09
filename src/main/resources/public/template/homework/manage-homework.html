@@ -2,6 +2,7 @@
 
     <form>
         <article>
+
             <div ng-if="!isInsideSessionForm">
                 <h3><i18n>utils.subject_and_audience</i18n></h3>
                 <div class="row form-row" ng-if="structures.all.length > 1">
@@ -38,7 +39,7 @@
                 </div>
             </div>
 
-            <h3><i18n>homework.manage.config</i18n></h3>
+            <h3 ng-if="!isInsideSessionForm"><i18n>homework.manage.config</i18n></h3>
             <div class="row form-row">
                 <label class="cell two twelve-mobile">
                     <i18n>title</i18n>*
@@ -72,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row form-row">
+            <div class="row form-row" ng-if="!isInsideSessionForm">
                 <label class="cell two twelve-mobile">
                     <i18n>state</i18n>*
                 </label>
@@ -105,12 +106,21 @@
         </article>
 
         <div class="row">
-            <span ng-if="session.id" class="left-magnet vertical-spacing">
-                <button class="cancel" type="button" ng-click="deleteHomework()">
+            <span ng-if="isInsideSessionForm">
+                <button class="cancel float-none display-inline-block" type="button" ng-click="cancelCreation()">
+                    <i18n>utils.cancel</i18n>
+                </button>
+                <button class="float-none display-inline-block" type="button" ng-click="deleteHomework()">
                     <i18n>utils.delete</i18n>
                 </button>
             </span>
-            <span class="right-magnet vertical-spacing">
+            <div ng-if="!isInsideSessionForm">
+                <span ng-if="homework.id" class="left-magnet vertical-spacing">
+                <button class="cancel" type="button" ng-click="deleteHomework()">
+                    <i18n>utils.delete</i18n>
+                </button>
+                </span>
+                <span class="right-magnet vertical-spacing">
                 <div ng-if="form_is_not_valid" class="warning">
                     <i18n>creation.error</i18n>
                 </div>
@@ -132,6 +142,7 @@
                     <i18n>unpublish</i18n>
                 </button>
             </span>
+            </div>
         </div>
 
     </form>

@@ -26,7 +26,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             if ($routeParams.id) {
                 $scope.session.id = $routeParams.id;
-                await $scope.session.sync($scope.structure);
+                await $scope.session.sync();
             }
             $scope.safeApply();
         }
@@ -38,9 +38,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             delete $scope.course;
         };
 
-        $scope.hasManageVisaRight = () => {
-            return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageVisa);
-        };
+
 
         $scope.isValidForm = () => {
             return $scope.session
@@ -50,6 +48,95 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime;
+        };
+
+
+
+        $scope.publishSession = async () => {
+            $scope.saveSession(true);
+        };
+
+        $scope.deleteSession = async () => {
+            $scope.toastHttpCall(await $scope.session.delete());
+            $scope.goTo('/');
+        };
+
+        $scope.unpublishSession = async () => {
+            $scope.toastHttpCall(await $scope.session.unpublish());
+            $scope.goTo('/');
+        };
+
+        $scope.saveSession = async (publish = false) => {
+            if(!$scope.isValidForm){
+                $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
+                return;
+            }
+
+            // Sauvegarde de la session
+            let result = $scope.toastHttpCall(await $scope.session.save());
+
+            if(!$scope.session.id && result.data.id) {
+                $scope.session.id = result.data.id;
+            } else if (!$scope.session.id && !result.data.id){
+                $scope.notifications.push(new Notification('Error no id for session'), 'error');
+                return;
+            }
+
+            if (result.succeed) {
+                if(publish){
+                    let {succeed} = $scope.toastHttpCall(await $scope.session.publish());
+                    if(succeed){
+                        $scope.session.state = 'published';
+                    }
+                }
+
+                // Sauvegarde des homeworks
+                $scope.session.homeworks.forEach(async h => {
+                    h.state = $scope.session.state;
+                    h.session = $scope.session;
+                    $scope.toastHttpCall(await h.save());
+                });
+            }
+
+            $scope.safeApply();
+            $scope.goTo('/');
+        };
+
+
+
+        // region Gestion des homework
+        $scope.addHomework = () => {
+            let newHomework = new Homework($scope.structure);
+            newHomework.audience = $scope.session.audience;
+            newHomework.subject = $scope.session.subject;
+            newHomework.session = $scope.session;
+
+            $scope.session.homeworks.push(newHomework);
+            $scope.safeApply();
+        };
+
+        $scope.localSyncHomework = (homework: Homework, originalHomework: Homework) => {
+            console.log('Local Sync');
+            let foundIndex = $scope.session.homeworks.findIndex(x => x.id == homework.id);
+            if(foundIndex === -1) {
+                $scope.session.homeworks.push(homework);
+                $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item !== originalHomework);
+            } else {
+                $scope.session.homeworks[foundIndex] = homework;
+            }
+        };
+
+        $scope.localRemoveHomework = (deletedHomework: Homework) => {
+            console.log('localRemoveHomework');
+            $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
+        };
+
+        // endregion
+
+
+        // region Gestion des visas
+        $scope.hasManageVisaRight = () => {
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageVisa);
         };
 
         $scope.visaForm = {};
@@ -69,14 +156,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.saveVisa = async () => {
-            let { status } = await $scope.visaForm.visa.save();
-            if (status === 200) {
-                let notificationText = $scope.visaForm.visa.id ? 'visa.updated' : 'visa.created';
-
+            let { succeed } = $scope.toastHttpCall(await $scope.visaForm.visa.delete());
+            if (succeed) {
                 $scope.visaForm.visa = undefined;
                 await $scope.session.sync();
-                $scope.notifications.push(new Notification(lang.translate(notificationText), 'confirm'));
-
                 $scope.safeApply();
             }
         };
@@ -87,89 +170,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.deleteVisa = async (visa: Visa) => {
-            let { status } = await visa.delete();
-            if (status === 200) {
+            let { succeed } = $scope.toastHttpCall(await visa.delete());
+            if (succeed){
                 await $scope.session.sync();
-                $scope.notifications.push(new Notification(lang.translate('visa.deleted'), 'confirm'));
                 $scope.safeApply();
             }
         };
 
-        $scope.addHomework = () => {
-            let newHomework = new Homework($scope.structure);
-            newHomework.audience = $scope.session.audience;
-            newHomework.subject = $scope.session.subject;
-
-            $scope.session.homeworks.push(newHomework);
-            $scope.safeApply();
-        };
-
-        $scope.publishSession = async () => {
-            $scope.saveSession(true);
-        };
-
-        $scope.unpublishSession = async () => {
-            let {status} = await $scope.session.unpublish();
-            if (status === 200) {
-                $scope.notifications.push(new Notification(lang.translate('session.manage.unpublished'), 'confirm'));
-                $scope.safeApply();
-                $scope.goTo('/');
-            }
-        };
-        
-        $scope.deleteSession = async () => {
-            let {status} = await $scope.session.delete();
-            if (status === 201) {
-                $scope.notifications.push(new Notification(lang.translate('session.manage.delete'), 'confirm'));
-                $scope.safeApply();
-                $scope.goTo('/');
-            }
-        };
-
-        $scope.localSyncHomework = (homework: Homework, originalHomework: Homework) => {
-            console.log('Local Sync');
-            let foundIndex = $scope.session.homeworks.findIndex(x => x.id == homework.id);
-            if(foundIndex === -1) {
-                $scope.session.homeworks.push(homework);
-                $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item !== originalHomework);
-            } else {
-                $scope.session.homeworks[foundIndex] = homework;
-            }
-
-            $scope.session.openedHomework = -1;
-            $scope.safeApply();
-        };
-
-        $scope.localRemoveHomework = (deletedHomework: Homework) => {
-            console.log('localRemoveHomework');
-            $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
-            $scope.session.openedHomework = -1;
-            $scope.safeApply();
-        };
-
-        $scope.saveSession = async (publish = false) => {
-            if(!$scope.isValidForm){
-                $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
-            }
-            else {
-                let {data, status} = await $scope.session.save();
-                if (status === 200 || status === 201) {
-                    if (publish && ($scope.session.id || (data && data.id)) )  {
-                        $scope.session.id = data.id ? data.id : $scope.session.id;
-                        let {status} = await $scope.session.publish();
-                        if (status === 200) {
-                            $scope.notifications.push(new Notification(lang.translate('session.manage.published'), 'confirm'));
-                        }
-                    }
-                    else {
-                        $scope.notifications.push(new Notification(lang.translate('session.manage.confirm'), 'confirm'));
-                    }
-                }
-                $scope.safeApply();
-                $scope.goTo('/');
-            }
-        };
-
-
+        //endregion
     }]
 );
