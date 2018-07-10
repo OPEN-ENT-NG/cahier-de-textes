@@ -38,7 +38,6 @@ export class Homework {
     constructor (structure: Structure) {
         this.structure = structure;
         this.color = 'pink';
-        this.type = new HomeworkType();
         this.dueDate = moment().toDate();
     }
 
@@ -117,13 +116,8 @@ export class Homework {
 
 
     async unpublish() {
-        try {
-            return await http.post('/diary/unPublishHomeworks', {ids:[this.id]});
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
+        let response = await http.post('/diary/unPublishHomeworks', {ids:[this.id]});
+        return Utils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
     }
 
     async sync(): Promise<void> {

@@ -353,4 +353,18 @@ public class DiaryController extends BaseController {
             }
         );
     }
+
+    @Get("/workflow/1/")
+    @ApiDoc("Used only to create a workflow right")
+    @SecuredAction(value = "calendar.view", type = ActionType.WORKFLOW)
+    public void workflow1(final HttpServerRequest request) {
+
+    }
+
+    @Get("/workflow/2/")
+    @ApiDoc("Used only to create a workflow right")
+    @SecuredAction(value = "list.view", type = ActionType.WORKFLOW)
+    public void workflow2(final HttpServerRequest request) {
+
+    }
 }

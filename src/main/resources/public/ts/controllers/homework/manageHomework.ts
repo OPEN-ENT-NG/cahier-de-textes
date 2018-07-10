@@ -5,7 +5,6 @@ import {Mix} from 'entcore-toolkit';
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', function ($scope, $routeParams, $location, $attrs) {
-        console.log("manageHomeworkCtrl");
 
         $scope.homework = new Homework($scope.structure);
         $scope.sessions = new Sessions($scope.structure);
@@ -37,7 +36,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
 
             if ($scope.homework.id) {
-                syncHomework();
+                await syncHomework();
             }
 
             $scope.safeApply();
@@ -53,12 +52,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         initData();
 
         $scope.syncSessions = async () => {
-            console.log('SyncSessions');
             if($scope.homework.audience && $scope.homework.subject)
                 await $scope.sessions.syncWithAudienceAndSubject(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
         };
 
-        $scope.cancelCreation = () => {
+        $scope.cancelCreation = async () => {
             if (!$scope.isInsideSessionForm) {
                 $scope.goTo('/');
             } else {
@@ -69,7 +67,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.$parent.localRemoveHomework($scope.$parent.homework);
                 } else {
                     // Si c'est insideSessionForm et update, on resync le homework
-                    syncHomework();
+                    await syncHomework();
                     $scope.safeApply();
                 }
 
@@ -78,11 +76,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         $scope.isValidForm = () => {
+            let validSessionOrDueDate = $scope.attachedToSession.bool ? !!$scope.homework.session : !!$scope.homework.dueDate;
             return $scope.homework
                 && $scope.homework.structure
                 && $scope.homework.subject
                 && $scope.homework.audience
-                && $scope.homework.dueDate
+                && validSessionOrDueDate
                 && $scope.homework.title
                 && $scope.homework.type;
         };
@@ -92,11 +91,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         $scope.unpublishHomework = async () => {
-            let {status} = await $scope.session.unpublish();
-            if (status === 200) {
-                $scope.notifications.push(new Notification(lang.translate('homework.manage.unpublished'), 'confirm'));
-                $scope.safeApply();
-                if(!$scope.isInsideSessionForm) $scope.goTo('/');
+            let { succeed } = $scope.toastHttpCall(await $scope.homework.unpublish());
+            if (succeed && !$scope.isInsideSessionForm) {
+                $scope.goTo('/');
             }
         };
 
@@ -120,39 +117,26 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.homework.session = undefined;
                 }
 
-                let result = $scope.toastHttpCall(await $scope.homework.save());
+                let homeworkSaveResponse = await $scope.homework.save();
 
-                if(!$scope.homework.id && result.data.id) {
-                    $scope.homework.id = result.data.id;
-                } else if (!$scope.homework.id && !result.data.id){
-                    $scope.notifications.push(new Notification('Error no id for homework'), 'error');
-                    return;
-                }
+                if (homeworkSaveResponse.succeed) {
+                    if(!$scope.homework.id && homeworkSaveResponse.data.id) {
+                        $scope.homework.id = homeworkSaveResponse.data.id;
+                    } else if (!$scope.homework.id && !homeworkSaveResponse.data.id){
+                        $scope.notifications.push(new Notification('Error no id for homework'), 'error');
+                        return;
+                    }
 
-                if (result.succeed) {
                     if(publish){
                         let {succeed} = $scope.toastHttpCall(await $scope.homework.publish());
                         if(succeed){
                             $scope.homework.state = 'published';
                         }
+                    } else {
+                        $scope.toastHttpCall(homeworkSaveResponse);
                     }
                 }
 
-                // if (status === 200 || status === 201) {
-                //     $scope.homework.id = data.id ? data.id : $scope.homework.id;
-                //     if($scope.isInsideSessionForm){
-                //         $scope.$parent.localSyncHomework($scope.homework, $scope.$parent.homework);
-                //     }
-                //     if (publish && ($scope.homework.id || (data && data.id))) {
-                //         let {status} = await $scope.homework.publish();
-                //         if (status === 200) {
-                //             $scope.notifications.push(new Notification(lang.translate('homework.manage.published'), 'confirm'));
-                //         }
-                //     }
-                //     else {
-                //         $scope.notifications.push(new Notification(lang.translate('homework.manage.confirm'), 'confirm'));
-                //     }
-                // }
                 $scope.safeApply();
                 if(!$scope.isInsideSessionForm) $scope.goTo('/');
             }

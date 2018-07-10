@@ -84,7 +84,6 @@ export let main = ng.controller('MainController',
         }
 
         async function initializeData(){
-            console.log('initializeData');
             $scope.isRefreshingCalendar = true;
 
             await initializeStructure();
@@ -220,7 +219,6 @@ export let main = ng.controller('MainController',
         $scope.$watch(() => $scope.calendar.firstDay, () => {
             if(!$scope.pageInitialized) return;
 
-            console.log('Watch $scope.calendar.firstDay : increment=' + $scope.calendar.increment);
             let calendarMode = $scope.calendar.increment;
             let momentFirstDay = moment($scope.calendar.firstDay);
 
@@ -241,6 +239,12 @@ export let main = ng.controller('MainController',
             $scope.syncPedagogicItems();
         });
 
+
+        /**
+         * Toast the response
+         * @param response
+         * @returns {any}
+         */
         $scope.toastHttpCall = (response) => {
             if(response.succeed) {
                 $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'confirm'));
@@ -319,6 +323,14 @@ export let main = ng.controller('MainController',
         $scope.goTo = (state: string) => {
             $location.path(state);
             $scope.safeApply();
+        };
+
+        $scope.hasAtLeastOneCreateRight = () => {
+          return model.me.hasWorkflow(WORKFLOW_RIGHTS.createHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.createLesson);
+        };
+
+        $scope.hasBothViewMode = () => {
+          return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
         };
 
         $scope.openSession = (sessionId: number, fromCourse: Boolean = false) => {

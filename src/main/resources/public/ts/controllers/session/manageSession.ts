@@ -6,7 +6,6 @@ import {Homework} from '../../model/homework';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
-        console.log("manageSessionCtrl");
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.isReadOnly = modeIsReadOnly();
@@ -39,15 +38,23 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
 
-
         $scope.isValidForm = () => {
-            return $scope.session
+            let sessionFormIsValid = $scope.session
                 && $scope.session.subject
                 && $scope.session.audience
                 && $scope.session.title
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime;
+
+            let homeworkFormsAreValids = true;
+            for(let h of $scope.session.homeworks) {
+                homeworkFormsAreValids = h.title && h.type;
+                if(!homeworkFormsAreValids)
+                    break;
+            }
+
+            return sessionFormIsValid && homeworkFormsAreValids;
         };
 
 
@@ -73,40 +80,46 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             // Sauvegarde de la session
-            let result = $scope.toastHttpCall(await $scope.session.save());
+            let sessionSaveResponse = await $scope.session.save();
 
-            if(!$scope.session.id && result.data.id) {
-                $scope.session.id = result.data.id;
-            } else if (!$scope.session.id && !result.data.id){
-                $scope.notifications.push(new Notification('Error no id for session'), 'error');
-                return;
-            }
-
-            if (result.succeed) {
-                if(publish){
-                    let {succeed} = $scope.toastHttpCall(await $scope.session.publish());
-                    if(succeed){
-                        $scope.session.state = 'published';
-                    }
+            if (sessionSaveResponse.succeed) {
+                if(!$scope.session.id && sessionSaveResponse.data.id) {
+                    $scope.session.id = sessionSaveResponse.data.id;
+                } else if (!$scope.session.id && !sessionSaveResponse.data.id){
+                    $scope.notifications.push(new Notification('Error no id for session'), 'error');
+                    return;
                 }
 
-                // Sauvegarde des homeworks
-                $scope.session.homeworks.forEach(async h => {
-                    h.state = $scope.session.state;
-                    h.session = $scope.session;
-                    $scope.toastHttpCall(await h.save());
-                });
+                if(publish){
+                    let sessionPublishResponse = await $scope.session.publish();
+                    if(sessionPublishResponse.succeed){
+                        $scope.session.state = 'published';
+                        await saveSessionHomeworks();
+                    }
+                    $scope.toastHttpCall(sessionPublishResponse);
+                } else {
+                    await saveSessionHomeworks();
+                    $scope.toastHttpCall(sessionSaveResponse);
+                }
             }
 
             $scope.safeApply();
             $scope.goTo('/');
         };
 
+        async function saveSessionHomeworks() {
+            $scope.session.homeworks.forEach(async h => {
+                h.state = $scope.session.state;
+                h.session = $scope.session;
+                await h.save();
+            });
+        }
 
 
         // region Gestion des homework
         $scope.addHomework = () => {
             let newHomework = new Homework($scope.structure);
+            newHomework.opened = true;
             newHomework.audience = $scope.session.audience;
             newHomework.subject = $scope.session.subject;
             newHomework.session = $scope.session;
@@ -116,7 +129,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.localSyncHomework = (homework: Homework, originalHomework: Homework) => {
-            console.log('Local Sync');
             let foundIndex = $scope.session.homeworks.findIndex(x => x.id == homework.id);
             if(foundIndex === -1) {
                 $scope.session.homeworks.push(homework);
@@ -127,7 +139,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.localRemoveHomework = (deletedHomework: Homework) => {
-            console.log('localRemoveHomework');
             $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
         };
 

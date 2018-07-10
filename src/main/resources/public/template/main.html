@@ -12,11 +12,10 @@
     <div class="clear"></div>
 </div>
 <div class="row" ng-init="display.listView = false">
-
     <article class="cell two twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></article>
 
-    <!-- Calendar View -->
-    <div class="cell ten twelve-mobile" ng-show="!display.listView" static-include="/diary/public/template/main/calendar-view.html"></div>
-    <div class="cell ten twelve-mobile" ng-show="display.listView" static-include="/diary/public/template/main/list-view.html"></div>
-
+    <div class="cell ten twelve-mobile" ng-show="!display.listView" workflow="diary.calendarView"
+         static-include="/diary/public/template/main/calendar-view.html"></div>
+    <div class="cell ten twelve-mobile" ng-show="display.listView" workflow="diary.listView"
+         static-include="/diary/public/template/main/list-view.html"></div>
 </div>

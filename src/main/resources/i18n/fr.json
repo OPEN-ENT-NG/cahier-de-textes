@@ -1,5 +1,6 @@
 {
   "diary": "Cahier de textes",
+  "diary.title": "Cahier de textes",
   "notify.saved": "La donnée a été sauvegardée",
   "notify.modified": "La donnée a été modifiée",
   "notify.deleted": "La donnée a été supprimée",

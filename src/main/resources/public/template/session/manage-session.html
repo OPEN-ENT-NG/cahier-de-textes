@@ -90,7 +90,6 @@
                             <div class="ten cell twelve-mobile ng-scope" >
                                 <div class="card row padding-md margin-bottom-md" ng-repeat="homework in session.homeworks">
                                     <div class="row" ng-click="homework.opened = !homework.opened">
-                                        <!-- titre  -->
                                         <h2 ng-show="!homework.opened" class="hover-orange" style="float: left;">
                                             <i18n>homework</i18n>
                                         </h2>
@@ -98,56 +97,17 @@
                                             <i18n>homework</i18n>
                                         </h2>
 
-                                        <!-- chevron -->
                                         <div class="cell right-magnet hover-orange">
                                             <i ng-show="!homework.opened" data-tooltip="Déplier" class="down-open"></i>
                                             <i ng-hide="!homework.opened" data-tooltip="Plier" class="up-open ng-hide"></i>
                                         </div>
                                     </div>
-
-                                    <!-- daily.homework.givenduedate homework.type.label homework.title -->
                                     <div ng-show="homework.opened">
                                         <div inside-session-form="true" ng-controller="manageHomeworkCtrl"
                                              static-include="/diary/public/template/homework/manage-homework.html" style="padding: 1px;">
                                         </div>
                                     </div>
                                 </div>
-
-
-                                <!--<table class="twelve">-->
-                                    <!--<tbody>-->
-                                        <!--<tr ng-repeat="homework in session.homeworks" class="accordion" ng-class="{ opened: session.openedHomework === $index }">-->
-                                            <!--<td>-->
-                                                <!--<h2 ng-click="session.openedHomework = $index;">-->
-                                                    <!--[[$index]]-->
-                                                    <!--<span ng-if="!homework.id">(<i18n>creation</i18n>) <i18n>homework</i18n></span>-->
-                                                    <!--<span ng-if="homework.id"><i18n>homework</i18n> - [[homework.title]]</span>-->
-                                                <!--</h2>-->
-                                                <!--<div class="toggle">-->
-                                                    <!--<div class="content">-->
-                                                        <!--<div inside-session-form="true" ng-controller="manageHomeworkCtrl"-->
-                                                             <!--static-include="/diary/public/template/homework/manage-homework.html" style="padding: 1px;">-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
-                                                <!--</div>-->
-                                            <!--</td>-->
-                                        <!--</tr>-->
-                                    <!--</tbody>-->
-                                <!--</table>-->
-                                <!-- todo: update css -->
-                                <!--<article ng-repeat="homework in session.homeworks" class="accordion" ng-class="{ opened: session.openedHomework === $index }">-->
-                                    <!--<h2 ng-click="session.openedHomework = $index;">-->
-                                        <!--[[$index]]-->
-                                        <!--<i18n>homework</i18n>-->
-                                    <!--</h2>-->
-                                    <!--<div class="toggle">-->
-                                        <!--<div class="content">-->
-                                            <!--<div inside-session-form="true" ng-controller="manageHomeworkCtrl"-->
-                                                 <!--static-include="/diary/public/template/homework/manage-homework.html" style="padding: 1px;">-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
-                                <!--</article>-->
                                 <button ng-click="addHomework()"><i18n>utils.add</i18n></button>
                             </div>
                         </div>
