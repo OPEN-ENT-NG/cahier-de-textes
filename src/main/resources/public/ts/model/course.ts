@@ -7,6 +7,7 @@ import {Session} from "./session";
 import {Visa} from "./visa";
 import {Homework, Homeworks} from "./homework";
 import {FORMAT} from "../utils/const/dateFormat";
+import includes = require('core-js/fn/array/includes');
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -27,6 +28,8 @@ export class Course {
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
+
+    structure: Structure;
 
     endDate: any;
     endMoment: any;
@@ -60,6 +63,9 @@ export class Course {
             this.endDisplayDate = Utils.getDisplayDate(this.endMoment);
             this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
         }
+
+        this.teachers = this.structure.teachers.all.filter(t => this.teacherIds.find(id => id === t.id));
+        this.subjectLabel = this.structure.subjects.mapping[this.subjectId];
     }
 
     async save () {
@@ -87,11 +93,9 @@ export class Course {
     }
 
     static formatSqlDataToModel(data: any, structure: Structure) {
-        let course = new Course(data, data.startDate, data.endDate);
-        course.subjectLabel = structure.subjects.mapping[data.subjectId];
-        course.teachers = _.map(data.teacherIds, (ids) => {
-            return _.findWhere(structure.teachers.all, {id: ids});
-        });
+        let course = new Course(structure);
+        Mix.extend(course, data);
+        course.init();
         return course;
     }
 
