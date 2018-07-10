@@ -1,7 +1,7 @@
 import {model, moment, _, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import { Subject, Structure, Teacher, Group, Utils} from './index';
+import { Subject, Structure, Teacher, Course, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
@@ -13,6 +13,7 @@ export class Session {
     id: string;
     subject: Subject;
     structure: Structure;
+    teacher: Teacher;
     audience: any;
     title: string;
     color: string = _.first(colors);
@@ -122,6 +123,26 @@ export class Session {
                 h.session = this;
             });
         }
+    }
+
+    async mapFromCourse(courseId: any) {
+        let course = new Course(this.structure);
+        course._id = courseId;
+        await course.sync(this.structure);
+        console.log('course', course)
+        if (course.teachers && course.teachers.length > 0)
+            this.teacher = course.teachers[0];
+        if (course.roomLabels && course.roomLabels.length > 0)
+            this.room = course.roomLabels[0];
+        if (course.subjectId)
+            this.subject = this.structure.subjects.all.find(t => t.id === course.subjectId)
+        if (course.startMoment)
+            this.startTime = moment(this.startMoment).toDate()
+        if (course.endMoment)
+            this.startTime = moment(this.endMoment).toDate();
+        if (course.classes)
+            this.audience = course.classes;
+        this.date = moment(course.startDate || this.date).toDate();
     }
 
     async save() {

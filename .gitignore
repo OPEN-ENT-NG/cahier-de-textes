@@ -20,6 +20,7 @@ src/main/resources/public/dist
 src/main/resources/public/js
 src/main/resources/public/view
 src/main/resources/template/entcore
+src/main/resources/public/template/entcore/
 rev-manifest.json
 package-lock.json
 error.log

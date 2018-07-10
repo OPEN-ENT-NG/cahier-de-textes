@@ -325,12 +325,13 @@ export let main = ng.controller('MainController',
         $scope.openSession = (sessionId: number, fromCourse: Boolean = false) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 if(fromCourse)
-                    $scope.goTo('/session/create?courseId=' + sessionId);
+                    $scope.goTo('/session/create/' + sessionId);
                 else
                     $scope.goTo('/session/update/' + sessionId);
             } else {
                 $scope.goTo('/session/view/' + sessionId);
             }
+            $scope.safeApply();
         };
 
         $scope.openHomework = (homeworkId: number) => {

@@ -5,14 +5,14 @@ import {USER_TYPES, Structure, Teacher, Group, Utils, Subject} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from "./session";
 import {Visa} from "./visa";
+import {Homework, Homeworks} from "./homework";
+import {FORMAT} from "../utils/const/dateFormat";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
 export class Course {
     _id: string;
     structureId: string;
-    startDate: string | object;
-    endDate: string | object;
     dayOfWeek: number;
     teacherIds: string[];
     subjectId: string;
@@ -22,13 +22,17 @@ export class Course {
     color: string;
     locked: boolean = true;
     is_periodic: boolean;
+
+    startDate: any;
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
 
+    endDate: any;
     endMoment: any;
     endDisplayDate: string;
     endDisplayTime: string;
+
     subjectLabel: string;
     teachers: Teacher[];
     originalStartMoment?: any;
@@ -36,22 +40,23 @@ export class Course {
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_COURSE;
 
-    constructor (obj: object, startDate?: string | object, endDate?: string | object) {
-        if (obj instanceof Object) {
-            for (let key in obj) {
-                this[key] = obj[key];
-            }
-        }
+    constructor (structure: Structure) {
+        this.structure = structure;
         this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    init() {
         this.is_periodic = false;
 
-        if (startDate) {
-            this.startMoment = moment(startDate);
+        if (this.startDate) {
+            this.startMoment = moment(this.startDate);
+            this.startDate = this.startMoment.toDate();
             this.startDisplayDate = Utils.getDisplayDate(this.startMoment);
             this.startDisplayTime = Utils.getDisplayTime(this.startMoment);
         }
-        if (endDate) {
-            this.endMoment = moment(endDate);
+        if (this.endDate) {
+            this.endMoment = moment(this.endDate);
+            this.endDate = this.endMoment.toDate();
             this.endDisplayDate = Utils.getDisplayDate(this.endMoment);
             this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
         }
@@ -115,6 +120,7 @@ export class Course {
         let course = structure.courses.all.find(t => t._id === this._id);
         if(course){
             Mix.extend(this, course);
+            this.init();
         }
         else {
             try {
