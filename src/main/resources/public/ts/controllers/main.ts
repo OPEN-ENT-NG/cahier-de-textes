@@ -344,6 +344,14 @@ export let main = ng.controller('MainController',
             }
         };
 
+        $scope.openHomework = (homeworkId: number) => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
+                $scope.goTo('/homework/update/' + homeworkId);
+            } else {
+                $scope.goTo('/homework/view/' + homeworkId);
+            }
+        };
+
         $scope.translate = (key: string) => lang.translate(key);
 
         $scope.calendarUpdateItem = (item) => {

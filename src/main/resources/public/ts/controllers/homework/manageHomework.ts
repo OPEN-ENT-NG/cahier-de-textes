@@ -6,6 +6,13 @@ import {Mix} from 'entcore-toolkit';
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', function ($scope, $routeParams, $location, $attrs) {
 
+        $scope.isReadOnly = modeIsReadOnly();
+
+        function modeIsReadOnly() {
+            let currentPath = $location.path();
+            return currentPath.includes('view');
+        }
+
         $scope.homework = new Homework($scope.structure);
         $scope.sessions = new Sessions($scope.structure);
         $scope.subjects = new Subjects();

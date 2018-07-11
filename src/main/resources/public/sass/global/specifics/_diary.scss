@@ -83,21 +83,12 @@ i.cahier-textes2::before {
   }
 }
 
-
-.accordion {
-  h2 {
-    margin: 0;
-  }
-
-  .toggle {
-    padding: 0;
-    border: none;
-  }
-
-  &.opened {
-    .toggle {
-      border: 2px solid gray;
-      border-radius: 0px;
-    }
-  }
+.read-only-description {
+  min-height: 250px;
+  height: auto;
+  padding: 10px;
+  background: #fff;
+  border: 1px dashed #4bafd5 !important;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }

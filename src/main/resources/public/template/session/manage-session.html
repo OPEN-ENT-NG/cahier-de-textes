@@ -163,7 +163,9 @@
             <div class="row">
                 <span class="gray">[[session.startDisplayDate]] &nbsp; [[session.startDisplayTime]] - [[session.endDisplayTime]]</span> &nbsp; <b>[[session.title]]</b>
             </div>
-            <textarea readonly class="min-height-textarea resize-none">[[session.description]]</textarea>
+            <div class="read-only-description">
+                [[session.description]]
+            </div>
         </div>
 
         <button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>

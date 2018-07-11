@@ -30,6 +30,9 @@ routes.define(($routeProvider) => {
         .when('/homework/update/:id', {
             action: 'manageHomework'
         })
+        .when('/homework/view/:id', {
+            action: 'manageHomework'
+        })
         .otherwise({
             redirectTo: '/'
         });

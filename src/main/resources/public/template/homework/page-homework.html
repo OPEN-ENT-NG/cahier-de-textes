@@ -1,6 +1,5 @@
 <h1 class="centered eight row">
-    <i18n ng-if="session.id">homework.manage.update</i18n>
-    <i18n ng-if="!session.id">homework.manage.create</i18n>
+    <i18n>homework</i18n>
 </h1>
-
-<div ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/manage-homework.html"></div>
+<button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
+<div ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework.html"></div>

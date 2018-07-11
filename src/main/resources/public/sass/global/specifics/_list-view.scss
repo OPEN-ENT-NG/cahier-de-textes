@@ -7,8 +7,8 @@
   }
 
   ul li i.icon {
-    font-size: 55px;
-    line-height: 55px;
+    font-size: 50px;
+    line-height: 45px;
     text-align: center;
   }
 
@@ -117,5 +117,11 @@
     max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  .description-preview {
+    max-width: 50ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

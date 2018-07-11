@@ -7,28 +7,28 @@
     </div>
     <section>
         <div class="pedagogic-day-container">
-                <ul>
-                    <li ng-repeat="day in pedagogicDays | orderBy : 'shortDate' ">
-                        <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" class="text-center" ng-click="selectPedagogicDay(day)">
-                            <div class="six zero-mobile" ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">
-                                <span class="zero-tablet">[[day.dayName]]</span>
-                                <!--<span class="five-tablet">[[day.shortDayName]]</span>-->
-                            </div>
-                            <div class="six seven-tablet twelve-mobile" ng-class="day.selected ? 'summary sum-selected' : 'summary'">
-                                <div class="padding-sm six">[[day.shortDate]]</div>
-                                <div class="padding-sm six">
-                                    <div>
-                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbHomework]]
-                                    </div>
-                                    <div>
-                                        <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i> [[day.nbCourseAndSession]]
-                                    </div>
+            <ul>
+                <li ng-repeat="day in pedagogicDays | orderBy : 'shortDate' ">
+                    <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" class="text-center" ng-click="selectPedagogicDay(day)">
+                        <div class="six zero-mobile" ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">
+                            <span class="zero-tablet">[[day.dayName]]</span>
+                            <!--<span class="five-tablet">[[day.shortDayName]]</span>-->
+                        </div>
+                        <div class="six seven-tablet twelve-mobile" ng-class="day.selected ? 'summary sum-selected' : 'summary'">
+                            <div class="padding-sm six">[[day.shortDate]]</div>
+                            <div class="padding-sm six">
+                                <div>
+                                    <i ng-class="day.selected ? 'day-card-icon card-icon-selected rack2 table-cell-left' : 'day-card-icon rack2 table-cell-left'"></i> [[day.nbHomework]]
+                                </div>
+                                <div>
+                                    <i ng-class="day.selected ? 'day-card-icon card-icon-selected cahier-textes2 table-cell-left' : 'day-card-icon cahier-textes2 table-cell-left'"></i> [[day.nbCourseAndSession]]
                                 </div>
                             </div>
                         </div>
-                    </li>
-                </ul>
-            </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
         <div class="pedagogic-item-container">
             <div class="list-pedagogic-item-card">
                 <ul>

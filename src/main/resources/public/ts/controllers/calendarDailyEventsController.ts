@@ -2,6 +2,7 @@ import { ng, template, notify, moment, _, Behaviours, model, angular } from 'ent
 
 export let calendarDailyEventsController = ng.controller('CalendarDailyEventsController',
     ['$scope', 'route', '$location', '$timeout', async function ($scope, route, $location, $timeout) {
+        const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         init();
 
@@ -318,15 +319,18 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             $scope.safeApply();
         });
 
-        $scope.updateHomework = (homeworkId) => {
-            $scope.goTo('/homework/update/' + homeworkId);
-        };
-
         $scope.goTo = (state: string) => {
             $location.path(state);
             $scope.safeApply();
         };
 
+        $scope.openHomework = (homeworkId: number) => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
+                $scope.goTo('/homework/update/' + homeworkId);
+            } else {
+                $scope.goTo('/homework/view/' + homeworkId);
+            }
+        };
 
         $scope.safeApply = (): Promise<any> => {
             return new Promise((resolve, reject) => {

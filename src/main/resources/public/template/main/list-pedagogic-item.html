@@ -1,38 +1,52 @@
-<div class="one cell text-center">
-    <label class="checkbox">
-        <input type="checkbox" ng-model="pedagogicItem.selected"/>
-        <span></span>
-    </label>
-</div>
-<div class="nine cell">
-    <!-- Homework et Session -->
-    <div ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK || pedagogicItem.pedagogicType == TYPE_SESSION">
-        <div class="row">
-            <span ng-if="pedagogicItem == 'draft'" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
-            <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]</b>
+<div class="row">
+    <div class="row">
+        <div class="ten cell">
+            <!-- Homework et Session -->
+            <div ng-if="pedagogicItem.pedagogicType == TYPE_SESSION" ng-click="openSession(pedagogicItem.id)">
+                <div class="row">
+                    <span ng-if="pedagogicItem == 'draft'" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
+                    <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]</b>
+                </div>
+                <div class="row medium-importance">
+                    [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]] &nbsp; [[pedagogicItem.title]]
+                </div>
+            </div>
+            <!-- Homework -->
+            <div ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK" ng-click="openHomework(pedagogicItem.id)">
+                <div class="row">
+                    <span ng-if="pedagogicItem == 'draft'" class="low-importance">(<i18n>draft</i18n>)&nbsp;</span>
+                    <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]] &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]</b>
+                </div>
+                <div class="row medium-importance">
+                    [[pedagogicItem.title]]
+                </div>
+            </div>
+            <!-- Course -->
+            <div ng-if="pedagogicItem.pedagogicType == TYPE_COURSE"> <!-- todo: add openCourse -->
+                <div class="row"><b>[[pedagogicItem.subjectLabel]] &nbsp;
+                    <span ng-repeat="className in pedagogicItem.classes">[[className]]&nbsp;</span>
+                    <span ng-repeat="groupName in pedagogicItem.groups">[[groupName]]&nbsp;</span>
+                    <span ng-repeat="teacher in pedagogicItem.teachers">[[teacher.firstName]]&nbsp;[[teacher.lastName]]&nbsp;</span></b>
+                </div>
+                <div class="row medium-importance">
+                    [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
+                </div>
+            </div>
         </div>
-        <div class="row medium-importance">
-            <span ng-if="pedagogicItem.pedagogicType == TYPE_SESSION">[[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]</span>
-            &nbsp;[[pedagogicItem.title]]
+        <div class="two cell text-right">
+            <div class="display-inline-block vertical-align-top">
+                <i ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'" ng-click="pedagogicItem.opened = !pedagogicItem.opened"></i>
+            </div>
+            <i ng-class="pedagogicItem.pedagogicType == TYPE_HOMEWORK ? 'rack2' : 'cahier-textes2'"
+               ng-style="{'color':pedagogicItem.color}" class="icon table-cell-left"></i>
         </div>
-        <div class="row">
+    </div>
+    <div class="row" ng-if="pedagogicItem.pedagogicType !== TYPE_COURSE">
+        <div ng-if="!pedagogicItem.opened" class="description-preview">
+            [[pedagogicItem.description]]
+        </div>
+        <div ng-if="pedagogicItem.opened" class="read-only-description">
             [[pedagogicItem.description]]
         </div>
     </div>
-    <!-- Course -->
-    <div ng-if="pedagogicItem.pedagogicType == TYPE_COURSE">
-        <div class="row"><b>[[pedagogicItem.subjectLabel]] &nbsp;
-            <span ng-repeat="className in pedagogicItem.classes">[[className]]&nbsp;</span>
-            <span ng-repeat="groupName in pedagogicItem.groups">[[groupName]]&nbsp;</span>
-            <span ng-repeat="teacher in pedagogicItem.teachers">[[teacher.firstName]]&nbsp;[[teacher.lastName]]&nbsp;</span></b>
-        </div>
-        <div class="row medium-importance">
-            [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
-        </div>
-    </div>
-
-</div>
-<div class="two cell text-right">
-    <i ng-class="pedagogicItem.pedagogicType == TYPE_HOMEWORK ? 'rack2' : 'cahier-textes2'"
-       ng-style="{'color':pedagogicItem.color}" class="icon table-cell-left"></i>
 </div>
