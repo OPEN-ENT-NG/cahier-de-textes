@@ -120,6 +120,7 @@
   }
 
   .description-preview {
+    white-space: nowrap;
     max-width: 50ch;
     overflow: hidden;
     text-overflow: ellipsis;

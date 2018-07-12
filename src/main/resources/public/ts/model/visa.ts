@@ -61,7 +61,7 @@ export class Visa {
 
     async delete() {
         let response = await http.delete('/diary/visa/' + this.id);
-        return Utils.setToastMessage(response, 'visa.delete','visa.delete.error');
+        return Utils.setToastMessage(response, 'visa.deleted','visa.deleted.error');
     }
 
     async sync(): Promise<void> {

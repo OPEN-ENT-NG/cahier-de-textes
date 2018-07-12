@@ -177,7 +177,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.saveVisa = async () => {
-            let { succeed } = $scope.toastHttpCall(await $scope.visaForm.visa.delete());
+            let { succeed } = $scope.toastHttpCall(await $scope.visaForm.visa.save());
             if (succeed) {
                 $scope.visaForm.visa = undefined;
                 await $scope.session.sync();

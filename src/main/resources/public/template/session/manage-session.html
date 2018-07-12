@@ -168,7 +168,7 @@
             </div>
         </div>
 
-        <button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
+        <button ng-if="isReadOnly" class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
     </div>
 
     <!-- Visas -->
