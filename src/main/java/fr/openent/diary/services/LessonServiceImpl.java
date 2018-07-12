@@ -213,18 +213,16 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         final JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
 
         StringBuilder query = new StringBuilder();
-        query.append("SELECT l.id as lesson_id, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
+        query.append("SELECT l.id as lesson_id, s.id as subject_id, array_to_json(array_agg(distinct homework)) as homeworks, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                 .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
                 .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
-                .append(" s.original_subject_id as original_subject_id , ")
-                .append(" att.attachments ")
+                .append(" s.original_subject_id as original_subject_id , array_to_json(array_agg(distinct visa)) as visas ")
                 .append(" FROM diary.lesson AS l")
                 .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
+                .append(" LEFT JOIN diary.visa as visa ON visa.session_id = l.id")
                 .append(" INNER JOIN diary.subject as s ON s.id = l.subject_id")
                 .append(" INNER JOIN diary.audience as a ON a.id = l.audience_id")
-                .append(" LEFT JOIN LATERAL (SELECT json_agg(json_build_object('document_id', a.document_id, 'document_label', a.document_label)) as attachments")
-                .append(" FROM diary.lesson_has_attachment as la INNER JOIN diary.attachment a ON la.attachment_id = a.id")
-                .append(" WHERE la.lesson_id = l.id) att ON TRUE")
+                .append(" LEFT JOIN diary.homework AS homework ON homework.lesson_id = l.id")
                 .append(" WHERE l.lesson_date >= to_date(?,'YYYY-MM-DD') AND l.lesson_date <= to_date(?,'YYYY-MM-DD') ");
 
         parameters.add(startDate).add(endDate);
@@ -238,6 +236,8 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         if (onlyPublished) {
             query.append(" AND l.lesson_state = 'published' ");
         }
+
+        query.append(" GROUP BY l.id, s.id, t.teacher_display_name, a.audience_type, a.audience_label ");
 
         sql.prepared(query.toString(), parameters, validResultHandler(handler));
     }

@@ -119,6 +119,7 @@ export class Session {
             this.homeworks = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(this.homeworks, this.structure));
             this.homeworks.forEach(h => {
                 h.structure = this.structure;
+                h.session = this;
             });
         }
     }
@@ -186,6 +187,7 @@ export class Sessions {
     }
 
     async syncSessions (url: string){
+        console.log('syncSessions');
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));

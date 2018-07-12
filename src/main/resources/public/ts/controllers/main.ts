@@ -7,6 +7,7 @@ import {Homeworks} from '../model/homework';
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+        console.log('MainController');
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
@@ -49,13 +50,12 @@ export let main = ng.controller('MainController',
                     }
                 }
             }
-            if (!$scope.isPersonnel()) {
-            } else {
-                $scope.safeApply();
-            }
         };
 
         function init(){
+            console.log('init');
+            $scope.pageInitialized = false;
+
             $timeout(async function () {
                 await placingLoader();
                 initializeData();
@@ -91,19 +91,35 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks = new Homeworks($scope.structure);
             $scope.structure.sessions = new Sessions($scope.structure);
 
-            await $scope.syncPedagogicItems();
+            await $scope.syncPedagogicItems(true);
 
             $scope.pageInitialized = true;
             $scope.safeApply();
         }
 
-        $scope.syncPedagogicItems = async (typeId?: string, type?: string) => {
+        $scope.syncPedagogicItems = async (firstRun?: boolean) => {
+            if(!firstRun && !$scope.pageInitialized){
+                // Prevent from executing twice from the front
+                return;
+            }
+            console.log('syncPedagogicItems');
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // Dates incorrectes
                 return;
             }
             $scope.isRefreshingCalendar = true;
             $scope.safeApply();
+            let typeId = undefined;
+            let type = undefined;
+
+            if($scope.params.user && $scope.params.user.id) {
+                typeId = $scope.params.user.id;
+                type = 'teacher';
+            } else if ($scope.params.group && $scope.params.group.id) {
+                typeId = $scope.params.group.id;
+                type = 'audience';
+            }
+
             if(!!typeId && !!type){
                 await Promise.all([
                     await $scope.syncHomeworks(typeId, type),
@@ -259,29 +275,6 @@ export let main = ng.controller('MainController',
             $scope.syncStructure(structure);
         };
 
-        /**
-         * Returns if current user is a personnel
-         * @returns {boolean}
-         */
-        $scope.isPersonnel = (): boolean => model.me.type === USER_TYPES.personnel;
-
-        /**
-         * Returns if current user is a teacher
-         * @returns {boolean}
-         */
-        $scope.isTeacher = (): boolean => model.me.type === USER_TYPES.teacher;
-
-        /**
-         * Returns if current user is a student
-         * @returns {boolean}
-         */
-        $scope.isStudent = (): boolean => model.me.type === USER_TYPES.student;
-
-        /**
-         * Returns if current user is a relative profile
-         * @returns {boolean}
-         */
-        $scope.isRelative = (): boolean => model.me.type === USER_TYPES.relative;
 
         /**
          * Returns student group
@@ -298,10 +291,6 @@ export let main = ng.controller('MainController',
             updateItem: null,
             dateFromCalendar: null
         };
-
-        if ($scope.isRelative()) {
-            $scope.currentStudent = null;
-        }
 
         $scope.safeApply = (): Promise<any> => {
             return new Promise((resolve, reject) => {
@@ -370,8 +359,8 @@ export let main = ng.controller('MainController',
         route({
             main: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'main');
                 init();
+                template.open('main', 'main');
             },
             manageSession: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();

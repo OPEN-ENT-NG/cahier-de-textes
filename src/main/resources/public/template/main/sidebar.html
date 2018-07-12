@@ -23,7 +23,7 @@
                     </div>
                 </div>
             </div>
-            <div ng-if="isPersonnel() && structures.all.length > 1">
+            <div ng-if="structures.all.length > 1">
                 <select ng-model="structure"
                         id="structure-list"
                         class="twelve"
@@ -37,8 +37,8 @@
                     <select ng-model="params.user"
                             id="user-list"
                             class="twelve"
-                            ng-change="params.group = null;syncPedagogicItems(params.user.id, 'teacher')"
-                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all">
+                            ng-change="params.group = null;syncPedagogicItems()"
+                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
                         <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
                     </select>
                 </label>
@@ -48,8 +48,8 @@
                     <select ng-model="params.group"
                             id="group-list"
                             class="twelve"
-                            ng-change="params.user = null;syncPedagogicItems(params.group.id, 'audience')"
-                            ng-options="group as group.name for group in structure.groups.all">
+                            ng-change="params.user = null;syncPedagogicItems()"
+                            ng-options="group as group.name for group in structure.groups.all track by group.id">
                         <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
                     </select>
                 </label>
