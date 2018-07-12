@@ -86,6 +86,22 @@
             </div>
 
             <div class="row form-row">
+                <label class="cell two twelve-mobile"><i18n>homework.workload</i18n></label>
+                <div class="cell twelve-mobile ten">
+                    <input style="width: 50px;" type="number" ng-model="homework.workload" min="0" max="999" step="5"> <i18n>minutes</i18n>
+                </div>
+            </div>
+            <div class="row form-row">
+                <label class="cell two twelve-mobile"><i18n>homework.week.workload</i18n></label>
+                <div class="cell twelve-mobile ten">
+                   <span ng-repeat="workload in homework.workloadWeek.all">
+                        <span class="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
+                    [[workload.shortDayString]] [[workload.numDayString]]</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row form-row">
                 <label class="cell two twelve-mobile">
                     <i18n>homework.manage.type</i18n>*
                 </label>

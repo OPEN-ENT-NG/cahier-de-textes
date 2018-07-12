@@ -1,6 +1,6 @@
 import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
 import {Subjects, Notification, Sessions} from '../../model';
-import {Homework, HomeworkTypes} from '../../model/homework';
+import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 import {Mix} from 'entcore-toolkit';
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
@@ -54,6 +54,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             await $scope.syncSessions();
             $scope.homework.session = $scope.sessions.all.find(s => s.id === $scope.homework.session_id);
             $scope.attachedToSession.bool = !!$scope.homework.session;
+            let dateInWeek = $scope.attachedToSession.bool ? $scope.homework.session.startMoment : $scope.homework.dueDate;
+            await $scope.homework.workloadWeek.sync(dateInWeek);
         }
 
         initData();

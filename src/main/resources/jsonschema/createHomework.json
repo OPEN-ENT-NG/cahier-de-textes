@@ -47,6 +47,10 @@
       "id": "http://jsonschema.net/attachments",
       "type": "array"
     },
+    "workload": {
+      "id": "http://jsonschema.net/workload",
+      "type": "number"
+    },
     "created": {
       "id": "http://jsonschema.net/created",
       "type": "string"
@@ -58,6 +62,7 @@
     "teacher_id",
     "school_id",
     "audience_id",
+    "workload",
     "homework_due_date",
     "homework_description",
     "homework_color"

@@ -92,3 +92,27 @@ i.cahier-textes2::before {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+.workloadDay {
+  border-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+  margin: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 3px;
+  padding-top: 3px;
+  font-size: 16px;
+}
+
+.workloadDay.red {
+  background-color: tomato;
+}
+
+.workloadDay.yellow {
+  background-color: khaki;
+}
+
+.workloadDay.green {
+  background-color: limegreen;
+}

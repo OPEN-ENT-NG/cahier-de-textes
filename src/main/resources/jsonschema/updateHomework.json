@@ -36,6 +36,9 @@
     "homework_state": {
       "type": "string"
     },
+    "workload": {
+      "type": "number"
+    },
     "attachments": {
       "type": "array"
     }

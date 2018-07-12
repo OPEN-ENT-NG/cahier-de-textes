@@ -81,7 +81,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.subject_id, h.school_id, h.audience_id,")
-                .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_state,")
+                .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.workload, h.homework_state,")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, h.homework_type_id, th.homework_type_label,")
                 .append(" teacher.teacher_display_name as teacher_display_name, h.teacher_id, ")
                 .append(" att.attachments ")
@@ -275,7 +275,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT h.id, h.lesson_id, s.subject_label, h.school_id as structureId, h.audience_id, h.subject_id, h.teacher_id, ")
-                .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.homework_type_id, ")
+                .append(" a.audience_type, a.audience_label, h.homework_title, h.homework_color, h.workload, h.homework_type_id, ")
                 .append(" h.homework_due_date, h.homework_description, h.homework_state, th.homework_type_label,")
                 .append(" att.attachments ")
                 .append(" FROM diary.homework AS h")
@@ -548,7 +548,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         if (currentDateFormatted != null && !currentDateFormatted.isEmpty()) {
 
             StringBuilder query = new StringBuilder();
-            query.append(" select z.day, count(h.*) as countLoad from " );
+            query.append(" select z.day, COALESCE(sum(h.workload),0) as total, count(h.*) as count from  " );
             query.append(" ( " );
             query.append(" select (date_trunc('week',to_date(?, 'YYYY-MM-DD'))::date) + i as day " );
             query.append(" from generate_series(0,6) i " );

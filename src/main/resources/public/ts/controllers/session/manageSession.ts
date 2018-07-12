@@ -38,6 +38,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
 
+        $scope.$watch(() => $scope.session.audience,  () => {
+            $scope.session.homeworks.forEach(h => h.audience = $scope.session.audience);
+            $scope.safeApply();
+        });
+
+        $scope.$watch(() => $scope.session.subject,  () => {
+            $scope.session.homeworks.forEach(h => h.subject = $scope.session.subject);
+            $scope.safeApply();
+        });
+
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
                 && $scope.session.subject

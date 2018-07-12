@@ -1,4 +1,4 @@
-import { model, moment, _, notify } from 'entcore';
+import { model, moment, _, notify, idiom as lang } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
 import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
@@ -17,7 +17,7 @@ export class Homework {
     state: string = "draft";
 
     session_id: number;
-
+    workloadWeek: WorkloadWeek;
     structure: Structure;
     type: HomeworkType;
     teacher: Teacher;
@@ -25,7 +25,7 @@ export class Homework {
     audience: any;
     session: Session;
     attachments: any = [];
-
+    workload: number;
     startMoment: any;
     endMoment: any;
 
@@ -56,8 +56,8 @@ export class Homework {
             homework_state: this.state,
             audience_type: this.audience.type_groupe == 0 ? 'class': 'group',
             audience_name: this.audience.name,
-            attachments: this.attachments
-
+            attachments: this.attachments,
+            workload: this.workload
         };
     }
 
@@ -83,6 +83,7 @@ export class Homework {
             dueDate: Utils.getFormattedDate(data.homework_due_date),
             description: data.homework_description,
             state: data.homework_state,
+            workload: data.workload,
         };
     }
 
@@ -123,12 +124,13 @@ export class Homework {
     async sync(): Promise<void> {
         let {data} = await http.get('/diary/homework/' + this.id);
         Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
-        this.initDates();
+        this.init();
     }
 
-    initDates(){
+    init(){
         this.dueDate = moment(this.dueDate).toDate();
         this.startMoment = moment(this.dueDate);
+        this.workloadWeek = new WorkloadWeek(this.audience);
     }
 }
 
@@ -164,7 +166,7 @@ export class Homeworks {
 
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
-            i.initDates();
+            i.init();
         });
     }
 
@@ -197,5 +199,63 @@ export class HomeworkTypes {
             });
         });
         return dataModel;
+    }
+}
+
+export class Workload {
+    total: number;
+    count: number = 0;
+    day: any;
+    shortDayString: string;
+    numDayString;
+    color: string;
+    description: string;
+
+    static getWorkloadColor(workload: number){
+        if (0 < workload && workload < 30) {
+            return 'green';
+        } else if (31 < workload && workload < 60) {
+            return 'yellow';
+        } else if (61 < workload) {
+            return 'red';
+        }
+    }
+
+    static getDescription(workload: number){
+        return workload + ' ' + lang.translate('minutes');
+    }
+
+    init(){
+        this.shortDayString = moment(this.day).format('dddd').substring(0, 1).toUpperCase(); // 'lundi' -> 'lu' -> 'L'
+        this.numDayString = moment(this.day).format('DD'); // 15
+        this.color = Workload.getWorkloadColor(this.total);
+        this.description = Workload.getDescription(this.total);
+    }
+}
+
+export class WorkloadWeek {
+    all: Workload[];
+    audience: any;
+
+    constructor(audience: any) {
+        this.audience = audience;
+    }
+
+    static formatSqlDataToModel(data: any[]) {
+        let dataModel = [];
+        data.forEach(i => {
+            dataModel.push({
+                total: +i.total,
+                count: +i.count,
+                day: i.day
+            });
+        });
+        return dataModel;
+    };
+
+    async sync(dateInWeek: any): Promise<void> {
+        let {data} = await http.get(`/diary/homework/load/${Utils.getFormattedDate(dateInWeek)}/${this.audience.id}`);
+        this.all = Mix.castArrayAs(Workload, WorkloadWeek.formatSqlDataToModel(data));
+        this.all.forEach(w => w.init());
     }
 }
