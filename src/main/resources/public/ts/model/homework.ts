@@ -1,10 +1,8 @@
 import { model, moment, _, notify, idiom as lang } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
+import { Structure, Teacher, Utils} from './index';
 import {Subject} from './subject';
-import {FORMAT} from '../utils/const/dateFormat';
-import {Course} from './course';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
 
@@ -72,7 +70,7 @@ export class Homework {
         type.id = data.homework_type_id;
 
         return {
-            audience: structure.groups.all.find(t => t.id === data.audience_id),
+            audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
             session_id: data.lesson_id,

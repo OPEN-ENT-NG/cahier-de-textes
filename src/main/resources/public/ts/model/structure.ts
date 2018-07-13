@@ -1,5 +1,5 @@
 import { model } from 'entcore';
-import { Courses, Subjects, Sessions, Homeworks, Groups, Teachers, Students, USER_TYPES } from './index';
+import { Courses, Subjects, Sessions, Homeworks, Audiences, Teachers, Students, USER_TYPES } from './index';
 import { Eventer } from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 
@@ -10,7 +10,7 @@ export class Structure {
     sessions: Sessions;
     homeworks: Homeworks;
     subjects: Subjects;
-    groups: Groups;
+    audiences: Audiences;
     teachers: Teachers;
     students: Students;
     personnels: Personnels;
@@ -25,8 +25,8 @@ export class Structure {
         if (typeof id === 'string') { this.id = id; }
         if (typeof name === 'string') { this.name = name; }
         this.subjects = new Subjects();
-        this.groups = new Groups();
-        this.courses = new Courses();
+        this.audiences = new Audiences();
+        this.courses = new Courses(this);
         this.sessions = new Sessions(this);
         this.homeworks = new Homeworks(this);
         this.teachers = new Teachers();
@@ -37,7 +37,7 @@ export class Structure {
     }
 
     /**
-     * Synchronize structure information. Groups and Subjects need to be synchronized to start courses
+     * Synchronize structure information. Audiences and Subjects need to be synchronized to start courses
      * synchronization.
      * @returns {Promise<T>|Promise}
      */
@@ -45,7 +45,7 @@ export class Structure {
         return new Promise((resolve, reject) => {
             let syncedCollections = {
                 subjects: false,
-                groups: false,
+                audiences: false,
                 teachers: false,
                 personnels: false,
                 students: model.me.type !== USER_TYPES.relative
@@ -53,7 +53,7 @@ export class Structure {
 
             let endSync = () => {
                 let _b: boolean = syncedCollections.subjects
-                && syncedCollections.groups
+                && syncedCollections.audiences
                 && syncedCollections.teachers
                 && syncedCollections.personnels
                 && syncedCollections.students;
@@ -64,7 +64,7 @@ export class Structure {
             };
 
             this.subjects.sync(this.id).then(() => { syncedCollections.subjects = true; endSync(); });
-            this.groups.sync(this.id).then(() => { syncedCollections.groups = true; endSync(); });
+            this.audiences.sync(this.id).then(() => { syncedCollections.audiences = true; endSync(); });
             this.teachers.sync(this).then(() => { syncedCollections.teachers = true; endSync(); });
             this.personnels.sync(this).then(() => { syncedCollections.personnels = true; endSync(); });
 

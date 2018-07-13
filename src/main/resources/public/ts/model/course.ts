@@ -1,9 +1,9 @@
-import { model, moment, _, notify } from 'entcore';
+import { angular, model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import {USER_TYPES, Structure, Teacher, Group, Utils, Subject} from './index';
+import {USER_TYPES, Structure, Teacher, Teachers, Audiences, Audience, Utils, Subject} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Session} from "./session";
+import {Session, Sessions} from "./session";
 import {Visa} from "./visa";
 import {Homework, Homeworks} from "./homework";
 import {FORMAT} from "../utils/const/dateFormat";
@@ -12,45 +12,57 @@ import includes = require('core-js/fn/array/includes');
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
 export class Course {
+
     _id: string;
-    structureId: string;
-    dayOfWeek: number;
-    teacherIds: string[];
-    subjectId: string;
-    roomLabels: string[];
-    classes: string[];
-    groups: string[];
-    color: string;
-    locked: boolean = true;
-    is_periodic: boolean;
+    audiences: Audiences;
+    structure: Structure;
+    teachers: Teachers;
+    subject: Subject;
+
+    dayOfWeek: any;
+    rooms: any;
+    color: any;
 
     startDate: any;
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
 
-    structure: Structure;
-
     endDate: any;
     endMoment: any;
     endDisplayDate: string;
     endDisplayTime: string;
 
-    subjectLabel: string;
-    teachers: Teacher[];
-    originalStartMoment?: any;
-    originalEndMoment?: any;
-
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_COURSE;
+
+    //required for calendar
+    is_periodic: boolean = false;
+    locked: boolean = true;
 
     constructor (structure: Structure) {
         this.structure = structure;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
     }
 
-    init() {
-        this.is_periodic = false;
+    static formatSqlDataToModel(data: any, structure: Structure) {
 
+        let audiences = new Audiences();
+        let audienceNameArray = data.classes.concat(data.groups);
+        audiences.all = structure.audiences.all.filter(t => audienceNameArray.includes(t.name))
+        return {
+            _id: data._id,
+            audiences: audiences,
+            dayOfWeek: data.dayOfWeek,
+            endDate: data.endDate,
+            rooms: data.roomLabels,
+            startDate: data.startDate,
+            teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
+            subject: structure.subjects.all.find(t => t.id === data.subjectId),
+            color: data.color ? data.color :colors[Math.floor(Math.random() * colors.length)],
+        };
+    }
+
+    init(structure: Structure) {
+        this.structure = structure;
         if (this.startDate) {
             this.startMoment = moment(this.startDate);
             this.startDate = this.startMoment.toDate();
@@ -63,77 +75,16 @@ export class Course {
             this.endDisplayDate = Utils.getDisplayDate(this.endMoment);
             this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
         }
-
-        this.teachers = this.structure.teachers.all.filter(t => this.teacherIds.find(id => id === t.id));
-        this.subjectLabel = this.structure.subjects.mapping[this.subjectId];
     }
 
-    async save () {
-        await this.create();
-        return;
-    }
-
-    async create () {
-        try {
-            let arr = [];
-            this.teacherIds = Utils.getValues(this.teachers, 'id');
-            this.startDate = moment(this.startMoment).format('YYYY-MM-DDTHH:mm:ss');
-            this.endDate = moment(this.endMoment).format('YYYY-MM-DDTHH:mm:ss');
-            this.classes = Utils.getValues(_.where(this.groups, { type_groupe: Utils.getClassGroupTypeMap()['CLASS']}), 'name');
-            this.groups = Utils.getValues(_.where(this.groups, { type_groupe: Utils.getClassGroupTypeMap()['FUNCTIONAL_GROUP']}), 'name');
-            this.startDate = Utils.mapStartMomentWithDayOfWeek(this.startDate, this.dayOfWeek);
-            arr.push(this.toJSON());
-            await http.post('/edt/course', arr);
-            return;
-        } catch (e) {
-            notify.error('notify.create.err');
-            console.error(e);
-            throw e;
-        }
-    }
-
-    static formatSqlDataToModel(data: any, structure: Structure) {
-        let course = new Course(structure);
-        Mix.extend(course, data);
-        course.init();
-        return course;
-    }
-
-    toJSON () {
-        let o: any = {
-            structureId: this.structureId,
-            subjectId: this.subjectId,
-            teacherIds: this.teacherIds,
-            classes: this.classes,
-            groups: this.groups,
-            endDate: this.endDate,
-            startDate: this.startDate,
-            roomLabels: this.roomLabels,
-            dayOfWeek: this.dayOfWeek,
-            manual: true
-        };
-        if (this._id) {
-            o._id = this._id;
-        }
-        return o;
-    }
 
     async sync(structure?: Structure) {
-        if(!this._id)
-            return;
-        let course = structure.courses.all.find(t => t._id === this._id);
-        if(course){
-            Mix.extend(this, course);
-            this.init();
-        }
-        else {
-            try {
-                let {data} = await http.get('/viescolaire/common/course/' + this._id);
-                Mix.extend(this, Course.formatSqlDataToModel(data, structure));
-
-            } catch (e) {
-                notify.error('session.sync.err');
-            }
+        try {
+            let {data} = await http.get('/viescolaire/common/course/' + this._id);
+            Mix.extend(this, Course.formatSqlDataToModel(data, this.structure));
+            this.init(this.structure);
+        } catch (e) {
+            notify.error('session.sync.err');
         }
     }
 }
@@ -141,10 +92,18 @@ export class Course {
 export class Courses {
     all: Course[];
     origin: Course[];
+    structure: Structure;
 
-    constructor () {
+    constructor (structure: Structure) {
+        this.structure = structure;
         this.all = [];
         this.origin = [];
+    }
+
+    static formatSqlDataToModel(data: any, structure: Structure) {
+        let dataModel = [];
+        data.forEach(i => dataModel.push(Course.formatSqlDataToModel(i, structure)));
+        return dataModel;
     }
 
     /**
@@ -154,27 +113,24 @@ export class Courses {
      * @param group group. Can be null. If null, teacher needs to be provide.
      * @returns {Promise<void>} Returns a promise.
      */
-    async sync(structure: Structure, teacher: Teacher | null, group: Group | null, startMoment: any, endMoment: any): Promise<void> {
-        if (teacher === null && group === null)
+    async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
+        if (teacher === null && audience === null)
             return;
 
         let firstDate = Utils.getFormattedDate(startMoment);
         let endDate =  Utils.getFormattedDate(endMoment);
         let filter = '';
 
-        if (group === null)
+        if (audience === null)
             filter += `teacherId=${model.me.type === USER_TYPES.personnel ? teacher.id : model.me.userId}`;
-        if (teacher === null && group !== null)
-            filter += `group=${group.name}`;
+        if (teacher === null && audience !== null)
+            filter += `group=${audience.name}`;
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let courses = await http.get(uri);
-        if (courses.data.length > 0) {
-            this.all = _.map(courses.data, (course) => {
-                return Course.formatSqlDataToModel(course, structure);
-            });
-            this.origin = Mix.castArrayAs(Course, courses.data);
-        }
-        return;
+        let { data } = await http.get(uri);
+        this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
+        this.all.forEach(i => {
+            i.init(this.structure);
+        });
     }
 }

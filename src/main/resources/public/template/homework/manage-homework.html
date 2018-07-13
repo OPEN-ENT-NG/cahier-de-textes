@@ -21,7 +21,7 @@
                     </label>
                     <div class="cell twelve-mobile ten">
                         <select ng-disabled="isInsideSessionForm" ng-change="syncSessions();homework.session = undefined;" required ng-model="homework.audience"
-                                ng-options="group.name for group in structure.groups.all track by group.id">
+                                ng-options="group.name for group in structure.audiences.all track by group.id">
                         </select>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
 import {
-    Structures, PEDAGOGIC_TYPES, USER_TYPES, Course, Student, Group, Structure, Sessions,
+    Structures, PEDAGOGIC_TYPES, USER_TYPES, Structure, Sessions,
     Notification
 } from '../model';
 import {Homeworks} from '../model/homework';
@@ -39,13 +39,13 @@ export let main = ng.controller('MainController',
                 }
                 break;
                 case USER_TYPES.student : {
-                    $scope.params.group = _.findWhere($scope.structure.groups.all, {id: model.me.classes[0]});
+                    $scope.params.group = _.findWhere($scope.structure.audiences.all, {id: model.me.classes[0]});
                 }
                 break;
                 case USER_TYPES.relative : {
                     if ($scope.structure.students.all.length > 0) {
                         let externalClassId = $scope.structure.students.all[0].classes[0];
-                        $scope.params.group = _.findWhere($scope.structure.groups.all, { externalId: externalClassId });
+                        $scope.params.group = _.findWhere($scope.structure.audiences.all, { externalId: externalClassId });
                         $scope.currentStudent = $scope.structure.students.all[0];
                     }
                 }
@@ -276,14 +276,6 @@ export let main = ng.controller('MainController',
         };
 
 
-        /**
-         * Returns student group
-         * @param {Student} user user group
-         * @returns {Group}
-         */
-        $scope.getStudentGroup = (user: Student): Group => {
-            return _.findWhere($scope.structure.groups.all, { externalId: user.classes[0] });
-        };
 
         $scope.params = {
             user: null,

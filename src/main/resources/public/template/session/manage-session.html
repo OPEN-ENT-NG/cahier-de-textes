@@ -13,7 +13,7 @@
                         </label>
                         <div class="cell twelve-mobile ten">
                             <select required ng-model="session.audience"
-                                    ng-options="group.name for group in structure.groups.all track by group.id">
+                                    ng-options="group.name for group in structure.audiences.all track by group.id">
                                 <option value="" disabled selected>[[translate('creation.groups.choose')]]</option>
                             </select>
                         </div>

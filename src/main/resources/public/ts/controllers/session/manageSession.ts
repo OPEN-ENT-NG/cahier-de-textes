@@ -29,7 +29,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 await $scope.session.sync();
             }
             else if($routeParams.courseId){
-                $scope.session.mapFromCourse($routeParams.courseId);
+                await $scope.session.mapFromCourse($routeParams.courseId);
+                console.log('session mapped', $scope.session)
             }
             $scope.safeApply();
         }

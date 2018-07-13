@@ -49,7 +49,7 @@
                             id="group-list"
                             class="twelve"
                             ng-change="params.user = null;syncPedagogicItems()"
-                            ng-options="group as group.name for group in structure.groups.all track by group.id">
+                            ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
                         <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
                     </select>
                 </label>

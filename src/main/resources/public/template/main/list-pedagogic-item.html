@@ -23,9 +23,8 @@
             </div>
             <!-- Course -->
             <div ng-if="pedagogicItem.pedagogicType == TYPE_COURSE"> <!-- todo: add openCourse -->
-                <div class="row"><b>[[pedagogicItem.subjectLabel]] &nbsp;
-                    <span ng-repeat="className in pedagogicItem.classes">[[className]]&nbsp;</span>
-                    <span ng-repeat="groupName in pedagogicItem.groups">[[groupName]]&nbsp;</span>
+        <div class="row"><b>[[pedagogicItem.subject.label]] &nbsp;
+            <span ng-repeat="audience in pedagogicItem.audiences">[[audience.label]]&nbsp;</span>
                     <span ng-repeat="teacher in pedagogicItem.teachers">[[teacher.firstName]]&nbsp;[[teacher.lastName]]&nbsp;</span></b>
                 </div>
                 <div class="row medium-importance">

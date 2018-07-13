@@ -49,12 +49,8 @@ export class Session {
 
     static formatSqlDataToModel(data: any, structure: Structure){
 
-        let subject = new Subject();
-        subject.id = data.subject_id;
-        subject.label = data.subject_label;
-
         return {
-            audience: structure.groups.all.find(t => t.id === data.audience_id),
+            audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
             id: data.lesson_id,
@@ -130,18 +126,18 @@ export class Session {
         course._id = courseId;
         await course.sync(this.structure);
         console.log('course', course)
-        if (course.teachers && course.teachers.length > 0)
+        if (course.teachers && course.teachers.all && course.teachers.all.length > 0)
             this.teacher = course.teachers[0];
-        if (course.roomLabels && course.roomLabels.length > 0)
-            this.room = course.roomLabels[0];
-        if (course.subjectId)
-            this.subject = this.structure.subjects.all.find(t => t.id === course.subjectId)
-        if (course.startMoment)
-            this.startTime = moment(this.startMoment).toDate()
-        if (course.endMoment)
-            this.startTime = moment(this.endMoment).toDate();
-        if (course.classes)
-            this.audience = course.classes;
+        if (course.rooms && course.rooms.length > 0)
+            this.room = course.rooms[0];
+        if (course.subject)
+            this.subject = course.subject;
+        if (course.startDate)
+            this.startTime = course.startDate;
+        if (course.endDate)
+            this.startTime = course.endDate;
+        if (course.audiences)
+            this.audience = course.audiences;
         this.date = moment(course.startDate || this.date).toDate();
     }
 

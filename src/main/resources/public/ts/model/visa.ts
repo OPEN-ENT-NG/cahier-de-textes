@@ -1,7 +1,7 @@
 import { model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import { USER_TYPES, Structure, Teacher, Group, Utils} from './index';
+import { Structure,  Utils} from './index';
 import {Personnel} from './Personnel';
 
 export class Visa {

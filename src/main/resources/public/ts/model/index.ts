@@ -4,7 +4,7 @@ export * from './course';
 export * from './subject';
 export * from './session';
 export * from './homework';
-export * from './group';
+export * from './audience';
 export * from './teacher';
 export * from './student';
 export * from '../utils/const/user-types';
