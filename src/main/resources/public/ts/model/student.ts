@@ -7,25 +7,15 @@ export class Student {
     firstName: string;
     lastName: string;
     displayName: string;
-    classes: string[];
+    class: any;
     structures: string[];
-
-    constructor (obj: any) {
-        for (let key in obj) {
-            this[key] = obj[key];
-        }
-    }
 }
 
 export class Students {
-    all: Student[];
-
-    constructor () {
-        this.all = [];
-    }
+    all: Student[] = [];
 
     async sync (): Promise<void> {
-        let children = await http.get('/edt/user/children');
+        let children = await http.get('/diary/student/children');
         this.all = Mix.castArrayAs(Student, children.data);
         return;
     }
