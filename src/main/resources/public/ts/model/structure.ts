@@ -1,4 +1,4 @@
-import { model } from 'entcore';
+import { model, Behaviours } from 'entcore';
 import { Courses, Subjects, Sessions, Homeworks, Audiences, Teachers, Students, USER_TYPES } from './index';
 import { Eventer } from 'entcore-toolkit';
 import {Personnels} from './Personnel';
@@ -31,9 +31,7 @@ export class Structure {
         this.homeworks = new Homeworks(this);
         this.teachers = new Teachers();
         this.personnels = new Personnels();
-        if (model.me.type === USER_TYPES.relative) {
-            this.students = new Students();
-        }
+        this.students = new Students(this);
     }
 
     /**
@@ -64,13 +62,16 @@ export class Structure {
             };
 
             this.subjects.sync(this.id).then(() => { syncedCollections.subjects = true; endSync(); });
-            this.audiences.sync(this.id).then(() => { syncedCollections.audiences = true; endSync(); });
+            this.audiences.sync(this.id).then(() => {
+                syncedCollections.audiences = true; endSync();
+                if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.readChildren)) {
+                    this.students.sync().then(() => { syncedCollections.students = true; endSync(); });
+                }
+            });
             this.teachers.sync(this).then(() => { syncedCollections.teachers = true; endSync(); });
             this.personnels.sync(this).then(() => { syncedCollections.personnels = true; endSync(); });
 
-            if (model.me.type === USER_TYPES.relative) {
-                this.students.sync().then(() => { syncedCollections.students = true; endSync(); });
-            }
+
         });
     }
 }

@@ -1,5 +1,5 @@
 <div class="diary-container diary-show-calendar"
-     ng-class="{'diary-show-homeworks': display.dailyHomeworks && calendar.increment !== 'month', 'calendar-day-mode': calendar.increment === 'day'}">
+     ng-class="{'diary-show-homeworks': display.homeworks && calendar.increment !== 'month', 'calendar-day-mode': calendar.increment === 'day'}">
     <!-- Loader calendrier -->
     <div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
         <div class="loader"></div>

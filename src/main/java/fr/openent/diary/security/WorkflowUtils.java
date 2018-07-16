@@ -11,6 +11,7 @@ public final class WorkflowUtils {
     static public final String LESSON_READ_RIGHT = "diary.lesson.read";
     static public final String VISA_MANAGE_RIGHT = "diary.visa.manage";
     static public final String EXTERNAL_VIEW_RIGHT = "diary.external.view";
+    static public final String CHILDREN_VIEW = "diary.children.view";
 
     private WorkflowUtils() {
         throw new IllegalAccessError("Utility class");

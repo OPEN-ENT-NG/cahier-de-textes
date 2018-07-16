@@ -8,6 +8,7 @@ import fr.openent.diary.model.general.Context;
 import fr.openent.diary.model.general.ResourceState;
 import fr.openent.diary.utils.DateUtils;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.json.Json;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlStatementsBuilder;
@@ -185,19 +186,18 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
     @Override
     public void getAllLessonsForParent(final String userId, final String childId, final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
-        diaryService.listGroupsFromChild(Arrays.asList(childId), new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> event) {
-                if (event.isRight()) {
-                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
-                        String groupId  = ((Map <String,String>)result).get("groupId");
-                        memberIds.add(groupId);
-                    }
-                    getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, null, handler);
-                } else {
-                    log.error("Teacher couldn't be retrieved or created.");
-                    handler.handle(event.left());
+        diaryService.getAudienceFromChild(childId, event -> {
+            if (event.isRight()) {
+                JsonArray result = event.right().getValue();
+                String audienceId = null;
+                if(result.size() > 1){
+                    audienceId = result.getJsonObject(0).getString("audienceId");
                 }
+
+                getLessons(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, audienceId, null, handler);
+            } else {
+                log.error("Teacher couldn't be retrieved or created.");
+                handler.handle(event.left());
             }
         });
 

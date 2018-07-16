@@ -13,7 +13,8 @@ export let main = ng.controller('MainController',
         $scope.notifications = [];
 
         $scope.display = {
-            dailyHomeworks: true,
+            homeworks: true,
+            sessions: true,
             listView: false,
         };
 
@@ -33,28 +34,13 @@ export let main = ng.controller('MainController',
             $scope.structure = structure;
             $scope.structure.eventer.once('refresh', () => $scope.safeApply());
             await $scope.structure.sync();
-            switch (model.me.type) {
-                case USER_TYPES.teacher : {
-                    $scope.params.user = model.me.userId;
-                }
-                break;
-                case USER_TYPES.student : {
-                    $scope.params.group = _.findWhere($scope.structure.audiences.all, {id: model.me.classes[0]});
-                }
-                break;
-                case USER_TYPES.relative : {
-                    if ($scope.structure.students.all.length > 0) {
-                        let externalClassId = $scope.structure.students.all[0].classes[0];
-                        $scope.params.group = _.findWhere($scope.structure.audiences.all, { externalId: externalClassId });
-                        $scope.currentStudent = $scope.structure.students.all[0];
-                    }
-                }
-            }
         };
 
         function init(){
             console.log('init');
             $scope.pageInitialized = false;
+            $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
+                && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
 
             $timeout(async function () {
                 await placingLoader();
@@ -118,15 +104,19 @@ export let main = ng.controller('MainController',
             } else if ($scope.params.group && $scope.params.group.id) {
                 typeId = $scope.params.group.id;
                 type = 'audience';
+            } else if ($scope.params.child && $scope.params.child.id) {
+                typeId = $scope.params.child.id;
+                type = 'child';
             }
 
+            console.log('Sync ' + type, typeId);
             if(!!typeId && !!type){
                 await Promise.all([
                     await $scope.syncHomeworks(typeId, type),
                     await $scope.syncSessions(typeId, type),
                     await $scope.syncCourses(typeId, type)
                 ]);
-            } else {
+            } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 await Promise.all([
                     await $scope.syncHomeworks(),
                     await $scope.syncSessions(),

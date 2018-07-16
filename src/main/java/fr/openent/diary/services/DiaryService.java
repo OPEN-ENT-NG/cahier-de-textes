@@ -70,6 +70,7 @@ public interface DiaryService {
      */
     void listGroupsFromChild(final List<String> childIds, final Handler<Either<String, JsonArray>> handler);
 
+    void getAudienceFromChild(final String childIds, final Handler<Either<String, JsonArray>> handler);
 
     /**
      * get all groups id from a audience / strucutre

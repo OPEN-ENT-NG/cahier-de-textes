@@ -245,24 +245,19 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void getAllHomeworksForParent(final String userId, final String childId,final List<String> schoolIds, final List<String> memberIds, final String startDate, final String endDate, final Handler<Either<String, JsonArray>> handler) {
 
-
-        diaryService.listGroupsFromChild(Arrays.asList(childId), new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> event) {
-                if (event.isRight()) {
-                    for (Object result : ((JsonArray) ((Either.Right) event).getValue()).getList()){
-                        String groupId  = ((Map<String,String>)result).get("groupId");
-                        memberIds.add(groupId);
-                    }
-                    getHomeworks(Context.PARENT, userId, schoolIds, memberIds, startDate, endDate, null, handler);
-                } else {
-                    log.error("Teacher couldn't be retrieved or created.");
-                    handler.handle(event.left());
+        diaryService.getAudienceFromChild(childId, event -> {
+            if (event.isRight()) {
+                JsonArray result = event.right().getValue();
+                String audienceId = null;
+                if(result.size() > 1){
+                    audienceId = result.getJsonObject(0).getString("audienceId");
                 }
+                getAllHomeworksForAudience(schoolIds.get(0), audienceId, startDate, endDate, true, handler);
+            } else {
+                log.error("Teacher couldn't be retrieved or created.");
+                handler.handle(event.left());
             }
         });
-
-
     }
 
     @Override

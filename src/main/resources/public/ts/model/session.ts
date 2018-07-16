@@ -219,7 +219,11 @@ export class Sessions {
 
         let url = '';
         if(!!typeId && !!type){
-            url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+            if(type === 'child'){
+                url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/${typeId}`;
+            } else {
+                url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+            }
         } else {
             url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
         }

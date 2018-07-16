@@ -32,7 +32,7 @@
         <div class="pedagogic-item-container">
             <div class="list-pedagogic-item-card">
                 <ul>
-                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems"
+                    <li ng-repeat="pedagogicItem in selectedPedagogicDay.pedagogicItems | pedagogicItemFilter: display.sessions:display.homeworks"
                         static-include="/diary/public/template/main/list-pedagogic-item.html"
                         class="card pedagogic-item-card padding-md margin-bottom-md">
                     </li>

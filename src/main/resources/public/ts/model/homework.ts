@@ -155,7 +155,11 @@ export class Homeworks {
 
         let url = '';
         if(!!typeId && !!type){
-            url = `/diary/homework/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+            if(type === 'child'){
+                url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/${typeId}`;
+            } else {
+                url = `/diary/homework/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
+            }
         } else {
             url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/null`;
         }

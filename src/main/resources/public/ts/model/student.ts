@@ -1,22 +1,42 @@
 import { model } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
+import {Structure, Utils} from './index';
+import {Session} from './session';
 
 export class Student {
     id: string;
-    firstName: string;
-    lastName: string;
     displayName: string;
-    class: any;
-    structures: string[];
+    audience: any;
+
+    static formatSqlDataToModel(data: any, structure: Structure){
+        return {
+            audience: structure.audiences.all.find(t => t.id === data.classId),
+            id: data.id,
+            displayName: data.displayName
+        };
+    }
 }
 
 export class Students {
     all: Student[] = [];
+    structure: Structure;
+
+    constructor(structure: Structure) {
+        this.structure = structure;
+    }
+
+    static formatSqlDataToModel(data: any, structure: Structure){
+        let dataModel = [];
+        data.forEach(i => dataModel.push(Student.formatSqlDataToModel(i, structure)));
+        return dataModel;
+    }
 
     async sync (): Promise<void> {
-        let children = await http.get('/diary/student/children');
-        this.all = Mix.castArrayAs(Student, children.data);
+        let url = '/diary/children/list';
+
+        let { data } = await http.get(url);
+        this.all = Mix.castArrayAs(Student, Students.formatSqlDataToModel(data, this.structure));
         return;
     }
 }

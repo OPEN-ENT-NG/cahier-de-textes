@@ -569,6 +569,13 @@ public class DiaryServiceImpl extends SqlCrudService implements DiaryService {
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
 
+    @Override
+    public void getAudienceFromChild(String childId, Handler<Either<String, JsonArray>> handler) {
+        StringBuilder query = new StringBuilder("");
+        query.append("MATCH (n:User) - [IN] -> (g:Group) - [] -> (c:Class ) where n.id = {id} RETURN c.id as audienceId");
+        JsonObject params = new JsonObject().put("id", childId);
+        neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
+    }
 
 
     @Override

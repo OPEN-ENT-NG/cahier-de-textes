@@ -367,4 +367,11 @@ public class DiaryController extends BaseController {
     public void workflow2(final HttpServerRequest request) {
 
     }
+
+    @Get("/workflow/3/")
+    @ApiDoc("Used only to create a workflow right")
+    @SecuredAction(value = "access.own.data", type = ActionType.WORKFLOW)
+    public void workflow3(final HttpServerRequest request) {
+
+    }
 }
