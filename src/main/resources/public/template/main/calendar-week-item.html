@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSession(item._id, true)" class="schedule-item-content bg-lightgrey pointer">
+<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSessionFromCourse(item)" class="schedule-item-content bg-lightgrey pointer">
     <div>[[item.startDisplayTime]] &nbsp; [[item.subject.label]]</div>
     <div>
         [[item.endDisplayTime]] &nbsp;

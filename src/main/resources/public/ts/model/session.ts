@@ -122,23 +122,23 @@ export class Session {
     }
 
     async mapFromCourse(courseId: any) {
-        let course = new Course(this.structure);
-        course._id = courseId;
-        await course.sync(this.structure);
-        console.log('course', course)
+        if(!courseId)
+            return;
+        let course:any = this.structure.courses.all.find(i => i._id === courseId);
+        if (!course)
+            return;
         if (course.teachers && course.teachers.all && course.teachers.all.length > 0)
             this.teacher = course.teachers[0];
         if (course.rooms && course.rooms.length > 0)
             this.room = course.rooms[0];
         if (course.subject)
             this.subject = course.subject;
-        if (course.startDate)
-            this.startTime = course.startDate;
-        if (course.endDate)
-            this.startTime = course.endDate;
-        if (course.audiences)
-            this.audience = course.audiences;
-        this.date = moment(course.startDate || this.date).toDate();
+        if (course.beginning)
+            this.date = this.startTime = course.beginning.toDate();
+        if (course.end)
+            this.endTime = course.end.toDate();;
+        if (course.audiences && course.audiences.all && course.audiences.all.length > 0)
+            this.audience = course.audiences.all[0];
     }
 
     async save() {

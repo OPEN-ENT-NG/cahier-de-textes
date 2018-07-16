@@ -77,16 +77,6 @@ export class Course {
         }
     }
 
-
-    async sync(structure?: Structure) {
-        try {
-            let {data} = await http.get('/viescolaire/common/course/' + this._id);
-            Mix.extend(this, Course.formatSqlDataToModel(data, this.structure));
-            this.init(this.structure);
-        } catch (e) {
-            notify.error('session.sync.err');
-        }
-    }
 }
 
 export class Courses {

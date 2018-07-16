@@ -304,14 +304,18 @@ export let main = ng.controller('MainController',
           return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
         };
 
-        $scope.openSession = (sessionId: number, fromCourse: Boolean = false) => {
+        $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
-                if(fromCourse)
-                    $scope.goTo('/session/create/' + sessionId);
-                else
-                    $scope.goTo('/session/update/' + sessionId);
+                $scope.goTo('/session/update/' + sessionId);
             } else {
                 $scope.goTo('/session/view/' + sessionId);
+            }
+            $scope.safeApply();
+        };
+
+        $scope.openSessionFromCourse = (calendar_course) => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
+                $scope.goTo('/session/create/' + calendar_course._id);
             }
             $scope.safeApply();
         };

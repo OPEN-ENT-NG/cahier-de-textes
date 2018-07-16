@@ -30,7 +30,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
             else if($routeParams.courseId){
                 await $scope.session.mapFromCourse($routeParams.courseId);
-                console.log('session mapped', $scope.session)
             }
             $scope.safeApply();
         }
