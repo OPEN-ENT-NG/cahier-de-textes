@@ -104,9 +104,6 @@ export class Courses {
      * @returns {Promise<void>} Returns a promise.
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
-        if (teacher === null && audience === null)
-            return;
-
         let firstDate = Utils.getFormattedDate(startMoment);
         let endDate =  Utils.getFormattedDate(endMoment);
         let filter = '';
