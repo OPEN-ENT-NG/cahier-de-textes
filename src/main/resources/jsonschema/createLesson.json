@@ -47,6 +47,10 @@
       "id": "http://jsonschema.net/lesson_color",
       "type": "string"
     },
+    "course_id": {
+      "id": "http://jsonschema.net/course_id",
+      "type": "string"
+    },
     "attachments": {
       "id": "http://jsonschema.net/attachments",
       "type": "array"

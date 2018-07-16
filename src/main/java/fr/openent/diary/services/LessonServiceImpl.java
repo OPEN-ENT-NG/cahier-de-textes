@@ -94,7 +94,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
             StringBuilder query = new StringBuilder();
             query.append("SELECT l.id as lesson_id, array_to_json(array_agg(distinct homework)) as homeworks, s.id as subject_id, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                     .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
-                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
+                    .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, l.course_id,")
                     .append(" s.original_subject_id as original_subject_id , array_to_json(array_agg(distinct visa)) as visas, ")
                     .append(homeworkAggregate.toString())
                     .append(" FROM diary.lesson AS l")
@@ -215,7 +215,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
         StringBuilder query = new StringBuilder();
         query.append("SELECT l.id as lesson_id, s.id as subject_id, array_to_json(array_agg(distinct homework)) as homeworks, s.subject_label, l.school_id, t.teacher_display_name, l.teacher_id, ")
                 .append(" a.audience_type, l.audience_id, a.audience_label, l.lesson_title, lesson_room, l.lesson_color, l.lesson_state, ")
-                .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, ")
+                .append(" l.lesson_date, l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.locked, l.course_id, ")
                 .append(" s.original_subject_id as original_subject_id , array_to_json(array_agg(distinct visa)) as visas ")
                 .append(" FROM diary.lesson AS l")
                 .append(" INNER JOIN diary.teacher as t ON t.id = l.teacher_id")
@@ -494,7 +494,7 @@ public class LessonServiceImpl extends SqlCrudService implements LessonService {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT l.id as lesson_id, array_to_json(array_agg(distinct homework)) as homeworks, s.subject_label, l.subject_id, l.school_id, l.teacher_id, t.teacher_display_name, a.audience_type,")
-                .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date,")
+                .append(" l.audience_id, a.audience_label, l.lesson_title, l.lesson_room, l.lesson_color, l.lesson_date, l.course_id, ")
                 .append(" array_to_json(array_agg(DISTINCT visa)) AS visas, ")
                 .append(" l.lesson_start_time, l.lesson_end_time, l.lesson_description, l.lesson_annotation, l.lesson_state ")
                 .append(" FROM diary.lesson as l")

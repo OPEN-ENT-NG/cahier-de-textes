@@ -67,7 +67,7 @@ export class Session {
             attachments: data.attachments,
             homeworks: JSON.parse(data.homeworks),
             visas: JSON.parse(data.visas),
-            courseId: data.courseId ? data.courseId: null
+            courseId: data.course_id ? data.course_id: null
         };
     }
 
@@ -88,7 +88,7 @@ export class Session {
             audience_type: this.audience.type_groupe == 0 ? 'class' : 'group',
             attachments: this.attachments ? this.attachments : [],
             lesson_room: this.room,
-            courseId: this.courseId
+            course_id: this.courseId
         };
     }
 
