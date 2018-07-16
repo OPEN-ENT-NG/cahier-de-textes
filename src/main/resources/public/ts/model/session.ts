@@ -26,6 +26,7 @@ export class Session {
     attachments: any = [];
     homeworks: Homework[] = [];
     room: string = "";
+    courseId: string = null;
 
     visas: Visa[];
 
@@ -65,7 +66,8 @@ export class Session {
             annotation: data.lesson_annotation,
             attachments: data.attachments,
             homeworks: JSON.parse(data.homeworks),
-            visas: JSON.parse(data.visas)
+            visas: JSON.parse(data.visas),
+            courseId: data.courseId ? data.courseId: null
         };
     }
 
@@ -85,7 +87,8 @@ export class Session {
             audience_id: this.audience.id,
             audience_type: this.audience.type_groupe == 0 ? 'class' : 'group',
             attachments: this.attachments ? this.attachments : [],
-            lesson_room: this.room
+            lesson_room: this.room,
+            courseId: this.courseId
         };
     }
 
@@ -121,10 +124,10 @@ export class Session {
         }
     }
 
-    async mapFromCourse(courseId: any) {
-        if(!courseId)
+    async mapFromCourse() {
+        if(!this.courseId)
             return;
-        let course:any = this.structure.courses.all.find(i => i._id === courseId);
+        let course:any = this.structure.courses.all.find(i => i._id === this.courseId);
         if (!course)
             return;
         if (course.teachers && course.teachers.all && course.teachers.all.length > 0)
@@ -136,7 +139,7 @@ export class Session {
         if (course.beginning)
             this.date = this.startTime = course.beginning.toDate();
         if (course.end)
-            this.endTime = course.end.toDate();;
+            this.endTime = course.end.toDate();
         if (course.audiences && course.audiences.all && course.audiences.all.length > 0)
             this.audience = course.audiences.all[0];
     }
