@@ -7,7 +7,7 @@ import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
 
-const colors = ['grey'];
+const colors = ['grey', 'green'];
 
 export class Session {
     id: string;
@@ -105,6 +105,10 @@ export class Session {
         this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
         this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
 
+        if(this.courseId){
+            this.color = colors[1];
+        }
+
         if (this.visas.every(v => v === null)) {
             this.visas = [];
         } else {
@@ -142,6 +146,7 @@ export class Session {
             this.endTime = course.end.toDate();
         if (course.audiences && course.audiences.all && course.audiences.all.length > 0)
             this.audience = course.audiences.all[0];
+        this.color = colors[1];
     }
 
     async save() {
