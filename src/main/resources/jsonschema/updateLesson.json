@@ -41,6 +41,13 @@
     },
     "attachments": {
       "type": "array"
+    },
+    "course_id": {
+      "id": "http://jsonschema.net/course_id",
+      "type": [
+        "null",
+        "string"
+      ]
     }
   },
   "required": [
@@ -52,6 +59,7 @@
     "lesson_start_time",
     "lesson_end_time",
     "lesson_description",
-    "lesson_color"
+    "lesson_color",
+    "course_id"
   ]
 }
