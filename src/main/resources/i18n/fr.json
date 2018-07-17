@@ -37,6 +37,7 @@
   "period.from": "Période du",
   "the": "Le",
   "date": "Date",
+  "legend": "Légende",
   "subject": "Matière",
   "loading": "Chargement",
   "import.file": "Importer",
@@ -122,6 +123,8 @@
   "session.manage.update": "Modifier une séance",
   "session.manage.config": "Configuration de la séance",
 
+  "session.punctual": "Séance ponctuelle",
+  "session.official": "Séance officielle",
   "session.deleted": "Séance supprimée",
   "session.deleted.error": "Erreur lors de la suppression de la séance",
   "session.created": "Séance créée",
@@ -131,6 +134,7 @@
   "session.published": "Séance publiée",
   "session.published.error": "Erreur lors de la publication de la séance",
   "session.unpublished": "Séance dépubliée",
+  "session.not.published": "Séance non publiée",
   "session.unpublished.error": "Erreur lors de la dépublication de la séance",
 
   "homework.deleted": "Travail à faire supprimé",

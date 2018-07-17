@@ -1,101 +1,138 @@
 <div class="sidebar ">
-
-    <div class="row">
-        <section id="display-section" class="cell twelve">
-            <h5 class="large">
-                <i18n>sidebar.display_mode</i18n> :
-            </h5>
-            <div class="row" ng-if="hasBothViewMode()">
-                <label class="cell twelve small">
-                    <span class="float-left"><i18n>calendar</i18n></span>
-                    <switch ng-model="display.listView" ng-click="display.listView = !display.listView"></switch>
-                    <i18n>list</i18n>
+    <section id="display-section" class="cell twelve">
+        <h5 class="large">
+            <i18n>sidebar.display_mode</i18n> :
+        </h5>
+        <div class="row" ng-if="hasBothViewMode()">
+            <label class="cell twelve small">
+                <span class="float-left"><i18n>calendar</i18n></span>
+                <switch ng-model="display.listView" ng-click="display.listView = !display.listView"></switch>
+                <i18n>list</i18n>
+            </label>
+        </div>
+        <div class="row margin-bottom-md">
+            <div class="magic-checkbox" ng-click="display.homeworks = !display.homeworks">
+                <label>
+                    <input type="checkbox" ng-model="display.homeworks"/>
+                    <i class="pointer input-helper"></i>
+                    <span class="small pointer"><i18n>homeworks</i18n></span>
                 </label>
             </div>
-            <div class="row margin-bottom-md">
-                <div class="magic-checkbox" ng-click="display.homeworks = !display.homeworks">
-                    <label>
-                        <input type="checkbox" ng-model="display.homeworks"/>
-                        <i class="pointer input-helper"></i>
-                        <span class="small pointer"><i18n>homeworks</i18n></span>
-                    </label>
-                </div>
+        </div>
+        <div class="row margin-bottom-md">
+            <div class="magic-checkbox" ng-click="display.sessions = !display.sessions">
+                <label>
+                    <input type="checkbox" ng-model="display.sessions"/>
+                    <i class="pointer input-helper"></i>
+                    <span class="small pointer"><i18n>session</i18n></span>
+                </label>
             </div>
-            <div class="row margin-bottom-md">
-                <div class="magic-checkbox" ng-click="display.sessions = !display.sessions">
-                    <label>
-                        <input type="checkbox" ng-model="display.sessions"/>
-                        <i class="pointer input-helper"></i>
-                        <span class="small pointer"><i18n>session</i18n></span>
-                    </label>
-                </div>
-            </div>
-            <div ng-if="structures.all.length > 1">
-                <select ng-model="structure"
-                        id="structure-list"
-                        class="twelve"
-                        ng-change="switchStructure(structure)"
-                        ng-options="structure as structure.name for structure in structures.all">
-                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-                </select>
-            </div>
+        </div>
+        <div ng-if="structures.all.length > 1">
+            <select ng-model="structure"
+                    id="structure-list"
+                    class="twelve"
+                    ng-change="switchStructure(structure)"
+                    ng-options="structure as structure.name for structure in structures.all">
+                <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+            </select>
+        </div>
 
-            <!-- Access Own Data -->
+        <!-- Access Own Data -->
 
 
-            <!-- Access Child Data -->
-            <div workflow="diary.accessChildData">
-                <select ng-model="params.child"
-                        class="twelve"
-                        ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                    <option value="" disabled selected>[[translate('utils.child.choose.one')]]</option>
-                </select>
-            </div>
+        <!-- Access Child Data -->
+        <div workflow="diary.accessChildData">
+            <select ng-model="params.child"
+                    class="twelve"
+                    ng-change="params.group = null;params.user = null;syncPedagogicItems()"
+                    ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                <option value="" disabled selected>[[translate('utils.child.choose.one')]]</option>
+            </select>
+        </div>
 
-            <!-- Access External Data -->
-            <div workflow="diary.accessExternalData">
-                <div class="row display-inline-block">
-                    <label class="cell twelve small" for="user-list">
-                        <select ng-model="params.user"
-                                id="user-list"
-                                class="twelve"
-                                ng-change="params.group = null;syncPedagogicItems()"
-                                ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
-                            <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="row display-inline-block">
-                    <label class="cell twelve small" for="user-list">
-                        <select ng-model="params.group"
-                                id="group-list"
-                                class="twelve"
-                                ng-change="params.user = null;syncPedagogicItems()"
-                                ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
-                            <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
-                        </select>
-                    </label>
-                </div>
+        <!-- Access External Data -->
+        <div workflow="diary.accessExternalData">
+            <div class="row display-inline-block">
+                <label class="cell twelve small" for="user-list">
+                    <select ng-model="params.user"
+                            id="user-list"
+                            class="twelve"
+                            ng-change="params.group = null;syncPedagogicItems()"
+                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
+                        <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+                    </select>
+                </label>
             </div>
-        </section>
-    </div>
+            <div class="row display-inline-block">
+                <label class="cell twelve small" for="user-list">
+                    <select ng-model="params.group"
+                            id="group-list"
+                            class="twelve"
+                            ng-change="params.user = null;syncPedagogicItems()"
+                            ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
+                        <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- Legend -->
+    <section class="row">
+        <div class="row">
+            <h5 class="large" ng-click="display.legend = !display.legend">
+                <i18n>legend</i18n>
+                <i ng-class="display.legend ? 'up-open' : 'down-open'" class="right-magnet"></i>
+            </h5>
+        </div>
+        <div class="row small" ng-show="display.legend">
+            <div>
+                <span class="help-color-bloc" style="background-color: lightgrey"></span>
+                <span><i18n>session.official</i18n></span>
+            </div>
+            <div>
+                <span class="help-color-bloc" style="background-color: green"></span>
+                <span><i18n>session.official</i18n> remplie</span>
+            </div>
+            <div>
+                <span class="help-color-bloc" style="background-color: grey"></span>
+                <span><i18n>session.punctual</i18n></span>
+            </div>
+            <div>
+                <i>&#xe904;</i>
+                <span><i18n>session.not.published</i18n></span>
+            </div>
+            <div>
+                <i>&#xe80d;</i>
+                <span><i18n>homework</i18n></span>
+            </div>
+            <div>
+                <i>&#xe86f;</i>
+                <span><i18n>session</i18n></span>
+            </div>
+        </div>
+    </section>
+
     <section id="add-section" class="row" ng-if="hasAtLeastOneCreateRight()">
         <div class="cell twelve ">
-            <h5 class="large">
-                <i18n>utils.add</i18n> :
+            <h5 class="large" ng-click="display.add = !display.add">
+                <i18n>utils.add</i18n>
+                <i ng-class="display.add ? 'up-open' : 'down-open'" class="right-magnet"></i>
             </h5>
-            <div class="row cell">
+            <div class="row" ng-show="display.add">
                 <div class="twelve cell small">
                     <button workflow="diary.createHomework" class="twelve padding-sm" ng-click="goTo('/homework/create/')">
-                        <i18n>homework.create</i18n>
+                        <i18n>homework</i18n>
                     </button>
                     <br/>
                     <button workflow="diary.createLesson" class="twelve padding-sm" ng-click="goTo('/session/create/')">
-                        <i18n>session.create</i18n>
+                        <i18n>session</i18n>
                     </button>
                 </div>
             </div>
         </div>
     </section>
+
+
 </div>
