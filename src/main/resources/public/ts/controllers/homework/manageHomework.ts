@@ -41,6 +41,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if ($scope.homework.id) {
                 await syncHomework();
             }
+            let dateInWeek = $scope.attachedToSession.bool ? $scope.homework.session.startMoment : $scope.homework.dueDate;
+            $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
+            await $scope.homework.workloadWeek.sync(dateInWeek);
 
             $scope.safeApply();
         }
@@ -52,8 +55,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework.session = $scope.sessions.all.find(s => s.id === $scope.homework.session_id);
             }
             $scope.attachedToSession.bool = !!$scope.homework.session;
-            let dateInWeek = $scope.attachedToSession.bool ? $scope.homework.session.startMoment : $scope.homework.dueDate;
-            await $scope.homework.workloadWeek.sync(dateInWeek);
         }
 
         initData();

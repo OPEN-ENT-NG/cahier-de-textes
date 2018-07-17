@@ -205,7 +205,7 @@ export class HomeworkTypes {
 }
 
 export class Workload {
-    total: number;
+    total: number = 0;
     count: number = 0;
     day: any;
     shortDayString: string;
