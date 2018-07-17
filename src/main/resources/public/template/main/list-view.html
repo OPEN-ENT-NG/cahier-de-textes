@@ -1,9 +1,9 @@
 <div class="list-view">
-    <div class="row card padding-sm margin-bottom-md">
-        <i18n>from</i18n>
-        <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"></date-picker>
+    <div class="row card padding-md margin-bottom-md">
+        <i18n>period.from</i18n>
+        <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();" class="date-picker-sm"></date-picker>
         <i18n>to</i18n>
-        <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"></date-picker>
+        <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();" class="date-picker-sm"></date-picker>
     </div>
     <section>
         <div class="pedagogic-day-container">
@@ -12,7 +12,7 @@
                     <div ng-class="day.selected ? 'pedagogic-day-card selected' : 'pedagogic-day-card'" class="text-center" ng-click="selectPedagogicDay(day)">
                         <div class="six zero-mobile" ng-class="day.selected ? 'thumbnail thumb-selected' : 'thumbnail'">
                             <span class="zero-tablet">[[day.dayName]]</span>
-                            <!--<span class="five-tablet">[[day.shortDayName]]</span>-->
+                            <span class="five-tablet">[[day.shortDayName]]</span>
                         </div>
                         <div class="six seven-tablet twelve-mobile" ng-class="day.selected ? 'summary sum-selected' : 'summary'">
                             <div class="padding-sm six">[[day.shortDate]]</div>

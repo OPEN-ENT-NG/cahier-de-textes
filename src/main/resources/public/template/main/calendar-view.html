@@ -4,7 +4,7 @@
     <div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
         <div class="loader"></div>
     </div>
-    <div class="row">
+    <div class="row" ng-class="{'hide-session':!display.sessions}">
         <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
                                b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks">
         </calendar-daily-events>

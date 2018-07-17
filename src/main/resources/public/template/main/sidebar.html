@@ -21,15 +21,15 @@
                     </label>
                 </div>
             </div>
-            <!--<div class="row margin-bottom-md">-->
-                <!--<div class="magic-checkbox" ng-click="display.sessions = !display.sessions">-->
-                    <!--<label>-->
-                        <!--<input type="checkbox" ng-model="display.sessions"/>-->
-                        <!--<i class="pointer input-helper"></i>-->
-                        <!--<span class="small pointer"><i18n>session</i18n></span>-->
-                    <!--</label>-->
-                <!--</div>-->
-            <!--</div>-->
+            <div class="row margin-bottom-md">
+                <div class="magic-checkbox" ng-click="display.sessions = !display.sessions">
+                    <label>
+                        <input type="checkbox" ng-model="display.sessions"/>
+                        <i class="pointer input-helper"></i>
+                        <span class="small pointer"><i18n>session</i18n></span>
+                    </label>
+                </div>
+            </div>
             <div ng-if="structures.all.length > 1">
                 <select ng-model="structure"
                         id="structure-list"
@@ -39,8 +39,12 @@
                     <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
                 </select>
             </div>
-            <!-- View Child -->
-            <div workflow="diary.readChildren">
+
+            <!-- Access Own Data -->
+
+
+            <!-- Access Child Data -->
+            <div workflow="diary.accessChildData">
                 <select ng-model="params.child"
                         class="twelve"
                         ng-change="params.group = null;params.user = null;syncPedagogicItems()"
@@ -49,8 +53,8 @@
                 </select>
             </div>
 
-            <!-- View External -->
-            <div workflow="diary.viewExternal">
+            <!-- Access External Data -->
+            <div workflow="diary.accessExternalData">
                 <div class="row display-inline-block">
                     <label class="cell twelve small" for="user-list">
                         <select ng-model="params.user"

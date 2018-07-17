@@ -1,6 +1,7 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.model.general.CriteriaSearchType;
+import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.LessonService;
@@ -370,8 +371,22 @@ public class DiaryController extends BaseController {
 
     @Get("/workflow/3/")
     @ApiDoc("Used only to create a workflow right")
-    @SecuredAction(value = "access.own.data", type = ActionType.WORKFLOW)
+    @SecuredAction(value = WorkflowUtils.ACCESS_OWN_DATA, type = ActionType.WORKFLOW)
     public void workflow3(final HttpServerRequest request) {
+
+    }
+
+    @Get("/workflow/4/")
+    @ApiDoc("Used only to create a workflow right")
+    @SecuredAction(value = WorkflowUtils.ACCESS_CHILD_DATA, type = ActionType.WORKFLOW)
+    public void workflow4(final HttpServerRequest request) {
+
+    }
+
+    @Get("/workflow/5/")
+    @ApiDoc("Used only to create a workflow right")
+    @SecuredAction(value = WorkflowUtils.ACCESS_EXTERNAL_DATA, type = ActionType.WORKFLOW)
+    public void workflow5(final HttpServerRequest request) {
 
     }
 }

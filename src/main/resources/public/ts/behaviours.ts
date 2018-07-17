@@ -9,11 +9,11 @@ const diaryBehaviours = {
             createHomework: "fr.openent.diary.controllers.HomeworkController|createFreeHomework",
             manageHomework: "fr.openent.diary.controllers.HomeworkController|modifyHomework",
             manageSession: "fr.openent.diary.controllers.LessonController|modifyLesson",
-            viewExternal: "fr.openent.diary.controllers.LessonController|getExternalLesson",
             calendarView: "fr.openent.diary.controllers.DiaryController|workflow1",
             listView: "fr.openent.diary.controllers.DiaryController|workflow2",
             accessOwnData: "fr.openent.diary.controllers.DiaryController|workflow3",
-            readChildren: "fr.openent.diary.controllers.StudentController|getChildren",
+            accessChildData: "fr.openent.diary.controllers.DiaryController|workflow4",
+            accessExternalData: "fr.openent.diary.controllers.DiaryController|workflow5",
         },
         resources: {
             //lessons

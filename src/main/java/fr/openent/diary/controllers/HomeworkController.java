@@ -1,11 +1,8 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.WorkflowUtils;
-import fr.openent.diary.security.filters.HomeworkAccessFilter;
-import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
-import fr.openent.diary.model.util.KeyValueModel;
-import fr.openent.diary.security.workflow.ExternalView;
+import fr.openent.diary.security.workflow.AccessExternalData;
 import fr.openent.diary.security.workflow.HomeworkManage;
 import fr.openent.diary.services.*;
 import fr.wseduc.rs.*;
@@ -121,7 +118,7 @@ public class HomeworkController extends ControllerHelper {
     @Get("/homework/external/list/:lessonId")
     @ApiDoc("Get all homeworks for a lesson")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(ExternalView.class)
+    @ResourceFilter(AccessExternalData.class)
     public void externalListHomeworkByLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("lessonId");
 
@@ -238,7 +235,7 @@ public class HomeworkController extends ControllerHelper {
     @Get("/homework/external/:etabIds/:startDate/:endDate/:type/:userid")
     @ApiDoc("Get all homeworks for a school")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(ExternalView.class)
+    @ResourceFilter(AccessExternalData.class)
     public void listExternalHomeworks(final HttpServerRequest request) {
 
         final String[] schoolIds = request.params().get("etabIds").split(":");

@@ -7,12 +7,12 @@ import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.user.UserInfos;
 
-public class ExternalView implements ResourcesProvider {
+public class AccessExternalData implements ResourcesProvider {
 
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.EXTERNAL_VIEW_RIGHT));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.ACCESS_EXTERNAL_DATA));
     }
 
 }

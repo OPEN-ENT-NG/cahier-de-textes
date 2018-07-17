@@ -1,11 +1,9 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.filters.LessonAccessFilter;
-import fr.openent.diary.model.HandlerResponse;
 import fr.openent.diary.model.general.Audience;
-import fr.openent.diary.model.util.KeyValueModel;
 import fr.openent.diary.security.WorkflowUtils;
-import fr.openent.diary.security.workflow.ExternalView;
+import fr.openent.diary.security.workflow.AccessExternalData;
 import fr.openent.diary.security.workflow.LessonManage;
 import fr.openent.diary.services.*;
 import fr.wseduc.rs.*;
@@ -97,7 +95,8 @@ public class LessonController extends ControllerHelper {
 
     @Get("/lesson/external/:id")
     @ApiDoc("Get a lesson using its identifier")
-    @SecuredAction(value = WorkflowUtils.EXTERNAL_VIEW_RIGHT, type = ActionType.WORKFLOW)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(AccessExternalData.class)
     public void getExternalLesson(final HttpServerRequest request) {
         final String lessonId = request.params().get("id");
 
@@ -122,7 +121,7 @@ public class LessonController extends ControllerHelper {
     @Get("/lesson/external/:etabIds/:startDate/:endDate/:type/:userid")
     @ApiDoc("Get all lessons for etab")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(ExternalView.class)
+    @ResourceFilter(AccessExternalData.class)
     public void listLessonsExternal(final HttpServerRequest request) {
         final String[] schoolIds = request.params().get("etabIds").split(":");
         final String startDate = request.params().get("startDate");

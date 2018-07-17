@@ -64,7 +64,7 @@ export class Structure {
             this.subjects.sync(this.id).then(() => { syncedCollections.subjects = true; endSync(); });
             this.audiences.sync(this.id).then(() => {
                 syncedCollections.audiences = true; endSync();
-                if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.readChildren)) {
+                if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
                     this.students.sync().then(() => { syncedCollections.students = true; endSync(); });
                 }
             });

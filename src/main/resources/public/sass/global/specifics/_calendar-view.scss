@@ -2,6 +2,14 @@
   margin-top: 72px;
 }
 
+.hide-session {
+  .schedule-item-content {
+    &.session {
+      display:none;
+    }
+  }
+}
+
 .schedule-item-content {
   display: flex;
   flex-direction: column;
