@@ -31,7 +31,8 @@
       "type": "string"
     },
     "lesson_room": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 8
     },
     "lesson_color": {
       "type": "string"

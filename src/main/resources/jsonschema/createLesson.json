@@ -41,7 +41,8 @@
     },
     "lesson_room": {
       "id": "http://jsonschema.net/lesson_room",
-      "type": "string"
+      "type": "string",
+      "maxLength": 8
     },
     "lesson_color": {
       "id": "http://jsonschema.net/lesson_color",
