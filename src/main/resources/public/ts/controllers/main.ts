@@ -164,7 +164,9 @@ export let main = ng.controller('MainController',
 
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
-            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.courses.all);
+
+            let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
+            $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
             $scope.loadCalendarItems();
             $scope.loadPedagogicDays();

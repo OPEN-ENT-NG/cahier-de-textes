@@ -13,4 +13,7 @@ select {
   &:hover {
     border-color: $primary;
   }
+  &:disabled {
+    background-color: rgb(235, 235, 228);
+  }
 }
