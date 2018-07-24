@@ -67,10 +67,10 @@
                         <label class="cell two twelve-mobile">
                             <i18n>state</i18n>*
                         </label>
-                        <div ng-if="session.state == 'draft'" class="cell twelve-mobile ten">
+                        <div ng-if="!session.isPublished" class="cell twelve-mobile ten">
                             <i18n>draft</i18n>
                         </div>
-                        <div ng-if="session.state == 'published'" class="cell twelve-mobile ten">
+                        <div ng-if="session.isPublished" class="cell twelve-mobile ten">
                             <i18n>published</i18n>
                         </div>
                     </div>
@@ -151,12 +151,12 @@
                         <i18n>utils.save</i18n>
                     </button>
 
-                    <button class="float-none display-inline-block" ng-if="session.state == 'draft'"
+                    <button class="float-none display-inline-block" ng-if="!session.isPublished"
                             ng-disabled="!isValidForm()" type="submit"
                             ng-click="publishSession()">
                         <i18n>publish</i18n>
                     </button>
-                    <button class="float-none display-inline-block" ng-if="session.state == 'published'"
+                    <button class="float-none display-inline-block" ng-if="session.isPublished"
                             ng-disabled="!isValidForm()" type="submit"
                             ng-click="unpublishSession()">
                         <i18n>unpublish</i18n>

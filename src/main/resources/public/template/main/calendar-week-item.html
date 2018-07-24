@@ -6,7 +6,7 @@
             <div class="text-ellipsis overflow-hidden">[[item.endDisplayTime]]&nbsp;[[item.audience.name]]</div>
         </div>
         <div class="right-side text-center">
-            <i ng-if="item.state === 'draft'">&#xe904;</i>
+            <i ng-if="!item.isPublished">&#xe904;</i>
             <div ng-if="item.homeworks.length > 0" class="row">[[item.homeworks.length]] <i>&#xe80d;</i></div>
         </div>
     </div>

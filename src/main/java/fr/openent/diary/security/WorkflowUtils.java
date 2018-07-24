@@ -6,10 +6,22 @@ import java.util.List;
 
 public final class WorkflowUtils {
 
-    static public final String HOMEWORK_MANAGE_RIGHT = "diary.homework.manage";
-    static public final String LESSON_MANAGE_RIGHT = "diary.lesson.manage";
-    static public final String LESSON_READ_RIGHT = "diary.lesson.read";
-    static public final String VISA_MANAGE_RIGHT = "diary.visa.manage";
+    static public final String VIEW = "diary.view";
+    static public final String CHILDREN_READ = "children.red";
+
+    static public final String VISA_MANAGE = "visa.manage";
+    static public final String VISA_READ = "visa.read";
+
+    static public final String SESSION_READ = "session.read";
+    static public final String SESSION_MANAGE = "session.manage";
+    static public final String SESSION_PUBLISH = "session.publish";
+
+    static public final String HOMEWORK_READ = "homework.read";
+    static public final String HOMEWORK_MANAGE = "homework.manage";
+    static public final String HOMEWORK_PUBLISH = "homework.publish";
+
+    static public final String VIEW_CALENDAR = "view.calendar";
+    static public final String VIEW_LIST = "view.list";
 
     static public final String ACCESS_OWN_DATA = "access.own.data";
     static public final String ACCESS_EXTERNAL_DATA = "access.external.data";

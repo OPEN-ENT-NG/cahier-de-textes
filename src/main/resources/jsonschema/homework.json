@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "subject_id": {
+      "type": "string"
+    },
+    "structure_id": {
+      "type": "string"
+    },
+    "audience_id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_published": {
+      "type": "boolean"
+    },
+    "color": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": ["null", "string"]
+    },
+    "due_date": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "subject_id",
+    "structure_id",
+    "audience_id",
+    "due_date",
+    "description",
+    "color",
+    "session_id"
+  ]
+}

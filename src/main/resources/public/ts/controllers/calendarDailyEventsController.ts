@@ -50,7 +50,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
         $scope.editSelectedHomework = function (homework, $event) {
             // prevent redirect on clicking on checkbox
             if (!($event.target && $event.target.type === "checkbox")) {
-                if (!homework.lesson_id) {
+                if (!homework.session_id) {
                     //window.location = '/diary#/editHomeworkView/' + homework.id;
                 } else {
                     //window.location = '/diary#/editLessonView/' + homework.lesson_id + '/' + homework.id;

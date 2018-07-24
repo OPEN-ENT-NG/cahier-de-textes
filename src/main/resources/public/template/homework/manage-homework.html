@@ -77,20 +77,14 @@
                 <label class="cell two twelve-mobile">
                     <i18n>state</i18n>*
                 </label>
-                <div ng-if="homework.state == 'draft'" class="cell twelve-mobile ten">
+                <div ng-if="!homework.isPublished" class="cell twelve-mobile ten">
                     <i18n>draft</i18n>
                 </div>
-                <div ng-if="homework.state == 'published'" class="cell twelve-mobile ten">
+                <div ng-if="homework.isPublished" class="cell twelve-mobile ten">
                     <i18n>published</i18n>
                 </div>
             </div>
 
-            <div class="row form-row">
-                <label class="cell two twelve-mobile"><i18n>homework.workload</i18n></label>
-                <div class="cell twelve-mobile ten">
-                    <input style="width: 50px;" type="number" ng-model="homework.workload" min="0" max="999" step="5"> <i18n>minutes</i18n>
-                </div>
-            </div>
             <div class="row form-row">
                 <label class="cell two twelve-mobile"><i18n>homework.week.workload</i18n></label>
                 <div class="cell twelve-mobile ten">
@@ -146,13 +140,13 @@
                 <button ng-disabled="!isValidForm()" type="button" ng-click="saveHomework()">
                     <i18n>utils.save</i18n>
                 </button>
-                <button ng-if="homework.state == 'draft'"
+                <button ng-if="!homework.isPublished"
                         ng-disabled="!isValidForm()" type="button"
                         ng-click="publishHomework()">
                     <i18n>publish</i18n>
                 </button>
 
-                <button ng-if="homework.state == 'published'"
+                <button ng-if="homework.isPublished"
                         ng-disabled="!isValidForm()" type="button"
                         ng-click="unpublishHomework()">
                     <i18n>unpublish</i18n>

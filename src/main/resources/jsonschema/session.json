@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "subject_id": {
+      "type": "string"
+    },
+    "structure_id": {
+      "type": "string"
+    },
+    "audience_id": {
+      "type": "string"
+    },
+    "is_published": {
+      "type": "boolean"
+    },
+    "date": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": "string"
+    },
+    "end_time": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "annotation": {
+      "type": "string"
+    },
+    "room": {
+      "type": "string",
+      "maxLength": 8
+    },
+    "color": {
+      "type": "string"
+    },
+    "course_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    }
+  },
+  "required": [
+    "title",
+    "subject_id",
+    "structure_id",
+    "audience_id",
+    "date",
+    "start_time",
+    "end_time",
+    "description",
+    "color",
+    "course_id"
+  ]
+}

@@ -12,7 +12,7 @@ public class HomeworkManage implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.HOMEWORK_MANAGE_RIGHT));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.HOMEWORK_MANAGE));
     }
 
 }

@@ -47,7 +47,7 @@
                     class="twelve"
                     ng-change="params.group = null;params.user = null;syncPedagogicItems()"
                     ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                <option value="" disabled selected>[[translate('utils.child.choose.one')]]</option>
+                <option value="" disabled selected>[[translate('student.choose')]]</option>
             </select>
         </div>
 
@@ -122,11 +122,11 @@
             </h5>
             <div class="row" ng-show="display.add">
                 <div class="twelve cell small">
-                    <button workflow="diary.createHomework" class="twelve padding-sm" ng-click="goTo('/homework/create/')">
+                    <button workflow="diary.manageHomework" class="twelve padding-sm" ng-click="goTo('/homework/create/')">
                         <i18n>homework</i18n>
                     </button>
                     <br/>
-                    <button workflow="diary.createLesson" class="twelve padding-sm" ng-click="goTo('/session/create/')">
+                    <button workflow="diary.manageSession" class="twelve padding-sm" ng-click="goTo('/session/create/')">
                         <i18n>session</i18n>
                     </button>
                 </div>

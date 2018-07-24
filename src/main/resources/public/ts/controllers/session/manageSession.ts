@@ -108,7 +108,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if(publish){
                     let sessionPublishResponse = await $scope.session.publish();
                     if(sessionPublishResponse.succeed){
-                        $scope.session.state = 'published';
+                        $scope.session.isPublished = true;
                         await saveSessionHomeworks();
                     }
                     $scope.toastHttpCall(sessionPublishResponse);
@@ -124,7 +124,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         async function saveSessionHomeworks() {
             $scope.session.homeworks.forEach(async h => {
-                h.state = $scope.session.state;
+                h.isPublished = $scope.session.isPublished;
                 h.session = $scope.session;
                 await h.save();
             });

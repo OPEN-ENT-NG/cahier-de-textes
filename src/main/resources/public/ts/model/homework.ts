@@ -4,7 +4,7 @@ import { Mix } from 'entcore-toolkit';
 import { Structure, Teacher, Utils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Session} from './session';
+import {Session, Sessions} from './session';
 
 export class Homework {
     id: string;
@@ -12,7 +12,6 @@ export class Homework {
     description: string = '';
     dueDate: Date = moment().toDate();
     color: string;
-    state: string = "draft";
 
     session_id: number;
     workloadWeek: WorkloadWeek;
@@ -26,7 +25,7 @@ export class Homework {
     workload: number;
     startMoment: any;
     endMoment: any;
-
+    isPublished: boolean;
     opened: boolean;
     is_periodic: boolean = false;
     locked: boolean = true;
@@ -41,20 +40,17 @@ export class Homework {
 
     toSendFormat () {
         return {
-            homework_title: this.title,
+            title: this.title,
             subject_id: this.subject.id,
-            homework_type_id: this.type.id,
+            type_id: this.type.id,
             teacher_id: model.me.userId,
-            school_id: this.structure.id,
-            lesson_id: this.session ? this.session.id : undefined,
+            structure_id: this.structure.id,
+            session_id: this.session ? this.session.id : null,
             audience_id: this.audience.id,
-            homework_due_date: Utils.getFormattedDate(this.dueDate),
-            homework_description: this.description,
-            homework_color: this.color,
-            homework_state: this.state,
-            audience_type: this.audience.type_groupe == 0 ? 'class': 'group',
-            audience_name: this.audience.name,
-            attachments: this.attachments,
+            due_date: Utils.getFormattedDate(this.dueDate),
+            description: this.description,
+            color: this.color,
+            is_published: this.isPublished,
             workload: this.workload
         };
     }
@@ -65,22 +61,18 @@ export class Homework {
         subject.id = data.subject_id;
         subject.label = data.subject_label;
 
-        let type = new HomeworkType();
-        type.label = data.homework_type_label;
-        type.id = data.homework_type_id;
-
         return {
             audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
-            session_id: data.lesson_id,
+            session_id: data.session_id,
             id: data.id,
-            type: type,
-            title: data.homework_title,
-            color: data.homework_color,
-            dueDate: Utils.getFormattedDate(data.homework_due_date),
-            description: data.homework_description,
-            state: data.homework_state,
+            type: JSON.parse(data.type),
+            title: data.title,
+            color: data.color,
+            dueDate: Utils.getFormattedDate(data.due_date),
+            description: data.description,
+            isPublished: data.is_published,
             workload: data.workload,
         };
     }
@@ -109,13 +101,13 @@ export class Homework {
     }
 
     async publish() {
-        let response = await http.post('/diary/publishHomeworks', {ids:[this.id]});
+        let response = await http.post('/diary/homework/publish/' + this.id);
         return Utils.setToastMessage(response, 'homework.published','homework.published.error');
     }
 
 
     async unpublish() {
-        let response = await http.post('/diary/unPublishHomeworks', {ids:[this.id]});
+        let response = await http.post('/diary/homework/unpublish/' + this.id);
         return Utils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
     }
 
@@ -126,6 +118,7 @@ export class Homework {
     }
 
     init(){
+        this.type = Mix.castAs(HomeworkType, this.type);
         this.dueDate = moment(this.dueDate).toDate();
         this.startMoment = moment(this.dueDate);
         this.workloadWeek = new WorkloadWeek(this.audience);
@@ -149,21 +142,35 @@ export class Homeworks {
         return dataModel;
     }
 
-    async sync(startMoment: any, endMoment: any, typeId?: string, type?: string){
+    async syncOwnHomeworks(startMoment: any, endMoment: any): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = '';
-        if(!!typeId && !!type){
-            if(type === 'child'){
-                url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/${typeId}`;
-            } else {
-                url = `/diary/homework/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
-            }
-        } else {
-            url = `/diary/homework/${this.structure.id}/${startDate}/${endDate}/null`;
-        }
+        let url = `/diary/homeworks/own/${startDate}/${endDate}`;
 
+        await this.syncHomeworks(url);
+    }
+
+    async syncExternalHomeworks(startMoment: any, endMoment: any, type?: string, typeId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/homeworks/external/${startDate}/${endDate}/${type}/${typeId}`;
+
+        await this.syncHomeworks(url);
+    }
+
+    async syncChildHomeworks(startMoment: any, endMoment: any, childId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}`;
+
+        await this.syncHomeworks(url);
+    }
+
+    async syncHomeworks (url: string){
+        console.log('syncHomeworks');
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
@@ -171,21 +178,18 @@ export class Homeworks {
             i.init();
         });
     }
-
 }
 
 export class HomeworkType {
     id: number;
     label: string;
-    category: string;
 }
 
 export class HomeworkTypes {
     all: HomeworkType[] = [];
-    origin: HomeworkType[] = [];
 
     async  sync (): Promise<void> {
-        let { data } = await http.get('/diary/homeworktype/initorlist');
+        let { data } = await http.get('/diary/homework-types');
 
         this.all = Mix.castArrayAs(HomeworkType, this.formatSqlDataToModel(data));
     }
@@ -195,9 +199,7 @@ export class HomeworkTypes {
         data.forEach(i => {
             dataModel.push({
                 id: i.id,
-                structureId: i.school_id,
-                label: i.homework_type_label,
-                category: i.homework_type_category,
+                label: i.label
             });
         });
         return dataModel;
@@ -214,24 +216,24 @@ export class Workload {
     description: string;
 
     static getWorkloadColor(workload: number){
-        if (0 < workload && workload < 30) {
+        if (0 < workload && workload <= 2) {
             return 'green';
-        } else if (31 < workload && workload < 60) {
+        } else if (2 < workload && workload <= 4) {
             return 'yellow';
-        } else if (61 < workload) {
+        } else if (4 < workload) {
             return 'red';
         }
     }
 
-    static getDescription(workload: number){
-        return workload + ' ' + lang.translate('minutes');
+    getDescription(){
+        return this.count + ' ' + (this.count > 0 ? lang.translate('homeworks') : lang.translate('homework'));
     }
 
     init(){
         this.shortDayString = moment(this.day).format('dddd').substring(0, 1).toUpperCase(); // 'lundi' -> 'lu' -> 'L'
         this.numDayString = moment(this.day).format('DD'); // 15
-        this.color = Workload.getWorkloadColor(this.total);
-        this.description = Workload.getDescription(this.total);
+        this.color = Workload.getWorkloadColor(this.count);
+        this.description = this.getDescription();
     }
 }
 
@@ -256,7 +258,7 @@ export class WorkloadWeek {
     };
 
     async sync(dateInWeek: any): Promise<void> {
-        let {data} = await http.get(`/diary/homework/load/${Utils.getFormattedDate(dateInWeek)}/${this.audience.id}`);
+        let {data} = await http.get(`/diary/workload-week/${Utils.getFormattedDate(dateInWeek)}/${this.audience.id}`);
         this.all = Mix.castArrayAs(Workload, WorkloadWeek.formatSqlDataToModel(data));
         this.all.forEach(w => w.init());
     }

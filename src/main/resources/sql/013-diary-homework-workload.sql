@@ -1,2 +1,0 @@
-ALTER TABLE diary.homework
-ADD COLUMN workload BIGINT DEFAULT 0 NOT NULL;

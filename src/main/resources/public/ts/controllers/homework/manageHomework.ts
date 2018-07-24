@@ -1,7 +1,6 @@
 import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
 import {Subjects, Notification, Sessions} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
-import {Mix} from 'entcore-toolkit';
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', function ($scope, $routeParams, $location, $attrs) {
@@ -18,7 +17,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes();
         $scope.isInsideSessionForm = false;
-        $scope.attachedToSession = {bool: true};
+        $scope.attachedToSession = {bool: false};
 
         async function initData(){
             await Promise.all([
@@ -51,7 +50,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         async function syncHomework() {
             await $scope.homework.sync();
             if(!$scope.homework.session) {
-                await $scope.syncSessions();
+                $scope.syncSessions();
                 $scope.homework.session = $scope.sessions.all.find(s => s.id === $scope.homework.session_id);
             }
             $scope.attachedToSession.bool = !!$scope.homework.session;
@@ -60,8 +59,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         initData();
 
         $scope.syncSessions = async () => {
-            if($scope.homework.audience && $scope.homework.subject)
-                await $scope.sessions.syncWithAudienceAndSubject(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
+            if($scope.homework.audience && $scope.homework.subject && !$scope.isReadOnly)
+                await $scope.sessions.syncOwnSessions(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
         };
 
         $scope.cancelCreation = async () => {
@@ -138,7 +137,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if(publish){
                         let {succeed} = $scope.toastHttpCall(await $scope.homework.publish());
                         if(succeed){
-                            $scope.homework.state = 'published';
+                            $scope.homework.isPublished = true;
                         }
                     } else {
                         $scope.toastHttpCall(homeworkSaveResponse);

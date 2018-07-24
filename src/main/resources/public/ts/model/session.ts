@@ -22,12 +22,11 @@ export class Session {
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     description: string = "";
     annotation: string = "";
-    state: string = "draft";
     attachments: any = [];
     homeworks: Homework[] = [];
     room: string = "";
     courseId: string = null;
-
+    isPublished: boolean;
     visas: Visa[];
 
     startMoment: any;
@@ -54,40 +53,38 @@ export class Session {
             audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
-            id: data.lesson_id,
-            title: data.lesson_title,
-            room: data.lesson_room,
-            color: data.lesson_color,
-            state: data.lesson_state,
-            date: Utils.getFormattedDate(data.lesson_date),
-            startTime: data.lesson_start_time,
-            endTime: data.lesson_end_time,
-            description: data.lesson_description,
-            annotation: data.lesson_annotation,
+            id: data.id,
+            title: data.title,
+            room: data.room,
+            color: data.color,
+            isPublished: data.is_published,
+            date: Utils.getFormattedDate(data.date),
+            startTime: data.start_time,
+            endTime: data.end_time,
+            description: data.description,
+            annotation: data.annotation,
             attachments: data.attachments,
-            homeworks: JSON.parse(data.homeworks),
-            visas: JSON.parse(data.visas),
+            homeworks: data.homeworks ? JSON.parse(data.homeworks) : [],
+            visas: data.visas ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id: null
         };
     }
 
     toSendFormat() {
         return {
-            lesson_id: this.id ? this.id : null,
+            id: this.id ? this.id : null,
             subject_id: this.subject.id,
-            school_id: this.structure.id,
-            lesson_title: this.title,
-            lesson_color: this.color,
-            lesson_date: Utils.getFormattedDate(this.date),
-            lesson_start_time: Utils.getFormattedTime(this.startTime),
-            lesson_end_time: Utils.getFormattedTime(this.endTime),
-            lesson_description: this.description,
-            lesson_annotation: this.annotation,
-            lesson_state: this.state,
+            structure_id: this.structure.id,
+            title: this.title,
+            color: this.color,
+            date: Utils.getFormattedDate(this.date),
+            start_time: Utils.getFormattedTime(this.startTime),
+            end_time: Utils.getFormattedTime(this.endTime),
+            description: this.description,
+            annotation: this.annotation,
+            is_published: this.isPublished,
             audience_id: this.audience.id,
-            audience_type: this.audience.type_groupe == 0 ? 'class' : 'group',
-            attachments: this.attachments ? this.attachments : [],
-            lesson_room: this.room,
+            room: this.room,
             course_id: this.courseId
         };
     }
@@ -151,32 +148,32 @@ export class Session {
 
     async save() {
         if(this.id) {
-            let response = await http.put('/diary/lesson/' + this.id, this.toSendFormat());
+            let response = await http.put('/diary/session/' + this.id, this.toSendFormat());
             return Utils.setToastMessage(response, 'session.updated','session.updated.error');
         } else {
-            let response = await http.post('/diary/lesson', this.toSendFormat());
-            return Utils.setToastMessage(response, 'session.create','session.create.error');
+            let response = await http.post('/diary/session', this.toSendFormat());
+            return Utils.setToastMessage(response, 'session.created','session.created.error');
         }
     }
 
     async delete() {
-        let response = await http.delete('/diary/lesson/' + this.id);
-        return Utils.setToastMessage(response, 'session.delete','session.delete.error');
+        let response = await http.delete('/diary/session/' + this.id);
+        return Utils.setToastMessage(response, 'session.deleted','session.deleted.error');
     }
 
     async publish() {
-        let response = await http.post('/diary/lesson/publish', this.toSendFormat());
+        let response = await http.post('/diary/session/publish/' + this.id);
         return Utils.setToastMessage(response, 'session.published','session.published.error');
     }
 
     async unpublish() {
-        let response = await http.post('/diary/lesson/unpublish', this.toSendFormat());
+        let response = await http.post('/diary/session/unpublish/' + this.id);
         return Utils.setToastMessage(response, 'session.unpublished','session.unpublished.error');
     }
 
     async sync() {
         try {
-            let {data} = await http.get('/diary/lesson/' + this.id);
+            let {data} = await http.get('/diary/session/' + this.id);
             Mix.extend(this, Session.formatSqlDataToModel(data, this.structure));
             this.init(this.structure);
         } catch (e) {
@@ -211,6 +208,41 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
+    async syncOwnSessions(startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/sessions/own/${startDate}/${endDate}`;
+
+        if (audienceId) {
+            url += `&audienceId=${audienceId}`;
+        }
+        if (subjectId) {
+            url += `&subjectId=${subjectId}`;
+        }
+        url = url.replace('&', '?');
+
+        await this.syncSessions(url);
+    }
+
+    async syncExternalSessions(startMoment: any, endMoment: any, type?: string, typeId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/sessions/external/${startDate}/${endDate}/${type}/${typeId}`;
+
+        await this.syncSessions(url);
+    }
+
+    async syncChildSessions(startMoment: any, endMoment: any, childId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/sessions/child/${startDate}/${endDate}/${childId}`;
+
+        await this.syncSessions(url);
+    }
+
     async syncSessions (url: string){
         console.log('syncSessions');
         let { data } = await http.get(url);
@@ -219,23 +251,5 @@ export class Sessions {
         this.all.forEach(i => {
             i.init(this.structure);
         });
-    }
-
-    async sync (startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
-
-        let url = '';
-        if(!!typeId && !!type){
-            if(type === 'child'){
-                url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/${typeId}`;
-            } else {
-                url = `/diary/lesson/external/${this.structure.id}/${startDate}/${endDate}/${type}/${typeId}`;
-            }
-        } else {
-            url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
-        }
-
-        await this.syncSessions(url);
     }
 }
