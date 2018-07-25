@@ -22,12 +22,11 @@ export class Session {
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     description: string = "";
     annotation: string = "";
-    attachments: any = [];
     homeworks: Homework[] = [];
     room: string = "";
     courseId: string = null;
     isPublished: boolean;
-    visas: Visa[];
+    visas: Visa[] = [];
 
     startMoment: any;
     endMoment: any;
@@ -43,8 +42,13 @@ export class Session {
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
 
-    constructor(structure: Structure) {
+    constructor(structure: Structure, course?: Course) {
         this.structure = structure;
+        if(course){
+            this.setFromCourse(course);
+            this.init(structure);
+            this.title = 'Séance du ' + this.startDisplayDate + '(' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
+        }
     }
 
     static formatSqlDataToModel(data: any, structure: Structure){
@@ -63,7 +67,6 @@ export class Session {
             endTime: data.end_time,
             description: data.description,
             annotation: data.annotation,
-            attachments: data.attachments,
             homeworks: data.homeworks ? JSON.parse(data.homeworks) : [],
             visas: data.visas ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id: null
@@ -143,6 +146,17 @@ export class Session {
             this.endTime = course.end.toDate();
         if (course.audiences && course.audiences.all && course.audiences.all.length > 0)
             this.audience = course.audiences.all[0];
+        this.color = colors[1];
+    }
+
+    async setFromCourse(course: Course) {
+        this.courseId = course._id;
+        this.teacher = course.teachers[0];
+        this.room = course.rooms[0];
+        this.subject = course.subject;
+        this.date = this.startTime = course.startMoment.toDate();
+        this.endTime = course.endMoment.toDate();
+        this.audience = course.audiences.all[0];
         this.color = colors[1];
     }
 

@@ -1,5 +1,5 @@
 import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
-import {Subjects, Notification, Sessions} from '../../model';
+import {Subjects, Notification, Sessions, Session, Courses} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
@@ -14,6 +14,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.homework = new Homework($scope.structure);
         $scope.sessions = new Sessions($scope.structure);
+        $scope.courses = new Courses($scope.structure);
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes();
         $scope.isInsideSessionForm = false;
@@ -28,16 +29,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework = $scope.$parent.homework;
                 if($scope.homework.id){
                     await $scope.homework.sync();
-                    await $scope.syncSessions();
+                    await $scope.syncSessionsAndCourses();
                 } else {
-                    await $scope.syncSessions();
+                    await $scope.syncSessionsAndCourses();
                 }
                 $scope.attachToParentSession();
             } else {
                 $scope.homework.id = $routeParams.id ? $routeParams.id : undefined;
                 if($scope.homework.id){
                     await $scope.homework.sync();
-                    await $scope.syncSessions();
+                    await $scope.syncSessionsAndCourses();
                     if ($scope.homework.session) {
                         $scope.attachToOtherSession();
                     } else {
@@ -60,7 +61,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.syncWorkloadWeek = async () => {
             if($scope.homework.audience) {
-                let dateInWeek = $scope.homework.attachedToDate ? $scope.homework.dueDate : $scope.homework.session.startMoment;
+                let dateInWeek = undefined;
+                if($scope.homework.attachedToDate){
+                    dateInWeek = $scope.homework.dueDate;
+                } else if($scope.homework.session) {
+                    dateInWeek = $scope.homework.session.startMoment;
+                } else {
+                    $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
+                    $scope.safeApply();
+                    return;
+                }
                 $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
                 await $scope.homework.workloadWeek.sync(dateInWeek);
                 $scope.safeApply();
@@ -69,9 +79,26 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         initData();
 
-        $scope.syncSessions = async () => {
-            if($scope.homework.audience && $scope.homework.subject && !$scope.isReadOnly)
-                await $scope.sessions.syncOwnSessions(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
+        $scope.syncSessionsAndCourses = async () => {
+            if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
+                return;
+            }
+
+            await $scope.sessions.syncOwnSessions(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
+            await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(7, 'day'));
+            $scope.sessionsToAttachTo = [];
+            $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
+            let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) && c.subject.id === $scope.homework.subject.id);
+            let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id)));
+
+            let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
+            $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
+
+
+            if($scope.isInsideSessionForm && $scope.$parent.session.id){
+                $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
+            }
+            $scope.safeApply();
         };
 
         $scope.attachToParentSession = () => {
@@ -150,6 +177,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
             }
             else {
+                // Creating session from course before saving the homework
+                if(!$scope.homework.attachedToDate && !$scope.homework.session.id && $scope.homework.session.courseId){
+                    let sessionSaveResponse = await $scope.homework.session.save();
+                    if(sessionSaveResponse.succeed) {
+                        $scope.homework.session.id = sessionSaveResponse.data.id;
+                    }
+                }
+
                 let homeworkSaveResponse = await $scope.homework.save();
 
                 if (homeworkSaveResponse.succeed) {

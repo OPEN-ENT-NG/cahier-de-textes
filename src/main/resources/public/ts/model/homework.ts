@@ -20,7 +20,6 @@ export class Homework {
     subject: Subject;
     audience: any;
     session: Session;
-    attachments: any = [];
     workload: number;
     startMoment: any;
     endMoment: any;

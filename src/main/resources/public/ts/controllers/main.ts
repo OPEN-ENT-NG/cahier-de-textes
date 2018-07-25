@@ -127,7 +127,6 @@ export let main = ng.controller('MainController',
             }
 
             // On lie les homeworks à leur session
-            $scope.structure.sessions.all.forEach(s => s.homeworks = $scope.structure.homeworks.all.filter(h => h.session_id === s.id));
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
             $scope.safeApply();

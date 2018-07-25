@@ -20,7 +20,7 @@
                         <i18n>utils.groups</i18n>*
                     </label>
                     <div class="cell twelve-mobile ten">
-                        <select ng-disabled="isInsideSessionForm" ng-change="syncSessions();syncWorkloadWeek();homework.session = undefined;" required ng-model="homework.audience"
+                        <select ng-disabled="isInsideSessionForm" ng-change="syncSessionsAndCourses();syncWorkloadWeek();homework.session = undefined;" required ng-model="homework.audience"
                                 ng-options="audience.name for audience in structure.audiences.all track by audience.id">
                         </select>
                     </div>
@@ -32,7 +32,7 @@
                     </label>
                     <div class="cell twelve-mobile ten">
                         <div class="cell twelve-mobile ten">
-                            <select ng-disabled="isInsideSessionForm" ng-change="syncSessions();homework.session = undefined;" required ng-model="homework.subject" ng-options="subject.label for subject in subjects.all track by subject.id">
+                            <select ng-disabled="isInsideSessionForm" ng-change="syncSessionsAndCourses();homework.session = undefined;" required ng-model="homework.subject" ng-options="subject.label for subject in subjects.all track by subject.id">
                             </select>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                             <div class="row">
                                 <input ng-if="homework.attachedToDate" ng-model="homework.dueDate" ng-change="syncWorkloadWeek()" type="date">
                                 <select ng-if="homework.attachedToOtherSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
-                                        ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessions.all track by session.id">
+                                        ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
                                 </select>
                             </div>
                         </div>
