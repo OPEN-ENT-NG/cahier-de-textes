@@ -3,9 +3,6 @@
   "id": "http://jsonschema.net",
   "type": "object",
   "properties": {
-    "title": {
-      "type": "string"
-    },
     "subject_id": {
       "type": "string"
     },
@@ -25,14 +22,13 @@
       "type": "string"
     },
     "session_id": {
-      "type": ["null", "string"]
+      "type": ["null", "number"]
     },
     "due_date": {
       "type": "string"
     }
   },
   "required": [
-    "title",
     "subject_id",
     "structure_id",
     "audience_id",

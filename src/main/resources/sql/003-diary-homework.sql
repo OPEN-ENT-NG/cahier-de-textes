@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS diary.homework_type;
 CREATE TABLE diary.homework_type (
   id          bigserial,
   label       character varying(50),
+  is_default  BOOLEAN DEFAULT FALSE NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -13,7 +14,6 @@ CREATE TABLE diary.homework (
   structure_id  character varying(37) NOT NULL,
   teacher_id    character varying(37) NOT NULL,
   audience_id   character varying(37) NOT NULL,
-  title         character varying(50) NOT NULL,
   color         character varying(6),
   description   text,
   is_published  BOOLEAN DEFAULT FALSE NOT NULL,

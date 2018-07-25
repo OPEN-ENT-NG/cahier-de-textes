@@ -20,8 +20,8 @@
                         <i18n>utils.groups</i18n>*
                     </label>
                     <div class="cell twelve-mobile ten">
-                        <select ng-disabled="isInsideSessionForm" ng-change="syncSessions();homework.session = undefined;" required ng-model="homework.audience"
-                                ng-options="group.name for group in structure.audiences.all track by group.id">
+                        <select ng-disabled="isInsideSessionForm" ng-change="syncSessions();syncWorkloadWeek();homework.session = undefined;" required ng-model="homework.audience"
+                                ng-options="audience.name for audience in structure.audiences.all track by audience.id">
                         </select>
                     </div>
                 </div>
@@ -40,36 +40,39 @@
             </div>
 
             <h3 ng-if="!isInsideSessionForm"><i18n>homework.manage.config</i18n></h3>
-            <div class="row form-row">
-                <label class="cell two twelve-mobile">
-                    <i18n>title</i18n>*
-                </label>
-                <div class="cell twelve-mobile ten">
-                    <input ng-model="homework.title" type="text">
-                </div>
-            </div>
-
-            <div ng-if="!isInsideSessionForm">
+            <div>
                 <div class="row form-row">
                     <label class="cell two twelve-mobile">
                         <i18n>Echéance</i18n>*
                     </label>
                     <div class="cell twelve-mobile ten">
-                        <div class="row margin-bottom-md">
-                            <div class="tab-button" ng-click="attachedToSession.bool = false" ng-class="{'selected': !attachedToSession.bool}">
-                                Date
+                        <div ng-if="isInsideSessionForm">
+                            <label>
+                                <input type="radio" ng-model="homework.attachedToParentSession" ng-value="true" ng-click="attachToParentSession()">
+                                <i18n>À faire pour cette séance</i18n>
+                            </label><br/>
+                            <label>
+                                <input type="radio" ng-model="homework.attachedToParentSession" ng-value="false" ng-click="attachToOtherSession()">
+                                <i18n>Choisir une autre Date/Séance</i18n>
+                            </label>
+                        </div>
+                        <!-- Other Seance or Date-->
+                        <div class="row" ng-if="!homework.attachedToParentSession || !isInsideSessionForm">
+                            <div class="row margin-bottom-md">
+                                <div class="tab-button" ng-click="attachToDate()" ng-class="{'selected': homework.attachedToDate}">
+                                    Date
+                                </div>
+                                <div class="tab-button" ng-click="attachToOtherSession()" ng-class="{'selected': homework.attachedToOtherSession}">
+                                    Séance
+                                </div>
                             </div>
-                            <div class="tab-button" ng-click="attachedToSession.bool = true" ng-class="{'selected': attachedToSession.bool}">
-                                Séance
+                            <div class="row">
+                                <input ng-if="homework.attachedToDate" ng-model="homework.dueDate" ng-change="syncWorkloadWeek()" type="date">
+                                <select ng-if="homework.attachedToOtherSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
+                                        ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessions.all track by session.id">
+                                </select>
                             </div>
                         </div>
-                        <div class="row">
-                            <input ng-if="!attachedToSession.bool" ng-model="homework.dueDate" type="date">
-                            <select ng-if="attachedToSession.bool" ng-model="homework.session"
-                                    ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessions.all track by session.id">
-                            </select>
-                        </div>
-
                     </div>
                 </div>
             </div>

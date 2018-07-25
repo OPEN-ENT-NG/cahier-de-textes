@@ -8,7 +8,6 @@ import {Session, Sessions} from './session';
 
 export class Homework {
     id: string;
-    title: string = '';
     description: string = '';
     dueDate: Date = moment().toDate();
     color: string;
@@ -26,11 +25,15 @@ export class Homework {
     startMoment: any;
     endMoment: any;
     isPublished: boolean;
+    attachedToCurrentSession: boolean;
     opened: boolean;
     is_periodic: boolean = false;
     locked: boolean = true;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+    attachedToParentSession: boolean = false;
+    attachedToOtherSession: boolean = false;
+    attachedToDate: boolean = false;
 
     constructor (structure: Structure) {
         this.structure = structure;
@@ -40,7 +43,6 @@ export class Homework {
 
     toSendFormat () {
         return {
-            title: this.title,
             subject_id: this.subject.id,
             type_id: this.type.id,
             teacher_id: model.me.userId,
@@ -67,7 +69,7 @@ export class Homework {
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
             session_id: data.session_id,
             id: data.id,
-            type: JSON.parse(data.type),
+            type: data.type ? JSON.parse(data.type) : undefined,
             title: data.title,
             color: data.color,
             dueDate: Utils.getFormattedDate(data.due_date),
@@ -123,6 +125,23 @@ export class Homework {
         this.startMoment = moment(this.dueDate);
         this.workloadWeek = new WorkloadWeek(this.audience);
     }
+
+
+    isValidForm = () => {
+        let validSessionOrDueDate = false;
+        if(this.attachedToDate && this.dueDate){
+            validSessionOrDueDate = true;
+        } else if ((this.attachedToParentSession || this.attachedToOtherSession) && this.session) {
+            validSessionOrDueDate = true;
+        }
+
+        return this
+            && this.structure
+            && this.subject
+            && this.audience
+            && validSessionOrDueDate
+            && this.type;
+    };
 }
 
 export class Homeworks {
@@ -183,6 +202,7 @@ export class Homeworks {
 export class HomeworkType {
     id: number;
     label: string;
+    is_default: boolean;
 }
 
 export class HomeworkTypes {
@@ -191,18 +211,7 @@ export class HomeworkTypes {
     async  sync (): Promise<void> {
         let { data } = await http.get('/diary/homework-types');
 
-        this.all = Mix.castArrayAs(HomeworkType, this.formatSqlDataToModel(data));
-    }
-
-    formatSqlDataToModel(data: any){
-        let dataModel = [];
-        data.forEach(i => {
-            dataModel.push({
-                id: i.id,
-                label: i.label
-            });
-        });
-        return dataModel;
+        this.all = Mix.castArrayAs(HomeworkType, data);
     }
 }
 

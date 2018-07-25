@@ -17,50 +17,88 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes();
         $scope.isInsideSessionForm = false;
-        $scope.attachedToSession = {bool: false};
 
         async function initData(){
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
 
-
             if($attrs.insideSessionForm){
-                // Si c'est une création, alors on ajoute les données parents
                 $scope.isInsideSessionForm = true;
                 $scope.homework = $scope.$parent.homework;
-
-                if(!$scope.homework.id){
-                    $scope.attachedToSession.bool = true;
+                if($scope.homework.id){
+                    await $scope.homework.sync();
+                    await $scope.syncSessions();
+                } else {
+                    await $scope.syncSessions();
                 }
+                $scope.attachToParentSession();
             } else {
                 $scope.homework.id = $routeParams.id ? $routeParams.id : undefined;
+                if($scope.homework.id){
+                    await $scope.homework.sync();
+                    await $scope.syncSessions();
+                    if ($scope.homework.session) {
+                        $scope.attachToOtherSession();
+                    } else {
+                        $scope.attachToDate();
+                    }
+                } else {
+                    $scope.attachToDate();
+                }
             }
 
-            if ($scope.homework.id) {
-                await syncHomework();
+            // if new homework, we set the default homeworkType
+            if(!$scope.homework.id) {
+                $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.is_default);
             }
-            let dateInWeek = $scope.attachedToSession.bool ? $scope.homework.session.startMoment : $scope.homework.dueDate;
-            $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
-            await $scope.homework.workloadWeek.sync(dateInWeek);
+
+            await $scope.syncWorkloadWeek();
 
             $scope.safeApply();
         }
 
-        async function syncHomework() {
-            await $scope.homework.sync();
-            if(!$scope.homework.session) {
-                $scope.syncSessions();
-                $scope.homework.session = $scope.sessions.all.find(s => s.id === $scope.homework.session_id);
+        $scope.syncWorkloadWeek = async () => {
+            if($scope.homework.audience) {
+                let dateInWeek = $scope.homework.attachedToDate ? $scope.homework.dueDate : $scope.homework.session.startMoment;
+                $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
+                await $scope.homework.workloadWeek.sync(dateInWeek);
+                $scope.safeApply();
             }
-            $scope.attachedToSession.bool = !!$scope.homework.session;
-        }
+        };
 
         initData();
 
         $scope.syncSessions = async () => {
             if($scope.homework.audience && $scope.homework.subject && !$scope.isReadOnly)
                 await $scope.sessions.syncOwnSessions(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
+        };
+
+        $scope.attachToParentSession = () => {
+            $scope.homework.attachedToOtherSession = false;
+            $scope.homework.attachedToParentSession = true;
+            $scope.homework.attachedToDate = false;
+
+            $scope.homework.session = $scope.$parent.session;
+            $scope.safeApply();
+        };
+
+        $scope.attachToOtherSession = () => {
+            $scope.homework.attachedToOtherSession = true;
+            $scope.homework.attachedToParentSession = false;
+            $scope.homework.attachedToDate = false;
+
+            $scope.homework.session = undefined;
+            $scope.safeApply();
+        };
+
+        $scope.attachToDate = () => {
+            $scope.homework.attachedToOtherSession = false;
+            $scope.homework.attachedToParentSession = false;
+            $scope.homework.attachedToDate = true;
+
+            $scope.homework.session = undefined;
+            $scope.safeApply();
         };
 
         $scope.cancelCreation = async () => {
@@ -74,23 +112,15 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.$parent.localRemoveHomework($scope.$parent.homework);
                 } else {
                     // Si c'est insideSessionForm et update, on resync le homework
-                    await syncHomework();
+                    await $scope.homework.sync();
+                    $scope.attachToParentSession();
                     $scope.safeApply();
                 }
-
-
             }
         };
 
         $scope.isValidForm = () => {
-            let validSessionOrDueDate = $scope.attachedToSession.bool ? !!$scope.homework.session : !!$scope.homework.dueDate;
-            return $scope.homework
-                && $scope.homework.structure
-                && $scope.homework.subject
-                && $scope.homework.audience
-                && validSessionOrDueDate
-                && $scope.homework.title
-                && $scope.homework.type;
+            return $scope.homework.isValidForm();
         };
 
         $scope.publishHomework = async () => {
@@ -120,10 +150,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
             }
             else {
-                if(!$scope.attachedToSession.bool) {
-                    $scope.homework.session = undefined;
-                }
-
                 let homeworkSaveResponse = await $scope.homework.save();
 
                 if (homeworkSaveResponse.succeed) {

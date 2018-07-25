@@ -64,7 +64,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             let homeworkFormsAreValids = true;
             for(let h of $scope.session.homeworks) {
-                homeworkFormsAreValids = h.title && h.type;
+                homeworkFormsAreValids = h.isValidForm();
                 if(!homeworkFormsAreValids)
                     break;
             }
@@ -109,11 +109,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     let sessionPublishResponse = await $scope.session.publish();
                     if(sessionPublishResponse.succeed){
                         $scope.session.isPublished = true;
-                        await saveSessionHomeworks();
+                        let hasFailed = await saveSessionHomeworks();
+                        console.log('hasFailed', hasFailed);
                     }
                     $scope.toastHttpCall(sessionPublishResponse);
                 } else {
-                    await saveSessionHomeworks();
+                    let hasFailed = await saveSessionHomeworks();
+                    console.log('hasFailed', hasFailed);
                     $scope.toastHttpCall(sessionSaveResponse);
                 }
             }
@@ -123,11 +125,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         async function saveSessionHomeworks() {
+            let hasFailed = false;
             $scope.session.homeworks.forEach(async h => {
                 h.isPublished = $scope.session.isPublished;
-                h.session = $scope.session;
-                await h.save();
+                let { succeed } = await h.save();
+                if(!succeed) {
+                    hasFailed = true;
+                }
             });
+
+            return hasFailed;
         }
 
 
