@@ -1,0 +1,78 @@
+<div class="session-form">
+    <div class="row">
+        <div class="six cell twelve-mobile">
+            <select ng-model="session.audience" ng-disabled="session.courseId && session.audience"
+                    ng-options="audience.name for audience in structure.audiences.all track by audience.id">
+                <option value="" disabled selected>[[translate('select.audience')]]</option>
+            </select>
+            <select required ng-model="session.subject" ng-disabled="session.courseId && session.subject"
+                    ng-options="subject.label for subject in subjects.all track by subject.id">
+                <option value="" disabled selected>[[translate('select.subject')]]</option>
+            </select>
+            <span class="text-xl margin-left-md">
+                <span style="color: green;" ng-if="session.isPublished">(<i18n>published.f</i18n>)</span>
+                <span style="color: red;" ng-if="!session.isPublished">(<i18n>draft</i18n>)</span>
+            </span>
+        </div>
+        <div class="six cell twelve-mobile text-right">
+            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
+                <i18n>utils.cancel</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="saveSession()">
+                <i18n>utils.save</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="!session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
+                <i18n>publish</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
+                <i18n>unpublish</i18n>
+            </button>
+        </div>
+    </div>
+    <div class="row card padding-md" ng-click="session.opened = !session.opened">
+        <h2 class="remove-margin">
+            <i18n>session</i18n>
+            <i class="right-magnet" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
+        </h2>
+    </div>
+    <div class="row card padding-md" ng-show="session.opened">
+        <!-- Title -->
+        <div class="row">
+            <label class="cell two twelve-mobile">
+                <i18n>title</i18n>*
+            </label>
+            <div class="cell ten twelve-mobile">
+                <input ng-model="session.title" style="width: 300px;"/>
+            </div>
+        </div>
+        <!-- Date -->
+        <div class="row">
+            <label class="cell two twelve-mobile">
+                <i18n>date</i18n>*
+            </label>
+            <div class="cell ten twelve-mobile">
+                <i18n>the</i18n>
+                <date-picker  class="date-picker-sm" ng-disabled="session.courseId && session.date" ng-model="session.date"></date-picker>
+                <i18n>from2</i18n>
+                <input type="time" ng-disabled="session.courseId && session.startTime" ng-model="session.startTime"/>
+                <i18n>to2</i18n>
+                <input type="time" ng-disabled="session.courseId && session.endTime" ng-model="session.endTime"/>
+            </div>
+        </div>
+        <!-- Room -->
+        <div class="row">
+            <label class="cell two twelve-mobile">
+                <i18n>utils.room</i18n>*
+            </label>
+            <div class="cell ten twelve-mobile">
+                <input maxlength="8" ng-model="session.room"/>
+            </div>
+        </div>
+        <!-- Description-->
+        <div class="row">
+            <editor ng-model="session.description"></editor>
+        </div>
+    </div>
+</div>

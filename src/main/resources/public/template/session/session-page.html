@@ -1,0 +1,41 @@
+<div ng-controller="manageSessionCtrl">
+    <h1 class="centered eight row"><i18n>session</i18n></h1>
+
+    <div ng-if="!isReadOnly">
+        <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
+        <div class="card padding-md margin-bottom-md">
+            <h2><i18n>homeworks</i18n></h2>
+            <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
+                 ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-form.html"></div>
+            <button class="float-none display-inline-block margin-top-md" ng-click="addHomework()"><i18n>homework.manage.create</i18n></button>
+        </div>
+        <div class="row text-right">
+            <button ng-if="session.id" class="left-magnet cancel" type="button" ng-click="deleteSession()">
+                <i18n>utils.delete</i18n>
+            </button>
+            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
+                <i18n>utils.cancel</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="saveSession()">
+                <i18n>utils.save</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="!session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
+                <i18n>publish</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
+                <i18n>unpublish</i18n>
+            </button>
+        </div>
+    </div>
+    <div ng-if="isReadOnly">
+        <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-view.html"></div>
+        <div class="card padding-md">
+            <h2><i18n>homeworks</i18n></h2>
+            <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
+                 ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-view.html"></div>
+            <button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
+        </div>
+    </div>
+</div>

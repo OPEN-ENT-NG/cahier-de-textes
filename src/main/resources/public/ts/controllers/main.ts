@@ -4,6 +4,7 @@ import {
     Notification
 } from '../model';
 import {Homeworks} from '../model/homework';
+import {Utils} from '../utils/utils';
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
@@ -319,6 +320,10 @@ export let main = ng.controller('MainController',
             $scope.calendarUpdateItem(item);
         };
 
+        $scope.getDisplayDate = (date: any) => {
+          return Utils.getDisplayDate(date);
+        };
+
         route({
             main: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
@@ -327,11 +332,11 @@ export let main = ng.controller('MainController',
             },
             manageSession: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'session/page-session');
+                template.open('main', 'session/session-page');
             },
             manageHomework: async () => {
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'homework/page-homework');
+                template.open('main', 'homework/homework-page');
             }
         });
     }]);

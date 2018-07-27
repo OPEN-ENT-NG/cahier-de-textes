@@ -5,7 +5,7 @@ import {Visa} from '../../model/visa';
 import {Homework} from '../../model/homework';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
-    ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
+    ['$scope', '$routeParams', '$location', async function ($scope, $routeParams, $location) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         console.log('manageSessionCtrl');
 
@@ -20,22 +20,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
 
-        async function initData() {
-            await Promise.all([
-                $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-
-            if ($routeParams.id) {
-                $scope.session.id = $routeParams.id;
-                await $scope.session.sync();
-            }
-            else if($routeParams.courseId){
-                $scope.session.courseId = $routeParams.courseId;
-                await $scope.session.mapFromCourse();
-            }
-            $scope.safeApply();
-        }
-
-        initData();
 
         $scope.cancelCreation = () => {
             $scope.goTo('/');
@@ -52,6 +36,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.homeworks.forEach(h => h.subject = $scope.session.subject);
             $scope.safeApply();
         });
+
+        $scope.openHomework = (homework: Homework) => {
+            let oldValue = homework.opened;
+            $scope.session.homeworks.forEach(h => h.opened = false);
+            homework.opened = !oldValue;
+            $scope.safeApply();
+        };
 
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
@@ -217,5 +208,24 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         //endregion
+
+
+        async function initData() {
+            await Promise.all([
+                $scope.subjects.sync($scope.structure.id, model.me.userId)]);
+
+            if ($routeParams.id) {
+                $scope.session.id = $routeParams.id;
+                await $scope.session.sync();
+            }
+            else if($routeParams.courseId){
+                $scope.session.courseId = $routeParams.courseId;
+                await $scope.session.mapFromCourse();
+            }
+            $scope.session.opened = true;
+            $scope.safeApply();
+        }
+
+        await initData();
     }]
 );

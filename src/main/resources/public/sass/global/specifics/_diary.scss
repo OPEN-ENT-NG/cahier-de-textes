@@ -1,6 +1,7 @@
 .small { font-size: 0.9em; }
 .normal { font-size: 1em; }
 .large { font-size: 1.1em; }
+.text-xl { font-size: 1.5em; }
 .float-left { float:left; }
 .pointer {cursor:pointer;}
 .margin10v {margin: 10px 0;}
@@ -99,7 +100,6 @@ i.cahier-textes2::before {
   background: #fff;
   border: 1px dashed #4bafd5 !important;
   margin-top: 10px;
-  margin-bottom: 20px;
 }
 
 .workloadDay {

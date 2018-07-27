@@ -27,7 +27,7 @@ export class Session {
     courseId: string = null;
     isPublished: boolean;
     visas: Visa[] = [];
-
+    opened: boolean;
     startMoment: any;
     endMoment: any;
 
@@ -47,7 +47,7 @@ export class Session {
         if(course){
             this.setFromCourse(course);
             this.init(structure);
-            this.title = 'Séance du ' + this.startDisplayDate + '(' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
+            this.title = 'Séance du ' + this.startDisplayDate + ' (' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
         }
     }
 

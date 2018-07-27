@@ -1,0 +1,20 @@
+<div class="session-view">
+    <div class="row margin-bottom-md" ng-if="!isInsideSessionForm">
+        <b>[[homework.subject.label]] &nbsp; [[homework.audience.name]] &nbsp; [[homework.teacher.firstName]] [[homework.teacher.lastName]]</b>
+    </div>
+    <div class="row card padding-md" ng-click="homework.opened = !homework.opened">
+        <h2 class="remove-margin">
+            <i18n>homework</i18n> -
+            <span>[[homework.type.label]]</span> -
+            <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
+            <span ng-if="homework.attachedToParentSession">Pour cette séance</span>
+            <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
+                [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
+            <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
+        </h2>
+    </div>
+    <div class="row card padding-md margin-bottom-md" ng-show="homework.opened">
+        <!-- Description-->
+        <div class="read-only-description" bind-html="homework.description"></div>
+    </div>
+</div>
