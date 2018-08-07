@@ -26,6 +26,8 @@ public interface HomeworkService {
 
     void unpublishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler);
 
+    void setProgressHomework(long homeworkId, String state, UserInfos user, Handler<Either<String, JsonObject>> handler);
+
     void getHomeworkTypes(Handler<Either<String, JsonArray>> handler);
 
     void getWorkloadWeek(final String dateInWeek, final String audienceId, Handler<Either<String, JsonArray>> handler);

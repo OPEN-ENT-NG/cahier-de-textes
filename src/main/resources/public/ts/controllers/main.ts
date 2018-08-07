@@ -1,7 +1,7 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
 import {
     Structures, PEDAGOGIC_TYPES, USER_TYPES, Structure, Sessions,
-    Notification
+    Notification, Homework
 } from '../model';
 import {Homeworks} from '../model/homework';
 import {Utils} from '../utils/utils';
@@ -137,6 +137,10 @@ export let main = ng.controller('MainController',
         $scope.loadPedagogicItems = () =>{
             $scope.pedagogicItems = [];
 
+            // let sessionHomeworks = [];
+            // $scope.structure.sessions.all.forEach(s => sessionHomeworks = sessionHomeworks.concat(s.homeworks));
+            // $scope.pedagogicItems = $scope.pedagogicItems.concat(sessionHomeworks);
+
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
 
@@ -170,16 +174,26 @@ export let main = ng.controller('MainController',
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
 
-                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length;
+
+                let nbHomeworkInSession = 0;
+                pedagogicItems.forEach(i => {
+                    if(i.pedagogicType == $scope.TYPE_SESSION){
+                        nbHomeworkInSession += i.homeworks.length;
+                    }
+                });
+                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length + nbHomeworkInSession;
                 let nbSession = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_SESSION).length;
                 let nbCourse = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_COURSE).length;
                 let nbCourseAndSession = nbSession + nbCourse;
 
+                let fullDayNameStr = moment(key).format('dddd LL');
+                fullDayNameStr = `${fullDayNameStr[0].toUpperCase()}${fullDayNameStr.slice(1)}`;
                 return {
                     descriptionMaxSize: 140,
                     date: moment(key),
                     pedagogicItems: pedagogicItems,
                     shortDate: moment(key).format('DD/MM'),
+                    fullDayName: fullDayNameStr,
                     dayName: moment(key).format('dddd'),
                     shortDayName: moment(key).format('dd'),
                     nbHomework: nbHomework,
@@ -191,6 +205,10 @@ export let main = ng.controller('MainController',
 
             $scope.selectedPedagogicDay = undefined;
             $scope.pedagogicDays = pedagogicDays;
+        };
+
+        $scope.setProgress = (homework: Homework) => {
+            homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
         };
 
         $scope.selectPedagogicDay = (pedagogicDay) => {

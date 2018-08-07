@@ -1,7 +1,17 @@
 .list-view {
+
+  .pedagogic-day {
+    border: 1px solid black;
+    border-radius: 10px;
+    background: white;
+    &.selected {
+      background: gray;
+    }
+  }
+
   ul {
     list-style-type: none;
-    margin-top: 0;
+    margin: 0;
     padding-left: 0;
     padding-right: 0;
   }
@@ -29,100 +39,105 @@
     background-image:none;
   }
 
-
-  div.pedagogic-day-container {
-    box-sizing: border-box;
-    width: 25%;
-    float:left;
-  }
-
-  .pedagogic-day-card {
-    box-sizing: border-box;
-    border: 1px solid #2a9cc8;
-    color: #2a9cc8;
-    width: 99%;
-    height: 55px;
-    float: left;
-    font-size: 24px;
-    background-color: white;
-    margin-bottom: 5px;
-  }
-
-  .pedagogic-day-card .selected {
-    color: white;
-    background-color: #2a9cc8;
-    border-style: none;
-    border: 0px;
-  }
-
-  .pedagogic-item-card {
-    display: flex;
-    align-items: center;
-  }
-
-  .thumbnail {
-    box-sizing: border-box;
-    color: #2a9cc8;
-    height: 100%;
-    float: left;
-    font-size: 30px;
-    padding: 14px;
-    text-transform: capitalize;
-    border-right: 1px;
-  }
-
-  .thumb-selected {
-    color: white;
-    background-color: #2a9cc8;
-    text-transform: capitalize;
-  }
-
-  .summary {
-    color: #2a9cc8;
-    height: 100%;
-    font-size: 22px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-  }
-
-  .sum-selected {
-    color: white;
-    background-color: #7bbcf0;
-  }
-
-  .day-card-icon {
-    font-size: 18px;
-    line-height: 18px;
-    text-align: center;
-    display: inline-block;
-    padding: 0px 0px 0px 5px;
-  }
-
-  .card-icon-selected {
-    color: white;
-    background-color: #7bbcf0;
-  }
-
-  div.pedagogic-item-container {
-    box-sizing: border-box;
-    width: 75%;
-    float: left;
-  }
-
-  .list-pedagogic-item-card {
-    box-sizing: border-box;
-    width: 99%;
-    float: right;
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
+  .border-black {
+    border: 2px solid black;
   }
 
   .description-preview {
-    white-space: nowrap;
-    max-width: 50ch;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    >div {
+      white-space: nowrap;
+      max-width: 50ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    >div>div{
+      display: inline-block;
+    }
+
+    >div>div:not(:first-child):before{
+      content: " ";
+      white-space: pre;
+    }
+  }
+
+  .list-view-item {
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    > i {
+      z-index: 999;
+      position: absolute;
+      right:10px;
+    }
+
+    .content {
+      width: 100%;
+    }
+
+    .right-side {
+      border-left: 1px solid #eeeeee;
+      margin-left: 5px;
+      width: 20%;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+
+  .timeline-story {
+    .round {
+      top: 0;
+      margin-left: -9px;
+      margin-top: -11px;
+      border: solid 2px #888888;
+    }
+    .date-field {
+      top: -12px;
+      line-height: 20px;
+      .label {
+        text-align: right;
+      }
+    }
+    .date-label {
+      position: relative;
+      top: -11px;
+    }
+    .event-row {
+      margin-top: 9px;
+    }
+    .event-row .date-field {
+      height: 54px;
+      width: 12.666%;
+    }
+    .event-row .event {
+      height: 54px;
+      width: 4%;
+    }
+  }
+
+  @media screen and (max-width: $tablette) {
+    .timeline-story {
+      &::before{
+        left: 1.8%;
+      }
+      .date-label {
+        display: block;
+      }
+    }
+  }
+
+  @media screen and (min-width: $tablette) {
+    .timeline-story {
+      &::before{
+        left: 14.444%;
+      }
+      .date-label {
+        display: none;
+      }
+    }
   }
 }

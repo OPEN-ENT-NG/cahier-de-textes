@@ -8,6 +8,7 @@ const diaryBehaviours = {
             readHomework: "fr.openent.diary.controllers.HomeworkController|workflow1",
             manageHomework: "fr.openent.diary.controllers.HomeworkController|workflow2",
             publishHomework: "fr.openent.diary.controllers.HomeworkController|workflow3",
+            setProgressHomework: "fr.openent.diary.controllers.HomeworkController|setProgressHomework",
 
             readSession: "fr.openent.diary.controllers.SessionController|workflow1",
             manageSession: "fr.openent.diary.controllers.SessionController|workflow2",

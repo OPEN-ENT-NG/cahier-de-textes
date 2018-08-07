@@ -13,6 +13,7 @@ export class Homework {
     color: string;
 
     session_id: number;
+    session_date: string;
     workloadWeek: WorkloadWeek;
     structure: Structure;
     type: HomeworkType;
@@ -33,6 +34,10 @@ export class Homework {
     attachedToParentSession: boolean = false;
     attachedToOtherSession: boolean = false;
     attachedToDate: boolean = false;
+    isDone: boolean;
+
+    static HOMEWORK_STATE_TODO : number = 1;
+    static HOMEWORK_STATE_DONE : number = 2;
 
     constructor (structure: Structure) {
         this.structure = structure;
@@ -67,14 +72,16 @@ export class Homework {
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
             session_id: data.session_id,
+            session_date: data.session_date,
             id: data.id,
-            type: data.type ? JSON.parse(data.type) : undefined,
+            type: data.type ? data.type : data.type,
             title: data.title,
             color: data.color,
             dueDate: Utils.getFormattedDate(data.due_date),
             description: data.description,
             isPublished: data.is_published,
             workload: data.workload,
+            isDone: data.progress ? data.progress.state_label === 'done' : undefined
         };
     }
 
@@ -84,6 +91,12 @@ export class Homework {
         } else {
             return await this.create();
         }
+    }
+
+    async setProgress (stateId: number) {
+        let state = stateId == Homework.HOMEWORK_STATE_DONE ? 'done' : 'todo';
+        let response = await http.post(`/diary/homework/progress/${this.id}/${state}`);
+        return Utils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
     }
 
     async create () {
@@ -121,7 +134,12 @@ export class Homework {
     init(){
         this.type = Mix.castAs(HomeworkType, this.type);
         this.dueDate = moment(this.dueDate).toDate();
-        this.startMoment = moment(this.dueDate);
+        if(this.session_id && this.session_date){
+            this.startMoment = moment(this.session_date);
+        } else {
+            this.startMoment = moment(this.dueDate);
+        }
+
         this.workloadWeek = new WorkloadWeek(this.audience);
     }
 

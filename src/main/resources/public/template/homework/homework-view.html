@@ -12,8 +12,10 @@
                 [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
             <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
+        <div workflow="diary.setProgressHomework" class="homework-progress inside-homework-view" ng-click="$event.stopPropagation();"
+             static-include="/diary/public/template/homework/homework-set-progress.html"></div>
     </div>
-    <div class="row card padding-md margin-bottom-md" ng-show="homework.opened">
+    <div class="row card padding-md" ng-show="homework.opened">
         <!-- Description-->
         <div class="read-only-description" bind-html="homework.description"></div>
     </div>

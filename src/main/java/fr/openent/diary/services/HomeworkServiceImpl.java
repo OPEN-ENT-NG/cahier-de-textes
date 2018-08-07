@@ -19,12 +19,32 @@ public class HomeworkServiceImpl implements HomeworkService {
     @Override
     public void getHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT h.*, to_json(type) as type");
+        query.append(" SELECT h.*, to_json(type) as type, to_json(progress_and_state) as progress");
         query.append(" FROM diary.homework h");
         query.append(" LEFT JOIN diary.homework_type AS type ON type.id = h.type_id");
+        query.append(" LEFT JOIN (");
+        query.append("   SELECT progress.*, homework_state.label as state_label");
+        query.append("   FROM diary.homework_progress progress");
+        query.append("   INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
+        query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
         query.append(" WHERE h.id = ").append(homeworkId);
 
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(handler));
+        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
+            if (result.isRight()) {
+                JsonObject homework = result.right().getValue();
+                cleanHomework(homework);
+
+                handler.handle(new Either.Right<>(homework));
+            } else {
+                handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+        }));
+    }
+
+    private void cleanHomework(JsonObject homework){
+        homework.put("type", new JsonObject(homework.getString("type")));
+        if(homework.getString("progress") != null)
+            homework.put("progress", new JsonObject(homework.getString("progress")));
     }
 
     @Override
@@ -75,26 +95,39 @@ public class HomeworkServiceImpl implements HomeworkService {
                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT h.*, to_json(type) as type ");
+        query.append(" SELECT h.*, to_json(type) as type, session.date as session_date, to_json(progress_and_state) as progress ");
         query.append(" FROM diary.homework h");
         query.append(" LEFT JOIN diary.homework_type AS type ON type.id = h.type_id");
+        query.append(" LEFT JOIN diary.session AS session ON session.id = h.session_id");
+        query.append(" LEFT JOIN (");
+        query.append(" SELECT progress.*, homework_state.label as state_label");
+        query.append(" FROM diary.homework_progress progress");
+        query.append(" INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
+        query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
 
         if (startDate != null && endDate != null) {
-            query.append(" AND h.due_date >= to_date(?,'YYYY-MM-DD')");
-            query.append(" AND h.due_date <= to_date(?,'YYYY-MM-DD')");
+            query.append(" AND ((h.session_id IS NOT NULL AND session.date >= to_date(?,'YYYY-MM-DD') AND session.date <= to_date(?,'YYYY-MM-DD'))");
+            query.append(" OR (h.session_id IS NULL AND h.due_date >= to_date(?,'YYYY-MM-DD') AND h.due_date <= to_date(?,'YYYY-MM-DD')))");
+
+            values.add(startDate);
+            values.add(endDate);
             values.add(startDate);
             values.add(endDate);
         }
 
         if (listAudienceId != null) {
-            query.append("AND h.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray()));
+            query.append(" AND ((h.session_id IS NOT NULL AND session.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray()));
+            query.append(" ) OR (h.session_id IS NULL AND h.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray())).append("))");
+            for (String audienceId : listAudienceId) {
+                values.add(audienceId);
+            }
             for (String audienceId : listAudienceId) {
                 values.add(audienceId);
             }
         }
 
         if (listTeacherId != null) {
-            query.append("AND h.teacher_id IN ").append(Sql.listPrepared(listTeacherId.toArray()));
+            query.append(" AND h.teacher_id IN ").append(Sql.listPrepared(listTeacherId.toArray()));
             for (String teacherId : listTeacherId) {
                 values.add(teacherId);
             }
@@ -111,7 +144,20 @@ public class HomeworkServiceImpl implements HomeworkService {
 
         query.append(" ORDER BY h.due_date ASC");
 
-        Sql.getInstance().prepared(query.toString().replaceFirst("AND", "WHERE"), values, SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query.toString().replaceFirst("AND", "WHERE"), values, SqlResult.validResultHandler(result -> {
+            // Formatting String into JsonObject
+            if (result.isRight()) {
+                JsonArray arrayHomework = result.right().getValue();
+                for (int i = 0; i < arrayHomework.size(); i++) {
+                    cleanHomework(arrayHomework.getJsonObject(i));
+                }
+
+                handler.handle(new Either.Right<>(arrayHomework));
+            } else {
+                handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+
+        }));
     }
 
     @Override
@@ -206,6 +252,25 @@ public class HomeworkServiceImpl implements HomeworkService {
     public void unpublishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
         String query = "UPDATE diary.homework SET is_published = false WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    public static final int HOMEWORK_STATE_TODO = 1;
+    public static final int HOMEWORK_STATE_DONE = 2;
+
+    @Override
+    public void setProgressHomework(long homeworkId, String state, UserInfos user, Handler<Either<String, JsonObject>> handler) {
+        int stateId = "done".equals(state) ? HOMEWORK_STATE_DONE : HOMEWORK_STATE_TODO;
+        StringBuilder query = new StringBuilder();
+        JsonArray values = new JsonArray();
+        query.append(" INSERT INTO diary.homework_progress (homework_id, state_id, user_id)");
+        query.append(" VALUES (?, ?, ?)");
+        query.append(" ON CONFLICT (homework_id, user_id)");
+        query.append(" DO UPDATE SET state_id = excluded.state_id");
+        values.add(homeworkId);
+        values.add(stateId);
+        values.add(user.getUserId());
+
+        Sql.getInstance().prepared(query.toString(), values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

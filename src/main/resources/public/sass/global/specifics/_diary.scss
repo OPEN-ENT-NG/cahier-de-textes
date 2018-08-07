@@ -94,12 +94,15 @@ i.cahier-textes2::before {
 }
 
 .read-only-description {
-  min-height: 250px;
+  min-height: 100px;
+  max-height: 500px;
+  overflow-y: auto;
   height: auto;
   padding: 10px;
   background: #fff;
   border: 1px dashed #4bafd5 !important;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .workloadDay {
@@ -124,4 +127,22 @@ i.cahier-textes2::before {
 
 .workloadDay.green {
   background-color: limegreen;
+}
+
+.homework-progress {
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  &.inside-homework-view {
+    flex-direction: row-reverse;
+    position: absolute;
+    right: 40px;
+    top: 6px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    border: 1px solid grey;
+    width: 135px;
+  }
 }

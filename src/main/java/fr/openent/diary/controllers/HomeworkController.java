@@ -136,4 +136,13 @@ public class HomeworkController extends ControllerHelper {
         homeworkService.getWorkloadWeek(date, audienceId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
+    @Post("/homework/progress/:id/:state")
+    @SecuredAction(value = WorkflowUtils.HOMEWORK_SET_PROGRESS, type = ActionType.WORKFLOW)
+    public void setProgressHomework(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            long homeworkId = Long.parseLong(request.getParam("id"));
+            String state = request.getParam("state");
+            homeworkService.setProgressHomework(homeworkId, state, user, DefaultResponseHandler.defaultResponseHandler(request));
+        });
+    }
 }

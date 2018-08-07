@@ -19,13 +19,26 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT s.*, array_to_json(array_agg(distinct homework)) as homeworks");
+        query.append(" SELECT s.*, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
         query.append(" FROM diary.session s");
-        query.append(" LEFT JOIN diary.homework AS homework ON homework.session_id = s.id");
+        query.append(" LEFT JOIN (");
+        query.append(" SELECT homework.*, to_json(homework_type) as type");
+        query.append(" FROM diary.homework homework");
+        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
+        query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
         query.append(" WHERE s.id = ").append(sessionId);
         query.append(" GROUP BY s.id");
 
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(handler));
+        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
+            if (result.isRight()) {
+                JsonObject session = result.right().getValue();
+                cleanSession(session);
+
+                handler.handle(new Either.Right<>(session));
+            } else {
+                handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+        }));
     }
 
     @Override
@@ -79,9 +92,18 @@ public class SessionServiceImpl implements SessionService {
                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT s.*, array_to_json(array_agg(distinct homework)) as homeworks");
+        query.append(" SELECT s.*, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
         query.append(" FROM diary.session s");
-        query.append(" LEFT JOIN diary.homework AS homework ON homework.session_id = s.id");
+        query.append(" LEFT JOIN (");
+        query.append("   SELECT homework.*, to_json(homework_type) as type, to_json(progress_and_state) as progress");
+        query.append("   FROM diary.homework homework");
+        query.append("   INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
+        query.append("   LEFT JOIN (");
+        query.append("     SELECT progress.*, homework_state.label as state_label");
+        query.append("     FROM diary.homework_progress progress");
+        query.append("     INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
+        query.append("   ) as progress_and_state ON (homework.id = progress_and_state.homework_id)");
+        query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
 
         if (startDate != null && endDate != null) {
             query.append(" AND s.date >= to_date(?,'YYYY-MM-DD')");
@@ -117,7 +139,27 @@ public class SessionServiceImpl implements SessionService {
         query.append(" GROUP BY s.id");
         query.append(" ORDER BY s.date ASC");
 
-        Sql.getInstance().prepared(query.toString().replaceFirst("AND", "WHERE"), values, SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query.toString().replaceFirst("AND", "WHERE"), values, SqlResult.validResultHandler(result -> {
+            // Formatting String into JsonObject
+            if (result.isRight()) {
+                JsonArray arraySession = result.right().getValue();
+                for (int i = 0; i < arraySession.size(); i++) {
+                    cleanSession(arraySession.getJsonObject(i));
+                }
+
+                handler.handle(new Either.Right<>(arraySession));
+            } else {
+                handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+
+        }));
+    }
+
+    private void cleanSession(JsonObject session){
+        session.put("homeworks", new JsonArray(session.getString("homeworks")));
+        if(session.getJsonArray("homeworks").contains(null)){
+            session.put("homeworks", new JsonArray());
+        }
     }
 
     @Override

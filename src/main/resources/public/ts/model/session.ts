@@ -67,7 +67,7 @@ export class Session {
             endTime: data.end_time,
             description: data.description,
             annotation: data.annotation,
-            homeworks: data.homeworks ? JSON.parse(data.homeworks) : [],
+            homeworks: data.homeworks ? Homeworks.formatSqlDataToModel(data.homeworks, structure) : [],
             visas: data.visas ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id: null
         };
@@ -120,10 +120,12 @@ export class Session {
             this.homeworks = [];
         }
         if(this.homeworks){
-            this.homeworks = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(this.homeworks, this.structure));
+            this.homeworks = Mix.castArrayAs(Homework, this.homeworks);
             this.homeworks.forEach(h => {
                 h.structure = this.structure;
                 h.session = this;
+                h.session_date = Utils.getFormattedDate(this.date);
+                h.init();
             });
         }
     }

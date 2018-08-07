@@ -181,5 +181,7 @@
   "visa.deleted.error": "Erreur lors de la suppression de la visa",
   "visa.none.applied": "Aucun visa apposé à cette séance",
   "comment": "Commentaire",
+  "done": "Fait",
+  "todo": "A faire",
   "back": "Retour"
 }
