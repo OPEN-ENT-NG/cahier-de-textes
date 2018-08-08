@@ -183,5 +183,7 @@
   "comment": "Commentaire",
   "done": "Fait",
   "todo": "A faire",
-  "back": "Retour"
+  "back": "Retour",
+  "inspector.no.habilitation": "Aucune habilitation",
+  "inspector.add.habilitation": "Ajouter une habilitation"
 }

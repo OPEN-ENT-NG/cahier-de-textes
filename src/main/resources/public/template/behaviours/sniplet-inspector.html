@@ -1,0 +1,32 @@
+<div class="row">
+    <h3><i18n>diary.manage.inspector</i18n></h3>
+    <p class="row medium-importance" style="font-style: italic;"><i18n>diary.manage.inspector.description</i18n></p>
+</div>
+<div class="row">
+    <div class="row">
+        <select ng-model="selectedStructure"
+                ng-options="structure.name for structure in structures.all">
+            <option value="" disabled>[[translate('choose.structure')]]</option>
+        </select>
+
+        <select ng-show="selectedStructure" ng-change="syncHabilitations();" ng-model="inspector"
+                ng-options="inspector.displayName for inspector in inspectors">
+            <option value="" disabled>[[translate('choose.inspector')]]</option>
+        </select>
+    </div>
+    <div class="row" ng-show="inspector">
+        <div class="row">
+            <i18n>diary.add.habilitation</i18n>:
+            <select ng-model="selectedTeacher" ng-change="createHabilitation(selectedTeacher)"
+                    ng-options="teacher.displayName for teacher in teachers">
+                <option value="" disabled>[[translate('choose.teacher')]]</option>
+            </select>
+        </div>
+        <div class="row">
+            <div class="card row padding-md text-center margin-bottom-sm" ng-repeat="habilitation in inspector.habilitations.all">
+                [[habilitation.teacher.displayName]] <i class="right-magnet" ng-click="deleteHabilitation(habilitation)">&#xe848;</i>
+            </div>
+            <div ng-if="inspector.habilitations.all.length === 0" class="row medium-importance"><i18n>diary.no.habilitation</i18n></div>
+        </div>
+    </div>
+</div>

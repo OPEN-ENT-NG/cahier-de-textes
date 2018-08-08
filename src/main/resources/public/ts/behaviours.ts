@@ -1,8 +1,11 @@
 import { Behaviours } from 'entcore';
+import { inspector } from "./sniplets/inspector";
 
 const diaryBehaviours = {
     rights: {
         workflow: {
+            view: "fr.openent.diary.controllers.DiaryController|view",
+
             manageVisa: "fr.openent.diary.controllers.VisaController|createVisa",
 
             readHomework: "fr.openent.diary.controllers.HomeworkController|workflow1",
@@ -20,6 +23,9 @@ const diaryBehaviours = {
             accessChildData: "fr.openent.diary.controllers.DiaryController|workflow4",
             accessExternalData: "fr.openent.diary.controllers.DiaryController|workflow5",
         },
+    },
+    sniplets: {
+        inspector: inspector
     }
 };
 

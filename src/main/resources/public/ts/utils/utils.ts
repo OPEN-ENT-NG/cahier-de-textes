@@ -48,4 +48,16 @@ export class Utils {
     static getDisplayDateTime(date) {
         return moment(date).format(FORMAT.displayDateTime);
     }
+
+    static safeApply(that) {
+        return new Promise((resolve, reject) => {
+            let phase = (that.$root !== null) ? that.$root.$$phase : undefined;
+            if(phase === '$apply' || phase === '$digest') {
+                if(resolve && (typeof(resolve) === 'function')) resolve();
+            } else {
+                if (resolve && (typeof(resolve) === 'function')) that.$apply(resolve);
+                else that.$apply();
+            }
+        });
+    }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public final class WorkflowUtils {
 
-    static public final String VIEW = "diary.view";
+    static public final String VIEW = "view";
     static public final String CHILDREN_READ = "children.red";
 
     static public final String VISA_MANAGE = "visa.manage";

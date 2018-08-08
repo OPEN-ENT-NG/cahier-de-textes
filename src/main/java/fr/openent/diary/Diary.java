@@ -1,9 +1,6 @@
 package fr.openent.diary;
 
-import fr.openent.diary.controllers.DiaryController;
-import fr.openent.diary.controllers.HomeworkController;
-import fr.openent.diary.controllers.SessionController;
-import fr.openent.diary.controllers.VisaController;
+import fr.openent.diary.controllers.*;
 import fr.openent.diary.services.*;
 import io.vertx.core.eventbus.EventBus;
 import org.entcore.common.http.BaseServer;
@@ -27,6 +24,7 @@ public class Diary extends BaseServer {
         addController(new VisaController(visaService));
         addController(new SessionController(new SessionServiceImpl()));
         addController(new HomeworkController(new HomeworkServiceImpl()));
+        addController(new InspectorController(new InspectorServiceImpl()));
 	}
 
 }
