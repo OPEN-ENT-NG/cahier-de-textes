@@ -221,6 +221,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             await $scope.syncWorkloadWeek();
 
             $scope.safeApply();
+            $scope.fixEditor();
         }
 
         await initData();

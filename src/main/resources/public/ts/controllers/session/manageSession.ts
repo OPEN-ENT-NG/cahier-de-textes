@@ -224,6 +224,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
             $scope.session.opened = true;
             $scope.safeApply();
+            $scope.fixEditor();
         }
 
         await initData();

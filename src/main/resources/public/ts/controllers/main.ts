@@ -62,6 +62,18 @@ export let main = ng.controller('MainController',
             }
         }
 
+        $scope.fixEditor = async (exit:number = 0) => {
+            if(exit < 100 ){
+                await $timeout(function () {
+                    if ($('editor').length > 0){
+                        $('editor').trigger('resize');
+                    } else {
+                        $scope.fixEditor(++exit);
+                    }
+                }, 50);
+            }
+        };
+
         async function initializeStructure(){
             $scope.structures = new Structures();
             await $scope.structures.sync();
