@@ -322,7 +322,7 @@ export let main = ng.controller('MainController',
 
         $scope.openSessionFromCourse = (calendar_course) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
-                $scope.goTo('/session/create/' + calendar_course._id);
+                $scope.goTo('/session/create/' + calendar_course._id + '/' + Utils.getFormattedDate(calendar_course.startMoment));
             }
             $scope.safeApply();
         };

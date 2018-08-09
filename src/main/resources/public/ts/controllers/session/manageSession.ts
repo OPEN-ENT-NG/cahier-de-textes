@@ -1,5 +1,5 @@
 import { ng, _, model, moment, Behaviours, notify, idiom as lang } from 'entcore';
-import { Subjects, Notification } from '../../model';
+import {Subjects, Notification, Course} from '../../model';
 import {Session} from "../../model";
 import {Visa} from '../../model/visa';
 import {Homework} from '../../model/homework';
@@ -218,9 +218,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.id = $routeParams.id;
                 await $scope.session.sync();
             }
-            else if($routeParams.courseId){
-                $scope.session.courseId = $routeParams.courseId;
-                await $scope.session.mapFromCourse();
+            else if($routeParams.courseId && $routeParams.date){
+                let course = new Course($scope.structure, $routeParams.courseId);
+                await course.sync($routeParams.date, $routeParams.date);
+                $scope.session.setFromCourse(course);
             }
             $scope.session.opened = true;
             $scope.safeApply();

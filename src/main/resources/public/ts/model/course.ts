@@ -3,11 +3,7 @@ import http from 'axios';
 import { Mix } from 'entcore-toolkit';
 import {USER_TYPES, Structure, Teacher, Teachers, Audiences, Audience, Utils, Subject} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Session, Sessions} from "./session";
-import {Visa} from "./visa";
-import {Homework, Homeworks} from "./homework";
-import {FORMAT} from "../utils/const/dateFormat";
-import includes = require('core-js/fn/array/includes');
+import {Session} from "./session";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -39,8 +35,9 @@ export class Course {
     is_periodic: boolean = false;
     locked: boolean = true;
 
-    constructor (structure: Structure) {
+    constructor (structure: Structure, id: string) {
         this.structure = structure;
+        this._id = id;
     }
 
     static formatSqlDataToModel(data: any, structure: Structure) {
@@ -77,6 +74,16 @@ export class Course {
         }
     }
 
+    async sync(startDate, endDate, teacherId?) {
+        let url = `/viescolaire/common/courses/${this.structure.id}/${startDate}/${endDate}`;
+        url += `?teacherId=${model.me.type === USER_TYPES.personnel ? teacherId : model.me.userId}`;
+
+        let {data} = await http.get(url);
+        let courses = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
+        let course = courses.find(c => c._id === this._id);
+        Mix.extend(this, course);
+        this.init(this.structure);
+    }
 }
 
 export class Courses {

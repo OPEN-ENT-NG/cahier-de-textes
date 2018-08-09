@@ -20,7 +20,10 @@ routes.define(($routeProvider) => {
         .when('/', {
             action: 'main'
         })
-        .when('/session/create/:courseId?', {
+        .when('/session/create/:courseId/:date/', {
+            action: 'manageSession'
+        })
+        .when('/session/create', {
             action: 'manageSession'
         })
         .when('/session/update/:id', {
