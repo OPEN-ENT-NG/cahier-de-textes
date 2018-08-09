@@ -1,7 +1,7 @@
 import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
 import {
     Structures, PEDAGOGIC_TYPES, USER_TYPES, Structure, Sessions,
-    Notification, Homework
+    Notification, Homework, Workload
 } from '../model';
 import {Homeworks} from '../model/homework';
 import {Utils} from '../utils/utils';
@@ -193,7 +193,15 @@ export let main = ng.controller('MainController',
                         nbHomeworkInSession += i.homeworks.length;
                     }
                 });
-                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length + nbHomeworkInSession;
+
+
+                let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
+                        return p.audience.id
+                });
+                let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
+                let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
+
+                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length;
                 let nbSession = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_SESSION).length;
                 let nbCourse = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_COURSE).length;
                 let nbCourseAndSession = nbSession + nbCourse;
@@ -212,6 +220,8 @@ export let main = ng.controller('MainController',
                     nbSession: nbSession,
                     nbCourse: nbCourse,
                     nbCourseAndSession: nbCourseAndSession,
+                    homeworksAreForOneAudienceOnly: homeworksAreForOneAudienceOnly,
+                    color: Workload.getWorkloadColor(nbHomework)
                 };
             });
 

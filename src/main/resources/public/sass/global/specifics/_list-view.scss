@@ -70,11 +70,21 @@
   }
 
   .timeline-story {
-    .round {
-      top: 0;
-      margin-left: -9px;
-      margin-top: -11px;
-      border: solid 2px #888888;
+    @media screen and (min-width: 800px) {
+      .round {
+        top: 0;
+        margin-left: -9px;
+        margin-top: -11px;
+        border: solid 2px #888888;
+      }
+    }
+    @media screen and (max-width: 800px) {
+      .round {
+        top: 0;
+        margin-left: -8px;
+        margin-top: -11px;
+        border: solid 2px #888888;
+      }
     }
     .date-field {
       top: -12px;
