@@ -16,8 +16,6 @@
     <div>[[item.startDisplayTime]] &nbsp; [[item.subject.label]]</div>
     <div>
         [[item.endDisplayTime]] &nbsp;
-        <em class="metadata">
-            <span ng-repeat="audience in item.audiences">[[audience.name]]</span>
-        </em>
+        <span class="text-ellipsis overflow-hidden"><span ng-repeat="audience in item.audiences.all">[[audience.name]]<span ng-if="!$last">, </span></span></span>
     </div>
 </div>
