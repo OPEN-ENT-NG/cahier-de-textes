@@ -60,4 +60,9 @@ export class Utils {
             }
         });
     }
+
+    static convertHtmlToPlainText(html) {
+        let htmlWithSpaces = html.replace(/<\/div>/g, ' </div>');
+        return htmlWithSpaces ? String(htmlWithSpaces).replace(/<[^>]+>/gm, '') : '';
+    }
 }

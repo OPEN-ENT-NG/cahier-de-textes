@@ -43,25 +43,6 @@
     border: 2px solid black;
   }
 
-  .description-preview {
-
-    >div {
-      white-space: nowrap;
-      max-width: 50ch;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    >div>div{
-      display: inline-block;
-    }
-
-    >div>div:not(:first-child):before{
-      content: " ";
-      white-space: pre;
-    }
-  }
-
   .list-view-item {
     display:flex;
     flex-direction: row;

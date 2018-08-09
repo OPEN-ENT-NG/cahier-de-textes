@@ -13,14 +13,14 @@
             </div>
             <!-- Description -->
             <div class="row" ng-click="pedagogicItem.opened = !pedagogicItem.opened" ng-if="pedagogicItem.description">
-                <div ng-if="!pedagogicItem.opened" class="description-preview" bind-html="pedagogicItem.description"></div>
+                <div ng-if="!pedagogicItem.opened" class="description-preview">[[pedagogicItem.plainTextDescription]]</div>
                 <div ng-if="pedagogicItem.opened" class="read-only-description" bind-html="pedagogicItem.description"></div>
             </div>
         </div>
     </div>
     <div class="padding-sm">
         <div class="list-view-item card padding-sm" ng-repeat="homework in pedagogicItem.homeworks">
-            <i ng-click="openHomework(pedagogicItem.id)">&#xe8aa;</i>
+            <i ng-click="openHomework(homework.id)">&#xe8aa;</i>
             <div class="content">
                 <!-- Type -->
                 <div class="row medium-importance">
@@ -28,7 +28,7 @@
                 </div>
                 <!-- Description -->
                 <div class="row" ng-click="homework.opened = !homework.opened">
-                    <div ng-if="!homework.opened" class="description-preview" bind-html="homework.description"></div>
+                    <div ng-if="!homework.opened" class="description-preview">[[homework.plainTextDescription]]</div>
                     <div ng-if="homework.opened" class="read-only-description" bind-html="homework.description"></div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
         </div>
         <!-- Description -->
         <div class="row" ng-if="pedagogicItem.description" ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-            <div ng-if="!pedagogicItem.opened" class="description-preview" bind-html="pedagogicItem.description"></div>
+            <div ng-if="!pedagogicItem.opened" class="description-preview">[[homework.plainTextDescription]]</div>
             <div ng-if="pedagogicItem.opened" class="read-only-description" bind-html="pedagogicItem.description"></div>
         </div>
     </div>

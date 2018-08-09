@@ -21,6 +21,7 @@ export class Session {
     startTime: any = (moment().set({'hour': '08', 'minute':'00'})).seconds(0).millisecond(0).toDate();
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     description: string = "";
+    plainTextDescription: string = "";
     annotation: string = "";
     homeworks: Homework[] = [];
     room: string = "";
@@ -128,6 +129,8 @@ export class Session {
                 h.init();
             });
         }
+
+        this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
     }
 
     async mapFromCourse() {

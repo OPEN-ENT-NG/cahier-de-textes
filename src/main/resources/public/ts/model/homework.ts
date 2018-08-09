@@ -9,6 +9,7 @@ import {Session, Sessions} from './session';
 export class Homework {
     id: string;
     description: string = '';
+    plainTextDescription: string = '';
     dueDate: Date = moment().toDate();
     color: string;
 
@@ -141,6 +142,7 @@ export class Homework {
         }
 
         this.workloadWeek = new WorkloadWeek(this.audience);
+        this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
     }
 
 
