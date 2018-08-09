@@ -102,5 +102,14 @@
         <div class="row">
             <editor ng-model="homework.description"></editor>
         </div>
+
+        <div class="row" ng-if="isInsideSessionForm">
+            <button class="cancel float-none display-inline-block" type="button" ng-click="cancelCreation()">
+                <i18n>utils.cancel</i18n>
+            </button>
+            <button class="float-none display-inline-block" type="button" ng-click="deleteHomework()">
+                <i18n>utils.delete</i18n>
+            </button>
+        </div>
     </div>
 </div>

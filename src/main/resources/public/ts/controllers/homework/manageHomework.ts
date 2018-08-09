@@ -128,13 +128,17 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
-        $scope.deleteHomework= async () => {
-            let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
-            if(succeed) {
-                if($scope.isInsideSessionForm){
-                    $scope.$parent.localRemoveHomework($scope.homework);
-                } else {
-                    $scope.goTo('/');
+        $scope.deleteHomework = async () => {
+            if($scope.isInsideSessionForm && !$scope.homework.id){
+                $scope.$parent.localRemoveHomework($scope.$parent.homework);
+            } else {
+                let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
+                if(succeed) {
+                    if($scope.isInsideSessionForm){
+                        $scope.$parent.localRemoveHomework($scope.homework);
+                    } else {
+                        $scope.goTo('/');
+                    }
                 }
             }
         };
