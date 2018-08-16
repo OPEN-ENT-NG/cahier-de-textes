@@ -1,4 +1,4 @@
-import { ng, _, idiom } from 'entcore';
+import {_, idiom, ng} from 'entcore';
 
 interface Toast {
     text: string;

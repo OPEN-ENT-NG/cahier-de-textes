@@ -1,0 +1,100 @@
+<div class="cell twelve">
+    <table class="twelve table-layout-fixed">
+        <thead>
+        <tr class="text-left">
+            <th width="5%" class="empty-take-space">
+                <label class="checkbox">
+                    <input type="checkbox"
+                           ng-model="checkbox_selectAll"
+                           ng-change="selectAll(mixVisaSessions)"
+                           ng-disabled="!mixVisaSessions || !mixVisaSessions.length">
+                    <span></span>
+                </label>
+            </th>
+            <!--<th width="20%">-->
+            <!--<i18n>utils.teachers</i18n>-->
+            <!--</th>-->
+            <th width="15%">
+                <i18n>utils.groups</i18n>
+            </th>
+            <th width="20%">
+                <i18n>subject</i18n>
+            </th>
+            <th width="20%">
+                <i18n>visa.manage.lastEdit</i18n>
+            </th>
+            <th width="15%">
+                <i18n>visa.manage.nbsessions</i18n>
+            </th>
+            <th width="15%">
+                <i18n>state</i18n>
+            </th>
+            <th class="text-center" width="10%">
+                <i18n>utils.actions</i18n>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat-start="(key, visaSession) in mixVisaSessions">
+            <td>
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="visaSession.selected">
+                    <span></span>
+                </label>
+            </td>
+            <!--<td>-->
+            <!--[[visaSession.teacher.displayName]]-->
+            <!--</td>-->
+            <td>
+                [[visaSession.audience.name]]
+            </td>
+            <td>
+                [[visaSession.subject.label]]
+            </td>
+            <td>
+                [[visaSession.lastEdit]]
+            </td>
+            <td>
+                [[visaSession.sessions.length]]
+            </td>
+            <td>
+                <i18n ng-show="!!visaSession.visas"> vise.manage.visaChecked</i18n>
+                <i18n ng-show="!visaSession.visas">vise.manage.visaNotChecked</i18n>
+            </td>
+            <td class="text-center">
+                <i ng-if="!!visaSession.visas" ng-click="wantDownloadPdf(visaSession.visas)">&#xe857;</i>&nbsp;
+                <i ng-click="openDetails = openDetails != key ? key : null" ng-show='!openDetails || openDetails==0'>&#xe873;</i>
+                <i ng-click="openDetails = null" ng-show='openDetails'>&#xe904;</i>
+
+            </td>
+        </tr>
+        <tr ng-repeat-end ng-show="openDetails == key">
+            <td colspan="7" class="remove-padding">
+                <table class="remove-margin twelve">
+                    <tbody>
+                    <tr ng-repeat="session in visaSession.sessions">
+                        <td width="10%" style="background-color: #ededed;">
+                        <td width="90%">
+                            <div class="row"
+                                 ng-controller="manageSessionCtrl"
+                                 read-only="true"
+                                 static-include="/diary/public/template/session/session-view.html"></div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+
+<lightbox show="visaPdfBox" on-close="closeVisaPdfBox()">
+    <div ng-repeat="(key, visa_pdf) in visas_pdfChoice">
+        <p ng-click="visa_pdf.downloadPdf(visa_pdf.visa_id)">
+            <i18n>visa.manage.choosePdf</i18n>&nbsp;
+            [[visa_pdf.modified]]
+        </p>
+    </div>
+</lightbox>

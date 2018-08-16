@@ -116,7 +116,7 @@ export class Courses {
         let filter = '';
 
         if (audience === null)
-            filter += `teacherId=${model.me.type === USER_TYPES.personnel ? teacher.id : model.me.userId}`;
+            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher? teacher.id : model.me.userId}`;
         if (teacher === null && audience !== null)
             filter += `group=${audience.name}`;
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;

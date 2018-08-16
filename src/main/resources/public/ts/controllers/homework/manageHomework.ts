@@ -5,7 +5,7 @@ import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
         console.log('manageHomeworkCtrl');
-        $scope.isReadOnly = modeIsReadOnly();
+        $scope.isReadOnly = $scope.isReadOnly || modeIsReadOnly();
 
         function modeIsReadOnly() {
             let currentPath = $location.path();

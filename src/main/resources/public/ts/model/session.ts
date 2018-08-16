@@ -1,7 +1,7 @@
-import {model, moment, _, notify} from 'entcore';
+import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import { Subject, Structure, Teacher, Course, Utils} from './index';
+import {Course, Structure, Subject, Teacher, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
@@ -69,8 +69,10 @@ export class Session {
             description: data.description,
             annotation: data.annotation,
             homeworks: data.homeworks ? Homeworks.formatSqlDataToModel(data.homeworks, structure) : [],
-            visas: data.visas ? JSON.parse(data.visas) : [],
-            courseId: data.course_id ? data.course_id: null
+            visas: data.visas && data.visas !== "[null]" ? JSON.parse(data.visas) : [],
+            courseId: data.course_id ? data.course_id: null,
+            modified: data.modified,
+            created: data.created
         };
     }
 
@@ -218,6 +220,55 @@ export class Sessions {
         return dataModel;
     }
 
+    static visaListingShuffle(sessions) {
+        let final = [];
+        sessions.forEach(function (sessionItem) {
+            var index = _.findLastIndex(final, {
+                teacherId: sessionItem.teacher.id,
+                subjectId: sessionItem.subject.id,
+                audienceId: sessionItem.audience.id,
+                visaNeeded: sessionItem.visas && !sessionItem.visas.length
+            });
+            if (index > -1 && final[index] && final[index].sessions) {
+                final[index].sessions.push(sessionItem);
+            }
+            else {
+                final.push({
+                    teacherId: sessionItem.teacher.id,
+                    subjectId: sessionItem.subject.id,
+                    audienceId: sessionItem.audience.id,
+                    visaNeeded: sessionItem.visas && !sessionItem.visas.length,
+                    sessions: [sessionItem]
+                })
+            }
+        });
+
+        final = final.map(function(item){
+            if(!item || !item.sessions || !item.sessions[0])
+                return item;
+            let firstSession = item.sessions[0];
+            return {
+                teacher: firstSession.teacher,
+                subject: firstSession.subject,
+                audience: firstSession.audience,
+                visas: !item.visaNeeded ? _.flatten(_.pluck(item.sessions, 'visas')) : null,
+                sessions: item.sessions,
+                sessionIds: _.pluck(item.sessions, 'id'),
+                nbSessions: item.sessions.length,
+                lastEdit: moment(
+                    _.chain(item.sessions)
+                        .pluck('modified')
+                        .max(function (dateString) {
+                            return new Date(dateString).getTime();
+                        })
+                        .value()
+                    ).format("DD-MM-YYYY HH:mm")
+            }
+        });
+        console.log('final', final);
+        return final;
+    }
+
     async syncWithAudienceAndSubject(startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
@@ -258,6 +309,15 @@ export class Sessions {
         let endDate = Utils.getFormattedDate(endMoment);
 
         let url = `/diary/sessions/child/${startDate}/${endDate}/${childId}`;
+
+        await this.syncSessions(url);
+    }
+
+    async syncSessionsWithVisa(startMoment: any, endMoment: any, teacherId?: string): Promise<void> {
+        let startDate = Utils.getFormattedDate(startMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
+
+        let url = `/diary/sessions/visa/${startDate}/${endDate}/${teacherId}`;
 
         await this.syncSessions(url);
     }

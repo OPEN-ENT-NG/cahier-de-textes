@@ -1,23 +1,19 @@
-import { model, moment, _, notify } from 'entcore';
+import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
-import { Mix } from 'entcore-toolkit';
-import { Structure,  Utils} from './index';
-import {Personnel} from './Personnel';
+import {Structure, Teacher, Utils} from './index';
 
 export class Visa {
 
     id: number;
-    comment: string = '';
+    comment: string = null;
+    sessionIds: object = [];
+    sessions: any = [];
+    structure: Structure;
+    teacher: Teacher;
+    nb_sessions: number = 0;
+
     created: string;
     modified: string;
-    session_id: number;
-    structure: Structure;
-    owner_id: string;
-    owner: Personnel;
-    moment: any;
-    displayDateTime: string;
-
-    isBeingUpdated: boolean;
 
     constructor (structure: Structure) {
         this.structure = structure;
@@ -27,64 +23,72 @@ export class Visa {
         if(structure){
             this.structure = structure;
         }
-
-        this.owner = this.structure.personnels.all.find(p => p.id === this.owner_id);
-        this.moment = moment(this.created);
-        this.displayDateTime = Utils.getDisplayDateTime(this.moment);
     }
 
-    toJSON () {
+    toSendFormat() {
         return {
             comment: this.comment,
-            session_id: this.session_id,
-            structure_id: this.structure.id
+            sessionIds: this.sessionIds,
+            sessions: this.sessions.map((n) => {
+                return {
+                    audience: n.audience.name,
+                    subject: n.subject.label,
+                    teacher: n.teacher,
+                    title: n.title,
+                    startDisplayDate: n.startDisplayDate,
+                    startDisplayTime: n.startDisplayTime,
+                    endDisplayTime: n.endDisplayTime,
+                    description: n.description,
+                    annotation: n.annotation
+                }
+            }),
+            structure_id: this.structure.id,
+            teacher_id: this.teacher.id,
+            nb_sessions: this.nb_sessions,
+            created: this.created,
+            modified: this.modified
         };
     }
 
-    async save () {
-        if (this.id) {
-            return await this.update();
-        } else {
-            return await this.create();
-        }
+    mapFormData(FormData) {
+        this.comment = FormData.comment;
+        this.sessionIds = FormData.sessionIds;
+        this.sessions = FormData.sessions;
+        this.teacher = FormData.teacher;
+        this.nb_sessions = FormData.nb_sessions;
+        this.created = FormData.created;
+        this.modified = FormData.modified;
     }
 
-    async create () {
-        let response = await http.post('/diary/visa', this.toJSON());
-        return Utils.setToastMessage(response, 'visa.created','visa.created.error');
-    }
-
-    async update () {
-        let response = await http.put(`/diary/visa/${this.id}`, this.toJSON());
-        return Utils.setToastMessage(response, 'visa.updated','visa.updated.error');
-    }
-
-    async delete() {
-        let response = await http.delete('/diary/visa/' + this.id);
-        return Utils.setToastMessage(response, 'visa.deleted','visa.deleted.error');
-    }
-
-    async sync(): Promise<void> {
-        let {data} = await http.get('/diary/visa/' + this.id);
-        Mix.extend(this, data);
+    async downloadPdf(): Promise<void> {
+        window.location.href = `/diary/visa/${this.id}/pdf`;
     }
 }
 
+
 export class Visas {
     all: Visa[];
-    origin: Visa[];
     structure: Structure;
 
     constructor (structure: Structure) {
         this.structure = structure;
         this.all = [];
-        this.origin = [];
     }
 
-    async sync(sessionId? : string){
-        let url = `/diary/visa/${this.structure.id}/${sessionId}`;
-
-        let { data } = await http.get(url);
-        this.all = Mix.castArrayAs(Visa, data);
+    toSendFormat () {
+        return {
+            structure_id: this.structure.id,
+            visas: this.all.map((n) => n.toSendFormat())
+        };
     }
+
+    async save() {
+        return await this.create();
+    }
+
+    async create() {
+        let response = await http.post('/diary/visas', this.toSendFormat());
+        return Utils.setToastMessage(response, 'visas.created','visas.created.error');
+    }
+
 }

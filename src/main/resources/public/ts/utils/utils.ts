@@ -1,4 +1,4 @@
-import { moment, model, me, Behaviours, _ } from 'entcore';
+import {_, Behaviours, me, model, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 
 export class Utils {
@@ -14,6 +14,7 @@ export class Utils {
         if(response.status === 200 || response.status === 201){
             response.succeed = true;
             response.toastMessage = message;
+
         } else {
             response.succeed = false;
             response.toastMessage = errorMessage;

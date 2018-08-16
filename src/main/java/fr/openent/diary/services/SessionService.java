@@ -6,6 +6,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
+import java.util.List;
+
 public interface SessionService {
 
     void getSession(long sessionId, Handler<Either<String, JsonObject>> handler);
@@ -26,4 +28,6 @@ public interface SessionService {
 
     void unpublishSession(long sessionId, Handler<Either<String, JsonObject>> handler);
 
+    void getSessions(String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
+                            boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler);
 }

@@ -1,11 +1,7 @@
-﻿import { ng, routes } from 'entcore';
+﻿import {ng, routes} from 'entcore';
 import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
-
-for (let controller in controllers) {
-    ng.controllers.push(controllers[controller]);
-}
 
 for (let directive in directives) {
     ng.directives.push(directives[directive]);
@@ -14,6 +10,10 @@ for (let directive in directives) {
 for (let filter in filters) {
     ng.filters.push(filters[filter]);
 }
+for (let controller in controllers) {
+    ng.controllers.push(controllers[controller]);
+}
+
 
 routes.define(($routeProvider) => {
     $routeProvider
@@ -40,6 +40,9 @@ routes.define(($routeProvider) => {
         })
         .when('/homework/view/:id', {
             action: 'manageHomework'
+        })
+        .when('/visas', {
+            action: 'manageVisas'
         })
         .otherwise({
             redirectTo: '/'

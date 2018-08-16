@@ -1,14 +1,12 @@
-import { ng, template, notify, moment, idiom as lang, _, Behaviours, model, angular } from 'entcore';
-import {
-    Structures, PEDAGOGIC_TYPES, USER_TYPES, Structure, Sessions,
-    Notification, Homework, Workload
-} from '../model';
-import {Homeworks} from '../model/homework';
+import {_, angular, Behaviours, idiom as lang, model, moment, ng, notify, template} from 'entcore';
+import {Homeworks, Homework, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
+
 import {Utils} from '../utils/utils';
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
         console.log('MainController');
+
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
@@ -16,7 +14,7 @@ export let main = ng.controller('MainController',
         $scope.display = {
             homeworks: true,
             sessions: true,
-            listView: false,
+            listView: false
         };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -27,6 +25,7 @@ export let main = ng.controller('MainController',
             startDate: moment().startOf('isoWeek').toDate(),
             endDate: moment().endOf('isoWeek').toDate()
         };
+
 
         /**
          * Synchronize a structure.
@@ -375,8 +374,12 @@ export let main = ng.controller('MainController',
                 template.open('main', 'session/session-page');
             },
             manageHomework: async () => {
-                if(!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'homework/homework-page');
+            },
+            manageVisas: async () => {
+                if (!$scope.structureInitialized) await initializeStructure();
+                template.open('main', 'visa/visa-page');
             }
         });
     }]);

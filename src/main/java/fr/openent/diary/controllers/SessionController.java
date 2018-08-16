@@ -16,6 +16,9 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SessionController extends ControllerHelper {
 
     private SessionService sessionService;
@@ -69,6 +72,19 @@ public class SessionController extends ControllerHelper {
 
         sessionService.getChildSessions(startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
     }
+
+
+    @Get("/sessions/visa/:startDate/:endDate/:teacherId")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getSessionsWithVisaField(final HttpServerRequest request) {
+        String startDate = request.getParam("startDate");
+        String endDate = request.getParam("endDate");
+        String teacherId = request.getParam("teacherId");
+        List<String> listTeacherId = Arrays.asList(teacherId);
+        sessionService.getSessions(startDate, endDate, null, null, null, listTeacherId, true, false, true,
+                DefaultResponseHandler.arrayResponseHandler(request));
+    }
+
 
     @Get("/session/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)

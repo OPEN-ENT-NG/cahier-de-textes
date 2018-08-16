@@ -9,8 +9,8 @@ public final class WorkflowUtils {
     static public final String VIEW = "view";
     static public final String CHILDREN_READ = "children.red";
 
-    static public final String VISA_MANAGE = "visa.manage";
     static public final String VISA_READ = "visa.read";
+    static public final String VISA_MANAGE = "visa.manage";
 
     static public final String SESSION_READ = "session.read";
     static public final String SESSION_MANAGE = "session.manage";

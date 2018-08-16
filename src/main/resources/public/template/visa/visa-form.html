@@ -1,0 +1,15 @@
+<form>
+    <div class="cell twelve">
+        <label for="comment">
+            <i18n>visa.manage.comment</i18n>
+            :</label>
+        <textarea ng-model="visaForm.comment" id="comment" cols="30" rows="10"></textarea>
+    </div>
+    <div class="cell twelve">
+        <button class="right-magnet"
+                ng-disabled="!visaFormIsvalid()"
+                ng-click="submitVisaForm()"
+        ><i18n>visa.manage.applyOnCheckedSessions</i18n>
+        </button>
+    </div>
+</form>

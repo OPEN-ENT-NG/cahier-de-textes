@@ -1,4 +1,6 @@
 body.cdt {
+  min-width: 1080px;
+
   @import 'specifics/mixins';
   @import 'specifics/responsive';
   @import 'specifics/diary';

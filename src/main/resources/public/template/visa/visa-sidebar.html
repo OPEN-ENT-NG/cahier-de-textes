@@ -1,0 +1,42 @@
+<div class="sidebar cell twelve">
+    <section id="display-section" class="cell twelve">
+        <!-- Access External Data -->
+        <div workflow="diary.accessExternalData" class="display-inline-block">
+            <div class="card padding-md margin-bottom-md">
+                <i18n>from</i18n>
+                <date-picker
+                         ng-model="filters.startDate"
+                         ng-change="syncPedagogicItems();"
+                         class="date-picker-sm">
+                </date-picker>
+                <br>
+                <i18n>to</i18n>
+                <date-picker
+                         ng-model="filters.endDate"
+                         ng-change="syncPedagogicItems();"
+                         class="date-picker-sm">
+                </date-picker>
+            </div>
+            <label class="cell twelve small">
+                <select
+                        ng-model="structure"
+                        id="structure-list"
+                        class="twelve"
+                        ng-change="switchStructure(structure)"
+                        ng-options="structure as structure.name for structure in structures.all">
+                    <option value="" disabled selected>
+                        [[translate('utils.structure.choose.one')]]
+                    </option>
+                </select>
+            </label>
+            <label class="cell twelve small">
+                <select ng-model="teacher"
+                        class="twelve"
+                        ng-change="syncSessionsVisas()"
+                        ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
+                    <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+                </select>
+            </label>
+        </div>
+    </section>
+</div>

@@ -5,7 +5,7 @@ import {Visa} from '../../model/visa';
 import {Homework} from '../../model/homework';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
-    ['$scope', '$routeParams', '$location', async function ($scope, $routeParams, $location) {
+    ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         console.log('manageSessionCtrl');
 
@@ -13,10 +13,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         function modeIsReadOnly() {
             let currentPath = $location.path();
-            return currentPath.includes('view');
+            return currentPath.includes('view') || $attrs.readOnly;
         }
 
-        $scope.session = new Session($scope.structure);
+        $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
 
@@ -160,54 +160,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.localRemoveHomework = (deletedHomework: Homework) => {
             $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
         };
-
-        // endregion
-
-
-        // region Gestion des visas
-        $scope.hasManageVisaRight = () => {
-            return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageVisa);
-        };
-
-        $scope.visaForm = {};
-
-        $scope.startCreatingVisa = () => {
-            $scope.visaForm.visa = new Visa($scope.structure);
-            $scope.visaForm.visa.session_id = $scope.session.id;
-
-            $scope.visaForm.visa.comment = '';
-            $scope.safeApply();
-        };
-
-        $scope.startUpdatingVisa = async (visa: Visa) => {
-            visa.isBeingUpdated = true;
-            $scope.visaForm.visa = _.clone(visa);
-            $scope.safeApply();
-        };
-
-        $scope.saveVisa = async () => {
-            let { succeed } = $scope.toastHttpCall(await $scope.visaForm.visa.save());
-            if (succeed) {
-                $scope.visaForm.visa = undefined;
-                await $scope.session.sync();
-                $scope.safeApply();
-            }
-        };
-
-        $scope.cancelVisaCreateOrUpdate = async () => {
-            $scope.session.visas.forEach(v => v.isBeingUpdated = false);
-            $scope.visaForm.visa = undefined;
-        };
-
-        $scope.deleteVisa = async (visa: Visa) => {
-            let { succeed } = $scope.toastHttpCall(await visa.delete());
-            if (succeed){
-                await $scope.session.sync();
-                $scope.safeApply();
-            }
-        };
-
-        //endregion
 
 
         async function initData() {

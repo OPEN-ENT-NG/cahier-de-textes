@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+
+<head>
+    <title>Publipostage</title>
+    <style type="text/css">
+        
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h3>{{comment}}</h3>
+
+    <div>
+        {{#sessions}}
+        <div class="session-view">
+            <div class="row margin-bottom-md">
+                <b>{{subject}} &nbsp; {{audience}} &nbsp; {{teacher}}</b>
+            </div>
+            <div class="row card padding-md">
+                <h2 class="remove-margin">
+                    Séance - {{title}}
+                </h2>
+            </div>
+            <div class="row card padding-md margin-bottom-md">
+                <div class="row">
+                    <span class="gray">{{startDisplayDate}} &nbsp; {{startDisplayTime}}- {{endDisplayTime}}</span>
+                </div>
+                <!-- Description-->
+                <div class="read-only-description">{{description}}</div>
+                <!-- Description-->
+                <div class="read-only-description">{{annotation}}</div>
+            </div>
+        </div>
+        {{/sessions}}
+    </div>
+</div>
+
+</body>
+</html>

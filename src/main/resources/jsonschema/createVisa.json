@@ -3,19 +3,15 @@
   "id": "http://jsonschema.net",
   "type": "object",
   "properties": {
-    "comment": {
-      "type": "string"
-    },
     "structure_id": {
       "type": "string"
     },
-    "session_id": {
-      "type": "number"
+    "visas": {
+      "type": "array"
     }
   },
   "required": [
-    "comment",
     "structure_id",
-    "session_id"
+    "visas"
   ]
 }
