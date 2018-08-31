@@ -12,14 +12,19 @@ import fr.wseduc.rs.Post;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
+import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+
+import java.util.Arrays;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 
@@ -27,11 +32,12 @@ public class VisaController extends ControllerHelper {
 
     private VisaService visaService;
     private ExportPDFService exportPDFService;
+    private Storage storage;
 
     public VisaController(VisaServiceImpl visaService, Storage storage) {
         this.visaService = visaService;
         this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, storage, config);
-
+        this.storage = storage;
     }
 
     @SecuredAction(value = WorkflowUtils.VISA_READ, type = ActionType.WORKFLOW)
@@ -52,6 +58,30 @@ public class VisaController extends ControllerHelper {
             JsonArray visas = json.getJsonArray("visas");
             visaService.createVisas(request, visas, user, handler);
         }));
+    }
+
+    @Post("/visa/pdf")
+    @SecuredAction(value ="", type = ActionType.AUTHENTICATED)
+    public void postPDFforVisa(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, user -> {
+            VisaController.this.storage.writeUploadFile(request, uploaded -> {
+                if (!"ok".equals(uploaded.getString("status"))) {
+                    badRequest(request, uploaded.getString("message"));
+                    return;
+                }
+
+                // Vérification du format qui doit-être un pdf
+                JsonObject metadata = uploaded.getJsonObject("metadata");
+                String contentType = metadata.getString("content-type");
+
+                if (Arrays.asList("application/pdf").contains(contentType)) {
+                    Renders.renderJson(request, uploaded);
+                } else {
+                    badRequest(request, "Format de fichier incorrect");
+                }
+
+            });
+        });
     }
 
     @Get("/visa/:id/pdf")

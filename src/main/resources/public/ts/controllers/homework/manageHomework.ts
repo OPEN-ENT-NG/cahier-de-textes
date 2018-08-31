@@ -6,6 +6,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
         console.log('manageHomeworkCtrl');
         $scope.isReadOnly = $scope.isReadOnly || modeIsReadOnly();
+        $scope.isInsideDiary = $attrs.insideDiary;
 
         function modeIsReadOnly() {
             let currentPath = $location.path();

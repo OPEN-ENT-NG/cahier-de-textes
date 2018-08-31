@@ -10,6 +10,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         console.log('manageSessionCtrl');
 
         $scope.isReadOnly = modeIsReadOnly();
+        $scope.isInsideDiary = $attrs.insideDiary;
 
         function modeIsReadOnly() {
             let currentPath = $location.path();

@@ -4,5 +4,5 @@ export const FORMAT = {
     formattedDateTime: 'YYYY-MM-DD HH:mm:ss',
     displayDate: 'DD/MM/YYYY',
     displayTime: 'HH:mm',
-    displayDateTime: 'YYYY-MM-DD HH:mm',
+    displayDateTime: 'DD/MM/YYYY HH:mm',
 };

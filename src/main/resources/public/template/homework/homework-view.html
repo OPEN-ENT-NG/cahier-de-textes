@@ -5,17 +5,19 @@
     <div class="row card padding-md" ng-click="homework.opened = !homework.opened">
         <h2 class="remove-margin">
             <i18n>homework</i18n> -
-            <span>[[homework.type.label]]</span> -
-            <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
-            <span ng-if="homework.attachedToParentSession">Pour cette séance</span>
-            <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
-                [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
-            <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
+            <span>[[homework.type.label]]</span>
+            <span ng-if="!homework.isInsideDiary">-
+                <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
+                <span ng-if="homework.attachedToParentSession">Pour cette séance</span>
+                <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
+                    [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
+            </span>
+            <i class="right-magnet" ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
         <div workflow="diary.setProgressHomework" class="homework-progress inside-homework-view" ng-click="$event.stopPropagation();"
              static-include="/diary/public/template/homework/homework-set-progress.html"></div>
     </div>
-    <div class="row card padding-md" ng-show="homework.opened">
+    <div class="row card padding-md" ng-show="homework.opened || homework.isInsideDiary">
         <!-- Description-->
         <div class="read-only-description" bind-html="homework.description"></div>
     </div>

@@ -12,6 +12,6 @@ public class VisaRead implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.VISA_MANAGE));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.VISA_READ));
     }
 }

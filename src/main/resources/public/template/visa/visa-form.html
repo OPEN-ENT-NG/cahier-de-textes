@@ -3,13 +3,13 @@
         <label for="comment">
             <i18n>visa.manage.comment</i18n>
             :</label>
-        <textarea ng-model="visaForm.comment" id="comment" cols="30" rows="10"></textarea>
+        <textarea class="resize-vertical min-height-textarea"  i18n-placeholder="visa.enter.comment" ng-model="visaForm.comment"
+                  id="comment"></textarea>
     </div>
     <div class="cell twelve">
-        <button class="right-magnet"
-                ng-disabled="!visaFormIsvalid()"
-                ng-click="submitVisaForm()"
-        ><i18n>visa.manage.applyOnCheckedSessions</i18n>
+        <button class="right-magnet" ng-class="{'loading': visaForm.loading}" ng-disabled="!visaFormIsvalid()" ng-click="submitVisaForm()">
+            <i18n>visa.vise.diary</i18n>
+            <span class="loader"></span>
         </button>
     </div>
 </form>

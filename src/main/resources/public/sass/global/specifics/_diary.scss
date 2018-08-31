@@ -107,6 +107,11 @@ i.cahier-textes2::before {
   }
 }
 
+.visa-diary {
+  .read-only-description {
+    max-height: none;
+  }
+}
 .read-only-description {
   min-height: 100px;
   max-height: 500px;
