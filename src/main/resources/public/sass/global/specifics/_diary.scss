@@ -1,7 +1,5 @@
 body {
-  min-width: 1000px; /* Suppose you want minimum width of 1000px */
   width: auto !important; /* Firefox will set width as auto */
-  width: 1000px; /* As IE6 ignores !important it will set width as 1000px; */
 }
 
 .small { font-size: 0.9em; }
@@ -12,16 +10,25 @@ body {
 .pointer {cursor:pointer;}
 .margin10v {margin: 10px 0;}
 .text-left {text-align:left!important;}
+
+.text-right {
+  text-align: right !important;
+}
 .text-center {text-align:center!important;}
 .min-height-textarea {
   min-height: 60px;
 }
 
-.ten.content-next-to-the-sidebar {
-  width: 81.33333%;
-  margin-left: 2%;
+inline-block {
+  display: inline-block;
 }
 
+@media screen and (min-width: 880px) {
+  .ten.content-next-to-the-sidebar {
+    width: 81.33333%;
+    margin-left: 2%;
+  }
+}
 
 
 .sidebar switch {

@@ -1,68 +1,45 @@
 <!-- Session and Course -->
-<div ng-if="pedagogicItem.pedagogicType == TYPE_SESSION || pedagogicItem.pedagogicType == TYPE_COURSE">
-    <div class="list-view-item">
-        <i ng-click="openSession(pedagogicItem.id)">&#xe8aa;</i>
-        <div class="content">
-            <!-- Subject, Audience and Teacher-->
-            <div class="row">
-                <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]]</b> &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]
-            </div>
-            <!-- Type -->
-            <div class="row medium-importance">
-                <i>&#xe910;</i> <i18n>session</i18n> [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
-            </div>
-            <!-- Description -->
-            <div class="row" ng-click="pedagogicItem.opened = !pedagogicItem.opened" ng-if="pedagogicItem.description">
-                <div ng-if="!pedagogicItem.opened" class="description-preview">[[pedagogicItem.plainTextDescription]]</div>
-                <div ng-if="pedagogicItem.opened" class="read-only-description" bind-html="pedagogicItem.description"></div>
-            </div>
-        </div>
-    </div>
-    <div class="padding-sm">
-        <div class="list-view-item card padding-sm" ng-repeat="homework in pedagogicItem.homeworks">
-            <i ng-click="openHomework(homework
-            .id)">&#xe8aa;</i>
-            <div class="content">
-                <!-- Type -->
-                <div class="row medium-importance">
-                    <i>&#xe80d;</i> [[homework.type.label]]
-                </div>
-                <!-- Description -->
-                <div class="row" ng-click="homework.opened = !homework.opened">
-                    <div ng-if="!homework.opened" class="description-preview">[[homework.plainTextDescription]]</div>
-                    <div ng-if="homework.opened" class="read-only-description" bind-html="homework.description"></div>
-                </div>
-            </div>
-            <div class="right-side" workflow="diary.setProgressHomework">
-                <div class="text-center">
-                    <div class="homework-progress" static-include="/diary/public/template/homework/homework-set-progress.html"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<article class="pedagogic-item-article">
+    <div class="row  list-view-item">
 
-<!-- Homework -->
-<div class="list-view-item" ng-if="pedagogicItem.pedagogicType == TYPE_HOMEWORK">
-    <i ng-click="openSession(pedagogicItem.id)">&#xe8aa;</i>
-    <div class="content">
-        <!-- Subject, Audience and Teacher-->
-        <div class="row">
-            <b>[[pedagogicItem.subject.label]] &nbsp; [[pedagogicItem.audience.name]]</b> &nbsp; [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]
+        <div class="eight cell first-content">
+            <!-- Subject, Audience and Teacher-->
+            <span ng-class=" pedagogicItem.description?'hasDescription':''"
+                  ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                        <span class="normal">
+                            [[pedagogicItem.subject.label]] &nbsp;
+                            <span class="small">
+                                [[pedagogicItem.audience.name]] [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]&nbsp;
+                            </span>
+                        </span>
+                <!--<i ng-if="pedagogicItem.description"-->
+                <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
+                    </span>
+            <i ng-click="openSession(pedagogicItem.id)">&#xe8aa;</i>
+            <br/>
+            <em ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
+                [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
+            </em>
+            <span class="small" ng-if="pedagogicItem.room">
+                <i18n>utils.room</i18n> [[pedagogicItem.room]]
+            </span>
+
+
+            <!-- Description -->
+            <div ng-if="pedagogicItem.opened && pedagogicItem.description"
+                 class="row"
+                 ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                <div ng-if="pedagogicItem.opened"
+                     class="read-only-description"
+                     bind-html="pedagogicItem.description"></div>
+            </div>
         </div>
-        <!-- Type -->
-        <div class="row medium-importance">
-            <i>&#xe80d;</i> [[pedagogicItem.type.label]]
-        </div>
-        <!-- Description -->
-        <div class="row" ng-if="pedagogicItem.description" ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-            <div ng-if="!pedagogicItem.opened" class="description-preview">[[homework.plainTextDescription]]</div>
-            <div ng-if="pedagogicItem.opened" class="read-only-description" bind-html="pedagogicItem.description"></div>
-        </div>
+        <div class="sub-content text-right cell four"
+             ng-if="pedagogicItem.homeworks && pedagogicItem.homeworks.length">
+                <div class="list-view-item"
+                     ng-repeat="homework in pedagogicItem.homeworks"
+                     static-include="/diary/public/template/main/list-pedagogic-item-homework.html">
+                </div>
+            </div>
     </div>
-    <div class="right-side" workflow="diary.setProgressHomework">
-        <div class="text-center">
-            <div class="homework-progress"  ng-init="homework = pedagogicItem" static-include="/diary/public/template/homework/homework-set-progress.html"></div>
-        </div>
-    </div>
-</div>
+</article>

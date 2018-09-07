@@ -2,6 +2,14 @@
   margin-top: 72px;
 }
 
+.calendar-current-week, #calendar-view {
+  min-width: 1080px;
+}
+
+calendar-daily-events {
+  min-width: 950px;
+}
+
 .hide-session {
   .schedule-item-content {
     &.session {

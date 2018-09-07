@@ -1,5 +1,5 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, notify, template} from 'entcore';
-import {Homeworks, Homework, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
+import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
 
 import {Utils} from '../utils/utils';
 
@@ -72,6 +72,22 @@ export let main = ng.controller('MainController',
                 }, 50);
             }
         };
+
+        $scope.changeViewMode = function () {
+            $scope.display.listView = !$scope.display.listView
+            if ($scope.display.listView) {
+                $scope.display.sessions = true;
+                $scope.display.homeworks = true
+            }
+        }
+
+        $scope.createHomeworksLoop = function (pedagogicItem) {
+
+            $scope.homeworks = !pedagogicItem.homeworks ? [pedagogicItem] : pedagogicItem.homeworks;
+            console.log("homeworks", $scope.homeworks)
+        }
+
+
 
         async function initializeStructure(){
             $scope.structures = new Structures();
@@ -152,7 +168,16 @@ export let main = ng.controller('MainController',
             // $scope.structure.sessions.all.forEach(s => sessionHomeworks = sessionHomeworks.concat(s.homeworks));
             // $scope.pedagogicItems = $scope.pedagogicItems.concat(sessionHomeworks);
 
-            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
+            //$scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
+
+            $scope.pedagogicItems = _.map($scope.structure.homeworks.all, function (item) {
+                console.log("item instanceof Homework", item instanceof Homework)
+                if (item instanceof Homework)
+                    item["homeworks"] = [item];
+                return item;
+            });
+
+
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
 
             let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
@@ -229,6 +254,7 @@ export let main = ng.controller('MainController',
         };
 
         $scope.setProgress = (homework: Homework) => {
+            homework.isDone = !homework.isDone;
             homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
         };
 

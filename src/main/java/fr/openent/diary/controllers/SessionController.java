@@ -75,7 +75,8 @@ public class SessionController extends ControllerHelper {
 
 
     @Get("/sessions/visa/:startDate/:endDate/:teacherId")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(VisaRead.class)
     public void getSessionsWithVisaField(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");

@@ -8,14 +8,25 @@
         <h5 class="large">
             <i18n>sidebar.display_mode</i18n> :
         </h5>
-        <div class="row" ng-if="hasBothViewMode()">
+        <div class="row margin-bottom-md" ng-if="hasBothViewMode()">
             <label class="cell twelve small">
                 <span class="float-left"><i18n>calendar</i18n></span>
-                <switch ng-model="display.listView" ng-click="display.listView = !display.listView"></switch>
+                <switch ng-model="display.listView" ng-click="changeViewMode()"></switch>
                 <i18n>list</i18n>
             </label>
         </div>
-        <div class="row margin-bottom-md">
+
+        <div class="row margin-bottom-md" ng-if="display.listView">
+            <i18n>period.from</i18n>
+            <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
+                         class="date-picker-sm"></date-picker>
+            <br/>
+            <i18n>to</i18n>
+            <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
+                         class="date-picker-sm"></date-picker>
+        </div>
+
+        <div class="row margin-bottom-md" ng-show="!display.listView">
             <div class="magic-checkbox" ng-click="display.homeworks = !display.homeworks">
                 <label>
                     <input type="checkbox" ng-model="display.homeworks"/>
@@ -24,7 +35,7 @@
                 </label>
             </div>
         </div>
-        <div class="row margin-bottom-md">
+        <div class="row margin-bottom-md" ng-show="!display.listView">
             <div class="magic-checkbox" ng-click="display.sessions = !display.sessions">
                 <label>
                     <input type="checkbox" ng-model="display.sessions"/>
@@ -84,7 +95,7 @@
     </section>
 
     <!-- Legend -->
-    <section class="row">
+    <section class="row" ng-show="!display.listView">
         <div class="row">
             <h5 class="large" ng-click="display.legend = !display.legend">
                 <i18n>legend</i18n>

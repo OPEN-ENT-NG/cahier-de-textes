@@ -24,4 +24,6 @@ src/main/resources/public/template/entcore/
 rev-manifest.json
 package-lock.json
 error.log
-/src/main/resources/public/sass/global/develop/entcore-css-lib/
+src/main/resources/public/sass/global/develop/entcore-css-lib/
+src/main/resources/public/sass/global/develop/output.scss
+src/main/resources/public/sass/global/develop/output.scss.map

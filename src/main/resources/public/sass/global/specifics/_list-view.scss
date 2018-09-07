@@ -24,19 +24,18 @@
 
   i.rack2::before {
     content: "\e80d";
-    font-family:"generic-icons";
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    background-image:none;
+    font-family: "generic-icons";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: none;
   }
-
 
   i.cahier-textes2::before {
     content: "\e86f";
-    font-family:"generic-icons";
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    background-image:none;
+    font-family: "generic-icons";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: none;
   }
 
   .border-black {
@@ -44,7 +43,7 @@
   }
 
   .list-view-item {
-    display:flex;
+    display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
@@ -52,7 +51,7 @@
     > i {
       z-index: 999;
       position: absolute;
-      right:10px;
+      right: 10px;
     }
 
     .content {
@@ -63,36 +62,74 @@
       border-left: 1px solid #eeeeee;
       margin-left: 5px;
       width: 20%;
-      display:flex;
+      display: flex;
       flex-direction: column;
       justify-content: center;
     }
   }
 
+
   .timeline-story {
-    @media screen and (min-width: 800px) {
-      .round {
-        top: 0;
-        margin-left: -9px;
-        margin-top: -11px;
-        border: solid 2px #888888;
+    .list-view-item {
+      display: block;
+    }
+
+    .isDone {
+      color: #46bfaf !important;
+    }
+    .title-lesson {
+      text-transform: lowercase;
+      &:first-letter {
+        text-transform: uppercase;
+      }
+      &::first-letter {
+        text-transform: uppercase;
       }
     }
-    @media screen and (max-width: 800px) {
-      .round {
-        top: 0;
-        margin-left: -8px;
-        margin-top: -11px;
-        border: solid 2px #888888;
-      }
+
+    .hasDescription {
+      cursor: pointer;
     }
+
     .date-field {
-      top: -12px;
+      top: 0;
       line-height: 20px;
       .label {
         text-align: right;
+        text-transform: uppercase;
+        font-size: 13px;
+        font-weight: 500;
+        color: #666;
+        padding-right: 5px;
       }
     }
+
+    .round {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      border-radius: 50%;
+      height: 15px;
+      width: 15px;
+      margin-left: -13px;
+      margin-top: 0;
+      border: solid 3px #F9F9F9;
+      background: #bbb;
+      &.green {
+        background: #46bfaf;
+      }
+    }
+
+    &::before {
+      background-color: #bbb;
+      content: ' ';
+      position: absolute;
+      top: 12px;
+      width: 2px;
+      height: 100%;
+      left: 12.3%;
+    }
+
     .date-label {
       position: relative;
       top: -11px;
@@ -106,15 +143,24 @@
     }
     .event-row .event {
       height: 54px;
-      width: 4%;
+      width: 2% !important;
+      margin-right: 1%;
+    }
+  }
+
+  @media screen and (min-width: 800px) {
+    .timeline-story::before {
+      left: 13.444% !important;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    .timeline-story::before {
+      left: 1% !important;
     }
   }
 
   @media screen and (max-width: $tablette) {
     .timeline-story {
-      &::before{
-        left: 1.8%;
-      }
       .date-label {
         display: block;
       }
@@ -123,9 +169,6 @@
 
   @media screen and (min-width: $tablette) {
     .timeline-story {
-      &::before{
-        left: 14.444%;
-      }
       .date-label {
         display: none;
       }

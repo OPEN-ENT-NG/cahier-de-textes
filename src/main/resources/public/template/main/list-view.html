@@ -1,34 +1,30 @@
 <div class="list-view">
-    <div class="row card padding-md margin-bottom-md">
-        <i18n>period.from</i18n>
-        <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();" class="date-picker-sm"></date-picker>
-        <i18n>to</i18n>
-        <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();" class="date-picker-sm"></date-picker>
-    </div>
-
-    <div class="row">
-        <div class="timeline-story vertical-spacing row">
-            <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:display.homeworks" class="twelve cell event-row">
-                <div class="cell date-field text-right">
+    <div class="timeline-story vertical-spacing row">
+        <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:display.homeworks"
+             class="twelve cell event-row">
+            <div class="cell date-field text-right">
                     <span class="label">
                         [[pedagogicDay.fullDayName]]
                     </span>
-                </div>
-                <div class="event cell">
-                    <div class="round" ng-class="{'[[pedagogicDay.color]]': pedagogicDay.homeworksAreForOneAudienceOnly}"></div>
-                </div>
-                <div>
-
-                </div>
-                <div class="cell ten eleven-mobile">
-                    <div class="date-label">
-                        [[pedagogicDay.fullDayName]] - [[pedagogicDay.nbHomework]] <i18n>homeworks</i18n>
-                    </div>
-                    <article class="padding-sm small" ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems | pedagogicItemFilter: display.sessions:display.homeworks" static-include="/diary/public/template/main/list-pedagogic-item.html">
-                    </article>
-                </div>
+            </div>
+            <div class="event cell">
+                <div class="round"
+                     ng-class="{'[[pedagogicDay.color]]': pedagogicDay.homeworksAreForOneAudienceOnly}"></div>
+            </div>
+            <div>
 
             </div>
+            <div class="cell ten eleven-mobile">
+                <div class="date-label">
+                    [[pedagogicDay.fullDayName]] - [[pedagogicDay.nbHomework]]
+                    <i18n>homeworks</i18n>
+                </div>
+                <div
+                        ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems | pedagogicItemFilter: display.sessions:display.homeworks"
+                        static-include="/diary/public/template/main/list-pedagogic-item.html">
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
