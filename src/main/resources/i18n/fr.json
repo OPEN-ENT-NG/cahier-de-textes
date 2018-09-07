@@ -129,9 +129,9 @@
   "session.manage.create": "Ajouter une séance",
   "session.manage.update": "Modifier une séance",
   "session.manage.config": "Configuration de la séance",
-
-  "session.punctual": "Séance ponctuelle",
-  "session.official": "Séance officielle",
+  "session.punctual": "Séance hors emploi du temps",
+  "session.official": "Séance issue de l'Emploi du temps",
+  "session.officialUpdate": "Séance issue de l'Emploi du temps remplie",
   "session.deleted": "Séance supprimée",
   "session.deleted.error": "Erreur lors de la suppression de la séance",
   "session.created": "Séance créée",
