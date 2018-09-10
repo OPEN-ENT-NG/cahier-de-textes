@@ -1,6 +1,7 @@
 import { ng, _, model, moment, notify, idiom as lang } from 'entcore';
 import {Subjects, Notification, Sessions, Session, Courses} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
+import {Utils} from '../../utils/utils';
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -52,16 +53,23 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 return;
             }
 
-            await $scope.sessions.syncOwnSessions(moment(), moment().add(7, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
-            await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(7, 'day'));
+            await $scope.sessions.syncOwnSessions(moment(), moment().add(15, 'day'), $scope.homework.audience.id, $scope.homework.subject.id);
+            await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(15, 'day'));
+            console.log('Data received', {sessions: $scope.sessions, courses: $scope.courses});
             $scope.sessionsToAttachTo = [];
             $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
             let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) && c.subject.id === $scope.homework.subject.id);
-            let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id)));
+
+            // We only keep the courses without a session attached to.
+            let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
+                && Utils.getFormattedDate(s.startMoment) ===  Utils.getFormattedDate(c.startMoment))));
 
             let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
             $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
 
+            $scope.sessionsToAttachTo.sort(function (a, b) {
+                return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+            });
 
             if($scope.isInsideSessionForm && $scope.$parent.session.id){
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
@@ -83,7 +91,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.homework.attachedToParentSession = false;
             $scope.homework.attachedToDate = false;
 
-            $scope.homework.session = undefined;
+            if($scope.sessionsToAttachTo.length > 0){
+                $scope.homework.session = $scope.sessionsToAttachTo[0];
+            } else {
+                $scope.homework.session = undefined;
+            }
+
             $scope.safeApply();
         };
 
