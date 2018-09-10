@@ -31,11 +31,11 @@
     </div>
     <div ng-if="isReadOnly">
         <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-view.html"></div>
-        <div class="card padding-md" ng-if="session.homeworks.length > 0">
+        <div class="card padding-md margin-bottom-lg" ng-if="session.homeworks.length > 0">
             <h2><i18n>homeworks</i18n></h2>
             <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
                  ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-view.html"></div>
-            <button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
         </div>
+        <button class="float-none cancel" ng-click="goTo('/');"><i18n>back</i18n></button>
     </div>
 </div>
