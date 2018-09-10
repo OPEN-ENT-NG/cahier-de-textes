@@ -1,9 +1,8 @@
-import { angular, model, moment, _, notify } from 'entcore';
+import {_, angular, model, moment, notify} from 'entcore';
 import http from 'axios';
-import { Mix } from 'entcore-toolkit';
-import {USER_TYPES, Structure, Teacher, Teachers, Audiences, Audience, Utils, Subject} from './index';
+import {Mix} from 'entcore-toolkit';
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Session} from "./session";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -119,6 +118,8 @@ export class Courses {
             filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher? teacher.id : model.me.userId}`;
         if (teacher === null && audience !== null)
             filter += `group=${audience.name}`;
+        if (model.me.type === USER_TYPES.student && model.me.classes && model.me.classes.length)
+            filter = `group=${model.me.classes[0]}`;
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
         let { data } = await http.get(uri);
