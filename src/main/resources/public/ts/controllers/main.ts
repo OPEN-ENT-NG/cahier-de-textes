@@ -26,7 +26,9 @@ export let main = ng.controller('MainController',
             endDate: moment().endOf('isoWeek').toDate()
         };
 
-
+        $scope.transformDateToFrenchDate=(date: Date)=>{
+           return moment(date).format("dddd D MMMM YYYY");
+        };
         /**
          * Synchronize a structure.
          */
