@@ -59,24 +59,18 @@
                 </label>
                 <date-picker  class="date-picker-sm" ng-if="!(session.courseId && session.date)"
                               ng-model="session.date" ></date-picker>
-                <!--<date-picker  class="date-picker-sm" ng-disabled="session.courseId && session.date"
-                              ng-model="session.date" ></date-picker>-->
                 <i18n>from2</i18n>
                 <label ng-model="session.startTime" ng-if="session.courseId && session.startTime">
                     [[session.startTime | date:'HH:mm']]
                 </label>
                 <input type="time" ng-if="!(session.courseId && session.startTime)"
                        ng-model="session.startTime" />
-                <!--<input type="time" ng-disabled="session.courseId && session.startTime"
-                ng-model="session.startTime" />-->
                 <i18n>to2</i18n>
                 <label ng-model="session.endTime" ng-if="session.courseId && session.endTime">
                     [[session.endTime | date:'HH:mm']]
                 </label>
                 <input type="time" ng-if="!(session.courseId && session.endTime)"
                        ng-model="session.endTime"/>
-               <!-- <input type="time" ng-disabled="session.courseId && session.endTime"
-                       ng-model="session.endTime" />-->
             </div>
         </div>
         <!-- Room -->
