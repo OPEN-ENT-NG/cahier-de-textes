@@ -26,8 +26,8 @@ export let main = ng.controller('MainController',
             endDate: moment().endOf('isoWeek').toDate()
         };
 
-        $scope.transformDateToFrenchDate=(date: Date)=>{
-           return moment(date).format("dddd D MMMM YYYY");
+        $scope.transformDateToFrenchDate = (date: Date) => {
+            return moment(date).format("dddd D MMMM YYYY");
         };
         /**
          * Synchronize a structure.
@@ -38,7 +38,7 @@ export let main = ng.controller('MainController',
             await $scope.structure.sync();
         };
 
-        function init(){
+        function init() {
             console.log('init');
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
@@ -50,10 +50,10 @@ export let main = ng.controller('MainController',
             }, 100);
         }
 
-        async function placingLoader(exit:number = 0){
-            if(exit < 20 ){
+        async function placingLoader(exit: number = 0) {
+            if (exit < 20) {
                 await $timeout(function () {
-                    if ($('.drawing-zone').length > 0){
+                    if ($('.drawing-zone').length > 0) {
                         $('#loader-calendar').appendTo('.drawing-zone');
                     }
                     else {
@@ -63,10 +63,10 @@ export let main = ng.controller('MainController',
             }
         }
 
-        $scope.fixEditor = async (exit:number = 0) => {
-            if(exit < 100 ){
+        $scope.fixEditor = async (exit: number = 0) => {
+            if (exit < 100) {
                 await $timeout(function () {
-                    if ($('editor').length > 0){
+                    if ($('editor').length > 0) {
                         $('editor').trigger('resize');
                     } else {
                         $scope.fixEditor(++exit);
@@ -90,8 +90,7 @@ export let main = ng.controller('MainController',
         }
 
 
-
-        async function initializeStructure(){
+        async function initializeStructure() {
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.first();
@@ -99,7 +98,7 @@ export let main = ng.controller('MainController',
             $scope.structureInitialized = true;
         }
 
-        async function initializeData(){
+        async function initializeData() {
             $scope.isRefreshingCalendar = true;
 
             await initializeStructure();
@@ -114,7 +113,7 @@ export let main = ng.controller('MainController',
         }
 
         $scope.syncPedagogicItems = async (firstRun?: boolean) => {
-            if(!firstRun && !$scope.pageInitialized){
+            if (!firstRun && !$scope.pageInitialized) {
                 // Prevent from executing twice from the front
                 return;
             }
@@ -163,7 +162,7 @@ export let main = ng.controller('MainController',
         };
 
 
-        $scope.loadPedagogicItems = () =>{
+        $scope.loadPedagogicItems = () => {
             $scope.pedagogicItems = [];
 
             // let sessionHomeworks = [];
@@ -215,14 +214,14 @@ export let main = ng.controller('MainController',
 
                 let nbHomeworkInSession = 0;
                 pedagogicItems.forEach(i => {
-                    if(i.pedagogicType == $scope.TYPE_SESSION){
+                    if (i.pedagogicType == $scope.TYPE_SESSION) {
                         nbHomeworkInSession += i.homeworks.length;
                     }
                 });
 
 
                 let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
-                        return p.audience.id
+                    return p.audience.id
                 });
                 let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
                 let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
@@ -267,12 +266,12 @@ export let main = ng.controller('MainController',
         };
 
         $scope.$watch(() => $scope.calendar.firstDay, () => {
-            if(!$scope.pageInitialized) return;
+            if (!$scope.pageInitialized) return;
 
             let calendarMode = $scope.calendar.increment;
             let momentFirstDay = moment($scope.calendar.firstDay);
 
-            switch(calendarMode){
+            switch (calendarMode) {
                 case 'month':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('month');
                     $scope.filters.endDate = momentFirstDay.clone().endOf('month');
@@ -296,7 +295,7 @@ export let main = ng.controller('MainController',
          * @returns {any}
          */
         $scope.toastHttpCall = (response) => {
-            if(response.succeed) {
+            if (response.succeed) {
                 $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'confirm'));
             } else {
                 $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'error'));
@@ -308,7 +307,6 @@ export let main = ng.controller('MainController',
         $scope.switchStructure = (structure: Structure) => {
             $scope.syncStructure(structure);
         };
-
 
 
         $scope.params = {
@@ -341,11 +339,11 @@ export let main = ng.controller('MainController',
         };
 
         $scope.hasAtLeastOneCreateRight = () => {
-          return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
         };
 
         $scope.hasBothViewMode = () => {
-          return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
         };
 
         $scope.openSession = (sessionId: number) => {
@@ -375,12 +373,12 @@ export let main = ng.controller('MainController',
         $scope.translate = (key: string) => lang.translate(key);
 
         $scope.calendarUpdateItem = (item) => {
-            $scope.params.updateItem =item;
+            $scope.params.updateItem = item;
             $scope.goTo('/create');
         };
 
         $scope.calendarDropItem = (item) => {
-           $scope.calendarUpdateItem(item);
+            $scope.calendarUpdateItem(item);
         };
 
         $scope.calendarResizedItem = (item) => {
@@ -388,17 +386,17 @@ export let main = ng.controller('MainController',
         };
 
         $scope.getDisplayDate = (date: any) => {
-          return Utils.getDisplayDate(date);
+            return Utils.getDisplayDate(date);
         };
 
         route({
             main: async () => {
-                if(!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.structureInitialized) await initializeStructure();
                 init();
                 template.open('main', 'main');
             },
             manageSession: async () => {
-                if(!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'session/session-page');
             },
             manageHomework: async () => {

@@ -15,7 +15,8 @@
                 <!--<i ng-if="pedagogicItem.description"-->
                 <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                     </span>
-            <i ng-click="openSession(pedagogicItem.id)">&#xe8aa;</i>
+            <i ng-if="pedagogicItem.pedagogicType == 2" ng-click="openSession(pedagogicItem.id)">&#xe8aa;</i>
+            <i ng-if="pedagogicItem.pedagogicType == 3" ng-click="openSessionFromCourse(pedagogicItem)">&#xe8aa;</i>
             <br/>
             <em ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
                 [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
