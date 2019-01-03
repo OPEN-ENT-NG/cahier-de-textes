@@ -107,6 +107,7 @@ export let main = ng.controller('MainController',
             $scope.structure.sessions = new Sessions($scope.structure);
 
             await $scope.syncPedagogicItems(true);
+            model.calendar.setDate(moment());
 
             $scope.pageInitialized = true;
             $scope.safeApply();
@@ -286,6 +287,33 @@ export let main = ng.controller('MainController',
                     break;
             }
             $scope.syncPedagogicItems();
+        });
+
+        model.calendar.on('date-change', function() {
+            console.log("'date-change'")
+            console.log(model.calendar.days.all[0]);
+
+            if(!$scope.pageInitialized) return;
+
+            let calendarMode = $scope.calendar.increment;
+            let momentFirstDay = moment($scope.calendar.firstDay);
+
+            switch(calendarMode){
+                case 'month':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('month');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('month');
+                    break;
+                case 'week':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
+                    break;
+                case 'day':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('day');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('day');
+                    break;
+            }
+            $scope.syncPedagogicItems();
+
         });
 
 
