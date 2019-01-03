@@ -5,16 +5,20 @@
         <i18n>visa.manage.button.goTo</i18n>
     </button>
     <section id="display-section" class="cell twelve">
-        <h5 class="large">
+        <h5 class="large cell twelve">
             <i18n>sidebar.display_mode</i18n> :
         </h5>
-        <div class="row margin-bottom-md" ng-if="hasBothViewMode()">
-            <label class="cell twelve small">
-                <span class="float-left"><i18n>calendar</i18n></span>
-                <switch ng-model="display.listView" ng-click="changeViewMode()"></switch>
-                <i18n>list</i18n>
-            </label>
-        </div>
+        <label class="cell twelve text-xl margin-bottom-md" ng-if="hasBothViewMode()">
+            <i tooltip="calendar"
+               class="margin-sm"
+               ng-class="display.listView ? 'opacity-icon' : 'selected'"
+               ng-click="changeViewMode()">&#xe8b3;</i>
+            <i tooltip="list"
+               class="margin-sm"
+               ng-class="display.listView ? 'selected' : 'opacity-icon'"
+               ng-click="changeViewMode()"
+               ng-model="display.listView">&#xe8b8;</i>
+        </label>
 
         <div class="row margin-bottom-md" ng-if="display.listView">
             <i18n>period.from</i18n>
@@ -32,63 +36,63 @@
                     <input type="checkbox" ng-model="display.homeworks"/>
                     <span class="small pointer"><i18n>homeworks</i18n></span>
                 </label>
-        </div>
-        <div class="row margin-bottom-md" ng-show="!display.listView">
-            <div ng-click="display.sessions = !display.sessions">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="display.sessions">
-                    <span class="small pointer"><i18n>session</i18n></span>
-                </label>
             </div>
-        </div>
-        <div ng-if="structures.all.length > 1">
-            <select ng-model="structure"
-                    id="structure-list"
-                    class="twelve"
-                    ng-change="switchStructure(structure)"
-                    ng-options="structure as structure.name for structure in structures.all">
-                <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-            </select>
-        </div>
-
-        <!-- Access Own Data -->
-
-
-        <!-- Access Child Data -->
-        <div workflow="diary.accessChildData">
-            <select ng-model="params.child"
-                    class="twelve"
-                    ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                    ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                <option value="" disabled selected>[[translate('student.choose')]]</option>
-            </select>
-        </div>
-
-        <!-- Access External Data -->
-        <div workflow="diary.accessExternalData">
-            <div class="row display-inline-block">
-                <label class="cell twelve small" for="user-list">
-                    <select ng-model="params.user"
-                            id="user-list"
-                            class="twelve"
-                            ng-change="params.group = null;syncPedagogicItems()"
-                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
-                        <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
-                    </select>
-                </label>
+            <div class="row margin-bottom-md" ng-show="!display.listView">
+                <div ng-click="display.sessions = !display.sessions">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.sessions">
+                        <span class="small pointer"><i18n>session</i18n></span>
+                    </label>
+                </div>
             </div>
-            <div class="row display-inline-block">
-                <label class="cell twelve small" for="user-list">
-                    <select ng-model="params.group"
-                            id="group-list"
-                            class="twelve"
-                            ng-change="params.user = null;syncPedagogicItems()"
-                            ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
-                        <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
-                    </select>
-                </label>
+            <div ng-if="structures.all.length > 1">
+                <select ng-model="structure"
+                        id="structure-list"
+                        class="twelve"
+                        ng-change="switchStructure(structure)"
+                        ng-options="structure as structure.name for structure in structures.all">
+                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+                </select>
             </div>
-        </div>
+
+            <!-- Access Own Data -->
+
+
+            <!-- Access Child Data -->
+            <div workflow="diary.accessChildData">
+                <select ng-model="params.child"
+                        class="twelve"
+                        ng-change="params.group = null;params.user = null;syncPedagogicItems()"
+                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                    <option value="" disabled selected>[[translate('student.choose')]]</option>
+                </select>
+            </div>
+
+            <!-- Access External Data -->
+            <div workflow="diary.accessExternalData">
+                <div class="row display-inline-block">
+                    <label class="cell twelve small" for="user-list">
+                        <select ng-model="params.user"
+                                id="user-list"
+                                class="twelve"
+                                ng-change="params.group = null;syncPedagogicItems()"
+                                ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
+                            <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="row display-inline-block">
+                    <label class="cell twelve small" for="user-list">
+                        <select ng-model="params.group"
+                                id="group-list"
+                                class="twelve"
+                                ng-change="params.user = null;syncPedagogicItems()"
+                                ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
+                            <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
     </section>
 
     <!-- Legend -->
