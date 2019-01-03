@@ -27,19 +27,16 @@
         </div>
 
         <div class="row margin-bottom-md" ng-show="!display.listView">
-            <div class="magic-checkbox" ng-click="display.homeworks = !display.homeworks">
-                <label>
+            <div ng-click="display.homeworks = !display.homeworks">
+                <label class="checkbox">
                     <input type="checkbox" ng-model="display.homeworks"/>
-                    <i class="pointer input-helper"></i>
                     <span class="small pointer"><i18n>homeworks</i18n></span>
                 </label>
-            </div>
         </div>
         <div class="row margin-bottom-md" ng-show="!display.listView">
-            <div class="magic-checkbox" ng-click="display.sessions = !display.sessions">
-                <label>
-                    <input type="checkbox" ng-model="display.sessions"/>
-                    <i class="pointer input-helper"></i>
+            <div ng-click="display.sessions = !display.sessions">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="display.sessions">
                     <span class="small pointer"><i18n>session</i18n></span>
                 </label>
             </div>
