@@ -134,8 +134,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.goTo('/');
             }
         };
-        $scope.deleteHomeworkInTable = (index: number) => {
-            $scope.$parent.localRemoveHomeworkInTable(index);
+        $scope.deleteHomeworkInTable = async (index: number) => {
+            let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
+            if(succeed) {
+                    $scope.$parent.localRemoveHomeworkInTable(index);
+            }
+
         }
 
         $scope.deleteHomework = async () => {
