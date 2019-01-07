@@ -74,7 +74,7 @@
                         </label>
                         <input type="time" class="margin-left-sm margin-right-sm"
                                ng-if="!(session.courseId && session.startTime)"
-                               ng-model="session.startTime"/>
+                               ng-model="session.startTime | date:'HH:mm'"/>
                         <i18n>to2</i18n>
                         <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
                                ng-if="session.courseId && session.endTime">
@@ -82,7 +82,7 @@
                         </label>
                         <input type="time" class="margin-left-sm margin-right-sm"
                                ng-if="!(session.courseId && session.endTime)"
-                               ng-model="session.endTime"/>
+                               ng-model="session.endTime | date:'HH:mm'"/>
                     </div>
                 </div>
             <!-- Description-->

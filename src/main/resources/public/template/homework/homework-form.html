@@ -70,7 +70,8 @@
                         </div>
                     </div>
                     <div class="row margin-bottom-md">
-                        <input ng-if="homework.attachedToDate" ng-model="homework.dueDate" ng-change="syncWorkloadWeek()" type="date">
+                        <date-picker class="date-picker-sm"  ng-if="homework.attachedToDate"
+                                     ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()"></date-picker>
                         <select ng-if="homework.attachedToOtherSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
                                 ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
                         </select>
