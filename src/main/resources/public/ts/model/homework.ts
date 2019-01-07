@@ -1,10 +1,10 @@
-import { model, moment, _, notify, idiom as lang } from 'entcore';
+import {_, idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
-import { Mix } from 'entcore-toolkit';
-import { Structure, Teacher, Utils} from './index';
+import {Mix} from 'entcore-toolkit';
+import {Structure, Teacher, Utils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Session, Sessions} from './session';
+import {Session} from './session';
 
 export class Homework {
     id: string;
@@ -26,14 +26,12 @@ export class Homework {
     startMoment: any;
     endMoment: any;
     isPublished: boolean;
-    attachedToCurrentSession: boolean;
     opened: boolean;
     is_periodic: boolean = false;
     locked: boolean = true;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
-    attachedToParentSession: boolean = false;
-    attachedToOtherSession: boolean = false;
+    attachedToSession: boolean = true;
     attachedToDate: boolean = false;
     isDone: boolean;
 
@@ -150,16 +148,17 @@ export class Homework {
         let validSessionOrDueDate = false;
         if(this.attachedToDate && this.dueDate){
             validSessionOrDueDate = true;
-        } else if ((this.attachedToParentSession || this.attachedToOtherSession) && this.session) {
+        } else if (this.attachedToSession && this.session) {
             validSessionOrDueDate = true;
         }
-
         return this
             && this.structure
             && this.subject
             && this.audience
             && validSessionOrDueDate
-            && this.type;
+            && this.type
+            && this.description
+            && this.description.length;
     };
 }
 

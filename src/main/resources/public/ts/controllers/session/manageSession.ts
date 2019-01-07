@@ -1,7 +1,5 @@
-import { ng, _, model, moment, Behaviours, notify, idiom as lang } from 'entcore';
-import {Subjects, Notification, Course} from '../../model';
-import {Session} from "../../model";
-import {Visa} from '../../model/visa';
+import {_, Behaviours, idiom as lang, model, moment, ng, notify} from 'entcore';
+import {Course, Notification, Session, Subjects} from '../../model';
 import {Homework} from '../../model/homework';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
@@ -41,7 +39,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.openHomework = (homework: Homework) => {
             let oldValue = homework.opened;
             $scope.session.homeworks.forEach(h => h.opened = false);
-            homework.opened = !oldValue;
+            homework.opened = true;
             $scope.safeApply();
         };
 
@@ -124,7 +122,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         h.session.id = sessionSaveResponse.data.id;
                     }
                 }
-
                 h.isPublished = $scope.session.isPublished;
                 let { succeed } = await h.save();
                 if(!succeed) {
@@ -137,14 +134,24 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
 
         // region Gestion des homework
+        $scope.areValidHomeworks = () => {
+            var back = true;
+            if (!$scope.session.homeworks || $scope.session.homeworks.length == 0)
+                return back;
+            $scope.session.homeworks.forEach((item) => {
+                back = back && item.isValidForm();
+            });
+            return back;
+        };
+
         $scope.addHomework = () => {
             let newHomework = new Homework($scope.structure);
             newHomework.opened = true;
             newHomework.audience = $scope.session.audience;
             newHomework.subject = $scope.session.subject;
             newHomework.session = $scope.session;
-
             $scope.session.homeworks.push(newHomework);
+            $scope.openHomework(newHomework);
             $scope.safeApply();
         };
 
@@ -157,7 +164,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.homeworks[foundIndex] = homework;
             }
         };
-
+        $scope.localRemoveHomeworkInTable = (index: number) => {
+            $scope.session.homeworks.splice(index,1);
+        };
         $scope.localRemoveHomework = (deletedHomework: Homework) => {
             $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
         };
