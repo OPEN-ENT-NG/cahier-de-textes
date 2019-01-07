@@ -59,20 +59,20 @@
                         <i18n>choose.another.date.or.session</i18n>
                     </label>
                 </div>
-                <!-- Other Seance or Date-->
-                <div class="row" ng-if="!homework.attachedToParentSession || !isInsideSessionForm">
+                <!-- Other Seance or Date -- ng-if="!homework.attachedToParentSession || !isInsideSessionForm"-->
+                <div class="row" >
                     <div class="row margin-bottom-md">
                         <div class="tab-button" ng-click="attachToDate()" ng-class="{'selected': homework.attachedToDate}">
                             <i18n>date</i18n>
                         </div>
-                        <div class="tab-button" ng-click="attachToOtherSession()" ng-class="{'selected': homework.attachedToOtherSession}">
+                        <div class="tab-button" ng-click="attachToSession()" ng-class="{'selected': homework.attachedToSession}">
                             <i18n>session</i18n>
                         </div>
                     </div>
                     <div class="row margin-bottom-md">
                         <date-picker class="date-picker-sm"  ng-if="homework.attachedToDate"
                                      ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()"></date-picker>
-                        <select ng-if="homework.attachedToOtherSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
+                        <select ng-if="homework.attachedToSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
                                 ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
                         </select>
                     </div>

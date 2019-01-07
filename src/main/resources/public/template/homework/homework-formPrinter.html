@@ -3,7 +3,8 @@
     class="three vertical-align-top text-left">
 
     <div class="row">
-        <input ng-if="homework.attachedToDate" ng-model="homework.dueDate" ng-change="syncWorkloadWeek()" type="date">
+        <date-picker class="date-picker-sm"  ng-if="homework.attachedToDate"
+                     ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()" ></date-picker>
         <select class="twelve" ng-if="!homework.attachedToDate" ng-model="homework.session"
                 ng-change="syncWorkloadWeek()"
                 ng-options="session as ( session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
