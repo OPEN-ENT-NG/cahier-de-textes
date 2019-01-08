@@ -62,8 +62,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             return sessionFormIsValid && homeworkFormsAreValids;
         };
 
-
-
         $scope.publishSession = async () => {
             $scope.saveSession(true);
         };

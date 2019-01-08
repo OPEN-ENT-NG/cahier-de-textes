@@ -2,27 +2,31 @@
     <div id="crumbs">
         <ul classe="remove-padding"><a href="#" ng-click="goTo('/')"><i18n><span><li>diary.title</li></span></i18n></a>&nbsp;>&nbsp;<i18n><span><li>session</li></span></i18n></ul>
     </div>
-
-    <h1>
-        <i18n><span>session.manage.create</span></i18n>
-    </h1>
-    <div class="row twelve-mobile text-right zero-mobile">
-        <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
-            <i18n>utils.cancel</i18n>
-        </button>
-        <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button"
-                ng-click="saveSession()">
-            <i18n>utils.save</i18n>
-        </button>
-        <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
-            <i18n>publish</i18n>
-        </button>
-        <button class="float-none display-inline-block" ng-if="session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
-            <i18n>unpublish</i18n>
-        </button>
+    <div class="row">
+        <div class="six cell twelve-mobile">
+            <h1>
+                <i18n><span>session.manage.create</span></i18n>
+            </h1>
+        </div>
+        <div class="six cell twelve-mobile text-right zero-mobile">
+            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
+                <i18n>utils.cancel</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button"
+                    ng-click="saveSession()">
+                <i18n>utils.save</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="!session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
+                <i18n>publish</i18n>
+            </button>
+            <button class="float-none display-inline-block" ng-if="session.isPublished"
+                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
+                <i18n>unpublish</i18n>
+            </button>
+        </div>
     </div>
+
     <article>
     <div ng-if="!isReadOnly">
              <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
