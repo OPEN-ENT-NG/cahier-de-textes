@@ -148,6 +148,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             newHomework.audience = $scope.session.audience;
             newHomework.subject = $scope.session.subject;
             newHomework.session = $scope.session;
+            newHomework.isNewField = true;
             $scope.session.homeworks.push(newHomework);
             $scope.openHomework(newHomework);
             $scope.safeApply();

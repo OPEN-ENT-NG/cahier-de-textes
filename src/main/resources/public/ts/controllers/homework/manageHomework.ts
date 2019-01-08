@@ -28,7 +28,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
             $scope.safeApply();
         };
-
+        $scope.closeHomework = (homework: Homework)=>{
+            homework.opened = !homework.opened;
+            $scope.safeApply();
+        }
         $scope.syncWorkloadWeek = async () => {
             if($scope.homework.audience) {
                 let dateInWeek = undefined;
@@ -135,11 +138,17 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
         $scope.deleteHomeworkInTable = async (index: number) => {
+            if($scope.homework.isNewField ){
+                $scope.$parent.localRemoveHomeworkInTable(index);
 
-            let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
-            if(succeed) {
-                    $scope.$parent.localRemoveHomeworkInTable(index);
             }
+            else{
+                let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
+                if(succeed) {
+                    $scope.$parent.localRemoveHomeworkInTable(index);
+                }
+            }
+
 
         }
 
