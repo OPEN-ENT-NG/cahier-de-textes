@@ -11,13 +11,13 @@
             <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
                 <i18n>utils.cancel</i18n>
             </button>
-            <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button" ng-click="saveHomework()">
+            <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button" ng-click="saveHomework()" workflow="diary.manageHomework">
                 <i18n>utils.save</i18n>
             </button>
-            <button ng-if="!homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="publishHomework()">
+            <button ng-if="!homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="publishHomework()"  workflow="diary.manageHomework">
                 <i18n>publish</i18n>
             </button>
-            <button ng-if="homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="unpublishHomework()">
+            <button ng-if="homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="unpublishHomework()"  workflow="diary.manageHomework">
                 <i18n>unpublish</i18n>
             </button>
         </div>

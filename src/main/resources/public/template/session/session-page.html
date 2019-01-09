@@ -9,19 +9,19 @@
             </h1>
         </div>
         <div class="six cell twelve-mobile text-right zero-mobile">
-            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
+            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
-            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button"
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession"
                     ng-click="saveSession()">
                 <i18n>utils.save</i18n>
             </button>
             <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
+                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()" workflow="diary.manageSession">
                 <i18n>publish</i18n>
             </button>
             <button class="float-none display-inline-block" ng-if="session.isPublished"
-                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
+                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()" workflow="diary.manageSession">
                 <i18n>unpublish</i18n>
             </button>
         </div>
@@ -69,21 +69,21 @@
     </div>
     </article>
     <div class="row text-right">
-        <button ng-if="session.id" class="left-magnet cancel" type="button" ng-click="deleteSession()">
+        <button ng-if="session.id" class="left-magnet cancel" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
             <i18n>utils.delete</i18n>
         </button>
-        <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()">
+        <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
             <i18n>utils.cancel</i18n>
         </button>
-        <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="saveSession()">
+        <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>
         <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
+                ng-disabled="!isValidForm()" type="button" ng-click="publishSession()" workflow="diary.manageSession">
             <i18n>publish</i18n>
         </button>
         <button class="float-none display-inline-block" ng-if="session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
+                ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()" workflow="diary.manageSession">
             <i18n>unpublish</i18n>
         </button>
     </div>
