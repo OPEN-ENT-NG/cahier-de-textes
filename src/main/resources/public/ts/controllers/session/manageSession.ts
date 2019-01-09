@@ -1,4 +1,4 @@
-import {_, Behaviours, idiom as lang, model, moment, ng, notify} from 'entcore';
+import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {Course, Notification, Session, Subjects} from '../../model';
 import {Homework} from '../../model/homework';
 
@@ -113,11 +113,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function saveSessionHomeworks() {
             let hasSucceed = true;
             $scope.session.homeworks.forEach(async h => {
-                // Creating session from course before saving the homework
                 if(!h.attachedToDate && !h.session.id && h.session.courseId){
-                    let sessionSaveResponse = await h.session.save();
-                    if(sessionSaveResponse.succeed) {
-                        h.session.id = sessionSaveResponse.data.id;
+                    if ($scope.session && $scope.session.id) {
+                        h.session.id = $scope.session.id;
                     }
                 }
                 h.isPublished = $scope.session.isPublished;
@@ -162,9 +160,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             } else {
                 $scope.session.homeworks[foundIndex] = homework;
             }
-        };
-        $scope.localRemoveHomeworkInTable = (index: number) => {
-            $scope.session.homeworks.splice(index,1);
         };
         $scope.localRemoveHomework = (deletedHomework: Homework) => {
             $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);

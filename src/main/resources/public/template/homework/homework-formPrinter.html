@@ -74,7 +74,6 @@
 <!-- Button part -->
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!homework.opened" ng-click="$parent.openHomework(homework)">&#xe858;</i>
-    <i  class="trash right-magnet" ng-click="deleteHomeworkInTable($index)"></i>
-    <i ng-show="homework.opened && !homwork.isNewField" class="icon-upload-cloud" ng-click="closeHomework(homework)"></i>
+    <i class="trash right-magnet" ng-click="deleteHomework()"></i>
 </td>
 
