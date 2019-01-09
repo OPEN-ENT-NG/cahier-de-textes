@@ -1,10 +1,11 @@
 <form>
     <div class="cell twelve">
         <label for="comment">
+
             <i18n>visa.manage.comment</i18n>
             :</label>
         <textarea class="resize-vertical min-height-textarea"  i18n-placeholder="visa.enter.comment" ng-model="visaForm.comment"
-                  id="comment"></textarea>
+                  id="comment" ng-readonly="edittextarea_enabled"></textarea>
     </div>
     <div class="cell twelve">
         <button class="right-magnet" ng-class="{'loading': visaForm.loading}" ng-disabled="!visaFormIsvalid()" ng-click="submitVisaForm()">

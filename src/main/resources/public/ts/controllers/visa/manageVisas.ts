@@ -11,6 +11,7 @@ export let manageVisasCtrl = ng.controller('manageVisasCtrl',
         (window as any).html2canvas = html2canvas;
 
         console.log('manageVisasCtrl');
+        $scope.edittextarea_enabled=true;
         $scope.sessions = new Sessions($scope.structure);
         $scope.openDetails = null;
         $scope.visas_pdfChoice = [];
@@ -22,7 +23,21 @@ export let manageVisasCtrl = ng.controller('manageVisasCtrl',
         $scope.visaForm = {
             comment: null
         };
-
+        $scope.textareEnable= (visaSession:any)=> {
+            if(visaSession && visaSession.selected){
+                $scope.edittextarea_enabled=false;
+            }
+            else{
+                let tmp = true;
+                $scope.mixVisaSessions.forEach((visasession)=>{
+                    if(visasession.selected){
+                        tmp=false;
+                    }
+                } );
+                $scope.edittextarea_enabled=tmp;
+            }
+            $scope.safeApply();
+        }
         $scope.submitVisaForm = async () => {
             if(!$scope.visaFormIsvalid){
                 return;

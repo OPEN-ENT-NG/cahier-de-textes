@@ -6,8 +6,8 @@
                 <label class="checkbox">
                     <input type="checkbox"
                            ng-model="checkbox_selectAll"
-                           ng-change="selectAll(mixVisaSessions)"
-                           ng-disabled="!mixVisaSessions || !mixVisaSessions.length">
+                           ng-change="selectAll(mixVisaSessions);textareEnable()"
+                           ng-disabled="!mixVisaSessions || !mixVisaSessions.length" >
                     <span></span>
                 </label>
             </th>
@@ -38,7 +38,7 @@
         <tr ng-repeat-start="(key, visaSession) in mixVisaSessions">
             <td>
                 <label class="checkbox">
-                    <input type="checkbox" ng-model="visaSession.selected">
+                    <input type="checkbox" ng-model="visaSession.selected" ng-change="textareEnable(visaSession)">
                     <span></span>
                 </label>
             </td>

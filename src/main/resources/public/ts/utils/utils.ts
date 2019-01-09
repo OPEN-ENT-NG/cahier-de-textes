@@ -1,4 +1,4 @@
-import {_, Behaviours, me, model, moment} from 'entcore';
+import {_, Behaviours, model, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 
 export class Utils {
