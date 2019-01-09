@@ -12,12 +12,13 @@
             <i tooltip="calendar"
                class="margin-sm"
                ng-class="display.listView ? 'opacity-icon' : 'selected'"
-               ng-click="changeViewMode()">&#xe8b3;</i>
+               ng-click="changeViewCalendar()">&#xe8b3;</i>
             <i tooltip="list"
                class="margin-sm"
                ng-class="display.listView ? 'selected' : 'opacity-icon'"
-               ng-click="changeViewMode()"
+               ng-click="changeViewList()"
                ng-model="display.listView">&#xe8b8;</i>
+
         </label>
 
         <div class="row margin-bottom-md" ng-if="display.listView">

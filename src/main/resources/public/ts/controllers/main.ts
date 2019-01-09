@@ -73,17 +73,22 @@ export let main = ng.controller('MainController',
             }
         };
 
-        $scope.changeViewMode = function () {
-            $scope.goTo('/list/');
-           /* $scope.display.listView = !$scope.display.listView
+        $scope.changeViewCalendar = function () {
+            $scope.goTo('/');
+            $scope.display.listView = false
             if ($scope.display.listView) {
-
-
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true ;
-            }*/
+            }
         }
-
+        $scope.changeViewList = function () {
+            $scope.goTo('/list');
+            $scope.display.listView = true
+            if ($scope.display.listView) {
+                $scope.display.sessions = true;
+                $scope.display.homeworks = true ;
+            }
+        }
         $scope.createHomeworksLoop = function (pedagogicItem) {
 
             $scope.homeworks = !pedagogicItem.homeworks ? [pedagogicItem] : pedagogicItem.homeworks;
@@ -166,12 +171,6 @@ export let main = ng.controller('MainController',
 
         $scope.loadPedagogicItems = () => {
             $scope.pedagogicItems = [];
-
-            // let sessionHomeworks = [];
-            // $scope.structure.sessions.all.forEach(s => sessionHomeworks = sessionHomeworks.concat(s.homeworks));
-            // $scope.pedagogicItems = $scope.pedagogicItems.concat(sessionHomeworks);
-
-            //$scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
 
             $scope.pedagogicItems = _.map($scope.structure.homeworks.all, function (item) {
                 if (item instanceof Homework)
@@ -400,7 +399,10 @@ export let main = ng.controller('MainController',
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                init();
+                if(model.me.type==="ELEVE" && !$scope.pageInitialized){
+                    $scope.goTo("/list")
+                }else
+                if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
             manageSession: async () => {
@@ -417,7 +419,7 @@ export let main = ng.controller('MainController',
             },
             manageList: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
-                init();
+                if(!$scope.pageInitialized) await  init();
                 template.open('main','list/list-view');
 
             }
