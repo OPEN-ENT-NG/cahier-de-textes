@@ -5,7 +5,6 @@ import {Utils} from '../utils/utils';
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
-        console.log('MainController');
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
@@ -39,7 +38,6 @@ export let main = ng.controller('MainController',
         };
 
         function init() {
-            console.log('init');
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
                 && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
@@ -76,17 +74,19 @@ export let main = ng.controller('MainController',
         };
 
         $scope.changeViewMode = function () {
-            $scope.display.listView = !$scope.display.listView
+            $scope.goTo('/list/');
+           /* $scope.display.listView = !$scope.display.listView
             if ($scope.display.listView) {
+
+
                 $scope.display.sessions = true;
-                $scope.display.homeworks = true
-            }
+                $scope.display.homeworks = true ;
+            }*/
         }
 
         $scope.createHomeworksLoop = function (pedagogicItem) {
 
             $scope.homeworks = !pedagogicItem.homeworks ? [pedagogicItem] : pedagogicItem.homeworks;
-            console.log("homeworks", $scope.homeworks)
         }
 
 
@@ -120,7 +120,6 @@ export let main = ng.controller('MainController',
                 // Prevent from executing twice from the front
                 return;
             }
-            console.log('syncPedagogicItems');
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // Dates incorrectes
                 return;
@@ -175,7 +174,6 @@ export let main = ng.controller('MainController',
             //$scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.homeworks.all);
 
             $scope.pedagogicItems = _.map($scope.structure.homeworks.all, function (item) {
-                console.log("item instanceof Homework", item instanceof Homework)
                 if (item instanceof Homework)
                     item["homeworks"] = [item];
                 return item;
@@ -271,10 +269,8 @@ export let main = ng.controller('MainController',
 
         model.calendar.on('date-change', function() {
 
-            console.log("'date-change'");
-           // if(1==1){return;}
 
-            console.log(model.calendar.days.all[2]);
+            $scope.calendar=model.calendar;
 
             if(!$scope.pageInitialized) return;
 
@@ -374,6 +370,7 @@ export let main = ng.controller('MainController',
         };
 
         $scope.openHomework = (homeworkId: number) => {
+            console.log('open HW');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId);
             } else {
@@ -417,6 +414,12 @@ export let main = ng.controller('MainController',
             manageVisas: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'visa/visa-page');
+            },
+            manageList: async()=>{
+                if(!$scope.structureInitialized) await initializeStructure();
+                init();
+                template.open('main','list/list-view');
+
             }
         });
     }]);

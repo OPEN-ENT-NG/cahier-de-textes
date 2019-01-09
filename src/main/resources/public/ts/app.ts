@@ -44,6 +44,9 @@ routes.define(($routeProvider) => {
         .when('/visas', {
             action: 'manageVisas'
         })
+        .when('/list',{
+            action : 'manageList'
+        })
         .otherwise({
             redirectTo: '/'
         });
