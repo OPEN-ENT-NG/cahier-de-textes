@@ -131,7 +131,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.unpublishHomework = async () => {
             let { succeed } = $scope.toastHttpCall(await $scope.homework.unpublish());
             if (succeed && !$scope.isInsideSessionForm) {
-                $scope.goTo('/');
+                window.history.back();
             }
         };
 
@@ -144,7 +144,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if($scope.isInsideSessionForm){
                         $scope.$parent.localRemoveHomework($scope.homework);
                     } else {
-                        $scope.goTo('/');
+                        window.history.back();
                     }
                 }
             }
@@ -184,7 +184,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
 
                 $scope.safeApply();
-                if(!$scope.isInsideSessionForm) $scope.goTo('/');
+                if(!$scope.isInsideSessionForm) window.history.back();
+
             }
         };
 
@@ -224,6 +225,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             $scope.safeApply();
             $scope.fixEditor();
+        }
+
+        $scope.back = ()=>{
+            window.history.back();
         }
 
         await initData();

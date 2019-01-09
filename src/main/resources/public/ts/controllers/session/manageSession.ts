@@ -184,6 +184,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.fixEditor();
         }
 
+        $scope.back = () =>{
+            window.history.back();
+        }
+
         await initData();
     }]
 );

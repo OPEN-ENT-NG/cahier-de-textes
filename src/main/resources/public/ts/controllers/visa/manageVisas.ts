@@ -210,6 +210,9 @@ export let manageVisasCtrl = ng.controller('manageVisasCtrl',
                 $scope.visaForm.comment.length;
 
         };
+        $scope.back = () =>{
+            window.history.back();
+        }
 
         $scope.safeApply();
     }]);
