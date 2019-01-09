@@ -104,7 +104,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.cancelCreation = async () => {
             if (!$scope.isInsideSessionForm) {
-                $scope.goTo('/');
+                window.history.back();
             } else {
                 $scope.homework.opened = false;
 

@@ -21,7 +21,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
 
         $scope.cancelCreation = () => {
-            $scope.goTo('/');
+            window.history.back();
             delete $scope.course;
         };
 
@@ -68,12 +68,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.deleteSession = async () => {
             $scope.toastHttpCall(await $scope.session.delete());
-            $scope.goTo('/');
+            window.history.back();
         };
 
         $scope.unpublishSession = async () => {
             $scope.toastHttpCall(await $scope.session.unpublish());
-            $scope.goTo('/');
+            window.history.back();
         };
 
         $scope.saveSession = async (publish = false) => {
@@ -107,7 +107,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             $scope.safeApply();
-            $scope.goTo('/');
+            window.history.back();
         };
 
         async function saveSessionHomeworks() {
