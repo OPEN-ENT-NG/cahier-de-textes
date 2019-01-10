@@ -120,8 +120,8 @@ i.cahier-textes2::before {
   }
 }
 .read-only-description {
-  min-height: 100px;
-  max-height: 500px;
+  min-height: max-content;
+  max-height: max-content;
   overflow-y: auto;
   height: auto;
   padding: 10px;
