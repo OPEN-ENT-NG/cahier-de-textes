@@ -1,3 +1,3 @@
-<div ng-if="homework.isDone"><i18n>done</i18n> <i style="color: green">&#xe871;</i></div>
+<div ng-if="homework.isDone" ng-click="homework.isDone=!homework.isDone"><i18n>done</i18n> <i style="color: green">&#xe871;</i></div>
 <div ng-if="!homework.isDone"><i18n>todo</i18n> <i style="color: red">&#xe866;</i></div>
-<switch class="display-inline-block" ng-model="homework.isDone" ng-change="setProgress(homework)"></switch>
+<switch ng-if="!homework.isDone" class="display-inline-block" ng-model="homework.isDone" ></switch>
