@@ -1,14 +1,17 @@
 <div ng-controller="manageSessionCtrl">
     <div id="crumbs">
-        <ul classe="remove-padding"><a href="#" ng-click="goTo('/')"><i18n><span><li>diary.title</li></span></i18n></a>&nbsp;>&nbsp;<i18n><span><li>session</li></span></i18n></ul>
+        <ul classe="remove-padding"><a href="#" ng-click="back()">
+            <i18n><span><li>diary.title</li></span></i18n>
+        </a>&nbsp;>&nbsp;<i18n><span><li>session</li></span></i18n>
+        </ul>
     </div>
-    <div class="row">
+    <div class="row" ng-if="!isReadOnly">
         <div class="six cell twelve-mobile">
             <h1>
                 <i18n><span>session.manage.create</span></i18n>
             </h1>
         </div>
-        <div class="six cell twelve-mobile text-right zero-mobile">
+        <div class="six cell zero-mobile text-right zero-mobile">
             <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
@@ -27,36 +30,9 @@
         </div>
     </div>
 
-    <article>
-    <div ng-if="!isReadOnly">
-             <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
-        <div class="padding-md margin-bottom-md">
-            <h2><i18n>homeworks</i18n></h2>
-            <article class="responsive-table row">
-                <table class="twelve">
-                    <thead>
-                        <tr>
-                            <td class="one text-left "><i18n>deadline</i18n></td>
-                            <td class="one text-left"><i18n>homework.manage.type</i18n></td>
-                            <td class="nine text-left"><i18n>settings.exclusion.description</i18n></td>
-                            <td class="one">&nbsp;</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="homework in session.homeworks track by $index"
-                        inside-session-form="true"
-                        class="ng-scope"
-                        ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-formPrinter.html"></tr>
-                    </tbody>
-                </table>
-                <button class="float-none display-inline-block margin-top-md"
-                        ng-disabled="!areValidHomeworks()"
-                        ng-click="addHomework()">
-                    <i18n>homework.manage.create</i18n>
-                </button>
-            </article>
 
-        </div>
+    <div ng-if="!isReadOnly">
+        <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
     </div>
     <div ng-if="isReadOnly">
         <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-view.html"></div>
@@ -67,7 +43,7 @@
         </div>
         <button class="float-none cancel" ng-click="back();"><i18n>back</i18n></button>
     </div>
-    </article>
+
     <div class="row text-right">
         <button ng-if="session.id" class="left-magnet cancel" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
             <i18n>utils.delete</i18n>

@@ -1,6 +1,4 @@
-import {_, Behaviours, idiom as lang, model, moment, ng, notify} from 'entcore';
-import {Courses, Notification, Session, Sessions, Subjects} from '../../model';
-import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
+import {Behaviours, model, ng} from 'entcore';
 import {Utils} from '../../utils/utils';
 
 export let manageListCtrl = ng.controller('manageListController',
@@ -8,7 +6,9 @@ export let manageListCtrl = ng.controller('manageListController',
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
-        $scope.homeworks.syncHomeworks();
+        if ($scope.homeworks) {
+            $scope.homeworks.syncHomeworks();
+        }
         $scope.openHomework = (homeworkId: number) => {
             console.log('open HW list');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {

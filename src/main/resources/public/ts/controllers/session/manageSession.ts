@@ -9,16 +9,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
+        $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
+        $scope.session.opened = false;
+        $scope.subjects = new Subjects();
+        $scope.session.teacher = {id: model.me.userId};
+
 
         function modeIsReadOnly() {
             let currentPath = $location.path();
             return currentPath.includes('view') || $attrs.readOnly;
         }
-
-        $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
-        $scope.subjects = new Subjects();
-        $scope.session.teacher = {id: model.me.userId};
-
 
         $scope.cancelCreation = () => {
             window.history.back();
@@ -173,13 +173,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             if ($routeParams.id) {
                 $scope.session.id = $routeParams.id;
                 await $scope.session.sync();
+                $scope.session.opened = true;
             }
             else if($routeParams.courseId && $routeParams.date){
                 let course = new Course($scope.structure, $routeParams.courseId);
                 await course.sync($routeParams.date, $routeParams.date);
                 $scope.session.setFromCourse(course);
+                $scope.session.opened = true;
             }
-            $scope.session.opened = true;
             $scope.safeApply();
             $scope.fixEditor();
         }

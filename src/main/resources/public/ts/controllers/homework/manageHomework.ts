@@ -50,6 +50,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
                 return;
             }
+            if (!$scope.homework.opened && !$scope.isInsideSessionForm) {
+                $scope.homework.opened = true;
+            }
 
             Promise.all([
                 await $scope.sessions.syncOwnSessions(moment(), moment().add(15, 'day'), $scope.homework.audience.id, $scope.homework.subject.id),
@@ -90,6 +93,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
             } else {
                 $scope.homework.session = undefined;
+                $scope.attachToDate();
             }
             $scope.safeApply();
         };
