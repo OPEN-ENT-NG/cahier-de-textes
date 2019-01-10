@@ -1,4 +1,4 @@
-import {_, Behaviours, model, moment, ng, notify} from 'entcore';
+import {_, model, moment, ng} from 'entcore';
 import {Sessions, Visa, Visas} from '../../model/';
 import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
@@ -10,7 +10,6 @@ export let manageVisasCtrl = ng.controller('manageVisasCtrl',
         (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
 
-        console.log('manageVisasCtrl');
         $scope.edittextarea_enabled=true;
         $scope.sessions = new Sessions($scope.structure);
         $scope.openDetails = null;

@@ -10,7 +10,6 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.homeworks.syncHomeworks();
         }
         $scope.openHomework = (homeworkId: number) => {
-            console.log('open HW list');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
             } else {
