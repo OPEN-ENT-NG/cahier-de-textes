@@ -211,5 +211,7 @@
   "visa.manage.button.goTo": "Gestions des visas",
   "back": "Retour",
   "inspector.no.habilitation": "Aucune habilitation",
-  "inspector.add.habilitation": "Ajouter une habilitation"
+  "inspector.add.habilitation": "Ajouter une habilitation",
+  "homework.done.notification": "Devoir fait",
+  "homework.todo.notification": "Devoir à faire"
 }

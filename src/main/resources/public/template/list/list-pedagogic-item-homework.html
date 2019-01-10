@@ -1,17 +1,23 @@
-<div class="row inline-block medium-importance">
+<div class="row inline-block medium-importance" >
     <span class="homeworkDone"
           ng-class="{isDone: homework.isDone}"
-          ng-click="setProgress(homework)"
+          ng-click="setHomeworkProgress(homework)"
+
           workflow="diary.setProgressHomework">
-        <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]">
-            &#xe871;</i>
+
+
+        <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"
+            ng-if="homework.isDone" style="color: green;">&#xe871;</i>
+        <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]" ng-if="!homework.isDone" >&#xe871;</i>
+
+
     </span>
     <span ng-class=" homework.description?'hasDescription':''"
           ng-click="homework.opened = !homework.opened">
                             [[homework.type.label]]&nbsp;
         <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
-    <i ng-click="openHomework(homework.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
+    <i ng-click="openHomework(homework.id)">&#xe8aa;</i>
 </div>
 <!-- Description -->
 <div class="row" ng-click="homework.opened = !homework.opened">

@@ -8,12 +8,13 @@ export let manageListCtrl = ng.controller('manageListController',
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
+        $scope.homeworks.syncHomeworks();
         $scope.openHomework = (homeworkId: number) => {
             console.log('open HW list');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
             } else {
-                $scope.goTo('/homework/view/' + homeworkId);
+                $scope.goTo('/homework/view/' + homeworkId );
             }
         };
         $scope.openSession = (sessionId: number) => {
@@ -40,6 +41,8 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.display.homeworks = true ;
             }
         }
+
+
         $scope.changeViewList = function () {
             $scope.goTo('/list');
             $scope.display.listView = true

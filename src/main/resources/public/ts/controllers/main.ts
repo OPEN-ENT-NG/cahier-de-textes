@@ -368,6 +368,15 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         };
 
+        $scope.setHomeworkProgress =(homework)=>{
+            if(!homework.isDone)
+                $scope.notifications.push(new Notification('homework.done.notification', 'info'));
+            else
+                $scope.notifications.push(new Notification('homework.todo.notification', 'info'));
+
+            $scope.setProgress(homework);
+        }
+
         $scope.openHomework = (homeworkId: number) => {
             console.log('open HW');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
