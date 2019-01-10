@@ -94,6 +94,7 @@ export class Homework {
     }
 
     async setProgress (stateId: number) {
+
         let state = stateId == Homework.HOMEWORK_STATE_DONE ? 'done' : 'todo';
         let response = await http.post(`/diary/homework/progress/${this.id}/${state}`);
         return Utils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
