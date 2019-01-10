@@ -1,9 +1,41 @@
 <div ng-controller="manageHomeworkCtrl">
-    <h1><a href="#" ng-click="goTo('/')"><i18n>diary.title</i18n></a>&nbsp;>&nbsp;<i18n>homework</i18n></h1>
-
+    <div id="crumbs">
+        <ul classe="remove-padding"><a href="#" ng-click="back()">
+            <i18n><span><li>diary.title</li></span></i18n>
+        </a>&nbsp;>&nbsp;<i18n><span><li>homework</li></span></i18n>
+        </ul>
+    </div>
     <div ng-if="!isReadOnly">
+        <div class="row">
+            <div class="six cell twelve-mobile">
+                <h1>
+                    <i18n><span>homework.manage.create</span></i18n>
+                </h1>
+            </div>
+            <div class="six cell zero-mobile text-right zero-mobile">
+                <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
+                    <i18n>utils.cancel</i18n>
+                </button>
+                <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button"
+                        ng-click="saveHomework()">
+                    <i18n>utils.save</i18n>
+                </button>
+                <button ng-if="!homework.isPublished" class="float-none display-inline-block"
+                        ng-disabled="!isValidForm()"
+                        type="button" ng-click="publishHomework()">
+                    <i18n>publish</i18n>
+                </button>
+                <button ng-if="homework.isPublished" class="float-none display-inline-block"
+                        ng-disabled="!isValidForm()"
+                        type="button" ng-click="unpublishHomework()">
+                    <i18n>unpublish</i18n>
+                </button>
+            </div>
+        </div>
+
         <div class="row margin-bottom-md"
              static-include="/diary/public/template/homework/homework-form.html"></div>
+
         <div class="row text-right">
             <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework($index)">
                 <i18n>utils.delete</i18n>

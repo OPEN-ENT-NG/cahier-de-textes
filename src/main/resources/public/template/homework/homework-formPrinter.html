@@ -19,7 +19,7 @@
                     </span>
     </div>
     <div class="margin-bottom-md">
-        <label>
+        <label ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0">
             <input type="radio"
                    ng-click="attachToSession()"
                    ng-checked="homework.attachedToSession"
