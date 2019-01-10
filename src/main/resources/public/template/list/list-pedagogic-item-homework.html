@@ -3,14 +3,15 @@
           ng-class="{isDone: homework.isDone}"
           ng-click="setProgress(homework)"
           workflow="diary.setProgressHomework">
-        <i>&#xe871;</i>
+        <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]">
+            &#xe871;</i>
     </span>
     <span ng-class=" homework.description?'hasDescription':''"
           ng-click="homework.opened = !homework.opened">
                             [[homework.type.label]]&nbsp;
         <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
-    <i ng-click="openHomework(homework.id)">&#xe8aa;</i>
+    <i ng-click="openHomework(homework.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
 </div>
 <!-- Description -->
 <div class="row" ng-click="homework.opened = !homework.opened">
