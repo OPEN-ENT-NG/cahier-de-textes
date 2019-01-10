@@ -1,4 +1,4 @@
-import { ng, template, notify, moment, _, Behaviours, model, angular } from 'entcore';
+import {Behaviours, model, moment, ng} from 'entcore';
 
 export let calendarDailyEventsController = ng.controller('CalendarDailyEventsController',
     ['$scope', 'route', '$location', '$timeout', async function ($scope, route, $location, $timeout) {
@@ -181,7 +181,7 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
 
             // max homeworks per day displayed used for drag and drop directive
             // to detect dropped day of the week area
-         //   model.homeworksPerDayDisplayed = homeworksPerDayDisplayed;
+            //model.homeworksPerDayDisplayed = homeworksPerDayDisplayed;
 
             return homeworksPerDayDisplayed * HW_HEIGHT;
         };
