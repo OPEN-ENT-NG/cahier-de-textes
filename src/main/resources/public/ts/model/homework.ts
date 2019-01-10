@@ -1,4 +1,4 @@
-import {_, idiom as lang, model, moment, notify} from 'entcore';
+import {idiom as lang, model, moment} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Structure, Teacher, Utils} from './index';
@@ -212,7 +212,6 @@ export class Homeworks {
     }
 
     async syncHomeworks (url: string){
-        console.log('syncHomeworks');
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));

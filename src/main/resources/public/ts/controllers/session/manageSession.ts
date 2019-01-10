@@ -5,7 +5,6 @@ import {Homework} from '../../model/homework';
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        console.log('manageSessionCtrl');
 
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;

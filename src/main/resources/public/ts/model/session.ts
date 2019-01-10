@@ -1,4 +1,4 @@
-import {_, model, moment, notify} from 'entcore';
+import {_, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, Utils} from './index';
@@ -265,7 +265,6 @@ export class Sessions {
                     ).format("DD-MM-YYYY HH:mm")
             }
         });
-        console.log('final', final);
         return final;
     }
 
@@ -323,7 +322,6 @@ export class Sessions {
     }
 
     async syncSessions (url: string){
-        console.log('syncSessions');
         let { data } = await http.get(url);
 
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));

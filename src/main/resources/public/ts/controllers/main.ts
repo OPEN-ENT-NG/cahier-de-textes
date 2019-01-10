@@ -1,4 +1,4 @@
-import {_, angular, Behaviours, idiom as lang, model, moment, ng, notify, template} from 'entcore';
+import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
 
 import {Utils} from '../utils/utils';
@@ -378,7 +378,6 @@ export let main = ng.controller('MainController',
         }
 
         $scope.openHomework = (homeworkId: number) => {
-            console.log('open HW');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId);
             } else {
