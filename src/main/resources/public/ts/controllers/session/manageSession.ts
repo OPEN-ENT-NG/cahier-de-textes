@@ -161,8 +161,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.homeworks[foundIndex] = homework;
             }
         };
-        $scope.localRemoveHomework = (deletedHomework: Homework) => {
-            $scope.session.homeworks = $scope.session.homeworks.filter(item =>  item.id !== deletedHomework.id);
+        $scope.localRemoveHomework = (indexToDeletedeletedHomework) => {
+            $scope.session.homeworks.splice(indexToDeletedeletedHomework, 1);
         };
 
 
