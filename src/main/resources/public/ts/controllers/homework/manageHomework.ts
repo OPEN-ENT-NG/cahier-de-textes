@@ -109,7 +109,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 // Si c'est insideSessionForm et create, on retire le homework de la session
                 if(!$scope.homework.id){
-                    $scope.$parent.localRemoveHomework($scope.$parent.homework);
+                    $scope.$parent.localRemoveHomework($scope.$parent.homework.indexof($scope.homework));
                 } else {
                     // Si c'est insideSessionForm et update, on resync le homework
                     await $scope.homework.sync();
@@ -134,14 +134,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
-        $scope.deleteHomework = async () => {
+        $scope.deleteHomework = async (index: any) => {
             if($scope.isInsideSessionForm && !$scope.homework.id){
-                $scope.$parent.localRemoveHomework($scope.$parent.homework);
+                $scope.$parent.localRemoveHomework(index);
             } else {
                 let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
                 if(succeed) {
                     if($scope.isInsideSessionForm){
-                        $scope.$parent.localRemoveHomework($scope.homework);
+                        $scope.$parent.localRemoveHomework(index);
                     } else {
                         window.history.back();
                     }
@@ -196,6 +196,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             if($attrs.insideSessionForm){
                 $scope.homework = $scope.$parent.homework;
+                $scope.isInsideSessionForm = true;
                 if($scope.homework.id){
                     await $scope.homework.sync();
                 }

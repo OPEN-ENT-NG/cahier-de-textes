@@ -5,7 +5,7 @@
         <div class="row margin-bottom-md"
              static-include="/diary/public/template/homework/homework-form.html"></div>
         <div class="row text-right">
-            <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework()">
+            <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework($index)">
                 <i18n>utils.delete</i18n>
             </button>
             <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
