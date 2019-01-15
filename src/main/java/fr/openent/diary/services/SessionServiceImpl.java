@@ -2,7 +2,6 @@ package fr.openent.diary.services;
 
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.sql.Sql;
@@ -157,31 +156,6 @@ public class SessionServiceImpl implements SessionService {
                 JsonArray arraySession = result.right().getValue();
                 for (int i = 0; i < arraySession.size(); i++) {
                     cleanSession(arraySession.getJsonObject(i));
-
-                    // Cleaning homework from null and duplicate todo: Fix query to directly get the good data
-                    JsonObject session = arraySession.getJsonObject(i);
-                    JsonArray homeworks = session.getJsonArray("homeworks");
-                    JsonArray uniqueHomeworks = new JsonArray();
-                    for (int j = 0; j < homeworks.size(); j++) {
-                        JsonObject homework = homeworks.getJsonObject(j);
-                        if(homework != null){
-                            boolean isUniqueHomework = true;
-                            for (int k = 0; k < uniqueHomeworks.size(); k++) {
-                                JsonObject uniqueHomework = homeworks.getJsonObject(j);
-                                if(uniqueHomework.getInteger("id").equals(homework.getInteger("id"))){
-                                    isUniqueHomework = false;
-                                    break;
-                                }
-                            }
-
-                            if(isUniqueHomework) {
-                                uniqueHomeworks.add(homework);
-                            }
-                        }
-                    }
-
-                    session.put("homeworks", uniqueHomeworks);
-
                 }
 
                 handler.handle(new Either.Right<>(arraySession));
