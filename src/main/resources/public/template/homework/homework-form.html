@@ -1,12 +1,14 @@
 <div class="homework-form">
     <div class="row" ng-if="!isInsideSessionForm">
         <div class="six cell twelve-mobile">
-            <select ng-change="syncSessionsAndCourses();syncWorkloadWeek();homework.session = undefined;"
+            <select ng-change="syncSessionsAndCourses();syncWorkloadWeek();homework.session = undefined;
+                            disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
                     ng-model="homework.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
                 <option value="" disabled selected>[[translate('select.audience')]]</option>
             </select>
-            <select ng-change="syncSessionsAndCourses();homework.session = undefined;"
+            <select ng-change="syncSessionsAndCourses();homework.session = undefined;
+                        disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
                     ng-model="homework.subject"
                     ng-options="subject.label for subject in subjects.all track by subject.id">
                 <option value="" disabled selected>[[translate('select.subject')]]</option>
@@ -17,7 +19,8 @@
             </span>
         </div>
     </div>
-    <div class="row card padding-md" ng-click="openHomework(homework)">
+    <fieldset  class="row card padding-md border-widht-fieldset" ng-click="openHomework(homework)"
+               ng-disabled="isSelectSubjectAndAudienceHomework">
         <h2 class="remove-margin">
             <span ng-if="!isInsideSessionForm"><i18n>homework</i18n> -</span>
             <span>[[homework.type.label]]</span> -
@@ -27,7 +30,7 @@
                 [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
             <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
-    </div>
+    </fieldset>
     <div class="row card padding-md" ng-show="homework.opened">
         <!-- Deadline -->
         <div class="row">
@@ -48,14 +51,14 @@
                 <!-- Other Seance or Date -- ng-if="!homework.attachedToParentSession || !isInsideSessionForm"-->
                 <div class="row" >
                     <div class="row margin-bottom-md">
-                        <label ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0">
+                        <label ><!--ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0"-->
                             <input type="radio"
                                    ng-click="attachToSession()"
                                    ng-checked="homework.attachedToSession"
                                    value="true">
                             <span class="no-style ng-scope"><i18n>session</i18n></span>
                         </label><br>
-                        <label>
+                        <label  >
                             <input type="radio"
                                    ng-click="attachToDate()"
                                    ng-checked="homework.attachedToDate"

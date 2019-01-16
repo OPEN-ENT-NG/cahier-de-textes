@@ -12,8 +12,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.session.opened = false;
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
+        $scope.isSelectSubjectAndAudienceSession=true;
 
-
+        $scope.disableFieldSetSubjectAndAudienceSession= (audience:any,subject:any)=>{
+            if(!audience || !subject){
+                $scope.isSelectSubjectAndAudienceSession=true;
+            }else{
+                $scope.isSelectSubjectAndAudienceSession=false;
+                $scope.session.opened = ! $scope.session.opened;
+            }
+        }
         function modeIsReadOnly() {
             let currentPath = $location.path();
             return currentPath.includes('view') || $attrs.readOnly;

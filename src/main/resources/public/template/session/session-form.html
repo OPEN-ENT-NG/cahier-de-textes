@@ -2,11 +2,13 @@
     <div class="row">
         <div class="six cell twelve-mobile">
             <select ng-model="session.audience"
+                    ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
                     ng-disabled="session.courseId && session.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
                 <option value="" disabled selected>[[translate('select.audience')]]</option>
             </select>
             <select required ng-model="session.subject"
+                    ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
                     ng-disabled="session.courseId && session.subject"
                     ng-options="subject.label for subject in subjects.all track by subject.id">
                 <option value="" disabled selected>[[translate('select.subject')]]</option>
@@ -15,7 +17,8 @@
         </div>
     </div>
 
-    <div class="row card padding-md" ng-click="session.opened = !session.opened">
+    <fieldset class="row card padding-md border-widht-fieldset" ng-click="session.opened = !session.opened"
+              ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
         <h2 class="remove-margin">
             <i18n>session</i18n>
             <span class="margin-left-md">
@@ -24,7 +27,7 @@
                 </span>
             <i class="right-magnet" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>
-    </div>
+    </fieldset>
 
     <div class="row card padding-md" ng-show="session.opened">
         <!-- Title -->
@@ -37,7 +40,7 @@
         </label>
         <div class="one"></div>
         <!-- Room -->
-        <label class="two cell horizontal-spacing twelve-mobile">
+        <label class="three cell horizontal-spacing twelve-mobile">
             <div class="twelve">
                 <i18n>utils.room</i18n>
             </div>
@@ -62,12 +65,12 @@
                 <i18n>from2</i18n>
                 <label ng-model="session.startTime"
                        class="margin-left-sm margin-right-sm"
-                       ng-if="session.courseId && session.startTime">
+                       ng-if="session.courseId && session.startTime"  >
                     [[session.startTime | date:'HH:mm']]
                 </label>
                 <input type="time" class="margin-left-sm margin-right-sm"
                        ng-if="!(session.courseId && session.startTime)"
-                       ng-model="session.startTime "/>
+                       ng-model="session.startTime"/>
                 <i18n>to2</i18n>
                 <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
                        ng-if="session.courseId && session.endTime">

@@ -18,7 +18,15 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes();
         $scope.isInsideSessionForm = false;
+        $scope.isSelectSubjectAndAudienceHomework=true;
 
+        $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=>{
+                if(!audience || !subject){
+                    $scope.isSelectSubjectAndAudienceHomework=true;
+                }else{
+                    $scope.isSelectSubjectAndAudienceHomework=false;
+                }
+        }
         $scope.openHomework = (homework: Homework) => {
             if($scope.isInsideSessionForm){
                 $scope.$parent.openHomework(homework);
