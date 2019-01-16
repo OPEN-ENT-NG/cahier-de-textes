@@ -8,6 +8,10 @@ CREATE TABLE diary.homework_type (
   PRIMARY KEY (id)
 );
 
+INSERT INTO diary.homework_type(label, is_default)
+  VALUES ('Exercice Maison', true),
+			    ('Devoir à rendre', false);
+
 CREATE TABLE diary.homework (
   id bigserial,
   subject_id    character varying(37) NOT NULL,
