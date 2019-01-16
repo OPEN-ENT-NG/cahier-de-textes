@@ -5,6 +5,12 @@
         <i18n>visa.manage.button.goTo</i18n>
     </button>
     <section id="display-section" class="cell twelve">
+        <!-- Legend -->
+        <span class="float-right">
+           <i class="help"
+              tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+        </span>
+        <!----->
         <h5 class="large cell twelve">
             <i18n>sidebar.display_mode</i18n> :
         </h5>
@@ -58,7 +64,6 @@
 
             <!-- Access Own Data -->
 
-
             <!-- Access Child Data -->
             <div workflow="diary.accessChildData">
                 <select ng-model="params.child"
@@ -94,41 +99,6 @@
                     </label>
                 </div>
             </div>
-    </section>
-
-    <!-- Legend -->
-    <section class="row" ng-show="!display.listView">
-        <div class="row">
-            <h5 class="large" ng-click="display.legend = !display.legend">
-                <i18n>legend</i18n>
-                <i ng-class="display.legend ? 'up-open' : 'down-open'" class="right-magnet"></i>
-            </h5>
-        </div>
-        <div class="row small" ng-show="display.legend">
-            <div>
-                <span class="help-color-bloc" style="background-color: lightgrey"></span>
-                <span><i18n>session.official</i18n></span>
-            </div>
-            <div>
-                <span class="help-color-bloc" style="background-color: green"></span>
-                <span><i18n>session.officialUpdate</i18n></span>
-            </div>
-            <div>
-                <span class="help-color-bloc" style="background-color: grey"></span>
-                <span><i18n>session.punctual</i18n></span>
-            </div>
-            <div>
-                <i>&#xe904;</i>
-                <span><i18n>session.not.published</i18n></span>
-            </div>
-            <div>
-                <i>&#xe80d;</i>
-                <span><i18n>homework</i18n></span>
-            </div>
-            <div>
-                <i>&#xe86f;</i>
-                <span><i18n>session</i18n></span>
-            </div>
         </div>
     </section>
 
@@ -154,3 +124,6 @@
 
 
 </div>
+<lightbox show="legendLightboxIsVisible" on-close="setLegendLightboxVisible(false);">
+    <container template="infoBulleTemplate"></container>
+</lightbox>
