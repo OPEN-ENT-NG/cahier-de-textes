@@ -40,6 +40,13 @@ inline-block {
     }
   }
 }
+.help{
+  content:'\e835';
+  font-family:"generic-icons";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:none;
+}
 
 .help-color-bloc {
   width: 40px;
@@ -179,4 +186,11 @@ i.cahier-textes2::before {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: none;
+}
+
+.float-right{
+  float: right;
+}
+.float-left{
+  float: left;
 }

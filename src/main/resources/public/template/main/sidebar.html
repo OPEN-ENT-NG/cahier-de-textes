@@ -8,6 +8,12 @@
         <i18n>progression.manage.button.goTo</i18n>
     </button>
     <section id="display-section" class="cell twelve">
+        <!-- Legend -->
+        <span class="float-right">
+           <i class="help"
+              tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+        </span>
+        <!----->
         <h5 class="large cell twelve">
             <i18n>sidebar.display_mode</i18n> :
         </h5>
@@ -61,7 +67,6 @@
 
 
             <!-- Access Own Data -->
-
 
             <!-- Access Child Data -->
             <div workflow="diary.accessChildData">
@@ -173,3 +178,6 @@
 
 
 </div>
+<lightbox show="legendLightboxIsVisible" on-close="setLegendLightboxVisible(false);">
+    <container template="infoBulleTemplate"></container>
+</lightbox>

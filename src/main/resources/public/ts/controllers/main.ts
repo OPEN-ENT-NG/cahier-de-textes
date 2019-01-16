@@ -10,7 +10,7 @@ export let main = ng.controller('MainController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
-
+        $scope.legendLightboxIsVisible = false;
         $scope.display = {
             homeworks: true,
             sessions: true,
@@ -27,6 +27,12 @@ export let main = ng.controller('MainController',
             endDate: moment().endOf('isoWeek').toDate()
         };
 
+        $scope.setLegendLightboxVisible = (state:boolean) => {
+            $scope.legendLightboxIsVisible = state;
+            if($scope.legendLightboxIsVisible){
+                template.open('infoBulleTemplate', 'main/toolTip-legendeTemplate');
+            }
+        };
         $scope.transformDateToFrenchDate = (date: Date) => {
             return moment(date).format("dddd D MMMM YYYY");
         };
