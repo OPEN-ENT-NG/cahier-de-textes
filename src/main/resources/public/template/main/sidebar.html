@@ -8,15 +8,16 @@
         <i18n>progression.manage.button.goTo</i18n>
     </button>
     <section id="display-section" class="cell twelve">
-        <!-- Legend -->
-        <span class="float-right">
-           <i class="help"
-              tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
-        </span>
-        <!----->
-        <h5 class="large cell twelve">
-            <i18n>sidebar.display_mode</i18n> :
-        </h5>
+
+        <div>
+            <h5 class="large cell eleven">
+                <i18n>sidebar.display_mode</i18n> :
+            </h5>
+            <!-- Legend -->
+            <i class="large help one cell margin-top-Botton-md" ng-if="!display.listView"
+                   tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+        </div>
+
         <label class="cell twelve text-xl margin-bottom-md" ng-if="hasBothViewMode()">
             <i tooltip="calendar"
                class="margin-sm"
