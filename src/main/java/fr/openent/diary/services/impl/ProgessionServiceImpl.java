@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.ProgressionService;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
