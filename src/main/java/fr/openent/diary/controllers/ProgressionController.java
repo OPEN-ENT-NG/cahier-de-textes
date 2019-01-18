@@ -10,8 +10,11 @@ import fr.wseduc.rs.Post;
 import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.JsonArray;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
@@ -31,33 +34,62 @@ public class ProgressionController extends ControllerHelper {
     @ResourceFilter(SessionRead.class)
     public void getProgressions(final HttpServerRequest request) {
 
-        String ownerId = request.getParam("owner");
+        String ownerId = request.getParam("ownerId");
 
         progressionService.getProgressions( ownerId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
 
-    @Delete("/progression/:progressionID")
+    @Delete("/progression/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
-    public void deleteProgressions(final HttpServerRequest request) {
+    public void deleteProgression(final HttpServerRequest request) {
 
-        String ownerId = request.getParam("owner");
+        String progressionId = request.getParam("progressionId");
 
-        progressionService.deleteProgressions( ownerId, DefaultResponseHandler.arrayResponseHandler(request));
+        progressionService.deleteProgressions( progressionId, DefaultResponseHandler.arrayResponseHandler(request));
+    }
+    @Post("/progression")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(SessionManage.class)
+    public void createProgression(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression", progression -> {
+            progressionService.createProgression(progression, user, DefaultResponseHandler.defaultResponseHandler(request));
+        }));
     }
 
 
-    @Get("/progression/:ownerId")
+    @Delete("/progression/homework/:progressionId")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(SessionManage.class)
+    public void deleteProgressionHomework(final HttpServerRequest request) {
+
+        String progressionId = request.getParam("progressionId");
+
+        progressionService.deleteHomeworkProgression( progressionId, DefaultResponseHandler.arrayResponseHandler(request));
+    }
+
+    @Post("/progression/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
     public void updateProgressions(final HttpServerRequest request) {
 
-        String ownerId = request.getParam("owner");
+        String progressionId = request.getParam("progressionId");
 
-        progressionService.updateProgressions( ownerId, DefaultResponseHandler.arrayResponseHandler(request));
+        progressionService.updateProgressions( progressionId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
+    @Post("/progression/to/session/:idProgression/:idSession")
+    @SecuredAction(value = "",type = ActionType.RESOURCE)
+    @ResourceFilter(SessionManage.class)
+    public void progressionToSession(final HttpServerRequest request){
+        String idProgression = request.getParam("idProgression");
+
+        String idSession = request.getParam("idSession");
+        progressionService.progressionToSession( idProgression,idSession, DefaultResponseHandler.arrayResponseHandler(request));
+
+    }
 
 }
 

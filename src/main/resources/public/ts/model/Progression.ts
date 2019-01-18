@@ -20,6 +20,30 @@ export class ProgressionSession{
 
     p_homeworks: ProgressionHomework[] = [];
 
+
+    init(){
+
+    }
+    static formatSqlDataToModel(data: any){
+
+        return {
+            id: data.id,
+            title: data.title,
+            room: data.room,
+            description: data.description,
+            p_homeworks: data.homeworks ? ProgressionHomework.formatSqlDataToModel(data.homeworks) : [],
+        };
+    }
+
+    async get() {
+        try {
+            let {data} = await http.get('/diary/progression/' + this.id);
+            Mix.extend(this, ProgressionSession.formatSqlDataToModel(data));
+            this.init();
+        } catch (e) {
+            notify.error('session.sync.err');
+        }
+    }
 }
 
 export class ProgressionHomework{
@@ -34,4 +58,8 @@ export class ProgressionHomework{
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
     attachedToSession: boolean = true;
+
+    static formatSqlDataToModel(homeworks: Homeworks | Homework[] | any[] | boolean | any) {
+        
+    }
 }

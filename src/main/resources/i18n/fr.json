@@ -213,5 +213,6 @@
   "inspector.no.habilitation": "Aucune habilitation",
   "inspector.add.habilitation": "Ajouter une habilitation",
   "homework.done.notification": "Devoir fait",
-  "homework.todo.notification": "Devoir à faire"
+  "homework.todo.notification": "Devoir à faire",
+  "progression.manage.button.goTo" : "Accéder aux progressions"
 }
