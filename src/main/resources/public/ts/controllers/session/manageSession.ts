@@ -1,4 +1,4 @@
-import {Behaviours, idiom as lang, model, ng} from 'entcore';
+import {Behaviours, idiom as lang, model, moment, ng} from 'entcore';
 import {Course, Notification, Session, Subjects} from '../../model';
 import {Homework} from '../../model/homework';
 
