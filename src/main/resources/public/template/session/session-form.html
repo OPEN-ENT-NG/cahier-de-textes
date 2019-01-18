@@ -68,7 +68,8 @@
                        ng-if="session.courseId && session.startTime"  >
                     [[session.startTime | date:'HH:mm']]
                 </label>
-                <input type="time" class="margin-left-sm margin-right-sm"
+                <input type="time"
+                       class="margin-left-sm margin-right-sm"
                        ng-if="!(session.courseId && session.startTime)"
                        ng-model="session.startTime"/>
                 <i18n>to2</i18n>
