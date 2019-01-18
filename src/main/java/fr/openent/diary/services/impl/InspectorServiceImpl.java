@@ -1,5 +1,6 @@
-package fr.openent.diary.services;
+package fr.openent.diary.services.impl;
 
+import fr.openent.diary.services.InspectorService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;

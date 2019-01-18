@@ -1,5 +1,7 @@
-package fr.openent.diary.services;
+package fr.openent.diary.services.impl;
 
+import fr.openent.diary.services.DiaryService;
+import fr.openent.diary.services.HomeworkService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
