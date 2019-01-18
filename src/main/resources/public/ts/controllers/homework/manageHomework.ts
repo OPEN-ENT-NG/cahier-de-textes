@@ -228,7 +228,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.back = ()=>{
             $scope.homework.isDone = !$scope.homework.isDone;
-           // $scope.setProgress($scope.homework);
+            // $scope.setProgress($scope.homework);
             window.history.back();
 
         }

@@ -47,6 +47,18 @@ routes.define(($routeProvider) => {
         .when('/list',{
             action : 'manageList'
         })
+        .when('/progression',{
+            action  : 'manageProgession'
+        })
+        .when('/progression/:progressionId',{
+            action  : 'manageProgession'
+        })
+        .when('/progression/to/session/:idProgression/:idSession',{
+            action  : 'manageProgession'
+        })
+        .when('/progressions',{
+            action  : 'manageProgession'
+        })
         .otherwise({
             redirectTo: '/'
         });
