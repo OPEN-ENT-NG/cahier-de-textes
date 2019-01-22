@@ -1,23 +1,81 @@
 import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {ProgressionHomework,ProgressionSession} from "../../model/Progression";
 import {Session, Subjects} from "../../model";
+import {Homework, HomeworkTypes} from "../../model/homework";
 
 export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         console.log('manageProgressionCtrl');
 
-        $scope.subjects = new Subjects();
+
+
+        async function initData(){
+            $scope.subjects = new Subjects();
+            $scope.homeworkTypes = new HomeworkTypes();
+
+            $scope.subjects.sync($scope.structure.id, model.me.userId);
+
+            $scope.homeworkTypes.sync();
+
+        }
 
         $scope.progression_session = $scope.progression_session ? $scope.progression_session : new ProgressionSession();
 
         $scope.progression_session.owner = {id: model.me.userId};
-        $scope.subjects.sync($scope.structure.id, model.me.userId);
 
 
         $scope.validProgressionsSessionForm = () =>{
             $scope.progression_session.create();
+        }
+
+        $scope.areValidHomeworks = () =>{
+            var back = true;
+            if (!$scope.progression_session.progression_homeworks || $scope.progression_session.progression_homeworks.length == 0)
+                return back;
+            $scope.progression_session.progression_homeworks.forEach((item) => {
+                back = back && item.isValidForm();
+            });
+            return back;
+        }
+
+        $scope.$watch(() => $scope.progression_session.subject,  () => {
+            $scope.progression_session.progression_homeworks.forEach(h => h.subject = $scope.progression_session.subject);
+            $scope.safeApply();
+        });
+
+
+        $scope.openProgressionHomework = (progressionHomework: ProgressionHomework) => {
+            $scope.progression_session.progression_homeworks.map(p => {
+                if(p.opened){
+                    p.opened = false ;
+                }
+            })
+            progressionHomework.opened = !progressionHomework.opened;
+
+            $scope.safeApply();
+
+
+        };
+
+        $scope.deleteProgressionHomework = (progressionHomework: ProgressionHomework,i) => {
+
+         console.log(i);
+         $scope.progression_session.progression_homeworks.splice(i,1);
 
         }
+
+        $scope.addProgressionHomework = () =>{
+
+            let newProgressionHomework = new ProgressionHomework();
+
+            newProgressionHomework.subject = $scope.progression_session.subject;
+
+            newProgressionHomework.isNewField = true;
+            $scope.progression_session.progression_homeworks.push(newProgressionHomework);
+            $scope.openProgressionHomework(newProgressionHomework);
+            $scope.safeApply();
+        }
+        await initData();
     }]
 );

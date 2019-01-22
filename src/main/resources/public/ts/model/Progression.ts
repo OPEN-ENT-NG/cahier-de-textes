@@ -8,6 +8,7 @@ import {Visa} from './visa';
 import {Homework, Homeworks, HomeworkType, WorkloadWeek} from './homework';
 import {Session} from "./session";
 import {subscript} from "entcore/types/src/ts/editor/options";
+import forEach = require("core-js/fn/array/for-each");
 
 
 export class ProgressionSession{
@@ -20,14 +21,13 @@ export class ProgressionSession{
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
 
-    p_homeworks: ProgressionHomework[] = [];
+    progression_homeworks: ProgressionHomework[] = [];
 
     constructor(){
         this.subject=new Subject();
         this.title= "";
     }
     async create(){
-        console.log(this);
         let response = await http.post('/diary/progression/create' , this.toJson());
 
     }
@@ -35,37 +35,49 @@ export class ProgressionSession{
     init(){
 
     }
-    static formatSqlDataToModel(data: any){
 
-        return {
-            id: data.id,
-            title: data.title,
-            room: data.room,
-            description: data.description,
-            p_homeworks: data.homeworks ? ProgressionHomework.formatSqlDataToModel(data.homeworks) : [],
-        };
-    }
 
     async get() {
         try {
             let {data} = await http.get('/diary/progression' + this.id);
-            Mix.extend(this, ProgressionSession.formatSqlDataToModel(data));
+            Mix.extend(this,data);
             this.init();
         } catch (e) {
             notify.error('session.sync.err');
         }
     }
-
+    private  homeWorkstoJson() {
+        let json = [];
+        this.progression_homeworks.map(p => {
+           let jsonLine = p.toJson(this.owner.id);
+           if(jsonLine){
+               json.push(jsonLine);
+           }
+        })
+        return json;
+    }
     private toJson() {
+
         return {
             description: this.description,
             subject_id: this.subject.id,
             title : this.title,
             annotation : this.annotation,
-            owner_id: this.owner["id"]
+            owner_id: this.owner.id,
+            progression_homeworks: this.homeWorkstoJson()
 
         }
     }
+    isValidForm = () => {
+        let validSessionOrDueDate = false;
+        return this
+            && this.title
+            && this.subject
+            && this.description
+            && this.description.length;
+    };
+
+
 }
 
 export class ProgressionHomework{
@@ -77,13 +89,36 @@ export class ProgressionHomework{
     subject: Subject;
     p_session: ProgressionSession;
     isNewField: boolean=false;
+    opened: boolean;
+    owner;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
     attachedToSession: boolean = true;
 
-    static formatSqlDataToModel(homeworks: Homeworks | Homework[] | any[] | boolean | any) {
-        
+
+
+    toJson(ownerId) {
+        if(this.description.length)
+            return {
+                description: this.description,
+                subject_id: this.subject.id,
+                owner_id: ownerId,
+                type_id: this.type
+
+            }
     }
+
+    isValidForm = () => {
+        let validSessionOrDueDate = false;
+        return this
+
+            && this.subject
+
+            && this.type
+            && this.description
+            && this.description.length;
+    };
+
 }
 
 export class ProgressionSessions{

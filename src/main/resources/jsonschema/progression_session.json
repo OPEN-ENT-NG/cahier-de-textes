@@ -17,6 +17,9 @@
     },
     "owner_id":{
       "type": "string"
+    },
+    "progression_homework": {
+      "type": ["array", "null" ]
     }
   },
   "required": [

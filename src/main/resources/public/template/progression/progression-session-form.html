@@ -36,7 +36,41 @@
                 </div>
                 <editor ng-model="progression_session.description"></editor>
             </div>
-            <button ng-click="validProgressionsSessionForm()"><i18n>utils.save </i18n></button>
+            <div>
+
+            </div>
+
+            <div class="padding-md margin-bottom-md">
+                <h2><i18n>homeworks</i18n></h2>
+                <article class="responsive-table row">
+                    <table class="twelve">
+                        <thead>
+                        <tr>
+                            <td class="one text-left"><i18n>homework.manage.type</i18n></td>
+
+                            <td class="nine text-left"><i18n>settings.exclusion.description</i18n></td>
+                            <td class="one">&nbsp;</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
+                            inside-session-form="true"
+                            class="ng-scope"
+                            ng-controller="manageProgessionCtrl" static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
+                        </tbody>
+                    </table>
+                    <button class="float-none display-inline-block margin-top-md"
+                            ng-disabled = "!areValidHomeworks()"
+                            ng-click="addProgressionHomework()">
+                        <i18n>homework.manage.create</i18n>
+                    </button>
+                </article>
+
+            </div>
+
+            <button
+                    ng-disabled="!progression_session.isValidForm()"
+                    ng-click="validProgressionsSessionForm()"><i18n>utils.save </i18n></button>
         </div>
 
     </div>

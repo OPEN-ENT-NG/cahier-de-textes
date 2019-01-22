@@ -56,24 +56,15 @@ public class ProgressionController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
     public void createProgression(final HttpServerRequest request) {
+
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_session", progression -> {
-            progressionService.createSessionProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+            if(progression.containsKey("progression_homeworks")&&!progression.getJsonArray("progression_homeworks").isEmpty()){
+                progressionService.createFullProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+            }else{
+                progressionService.createSessionProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+            }
         }));
 //                progressionService.createSessionProgression(new JsonObject(), DefaultResponseHandler.arrayResponseHandler(request));
-
-
-
-    }
-
-    @Post("/progression/homework/create")
-    @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(SessionManage.class)
-    public void createHomeworkProgression(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_homework", progression -> {
-            progressionService.createHomeworkProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
-        }));
-//                progressionService.createSessionProgression(new JsonObject(), DefaultResponseHandler.arrayResponseHandler(request));
-
 
 
     }
