@@ -47,7 +47,7 @@ routes.define(($routeProvider) => {
         .when('/list',{
             action : 'manageList'
         })
-        .when('/progression',{
+        .when('/progression/create',{
             action  : 'manageProgession'
         })
         .when('/progression/:progressionId',{

@@ -2,6 +2,7 @@ import {_, angular, Behaviours, idiom as lang, model, moment, ng, notify, templa
 import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
 
 import {Utils} from '../utils/utils';
+import {ProgressionSession, ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
@@ -110,7 +111,7 @@ export let main = ng.controller('MainController',
 
             $scope.structure.homeworks = new Homeworks($scope.structure);
             $scope.structure.sessions = new Sessions($scope.structure);
-
+            $scope.structure.progression_sessions = new ProgressionSessions($scope.structure);
             await $scope.syncPedagogicItems(true);
 
             $scope.pageInitialized = true;
@@ -135,6 +136,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
+            $scope.structure.progression_sessions.all =[];
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
                 && ($scope.params.user && $scope.params.user.id)
@@ -416,7 +418,7 @@ export let main = ng.controller('MainController',
             },
             manageProgession: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main','progression/progression-view');
+                template.open('main','progression/progression-session-form');
             },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();

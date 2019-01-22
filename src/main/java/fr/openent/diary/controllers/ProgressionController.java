@@ -15,6 +15,7 @@ import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
@@ -49,14 +50,32 @@ public class ProgressionController extends ControllerHelper {
 
         progressionService.deleteProgressions( progressionId, DefaultResponseHandler.arrayResponseHandler(request));
     }
-    @Post("/progression")
+
+
+    @Post("/progression/create")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
     public void createProgression(final HttpServerRequest request) {
-
-        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression", progression -> {
-            progressionService.createProgression(progression, user, DefaultResponseHandler.defaultResponseHandler(request));
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_session", progression -> {
+            progressionService.createSessionProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
         }));
+//                progressionService.createSessionProgression(new JsonObject(), DefaultResponseHandler.arrayResponseHandler(request));
+
+
+
+    }
+
+    @Post("/progression/homework/create")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(SessionManage.class)
+    public void createHomeworkProgression(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_homework", progression -> {
+            progressionService.createHomeworkProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+        }));
+//                progressionService.createSessionProgression(new JsonObject(), DefaultResponseHandler.arrayResponseHandler(request));
+
+
+
     }
 
 

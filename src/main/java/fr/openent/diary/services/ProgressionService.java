@@ -39,12 +39,13 @@ public interface ProgressionService {
     void progressionToSession(String idProgression, String idSession, Handler<Either<String, JsonArray>> handler);
 
     /***
-     * Create a progression
+     * Create a progression session
      * @param progression
      * @param handler
      */
 
-    void createProgression(JsonObject progression, UserInfos user, Handler<Either<String, JsonObject>> handler);
+    void createSessionProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler);
+
 
     /**
      * Delete an homework from progression
@@ -52,4 +53,11 @@ public interface ProgressionService {
      * @param handler
      */
     void deleteHomeworkProgression(String progressionId, Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * Create an homework for a progression
+     * @param progression
+     * @param handler
+     */
+    void createHomeworkProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler);
 }

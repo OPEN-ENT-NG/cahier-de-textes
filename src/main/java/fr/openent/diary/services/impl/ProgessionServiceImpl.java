@@ -40,7 +40,7 @@ public class ProgessionServiceImpl implements ProgressionService {
     @Override
     public void updateProgressions(String progressionId, Handler<Either<String, JsonArray>> handler) {
 
-        String query = "";
+        //String query = "UPDATE diary.progressions_session";
 
 
     }
@@ -51,7 +51,19 @@ public class ProgessionServiceImpl implements ProgressionService {
     }
 
     @Override
-    public void createProgression(JsonObject progression, UserInfos user, Handler<Either<String, JsonObject>> handler) {
+    public void createSessionProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler) {
+        JsonArray params;
+        String query = "INSERT INTO diary.progression_session" +
+                "(subject_id,title, description, annotation, owner_id) " +
+                "values ( ?, ?, ?, ?, ?)" +
+                "RETURNING id;";
+        params =  new JsonArray().add(progression.getString("subject_id"))
+                .add(progression.getString("title"))
+                .add(progression.getString("description"))
+                .add(progression.getString("annotation"))
+                .add(progression.getString("owner_id"));
+
+        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
     }
 
@@ -65,6 +77,11 @@ public class ProgessionServiceImpl implements ProgressionService {
 
         params.add(progressionId);
         //   Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+
+    }
+
+    @Override
+    public void createHomeworkProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler) {
 
     }
 

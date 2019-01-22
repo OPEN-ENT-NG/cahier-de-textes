@@ -7,6 +7,7 @@ import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks, HomeworkType, WorkloadWeek} from './homework';
 import {Session} from "./session";
+import {subscript} from "entcore/types/src/ts/editor/options";
 
 
 export class ProgressionSession{
@@ -17,9 +18,19 @@ export class ProgressionSession{
     plainTextDescription: string = "";
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
+    owner ;
 
     p_homeworks: ProgressionHomework[] = [];
 
+    constructor(){
+        this.subject=new Subject();
+        this.title= "";
+    }
+    async create(){
+        console.log(this);
+        let response = await http.post('/diary/progression/create' , this.toJson());
+
+    }
 
     init(){
 
@@ -37,11 +48,22 @@ export class ProgressionSession{
 
     async get() {
         try {
-            let {data} = await http.get('/diary/progression/' + this.id);
+            let {data} = await http.get('/diary/progression' + this.id);
             Mix.extend(this, ProgressionSession.formatSqlDataToModel(data));
             this.init();
         } catch (e) {
             notify.error('session.sync.err');
+        }
+    }
+
+    private toJson() {
+        return {
+            description: this.description,
+            subject_id: this.subject.id,
+            title : this.title,
+            annotation : this.annotation,
+            owner_id: this.owner["id"]
+
         }
     }
 }
@@ -61,5 +83,17 @@ export class ProgressionHomework{
 
     static formatSqlDataToModel(homeworks: Homeworks | Homework[] | any[] | boolean | any) {
         
+    }
+}
+
+export class ProgressionSessions{
+    all: Session[];
+    origin: Session[];
+    structure: Structure;
+
+    constructor (structure: Structure) {
+        this.structure = structure;
+        this.all = [];
+        this.origin = [];
     }
 }

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "subject_id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "annotation": {
+      "type": "string"
+    },
+    "owner_id":{
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "subject_id",
+    "description",
+    "owner_id"
+  ]
+}
