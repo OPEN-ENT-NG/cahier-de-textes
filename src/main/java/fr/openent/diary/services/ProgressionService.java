@@ -61,5 +61,10 @@ public interface ProgressionService {
      */
     void createHomeworkProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler);
 
-    void createFullProgression(JsonObject progression, Handler<Either<String, JsonArray>> handler);
+    /**
+     * Create a progression with homeworks
+     * @param progression
+     * @param handler
+     */
+    void createFullProgression(JsonObject progression, Handler<Either<String, JsonObject>> handler);
 }

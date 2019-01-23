@@ -4,6 +4,7 @@ import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.*;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.services.ProgressionService;
+import fr.openent.diary.services.impl.ProgessionServiceImpl;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
@@ -21,13 +22,15 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
+import static fr.wseduc.webutils.http.response.DefaultResponseHandler.defaultResponseHandler;
+
 public class ProgressionController extends ControllerHelper {
 
     ProgressionService progressionService;
 
 
-    public ProgressionController(ProgressionService progressionService) {
-        this.progressionService = progressionService;
+    public ProgressionController(ProgessionServiceImpl diary) {
+        this.progressionService = diary;
     }
 
     @Get("/progressions/:ownerId")
@@ -57,12 +60,16 @@ public class ProgressionController extends ControllerHelper {
     @ResourceFilter(SessionManage.class)
     public void createProgression(final HttpServerRequest request) {
 
-        UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_session", progression -> {
-            if(progression.containsKey("progression_homeworks")&&!progression.getJsonArray("progression_homeworks").isEmpty()){
-                progressionService.createFullProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
-            }else{
-                progressionService.createSessionProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+        UserUtils.getUserInfos(eb, request, user ->   RequestUtils.bodyToJson(request, pathPrefix + "progression_session", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject progression) {
+                if(progression.containsKey("progression_homeworks")&&!progression.getJsonArray("progression_homeworks").isEmpty()){
+                    progressionService.createFullProgression(progression, defaultResponseHandler(request));
+                }else{
+                    progressionService.createSessionProgression(progression, DefaultResponseHandler.arrayResponseHandler(request));
+                }
             }
+
         }));
 //                progressionService.createSessionProgression(new JsonObject(), DefaultResponseHandler.arrayResponseHandler(request));
 

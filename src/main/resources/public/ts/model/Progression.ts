@@ -72,7 +72,7 @@ export class ProgressionSession{
         let validSessionOrDueDate = false;
         return this
             && this.title
-            && this.subject
+            && this.subject.id
             && this.description
             && this.description.length;
     };
@@ -103,7 +103,7 @@ export class ProgressionHomework{
                 description: this.description,
                 subject_id: this.subject.id,
                 owner_id: ownerId,
-                type_id: this.type
+                type_id: this.type.id
 
             }
     }
@@ -124,11 +124,13 @@ export class ProgressionHomework{
 export class ProgressionSessions{
     all: Session[];
     origin: Session[];
-    structure: Structure;
-
-    constructor (structure: Structure) {
-        this.structure = structure;
+    owner;
+    constructor (owner) {
         this.all = [];
         this.origin = [];
+    }
+
+    async sync(){
+
     }
 }

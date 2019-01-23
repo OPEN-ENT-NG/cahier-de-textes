@@ -30,7 +30,7 @@ public class Diary extends BaseServer {
         addController(new SessionController(new SessionServiceImpl()));
         addController(new HomeworkController(new HomeworkServiceImpl()));
         addController(new InspectorController(new InspectorServiceImpl()));
-        addController(new ProgressionController(new ProgessionServiceImpl()));
+        addController(new ProgressionController(new ProgessionServiceImpl("diary")));
 	}
 
 }

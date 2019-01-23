@@ -1,5 +1,5 @@
 import {Behaviours, idiom as lang, model, ng} from 'entcore';
-import {ProgressionHomework,ProgressionSession} from "../../model/Progression";
+import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
 import {Session, Subjects} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
 
@@ -13,7 +13,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         async function initData(){
             $scope.subjects = new Subjects();
             $scope.homeworkTypes = new HomeworkTypes();
-
+            $scope.progression_sessions = new ProgressionSessions(model.me.userId);
+            $scope.progression_sessions.sync();
             $scope.subjects.sync($scope.structure.id, model.me.userId);
 
             $scope.homeworkTypes.sync();
