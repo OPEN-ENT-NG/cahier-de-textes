@@ -54,9 +54,11 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 "  ON homework_type.id = progression_homework.type_id " +
                 " ) h ON h.progression_session_id = ps.id" +
                 " where ps.owner_id = ? " +
-                " GROUP BY ps.id";
+
+                " GROUP BY ps.id" +
+                " ORDER BY ps.modified";
         params.add(ownerId);
-         Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
     }
 
@@ -128,25 +130,25 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
             @Override
             public void handle(Either<String, JsonObject> event) {
                 if (event.isRight()) {
-                        try {
-                            final Number id = event.right().getValue().getInteger("id");
-                            JsonArray homeworks = progression.getJsonArray("progression_homeworks");
-                            JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-                            statements.add(getSessionCreationstatement(id,progression));
+                    try {
+                        final Number id = event.right().getValue().getInteger("id");
+                        JsonArray homeworks = progression.getJsonArray("progression_homeworks");
+                        JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
+                        statements.add(getSessionCreationstatement(id,progression));
 
-                            for (int i=0; i<homeworks.size();i++) {
-                                statements.add(getHomeworkCreationStatement(id,homeworks.getJsonObject(i)));
-                            }
-                            sql.transaction(statements, new Handler<Message<JsonObject>>() {
-                                @Override
-                                public void handle(Message<JsonObject> event) {
-                                    handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
-                                }
-                            });
-                        } catch (ClassCastException e) {
-                           LOGGER.error("An error occurred when insert progression", e);
-                            handler.handle(new Either.Left<String, JsonObject>(""));
+                        for (int i=0; i<homeworks.size();i++) {
+                            statements.add(getHomeworkCreationStatement(id,homeworks.getJsonObject(i)));
                         }
+                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> event) {
+                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
+                            }
+                        });
+                    } catch (ClassCastException e) {
+                        LOGGER.error("An error occurred when insert progression", e);
+                        handler.handle(new Either.Left<String, JsonObject>(""));
+                    }
 
                 } else {
                     LOGGER.error("An error occurred when selecting next val");

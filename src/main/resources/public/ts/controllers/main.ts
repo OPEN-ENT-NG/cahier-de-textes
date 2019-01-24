@@ -416,9 +416,13 @@ export let main = ng.controller('MainController',
                 if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
-            manageProgession: async()=>{
+           viewProgession: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main','progression/progression-view');
+            },
+            manageProgression :async()=>{
+                if(!$scope.structureInitialized) await initializeStructure();
+                template.open('main','progression/progression-session-form');
             },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();

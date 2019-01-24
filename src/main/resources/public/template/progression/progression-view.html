@@ -1,3 +1,4 @@
+<h1><a href="#" ng-click="goTo('/')"><i18n>diary.title</i18n></a></h1>
 <div class="progression-view" ng-controller="manageProgessionCtrl">
 
     <article class="responsive-table row">
@@ -17,7 +18,7 @@
                 <tr ng-repeat="progression_session in progression_sessions.all track by $index">
                     <td class="one text-left">[[progression_session.title]]</td>
                     <td class="one text-left">[[progression_session.subject.label]]</td>
-                    <td class="three text-left">[[progression_session.description]]</td>
+                    <td class="three text-left" ng-bind-html="[[progressionHomework.description]]"></td>
                     <td class="six text-left">
                         <div ng-if="progression_session.progression_homeworks.length != 0" >
                             <table class="twelve">
@@ -47,6 +48,9 @@
             </table>
         </div>
 
+        <button class="twelve padding-sm" ng-click="goTo('/progression/create')">
+            <i18n>progression.manage.button.Create</i18n>
+        </button>
     </article>
 
 </div>

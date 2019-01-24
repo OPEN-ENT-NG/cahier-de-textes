@@ -35,6 +35,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         $scope.validProgressionsSessionForm = () =>{
             $scope.progression_session.create();
+            $scope.goTo('/progressions');
         }
 
         $scope.areValidHomeworks = () =>{
