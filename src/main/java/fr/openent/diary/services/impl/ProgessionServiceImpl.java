@@ -66,12 +66,12 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     public void deleteProgressions(String progressionId, Handler<Either<String, JsonArray>> handler) {
         JsonArray params = new JsonArray();
 
-        String query = "DELETE from diray.progression_session" +
-                "WHERE id = ?";
+        String query = "DELETE from diary.progression_session" +
+                " WHERE id = ?";
 
 
         params.add(progressionId);
-        //   Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
     }
 

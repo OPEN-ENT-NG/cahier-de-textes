@@ -85,6 +85,12 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.openProgressionHomework(newProgressionHomework);
             $scope.safeApply();
         }
+
+        $scope.deleteProgressionSession = async (progressionSession: ProgressionSession)=>{
+            await progressionSession.delete();
+            await initData();
+            $scope.safeApply();
+        }
         await initData();
     }]
 );

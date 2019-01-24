@@ -97,6 +97,14 @@ export class ProgressionSession{
             created: data.created
         }
     }
+
+    async delete() {
+        try {
+            await http.delete(`/diary/progression/${this.id}`);
+        }catch (e){
+            console.error(e);
+        }
+    }
 }
 
 
