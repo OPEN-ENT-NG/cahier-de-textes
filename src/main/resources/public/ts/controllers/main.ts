@@ -443,7 +443,7 @@ export let main = ng.controller('MainController',
                 if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
-            viewProgression :async()=>{
+           viewProgession: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main','progression/progression-view');
             },
@@ -452,6 +452,7 @@ export let main = ng.controller('MainController',
                 template.open('main','progression/progression-session-form');
 
             },
+
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'session/session-page');
