@@ -14,10 +14,17 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.subjects = new Subjects();
             $scope.homeworkTypes = new HomeworkTypes();
             $scope.progression_sessions = new ProgressionSessions(model.me.userId);
-            $scope.progression_sessions.sync();
-            $scope.subjects.sync($scope.structure.id, model.me.userId);
-
+            await   $scope.progression_sessions.sync();
+            await $scope.subjects.sync($scope.structure.id, model.me.userId);
+            $scope.progression_sessions.all.map(psession => {
+                $scope.subjects.all.forEach( subject =>{
+                    if(psession.subject_id == subject.id){
+                        psession.setSubject(subject);
+                    }
+                })
+            })
             $scope.homeworkTypes.sync();
+            $scope.safeApply();
 
         }
 
@@ -61,8 +68,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         $scope.deleteProgressionHomework = (progressionHomework: ProgressionHomework,i) => {
 
-         console.log(i);
-         $scope.progression_session.progression_homeworks.splice(i,1);
+            console.log(i);
+            $scope.progression_session.progression_homeworks.splice(i,1);
 
         }
 

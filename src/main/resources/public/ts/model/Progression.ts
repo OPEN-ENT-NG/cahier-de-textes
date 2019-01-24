@@ -1,3 +1,4 @@
+///<reference path="session.ts"/>
 import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
@@ -20,16 +21,21 @@ export class ProgressionSession{
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
+    subject_id;
 
     progression_homeworks: ProgressionHomework[] = [];
 
     constructor(){
-        this.subject=new Subject();
+        this.subject = new Subject();
         this.title= "";
     }
     async create(){
         let response = await http.post('/diary/progression/create' , this.toJson());
 
+    }
+
+    public setSubject(subject: Subject){
+        this.subject = subject;
     }
 
     init(){
@@ -46,13 +52,13 @@ export class ProgressionSession{
             notify.error('session.sync.err');
         }
     }
-    private  homeWorkstoJson() {
+    private  homeworksToJson() {
         let json = [];
         this.progression_homeworks.map(p => {
-           let jsonLine = p.toJson(this.owner.id);
-           if(jsonLine){
-               json.push(jsonLine);
-           }
+            let jsonLine = p.toJson(this.owner.id);
+            if(jsonLine){
+                json.push(jsonLine);
+            }
         })
         return json;
     }
@@ -64,7 +70,7 @@ export class ProgressionSession{
             title : this.title,
             annotation : this.annotation,
             owner_id: this.owner.id,
-            progression_homeworks: this.homeWorkstoJson()
+            progression_homeworks: this.homeworksToJson()
 
         }
     }
@@ -78,6 +84,45 @@ export class ProgressionSession{
     };
 
 
+
+    static formatSqlDataToModel(data: any) {
+
+        return {
+            id: data.id,
+            title: data.title,
+            description: data.description,
+            subject_id : data.subject_id,
+            progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
+            modified: data.modified,
+            created: data.created
+        }
+    }
+}
+
+
+export class ProgressionSessions{
+    all: ProgressionSession[];
+    origin: ProgressionSession[];
+    owner_id;
+    constructor (owner_id) {
+        this.owner_id = owner_id;
+        this.all = [];
+        this.origin = [];
+    }
+
+    async sync(){
+        let {data} = await http.get('/diary/progressions/' + this.owner_id);
+        this.all = Mix.castArrayAs(ProgressionSession, ProgressionSessions.formatSqlDataToModel(data))
+        this.all.forEach(i => {
+            i.init();
+        });
+    }
+
+    private static formatSqlDataToModel(data: any) {
+        let dataModel = [];
+        data.forEach(i => dataModel.push(ProgressionSession.formatSqlDataToModel(i)));
+        return dataModel;
+    }
 }
 
 export class ProgressionHomework{
@@ -86,6 +131,8 @@ export class ProgressionHomework{
     plainTextDescription: string = '';
     p_session_id: number;
     type: HomeworkType;
+    type_id;
+    type_label;
     subject: Subject;
     p_session: ProgressionSession;
     isNewField: boolean=false;
@@ -96,6 +143,13 @@ export class ProgressionHomework{
     attachedToSession: boolean = true;
 
 
+    initType(){
+        if(this.type_label && this.type_id){
+            this.type = new HomeworkType();
+            this.type.id = this.type_id;
+            this.type.label = this.type_label;
+        }
+    }
 
     toJson(ownerId) {
         if(this.description.length)
@@ -119,18 +173,29 @@ export class ProgressionHomework{
             && this.description.length;
     };
 
-}
+    static formatSqlDataToModel(data) {
+        let result={
+            id: data.id,
+            type_id : data.type_id,
+            type_label : data.type_label,
+            description: data.description,
+            modified: data.modified,
+            created: data.created
+        }
 
-export class ProgressionSessions{
-    all: Session[];
-    origin: Session[];
-    owner;
-    constructor (owner) {
-        this.all = [];
-        this.origin = [];
+        return result
     }
+}
+export class ProgressionHomeworks{
+    all: ProgressionHomework[];
 
-    async sync(){
+    static formatSqlDataToModel(data: any){
+        let dataModel = [];
 
+        let json = JSON.parse(data.toString())
+        console.log(json);
+        json.forEach(i => dataModel.push(Mix.castAs(ProgressionHomework,ProgressionHomework.formatSqlDataToModel(i))));
+        dataModel.forEach(i => i.initType());
+        return dataModel;
     }
 }

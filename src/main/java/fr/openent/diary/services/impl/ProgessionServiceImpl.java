@@ -45,10 +45,18 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     public void getProgressions(String ownerId, Handler<Either<String, JsonArray>> handler) {
         JsonArray params =  new JsonArray();
 
-        String query = "SELECT title from diary.progression_session" +
-                "WHERE owner_id = ?";
+        String query = "SELECT ps.id, title, ps.description, ps.modified, ps.created, ps.subject_id ," +
+                "array_to_json(array_agg(h.*)) as homeworks from diary.progression_session ps " +
+                " LEFT JOIN ( " +
+                "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
+                " FROM  diary.progression_homework " +
+                "INNER JOIN diary.homework_type " +
+                "  ON homework_type.id = progression_homework.type_id " +
+                " ) h ON h.progression_session_id = ps.id" +
+                " where ps.owner_id = ? " +
+                " GROUP BY ps.id";
         params.add(ownerId);
-        // Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+         Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
     }
 
