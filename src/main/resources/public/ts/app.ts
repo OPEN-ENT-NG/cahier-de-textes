@@ -56,8 +56,8 @@ routes.define(($routeProvider) => {
         .when('/progression/to/session/:idProgression/:idSession',{
             action  : 'manageProgression'
         })
-        .when('/progressions',{
-            action  : 'viewProgession'
+        .when('/progressions/view',{
+            action  : 'viewProgression'
         })
         .otherwise({
             redirectTo: '/'

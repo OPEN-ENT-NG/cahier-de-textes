@@ -317,6 +317,12 @@ export let main = ng.controller('MainController',
         };
 
 
+        $scope.newProgressionForm = () =>{
+            $scope.goTo('/progression/create');
+
+            $scope.safeApply();
+        };
+
         $scope.params = {
             user: null,
             group: null,
@@ -379,6 +385,11 @@ export let main = ng.controller('MainController',
             $scope.setProgress(homework);
         }
 
+        $scope.newProgressionForm = () =>{
+            $scope.goTo('/progression/create');
+
+            $scope.safeApply();
+        };
         $scope.openHomework = (homeworkId: number) => {
             console.log('open HW');
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
@@ -407,6 +418,11 @@ export let main = ng.controller('MainController',
             return Utils.getDisplayDate(date);
         };
 
+        $scope.plop= () =>{
+            console.log("plop");
+        }
+
+
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
@@ -416,13 +432,14 @@ export let main = ng.controller('MainController',
                 if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
-           viewProgession: async()=>{
+            viewProgression :async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main','progression/progression-view');
             },
-            manageProgression :async()=>{
+            manageProgression :async() =>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main','progression/progression-session-form');
+
             },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();

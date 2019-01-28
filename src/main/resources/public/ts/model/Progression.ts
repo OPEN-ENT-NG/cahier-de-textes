@@ -1,7 +1,7 @@
 ///<reference path="session.ts"/>
 import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
-import {Mix} from 'entcore-toolkit';
+import {Eventer, Mix} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
@@ -22,11 +22,14 @@ export class ProgressionSession{
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
     subject_id;
+    homeworks;
+    eventer: Eventer;
 
     progression_homeworks: ProgressionHomework[] = [];
 
     constructor(){
         this.subject = new Subject();
+        this.eventer = new Eventer();
         this.title= "";
     }
     async create(){
@@ -34,23 +37,35 @@ export class ProgressionSession{
 
     }
 
+    async update(){
+        let response = await  http.put(`/diary/progression/update/${this.id}`, this.toJson());
+    }
+
     public setSubject(subject: Subject){
         this.subject = subject;
     }
 
     init(){
-
     }
 
 
     async get() {
-        try {
-            let {data} = await http.get('/diary/progression' + this.id);
-            Mix.extend(this,data);
-            this.init();
-        } catch (e) {
-            notify.error('session.sync.err');
+        if(!this.title) {
+            try {
+
+                let {data} = await http.get('/diary/progression/' + this.id);
+                Mix.extend(this, data[0]);
+                this.progression_homeworks = [] ;
+
+                let json = JSON.parse(this.homeworks.toString());
+                json.forEach(i => this.progression_homeworks.push(Mix.castAs(ProgressionHomework, ProgressionHomework.formatSqlDataToModel(i))));
+                this.progression_homeworks.forEach(i => i.initType());
+                this.eventer.trigger(`get:end`)
+            } catch (e) {
+           //     notify.error('session.sync.err');
+            }
         }
+
     }
     private  homeworksToJson() {
         let json = [];
@@ -120,7 +135,7 @@ export class ProgressionSessions{
 
     async sync(){
         let {data} = await http.get('/diary/progressions/' + this.owner_id);
-        this.all = Mix.castArrayAs(ProgressionSession, ProgressionSessions.formatSqlDataToModel(data))
+        this.all = Mix.castArrayAs(ProgressionSession, ProgressionSessions.formatSqlDataToModel(data));
         this.all.forEach(i => {
             i.init();
         });
@@ -162,6 +177,7 @@ export class ProgressionHomework{
     toJson(ownerId) {
         if(this.description.length)
             return {
+                id: this.id || null ,
                 description: this.description,
                 subject_id: this.subject.id,
                 owner_id: ownerId,
@@ -189,7 +205,7 @@ export class ProgressionHomework{
             description: data.description,
             modified: data.modified,
             created: data.created
-        }
+        };
 
         return result
     }
@@ -200,8 +216,7 @@ export class ProgressionHomeworks{
     static formatSqlDataToModel(data: any){
         let dataModel = [];
 
-        let json = JSON.parse(data.toString())
-        console.log(json);
+        let json = JSON.parse(data.toString());
         json.forEach(i => dataModel.push(Mix.castAs(ProgressionHomework,ProgressionHomework.formatSqlDataToModel(i))));
         dataModel.forEach(i => i.initType());
         return dataModel;

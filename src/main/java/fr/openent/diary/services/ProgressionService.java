@@ -26,7 +26,7 @@ public interface ProgressionService {
      * @param ownerId
      * @param handler
      */
-    void updateProgressions(String ownerId, Handler<Either<String, JsonArray>> handler);
+    void updateProgressions(JsonObject progression, String ownerId, Handler<Either<String, JsonObject>> handler);
 
     /**
      * Apply a progression to a sesson of a course
@@ -67,4 +67,11 @@ public interface ProgressionService {
      * @param handler
      */
     void createFullProgression(JsonObject progression, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Get a unique progressionById
+     * @param progressionId
+     * @param handler
+     */
+    void getProgression(String progressionId, Handler<Either<String, JsonArray>> handler);
 }

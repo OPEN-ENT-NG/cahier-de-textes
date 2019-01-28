@@ -1,7 +1,5 @@
-<h1><a href="#" ng-click="goTo('/')"><i18n>diary.title</i18n></a></h1>
-<div class="progression-view" ng-controller="manageProgessionCtrl">
 
-    <article class="responsive-table row">
+    <article class="responsive-table row" ng-controller="manageProgessionCtrl">
         <div     class="padding-md margin-bottom-md">
             <table class="twelve">
                 <thead>
@@ -40,7 +38,7 @@
                         </div>
                     </td>
                     <td class="one vertical-align-top vertical-align-top text-right">
-                        <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
+                        <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionSession(progression_session)">&#xe858;</i>
                         <i class="trash right-magnet" ng-click="deleteProgressionSession(progression_session)"></i>
                     </td>
                 </tr>
@@ -48,9 +46,8 @@
             </table>
         </div>
 
-        <button class="twelve padding-sm" ng-click="goTo('/progression/create')">
+        <button class="twelve padding-sm" ng-click="newProgressionForm()">
             <i18n>progression.manage.button.Create</i18n>
         </button>
     </article>
 
-</div>

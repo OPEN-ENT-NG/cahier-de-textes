@@ -3,8 +3,8 @@
         <div class="twelve cell twelve-mobile">
 
             <span class="twe cell vertical-spacing horizontal-spacing twelve-mobile">
-                <i18n  class="twelve" ng-if="!(progression_session.courseId && progression_session.subject)">select.subject</i18n>
-                 <i18n  class="twelve" ng-if="progression_session.courseId && progression_session.subject">printer.subject</i18n>
+                <i18n  class="twelve" ng-if="! progression_session.subject">select.subject</i18n>
+                 <i18n  class="twelve" ng-if=" progression_session.subject">printer.subject</i18n>
                 <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
                         ng-disabled="progression_session.courseId && progression_session.subject"
                         ng-options="subject.label for subject in subjects.all track by subject.id">
@@ -75,4 +75,4 @@
 
     </div>
 
-</div>
+</>
