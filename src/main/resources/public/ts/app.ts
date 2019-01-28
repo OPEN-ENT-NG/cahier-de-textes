@@ -1,4 +1,4 @@
-﻿import {ng, routes} from 'entcore';
+import {ng, routes} from 'entcore';
 import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
@@ -57,7 +57,7 @@ routes.define(($routeProvider) => {
             action  : 'manageProgression'
         })
         .when('/progressions/view',{
-            action  : 'viewProgession'
+            action  : 'viewProgression'
         })
         .otherwise({
             redirectTo: '/'

@@ -97,7 +97,6 @@ public class ProgressionController extends ControllerHelper {
         progressionService.deleteHomeworkProgression( progressionHomeworkId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
-
     @Put("/progression/update/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)

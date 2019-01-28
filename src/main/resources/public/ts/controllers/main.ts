@@ -443,7 +443,7 @@ export let main = ng.controller('MainController',
                 if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
-           viewProgession: async()=>{
+            viewProgression :async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 template.open('main','progression/progression-view');
             },
