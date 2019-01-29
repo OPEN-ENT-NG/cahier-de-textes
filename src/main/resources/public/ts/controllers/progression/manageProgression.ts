@@ -79,14 +79,14 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         $scope.validProgressionsSessionForm = async () =>{
             let exist = false;
             $scope.progression_sessions.all.map((item) =>{
-            if (item.id == $scope.progression_session.id){
-                    exist=true;
-                }
-            });
+             if (item.id == $scope.progression_session.id){
+                 exist=true;
+             }
+         });
             if(!exist){
-                $scope.toastHttpCall (await $scope.progression_session.create());
+              await  $scope.toastHttpCall (await $scope.progression_session.create());
         $scope.goTo('/progressions');}else{
-                $scope.toastHttpCall ( await $scope.progression_session.update());
+                await $scope.toastHttpCall ( await $scope.progression_session.update());
             }
             $scope.goTo('/progressions/view');
             $scope.safeApply();
