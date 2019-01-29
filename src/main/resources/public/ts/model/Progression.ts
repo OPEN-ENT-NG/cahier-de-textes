@@ -44,10 +44,6 @@ export class ProgressionSession{
 
     }
 
-    async update(){
-        let response = await  http.put(`/diary/progression/update/${this.id}`, this.toJson());
-    }
-
     public setSubject(subject: Subject){
         this.subject = subject;
     }
