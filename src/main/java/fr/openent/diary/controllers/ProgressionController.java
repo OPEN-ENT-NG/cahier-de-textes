@@ -120,7 +120,13 @@ public class ProgressionController extends ControllerHelper {
         String idProgression = request.getParam("idProgression");
 
         String idSession = request.getParam("idSession");
-        progressionService.progressionToSession( idProgression,idSession, DefaultResponseHandler.arrayResponseHandler(request));
+        UserUtils.getUserInfos(eb, request, user ->   RequestUtils.bodyToJson(request, pathPrefix + "progression_session", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject progression) {
+                progressionService.progressionToSession( progression, idProgression, idSession,DefaultResponseHandler.defaultResponseHandler(request));
+            }
+
+        }));
 
     }
 

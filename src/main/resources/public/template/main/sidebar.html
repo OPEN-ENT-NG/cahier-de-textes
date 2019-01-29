@@ -59,6 +59,7 @@
                 </select>
             </div>
 
+
             <!-- Access Own Data -->
 
 
@@ -98,6 +99,21 @@
                 </div>
             </div>
     </section>
+<section ng-show="!display.listView" ng-if="progressions.all.length > 10">
+    <div class="row">
+        <h5 class="large" ng-click="display.progression = !display.progression">
+            <i18n>progression</i18n>
+            <i ng-class="display.progression ? 'up-open' : 'down-open'" class="right-magnet"></i>
+        </h5>
+    </div>
+    <div ng-show="display.progression" >
+        <table>
+            <tr ng-repeat="progression in progressions.all track by $index">
+                <td>[[progression.title]]</td>
+            </tr>
+        </table>
+    </div>
+</section>
 
     <!-- Legend -->
     <section class="row" ng-show="!display.listView">

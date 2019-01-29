@@ -66,15 +66,12 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         }
         $scope.progression_session.eventer.on(`get:end` , ()=>{
-            console.log("get:end");
             $scope.safeApply();
 
         });
 
 
         $scope.getIsReadOnly = () => {
-            console.log($scope.progression_session);
-
             return modeIsReadOnly();
         };
 

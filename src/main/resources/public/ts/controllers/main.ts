@@ -14,7 +14,8 @@ export let main = ng.controller('MainController',
         $scope.display = {
             homeworks: true,
             sessions: true,
-            listView: false
+            listView: false,
+            progression: false
         };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -111,7 +112,7 @@ export let main = ng.controller('MainController',
 
             $scope.structure.homeworks = new Homeworks($scope.structure);
             $scope.structure.sessions = new Sessions($scope.structure);
-            $scope.structure.progression_sessions = new ProgressionSessions($scope.structure);
+            $scope.progressions = new ProgressionSessions(model.me.userId);
             await $scope.syncPedagogicItems(true);
 
             $scope.pageInitialized = true;
@@ -136,7 +137,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
-            $scope.structure.progression_sessions.all =[];
+            $scope.progressions.all =[];
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
                 && ($scope.params.user && $scope.params.user.id)
@@ -144,21 +145,26 @@ export let main = ng.controller('MainController',
 
                 let typeId = $scope.params.user && $scope.params.user.id ? $scope.params.user.id : $scope.params.group.id;
                 let type = $scope.params.user && $scope.params.user.id ? 'teacher' : 'audience';
-
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
+
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
+
                 await Promise.all([
                     await $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
+
                 await Promise.all([
                     await $scope.structure.homeworks.syncOwnHomeworks($scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncOwnSessions($scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);

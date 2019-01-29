@@ -1,6 +1,5 @@
 package fr.openent.diary.services.impl;
 
-import fr.openent.diary.Diary;
 import fr.openent.diary.services.ProgressionService;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
@@ -13,22 +12,7 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.I18n;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.Message;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
-import org.entcore.common.sql.Sql;
-import org.entcore.common.sql.SqlResult;
-
-import org.entcore.common.service.impl.SqlCrudService;
-import org.entcore.common.user.UserInfos;
 
 public class ProgessionServiceImpl extends SqlCrudService implements ProgressionService {
     private static final String STATEMENT = "statement" ;
@@ -100,7 +84,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         try {
             JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-            statements.add(getSessionUpdateStatement(progression,progressionId));
+            statements.add(getProgressionSessionUpdateStatement(progression,progressionId));
 
             if(progression.containsKey("progression_homeworks")) {
                 JsonArray homeworks = progression.getJsonArray("progression_homeworks");
@@ -129,7 +113,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
     }
 
-    private JsonObject getSessionUpdateStatement(JsonObject progression, String progressionId) {
+    private JsonObject getProgressionSessionUpdateStatement(JsonObject progression, String progressionId) {
         JsonArray params;
         String query = "UPDATE diary.progression_session " +
                 "SET subject_id = ? ,title = ? , description = ? , annotation = ?, owner_id = ? " +
@@ -170,10 +154,6 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .put(STATEMENT, query)
                 .put(VALUES, params)
                 .put(ACTION, PREPARED);
-    }
-    @Override
-    public void progressionToSession(String idProgression, String idSession, Handler<Either<String, JsonArray>> handler) {
-
     }
 
     @Override
@@ -227,7 +207,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                         final Number id = event.right().getValue().getInteger("id");
                         JsonArray homeworks = progression.getJsonArray("progression_homeworks");
                         JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-                        statements.add(getSessionCreationstatement(id,progression));
+                        statements.add(getProgressionSessionCreationstatement(id,progression));
 
                         for (int i=0; i<homeworks.size();i++) {
                             statements.add(getHomeworkCreationStatement(id,homeworks.getJsonObject(i)));
@@ -261,7 +241,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      * @param progression
      * @return
      */
-    private JsonObject getSessionCreationstatement(Number id, JsonObject progression) {
+    private JsonObject getProgressionSessionCreationstatement(Number id, JsonObject progression) {
         String query = "INSERT INTO diary.progression_session ( id , subject_id ,title, description, annotation, owner_id) " +
                 "values ( ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
@@ -277,6 +257,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .put(VALUES, params)
                 .put(ACTION, PREPARED);
     }
+
+
+
     /**
      * Create insert request for an homework from a progression session
      * @param id
@@ -292,6 +275,120 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
                 .add(homework.getInteger("type_id"));
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
+    }
+
+    /**
+     * Get all the params from session needed to create an homework
+     * @param event
+     * @return
+     */
+    private JsonObject getSessionJsonObject(Either<String, JsonObject> event) {
+        JsonObject session =new JsonObject();
+        final Integer id = event.right().getValue().getInteger("id");
+
+        final String subject_id = event.right().getValue().getString("subject_id");
+        final String color = event.right().getValue().getString("color");
+        final String structure_id = event.right().getValue().getString("structure_id");
+        final String teacher_id = event.right().getValue().getString("teacher_id");
+        final String audience_id = event.right().getValue().getString("audience_id");
+        final String date = event.right().getValue().getString("date");
+        final boolean is_published = event.right().getValue().getBoolean("is_published");
+        session.put("subject_id",subject_id)
+                .put("color",color)
+                .put("structure_id",structure_id)
+                .put("teacher_id",teacher_id)
+                .put("audience_id",audience_id)
+                .put("is_published",is_published)
+                .put("date",date)
+                .put("id",id);
+        return session;
+    }
+
+    /**
+     * Create homeworks from progression_homeworks
+     * @param session
+     * @param homework
+     * @return
+     */
+    private JsonObject getHomeworksProgressionToHomeworks( JsonObject homework, JsonObject session){
+        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id,  " +
+                " color, description, is_published, session_id, due_date, type_id, owner_id" +
+                " ,created, modified)  " +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?,  " +
+                " to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()) RETURNING id";
+        JsonArray params = new JsonArray()
+                .add(session.getString("subject_id"))
+                .add(session.getString("structure_id"))
+                .add(session.getString("teacher_id"))
+                .add(session.getString("audience_id"))
+                .add(session.getString("color"))
+                .add(homework.getString("description"))
+                .add(session.getBoolean("is_published"))
+                .add(session.getInteger("id"))
+                .add(session.getString("date"))
+                .add(homework.getInteger("type_id"))
+                .add(homework.getString("owner_id"));
+        System.out.println(params.toString());
+
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
+
+    }
+    @Override
+    public void progressionToSession(JsonObject progression, String idProgression, String idSession, Handler<Either<String, JsonObject>> handler) {
+
+        String getIdQuery = "SELECT id as id, subject_id, color, structure_id, teacher_id, date, is_published, audience_id from diary.session where id = " + idSession ;
+        sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    try {
+                        final Number id = event.right().getValue().getInteger("id");
+
+                        JsonObject session= getSessionJsonObject( event);
+
+                        JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
+                        JsonArray homeworks = progression.getJsonArray("progression_homeworks");
+                        statements.add(getSessionUpdateStatement(progression,id));
+
+                        for (int i=0; i<homeworks.size();i++) {
+                            statements.add(getHomeworksProgressionToHomeworks(homeworks.getJsonObject(i),session));
+                        }
+                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> event) {
+                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
+                            }
+                        });
+                    } catch (ClassCastException e) {
+                        LOGGER.error("An error occurred when insert progression", e);
+                    }
+
+                } else {
+                    LOGGER.error("An error occurred when selecting id");
+                }
+            }
+
+        }));
+
+    }
+    private JsonObject getSessionUpdateStatement(JsonObject progression, Number sessionId) {
+        JsonArray params;
+        String query = "UPDATE diary.session " +
+                "SET subject_id = ? , description = ? , annotation = ?, owner_id = ? " +
+                "Where session.id = ?  ";
+        params =  new JsonArray().add(progression.getString("subject_id"))
+                .add(progression.getString("description"))
+                .add(progression.getString("annotation"))
+                .add(progression.getString("owner_id"))
+                .add(sessionId);
+
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params)

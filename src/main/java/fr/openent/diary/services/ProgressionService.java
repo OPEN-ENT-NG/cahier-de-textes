@@ -4,7 +4,6 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.entcore.common.user.UserInfos;
 
 public interface ProgressionService {
     /**
@@ -29,14 +28,13 @@ public interface ProgressionService {
     void updateProgressions(JsonObject progression, String ownerId, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * Apply a progression to a sesson of a course
-     *
-     *
-     * @param idProgression
+     * Apply a progression to a session of a course
+     *   @param idProgression
      * @param idSession
+     * @param progression
      * @param handler
      */
-    void progressionToSession(String idProgression, String idSession, Handler<Either<String, JsonArray>> handler);
+    void progressionToSession(JsonObject progression, String idProgression, String idSession, Handler<Either<String, JsonObject>> handler);
 
     /***
      * Create a progression session
