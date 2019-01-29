@@ -217,8 +217,12 @@
   "progression.manage.button.goTo": "Accéder aux progressions",
   "progression.manage.button.Create": "Créer une progression",
   "progression": "Progression",
-  "progression.session.delete": "Progression Supprimée",
-  "progression.session.delete.error": "Erreu lors de la suppression de la progression",
+  "progression.session.delete": "Progression supprimée",
+  "progression.session.delete.error": "Erreur lors de la suppression de la progression",
+  "progression.session.create": "Progression créee",
+  "progression.session.create.error": "Erreur lors de la création de la progression",
+  "progression.session.update": "Progression modifiée",
+  "progression.session.update.error": "Erreur lors de la modification de la progression",
 
   "progression.get.err": "Erreur lors de la récupération de la progression"
 }

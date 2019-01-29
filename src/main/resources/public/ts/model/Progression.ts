@@ -34,11 +34,14 @@ export class ProgressionSession{
     }
     async create(){
         let response = await http.post('/diary/progression/create' , this.toJson());
+        return Utils.setToastMessage(response, 'progression.session.create','progression.session.create.error');
 
     }
 
     async update(){
         let response = await  http.put(`/diary/progression/update/${this.id}`, this.toJson());
+        return Utils.setToastMessage(response, 'progression.session.update','progression.session.update.error');
+
     }
 
     public setSubject(subject: Subject){

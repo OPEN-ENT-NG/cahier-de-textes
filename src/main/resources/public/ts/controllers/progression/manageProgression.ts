@@ -61,7 +61,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 ;
             }
 
-            $scope.homeworkTypes.sync();
+           await $scope.homeworkTypes.sync();
             $scope.safeApply();
 
         }
@@ -84,9 +84,9 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 }
             });
             if(!exist){
-              await  $scope.progression_session.create()
+                $scope.toastHttpCall (await  $scope.progression_session.create());
             }else{
-                await $scope.progression_session.update()
+                $scope.toastHttpCall ( await $scope.progression_session.update());
             }
             $scope.goTo('/progressions/view');
             $scope.safeApply();
@@ -131,6 +131,16 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
+        $scope.newProgressionHomework = () =>{
+           $scope.progression_session.progression_homeworks.map(p => {
+                if(p.opened){
+                    p.opened = false ;
+                }
+            });
+
+            $scope.safeApply();
+
+        }
         $scope.addProgressionHomework = () =>{
 
             let newProgressionHomework = new ProgressionHomework();

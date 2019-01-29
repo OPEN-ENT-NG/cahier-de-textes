@@ -8,6 +8,10 @@
             ng-model="progressionHomework.type"
             ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
     </select>
+    <button
+            ng-disabled="!areValidHomeworks()"
+            ng-click="newProgressionHomework()"><i18n>utils.save </i18n></button>
+
 </td>
 <!-- Type static data -->
 <td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
@@ -29,5 +33,7 @@
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
     <i class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
+
 </td>
+
 
