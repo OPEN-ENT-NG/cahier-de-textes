@@ -87,15 +87,16 @@ public class ProgressionController extends ControllerHelper {
     }
 
 
-    @Delete("/progression/homework/:progressionId")
+    @Delete("/progression/homework/:progressionHomeworkId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
     public void deleteProgressionHomework(final HttpServerRequest request) {
 
-        String progressionId = request.getParam("progressionId");
+        String progressionHomeworkId = request.getParam("progressionHomeworkId");
 
-        progressionService.deleteHomeworkProgression( progressionId, DefaultResponseHandler.arrayResponseHandler(request));
+        progressionService.deleteHomeworkProgression( progressionHomeworkId, DefaultResponseHandler.arrayResponseHandler(request));
     }
+
 
     @Put("/progression/update/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)

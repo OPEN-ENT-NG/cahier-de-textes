@@ -115,7 +115,9 @@ export class ProgressionSession{
 
     async delete() {
         try {
-            await http.delete(`/diary/progression/${this.id}`);
+            let response = await http.delete(`/diary/progression/${this.id}`);
+            return Utils.setToastMessage(response, 'progression.session.delete','progression.session.delete.error');
+
         }catch (e){
             console.error(e);
         }
@@ -208,6 +210,16 @@ export class ProgressionHomework{
         };
 
         return result
+    }
+
+    async delete() {
+        try {
+            let response = await http.delete(`/diary/progression/homework/${this.id}`);
+            return Utils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
+
+        }catch (e){
+            console.error(e);
+        }
     }
 }
 export class ProgressionHomeworks{

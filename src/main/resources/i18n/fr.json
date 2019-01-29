@@ -217,5 +217,8 @@
   "progression.manage.button.goTo": "Accéder aux progressions",
   "progression.manage.button.Create": "Créer une progression",
   "progression": "Progression",
+  "progression.session.delete": "Progression Supprimée",
+  "progression.session.delete.error": "Erreu lors de la suppression de la progression",
+
   "progression.get.err": "Erreur lors de la récupération de la progression"
 }

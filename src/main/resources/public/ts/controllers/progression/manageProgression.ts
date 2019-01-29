@@ -76,18 +76,19 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
 
-        $scope.validProgressionsSessionForm = () =>{
-         let exist = false;
+        $scope.validProgressionsSessionForm = async () =>{
+            let exist = false;
             $scope.progression_sessions.all.map((item) =>{
-             if (item.id == $scope.progression_session.id){
-                 exist=true;
-             }
-         });
+                if (item.id == $scope.progression_session.id){
+                    exist=true;
+                }
+            });
             if(!exist){
-                $scope.progression_session.create()
+              await  $scope.progression_session.create()
             }else{
-                $scope.progression_session.update()
+                await $scope.progression_session.update()
             }
+            $scope.goTo('/progressions/view');
             $scope.safeApply();
 
         };
@@ -121,10 +122,12 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
-        $scope.deleteProgressionHomework = (progressionHomework: ProgressionHomework,i) => {
+        $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
 
             console.log(i);
             $scope.progression_session.progression_homeworks.splice(i,1);
+            if(progressionHomework.id)
+                $scope.toastHttpCall (await progressionHomework.delete());
 
         };
 
@@ -141,7 +144,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.deleteProgressionSession = async (progressionSession: ProgressionSession)=>{
-            await progressionSession.delete();
+            $scope.toastHttpCall (await progressionSession.delete());
             await initData();
             $scope.isReadOnly = !$scope.isReadOnly;
 
@@ -153,7 +156,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
 
             $scope.goTo('/progression/'+ progressionSession.id);
-          //  $scope.safeApply();
+            //  $scope.safeApply();
 
         };
         $scope.back = () =>{

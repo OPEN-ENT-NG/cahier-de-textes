@@ -47,10 +47,10 @@ public interface ProgressionService {
 
     /**
      * Delete an homework from progression
-     * @param progressionId
+     * @param progressionHomeworkId
      * @param handler
      */
-    void deleteHomeworkProgression(String progressionId, Handler<Either<String, JsonArray>> handler);
+    void deleteHomeworkProgression(String progressionHomeworkId, Handler<Either<String, JsonArray>> handler);
 
     /**
      * Create an homework for a progression

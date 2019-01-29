@@ -179,15 +179,16 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
 
     @Override
-    public void deleteHomeworkProgression(String progressionId, Handler<Either<String, JsonArray>> handler) {
+    public void deleteHomeworkProgression(String progressionHomeworkId, Handler<Either<String, JsonArray>> handler) {
         JsonArray params =  new JsonArray();
 
-        String query = "DELETE from diray.progression_homework" +
-                "WHERE id = ?";
+        String query = "DELETE from diary.progression_homework" +
+                " WHERE id = ?";
 
 
-        params.add(progressionId);
-        //   Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        params.add(progressionHomeworkId);
+
+           Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
     }
 
@@ -332,7 +333,6 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(session.getString("date"))
                 .add(homework.getInteger("type_id"))
                 .add(homework.getString("owner_id"));
-        System.out.println(params.toString());
 
         return new JsonObject()
                 .put(STATEMENT, query)
