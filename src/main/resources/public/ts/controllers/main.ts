@@ -1,6 +1,5 @@
 import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
-
 import {Utils} from '../utils/utils';
 import {ProgressionSession, ProgressionSessions} from "../model/Progression";
 

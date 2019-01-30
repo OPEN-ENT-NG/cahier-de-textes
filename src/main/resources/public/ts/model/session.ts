@@ -6,6 +6,7 @@ import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
+import {ProgressionSession,ProgressionHomework} from "./Progression";
 
 const colors = ['grey', 'green'];
 
@@ -43,12 +44,15 @@ export class Session {
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
 
-    constructor(structure: Structure, course?: Course) {
+    constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
         if(course){
             this.setFromCourse(course);
             this.init(structure);
             this.title = 'Séance du ' + this.startDisplayDate + ' (' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
+        }if(course && progression){
+            this.setFromCourseAndProgression(progression,course);
+            this.init(structure);
         }
     }
 
@@ -200,6 +204,18 @@ export class Session {
         } catch (e) {
             notify.error('session.sync.err');
         }
+    }
+
+    setFromCourseAndProgression(progression: ProgressionSession,course: Course) {
+        this.subject = progression.subject;
+        this.title = progression.title;
+        this.courseId = course._id;
+        this.teacher = course.teachers[0];
+        this.room = course.rooms[0];
+        this.date = this.startTime = course.startMoment.toDate();
+        this.endTime = course.endMoment.toDate();
+        this.audience = course.audiences.all[0];
+        this.color = colors[1];
     }
 }
 

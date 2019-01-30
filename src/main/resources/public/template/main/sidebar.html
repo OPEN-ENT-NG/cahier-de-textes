@@ -105,7 +105,7 @@
                 </div>
             </div>
     </section>
-<section ng-show="!display.listView" ng-if="progressions.all.length > 10">
+<section  ng-show="!display.listView" ng-if="progressions.all.length > 0">
     <div class="row">
         <h5 class="large" ng-click="display.progression = !display.progression">
             <i18n>progression</i18n>
@@ -113,10 +113,10 @@
         </h5>
     </div>
     <div ng-show="display.progression" >
-        <table>
-            <tr ng-repeat="progression in progressions.all track by $index">
-                <td>[[progression.title]]</td>
-            </tr>
+        <table >
+            <div ng-repeat="progression in progressions.all track by $index">
+                <p class="progression-item-scrollable six"  lvl-draggable="true" >[[progression.title]]</p>
+            </div>
         </table>
     </div>
 </section>

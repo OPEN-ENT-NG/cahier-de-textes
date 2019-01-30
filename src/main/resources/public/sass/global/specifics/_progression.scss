@@ -1,0 +1,9 @@
+.progression-item-scrollable{
+  background-color: #2a9cc8;
+  color: white;
+  border-radius:10px;
+  transform: translate(0, 0);// Allow to erase the corner during drag
+  padding:1px;
+  text-align: center;
+  z-index: 10;
+}
