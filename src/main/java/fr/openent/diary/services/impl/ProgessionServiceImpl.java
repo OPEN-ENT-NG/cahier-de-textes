@@ -107,6 +107,8 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
             });
         } catch (ClassCastException e) {
             LOGGER.error("An error occurred when insert progression", e);
+            handler.handle(new Either.Left<String, JsonObject>(""));
+
         }
 
 
@@ -368,6 +370,8 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                         });
                     } catch (ClassCastException e) {
                         LOGGER.error("An error occurred when insert progression", e);
+                        handler.handle(new Either.Left<String, JsonObject>(""));
+
                     }
 
                 } else {
