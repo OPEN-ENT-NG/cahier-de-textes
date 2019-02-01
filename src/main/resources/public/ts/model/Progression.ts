@@ -21,6 +21,7 @@ export class ProgressionSession{
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
+    owner_id;
     subject_id;
     homeworks;
     eventer: Eventer;
@@ -49,6 +50,8 @@ export class ProgressionSession{
     }
 
     init(){
+        if(this.subject_id)
+            this.subject.id = this.subject_id
     }
 
 
@@ -65,15 +68,15 @@ export class ProgressionSession{
                 this.progression_homeworks.forEach(i => i.initType());
                 this.eventer.trigger(`get:end`)
             } catch (e) {
-           //     notify.error('session.sync.err');
+                //     notify.error('session.sync.err');
             }
         }
 
     }
-    private  homeworksToJson() {
+    private  homeworksToJson(owner_id?) {
         let json = [];
         this.progression_homeworks.map(p => {
-            let jsonLine = p.toJson(this.owner.id);
+            let jsonLine = p.toJson(this.owner ? this.owner.id : owner_id);
             if(jsonLine){
                 json.push(jsonLine);
             }
@@ -84,11 +87,11 @@ export class ProgressionSession{
 
         return {
             description: this.description,
-            subject_id: this.subject.id,
+            subject_id: this.subject.id ? this.subject.id : this.subject_id,
             title : this.title,
             annotation : this.annotation,
-            owner_id: this.owner.id,
-            progression_homeworks: this.homeworksToJson()
+            owner_id: this.owner ? this.owner.id : this.owner_id,
+            progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
 
         }
     }
@@ -101,20 +104,30 @@ export class ProgressionSession{
             && this.description.length;
     };
 
+    setOwnerId(owner_id: any) {
 
+        this.owner_id = owner_id;
+
+    }
 
     static formatSqlDataToModel(data: any) {
+
 
         return {
             id: data.id,
             title: data.title,
             description: data.description,
+            owner_id: data.owner_id,
             subject_id : data.subject_id,
             progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
             created: data.created
         }
     }
+
+
+
+
 
     async delete() {
         try {
@@ -124,6 +137,12 @@ export class ProgressionSession{
         }catch (e){
             console.error(e);
         }
+    }
+
+    async toSession(idSession){
+        let response = await http.put(`/diary/progression/to/session/${this.id}/${idSession}` , this.toJson());
+        return Utils.setToastMessage(response, 'session.updated','session.updated.error');
+
     }
 }
 
@@ -143,6 +162,7 @@ export class ProgressionSessions{
         this.all = Mix.castArrayAs(ProgressionSession, ProgressionSessions.formatSqlDataToModel(data));
         this.all.forEach(i => {
             i.init();
+            i.setOwnerId(this.owner_id);
         });
     }
 
@@ -162,6 +182,7 @@ export class ProgressionHomework{
     type_id;
     type_label;
     subject: Subject;
+    subject_id;
     p_session: ProgressionSession;
     isNewField: boolean=false;
     opened: boolean;
@@ -184,7 +205,7 @@ export class ProgressionHomework{
             return {
                 id: this.id || null ,
                 description: this.description,
-                subject_id: this.subject.id,
+                subject_id: this.subject ? this.subject.id : this.subject_id,
                 owner_id: ownerId,
                 type_id: this.type.id
 
@@ -206,6 +227,7 @@ export class ProgressionHomework{
         let result={
             id: data.id,
             type_id : data.type_id,
+            subject_id:data.subject_id,
             type_label : data.type_label,
             description: data.description,
             modified: data.modified,

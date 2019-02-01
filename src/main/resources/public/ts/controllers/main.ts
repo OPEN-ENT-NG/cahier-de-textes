@@ -1,11 +1,47 @@
-import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
+import {_,angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
 import {Utils} from '../utils/utils';
 import {ProgressionSession, ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+    ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
 
+
+        $scope.dropped = function(dragEl, dropEl) {
+
+            // this is your application logic, do whatever makes sense
+            let progression = $( '#'+dragEl );
+            let id_progression = progression[0].children[0].textContent;
+            let sessionOrCourse = $('#'+dropEl);
+            let typeCourseSession =sessionOrCourse[0].classList[2];
+            console.log(sessionOrCourse);
+
+            if (typeCourseSession == "TYPE_SESSION"){
+                let idSession = sessionOrCourse[0].children[0].textContent;
+                $scope.updateSession(idSession,id_progression);
+
+            }else if(typeCourseSession == "TYPE_COURSE"){
+
+            }
+        };
+
+        $scope.updateSession = async (idSession, idProgression) => {
+           let progressionDragged, SessionDroped;
+            $scope.progressions.all.map(progression => {
+                if (progression.id == idProgression)
+                {
+                    progressionDragged = progression;
+                }
+            });
+            await progressionDragged.toSession(idSession);
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSession) {
+                    await session.sync();
+                }
+            });
+           model.calendar.setDate(model.calendar.firsDate);
+             $scope.safeApply();
+        };
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];

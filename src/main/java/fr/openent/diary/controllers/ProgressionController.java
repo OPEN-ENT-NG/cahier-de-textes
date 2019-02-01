@@ -114,7 +114,7 @@ public class ProgressionController extends ControllerHelper {
 
     }
 
-    @Post("/progression/to/session/:idProgression/:idSession")
+    @Put("/progression/to/session/:idProgression/:idSession")
     @SecuredAction(value = "",type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)
     public void progressionToSession(final HttpServerRequest request){
