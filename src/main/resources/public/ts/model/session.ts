@@ -175,9 +175,13 @@ export class Session {
         if(this.id) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat());
             return Utils.setToastMessage(response, 'session.updated','session.updated.error');
+
         } else {
             let response = await http.post('/diary/session', this.toSendFormat());
+            this.id=response.data.id;
+
             return Utils.setToastMessage(response, 'session.created','session.created.error');
+
         }
     }
 
@@ -216,7 +220,9 @@ export class Session {
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
         this.color = colors[1];
+
     }
+
 }
 
 export class Sessions {
@@ -278,7 +284,7 @@ export class Sessions {
                             return new Date(dateString).getTime();
                         })
                         .value()
-                    ).format("DD-MM-YYYY HH:mm")
+                ).format("DD-MM-YYYY HH:mm")
             }
         });
         return final;

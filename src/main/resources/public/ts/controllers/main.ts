@@ -1,5 +1,8 @@
 import {_,angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
+import {
+    Course, Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
+    Workload
+} from '../model';
 import {Utils} from '../utils/utils';
 import {ProgressionSession, ProgressionSessions} from "../model/Progression";
 
@@ -7,41 +10,7 @@ export let main = ng.controller('MainController',
     ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
 
 
-        $scope.dropped = function(dragEl, dropEl) {
 
-            // this is your application logic, do whatever makes sense
-            let progression = $( '#'+dragEl );
-            let id_progression = progression[0].children[0].textContent;
-            let sessionOrCourse = $('#'+dropEl);
-            let typeCourseSession =sessionOrCourse[0].classList[2];
-            console.log(sessionOrCourse);
-
-            if (typeCourseSession == "TYPE_SESSION"){
-                let idSession = sessionOrCourse[0].children[0].textContent;
-                $scope.updateSession(idSession,id_progression);
-
-            }else if(typeCourseSession == "TYPE_COURSE"){
-
-            }
-        };
-
-        $scope.updateSession = async (idSession, idProgression) => {
-           let progressionDragged, SessionDroped;
-            $scope.progressions.all.map(progression => {
-                if (progression.id == idProgression)
-                {
-                    progressionDragged = progression;
-                }
-            });
-            await progressionDragged.toSession(idSession);
-            $scope.calendarItems.map(async session => {
-                if (session.id == idSession) {
-                    await session.sync();
-                }
-            });
-           model.calendar.setDate(model.calendar.firsDate);
-             $scope.safeApply();
-        };
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
@@ -464,10 +433,81 @@ export let main = ng.controller('MainController',
             return Utils.getDisplayDate(date);
         };
 
-        $scope.plop= () =>{
-            console.log("plop");
-        }
 
+//handle the drop event
+        $scope.dropped = function(dragEl, dropEl) {
+
+            // this is your application logic, do whatever makes sense
+            let progression = $( '#'+dragEl );
+            let id_progression = progression[0].children[0].textContent;
+            let sessionOrCourse = $('#'+dropEl);
+            let typeCourseSession =sessionOrCourse[0].classList[2];
+
+            if (typeCourseSession == "TYPE_SESSION"){
+                let idSession = sessionOrCourse[0].children[0].textContent;
+                $scope.updateSession(idSession,id_progression);
+
+            }else if(typeCourseSession == "TYPE_COURSE"){
+                let idCourse = sessionOrCourse[0].children[0].textContent;
+                let date = sessionOrCourse[0].children[1].textContent;
+
+                $scope.createSessionFromProgression(id_progression,idCourse,date);
+            }
+
+
+        };
+
+        $scope.updateSession = async (idSession, idProgression) => {
+            let progressionDragged, SessionDroped;
+            $scope.progressions.all.map(progression => {
+                if (progression.id == idProgression)
+                {
+                    progressionDragged = progression;
+                }
+            });
+            await progressionDragged.toSession(idSession);
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSession) {
+                    await session.sync();
+                }
+            });
+            model.calendar.sync();
+            $scope.syncPedagogicItems();
+
+            $scope.safeApply();
+        };
+        $scope.createSessionFromProgression = async (idProgression,idCourse,date) =>{
+
+            let progressionDragged;
+            $scope.progressions.all.map(progression => {
+                if (progression.id == idProgression)
+                {
+                    progressionDragged = progression;
+                }
+            });
+
+            let course = new Course($scope.structure, idCourse);
+
+            // Formating date
+            date = date.split('/').join('-');
+            date = date.split("-");
+            let tempDateAnnee = date[2];
+            date[2]=date[0];
+            date[0]=tempDateAnnee;
+            date = date.join("-");
+
+            //insert data and refresh calendar
+            await course.sync(date, date);
+            let session= new Session($scope.structure,course,progressionDragged);
+            session.setFromCourse(course);
+            session.opened = true;
+            await session.save();
+            await progressionDragged.toSession(session.id);
+            $scope.syncPedagogicItems();
+            $scope.safeApply();
+
+
+        };
 
         route({
             main: async () => {
@@ -507,4 +547,5 @@ export let main = ng.controller('MainController',
 
             }
         });
+
     }]);

@@ -19,6 +19,7 @@
 <div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSessionFromCourse(item)" class="schedule-item-content bg-lightgrey TYPE_COURSE pointer session "
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item._id]]</span>
+    <span ng-show="false">[[item.startDisplayDate]]</span>
 
     <div class="twelve">
         <div class="text-ellipsis overflow-hidden">
