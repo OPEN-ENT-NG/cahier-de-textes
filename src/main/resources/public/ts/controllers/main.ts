@@ -439,23 +439,79 @@ export let main = ng.controller('MainController',
 
             // this is your application logic, do whatever makes sense
             let progression = $( '#'+dragEl );
-            let id_progression = progression[0].children[0].textContent;
+            let id_progressionOrSession = progression[0].children[0].textContent;
             let sessionOrCourse = $('#'+dropEl);
             let typeCourseSession =sessionOrCourse[0].classList[2];
+            let idCourseSession = sessionOrCourse[0].children[0].textContent;;
+            if(progression[0].classList[2]=="progression-item-draggable"){
+                if (typeCourseSession == "TYPE_SESSION"){
+                    $scope.updateSession(idCourseSession,id_progressionOrSession);
+                }else if(typeCourseSession == "TYPE_COURSE"){
+                    let date = sessionOrCourse[0].children[1].textContent;
+                    $scope.createSessionFromProgression(id_progressionOrSession,idCourseSession,date);
+                }
+            }else if (progression[0].classList[2] == "TYPE_SESSION" ){
+                if (typeCourseSession == "TYPE_SESSION" ){
+                    $scope.sessionToSession(id_progressionOrSession,idCourseSession)
+                }else
+                if(typeCourseSession == "TYPE_COURSE" ){
+                    let date = sessionOrCourse[0].children[1].textContent;
 
-            if (typeCourseSession == "TYPE_SESSION"){
-                let idSession = sessionOrCourse[0].children[0].textContent;
-                $scope.updateSession(idSession,id_progression);
+                    $scope.sessionToCourse(id_progressionOrSession,idCourseSession,date)
 
-            }else if(typeCourseSession == "TYPE_COURSE"){
-                let idCourse = sessionOrCourse[0].children[0].textContent;
-                let date = sessionOrCourse[0].children[1].textContent;
+                }
 
-                $scope.createSessionFromProgression(id_progression,idCourse,date);
             }
-
-
         };
+        $scope.sessionToSession = (idSessionDrag , idSessionDrop) =>{
+            let sessionDrag,sessionDrop;
+            console.log("sessionToSession");
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSessionDrop) {
+                    sessionDrag= session;
+                }
+            });
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSessionDrop) {
+                    sessionDrop= session;
+                }
+            });
+        }
+
+
+        $scope.sessionToCourse = async (idSession , idCourse,date) =>{
+
+            let sessionDrag;
+            let course = new Course($scope.structure, idCourse);
+
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSession) {
+                    sessionDrag= session;
+                }
+            });
+
+
+            // Formating date
+            date = date.split('/').join('-');
+            date = date.split("-");
+            let tempDateAnnee = date[2];
+            date[2]=date[0];
+            date[0]=tempDateAnnee;
+            date = date.join("-");
+
+            //insert data and refresh calendar
+            await course.sync(date, date);
+            let session= new Session($scope.structure,course);
+            session.setFromCourse(course);
+            session.opened = true;
+            await session.save();
+            console.log(session);
+            await sessionDrag.duplicateHomework(session)
+            $scope.syncPedagogicItems();
+            $scope.safeApply();
+
+        }
+
 
         $scope.updateSession = async (idSession, idProgression) => {
             let progressionDragged, SessionDroped;
@@ -471,6 +527,8 @@ export let main = ng.controller('MainController',
                     await session.sync();
                 }
             });
+
+
             model.calendar.sync();
             $scope.syncPedagogicItems();
 
@@ -503,6 +561,7 @@ export let main = ng.controller('MainController',
             session.opened = true;
             await session.save();
             await progressionDragged.toSession(session.id);
+            await session.sync();
             $scope.syncPedagogicItems();
             $scope.safeApply();
 

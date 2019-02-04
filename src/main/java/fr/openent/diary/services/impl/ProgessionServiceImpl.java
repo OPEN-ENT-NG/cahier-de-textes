@@ -335,7 +335,6 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(session.getString("date"))
                 .add(homework.getInteger("type_id"))
                 .add(homework.getString("owner_id"));
-
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params)

@@ -222,6 +222,11 @@ export class Session {
         this.color = colors[1];
 
     }
+    async duplicateHomework(session){
+        this.homeworks.map(async homework =>  {
+          await  homework.duplicate(session.id,session.date);
+        });
+    }
 
 }
 

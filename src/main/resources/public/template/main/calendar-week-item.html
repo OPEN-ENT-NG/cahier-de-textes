@@ -1,5 +1,6 @@
 <div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)"
      class="schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
+     lvl-draggable
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item.id]]</span>
     <div  class="twelve">
@@ -17,7 +18,7 @@
 </div>
 
 <div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSessionFromCourse(item)" class="schedule-item-content bg-lightgrey TYPE_COURSE pointer session "
-     lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item._id]]</span>
     <span ng-show="false">[[item.startDisplayDate]]</span>
 

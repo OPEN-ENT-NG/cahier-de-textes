@@ -115,7 +115,7 @@
         <div ng-show="display.progression" >
             <table >
                 <div ng-repeat="progression in progressions.all track by $index">
-                    <p class="progression-item-scrollable six"  lvl-draggable="true" >[[progression.title]]
+                    <p class="progression-item-scrollable six progression-item-draggable "  lvl-draggable="true" >[[progression.title]]
                         <span ng-show="false">[[progression.id]]</span>
                         <span ng-show="false">[[progression.progression_homeworks.length]]</span>
                     </p>
