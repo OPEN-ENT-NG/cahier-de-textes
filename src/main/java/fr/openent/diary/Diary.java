@@ -2,6 +2,7 @@ package fr.openent.diary;
 
 import fr.openent.diary.controllers.*;
 import fr.openent.diary.services.*;
+import fr.openent.diary.services.impl.*;
 import io.vertx.core.eventbus.EventBus;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.notification.TimelineHelper;
@@ -29,6 +30,7 @@ public class Diary extends BaseServer {
         addController(new SessionController(new SessionServiceImpl()));
         addController(new HomeworkController(new HomeworkServiceImpl()));
         addController(new InspectorController(new InspectorServiceImpl()));
+        addController(new ProgressionController(new ProgessionServiceImpl("diary")));
 	}
 
 }

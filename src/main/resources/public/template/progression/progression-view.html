@@ -1,0 +1,53 @@
+
+    <article class="responsive-table row" ng-controller="manageProgessionCtrl">
+        <div     class="padding-md margin-bottom-md">
+            <table class="twelve">
+                <thead>
+                <tr>
+                    <td class="one text-left"><i18n>title</i18n></td>
+                    <td class="one text-left"><i18n>subject</i18n></td>
+                    <td class="three text-left"><i18n>settings.exclusion.description</i18n></td>
+                    <td class="six text-left"><i18n>homeworks.attached</i18n></td>
+                    <td class="one">&nbsp;</td>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="progression_session in progression_sessions.all track by $index">
+                    <td class="one text-left">[[progression_session.title]]</td>
+                    <td class="one text-left">[[progression_session.subject.label]]</td>
+                    <td class="three text-left" ng-bind-html="[[progressionHomework.description]]"></td>
+                    <td class="six text-left">
+                        <div ng-if="progression_session.progression_homeworks.length != 0" >
+                            <table class="twelve">
+                                <thead>
+                                <tr>
+                                    <td class="two text-left"><i18n>homework.manage.type</i18n></td>
+
+                                    <td class="ten text-left"><i18n>settings.exclusion.description</i18n></td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index">
+                                    <td class="two text-left">[[progressionHomework.type.label]]</td>
+                                    <td class="ten text-left" ng-bind-html="[[progressionHomework.description]]"></td>
+                                </tr>
+                                </tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td class="one vertical-align-top vertical-align-top text-right">
+                        <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionSession(progression_session)">&#xe858;</i>
+                        <i class="trash right-magnet" ng-click="deleteProgressionSession(progression_session)"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="twelve padding-sm" ng-click="newProgressionForm()">
+            <i18n>progression.manage.button.Create</i18n>
+        </button>
+    </article>
+

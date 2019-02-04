@@ -30,7 +30,7 @@ export class Homework {
     isNewField: boolean=false;
     is_periodic: boolean = false;
     locked: boolean = true;
-
+    due_date;
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
     attachedToSession: boolean = true;
     attachedToDate: boolean = false;
@@ -165,6 +165,12 @@ export class Homework {
             && this.description
             && this.description.length;
     };
+
+    async duplicate(idSession: any,date) {
+        this.session.id = idSession;
+        this.due_date = date;
+        await this.create();
+    }
 }
 
 export class Homeworks {

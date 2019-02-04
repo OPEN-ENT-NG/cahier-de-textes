@@ -1,5 +1,6 @@
-package fr.openent.diary.services;
+package fr.openent.diary.services.impl;
 
+import fr.openent.diary.services.ExportPDFService;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.data.FileResolver;
 import fr.wseduc.webutils.http.Renders;

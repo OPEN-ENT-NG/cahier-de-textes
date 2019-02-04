@@ -6,6 +6,7 @@ import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
+import {ProgressionSession,ProgressionHomework} from "./Progression";
 
 const colors = ['grey', 'green'];
 
@@ -43,12 +44,15 @@ export class Session {
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
 
-    constructor(structure: Structure, course?: Course) {
+    constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
         if(course){
             this.setFromCourse(course);
             this.init(structure);
             this.title = 'Séance du ' + this.startDisplayDate + ' (' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
+        }if(course && progression){
+            this.setFromCourseAndProgression(progression,course);
+            this.init(structure);
         }
     }
 
@@ -171,9 +175,13 @@ export class Session {
         if(this.id) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat());
             return Utils.setToastMessage(response, 'session.updated','session.updated.error');
+
         } else {
             let response = await http.post('/diary/session', this.toSendFormat());
+            this.id=response.data.id;
+
             return Utils.setToastMessage(response, 'session.created','session.created.error');
+
         }
     }
 
@@ -201,6 +209,25 @@ export class Session {
             notify.error('session.sync.err');
         }
     }
+
+    setFromCourseAndProgression(progression: ProgressionSession,course: Course) {
+        this.subject = progression.subject;
+        this.title = progression.title;
+        this.courseId = course._id;
+        this.teacher = course.teachers[0];
+        this.room = course.rooms[0];
+        this.date = this.startTime = course.startMoment.toDate();
+        this.endTime = course.endMoment.toDate();
+        this.audience = course.audiences.all[0];
+        this.color = colors[1];
+
+    }
+    async duplicateHomework(session){
+        this.homeworks.map(async homework =>  {
+          await  homework.duplicate(session.id,session.date);
+        });
+    }
+
 }
 
 export class Sessions {
@@ -262,7 +289,7 @@ export class Sessions {
                             return new Date(dateString).getTime();
                         })
                         .value()
-                    ).format("DD-MM-YYYY HH:mm")
+                ).format("DD-MM-YYYY HH:mm")
             }
         });
         return final;

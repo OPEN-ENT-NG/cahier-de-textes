@@ -1,9 +1,12 @@
-package fr.openent.diary.services;
+package fr.openent.diary.services.impl;
 
+import fr.openent.diary.services.DiaryService;
+import fr.openent.diary.services.SessionService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SessionServiceImpl implements SessionService {
+public class SessionServiceImpl  implements SessionService {
 
     private DiaryService diaryService = new DiaryServiceImpl();
 

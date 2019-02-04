@@ -1,0 +1,39 @@
+
+<!-- Deadline static data -->
+
+<!-- Type -->
+<td ng-if="progressionHomework.opened" class="two vertical-align-top text-left ">
+    <select class="twelve"
+            required
+            ng-model="progressionHomework.type"
+            ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
+    </select>
+    <button
+            ng-disabled="!areValidHomeworks()"
+            ng-click="newProgressionHomework()"><i18n>utils.save </i18n></button>
+
+</td>
+<!-- Type static data -->
+<td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
+    <p class="twelve">[[progressionHomework.type.label]]</p>
+</td>
+
+
+<!-- Description-->
+<td ng-if="progressionHomework.opened" class="six vertical-align-top full-td-width text-left">
+    <editor class="twelve" ng-model="progressionHomework.description"></editor>
+</td>
+<!-- Deadline static data -->
+<td ng-if="!progressionHomework.opened" class="six vertical-align-top full-td-width text-left">
+    <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
+</td>
+
+
+<!-- Button part -->
+<td class="one vertical-align-top vertical-align-top text-right">
+    <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
+    <i class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
+
+</td>
+
+

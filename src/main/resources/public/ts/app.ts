@@ -1,7 +1,9 @@
-﻿import {ng, routes} from 'entcore';
+import {angular, ng, routes} from 'entcore';
 import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
+import * as modules from './modules';
+
 
 for (let directive in directives) {
     ng.directives.push(directives[directive]);
@@ -14,6 +16,9 @@ for (let controller in controllers) {
     ng.controllers.push(controllers[controller]);
 }
 
+for (let module in modules){
+     ng.addRequiredModule(module);
+}
 
 routes.define(($routeProvider) => {
     $routeProvider
@@ -46,6 +51,18 @@ routes.define(($routeProvider) => {
         })
         .when('/list',{
             action : 'manageList'
+        })
+        .when('/progression/create',{
+            action  : 'manageProgression'
+        })
+        .when('/progression/:progressionId',{
+            action  : 'manageProgression'
+        })
+        .when('/progression/to/session/:idProgression/:idSession',{
+            action  : 'manageProgression'
+        })
+        .when('/progressions/view',{
+            action  : 'viewProgression'
         })
         .otherwise({
             redirectTo: '/'

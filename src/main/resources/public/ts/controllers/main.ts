@@ -1,10 +1,15 @@
-import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Sessions, Structure, Structures, Workload} from '../model';
-
+import {_,angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
+import {
+    Course, Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
+    Workload
+} from '../model';
 import {Utils} from '../utils/utils';
+import {ProgressionSession, ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+    ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+
+
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
@@ -13,7 +18,8 @@ export let main = ng.controller('MainController',
         $scope.display = {
             homeworks: true,
             sessions: true,
-            listView: false
+            listView: false,
+            progression: false
         };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -116,7 +122,7 @@ export let main = ng.controller('MainController',
 
             $scope.structure.homeworks = new Homeworks($scope.structure);
             $scope.structure.sessions = new Sessions($scope.structure);
-
+            $scope.progressions = new ProgressionSessions(model.me.userId);
             await $scope.syncPedagogicItems(true);
 
             $scope.pageInitialized = true;
@@ -141,6 +147,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
+            $scope.progressions.all =[];
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
                 && ($scope.params.user && $scope.params.user.id)
@@ -148,21 +155,26 @@ export let main = ng.controller('MainController',
 
                 let typeId = $scope.params.user && $scope.params.user.id ? $scope.params.user.id : $scope.params.group.id;
                 let type = $scope.params.user && $scope.params.user.id ? 'teacher' : 'audience';
-
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
+
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
+
                 await Promise.all([
                     await $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
+
                 await Promise.all([
                     await $scope.structure.homeworks.syncOwnHomeworks($scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncOwnSessions($scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
@@ -321,6 +333,12 @@ export let main = ng.controller('MainController',
         };
 
 
+        $scope.newProgressionForm = () =>{
+            $scope.goTo('/progression/create');
+
+            $scope.safeApply();
+        };
+
         $scope.params = {
             user: null,
             group: null,
@@ -383,6 +401,11 @@ export let main = ng.controller('MainController',
             $scope.setProgress(homework);
         }
 
+        $scope.newProgressionForm = () =>{
+            $scope.goTo('/progression/create');
+
+            $scope.safeApply();
+        };
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId);
@@ -410,6 +433,141 @@ export let main = ng.controller('MainController',
             return Utils.getDisplayDate(date);
         };
 
+
+//handle the drop event
+        $scope.dropped = function(dragEl, dropEl) {
+
+            // this is your application logic, do whatever makes sense
+            let progression = $( '#'+dragEl );
+            let id_progressionOrSession = progression[0].children[0].textContent;
+            let sessionOrCourse = $('#'+dropEl);
+            let typeCourseSession =sessionOrCourse[0].classList[2];
+            let idCourseSession = sessionOrCourse[0].children[0].textContent;;
+            if(progression[0].classList[2]=="progression-item-draggable"){
+                if (typeCourseSession == "TYPE_SESSION"){
+                    $scope.updateSession(idCourseSession,id_progressionOrSession);
+                }else if(typeCourseSession == "TYPE_COURSE"){
+                    let date = sessionOrCourse[0].children[1].textContent;
+                    $scope.createSessionFromProgression(id_progressionOrSession,idCourseSession,date);
+                }
+            }else if (progression[0].classList[2] == "TYPE_SESSION" ){
+                if (typeCourseSession == "TYPE_SESSION" ){
+                    $scope.sessionToSession(id_progressionOrSession,idCourseSession)
+                }else
+                if(typeCourseSession == "TYPE_COURSE" ){
+                    let date = sessionOrCourse[0].children[1].textContent;
+
+                    $scope.sessionToCourse(id_progressionOrSession,idCourseSession,date)
+
+                }
+
+            }
+        };
+        $scope.sessionToSession = (idSessionDrag , idSessionDrop) =>{
+            let sessionDrag,sessionDrop;
+            console.log("sessionToSession");
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSessionDrop) {
+                    sessionDrag= session;
+                }
+            });
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSessionDrop) {
+                    sessionDrop= session;
+                }
+            });
+        }
+
+
+        $scope.sessionToCourse = async (idSession , idCourse,date) =>{
+
+            let sessionDrag;
+            let course = new Course($scope.structure, idCourse);
+
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSession) {
+                    sessionDrag= session;
+                }
+            });
+
+
+            // Formating date
+            date = date.split('/').join('-');
+            date = date.split("-");
+            let tempDateAnnee = date[2];
+            date[2]=date[0];
+            date[0]=tempDateAnnee;
+            date = date.join("-");
+
+            //insert data and refresh calendar
+            await course.sync(date, date);
+            let session= new Session($scope.structure,course);
+            session.setFromCourse(course);
+            session.opened = true;
+            await session.save();
+            console.log(session);
+            await sessionDrag.duplicateHomework(session)
+            $scope.syncPedagogicItems();
+            $scope.safeApply();
+
+        }
+
+
+        $scope.updateSession = async (idSession, idProgression) => {
+            let progressionDragged, SessionDroped;
+            $scope.progressions.all.map(progression => {
+                if (progression.id == idProgression)
+                {
+                    progressionDragged = progression;
+                }
+            });
+            await progressionDragged.toSession(idSession);
+            $scope.calendarItems.map(async session => {
+                if (session.id == idSession) {
+                    await session.sync();
+                }
+            });
+
+
+            model.calendar.sync();
+            $scope.syncPedagogicItems();
+
+            $scope.safeApply();
+        };
+        $scope.createSessionFromProgression = async (idProgression,idCourse,date) =>{
+
+            let progressionDragged;
+            $scope.progressions.all.map(progression => {
+                if (progression.id == idProgression)
+                {
+                    progressionDragged = progression;
+                }
+            });
+
+            let course = new Course($scope.structure, idCourse);
+
+            // Formating date
+            date = date.split('/').join('-');
+            date = date.split("-");
+            let tempDateAnnee = date[2];
+            date[2]=date[0];
+            date[0]=tempDateAnnee;
+            date = date.join("-");
+
+            //insert data and refresh calendar
+            await course.sync(date, date);
+            let session= new Session($scope.structure,course,progressionDragged);
+            session.setFromCourse(course);
+            session.opened = true;
+            await session.save();
+            await progressionDragged.toSession(session.id);
+            await session.sync();
+            $scope.syncPedagogicItems();
+            $scope.safeApply();
+
+
+        };
+
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
@@ -419,6 +577,16 @@ export let main = ng.controller('MainController',
                 if(!$scope.pageInitialized) await  init();
                 template.open('main', 'main');
             },
+            viewProgression :async()=>{
+                if(!$scope.structureInitialized) await initializeStructure();
+                template.open('main','progression/progression-view');
+            },
+            manageProgression :async() =>{
+                if(!$scope.structureInitialized) await initializeStructure();
+                template.open('main','progression/progression-session-form');
+
+            },
+
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'session/session-page');
@@ -438,4 +606,5 @@ export let main = ng.controller('MainController',
 
             }
         });
+
     }]);

@@ -1,4 +1,4 @@
-package fr.openent.diary.services;
+package fr.openent.diary.services.impl;
 
 import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.user.UserInfos;
