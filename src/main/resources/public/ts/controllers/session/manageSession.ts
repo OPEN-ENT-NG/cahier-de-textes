@@ -83,7 +83,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             window.history.back();
         };
 
-        $scope.saveSession = async (publish = false) => {
+        $scope.saveSession = async () => {
             if(!$scope.isValidForm){
                 $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
                 return;
@@ -99,18 +99,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.notifications.push(new Notification('Error no id for session'), 'error');
                     return;
                 }
+                await saveSessionHomeworks();
 
-                if(publish){
-                    let sessionPublishResponse = await $scope.session.publish();
-                    if(sessionPublishResponse.succeed){
-                        $scope.session.isPublished = true;
-                        await saveSessionHomeworks();
-                    }
-                    $scope.toastHttpCall(sessionPublishResponse);
-                } else {
-                    await saveSessionHomeworks();
-                    $scope.toastHttpCall(sessionSaveResponse);
-                }
             }
 
             $scope.safeApply();
@@ -120,12 +110,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function saveSessionHomeworks() {
             let hasSucceed = true;
             $scope.session.homeworks.forEach(async h => {
-                if(!h.attachedToDate && !h.session.id && h.session.courseId){
+                if(!h.attachedToDate && h.session.courseId){
                     if ($scope.session && $scope.session.id) {
                         h.session.id = $scope.session.id;
                     }
                 }
-                h.isPublished = $scope.session.isPublished;
                 let { succeed } = await h.save();
                 if(!succeed) {
                     hasSucceed = false;

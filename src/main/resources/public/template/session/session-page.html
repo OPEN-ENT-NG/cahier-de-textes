@@ -19,14 +19,7 @@
                     ng-click="saveSession()">
                 <i18n>utils.save</i18n>
             </button>
-            <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                    ng-disabled="!isValidForm()" type="button" ng-click="publishSession()" workflow="diary.manageSession">
-                <i18n>publish</i18n>
-            </button>
-            <button class="float-none display-inline-block" ng-if="session.isPublished"
-                    ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()" workflow="diary.manageSession">
-                <i18n>unpublish</i18n>
-            </button>
+
         </div>
     </div>
 
@@ -54,13 +47,6 @@
         <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>
-        <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="publishSession()" workflow="diary.manageSession">
-            <i18n>publish</i18n>
-        </button>
-        <button class="float-none display-inline-block" ng-if="session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()" workflow="diary.manageSession">
-            <i18n>unpublish</i18n>
-        </button>
+
     </div>
 </div>

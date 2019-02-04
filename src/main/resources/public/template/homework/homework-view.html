@@ -12,6 +12,7 @@
                 <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
                     [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
             </span>
+
             <i class="right-magnet" ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
         <div workflow="diary.setProgressHomework" class="homework-progress inside-homework-view" ng-click="$event.stopPropagation();"

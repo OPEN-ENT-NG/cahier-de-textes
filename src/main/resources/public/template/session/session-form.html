@@ -16,7 +16,20 @@
 
         </div>
     </div>
+    <div class="horizontal-spacing twelve-mobile">
+        <label class="row twelve vertical-spacing">
+            <div class="twelve margin-bottom-md">
+                <i18n>utils.publish</i18n>
+            </div>
+        </label>
+        <div>
+            <switch ng-model="session.isPublished"  class="ng-pristine ng-untouched ng-valid ng-isolate-scope">
+                <label class="switch">
 
+                </label>
+            </switch>
+        </div>
+    </div>
     <fieldset class="row card padding-md border-widht-fieldset" ng-click="session.opened = !session.opened"
               ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
         <h2 class="remove-margin">
@@ -48,6 +61,7 @@
         </label>
         <div class="one"></div>
         <!-- Date -->
+
         <div class="five cell horizontal-spacing twelve-mobile">
             <label class="row twelve vertical-spacing">
                 <div class="twelve margin-bottom-md">
@@ -55,6 +69,7 @@
                     *
                 </div>
             </label>
+
             <div class="twelve twelve-mobile">
                 <i18n ng-if="!(session.courseId && session.date)">the</i18n>
                 <label ng-model="session.date" ng-if="session.courseId && session.date">

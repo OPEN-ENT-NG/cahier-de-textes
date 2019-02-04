@@ -1,7 +1,19 @@
 <!-- Deadline -->
 <td ng-if="homework.opened"
     class="three vertical-align-top text-left">
+    <div class="horizontal-spacing twelve-mobile">
+        <label class="row twelve vertical-spacing">
+            <div class="twelve margin-bottom-md">
+                <i18n>utils.publish</i18n> :
 
+        </label>
+
+            <switch ng-model="homework.isPublished" ng-change="" class="ng-pristine ng-untouched ng-valid ng-isolate-scope">
+                <label class="switch">
+
+                </label>
+            </switch>
+        </div>
     <div class="row">
         <date-picker class="date-picker-sm"  ng-if="homework.attachedToDate"
                      ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()" ></date-picker>
@@ -10,6 +22,7 @@
                 ng-options="session as ( session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
         </select>
     </div>
+
     <div>
         <!-- Workload -->
         <span class="twelve" ng-repeat="workload in homework.workloadWeek.all">
@@ -45,6 +58,7 @@
         [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
         [[homework.session.subject.label]]
     </p>
+
 </td>
 
 
