@@ -229,6 +229,16 @@ export class Session {
         });
     }
 
+    getSessionInfo(session: Session) {
+        this.subject = session.subject;
+        this.homeworks = session.homeworks;
+        this.teacher = session.teacher;
+        this.color = session.color;
+        this.audience = session.audience;
+        this.opened = true;
+        this.room = session.room;
+        this.description = session.description;
+    }
 }
 
 export class Sessions {

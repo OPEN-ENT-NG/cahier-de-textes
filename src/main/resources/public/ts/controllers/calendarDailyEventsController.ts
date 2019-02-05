@@ -324,6 +324,12 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             $scope.safeApply();
         };
 
+        $scope.publishHomework = (homework, event) =>{
+            event.stopPropagation();
+            homework.publish();
+            setDaysContent();
+            $scope.safeApply();
+        }
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId);

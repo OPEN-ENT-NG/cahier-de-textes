@@ -165,16 +165,19 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function initData() {
             await Promise.all([
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-
-            if ($routeParams.id) {
-                $scope.session.id = $routeParams.id;
-                await $scope.session.sync();
-                $scope.session.opened = true;
-            }
-            else if($routeParams.courseId && $routeParams.date){
-                let course = new Course($scope.structure, $routeParams.courseId);
-                await course.sync($routeParams.date, $routeParams.date);
-                $scope.session.setFromCourse(course);
+            if(!$scope.session) {
+                if ($routeParams.id) {
+                    $scope.session.id = $routeParams.id;
+                    await $scope.session.sync();
+                    $scope.session.opened = true;
+                }
+                else if ($routeParams.courseId && $routeParams.date) {
+                    let course = new Course($scope.structure, $routeParams.courseId);
+                    await course.sync($routeParams.date, $routeParams.date);
+                    $scope.session.setFromCourse(course);
+                    $scope.session.opened = true;
+                }
+            }else{
                 $scope.session.opened = true;
             }
             $scope.safeApply();

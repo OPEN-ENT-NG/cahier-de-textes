@@ -475,16 +475,21 @@ export let main = ng.controller('MainController',
             let sessionDrag,sessionDrop;
             console.log("sessionToSession");
             $scope.calendarItems.map(async session => {
-                if (session.id == idSessionDrop) {
-                    sessionDrag= session;
+                if (session.id == idSessionDrag) {
+                    sessionDrag = session;
                 }
             });
             $scope.calendarItems.map(async session => {
                 if (session.id == idSessionDrop) {
-                    sessionDrop= session;
+                    $scope.session = session;
                 }
             });
+            $scope.session.getSessionInfo(sessionDrag);
+
+            $scope.goTo('/session/update/' + $scope.session.id );
         }
+
+
 
 
         $scope.sessionToCourse = async (idSession , idCourse,date) =>{
