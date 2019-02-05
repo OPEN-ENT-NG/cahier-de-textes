@@ -400,7 +400,15 @@ export let main = ng.controller('MainController',
 
             $scope.setProgress(homework);
         }
+        $scope.publishSession = (item ,event) =>   {
+            event.stopPropagation();
+            let sessionToPublish = new Session($scope.structure);
+            sessionToPublish.id = item.id;
+            sessionToPublish.publish();
+            $scope.syncPedagogicItems();
 
+            $scope.safeApply();
+        }
         $scope.newProgressionForm = () =>{
             $scope.goTo('/progression/create');
 
@@ -529,7 +537,6 @@ export let main = ng.controller('MainController',
             });
 
 
-            model.calendar.sync();
             $scope.syncPedagogicItems();
 
             $scope.safeApply();

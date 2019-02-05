@@ -11,7 +11,7 @@
             [[item.endDisplayTime]]&nbsp;[[item.audience.name]]
             <span class="pull-right">
                 <span ng-if="item.homeworks.length > 0">[[item.homeworks.length]] <i>&#xe80d;</i></span>
-                <i class="margin-left-sm" ng-if="!item.isPublished">&#xe904;</i>
+                <i class="margin-left-sm" ng-click="publishSession(item,$event)"ng-if="!item.isPublished">&#xe904;</i>
             </span>
         </div>
     </div>
