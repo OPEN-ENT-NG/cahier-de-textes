@@ -80,12 +80,12 @@ export class Session {
         };
     }
 
-    toSendFormat() {
+    toSendFormat(placeholder?) {
         return {
             id: this.id ? this.id : null,
             subject_id: this.subject.id,
             structure_id: this.structure.id,
-            title: this.title,
+            title: this.title ?  this.title : placeholder,
             color: this.color,
             date: Utils.getFormattedDate(this.date),
             start_time: Utils.getFormattedTime(this.startTime),
@@ -171,13 +171,13 @@ export class Session {
         this.color = colors[1];
     }
 
-    async save() {
+    async save(placeholder?) {
         if(this.id) {
-            let response = await http.put('/diary/session/' + this.id, this.toSendFormat());
+            let response = await http.put('/diary/session/' + this.id, this.toSendFormat(placeholder));
             return Utils.setToastMessage(response, 'session.updated','session.updated.error');
 
         } else {
-            let response = await http.post('/diary/session', this.toSendFormat());
+            let response = await http.post('/diary/session', this.toSendFormat(placeholder));
             this.id=response.data.id;
 
             return Utils.setToastMessage(response, 'session.created','session.created.error');

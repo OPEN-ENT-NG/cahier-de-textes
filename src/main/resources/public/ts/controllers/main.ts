@@ -183,6 +183,8 @@ export let main = ng.controller('MainController',
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
+            delete($scope.session);
+
             $scope.safeApply();
         };
 

@@ -28,6 +28,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         }
 
         $scope.cancelCreation = () => {
+            delete($scope.session);
             window.history.back();
             delete $scope.course;
         };
@@ -54,7 +55,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             let sessionFormIsValid = $scope.session
                 && $scope.session.subject
                 && $scope.session.audience
-                && $scope.session.title
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime;
@@ -90,7 +90,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             // Sauvegarde de la session
-            let sessionSaveResponse = await $scope.session.save();
+            let sessionSaveResponse = await $scope.session.save(  $scope.placeholder );
 
             if (sessionSaveResponse.succeed) {
                 if(!$scope.session.id && sessionSaveResponse.data.id) {
@@ -165,7 +165,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function initData() {
             await Promise.all([
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-            if(!$scope.session) {
+             if(!$scope.session.id) {
                 if ($routeParams.id) {
                     $scope.session.id = $routeParams.id;
                     await $scope.session.sync();
@@ -180,6 +180,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }else{
                 $scope.session.opened = true;
             }
+            $scope.placeholder = "Séance du " + moment($scope.session.date).format("DD/MM/YYYY");
+
             $scope.safeApply();
             $scope.fixEditor();
         }
