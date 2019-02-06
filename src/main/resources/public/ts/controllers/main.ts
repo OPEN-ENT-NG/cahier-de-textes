@@ -374,9 +374,9 @@ export let main = ng.controller('MainController',
             return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
         };
 
-        $scope.hasBothViewMode = () => {
-            return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
-        };
+        // $scope.hasBothViewMode = () => {
+        //     return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
+        // };
 
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
@@ -393,7 +393,6 @@ export let main = ng.controller('MainController',
             }
             $scope.safeApply();
         };
-
         $scope.setHomeworkProgress =(homework)=>{
             if(!homework.isDone)
                 $scope.notifications.push(new Notification('homework.done.notification', 'info'));
@@ -581,15 +580,17 @@ export let main = ng.controller('MainController',
 
 
         };
-
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                if(model.me.type==="ELEVE" && !$scope.pageInitialized){
+                if(model.me.type === "ELEVE" || model.me.type === "PERSELEVE" && !$scope.pageInitialized){
                     $scope.goTo("/list")
-                }else
-                if(!$scope.pageInitialized) await  init();
-                template.open('main', 'main');
+                }else if (model.me.type === "PERSEDUCNAT"){
+                    $scope.goTo("/visas");
+                }else{
+                    if(!$scope.pageInitialized) await  init();
+                    template.open('main', 'main');
+                }
             },
             viewProgression :async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
