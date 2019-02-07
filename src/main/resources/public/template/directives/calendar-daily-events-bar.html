@@ -1,5 +1,11 @@
 <div class="days">
-    <div class="day homeworkpanel" ng-repeat="day in calendar.days.all" >
+    <div class="day homeworkpanel"
+         ng-repeat="day in calendar.days.all"
+         ng-if="(!(!calendar.display.saturday && day.name == 'saturday') && !(!calendar.display.sunday && day.name == 'sunday'))"
+         ng-class="{
+                    sixDays: ( (calendar.display.saturday && !calendar.display.sunday) || (!calendar.display.saturday && calendar.display.sunday) ),
+                    fiveDays: (!calendar.display.saturday && !calendar.display.sunday),
+                }">
         <div ng-if="day.dailyHomeworks.length <= 1">
             <div ng-repeat="homework in day.dailyHomeworks">
                 <div static-include="/diary/public/template/directives/daily-homework-item.html" style="padding: 1px;"></div>

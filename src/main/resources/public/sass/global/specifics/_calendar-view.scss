@@ -1,7 +1,3 @@
-#calendar-view {
-  margin-top: 72px;
-}
-
 .hide-session {
   .schedule-item-content {
     &.session {
@@ -9,8 +5,6 @@
     }
   }
 }
-
-
 
 .schedule-item-content {
   padding: 3px !important;
@@ -80,28 +74,8 @@
   display: initial;
 }
 
-.diary-container.diary-show-homeworks .schedule-item {
-  margin-top: 38px;
-}
-
-.diary-container.diary-show-homeworks .day .timeslots .timeslot:first-child {
-  margin-top: 38px;
-}
-
-.diary-container .day .timeslots .timeslot:last-child {
-  height: 58px;
-}
-
-.diary-container .next-timeslots {
-  bottom: -10px;
-}
-
 .diary-container .previous-timeslots {
   height:20px;
-}
-
-.diary-container.diary-show-homeworks legend.timeslots {
-  margin-top: 118px;
 }
 
 .diary-container .schedule .days {
@@ -121,6 +95,13 @@
   min-height: 40px;
   width: calc(100% / 7) !important;
   background: #ddd !important;
+
+  &.sixDays {
+    width: calc(100% / 6) !important;
+  }
+  &.fiveDays {
+    width: calc(100% / 5) !important;
+  }
 }
 
 .diary-container.diary-show-calendar.calendar-day-mode calendar-daily-events .days .day {
@@ -138,7 +119,6 @@
 
 calendar-daily-events {
   padding-left: 0px !important;
-  top: 79px !important;
 }
 .homework-content {
   //height: 32px;
