@@ -1,5 +1,5 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import {Courses, Notification, Session, Sessions, Subjects} from '../../model';
+import {Courses, Toast, Session, Sessions, Subjects} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 import {Utils} from '../../utils/utils';
 
@@ -163,7 +163,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.saveHomework = async (publish = false) => {
             if (!$scope.isValidForm) {
-                $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
+                $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
             }
             else {
                 // Creating session from course before saving the homework
@@ -180,7 +180,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if(!$scope.homework.id && homeworkSaveResponse.data.id) {
                         $scope.homework.id = homeworkSaveResponse.data.id;
                     } else if (!$scope.homework.id && !homeworkSaveResponse.data.id){
-                        $scope.notifications.push(new Notification('Error no id for homework'), 'error');
+                        //TODO Change to i18n key
+                        $scope.notifications.push(new Toast('Error no id for homework', 'error'));
                         return;
                     }
 
@@ -230,7 +231,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             // if new homework, we set the default homeworkType
             if(!$scope.homework.id) {
-                $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.is_default);
+                $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank = 1);
             }
 
             await $scope.syncWorkloadWeek();

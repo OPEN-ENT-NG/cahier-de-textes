@@ -2,18 +2,15 @@ DROP TABLE IF EXISTS diary.homework;
 DROP TABLE IF EXISTS diary.homework_type;
 
 CREATE TABLE diary.homework_type (
-  id          bigserial,
-  label       character varying(50),
-  is_default  BOOLEAN DEFAULT FALSE NOT NULL,
+  id            bigserial,
+  structure_id  character varying(37) NOT NULL,
+  label         character varying(50),
+  rank         bigint,
   PRIMARY KEY (id)
 );
 
-INSERT INTO diary.homework_type(label, is_default)
-  VALUES ('Exercice Maison', true),
-			    ('Devoir à rendre', false);
-
 CREATE TABLE diary.homework (
-  id bigserial,
+  id            bigserial,
   subject_id    character varying(37) NOT NULL,
   structure_id  character varying(37) NOT NULL,
   teacher_id    character varying(37) NOT NULL,
@@ -22,7 +19,7 @@ CREATE TABLE diary.homework (
   description   text,
   is_published  BOOLEAN DEFAULT FALSE NOT NULL,
 
-  session_id     bigint,
+  session_id    bigint,
   due_date      date,
   type_id       integer NOT NULL,
   workload      BIGINT DEFAULT 0 NOT NULL,

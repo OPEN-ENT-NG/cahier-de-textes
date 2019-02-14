@@ -1,5 +1,5 @@
 import {Behaviours, idiom as lang, model, moment, ng} from 'entcore';
-import {Course, Notification, Session, Subjects} from '../../model';
+import {Course, Toast, Session, Subjects} from '../../model';
 import {Homework} from '../../model/homework';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
@@ -85,7 +85,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.saveSession = async () => {
             if(!$scope.isValidForm){
-                $scope.notifications.push(new Notification(lang.translate('utils.unvalidForm')), 'error');
+                $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                 return;
             }
 
@@ -96,7 +96,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if(!$scope.session.id && sessionSaveResponse.data.id) {
                     $scope.session.id = sessionSaveResponse.data.id;
                 } else if (!$scope.session.id && !sessionSaveResponse.data.id){
-                    $scope.notifications.push(new Notification('Error no id for session'), 'error');
+                    $scope.notifications.push(new Toast('Error no id for session', 'error'));
                     return;
                 }
                 await saveSessionHomeworks();

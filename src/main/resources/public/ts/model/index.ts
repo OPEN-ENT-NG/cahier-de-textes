@@ -9,7 +9,7 @@ export * from './teacher';
 export * from './student';
 export * from './Personnel';
 export * from './visa';
-export * from './Notification';
+export * from './Toast';
 
 export * from '../utils/utils';
 export * from '../utils/const/user-types';

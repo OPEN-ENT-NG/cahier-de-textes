@@ -1,0 +1,43 @@
+<div class="homework-type ten cell">
+    <toasts notifications="notifications"></toasts>
+    <article class="row">
+
+        <h3 class="row">
+            [[lang.translate('cdt.setting.homework.type')]]
+        </h3>
+
+        <div class="cell twelve-mobile twelve">
+                <ul class="settings-list">
+                    <li class="twelve skill-list-proposition">
+                        <input type="text"
+                               class="input-libelle"
+                               placeholder="Créer un type de travail"
+                               ng-model="homework_type.label"
+                               ng-maxlength="50"
+                               maxlength="50"/>
+                        <button class="right-button"
+                                ng-if="!updateType"
+                                ng-click="createHomeworkType(homework_type)"
+                                ng-disabled="">
+                            [[lang.translate('evaluations.add')]]
+                        </button>
+                        <button class="right-button"
+                                ng-if="updateType"
+                                ng-click="updateHomeworkType(homeworkType);"
+                                ng-disabled="">
+                            [[lang.translate('item.modify')]]
+                        </button>
+                    </li>
+                    <li ng-repeat="homeworkType in homeworkTypes.all"
+                        class="twelve skills-list-proposition">
+                        <span class="two cell">[[homeworkType.label]]</span>
+                        <i class="pencil icon-grey" data-ng-click="prepareUpdate(homeworkType);"></i>
+                        <i class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
+                    </li>
+                </ul>
+        </div>
+
+    </article>
+
+
+</div>

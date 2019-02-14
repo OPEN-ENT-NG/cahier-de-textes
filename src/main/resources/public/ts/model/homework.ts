@@ -1,4 +1,4 @@
-import {idiom as lang, model, moment} from 'entcore';
+import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Structure, Teacher, Utils} from './index';
@@ -229,17 +229,60 @@ export class Homeworks {
 
 export class HomeworkType {
     id: number;
+    structure_id: string;
     label: string;
-    is_default: boolean;
+    rank: number;
+
+    constructor (id_structure?: string) {
+        if (id_structure) this.structure_id = id_structure;
+    }
+
+    toJson() {
+        return {
+            id: this.id,
+            structure_id: this.structure_id,
+            label: this.label,
+            rank: this.rank
+        }
+    }
+
+    async create() {
+        let response = await http.post(`/diary/homework-type` , this.toJson());
+        return Utils.setToastMessage(response,'cdt.homework.type.create', 'cdt.homework.type.create.error')
+    }
+
+    async update() {
+        let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
+        return Utils.setToastMessage(response,'cdt.homework.type.update', 'cdt.homework.type.update.error')
+    }
+
+    async delete() {
+        let {data} = await http.delete(`/diary/homework-type/${this.id}`);
+        if (data.id != undefined) {
+            let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
+            return Utils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')
+        }
+        else {
+            notify.error('cdt.homework.type.delete.impossible')
+        }
+    }
 }
 
 export class HomeworkTypes {
     all: HomeworkType[] = [];
+    id: number;
+    structure_id: string;
+    label: string;
+
+    constructor (id_structure?: string) {
+        if (id_structure) this.structure_id = id_structure;
+    }
 
     async  sync (): Promise<void> {
-        let { data } = await http.get('/diary/homework-types');
-
+        let { data } = await http.get(`/diary/homework-types/${this.structure_id}`);
         this.all = Mix.castArrayAs(HomeworkType, data);
+        this.id = data.id;
+        this.label = data.label;
     }
 }
 

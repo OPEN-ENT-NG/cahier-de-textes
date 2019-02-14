@@ -119,11 +119,41 @@ public class HomeworkController extends ControllerHelper {
         homeworkService.unpublishHomework(homeworkId, DefaultResponseHandler.defaultResponseHandler(request));
     }
 
-    @Get("/homework-types")
-    @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkRead.class)
+    @Get("/homework-types/:idStructure")
+    @SecuredAction(value = WorkflowUtils.CDT_ACCESS_SETTING, type = ActionType.WORKFLOW)
+    @ResourceFilter(HomeworkTypeSetting.class)
     public void getHomeworkTypes(final HttpServerRequest request) {
-        homeworkService.getHomeworkTypes(DefaultResponseHandler.arrayResponseHandler(request));
+        final String structure_id = request.params().get("idStructure");
+        homeworkService.getHomeworkTypes(structure_id, DefaultResponseHandler.arrayResponseHandler(request));
+    }
+
+    @Post("/homework-type")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkTypeSetting.class)
+    public void createHomeworkType(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request,
+                homeworkType -> {
+                    homeworkService.createHomeworkType(homeworkType, DefaultResponseHandler.defaultResponseHandler(request));
+                });
+    }
+
+    @Put("/homework-type/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkTypeSetting.class)
+    public void updateHomeworkType(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request,
+                homeworkType -> {
+                    Integer homework_typeId = Integer.parseInt(request.getParam("id"));
+                    homeworkService.updateHomeworkType(homework_typeId, homeworkType, DefaultResponseHandler.defaultResponseHandler(request));
+                });
+    }
+
+    @Delete("/homework-type/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkTypeSetting.class)
+    public void deleteHomeworkType(final HttpServerRequest request) {
+        Integer homeworkTypeId = Integer.parseInt(request.getParam("id"));
+        homeworkService.deleteHomeworkType(homeworkTypeId, DefaultResponseHandler.defaultResponseHandler(request));
     }
 
     @Get("/workload-week/:date/:audienceId")
