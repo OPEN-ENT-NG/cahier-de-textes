@@ -2,10 +2,15 @@ package fr.openent.diary.services.impl;
 
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
+import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
@@ -14,9 +19,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeworkServiceImpl implements HomeworkService {
+public class HomeworkServiceImpl extends SqlCrudService implements HomeworkService {
+    private static final String STATEMENT = "statement" ;
+    private static final String VALUES = "values" ;
+    private static final String ACTION = "action" ;
+    private static final String PREPARED = "prepared" ;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
 
     private DiaryService diaryService = new DiaryServiceImpl();
+
+    public HomeworkServiceImpl(String table) {
+        super(table);
+    }
 
     @Override
     public void getHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
@@ -94,7 +108,7 @@ public class HomeworkServiceImpl implements HomeworkService {
      * @param handler
      */
     private void getHomeworks(String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                             boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
         query.append(" SELECT h.*, to_json(type) as type, session.date as session_date, to_json(progress_and_state) as progress ");
@@ -276,10 +290,80 @@ public class HomeworkServiceImpl implements HomeworkService {
     }
 
     @Override
-    public void getHomeworkTypes(Handler<Either<String, JsonArray>> handler) {
-        String query = "SELECT * FROM diary.homework_type";
+    public void getHomeworkTypes(String structure_id, Handler<Either<String, JsonArray>> handler) {
+        StringBuilder query = new StringBuilder();
+        JsonArray param = new JsonArray();
+        query.append("SELECT * FROM diary.homework_type " + "WHERE structure_id = ? ORDER BY rank;");
+        param.add(structure_id);
 
-        Sql.getInstance().raw(query, SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query.toString(), param, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void createHomeworkType(JsonObject homeworkType, Handler<Either<String, JsonObject>> handler) {
+        String maxQuery = "Select MAX(rank) as max, nextval('diary.homework_type_id_seq') as id from diary.homework_type "
+                + "where structure_id = '" + homeworkType.getString("structure_id") + "'";
+        sql.raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    try {
+                        final Number rank = event.right().getValue().getInteger("max");
+                        final Number id = event.right().getValue().getInteger("id");
+
+                        JsonArray statements = new JsonArray();
+                        statements.add(getInsertHomeworkTypeStatement(homeworkType,rank.intValue() + 1));
+                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> event) {
+                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
+                            }
+                        });
+                    } catch (ClassCastException e) {
+                        LOGGER.error("An error occurred when insert homework_type", e);
+                        handler.handle(new Either.Left<String, JsonObject>("Error creating type"));
+                    }
+                } else {
+                    LOGGER.error("An error occurred when selecting max");
+                    handler.handle(new Either.Left<String, JsonObject>("Error while retrieving data"));
+                }
+            }
+        }));
+
+    }
+
+    private JsonObject getInsertHomeworkTypeStatement(JsonObject homeworkType, Number rank) {
+        String query = " INSERT INTO diary.homework_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
+        JsonArray params = new JsonArray()
+                .add(homeworkType.getString("structure_id"))
+                .add(homeworkType.getString("label"))
+                .add(rank);
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
+    }
+
+    @Override
+    public void updateHomeworkType(Integer id, JsonObject homeworkType, Handler<Either<String, JsonObject>> handler) {
+        JsonArray params = new JsonArray();
+        String query = "UPDATE diary.homework_type SET structure_id = ?, label = ? WHERE id = ?";
+        params.add(homeworkType.getString("structure_id"));
+        params.add(homeworkType.getString("label"));
+        params.add(id);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deleteHomeworkType(Integer id, Handler<Either<String, JsonObject>> handler) {
+        JsonArray param = new JsonArray();
+        String query = "DELETE FROM diary.homework_type ht " +
+                "WHERE not Exists (SELECT 1 from diary.homework h WHERE ht.id =  h.type_id) " +
+                "AND not Exists (SELECT 1 from diary.progression_homework ph WHERE ht.id = ph.type_id)" +
+                "AND ht.id = ? RETURNING id";
+        param.add(id);
+        Sql.getInstance().prepared(query, param, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

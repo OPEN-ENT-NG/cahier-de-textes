@@ -1,6 +1,6 @@
 import {_,angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {
-    Course, Homework, Homeworks, Notification, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
+    Course, Homework, Homeworks, Toast, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
     Workload
 } from '../model';
 import {Utils} from '../utils/utils';
@@ -322,9 +322,9 @@ export let main = ng.controller('MainController',
          */
         $scope.toastHttpCall = (response) => {
             if (response.succeed) {
-                $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'confirm'));
+                $scope.notifications.push(new Toast(response.toastMessage, 'confirm'));
             } else {
-                $scope.notifications.push(new Notification(lang.translate(response.toastMessage), 'error'));
+                $scope.notifications.push(new Toast(response.toastMessage, 'error'));
             }
             $scope.safeApply();
             return response;
@@ -395,9 +395,9 @@ export let main = ng.controller('MainController',
         };
         $scope.setHomeworkProgress =(homework)=>{
             if(!homework.isDone)
-                $scope.notifications.push(new Notification('homework.done.notification', 'info'));
+                $scope.notifications.push(new Toast('homework.done.notification', 'info'));
             else
-                $scope.notifications.push(new Notification('homework.todo.notification', 'info'));
+                $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
 
             $scope.setProgress(homework);
         }

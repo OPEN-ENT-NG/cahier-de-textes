@@ -21,6 +21,8 @@ public final class WorkflowUtils {
     static public final String HOMEWORK_PUBLISH = "homework.publish";
     static public final String HOMEWORK_SET_PROGRESS = "homework.set.progress";
 
+    static public final String CDT_ACCESS_SETTING = "cdt.access.setting";
+
     static public final String VIEW_CALENDAR = "view.calendar";
     static public final String VIEW_LIST = "view.list";
 

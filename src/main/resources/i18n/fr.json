@@ -219,7 +219,7 @@
   "progression": "Progression",
   "progression.session.delete": "Progression supprimée",
   "progression.session.delete.error": "Erreur lors de la suppression de la progression",
-"progression.session.create": "Progression créee",
+  "progression.session.create": "Progression créée",
   "progression.session.create.error": "Erreur lors de la création de la progression",
   "progression.session.update": "Progression modifiée",
   "progression.session.update.error": "Erreur lors de la modification de la progression",

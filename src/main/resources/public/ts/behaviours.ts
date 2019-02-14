@@ -1,5 +1,6 @@
 import {Behaviours} from 'entcore';
 import { inspector } from "./sniplets/inspector";
+import {homeworkType} from "./sniplets/homeworkType";
 
 const diaryBehaviours = {
     rights: {
@@ -26,7 +27,8 @@ const diaryBehaviours = {
         },
     },
     sniplets: {
-        inspector: inspector
+        inspector,
+        homework_type: homeworkType
     }
 };
 

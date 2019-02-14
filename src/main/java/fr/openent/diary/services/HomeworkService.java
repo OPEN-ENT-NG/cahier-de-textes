@@ -28,7 +28,13 @@ public interface HomeworkService {
 
     void setProgressHomework(long homeworkId, String state, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
-    void getHomeworkTypes(Handler<Either<String, JsonArray>> handler);
+    void getHomeworkTypes(String structure_id, Handler<Either<String, JsonArray>> handler);
+
+    void createHomeworkType(JsonObject homeworkType, Handler<Either<String, JsonObject>> handler);
+
+    void updateHomeworkType(Integer id, JsonObject homeworkType, Handler<Either<String, JsonObject>> handler);
+
+    void deleteHomeworkType(Integer id, Handler<Either<String, JsonObject>> handler);
 
     void getWorkloadWeek(final String dateInWeek, final String audienceId, Handler<Either<String, JsonArray>> handler);
 }

@@ -10,8 +10,11 @@ body.cdt {
   @import 'specifics/select';
   @import 'specifics/progression';
 
+
   @import 'specifics/fixCalendarHRFirefox';
 
   @import 'components/loader';
   @import 'components/toasts';
 }
+
+@import 'specifics/sniplet';
