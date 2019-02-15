@@ -16,7 +16,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.sessions = new Sessions($scope.structure);
         $scope.courses = new Courses($scope.structure);
         $scope.subjects = new Subjects();
-        $scope.homeworkTypes = new HomeworkTypes();
+        $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
         $scope.isInsideSessionForm = false;
         $scope.isSelectSubjectAndAudienceHomework=true;
 
