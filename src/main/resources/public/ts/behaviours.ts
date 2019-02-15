@@ -5,6 +5,7 @@ import {homeworkType} from "./sniplets/homeworkType";
 const diaryBehaviours = {
     rights: {
         workflow: {
+            access: "fr.openent.diary.controllers.DiaryController|view",
             view: "fr.openent.diary.controllers.DiaryController|view",
 
             manageVisa: "fr.openent.diary.controllers.VisaController|workflow1",
