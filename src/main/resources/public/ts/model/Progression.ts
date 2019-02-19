@@ -21,6 +21,7 @@ export class ProgressionSession{
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
+    class: string;
     owner_id;
     subject_id;
     homeworks;
@@ -32,6 +33,7 @@ export class ProgressionSession{
         this.subject = new Subject();
         this.eventer = new Eventer();
         this.title= "";
+        this.class = "";
     }
     async create(){
         let response = await http.post('/diary/progression/create' , this.toJson());
@@ -89,6 +91,7 @@ export class ProgressionSession{
             description: this.description,
             subject_id: this.subject.id ? this.subject.id : this.subject_id,
             title : this.title,
+            class : this.class,
             annotation : this.annotation,
             owner_id: this.owner ? this.owner.id : this.owner_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
@@ -116,6 +119,7 @@ export class ProgressionSession{
         return {
             id: data.id,
             title: data.title,
+            class: data.class,
             description: data.description,
             owner_id: data.owner_id,
             subject_id : data.subject_id,

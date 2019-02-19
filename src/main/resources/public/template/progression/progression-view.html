@@ -1,4 +1,8 @@
-
+<div>
+    <button class="right-magnet cancel" ng-click="goTo('/view')">
+        <i18n>visa.manage.backOnDiary</i18n>
+    </button>
+</div>
     <article class="responsive-table row" ng-controller="manageProgessionCtrl">
         <div     class="padding-md margin-bottom-md">
             <table class="twelve">
@@ -7,7 +11,9 @@
                     <td class="one text-left"><i18n>title</i18n></td>
                     <td class="one text-left"><i18n>subject</i18n></td>
                     <td class="three text-left"><i18n>settings.exclusion.description</i18n></td>
-                    <td class="six text-left"><i18n>homeworks.attached</i18n></td>
+                    <td class="five text-left"><i18n>homeworks.attached</i18n></td>
+                    <td class="one text-left"><i18n>utils.groups</i18n></td>
+
                     <td class="one">&nbsp;</td>
 
                 </tr>
@@ -17,7 +23,7 @@
                     <td class="one text-left">[[progression_session.title]]</td>
                     <td class="one text-left">[[progression_session.subject.label]]</td>
                     <td class="three text-left" ng-bind-html="[[progressionHomework.description]]"></td>
-                    <td class="six text-left">
+                    <td class="five text-left">
                         <div ng-if="progression_session.progression_homeworks.length != 0" >
                             <table class="twelve">
                                 <thead>
@@ -37,6 +43,8 @@
                             </table>
                         </div>
                     </td>
+                    <td class="one text-left">[[progression_session.class]]</td>
+
                     <td class="one vertical-align-top vertical-align-top text-right">
                         <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionSession(progression_session)">&#xe858;</i>
                         <i class="trash right-magnet" ng-click="deleteProgressionSession(progression_session)"></i>
