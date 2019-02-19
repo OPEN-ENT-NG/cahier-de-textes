@@ -59,7 +59,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 " where ps.owner_id = ? " +
 
                 " GROUP BY ps.id" +
-                " ORDER BY ps.modified";
+                " ORDER BY ps.title";
         params.add(ownerId);
         Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 

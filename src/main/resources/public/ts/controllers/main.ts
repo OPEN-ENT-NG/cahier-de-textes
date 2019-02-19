@@ -197,7 +197,6 @@ export let main = ng.controller('MainController',
          */
         $scope.filterProgression = (search) =>{
             $scope.progressionsToDisplay.all =  $scope.progressions.all.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
-           console.log($scope.progressionsToDisplay.all);
         }
 
         $scope.loadPedagogicItems = () => {

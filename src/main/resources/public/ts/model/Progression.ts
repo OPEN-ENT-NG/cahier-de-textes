@@ -1,7 +1,7 @@
 ///<reference path="session.ts"/>
 import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
-import {Eventer, Mix} from 'entcore-toolkit';
+import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
@@ -12,7 +12,8 @@ import {subscript} from "entcore/types/src/ts/editor/options";
 import forEach = require("core-js/fn/array/for-each");
 
 
-export class ProgressionSession{
+export class ProgressionSession implements  Selectable{
+    selected: boolean;
     id: string;
     subject: Subject;
     title: string;
@@ -53,7 +54,7 @@ export class ProgressionSession{
 
     init(){
         if(this.subject_id)
-            this.subject.id = this.subject_id
+            this.subject.id = this.subject_id;
     }
 
 
@@ -68,7 +69,7 @@ export class ProgressionSession{
                 let json = JSON.parse(this.homeworks.toString());
                 json.forEach(i => this.progression_homeworks.push(Mix.castAs(ProgressionHomework, ProgressionHomework.formatSqlDataToModel(i))));
                 this.progression_homeworks.forEach(i => i.initType());
-                this.eventer.trigger(`get:end`)
+                this.eventer.trigger(`get:end`);
             } catch (e) {
                 //     notify.error('session.sync.err');
             }
@@ -82,7 +83,7 @@ export class ProgressionSession{
             if(jsonLine){
                 json.push(jsonLine);
             }
-        })
+        });
         return json;
     }
     private toJson() {
@@ -96,7 +97,7 @@ export class ProgressionSession{
             owner_id: this.owner ? this.owner.id : this.owner_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
 
-        }
+        };
     }
     isValidForm = () => {
         let validSessionOrDueDate = false;
@@ -126,7 +127,7 @@ export class ProgressionSession{
             progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
             created: data.created
-        }
+        };
     }
 
 
@@ -151,14 +152,12 @@ export class ProgressionSession{
 }
 
 
-export class ProgressionSessions{
-    all: ProgressionSession[];
-    origin: ProgressionSession[];
+export class ProgressionSessions extends Selection<ProgressionSession>{
     owner_id;
     constructor (owner_id) {
+        super([]);
         this.owner_id = owner_id;
-        this.all = [];
-        this.origin = [];
+
     }
 
     async sync(){
@@ -213,7 +212,7 @@ export class ProgressionHomework{
                 owner_id: ownerId,
                 type_id: this.type.id
 
-            }
+            };
     }
 
     isValidForm = () => {
@@ -238,7 +237,7 @@ export class ProgressionHomework{
             created: data.created
         };
 
-        return result
+        return result;
     }
 
     async delete() {

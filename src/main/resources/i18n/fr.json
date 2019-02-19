@@ -13,6 +13,7 @@
   "manager": "Gestion",
   "contrib": "Contribution",
   "read": "Lecture",
+  "delete": "Supprimer",
   "unsetImage": "Supprimer l'image",
   "group.Teacher": "Tous les enseignants du groupe {0}.",
   "group.Personnel": "Tous les personnels du groupe {0}.",
