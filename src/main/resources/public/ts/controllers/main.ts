@@ -51,7 +51,7 @@ export let main = ng.controller('MainController',
 
         function init() {
             $scope.search = "";
-           $scope.typeUser= model.me.type;
+            $scope.typeUser= model.me.type;
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
                 && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
@@ -96,6 +96,7 @@ export let main = ng.controller('MainController',
             }
         }
         $scope.changeViewList = function () {
+            $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks');
             $scope.goTo('/list');
             $scope.display.listView = true
             if ($scope.display.listView) {
@@ -306,7 +307,7 @@ export let main = ng.controller('MainController',
 
             let calendarMode = $scope.calendar.increment;
             let momentFirstDay = moment($scope.calendar.firstDay);
-
+            console.log($scope.display.listView);
             switch(calendarMode){
                 case 'month':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('month');
@@ -314,7 +315,10 @@ export let main = ng.controller('MainController',
                     break;
                 case 'week':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
-                    $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
+                    if($scope.display.listview)
+                        $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
+                    else
+                        $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks');
                     break;
                 case 'day':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('day');

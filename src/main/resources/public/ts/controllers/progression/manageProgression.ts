@@ -54,8 +54,6 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                     if(psession.subject_id == subject.id){
                         psession.setSubject(subject);
                     }
-
-
                 })
             });
 

@@ -1,4 +1,4 @@
-import {Behaviours, model, ng} from 'entcore';
+import {Behaviours, model,moment, ng} from 'entcore';
 import {Utils} from '../../utils/utils';
 
 export let manageListCtrl = ng.controller('manageListController',
@@ -6,6 +6,7 @@ export let manageListCtrl = ng.controller('manageListController',
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
+        $scope.display.session = true;
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
