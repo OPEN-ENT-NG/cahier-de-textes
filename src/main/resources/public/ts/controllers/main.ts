@@ -196,8 +196,9 @@ export let main = ng.controller('MainController',
         display the progressions that match the search query
          */
         $scope.filterProgression = (search) =>{
-            $scope.progressionsToDisplay.all =  $scope.progressions.all.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
-        }
+            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progressions.all);
+        };
+
 
         $scope.loadPedagogicItems = () => {
             $scope.pedagogicItems = [];

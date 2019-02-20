@@ -2,7 +2,7 @@ import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
 import {Session, Subjects} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
-
+import {Utils} from '../../utils/utils';
 
 export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -130,7 +130,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.filterProgression = (search) =>{
-            $scope.progressionsToDisplay.all =  $scope.progression_sessions.all.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
+            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progression_sessions.all);
         }
 
         $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
