@@ -1,6 +1,7 @@
 import {Behaviours, idiom as lang, model, moment, ng} from 'entcore';
 import {Course, Toast, Session, Subjects} from '../../model';
 import {Homework} from '../../model/homework';
+import {ProgressionHomework} from "../../model/Progression";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -13,6 +14,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
         $scope.isSelectSubjectAndAudienceSession=true;
+        $scope.validate = false;
         $scope.disableFieldSetSubjectAndAudienceSession= (audience:any,subject:any)=>{
             if(!audience || !subject){
                 $scope.isSelectSubjectAndAudienceSession=true;
@@ -43,12 +45,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.safeApply();
         });
 
-        $scope.openHomework = (homework: Homework) => {
-            let oldValue = homework.opened;
-            $scope.session.homeworks.forEach(h => h.opened = false);
-            homework.opened = true;
-            $scope.safeApply();
-        };
+
 
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
@@ -134,10 +131,29 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             });
             return back;
         };
+        $scope.openHomework = (homework: Homework) => {
+            $scope.validate = true;
+            $scope.session.homeworks.map(h => {
+                if (h.opened) {
+                    h.opened = false;
+                }
+            });
+            homework.opened = !homework.opened;
+            $scope.safeApply();
+        };
+
+        $scope.closeHomework = () => {
+            $scope.validate = false;
+            $scope.session.homeworks.map(h => {
+                if (h.opened) {
+                    h.opened = false;
+                }
+            });
+            $scope.safeApply();
+        };
 
         $scope.addHomework = () => {
             let newHomework = new Homework($scope.structure);
-            newHomework.opened = true;
             newHomework.audience = $scope.session.audience;
             newHomework.subject = $scope.session.subject;
             newHomework.session = $scope.session;
@@ -158,6 +174,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
         $scope.localRemoveHomework = (indexToDeletedeletedHomework) => {
             $scope.session.homeworks.splice(indexToDeletedeletedHomework, 1);
+            $scope.safeApply();
         };
 
 

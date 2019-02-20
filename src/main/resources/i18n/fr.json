@@ -225,5 +225,6 @@
   "progression.session.update": "Progression modifiée",
   "progression.session.update.error": "Erreur lors de la modification de la progression",
   "progression.get.err": "Erreur lors de la récupération de la progression",
-  "help": "aide"
+  "help": "aide",
+  "validate": "valider"
 }

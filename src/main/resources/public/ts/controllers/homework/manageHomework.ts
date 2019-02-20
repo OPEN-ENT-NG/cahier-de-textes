@@ -18,15 +18,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
         $scope.isInsideSessionForm = false;
-        $scope.isSelectSubjectAndAudienceHomework=true;
+        $scope.isSelectSubjectAndAudienceHomework = true;
 
-        $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=>{
+        $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
                 if(!audience || !subject){
                     $scope.isSelectSubjectAndAudienceHomework=true;
                 }else{
                     $scope.isSelectSubjectAndAudienceHomework=false;
                 }
-        }
+        };
+
         $scope.openHomework = (homework: Homework) => {
             if($scope.isInsideSessionForm){
                 $scope.$parent.openHomework(homework);
@@ -96,10 +97,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.homework.attachedToSession = true;
             $scope.homework.attachedToDate = false;
 
-            if($scope.sessionsToAttachTo.length > 0){
-                $scope.homework.session = $scope.sessionsToAttachTo[0];
+            if($scope.sessionsToAttachTo.length <= 1){
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
-            } else {
+                $scope.homework.session = $scope.sessionsToAttachTo[0];
+            } else if ($scope.sessionsToAttachTo.length > 1){
+                $scope.homework.session = $scope.sessionsToAttachTo[1];
+            }
+            else {
                 $scope.homework.session = undefined;
                 $scope.attachToDate();
             }
@@ -201,8 +205,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
-
-        async function initData(){
+        async function initData() {
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
@@ -238,16 +241,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             $scope.safeApply();
             $scope.fixEditor();
-        }
+        };
 
         $scope.back = ()=>{
             $scope.homework.isDone = !$scope.homework.isDone;
             // $scope.setProgress($scope.homework);
             window.history.back();
-
-        }
-
-
+        };
 
         await initData();
     }]
