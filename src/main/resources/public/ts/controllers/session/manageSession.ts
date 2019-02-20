@@ -13,7 +13,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
         $scope.isSelectSubjectAndAudienceSession=true;
-
         $scope.disableFieldSetSubjectAndAudienceSession= (audience:any,subject:any)=>{
             if(!audience || !subject){
                 $scope.isSelectSubjectAndAudienceSession=true;
@@ -28,19 +27,20 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         }
 
         $scope.cancelCreation = () => {
-            delete($scope.session);
             window.history.back();
             delete $scope.course;
         };
 
 
         $scope.$watch(() => $scope.session.audience,  () => {
-            $scope.session.homeworks.forEach(h => h.audience = $scope.session.audience);
+            if($scope.session.audience)
+                $scope.session.homeworks.forEach(h => h.audience = $scope.session.audience);
             $scope.safeApply();
         });
 
         $scope.$watch(() => $scope.session.subject,  () => {
-            $scope.session.homeworks.forEach(h => h.subject = $scope.session.subject);
+            if($scope.session.subject)
+                $scope.session.homeworks.forEach(h => h.subject = $scope.session.subject);
             $scope.safeApply();
         });
 
@@ -165,7 +165,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function initData() {
             await Promise.all([
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-             if(!$scope.session.id) {
+            if(!$scope.session.id) {
                 if ($routeParams.id) {
                     $scope.session.id = $routeParams.id;
                     await $scope.session.sync();
