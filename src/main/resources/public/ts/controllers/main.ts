@@ -51,7 +51,7 @@ export let main = ng.controller('MainController',
 
         function init() {
             $scope.search = "";
-
+           $scope.typeUser= model.me.type;
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
                 && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
@@ -88,7 +88,7 @@ export let main = ng.controller('MainController',
         };
 
         $scope.changeViewCalendar = function () {
-            $scope.goTo('/');
+            $scope.goTo('/view');
             $scope.display.listView = false
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
@@ -623,7 +623,11 @@ export let main = ng.controller('MainController',
                 template.open('main','progression/progression-session-form');
 
             },
+            mainView: async()=>{
+                if(!$scope.structureInitialized) await initializeStructure();
+                template.open('main','main');
 
+            },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'session/session-page');

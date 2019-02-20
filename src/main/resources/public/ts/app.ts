@@ -25,6 +25,9 @@ routes.define(($routeProvider) => {
         .when('/', {
             action: 'main'
         })
+        .when('/view', {
+            action: 'mainView'
+        })
         .when('/session/create/:courseId/:date/', {
             action: 'manageSession'
         })

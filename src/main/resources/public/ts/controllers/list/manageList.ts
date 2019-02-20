@@ -33,7 +33,7 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.changeViewCalendar = function () {
-            $scope.goTo('/');
+            $scope.goTo('/view');
             $scope.display.listView = false
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
