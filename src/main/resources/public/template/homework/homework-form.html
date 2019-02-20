@@ -19,15 +19,10 @@
             </span>
         </div>
     </div>
-    <fieldset  class="row card padding-md border-widht-fieldset" ng-click="openHomework(homework)"
+    <fieldset  class="row card padding-md border-widht-fieldset remove-margin" ng-click="openHomework(homework)"
                ng-disabled="isSelectSubjectAndAudienceHomework">
         <h2 class="remove-margin">
-            <span ng-if="!isInsideSessionForm"><i18n>homework</i18n> -</span>
-            <span>[[homework.type.label]]</span> -
-            <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
-            <span ng-if="homework.attachedToParentSession">Pour cette séance</span>
-            <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
-                [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
+            <span ng-if="!isInsideSessionForm"><i18n>homework</i18n></span>
             <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </fieldset>
@@ -40,11 +35,13 @@
             <div class="cell twelve-mobile ten">
                 <div ng-if="isInsideSessionForm">
                     <label>
-                        <input type="radio" ng-model="homework.attachedToParentSession" ng-value="true" ng-click="attachToParentSession()">
+                        <input type="radio" ng-model="homework.attachedToParentSession" ng-value="true"
+                               ng-click="attachToParentSession()">
                         <i18n>todo.for.this.session</i18n>
                     </label><br/>
                     <label>
-                        <input type="radio" ng-model="homework.attachedToParentSession" ng-value="false" ng-click="attachToOtherSession()">
+                        <input type="radio" ng-model="homework.attachedToParentSession" ng-value="false"
+                               ng-click="attachToOtherSession()">
                         <i18n>choose.another.date.or.session</i18n>
                     </label>
                 </div>
@@ -58,7 +55,7 @@
                                    value="true">
                             <span class="no-style ng-scope"><i18n>session</i18n></span>
                         </label><br>
-                        <label  >
+                        <label>
                             <input type="radio"
                                    ng-click="attachToDate()"
                                    ng-checked="homework.attachedToDate"
@@ -68,10 +65,12 @@
 
                     </div>
                     <div class="row margin-bottom-md">
-                        <date-picker class="date-picker-sm"  ng-if="homework.attachedToDate"
-                                     ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()"></date-picker>
+                        <date-picker class="date-picker-sm margin-bottom-7"  ng-if="homework.attachedToDate"
+                                     ng-model="homework.dueDate"  ng-change="syncWorkloadWeek()">
+                        </date-picker>
                         <select ng-if="homework.attachedToSession" ng-model="homework.session" ng-change="syncWorkloadWeek()"
-                                ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' + session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
+                                ng-options="session as (session.subject.label + ' - ' + session.startDisplayDate + ' ' +
+                                session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
                         </select>
                     </div>
                 </div>
@@ -93,7 +92,8 @@
                 <i18n>homework.manage.type</i18n>*
             </label>
             <div class="cell twelve-mobile ten">
-                <select required ng-model="homework.type" ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
+                <select required ng-model="homework.type"
+                        ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
                 </select>
             </div>
         </div>

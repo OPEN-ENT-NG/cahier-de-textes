@@ -9,20 +9,18 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         console.log('manageProgressionCtrl');
 
-
         function modeIsReadOnly() {
-
             let currentPath = $location.path();
             return  currentPath.includes('view');
         }
         $scope.progression_session = $scope.progression_session ? $scope.progression_session : new ProgressionSession();
         $scope.progression_sessions = new ProgressionSessions(model.me.userId);
-        $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
+
+$scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
         $scope.sort = {
             progression: 'title',
             reverse : false
         };
-
         $scope.refresh = () =>{
             if($routeParams.progressionId){
                 $scope.progression_session.id = parseInt ($routeParams.progressionId);
@@ -30,22 +28,21 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 $scope.safeApply();
 
             }
-        }
-
+        };
         async function initData(){
-
             if($routeParams.progressionId){
                 $scope.progression_session.id = parseInt ($routeParams.progressionId);
                 await  $scope.progression_session.get();
                 $scope.safeApply();
             }
+            $scope.validate = false;
 
             $scope.progression_session.owner = {id: model.me.userId};
 
             $scope.isReadOnly = modeIsReadOnly();
 
             $scope.subjects = new Subjects();
-            $scope.homeworkTypes = new HomeworkTypes();
+            $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
             await   $scope.progression_sessions.sync();
             await $scope.subjects.sync($scope.structure.id, model.me.userId);
             $scope.progression_sessions.all.map(psession => {
@@ -68,24 +65,22 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 ;
             }
 
-            await $scope.homeworkTypes.sync();
+           await $scope.homeworkTypes.sync();
             $scope.safeApply();
-
         }
-        $scope.progression_session.eventer.on(`get:end` , ()=>{
+
+        $scope.progression_session.eventer.on(`get:end` , ()=> {
             $scope.safeApply();
 
         });
-
 
         $scope.getIsReadOnly = () => {
             return modeIsReadOnly();
         };
 
-
-        $scope.validProgressionsSessionForm = async () =>{
+        $scope.validProgressionsSessionForm = async () => {
             let exist = false;
-            $scope.progression_sessions.all.map((item) =>{
+            $scope.progression_sessions.all.map((item) => {
                 if (item.id == $scope.progression_session.id){
                     exist=true;
                 }
@@ -114,9 +109,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         });
 
-
         $scope.openProgressionHomework = (progressionHomework: ProgressionHomework) => {
-
+            $scope.validate = true;
             $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
                     p.opened = false ;
@@ -125,8 +119,6 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             progressionHomework.opened = !progressionHomework.opened;
 
             $scope.safeApply();
-
-
         };
 
         $scope.filterProgression = (search) =>{
@@ -142,19 +134,20 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
-        $scope.newProgressionHomework = () =>{
-            $scope.progression_session.progression_homeworks.map(p => {
+        $scope.newProgressionHomework = () => {
+            $scope.validate = false;
+           $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
                     p.opened = false ;
                 }
             });
 
             $scope.safeApply();
+        };
 
-        }
-        $scope.addProgressionHomework = () =>{
-
+        $scope.addProgressionHomework = () => {
             let newProgressionHomework = new ProgressionHomework();
+            newProgressionHomework.type = $scope.homeworkTypes.all.find(ht => ht.rank = 1);
 
             newProgressionHomework.subject = $scope.progression_session.subject;
 
@@ -178,16 +171,17 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
             $scope.goTo('/progression/'+ progressionSession.id);
             //  $scope.safeApply();
-
         };
-        $scope.back = () =>{
+
+        $scope.back = () => {
             window.history.back();
         };
+
         $scope.deleteProgressions = (progressionsSessions) => {
             progressionsSessions.map(p => {
                 $scope.deleteProgressionSession(p)
             })
-        }
+        };
         //change the sorting of the progressions
         $scope.changeSortType = (type) =>{
             if($scope.sort.progression === type){
@@ -196,7 +190,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 $scope.sort.progression = type;
                 $scope.sort.reverse = false;
             }
-        }
+        };
+
         await initData();
     }]
 );

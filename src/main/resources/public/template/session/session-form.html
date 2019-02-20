@@ -118,7 +118,7 @@
                         <td class="one text-left ">
                             <i18n>deadline</i18n>
                         </td>
-                        <td class="one text-left">
+                        <td class="one text-left ">
                             <i18n>homework.manage.type</i18n>
                         </td>
                         <td class="nine text-left">
@@ -135,10 +135,16 @@
                         static-include="/diary/public/template/homework/homework-formPrinter.html"></tr>
                     </tbody>
                 </table>
-                <button class="float-none display-inline-block margin-top-md"
-                        ng-disabled="!areValidHomeworks()"
+                <button ng-if="!validate"
+                        class="float-none display-inline-block margin-top-md"
                         ng-click="addHomework()">
                     <i18n>homework.manage.create</i18n>
+                </button>
+                <button ng-if="validate"
+                        class="float-none display-inline-block margin-top-md"
+                        ng-disabled="!areValidHomeworks()"
+                        ng-click="closeHomework()">
+                    <i18n>validate</i18n>
                 </button>
             </article>
 

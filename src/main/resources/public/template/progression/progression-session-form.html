@@ -3,8 +3,8 @@
         <div class="twelve cell twelve-mobile">
 
             <span class="twe cell vertical-spacing horizontal-spacing twelve-mobile">
-                <i18n  class="twelve" ng-if="! progression_session.subject">select.subject</i18n>
-                 <i18n  class="twelve" ng-if=" progression_session.subject">printer.subject</i18n>
+                <i18n class="twelve" ng-if="! progression_session.subject">select.subject</i18n>
+                 <i18n class="twelve" ng-if=" progression_session.subject">printer.subject</i18n>
                 <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
                         ng-disabled="progression_session.courseId && progression_session.subject"
                         ng-options="subject.label for subject in subjects.all track by subject.id">
@@ -16,7 +16,7 @@
     </div>
     <div class="twelve cell twelve-mobile">
 
-        <div class="row padding-md" >
+        <div class="row padding-md">
             <!-- Title -->
             <label class="four cell horizontal-spacing twelve-mobile">
                 <div class="twelve">
@@ -44,19 +44,26 @@
                 </div>
                 <editor ng-model="progression_session.description"></editor>
             </div>
+
             <div>
 
             </div>
 
             <div class="padding-md margin-bottom-md">
-                <h2><i18n>homeworks</i18n></h2>
+                <h2>
+                    <i18n>homeworks</i18n>
+                </h2>
                 <article class="responsive-table row">
                     <table class="twelve">
                         <thead>
                         <tr>
-                            <td class="one text-left"><i18n>homework.manage.type</i18n></td>
+                            <td class="one text-left">
+                                <i18n>homework.manage.type</i18n>
+                            </td>
 
-                            <td class="nine text-left"><i18n>settings.exclusion.description</i18n></td>
+                            <td class="nine text-left">
+                                <i18n>settings.exclusion.description</i18n>
+                            </td>
                             <td class="one">&nbsp;</td>
                         </tr>
                         </thead>
@@ -64,7 +71,8 @@
                         <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
                             inside-session-form="true"
                             class="ng-scope"
-                            ng-controller="manageProgessionCtrl" static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
+                            ng-controller="manageProgessionCtrl"
+                            static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
                         </tbody>
 
                         <div>
@@ -73,10 +81,18 @@
                         </div>
 
                     </table>
-                       <button class="float-none display-inline-block margin-top-md"
-                            ng-disabled = "!areValidHomeworks()"
+                    <button ng-if="!validate"
+                            class="float-none display-inline-block margin-top-md"
+                            ng-disabled="!areValidHomeworks()"
                             ng-click="addProgressionHomework()">
                         <i18n>homework.manage.create</i18n>
+                    </button>
+
+                    <button ng-if="validate"
+                            class="float-none display-inline-block margin-top-md"
+                            ng-disabled="!areValidHomeworks()"
+                            ng-click="newProgressionHomework()">
+                        <i18n>validate</i18n>
                     </button>
 
                 </article>
@@ -85,9 +101,11 @@
 
             <button
                     ng-disabled="!progression_session.isValidForm()"
-                    ng-click="validProgressionsSessionForm()"><i18n>utils.save </i18n></button>
+                    ng-click="validProgressionsSessionForm()">
+                <i18n>utils.save</i18n>
+            </button>
+
         </div>
 
     </div>
-
-</>
+</div>
