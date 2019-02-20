@@ -120,7 +120,7 @@ public class HomeworkController extends ControllerHelper {
     }
 
     @Get("/homework-types/:idStructure")
-    @SecuredAction(value = WorkflowUtils.CDT_ACCESS_SETTING, type = ActionType.WORKFLOW)
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     @ResourceFilter(HomeworkTypeSetting.class)
     public void getHomeworkTypes(final HttpServerRequest request) {
         final String structure_id = request.params().get("idStructure");
@@ -128,7 +128,7 @@ public class HomeworkController extends ControllerHelper {
     }
 
     @Post("/homework-type")
-    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @SecuredAction(value = WorkflowUtils.CDT_ACCESS_SETTING, type = ActionType.WORKFLOW)
     @ResourceFilter(HomeworkTypeSetting.class)
     public void createHomeworkType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request,
