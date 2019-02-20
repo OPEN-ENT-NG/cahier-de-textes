@@ -28,7 +28,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.cancelCreation = () => {
             window.history.back();
-            delete $scope.course;
         };
 
 
