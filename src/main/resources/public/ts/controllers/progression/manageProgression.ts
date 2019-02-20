@@ -2,7 +2,7 @@ import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
 import {Session, Subjects} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
-
+import {Utils} from '../../utils/utils';
 
 export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -17,7 +17,11 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         }
         $scope.progression_session = $scope.progression_session ? $scope.progression_session : new ProgressionSession();
         $scope.progression_sessions = new ProgressionSessions(model.me.userId);
-
+        $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
+        $scope.sort = {
+            progression: 'title',
+            reverse : false
+        };
 
         $scope.refresh = () =>{
             if($routeParams.progressionId){
@@ -27,6 +31,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
             }
         }
+
         async function initData(){
 
             if($routeParams.progressionId){
@@ -52,6 +57,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
                 })
             });
+            $scope.progressionsToDisplay.all = $scope.progression_sessions.all;
+
             if($scope.progression_session.title) {
                 $scope.subjects.all.forEach(subject => {
                     if ($scope.progression_session.subject_id == subject.id) {
@@ -61,7 +68,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 ;
             }
 
-           await $scope.homeworkTypes.sync();
+            await $scope.homeworkTypes.sync();
             $scope.safeApply();
 
         }
@@ -79,13 +86,13 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         $scope.validProgressionsSessionForm = async () =>{
             let exist = false;
             $scope.progression_sessions.all.map((item) =>{
-             if (item.id == $scope.progression_session.id){
-                 exist=true;
-             }
-         });
+                if (item.id == $scope.progression_session.id){
+                    exist=true;
+                }
+            });
             if(!exist){
-              await  $scope.toastHttpCall (await $scope.progression_session.create());
-        $scope.goTo('/progressions');}else{
+                await  $scope.toastHttpCall (await $scope.progression_session.create());
+                $scope.goTo('/progressions');}else{
                 await $scope.toastHttpCall ( await $scope.progression_session.update());
             }
             $scope.goTo('/progressions/view');
@@ -122,9 +129,13 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
+        $scope.filterProgression = (search) =>{
+            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progression_sessions.all);
+        }
+
         $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
 
-            console.log(i);
+
             $scope.progression_session.progression_homeworks.splice(i,1);
             if(progressionHomework.id)
                 $scope.toastHttpCall (await progressionHomework.delete());
@@ -132,7 +143,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.newProgressionHomework = () =>{
-           $scope.progression_session.progression_homeworks.map(p => {
+            $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
                     p.opened = false ;
                 }
@@ -171,6 +182,20 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
         $scope.back = () =>{
             window.history.back();
+        };
+        $scope.deleteProgressions = (progressionsSessions) => {
+            progressionsSessions.map(p => {
+                $scope.deleteProgressionSession(p)
+            })
+        }
+        //change the sorting of the progressions
+        $scope.changeSortType = (type) =>{
+            if($scope.sort.progression === type){
+                $scope.sort.reverse = !$scope.sort.reverse;
+            }else{
+                $scope.sort.progression = type;
+                $scope.sort.reverse = false;
+            }
         }
         await initData();
     }]

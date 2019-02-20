@@ -1,7 +1,7 @@
 ///<reference path="session.ts"/>
 import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
-import {Eventer, Mix} from 'entcore-toolkit';
+import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
@@ -12,7 +12,8 @@ import {subscript} from "entcore/types/src/ts/editor/options";
 import forEach = require("core-js/fn/array/for-each");
 
 
-export class ProgressionSession{
+export class ProgressionSession implements  Selectable{
+    selected: boolean;
     id: string;
     subject: Subject;
     title: string;
@@ -21,6 +22,7 @@ export class ProgressionSession{
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     owner ;
+    class: string;
     owner_id;
     subject_id;
     homeworks;
@@ -32,6 +34,7 @@ export class ProgressionSession{
         this.subject = new Subject();
         this.eventer = new Eventer();
         this.title= "";
+        this.class = "";
     }
     async create(){
         let response = await http.post('/diary/progression/create' , this.toJson());
@@ -51,7 +54,7 @@ export class ProgressionSession{
 
     init(){
         if(this.subject_id)
-            this.subject.id = this.subject_id
+            this.subject.id = this.subject_id;
     }
 
 
@@ -66,7 +69,7 @@ export class ProgressionSession{
                 let json = JSON.parse(this.homeworks.toString());
                 json.forEach(i => this.progression_homeworks.push(Mix.castAs(ProgressionHomework, ProgressionHomework.formatSqlDataToModel(i))));
                 this.progression_homeworks.forEach(i => i.initType());
-                this.eventer.trigger(`get:end`)
+                this.eventer.trigger(`get:end`);
             } catch (e) {
                 //     notify.error('session.sync.err');
             }
@@ -80,7 +83,7 @@ export class ProgressionSession{
             if(jsonLine){
                 json.push(jsonLine);
             }
-        })
+        });
         return json;
     }
     private toJson() {
@@ -89,11 +92,12 @@ export class ProgressionSession{
             description: this.description,
             subject_id: this.subject.id ? this.subject.id : this.subject_id,
             title : this.title,
+            class : this.class,
             annotation : this.annotation,
             owner_id: this.owner ? this.owner.id : this.owner_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
 
-        }
+        };
     }
     isValidForm = () => {
         let validSessionOrDueDate = false;
@@ -116,13 +120,14 @@ export class ProgressionSession{
         return {
             id: data.id,
             title: data.title,
+            class: data.class,
             description: data.description,
             owner_id: data.owner_id,
             subject_id : data.subject_id,
             progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
             created: data.created
-        }
+        };
     }
 
 
@@ -147,14 +152,12 @@ export class ProgressionSession{
 }
 
 
-export class ProgressionSessions{
-    all: ProgressionSession[];
-    origin: ProgressionSession[];
+export class ProgressionSessions extends Selection<ProgressionSession>{
     owner_id;
     constructor (owner_id) {
+        super([]);
         this.owner_id = owner_id;
-        this.all = [];
-        this.origin = [];
+
     }
 
     async sync(){
@@ -209,7 +212,7 @@ export class ProgressionHomework{
                 owner_id: ownerId,
                 type_id: this.type.id
 
-            }
+            };
     }
 
     isValidForm = () => {
@@ -234,7 +237,7 @@ export class ProgressionHomework{
             created: data.created
         };
 
-        return result
+        return result;
     }
 
     async delete() {

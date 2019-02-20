@@ -15,6 +15,9 @@
     "annotation": {
       "type": "string"
     },
+    "class":{
+      "type": "string"
+    },
     "owner_id":{
       "type": "string"
     },

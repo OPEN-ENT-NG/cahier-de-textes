@@ -1,9 +1,26 @@
 .progression-item-scrollable{
-  background-color: #2a9cc8;
+  background-color: grey;
   color: white;
-  border-radius:10px;
+  transition: background 250ms ease;
+  margin: 2px;
+  font-size: 12px;
+  padding: 2px;
+  border : 1px white solid;
   transform: translate(0, 0);// Allow to erase the corner during drag
-  padding:1px;
   text-align: center;
   z-index: 10;
+}
+
+.progression-list{
+  margin:0;
+  max-height: 200px;
+  overflow:auto;
+}
+
+.progression-search {
+  margin :1px;
+}
+.progression-settings:before{
+  @include fonticon();
+  content:'\e854';
 }

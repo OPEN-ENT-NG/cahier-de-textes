@@ -50,6 +50,8 @@ export let main = ng.controller('MainController',
         };
 
         function init() {
+            $scope.search = "";
+
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
                 && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
@@ -106,7 +108,6 @@ export let main = ng.controller('MainController',
             $scope.homeworks = !pedagogicItem.homeworks ? [pedagogicItem] : pedagogicItem.homeworks;
         }
 
-
         async function initializeStructure() {
             $scope.structures = new Structures();
             await $scope.structures.sync();
@@ -123,6 +124,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks = new Homeworks($scope.structure);
             $scope.structure.sessions = new Sessions($scope.structure);
             $scope.progressions = new ProgressionSessions(model.me.userId);
+            $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
             await $scope.syncPedagogicItems(true);
 
             $scope.pageInitialized = true;
@@ -149,6 +151,8 @@ export let main = ng.controller('MainController',
             $scope.structure.courses.all = [];
             $scope.progressions.all =[];
 
+
+
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
                 && ($scope.params.user && $scope.params.user.id)
                 || ($scope.params.group && $scope.params.group.id)) {
@@ -157,7 +161,7 @@ export let main = ng.controller('MainController',
                 let type = $scope.params.user && $scope.params.user.id ? 'teacher' : 'audience';
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
-                    await $scope.progressions.sync(),
+                    await $scope.progressionsToDisplay.sync(),
                     await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
 
@@ -180,12 +184,19 @@ export let main = ng.controller('MainController',
                 ]);
             }
 
+
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
             delete($scope.session);
 
             $scope.safeApply();
+        };
+        /*
+        display the progressions that match the search query
+         */
+        $scope.filterProgression = (search) =>{
+            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progressions.all);
         };
 
 
@@ -472,6 +483,9 @@ export let main = ng.controller('MainController',
 
             }
         };
+        /*
+        Handle a session drop on another session
+         */
         $scope.sessionToSession = (idSessionDrag , idSessionDrop) =>{
             let sessionDrag,sessionDrop;
             console.log("sessionToSession");
@@ -492,7 +506,9 @@ export let main = ng.controller('MainController',
 
 
 
-
+        /*
+               Handle a session drop on course
+         */
         $scope.sessionToCourse = async (idSession , idCourse,date) =>{
 
             let sessionDrag;
@@ -526,7 +542,9 @@ export let main = ng.controller('MainController',
 
         }
 
-
+        /*
+               Handle a progression dropped on a session
+                */
         $scope.updateSession = async (idSession, idProgression) => {
             let progressionDragged, SessionDroped;
             $scope.progressions.all.map(progression => {
@@ -547,6 +565,10 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply();
         };
+
+        /*
+        Handle a progression dropped on a course
+         */
         $scope.createSessionFromProgression = async (idProgression,idCourse,date) =>{
 
             let progressionDragged;

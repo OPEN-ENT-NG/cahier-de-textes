@@ -66,4 +66,10 @@ export class Utils {
         let htmlWithSpaces = html.replace(/<\/div>/g, ' </div>');
         return htmlWithSpaces ? String(htmlWithSpaces).replace(/<[^>]+>/gm, '') : '';
     }
+
+
+    static filterProgression = (search , array) =>{
+       return  array.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
+    }
+
 }

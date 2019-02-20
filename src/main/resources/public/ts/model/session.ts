@@ -164,7 +164,8 @@ export class Session {
         this.courseId = course._id;
         this.teacher = course.teachers[0];
         this.room = course.rooms[0];
-        this.subject = course.subject;
+        if(!this.subject)
+            this.subject = course.subject;
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
@@ -225,7 +226,7 @@ export class Session {
     }
     async duplicateHomework(session){
         this.homeworks.map(async homework =>  {
-          await  homework.duplicate(session.id,session.date);
+            await  homework.duplicate(session.id,session.date);
         });
     }
 
