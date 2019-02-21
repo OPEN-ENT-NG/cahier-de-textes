@@ -283,6 +283,20 @@ export let main = ng.controller('MainController',
             });
 
             $scope.pedagogicDays = pedagogicDays;
+
+            if(Utils.isAChildOrAParent(model.me.type)){
+                $scope.initDisplay();
+            }
+        };
+
+
+        $scope.initDisplay = () =>{
+            $scope.pedagogicDays.map(c =>{
+                c.displayed = false;
+            });
+            $scope.pedagogicDays[0].displayed = true;
+            $scope.pedagogicDays[1].displayed = true;
+            $scope.pedagogicDays[2].displayed = true;
         };
 
         $scope.setProgress = (homework: Homework) => {
@@ -307,7 +321,6 @@ export let main = ng.controller('MainController',
 
             let calendarMode = $scope.calendar.increment;
             let momentFirstDay = moment($scope.calendar.firstDay);
-            console.log($scope.display.listView);
             switch(calendarMode){
                 case 'month':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('month');
@@ -609,7 +622,7 @@ export let main = ng.controller('MainController',
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                if(model.me.type === "ELEVE" || model.me.type === "PERSELEVE" && !$scope.pageInitialized){
+                if(Utils.isAChildOrAParent(model.me.type) && !$scope.pageInitialized){
                     $scope.goTo("/list")
                 }else if (model.me.type === "PERSEDUCNAT"){
                     $scope.goTo("/visas");

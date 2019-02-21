@@ -10,6 +10,7 @@
             <div class="timeline-story vertical-spacing row">
                 <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:display.homeworks"
                      class="twelve cell event-row">
+                    <i  ng-class="!pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet" ng-click="displayDay(pedagogicDay)"></i>
                     <div class="cell date-field text-right">
                     <span class="label">
                         [[pedagogicDay.fullDayName]]
@@ -28,6 +29,7 @@
                             <i18n>homeworks</i18n>
                         </div>
                         <div
+                                ng-show="pedagogicDay.displayed"
                                 ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems | pedagogicItemFilter: display.sessions:display.homeworks"
                                 static-include="/diary/public/template/list/list-pedagogic-item.html">
                         </div>

@@ -1,4 +1,4 @@
-import {moment} from 'entcore';
+import {model, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 
 export class Utils {
@@ -72,4 +72,7 @@ export class Utils {
        return  array.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
     }
 
+    static isAChildOrAParent(type) {
+        return type === "ELEVE" || type === "PERSELEVE"
+    }
 }

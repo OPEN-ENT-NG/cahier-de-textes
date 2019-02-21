@@ -7,6 +7,8 @@ export let manageListCtrl = ng.controller('manageListController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
         $scope.display.session = true;
+        $scope.indexItemsDisplayed = [];
+
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
@@ -17,6 +19,25 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.goTo('/homework/view/' + homeworkId );
             }
         };
+
+        $scope.displayDay = (pedagogicDay) =>{
+           pedagogicDay.displayed = !pedagogicDay.displayed;
+           $scope.safeApply();
+        };
+
+
+
+        $scope.isClickableByStudentOrParent = (pedagogicItem) => {
+            if (Utils.isAChildOrAParent(model.me.type)){
+                if(pedagogicItem.isPublished){
+                    return pedagogicItem.pedagogicType === 2;
+                }else{
+                    return false;
+                }
+            }else{
+                return pedagogicItem.pedagogicType === 2;
+            }
+        };
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/update/' + sessionId);
@@ -25,14 +46,13 @@ export let manageListCtrl = ng.controller('manageListController',
             }
             $scope.safeApply();
         };
-
         $scope.openSessionFromCourse = (calendar_course) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/create/' + calendar_course._id + '/' + Utils.getFormattedDate(calendar_course.startMoment));
             }
             $scope.safeApply();
         };
-
+        console.log(  $scope.pedagogicItems)
         $scope.changeViewCalendar = function () {
             $scope.goTo('/view');
             $scope.display.listView = false
