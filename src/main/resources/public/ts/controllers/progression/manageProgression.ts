@@ -16,7 +16,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         $scope.progression_session = $scope.progression_session ? $scope.progression_session : new ProgressionSession();
         $scope.progression_sessions = new ProgressionSessions(model.me.userId);
 
-$scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
+        $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
         $scope.sort = {
             progression: 'title',
             reverse : false
@@ -29,13 +29,15 @@ $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
 
             }
         };
-        async function initData(){
+
+        async function initData() {
             if($routeParams.progressionId){
                 $scope.progression_session.id = parseInt ($routeParams.progressionId);
                 await  $scope.progression_session.get();
                 $scope.safeApply();
             }
             $scope.validate = false;
+            $scope.display.progression = true;
 
             $scope.progression_session.owner = {id: model.me.userId};
 
@@ -67,7 +69,7 @@ $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
 
            await $scope.homeworkTypes.sync();
             $scope.safeApply();
-        }
+        };
 
         $scope.progression_session.eventer.on(`get:end` , ()=> {
             $scope.safeApply();
@@ -182,6 +184,7 @@ $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
                 $scope.deleteProgressionSession(p)
             })
         };
+
         //change the sorting of the progressions
         $scope.changeSortType = (type) =>{
             if($scope.sort.progression === type){

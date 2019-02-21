@@ -216,8 +216,11 @@
   "homework.done.notification": "Devoir fait",
   "homework.todo.notification": "Devoir à faire",
   "progression.manage.button.goTo" : "Accéder aux progressions",
-  "progression.manage.button.Create": "Créer une progression",
+  "progression.manage.button.create": "Créer une progression",
+  "progression.creation": "Création progression",
+  "progression.add.title": "Ajouter une progression",
   "progression": "Progression(s)",
+  "progression.title": "Progression",
   "progression.session.delete": "Progression supprimée",
   "progression.session.delete.error": "Erreur lors de la suppression de la progression",
   "progression.session.create": "Progression créée",
@@ -225,6 +228,7 @@
   "progression.session.update": "Progression modifiée",
   "progression.session.update.error": "Erreur lors de la modification de la progression",
   "progression.get.err": "Erreur lors de la récupération de la progression",
+  "progression.niveau": "Niveau",
   "help": "aide",
   "validate": "valider"
 }

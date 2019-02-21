@@ -24,3 +24,33 @@
   @include fonticon();
   content:'\e854';
 }
+
+.sidebar {
+
+  .ellipsis {
+    margin-right: 30px;
+  }
+
+  .plus-input::after {
+    content: "\e823";
+    position: absolute;
+    top: -9px;
+    right: 0px;
+  }
+
+  > .filter__input--icon {
+    position: relative;
+
+    &:after {
+      content: "\e8d0";
+      font-family: "generic-icons";
+      position: absolute;
+      top: 0;
+      right: 10px;
+      color: #888;
+    }
+    > input[type="text"] {
+      width: 100%;
+    }
+  }
+}

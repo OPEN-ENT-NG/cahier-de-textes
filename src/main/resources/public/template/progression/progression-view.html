@@ -1,50 +1,63 @@
-
-
-
+<div id="crumbs">
+    <ul class="remove-padding">
+        <a href="#" ng-click="goTo('/view')">
+            <i18n><span><li>diary.title</li></span></i18n>
+        </a>&nbsp;>&nbsp;
+            <i18n><span><li>progression.title</li></span></i18n>
+    </ul>
+</div>
 
 <div>
-    <button class="right-magnet cancel" ng-click="goTo('/view')">
-        <i18n>visa.manage.backOnDiary</i18n>
-    </button>
-    <button  ng-click="newProgressionForm()">
-        <i18n>progression.manage.button.Create</i18n>
+    <button class="right-magnet" ng-click="newProgressionForm()">
+        <i18n>progression.manage.button.create</i18n>
     </button>
 </div>
-<div class="row"  ng-controller="manageProgessionCtrl">
+<div class="row" ng-controller="manageProgessionCtrl">
 
     <article class="cell two twelve-mobile">
-        <div class="sidebar ">
-            <input ng-change="filterProgression(search)" type="text" placeholder="Recherche" ng-model="search">
+        <div class="sidebar" ng-class="{opened : searchbar.progression}">
+            <h5 class="large" ng-click="display.progression = !display.progression">
+                <i18n>progression</i18n>
+                <i ng-class="display.progression ? 'up-open' : 'down-open'" class="right-magnet"></i>
+            </h5>
+            <span ng-show="display.progression" class="filter__input--icon">
+                <input type="text" ng-change="filterProgression(search)" ng-model="search" placeholder="Rechercher">
+            </span>
         </div>
     </article>
 
     <div class="ten cell content-next-to-the-sidebar">
 
-        <div     class=" row padding-md margin-bottom-md">
+        <div class=" row margin-bottom-md">
             <table class="twelve">
                 <thead>
                 <tr>
-                    <td class="one text-left"><i18n>&nbsp</i18n></td>
-
-                    <td   class="one text-left"  ng-click="changeSortType('title')">
-                        <i ng-if="sort.progression === 'title' " ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
+                    <th class="one text-left">
+                        <i18n>&nbsp</i18n>
+                    </th>
+                    <th class="one text-left" ng-click="changeSortType('title')">
+                        <i ng-if="sort.progression === 'title' " ng-class="sort.reverse ? 'up-open' : 'down-open'"
+                           class="left-magnet"></i>
 
                         <i18n>title</i18n>
 
-                    </td>
-                    <td class="one text-left" ng-click="changeSortType('class')">
-                        <i ng-if="sort.progression === 'class' " ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
-                        <i18n>utils.groups</i18n></td>
+                    </th>
+                    <th class="one text-left" ng-click="changeSortType('class')">
+                        <i ng-if="sort.progression === 'class' " ng-class="sort.reverse ? 'up-open' : 'down-open'"
+                           class="left-magnet"></i>
+                        <i18n>progression.niveau</i18n>
+                    </th>
 
-                    <td class="one text-left" ng-click="changeSortType('subject.label')">
-                        <i ng-if="sort.progression === 'subject.label' " ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
-                        <i18n>subject</i18n></td>
-                    <td class="five text-left" ng-click="changeSortType('progression_homeworks.length')">
-                        <i ng-if="sort.progression === 'progression_homeworks.length' " ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
-                        <i18n>homeworks.attached</i18n></td>
-
-
-
+                    <th class="one text-left" ng-click="changeSortType('subject.label')">
+                        <i ng-if="sort.progression === 'subject.label' "
+                           ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
+                        <i18n>subject</i18n>
+                    </th>
+                    <th class="five text-left" ng-click="changeSortType('progression_homeworks.length')">
+                        <i ng-if="sort.progression === 'progression_homeworks.length' "
+                           ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
+                        <i18n>homeworks.attached</i18n>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -56,19 +69,25 @@
                         </label>
                     </td>
 
-                    <td  ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">[[progression_session.title]]</td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">[[progression_session.class]]</td>
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                        [[progression_session.title]]
+                    </td>
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                        [[progression_session.class]]
+                    </td>
 
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">[[progression_session.subject.label]]</td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="five text-left">[[progression_session.progression_homeworks.length]]</td>
-
-
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                        [[progression_session.subject.label]]
+                    </td>
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="five text-left">
+                        [[progression_session.progression_homeworks.length]]
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
 
-        <section class="toggle-buttons"  ng-class="{ hide: progressionsToDisplay.selected.length === 0 }">
+        <section class="toggle-buttons" ng-class="{ hide: progressionsToDisplay.selected.length === 0 }">
             <div class="toggle">
                 <div class="row">
                     <button ng-click="deleteProgressions(progressionsToDisplay.selected)">

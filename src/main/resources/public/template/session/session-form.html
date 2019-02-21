@@ -16,21 +16,19 @@
 
         </div>
     </div>
-    <div class="horizontal-spacing twelve-mobile">
-        <label class="row twelve vertical-spacing">
-            <div class="twelve margin-bottom-md">
+        <div class="flex twelve-mobile">
+            <label class="vertical-spacing margin-right-md">
                 <i18n>utils.publish</i18n>
-            </div>
-        </label>
-        <div>
-            <switch ng-model="session.isPublished"  class="ng-pristine ng-untouched ng-valid ng-isolate-scope">
-                <label class="switch">
+                :
+            </label>
 
-                </label>
+            <switch class="vertical-spacing" ng-model="session.isPublished">
+                <label class="switch"> </label>
             </switch>
         </div>
     </div>
-    <fieldset class="row card padding-md border-widht-fieldset" ng-click="session.opened = !session.opened"
+    <fieldset class="row card remove-margin padding-md border-widht-fieldset"
+              ng-click="session.opened = !session.opened"
               ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
         <h2 class="remove-margin">
             <i18n>session</i18n>
