@@ -248,6 +248,12 @@ export let main = ng.controller('MainController',
                 pedagogicItems.forEach(i => {
                     if (i.pedagogicType == $scope.TYPE_SESSION) {
                         nbHomeworkInSession += i.homeworks.length;
+
+                    }
+                });
+                pedagogicItems.forEach(i => {
+                    if (i.pedagogicType == $scope.TYPE_HOMEWORK) {
+                        console.log(i);
                     }
                 });
 
@@ -258,7 +264,13 @@ export let main = ng.controller('MainController',
                 let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
                 let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
 
-                let nbHomework = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_HOMEWORK).length;
+                let nbHomework = 0;
+                pedagogicItems.map(i => {
+                    if(i.pedagogicType == $scope.TYPE_SESSION) {
+                        // console.log(i)
+                        nbHomework += i.homeworks.length;
+                    }
+                });
                 let nbSession = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_SESSION).length;
                 let nbCourse = pedagogicItems.filter(i => i.pedagogicType == $scope.TYPE_COURSE).length;
                 let nbCourseAndSession = nbSession + nbCourse;
