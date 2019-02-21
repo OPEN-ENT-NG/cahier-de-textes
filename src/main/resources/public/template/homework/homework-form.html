@@ -26,7 +26,7 @@
             <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </fieldset>
-    <div class="row card padding-md" ng-show="homework.opened">
+    <div class="row card padding-md" ng-if="homework.opened">
         <!-- Deadline -->
         <div class="row">
             <label class="cell two twelve-mobile">
