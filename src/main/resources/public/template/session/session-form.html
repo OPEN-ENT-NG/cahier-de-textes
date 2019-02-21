@@ -16,17 +16,7 @@
 
         </div>
     </div>
-        <div class="flex twelve-mobile">
-            <label class="vertical-spacing margin-right-md">
-                <i18n>utils.publish</i18n>
-                :
-            </label>
 
-            <switch class="vertical-spacing" ng-model="session.isPublished">
-                <label class="switch"> </label>
-            </switch>
-        </div>
-    </div>
     <fieldset class="row card remove-margin padding-md border-widht-fieldset"
               ng-click="session.opened = !session.opened"
               ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
@@ -42,7 +32,7 @@
 
     <div class="row card padding-md" ng-show="session.opened">
         <!-- Title -->
-        <label class="four cell horizontal-spacing twelve-mobile">
+        <label class="three cell horizontal-spacing twelve-mobile">
             <div class="twelve">
                 <i18n>title</i18n>
             </div>
@@ -58,8 +48,7 @@
         </label>
         <div class="one"></div>
         <!-- Date -->
-
-        <div class="five cell horizontal-spacing twelve-mobile">
+        <div class="three cell horizontal-spacing twelve-mobile">
             <label class="row twelve vertical-spacing">
                 <div class="twelve margin-bottom-md">
                     <i18n>date</i18n>
@@ -95,6 +84,17 @@
                        ng-model="session.endTime"/>
             </div>
         </div>
+        <!-- Publish -->
+        <label class="three cell horizontal-spacing twelve-mobile">
+            <div class="twelve margin-bottom-md">
+                <i18n>utils.publish</i18n>
+            </div>
+            <switch class="vertical-spacing" ng-model="session.isPublished">
+                <label class="switch"> </label>
+            </switch>
+        </label>
+        <div class="one"></div>
+
         <!-- Description-->
         <div class="row">
             <div class="row twelve vertical-spacing">
@@ -148,6 +148,5 @@
 
         </div>
     </div>
-
 
 </div>
