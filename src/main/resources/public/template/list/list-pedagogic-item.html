@@ -1,13 +1,15 @@
 <!-- Session and Course -->
 <article class="pedagogic-item-article">
+    <!-- Sessions -->
     <div class="row  list-view-item">
-        <div class="eight cell first-content">
+        <div  class="eight cell first-content">
             <!-- Subject, Audience and Teacher-->
+
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                        <span class="normal">
+                <span class="normal">
                             [[pedagogicItem.subject.label]] &nbsp;
-                            <span class="small">
+                    <span class="small">
                                 [[pedagogicItem.audience.name]] [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]&nbsp;
                             </span>
                         </span>
@@ -23,8 +25,6 @@
             <span class="small" ng-if="pedagogicItem.room">
                 <i18n>utils.room</i18n> [[pedagogicItem.room]]
             </span>
-
-
             <!-- Description -->
             <div ng-if="pedagogicItem.opened && pedagogicItem.description"
                  class="row"
@@ -36,10 +36,10 @@
         </div>
         <div class="sub-content text-right cell four"
              ng-if="pedagogicItem.homeworks && pedagogicItem.homeworks.length">
-                <div class="list-view-item"
-                     ng-repeat="homework in pedagogicItem.homeworks"
-                     static-include="/diary/public/template/list/list-pedagogic-item-homework.html">
-                </div>
+            <div class="list-view-item"
+                 ng-repeat="homework in pedagogicItem.homeworks"
+                 static-include="/diary/public/template/list/list-pedagogic-item-homework.html">
             </div>
+        </div>
     </div>
 </article>

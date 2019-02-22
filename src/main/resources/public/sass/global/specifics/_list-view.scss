@@ -145,7 +145,7 @@
 
     .date-label {
       position: relative;
-      top: -11px;
+      top: 0;
     }
     .event-row {
       margin-top: 9px;
@@ -180,11 +180,11 @@
     }
   }
 
-  @media screen and (min-width: $tablette) {
+ /* @media screen and (min-width: $tablette) {
     .timeline-story {
       .date-label {
-        display: none;
+        display: block;
       }
     }
-  }
+  }*/
 }
