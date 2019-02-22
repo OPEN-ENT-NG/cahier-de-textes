@@ -257,7 +257,7 @@ export class HomeworkType {
     }
 
     async delete() {
-        let {data} = await http.delete(`/diary/homework-type/${this.id}`);
+        let {data} = await http.delete(`/diary/homework-type/${this.id}/${this.structure_id}`);
         if (data.id != undefined) {
             let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
             return Utils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')

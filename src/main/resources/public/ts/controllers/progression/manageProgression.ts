@@ -149,7 +149,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         $scope.addProgressionHomework = () => {
             let newProgressionHomework = new ProgressionHomework();
-            newProgressionHomework.type = $scope.homeworkTypes.all.find(ht => ht.rank = 1);
+            newProgressionHomework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
 
             newProgressionHomework.subject = $scope.progression_session.subject;
 

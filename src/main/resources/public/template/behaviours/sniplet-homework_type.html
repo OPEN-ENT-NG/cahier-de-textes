@@ -29,10 +29,10 @@
                         </button>
                     </li>
                     <li ng-repeat="homeworkType in homeworkTypes.all"
-                        class="twelve skills-list-proposition">
-                        <span class="two cell">[[homeworkType.label]]</span>
+                        class="twelve twelve-mobile skills-list-proposition">
+                        <span class="three cell twelve-mobile">[[homeworkType.label]]</span>
                         <i class="pencil icon-grey" data-ng-click="prepareUpdate(homeworkType);"></i>
-                        <i class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
+                        <i ng-show="!hideTrash" class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
                     </li>
                 </ul>
         </div>

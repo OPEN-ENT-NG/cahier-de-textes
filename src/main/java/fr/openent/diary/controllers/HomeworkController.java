@@ -148,12 +148,13 @@ public class HomeworkController extends ControllerHelper {
                 });
     }
 
-    @Delete("/homework-type/:id")
+    @Delete("/homework-type/:id/:idStructure")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkTypeSetting.class)
     public void deleteHomeworkType(final HttpServerRequest request) {
         Integer homeworkTypeId = Integer.parseInt(request.getParam("id"));
-        homeworkService.deleteHomeworkType(homeworkTypeId, DefaultResponseHandler.defaultResponseHandler(request));
+        final String structure_id = request.params().get("idStructure");
+        homeworkService.deleteHomeworkType(homeworkTypeId, structure_id, DefaultResponseHandler.defaultResponseHandler(request));
     }
 
     @Get("/workload-week/:date/:audienceId")

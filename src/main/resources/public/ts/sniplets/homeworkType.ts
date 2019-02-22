@@ -13,11 +13,13 @@ export const homeworkType = {
     controller: {
         init: async function () {
             this.notifications = [];
-            homeworkType.that = this
+            homeworkType.that = this;
             this.structure_id = this.source.idStructure;
             this.homework_type = new HomeworkType(this.structure_id);
             this.homeworkTypes = new HomeworkTypes(this.structure_id);
+            this.hideTrash = false;
             await this.homeworkTypes.sync();
+            this.isLast();
             this.safeApply();
         },
 
@@ -38,6 +40,15 @@ export const homeworkType = {
             });
         },
 
+        isLast: function () {
+            if(this.homeworkTypes.all.length <= 1) {
+                homeworkType.that.hideTrash = true;
+            }
+            else {
+                homeworkType.that.hideTrash = false;
+            }
+        },
+
         toastHttpCall: (response) => {
             if (response.succeed) {
                 homeworkType.that.notifications.push(new Toast(response.toastMessage, 'confirm'));
@@ -55,6 +66,7 @@ export const homeworkType = {
             this.homework_type.label = null;
             homeworkType.that.homework_type.label = null;
             this.safeApply(homeworkType.that);
+            this.isLast();
         },
 
         updateHomeworkType: async function (homework_type: HomeworkType) {
@@ -73,6 +85,7 @@ export const homeworkType = {
             this.toastHttpCall(await homework_type.delete());
             await this.homeworkTypes.sync();
             this.safeApply(homeworkType.that);
+            this.isLast();
         },
 
         prepareUpdate: async function (homework_type: HomeworkType) {

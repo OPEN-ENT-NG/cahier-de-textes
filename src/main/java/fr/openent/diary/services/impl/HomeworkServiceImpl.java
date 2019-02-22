@@ -356,14 +356,17 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void deleteHomeworkType(Integer id, Handler<Either<String, JsonObject>> handler) {
-        JsonArray param = new JsonArray();
+    public void deleteHomeworkType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler) {
+        JsonArray params = new JsonArray();
         String query = "DELETE FROM diary.homework_type ht " +
-                "WHERE not Exists (SELECT 1 from diary.homework h WHERE ht.id =  h.type_id) " +
-                "AND not Exists (SELECT 1 from diary.progression_homework ph WHERE ht.id = ph.type_id)" +
+                "WHERE not Exists (SELECT 1 from diary.homework h WHERE ht.id =  h.type_id)" +
+                "AND not Exists (SELECT 1 from diary.progression_homework ph WHERE ht.id = ph.type_id) " +
+                "AND Exists (SELECT 1 FROM diary.homework_type htt WHERE structure_id = ? HAVING COUNT(htt.id) > 1) " +
                 "AND ht.id = ? RETURNING id";
-        param.add(id);
-        Sql.getInstance().prepared(query, param, SqlResult.validUniqueResultHandler(handler));
+        params.add(structure_id);
+        params.add(id);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

@@ -234,7 +234,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             // if new homework, we set the default homeworkType
             if(!$scope.homework.id) {
-                $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank = 1);
+                $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
             }
 
             await $scope.syncWorkloadWeek();
