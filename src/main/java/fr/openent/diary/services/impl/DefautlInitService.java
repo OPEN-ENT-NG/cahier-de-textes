@@ -43,7 +43,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
             futureMyResponse1Lst.add(resp1FutureComposite);
             JsonArray types = new JsonArray();
             JsonObject action = new JsonObject()
-                    .put("action", "structure.getStructuresActives")
+                    .put("action", "structure.getAllStructures")
                     .put("types", types);
             eb.send("viescolaire", action, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
                 @Override
@@ -62,25 +62,22 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
         CompositeFuture.all(futureMyResponse1Lst).setHandler(
 
                 event -> handler.handle("success"));
-//
-//        try {
-//            JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-////            statements.add(getHomeworkStateInitStatement());
-////
-//
-//
-//            sql.transaction(statements, new Handler<Message<JsonObject>>() {
-//                @Override
-//                public void handle(Message<JsonObject> event) {
-//                    Number id = Integer.parseInt("1");
-//                    handler.handle(SqlQueryUtils.getTransactionHandler(event,id));
-//                }
-//            });
-//        } catch (ClassCastException e) {
-//            LOGGER.error("An error occurred when insert progression", e);
-//            handler.handle(new Either.Left<String, JsonObject>(""));
-//
-//        }
+
+        try {
+
+          //  statements.add(getHomeworkStateInitStatement());
+              sql.transaction(statements, new Handler<Message<JsonObject>>() {
+                @Override
+                public void handle(Message<JsonObject> event) {
+                    Number id = Integer.parseInt("1");
+            //        handler.handle(SqlQueryUtils.getTransactionHandler(event,id));
+                }
+            });
+        } catch (ClassCastException e) {
+            LOGGER.error("An error occurred when insert progression", e);
+           // handler.handle(new Either.Left<String, JsonObject>(""));
+
+        }
 
 
     }
@@ -89,9 +86,9 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
 
         String query = "INSERT INTO diary.homework_type (structure_id, label, rank) values (? ,? ,?) , (?, ?, ?) , (?, ?, ?) ;";
 
-        JsonArray params = new JsonArray().add(jsonObject.getString("id")).add("Exercice(s)").add(1)
-                .add(jsonObject.getString("id")).add("Devoir maison").add(2)
-                .add(jsonObject.getString("id")).add("Autre").add(3);
+        JsonArray params = new JsonArray().add(jsonObject.getString("s.id")).add("Exercice(s)").add(1)
+                .add(jsonObject.getString("s.id")).add("Devoir maison").add(2)
+                .add(jsonObject.getString("s.id")).add("Autre").add(3);
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params )
@@ -100,7 +97,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
 
     public JsonObject getHomeworkStateInitStatement() {
 
-        String query = "INSERT INTO diary.homework_progress (id,label) values( 1 ,'todo') , ( 2 , 'done') ;";
+        String query = "INSERT INTO diary.homework_state (id,label) values( 1 ,'todo') , ( 2 , 'done') ON CONFLICT DO NOTHING;";
 
         return new JsonObject()
                 .put(STATEMENT, query)
