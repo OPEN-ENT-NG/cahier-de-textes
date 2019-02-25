@@ -8,28 +8,35 @@
 
         <div class="list-view">
             <div class="timeline-story vertical-spacing row">
-                <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:display.homeworks"
+                <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:!display.sessions"
                      class="twelve cell event-row">
+                    <i  ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet" ng-click="displayDay(pedagogicDay)"></i>
                     <div class="cell date-field text-right">
                     <span class="label">
                         [[pedagogicDay.fullDayName]]
                     </span>
                     </div>
                     <div class="event cell">
-                        <div class="round"
-                             ng-class="{'[[pedagogicDay.color]]': pedagogicDay.homeworksAreForOneAudienceOnly}"></div>
+                        <div>
+                            <span  class="round "
+                                   ng-class="{'[[pedagogicDay.color]]': true}">
+                                <span ng-show="!display.sessions">
+                                    [[pedagogicDay.nbHomework]]
+                                </span>
+                            </span>
+                        </div>
                     </div>
-                    <div>
 
-                    </div>
-                    <div class="cell ten eleven-mobile">
+                    <div  ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
                         <div class="date-label">
                             [[pedagogicDay.fullDayName]] - [[pedagogicDay.nbHomework]]
                             <i18n>homeworks</i18n>
                         </div>
                         <div
-                                ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems | pedagogicItemFilter: display.sessions:display.homeworks"
-                                static-include="/diary/public/template/list/list-pedagogic-item.html">
+                                ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
+                            <div ng-if="displaySession(display.sessions,pedagogicItem) && display.sessions" static-include="/diary/public/template/list/list-pedagogic-item.html"/>
+                            <div ng-if="displaySession(display.sessions,pedagogicItem) && !display.sessions" static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"/>
+
                         </div>
                     </div>
                 </div>

@@ -74,7 +74,7 @@ public class SessionServiceImpl  implements SessionService {
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getSessions(startDate, endDate, null, listAudienceId, null, null, true, false, false, handler);
+                this.getSessions(startDate, endDate, null, listAudienceId, null, null, false, false, false, handler);
             }
         });
     }

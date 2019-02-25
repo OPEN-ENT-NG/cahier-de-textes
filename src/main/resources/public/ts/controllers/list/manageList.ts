@@ -1,11 +1,18 @@
-import {Behaviours, model, ng} from 'entcore';
+import {Behaviours, model,moment, ng} from 'entcore';
 import {Utils} from '../../utils/utils';
+import {
+    Course, Homework, Homeworks, Toast, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
+    Workload
+} from '../../model';
 
 export let manageListCtrl = ng.controller('manageListController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
+        $scope.display.session = true;
+        $scope.indexItemsDisplayed = [];
+
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
@@ -16,6 +23,25 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.goTo('/homework/view/' + homeworkId );
             }
         };
+
+        $scope.displayDay = (pedagogicDay) =>{
+           pedagogicDay.displayed = !pedagogicDay.displayed;
+           $scope.safeApply();
+        };
+
+
+
+        $scope.isClickableByStudentOrParent = (pedagogicItem) => {
+            if (Utils.isAChildOrAParent(model.me.type)){
+                if(pedagogicItem.isPublished){
+                    return pedagogicItem.pedagogicType === 2;
+                }else{
+                    return false;
+                }
+            }else{
+                return pedagogicItem.pedagogicType === 2;
+            }
+        };
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/update/' + sessionId);
@@ -24,27 +50,33 @@ export let manageListCtrl = ng.controller('manageListController',
             }
             $scope.safeApply();
         };
-
         $scope.openSessionFromCourse = (calendar_course) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/create/' + calendar_course._id + '/' + Utils.getFormattedDate(calendar_course.startMoment));
             }
             $scope.safeApply();
         };
-
+        console.log(  $scope.pedagogicItems);
         $scope.changeViewCalendar = function () {
             $scope.goTo('/view');
-            $scope.display.listView = false
+            $scope.display.listView = false;
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true ;
             }
-        }
+        };
 
+        //check the display mod and if display session check the homeworks an the sessions which have homeworks
+        $scope.displaySession = (displaySession,pedagogicItem) =>{
+           if (displaySession)
+               return pedagogicItem.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+           else
+                return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
+        };
 
         $scope.changeViewList = function () {
             $scope.goTo('/list');
-            $scope.display.listView = true
+            $scope.display.listView = true;
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true ;

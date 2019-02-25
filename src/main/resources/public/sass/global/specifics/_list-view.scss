@@ -105,19 +105,32 @@
     }
 
     .round {
-      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+      transition: all 200ms ease;
       top: 0;
       left: 50%;
-      border-radius: 50%;
-      height: 15px;
-      width: 15px;
       margin-left: -13px;
       margin-top: 0;
       border: solid 3px #F9F9F9;
-      background: #bbb;
+      background: #666;
+      text-align: center;
       &.green {
         background: #46bfaf;
       }
+      &.yellow{
+        background: #ffd900;
+      }
+      &.red{
+        background: #ff2011;
+      }
+    }
+    .round > span {
+      filter: invert(100%);
+      -webkit-filter: invert(100%);
     }
 
     &::before {
@@ -132,7 +145,7 @@
 
     .date-label {
       position: relative;
-      top: -11px;
+      top: 0;
     }
     .event-row {
       margin-top: 9px;
@@ -167,11 +180,11 @@
     }
   }
 
-  @media screen and (min-width: $tablette) {
+ /* @media screen and (min-width: $tablette) {
     .timeline-story {
       .date-label {
-        display: none;
+        display: block;
       }
     }
-  }
+  }*/
 }

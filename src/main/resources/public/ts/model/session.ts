@@ -38,7 +38,7 @@ export class Session {
 
     endDisplayDate: string;
     endDisplayTime: string;
-
+    isDisplayed:boolean = false;
     is_periodic: boolean = false;
     locked: boolean = true;
 

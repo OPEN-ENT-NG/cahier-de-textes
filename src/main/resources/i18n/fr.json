@@ -230,5 +230,6 @@
   "progression.get.err": "Erreur lors de la récupération de la progression",
   "progression.niveau": "Niveau",
   "help": "aide",
-  "validate": "valider"
+  "validate": "valider",
+  "Status":"Statut"
 }

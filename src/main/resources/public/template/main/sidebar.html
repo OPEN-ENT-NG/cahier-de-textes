@@ -31,6 +31,7 @@
 
         </label>
 
+
         <div class="row margin-bottom-md" ng-if="display.listView">
             <i18n>period.from</i18n>
             <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
@@ -40,6 +41,21 @@
             <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
                          class="date-picker-sm"></date-picker>
         </div>
+
+        <div class="row margin-bottom-md" ng-show="display.listView">
+
+            <label>
+                <input type="radio" ng-model="display.sessions" ng-value="true"
+                       ng-click="">
+                <i18n>session</i18n>
+            </label><br/>
+            <label>
+                <input type="radio" ng-model="display.sessions" ng-value="false"
+                       ng-click="">
+                <i18n>homework</i18n>
+            </label>
+        </div>
+
 
         <div class="row margin-bottom-md" ng-show="!display.listView">
             <div ng-click="display.homeworks = !display.homeworks">
