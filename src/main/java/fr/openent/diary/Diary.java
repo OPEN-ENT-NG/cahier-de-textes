@@ -26,6 +26,7 @@ public class Diary extends BaseServer {
         final VisaServiceImpl visaService = new VisaServiceImpl(storage, eb, vertx, config);
 
         addController(new DiaryController(diaryService));
+        addController(new InitController(new DefautlInitService("diary",eb)));
         addController(new VisaController(visaService, storage));
         addController(new SessionController(new SessionServiceImpl()));
         addController(new HomeworkController(new HomeworkServiceImpl("diary")));
