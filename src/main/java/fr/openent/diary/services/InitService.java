@@ -7,5 +7,5 @@ import io.vertx.core.json.JsonObject;
 public interface InitService {
 
 
-    void init( final Handler<String> handler);
+    void init( final  Handler<Either<String, JsonObject>>  handler);
 }
