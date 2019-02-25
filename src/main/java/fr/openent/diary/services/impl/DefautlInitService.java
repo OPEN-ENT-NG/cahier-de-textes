@@ -13,6 +13,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
+import org.entcore.common.sql.SqlResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,51 +35,54 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
     }
 
     @Override
-    public void init(final Handler<String> handler) {
-        final List<Future> futureMyResponse1Lst = new ArrayList<>();
-        JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-//            statements.add(getHomeworkStateInitStatement());
-//
-            Future<JsonObject> resp1FutureComposite = Future.future();
-            futureMyResponse1Lst.add(resp1FutureComposite);
-            JsonArray types = new JsonArray();
-            JsonObject action = new JsonObject()
-                    .put("action", "structure.getAllStructures")
-                    .put("types", types);
-            eb.send("viescolaire", action, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
-                @Override
-                public void handle(Message<JsonObject> message) {
-                    JsonObject body = message.body();
-                    if ("ok".equals(body.getString("status"))) {
-                        JsonArray structList = body.getJsonArray("results");
-                        for (Integer k = 0; k < structList.size(); k++) {
-                            statements.add(initHomeworkType(structList.getJsonObject(k)));
+    public void init(final  Handler<Either<String, JsonObject>> handler) {
+
+        String structQuery = "SELECT DISTINCT structure_id as struct from diary.homework_type ";
+        sql.raw(structQuery, SqlResult.validResultHandler(new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                JsonArray structuresRegistered = new JsonArray();
+                for(Integer i = 0 ; i < event.right().getValue().size();i++){
+                    structuresRegistered.add(event.right().getValue().getJsonObject(i).getString("struct"));
+                }
+
+                JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
+
+                JsonArray types = new JsonArray();
+                JsonObject action = new JsonObject()
+                        .put("action", "structure.getAllStructures")
+                        .put("types", types);
+                eb.send("viescolaire", action, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
+                    @Override
+                    public void handle(Message<JsonObject> message) {
+                        JsonObject body = message.body();
+                        if ("ok".equals(body.getString("status"))) {
+                            JsonArray structList = body.getJsonArray("results");
+                            for (Integer k = 0; k < structList.size(); k++) {
+                                if(!structuresRegistered.contains(structList.getJsonObject(k).getString("s.id")))
+                                    statements.add(initHomeworkType(structList.getJsonObject(k)));
+                            }
+                            statements.add(getHomeworkStateInitStatement());
+                            try {
+                                    sql.transaction(statements, new Handler<Message<JsonObject>>() {
+                                        @Override
+                                        public void handle(Message<JsonObject> event) {
+                                            Number id = Integer.parseInt("1");
+                                            handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
+                                        }
+                                    });
+                            } catch (ClassCastException e) {
+                                LOGGER.error("An error occurred when init", e);
+                                handler.handle(new Either.Left<String, JsonObject>(""));
+
+                            }
+
                         }
-                        resp1FutureComposite.complete();
                     }
-                }
-            }));
+                }));
 
-        CompositeFuture.all(futureMyResponse1Lst).setHandler(
-
-                event -> handler.handle("success"));
-
-        try {
-
-          //  statements.add(getHomeworkStateInitStatement());
-              sql.transaction(statements, new Handler<Message<JsonObject>>() {
-                @Override
-                public void handle(Message<JsonObject> event) {
-                    Number id = Integer.parseInt("1");
-            //        handler.handle(SqlQueryUtils.getTransactionHandler(event,id));
-                }
-            });
-        } catch (ClassCastException e) {
-            LOGGER.error("An error occurred when insert progression", e);
-           // handler.handle(new Either.Left<String, JsonObject>(""));
-
-        }
-
+            }
+        }));
 
     }
 
