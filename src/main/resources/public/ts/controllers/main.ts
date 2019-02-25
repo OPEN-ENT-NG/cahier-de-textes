@@ -539,9 +539,7 @@ export let main = ng.controller('MainController',
                 }else
                 if(typeCourseSession == "TYPE_COURSE" ){
                     let date = sessionOrCourse[0].children[1].textContent;
-
                     $scope.sessionToCourse(id_progressionOrSession,idCourseSession,date)
-
                 }
 
             }
@@ -595,10 +593,9 @@ export let main = ng.controller('MainController',
             //insert data and refresh calendar
             await course.sync(date, date);
             let session= new Session($scope.structure,course);
-            session.setFromCourse(course);
+            session.setFromCourseAndSession(course,sessionDrag)
             session.opened = true;
             await session.save();
-            console.log(session);
             await sessionDrag.duplicateHomework(session)
             $scope.syncPedagogicItems();
             $scope.safeApply();

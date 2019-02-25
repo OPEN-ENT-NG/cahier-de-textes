@@ -240,6 +240,18 @@ export class Session {
         this.room = session.room;
         this.description = session.description;
     }
+
+    setFromCourseAndSession(course: Course, sessionDrag: Session) {
+        this.courseId = course._id;
+        this.teacher = sessionDrag.teacher;
+        this.room = sessionDrag.room;
+        if(!this.subject)
+            this.subject = sessionDrag.subject;
+        this.date = this.startTime = course.startMoment.toDate();
+        this.endTime = course.endMoment.toDate();
+        this.audience = course.audiences.all[0];
+        this.color = sessionDrag.color;
+    }
 }
 
 export class Sessions {
