@@ -66,12 +66,22 @@ export let manageListCtrl = ng.controller('manageListController',
             }
         };
 
+        $scope.containsOnlyCourses = (pedagogicDay) =>{
+            let containsOnlyCourseBool = true;
+            pedagogicDay.pedagogicItems.map(p => {
+                if (p.pedagogicType === PEDAGOGIC_TYPES.TYPE_SESSION || p.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK){
+                     containsOnlyCourseBool = false ;
+
+                }
+            })
+            return containsOnlyCourseBool;
+        }
         //check the display mod and if display session check the homeworks an the sessions which have homeworks
         $scope.displaySession = (displaySession,pedagogicItem) =>{
            if (displaySession)
                return pedagogicItem.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK;
            else
-                return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
+                return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
         $scope.changeViewList = function () {

@@ -207,14 +207,12 @@ export let main = ng.controller('MainController',
             $scope.pedagogicItems = _.map($scope.structure.homeworks.all, function (item) {
                 if (item instanceof Homework) {
                     item["homeworks"] = [item];
-                    console.log(item);
                 }
                 return item;
             });
 
 
             $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
-
             let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
             $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
@@ -290,10 +288,7 @@ export let main = ng.controller('MainController',
             });
 
             $scope.pedagogicDays = pedagogicDays;
-            console.log(pedagogicDays);
-            if(Utils.isAChildOrAParent(model.me.type)){
-                $scope.initDisplay();
-            }
+            $scope.initDisplay();
         };
 
 
