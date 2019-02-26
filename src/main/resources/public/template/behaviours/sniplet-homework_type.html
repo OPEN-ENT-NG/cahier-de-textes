@@ -1,4 +1,5 @@
 <div class="homework-type ten cell">
+    <toasts notifications="notifications"></toasts>
     <article class="row">
 
         <h3 class="row">
@@ -16,14 +17,12 @@
                                maxlength="50"/>
                         <button class="right-button"
                                 ng-if="!updateType"
-                                ng-click="createHomeworkType(homework_type)"
-                                ng-disabled="">
+                                ng-click="createHomeworkType(homework_type)">
                             [[lang.translate('evaluations.add')]]
                         </button>
                         <button class="right-button"
                                 ng-if="updateType"
-                                ng-click="updateHomeworkType(homeworkType);"
-                                ng-disabled="">
+                                ng-click="updateHomeworkType(homeworkType);">
                             [[lang.translate('item.modify')]]
                         </button>
                     </li>

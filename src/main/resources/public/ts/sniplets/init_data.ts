@@ -43,7 +43,8 @@ export const initData = {
 
         initData: async function () {
             let response = await http.get(`diary/init`);
-            this.toastHttpCall(Utils.setToastMessage(response,'yep', 'nope'))
+            this.toastHttpCall(Utils.setToastMessage(response,'cdt.data.init.success', 'cdt.data.init.error'));
+            this.safeApply();
         }
     }
 }
