@@ -79,11 +79,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
-
                 $scope.sessionsToAttachTo.sort(function (a, b) {
                     return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                 });
-
                 // if ($scope.isInsideSessionForm) {
                 //     $scope.sessionsToAttachTo.unshift($scope.$parent.session);
                 //     if ($scope.$parent.session.id) {
@@ -98,11 +96,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToSession = () => {
             $scope.homework.attachedToSession = true;
             $scope.homework.attachedToDate = false;
+            if($scope.sessionsToAttachTo.length < 1 && $scope.isInsideSessionForm){
 
-            if($scope.sessionsToAttachTo.length <= 1){
+                // $scope.homework.session = $scope.session;
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
+
+                $scope.sessionsToAttachTo.push($scope.homework.session);
+            }
+           else  if($scope.sessionsToAttachTo.length == 1){
+                $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
+
                 $scope.homework.session = $scope.sessionsToAttachTo[0];
             } else if ($scope.sessionsToAttachTo.length > 1){
+
                 $scope.homework.session = $scope.sessionsToAttachTo[1];
             }
             else {
