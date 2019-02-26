@@ -1,11 +1,11 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.WorkflowUtils;
+import fr.openent.diary.security.workflow.AdminAccess;
 import fr.openent.diary.security.workflow.VisaManage;
-import fr.openent.diary.security.workflow.VisaRead;
 import fr.openent.diary.services.ExportPDFService;
-import fr.openent.diary.services.impl.ExportPDFServiceImpl;
 import fr.openent.diary.services.VisaService;
+import fr.openent.diary.services.impl.ExportPDFServiceImpl;
 import fr.openent.diary.services.impl.VisaServiceImpl;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
@@ -39,7 +39,7 @@ public class VisaController extends ControllerHelper {
         this.storage = storage;
     }
 
-    @SecuredAction(value = WorkflowUtils.VISA_READ, type = ActionType.WORKFLOW)
+    @SecuredAction(value = WorkflowUtils.ADMIN_ACCESS, type = ActionType.WORKFLOW)
     public void workflow1(final HttpServerRequest request) {
     }
 
@@ -63,12 +63,12 @@ public class VisaController extends ControllerHelper {
     @SecuredAction(value ="", type = ActionType.AUTHENTICATED)
     public void postPDFforVisa(final HttpServerRequest request){
         UserUtils.getUserInfos(eb, request, user -> {
+
             VisaController.this.storage.writeUploadFile(request, uploaded -> {
                 if (!"ok".equals(uploaded.getString("status"))) {
                     badRequest(request, uploaded.getString("message"));
                     return;
                 }
-
                 // Vérification du format qui doit-être un pdf
                 JsonObject metadata = uploaded.getJsonObject("metadata");
                 String contentType = metadata.getString("content-type");
@@ -85,7 +85,7 @@ public class VisaController extends ControllerHelper {
 
     @Get("/visa/:id/pdf")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(VisaRead.class)
+    @ResourceFilter(AdminAccess.class)
     public void getVisaPdf(final HttpServerRequest request) {
         String visaId = request.getParam("id");
         visaService.getVisaPdfDetails(visaId, visa -> {

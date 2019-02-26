@@ -1,4 +1,8 @@
-.visa-page {
+.global-administrator-page {
+  tbody tr:hover {
+    background: none;
+  }
+
   #list-diary-to-pdf {
     opacity: 0;
     z-index: -5;

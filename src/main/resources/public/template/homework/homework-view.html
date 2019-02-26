@@ -1,5 +1,5 @@
 <div class="homework-view">
-    <div class="row margin-bottom-md" ng-if="!isInsideSessionForm">
+    <div class="row margin-bottom-md" ng-if="!isInsideSessionForm && !session.isInsideDiary">
         <b>[[homework.subject.label]] &nbsp; [[homework.audience.name]] &nbsp; [[homework.teacher.firstName]] [[homework.teacher.lastName]]</b>
     </div>
     <div class="row card padding-md" ng-click="homework.opened = !homework.opened">

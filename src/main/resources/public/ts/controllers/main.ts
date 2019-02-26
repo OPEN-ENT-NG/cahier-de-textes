@@ -1,10 +1,18 @@
-import {_,angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
+import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {
-    Course, Homework, Homeworks, Toast, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
+    Course,
+    Homework,
+    Homeworks,
+    PEDAGOGIC_TYPES,
+    Session,
+    Sessions,
+    Structure,
+    Structures,
+    Toast,
     Workload
 } from '../model';
 import {Utils} from '../utils/utils';
-import {ProgressionSession, ProgressionSessions} from "../model/Progression";
+import {ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
     ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
@@ -663,7 +671,7 @@ export let main = ng.controller('MainController',
                 if(Utils.isAChildOrAParent(model.me.type) && !$scope.pageInitialized){
                     $scope.goTo("/list")
                 }else if (model.me.type === "PERSEDUCNAT"){
-                    $scope.goTo("/visas");
+                    $scope.goTo("/administrator/global");
                 }else{
                     if(!$scope.pageInitialized) await  init();
                     template.open('main', 'main');
@@ -691,9 +699,9 @@ export let main = ng.controller('MainController',
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'homework/homework-page');
             },
-            manageVisas: async () => {
+            globalAdminCtrl: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'visa/visa-page');
+                template.open('main', 'administrator/admin-main-page');
             },
             manageList: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();

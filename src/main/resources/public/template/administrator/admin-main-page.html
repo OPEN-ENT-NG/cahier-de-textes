@@ -1,0 +1,32 @@
+<div class="global-administrator-page">
+    <div class="row">
+        <button class="right-magnet cancel" ng-click="goTo('/view')">
+            <i18n>sessions.admin.backOnDiary</i18n>
+        </button>
+        <h1 workflow="diary.adminAccess" class="eight">
+            <i18n>sessions.admin.main.title</i18n>
+        </h1>
+    </div>
+    <div workflow="diary.adminAccess" ng-controller="globalAdminCtrl">
+        <div class="row">
+            <article class="cell twelve-mobile  two-lg three-md"
+                     static-include="/diary/public/template/administrator/admin-sidebar.html"></article>
+            <div class="cell twelve-mobile ten-lg nine-md content-next-to-the-sidebar visa-diary"
+                 static-include="/diary/public/template/administrator/diary-lister.html">
+            </div>
+        </div>
+
+        <section class="toggle-buttons" ng-class="{ hide: showOptionToaster != true }">
+            <div class="toggle">
+                <div class="row">
+                    <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
+                        <i18n>visa.manage.viser</i18n>
+                    </button>
+                    <button ng-click="printPdf()">
+                        <i18n>visa.manage.diaryToPrintPDF</i18n>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

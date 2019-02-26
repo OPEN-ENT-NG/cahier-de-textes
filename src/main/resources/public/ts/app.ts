@@ -1,4 +1,4 @@
-import {angular, ng, routes} from 'entcore';
+import {ng, routes} from 'entcore';
 import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
@@ -49,8 +49,8 @@ routes.define(($routeProvider) => {
         .when('/homework/view/:id', {
             action: 'manageHomework'
         })
-        .when('/visas', {
-            action: 'manageVisas'
+        .when('/administrator/global', {
+            action: 'globalAdminCtrl'
         })
         .when('/list',{
             action : 'manageList'

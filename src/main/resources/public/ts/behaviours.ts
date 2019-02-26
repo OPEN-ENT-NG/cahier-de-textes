@@ -9,8 +9,8 @@ const diaryBehaviours = {
             access: "fr.openent.diary.controllers.DiaryController|view",
             view: "fr.openent.diary.controllers.DiaryController|view",
 
-            manageVisa: "fr.openent.diary.controllers.VisaController|workflow1",
-            readVisa: "fr.openent.diary.controllers.VisaController|workflow2",
+            adminAccess: "fr.openent.diary.controllers.VisaController|workflow1",
+            manageVisa: "fr.openent.diary.controllers.VisaController|workflow2",
 
             readHomework: "fr.openent.diary.controllers.HomeworkController|workflow1",
             manageHomework: "fr.openent.diary.controllers.HomeworkController|workflow2",
