@@ -32,7 +32,7 @@
             <label class="cell twelve small">
                 <select ng-model="teacher"
                         class="twelve"
-                        ng-change="syncSessionsVisas()"
+                        ng-change="syncSessionsWithVisa()"
                         ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
                     <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
                 </select>

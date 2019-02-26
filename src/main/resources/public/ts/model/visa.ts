@@ -1,4 +1,4 @@
-import {_, model, moment, notify} from 'entcore';
+import {moment} from 'entcore';
 import http from 'axios';
 import {Structure, Teacher, Utils} from './index';
 
@@ -47,6 +47,24 @@ export class Visa {
     async downloadPdf(): Promise<void> {
         window.location.href = `/diary/visa/${this.id}/pdf`;
     }
+
+    static async uploadVisaPdf(canvasData, $scope) {
+        // Uploading files and receiving their id
+        const formData = new FormData();
+        formData.append('file', canvasData.pdfBlob);
+
+        const response = await
+            http.post('/diary/visa/pdf', formData, {
+                onUploadProgress: (e: ProgressEvent) => {
+                    if (e.lengthComputable) {
+                        let percentage = Math.round((e.loaded * 100) / e.total);
+                        $scope.safeApply();
+                    }
+                }
+            });
+        $scope.safeApply();
+        return response.data._id;
+    };
 }
 
 
@@ -74,5 +92,4 @@ export class Visas {
         let response = await http.post('/diary/visas', this.toSendFormat());
         return Utils.setToastMessage(response, 'visas.created','visas.created.error');
     }
-
 }

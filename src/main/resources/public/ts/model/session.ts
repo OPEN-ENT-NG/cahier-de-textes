@@ -6,7 +6,7 @@ import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
-import {ProgressionSession,ProgressionHomework} from "./Progression";
+import {ProgressionSession} from "./Progression";
 
 const colors = ['grey', 'green'];
 
@@ -271,52 +271,10 @@ export class Sessions {
         return dataModel;
     }
 
-    static visaListingShuffle(sessions) {
-        let final = [];
-        sessions.forEach(function (sessionItem) {
-            var index = _.findLastIndex(final, {
-                teacherId: sessionItem.teacher.id,
-                subjectId: sessionItem.subject.id,
-                audienceId: sessionItem.audience.id,
-                visaNeeded: sessionItem.visas && !sessionItem.visas.length
-            });
-            if (index > -1 && final[index] && final[index].sessions) {
-                final[index].sessions.push(sessionItem);
-            }
-            else {
-                final.push({
-                    teacherId: sessionItem.teacher.id,
-                    subjectId: sessionItem.subject.id,
-                    audienceId: sessionItem.audience.id,
-                    visaNeeded: sessionItem.visas && !sessionItem.visas.length,
-                    sessions: [sessionItem]
-                })
-            }
+    static groupByLevelANdSubject(sessions) {
+        return _.groupBy(sessions, function (item) {
+            return item.audience.id + '#' + item.subject.id;
         });
-
-        final = final.map(function(item){
-            if(!item || !item.sessions || !item.sessions[0])
-                return item;
-            let firstSession = item.sessions[0];
-            return {
-                teacher: firstSession.teacher,
-                subject: firstSession.subject,
-                audience: firstSession.audience,
-                visas: !item.visaNeeded ? _.flatten(_.pluck(item.sessions, 'visas')) : null,
-                sessions: item.sessions,
-                sessionIds: _.pluck(item.sessions, 'id'),
-                nbSessions: item.sessions.length,
-                lastEdit: moment(
-                    _.chain(item.sessions)
-                        .pluck('modified')
-                        .max(function (dateString) {
-                            return new Date(dateString).getTime();
-                        })
-                        .value()
-                ).format("DD-MM-YYYY HH:mm")
-            }
-        });
-        return final;
     }
 
     async syncWithAudienceAndSubject(startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
@@ -357,7 +315,6 @@ export class Sessions {
     async syncChildSessions(startMoment: any, endMoment: any, childId?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
-
         let url = `/diary/sessions/child/${startDate}/${endDate}/${childId}`;
 
         await this.syncSessions(url);
@@ -366,7 +323,6 @@ export class Sessions {
     async syncSessionsWithVisa(startMoment: any, endMoment: any, teacherId?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
-
         let url = `/diary/sessions/visa/${startDate}/${endDate}/${teacherId}`;
 
         await this.syncSessions(url);

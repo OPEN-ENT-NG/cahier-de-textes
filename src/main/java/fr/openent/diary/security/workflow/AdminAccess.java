@@ -7,11 +7,11 @@ import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.user.UserInfos;
 
-public class VisaRead implements ResourcesProvider {
+public class AdminAccess implements ResourcesProvider {
 
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.VISA_READ));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.ADMIN_ACCESS));
     }
 }

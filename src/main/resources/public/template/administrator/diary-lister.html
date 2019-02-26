@@ -1,0 +1,136 @@
+<div class="cell twelve">
+    <table class="twelve table-layout-fixed">
+        <thead>
+        <tr class="text-left">
+            <th width="5%" class="empty-take-space">
+                <label class="checkbox">
+                    <input type="checkbox"
+                           ng-model="allSessionsSelect"
+                           ng-change="allSessionsSelect = !$scope.allSessionsSelect && selectOrUnselectAllSessions(allSessionsSelect)"
+                           ng-disabled="!sessions_GroupBy_AudienceSubject || !sessions_GroupBy_AudienceSubject.length">
+                    <span></span>
+                </label>
+            </th>
+            <!--<th width="20%">-->
+            <!--<i18n>utils.teachers</i18n>-->
+            <!--</th>-->
+            <th width="10%">
+                <i18n>utils.groups</i18n>
+            </th>
+            <th width="20%">
+                <i18n>subject</i18n>
+            </th>
+            <th width="15%">
+                <i18n>sessions.admin.nbsessions</i18n>
+            </th>
+            <th width="15%">
+                <i18n>sessions.admin.lastEditSession</i18n>
+            </th>
+            <th width="15%">
+                <i18n>sessions.admin.lastCreatedVisa</i18n>
+            </th>
+            <th class="text-center" width="10%">
+                <i18n>utils.actions</i18n>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat-start="(key, sessionsGroup) in sessions_GroupBy_AudienceSubject">
+            <td>
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
+                    <span></span>
+                </label>
+            </td>
+            <!--<td>-->
+            <!--[[visaSession.teacher.displayName]]-->
+            <!--</td>-->
+            <td>
+                [[sessionsGroup[0].audience.name]]
+            </td>
+            <td>
+                [[sessionsGroup[0].subject.label]]
+            </td>
+            <td>
+                [[sessionsGroup.length]]
+            </td>
+            <td>
+                [[getLastEditSession(sessionsGroup)]]
+            </td>
+            <td>
+                [[getLastCreatedVisa(sessionsGroup)]]
+            </td>
+            <td class="text-center">
+                <i ng-if="getVisas(sessionsGroup).length > 0" ng-click="wantDownloadPdf(sessionsGroup)">&#xe857;</i>&nbsp;
+                <i ng-click="openDetails = openDetails != key ? key : null" ng-show='!openDetails || openDetails==0'>&#xe873;</i>
+                <i ng-click="openDetails = null" ng-show='openDetails'>&#xe904;</i>
+
+            </td>
+        </tr>
+        <tr ng-repeat-end ng-show="openDetails == key">
+            <td colspan="7" class="remove-padding" style="padding-left: 50px;">
+                <div class="diary[[getSessionsIds(sessionsGroup).join('-')]]">
+                    <div ng-repeat="session in sessionsGroup" class="twelve">
+                        <div class="row margin-bottom-lg"
+                             static-include="/diary/public/template/session/session-view.html"
+                             read-only="true"
+                             inside-diary="true">
+                        </div>
+                        <div class="padding-md"
+                             ng-if="session.homeworks.length > 0">
+                            <div class="row">
+                                <div class="eleven right-magnet"
+                                     ng-repeat="homework in session.homeworks"
+                                     is-inside-session-form="true"
+                                     inside-diary="true"
+                                     static-include="/diary/public/template/homework/homework-view.html"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+
+<lightbox show="visaPdfDownloadBox" on-close="closeVisaPdfDownloadBox()">
+    <h3>
+        <i18n>visa.manage.title</i18n>
+    </h3>
+    <div ng-repeat="visa_pdf in visas_pdfChoice | orderBy: 'moment':true">
+        <p ng-click="visa_pdf.downloadPdf(visa_pdf.visa_id)">
+            <i>&#xe857;</i>&nbsp;
+            <i18n>visa.manage.choosePdf</i18n>&nbsp;
+            [[visa_pdf.displayDate]]
+        </p>
+    </div>
+</lightbox>
+
+<lightbox workflow="diary.manageVisa"
+          show="visaCreateBox"
+          on-close="closeVisaCreateBox()">
+    <form>
+        <div class="cell twelve">
+            <label for="comment">
+
+                <i18n>sessions.admin.comment</i18n>
+            </label>
+            <textarea class="resize-vertical min-height-textarea" i18n-placeholder="visa.create.commentLabel"
+                      ng-model="visaForm.comment"
+                      id="comment"></textarea>
+        </div>
+        <div class="cell twelve">
+            <button class="right-magnet" ng-class="{'loading': visaForm.loading}" ng-disabled="!visaFormIsvalid()"
+                    ng-click="submitVisaForm()">
+                <i18n>visa.vise.diary</i18n>
+                <span class="loader"></span>
+            </button>
+        </div>
+    </form>
+</lightbox>
+
+
+<div id="list-diary-to-pdf"></div>
+<div id="canvas-diary-to-pdf"></div>

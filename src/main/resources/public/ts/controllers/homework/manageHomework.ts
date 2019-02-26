@@ -1,5 +1,5 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import {Courses, Toast, Session, Sessions, Subjects} from '../../model';
+import {Courses, Session, Sessions, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 import {Utils} from '../../utils/utils';
 
@@ -169,7 +169,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.saveHomework = async (publish = false) => {
             if (!$scope.isValidForm) {
-                $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
+                $scope.notifications.push(new Toast(lang.translate('utils.unvalidForm'), 'error'));
             }
             else {
                 // Creating session from course before saving the homework
@@ -186,8 +186,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if(!$scope.homework.id && homeworkSaveResponse.data.id) {
                         $scope.homework.id = homeworkSaveResponse.data.id;
                     } else if (!$scope.homework.id && !homeworkSaveResponse.data.id){
-                        //TODO Change to i18n key
-                        $scope.notifications.push(new Toast('Error no id for homework', 'error'));
+                        $scope.notifications.push(new Toast(lang.translate("homework.manage.error.noId"), 'error'));
                         return;
                     }
 
@@ -212,7 +211,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
 
-            if($attrs.insideSessionForm){
+            if ($attrs.insideSessionForm) {
                 $scope.homework = $scope.$parent.homework;
                 $scope.isInsideSessionForm = true;
                 if($scope.homework.id){
@@ -250,7 +249,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             // $scope.setProgress($scope.homework);
             window.history.back();
         };
-
         await initData();
     }]
 );
