@@ -69,7 +69,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             ]).then(function () {
                 $scope.sessionsToAttachTo = [];
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
-                let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) && c.subject.id === $scope.homework.subject.id);
+                let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) &&
+                    (c.subject) ? c.subject.id === $scope.homework.subject.id
+                    : false );
 
                 // We only keep the courses without a session attached to.
                 let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
@@ -82,12 +84,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                 });
 
-                if ($scope.isInsideSessionForm) {
-                    $scope.sessionsToAttachTo.unshift($scope.$parent.session);
-                    if ($scope.$parent.session.id) {
-                        $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
-                    }
-                }
+                // if ($scope.isInsideSessionForm) {
+                //     $scope.sessionsToAttachTo.unshift($scope.$parent.session);
+                //     if ($scope.$parent.session.id) {
+                //         $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
+                //     }
+                // }
                 $scope.attachToSession();
                 $scope.safeApply();
             });

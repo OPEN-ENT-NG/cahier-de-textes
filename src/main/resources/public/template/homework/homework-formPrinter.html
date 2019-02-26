@@ -29,7 +29,7 @@
                      ng-model="homework.dueDate" ng-change="syncWorkloadWeek()"></date-picker>
         <select class="twelve" ng-if="!homework.attachedToDate" ng-model="homework.session"
                 ng-change="syncWorkloadWeek()"
-                ng-options="session as ( session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime
+                ng-options="session as ( session.startDisplayDate + ' ' + session.startDisplayTime
                 + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
         </select>
 
