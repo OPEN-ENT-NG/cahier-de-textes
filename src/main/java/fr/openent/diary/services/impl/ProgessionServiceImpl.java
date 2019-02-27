@@ -118,14 +118,16 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     private JsonObject getProgressionSessionUpdateStatement(JsonObject progression, String progressionId) {
         JsonArray params;
         String query = "UPDATE diary.progression_session " +
-                "SET subject_id = ? ,title = ? , description = ? , annotation = ?, owner_id = ? " +
+                "SET subject_id = ? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ? " +
                 "Where progression_session.id = ?  ";
         params =  new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getString("title"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
-                .add(progressionId);
+                .add(progressionId)
+                .add(progression.getString("class"));
+
 
         return new JsonObject()
                 .put(STATEMENT, query)
@@ -149,7 +151,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
                 .add(homework.getInteger("type_id"))
-                .add(homework.getInteger("id"));
+                .add(homework.getInteger("id"))
+        ;
+
 
 
         return new JsonObject()
