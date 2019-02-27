@@ -27,7 +27,8 @@ export let main = ng.controller('MainController',
             homeworks: true,
             sessions: true,
             listView: false,
-            progression: false
+            progression: false,
+            sessionList : false
         };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -256,7 +257,8 @@ export let main = ng.controller('MainController',
                 let nbHomework = 0;
                 pedagogicItems.forEach(i => {
                     if (i.pedagogicType === $scope.TYPE_SESSION) {
-                        nbHomeworkInSession += i.homeworks.length;
+                        nbHomework += i.homeworks.length;
+
                     }
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
                         nbHomework ++;

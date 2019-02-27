@@ -10,7 +10,6 @@ export let manageListCtrl = ng.controller('manageListController',
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView= true;
-        $scope.display.session = true;
         $scope.indexItemsDisplayed = [];
 
         if ($scope.homeworks) {

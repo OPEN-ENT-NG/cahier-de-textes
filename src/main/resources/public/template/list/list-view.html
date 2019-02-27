@@ -8,7 +8,7 @@
 
         <div class="list-view">
             <div class="timeline-story vertical-spacing row">
-                <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessions:!display.sessions"
+                <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
                      class="twelve cell event-row">
                     <div  ng-if="!containsOnlyCourses(pedagogicDay)" >
                         <i  ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet" ng-click="displayDay(pedagogicDay)"></i>
@@ -21,7 +21,7 @@
                             <div>
                             <span  class="round "
                                    ng-class="{'[[pedagogicDay.color]]': true}">
-                                <span ng-show="!display.sessions">
+                                <span ng-show="!display.sessionList">
                                     [[pedagogicDay.nbHomework]]
                                 </span>
                             </span>
@@ -35,8 +35,8 @@
                             </div>
                             <div
                                     ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
-                                <div ng-if="displaySession(display.sessions,pedagogicItem) && display.sessions" static-include="/diary/public/template/list/list-pedagogic-item.html"/>
-                                <div ng-if="displaySession(display.sessions,pedagogicItem) && !display.sessions" static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"/>
+                                <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList" static-include="/diary/public/template/list/list-pedagogic-item.html"/>
+                                <div ng-if="displaySession(display.sessionList,pedagogicItem) && !display.sessionList" static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"/>
 
                             </div>
                         </div>

@@ -16,7 +16,7 @@
                 <!--<i ng-if="pedagogicItem.description"-->
                 <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                     </span>
-            <div ng-show="!display.sessions">
+            <div ng-show="!display.sessionList">
                 <div class="row inline-block medium-importance padding-bottom-list">
                     <!--devoir --> <span  ><i>&#xe80d;</i></span>
                     <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
@@ -37,11 +37,6 @@
                 </span>
                 </div>
                 <!-- HOMEWORK DONE -->
-                <!-- Description -->
-                <div class="row" ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                    <div ng-if="pedagogicItem.opened" class="read-only-description"
-                         bind-html="pedagogicItem.description"></div>
-                </div>
             </div>
             <!-- Description -->
             <div ng-if="pedagogicItem.opened && pedagogicItem.description"
@@ -62,20 +57,20 @@
         <div  class="eight cell first-content">
             <!-- Subject, Audience and Teacher-->
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
-                  ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                  ng-click="homework.opened = !homework.opened">
                 <span class="normal">
-                            [[pedagogicItem.subject.label]] &nbsp;
+                            [[homework.subject.label]] &nbsp;
                     <span class="small">
-                                [[pedagogicItem.audience.name]] [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]&nbsp;
+                                [[homework.audience.name]] [[homework.teacher.firstName]] [[homework.teacher.lastName]]&nbsp;
                             </span>
                         </span>
                 <!--<i ng-if="pedagogicItem.description"-->
                 <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                     </span>
-            <div ng-show="!display.sessions">
+            <div ng-show="!display.sessionList">
                 <div class="row inline-block medium-importance padding-bottom-list">
                     <!--devoir --> <span  ><i>&#xe80d;</i></span>
-                    <span ng-class=" homework.description?'hasDescription':''"
+                    <span ng-class=" homework.description ? 'hasDescription':''"
                           ng-click="homework.opened = !homework.opened">
                             [[homework.type.label]]&nbsp;
                         <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
@@ -93,19 +88,13 @@
                 </div>
                 <!-- HOMEWORK DONE -->
                 <!-- Description -->
-                <div class="row" ng-click="pedagogicItem.homework.opened = !pedagogicItem.homework.opened">
-                    <div ng-if="pedagogicItem.homework.opened" class="read-only-description"
-                         bind-html="pedagogicItem.homework.description"></div>
+                <div class="row" ng-click="homework.opened = !homework.opened">
+                    <div ng-show="homework.opened" class="read-only-description"
+                         bind-html="homework.description"></div>
                 </div>
             </div>
             <!-- Description -->
-            <div ng-if="pedagogicItem.opened && pedagogicItem.description"
-                 class="row"
-                 ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                <div ng-if="pedagogicItem.opened"
-                     class="read-only-description"
-                     bind-html="pedagogicItem.description"></div>
-            </div>
+
         </div>
         <i ng-click="openHomework(homework.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
     </div>
