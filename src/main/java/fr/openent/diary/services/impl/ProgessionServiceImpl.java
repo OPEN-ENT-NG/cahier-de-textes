@@ -125,8 +125,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
-                .add(progressionId)
-                .add(progression.getString("class"));
+                .add(progression.getString("class"))
+                .add(progressionId);
+
 
 
         return new JsonObject()
@@ -169,7 +170,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         JsonArray params;
         String query = "INSERT INTO diary.progression_session" +
                 "(subject_id,title, description, annotation, owner_id, class) " +
-                "values ( ?, ?, ?, ?, ?, ?) " +
+                "values ( ?, ?, ?, ?, ?, ? ) " +
                 "RETURNING id;";
 
 
@@ -250,15 +251,16 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      * @return
      */
     private JsonObject getProgressionSessionCreationstatement(Number id, JsonObject progression) {
-        String query = "INSERT INTO diary.progression_session ( id , subject_id ,title, description, annotation, owner_id) " +
-                "values ( ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO diary.progression_session ( id , subject_id ,title, description, annotation, owner_id, class) " +
+                "values ( ?, ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
                 .add(progression.getString("subject_id"))
                 .add(progression.getString("title"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
-                .add(progression.getString("owner_id"));
+                .add(progression.getString("owner_id"))
+                 .add(progression.getString("class"));
 
         return new JsonObject()
                 .put(STATEMENT, query)
