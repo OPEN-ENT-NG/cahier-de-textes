@@ -48,9 +48,9 @@
                 </div>
             </div>
         </div>
-        <div class="four inline-block">
 
-            <label class="three cell horizontal-spacing twelve-mobile">
+        <div class="cell four">
+            <label class="two cell twelve-mobile">
                 <div ng-show="pedagogicItem.isDone" class="six margin-bottom-md">
                     <i18n>done</i18n>
 
@@ -59,10 +59,12 @@
                     <i18n>todo</i18n>
 
                 </div>
+            </label>
+            <div class="cell horizontal-spacing twelve-mobile ">
                 <switch class="" ng-model="pedagogicItem.isDone">
                     <label class="switch"> </label>
                 </switch>
-            </label>
+            </div>
         </div>
         <!-- HOMEWORK DONE -->
 
@@ -115,9 +117,9 @@
             <!-- Description -->
 
         </div>
-        <div class="four inline-block">
 
-            <label class="three cell horizontal-spacing twelve-mobile">
+        <div class="cell four">
+            <label class="two cell twelve-mobile">
                 <div ng-show="homework.isDone" class="six margin-bottom-md">
                     <i18n>done</i18n>
 
@@ -126,10 +128,12 @@
                     <i18n>todo</i18n>
 
                 </div>
+            </label>
+            <div class="cell horizontal-spacing twelve-mobile ">
                 <switch class="" ng-model="homework.isDone">
                     <label class="switch"> </label>
                 </switch>
-            </label>
+            </div>
         </div>
         <i ng-click="openHomework(homework.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
     </div>
