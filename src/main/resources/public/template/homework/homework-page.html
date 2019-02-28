@@ -20,16 +20,6 @@
                         ng-click="saveHomework()">
                     <i18n>utils.save</i18n>
                 </button>
-                <button ng-if="!homework.isPublished" class="float-none display-inline-block"
-                        ng-disabled="!isValidForm()"
-                        type="button" ng-click="publishHomework()">
-                    <i18n>publish</i18n>
-                </button>
-                <button ng-if="homework.isPublished" class="float-none display-inline-block"
-                        ng-disabled="!isValidForm()"
-                        type="button" ng-click="unpublishHomework()">
-                    <i18n>unpublish</i18n>
-                </button>
             </div>
         </div>
 
@@ -45,12 +35,6 @@
             </button>
             <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button" ng-click="saveHomework()" workflow="diary.manageHomework">
                 <i18n>utils.save</i18n>
-            </button>
-            <button ng-if="!homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="publishHomework()"  workflow="diary.manageHomework">
-                <i18n>publish</i18n>
-            </button>
-            <button ng-if="homework.isPublished" class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" ng-click="unpublishHomework()"  workflow="diary.manageHomework">
-                <i18n>unpublish</i18n>
             </button>
         </div>
     </div>

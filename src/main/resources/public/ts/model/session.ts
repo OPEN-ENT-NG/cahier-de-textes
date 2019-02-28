@@ -27,7 +27,7 @@ export class Session {
     homeworks: Homework[] = [];
     room: string = "";
     courseId: string = null;
-    isPublished: boolean;
+    isPublished: boolean = true;
     visas: Visa[] = [];
     opened: boolean;
     startMoment: any;

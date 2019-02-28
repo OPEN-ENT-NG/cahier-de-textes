@@ -97,6 +97,19 @@
                 </select>
             </div>
         </div>
+        <!-- Publish -->
+        <div class="row form-row">
+            <label class="two cell twelve-mobile">
+                <div class="twelve margin-bottom-md">
+                    <i18n>utils.publish</i18n>
+                </div>
+            </label>
+            <div class="cell twelve-mobile ten">
+                <switch class="vertical-spacing" ng-model="homework.isPublished">
+                    <label class="switch"> </label>
+                </switch>
+            </div>
+        </div>
         <!-- Description-->
         <div class="row">
             <editor ng-model="homework.description"></editor>

@@ -25,7 +25,7 @@ export class Homework {
     workload: number;
     startMoment: any;
     endMoment: any;
-    isPublished: boolean = false;
+    isPublished: boolean = true;
     opened: boolean = false;
     isNewField: boolean=false;
     is_periodic: boolean = false;
