@@ -30,28 +30,47 @@
 
                           workflow="diary.setProgressHomework">
 
-                     <i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"
-                        ng-if="homework.isDone" style="color: green;">&#xe871;</i>
-                     <i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"
-                        ng-if="!pedagogicItem.isDone" >&#xe871;</i>
+
+                        <!--<i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"-->
+                        <!--ng-if="homework.isDone" style="color: green;">&#xe871;</i>-->
+                        <!--<i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"-->
+                        <!--ng-if="!pedagogicItem.isDone" >&#xe871;</i>-->
                 </span>
                 </div>
-                <!-- HOMEWORK DONE -->
-            </div>
-            <!-- Description -->
-            <div ng-if="pedagogicItem.opened && pedagogicItem.description"
-                 class="row"
-                 ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                <div ng-if="pedagogicItem.opened"
-                     class="read-only-description"
-                     bind-html="pedagogicItem.description"></div>
+
+                <!-- Description -->
+                <div ng-if="pedagogicItem.opened && pedagogicItem.description"
+                     class="row"
+                     ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                    <div ng-if="pedagogicItem.opened"
+                         class="read-only-description"
+                         bind-html="pedagogicItem.description"></div>
+                </div>
             </div>
         </div>
+        <div class="four inline-block">
+
+            <label class="three cell horizontal-spacing twelve-mobile">
+                <div ng-show="pedagogicItem.isDone" class="six margin-bottom-md">
+                    <i18n>done</i18n>
+
+                </div>
+                <div ng-show="!pedagogicItem.isDone" class="twelve margin-bottom-md">
+                    <i18n>todo</i18n>
+
+                </div>
+                <switch class="" ng-model="pedagogicItem.isDone">
+                    <label class="switch"> </label>
+                </switch>
+            </label>
+        </div>
+        <!-- HOMEWORK DONE -->
+
         <i ng-click="openHomework(pedagogicItem.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
 
     </div>
 </article>
- <!--HOMEWORKS FROM SESSIONS-->
+<!--HOMEWORKS FROM SESSIONS-->
 <article  ng-show="pedagogicItem.pedagogicType !== TYPE_COURSE" ng-repeat="homework in pedagogicItem.homeworks"  ng-if="pedagogicItem.pedagogicType !== TYPE_HOMEWORK" class="pedagogic-item-article">
     <div  class="row  list-view-item">
         <div  class="eight cell first-content">
@@ -95,6 +114,22 @@
             </div>
             <!-- Description -->
 
+        </div>
+        <div class="four inline-block">
+
+            <label class="three cell horizontal-spacing twelve-mobile">
+                <div ng-show="homework.isDone" class="six margin-bottom-md">
+                    <i18n>done</i18n>
+
+                </div>
+                <div ng-show="!homework.isDone" class="twelve margin-bottom-md">
+                    <i18n>todo</i18n>
+
+                </div>
+                <switch class="" ng-model="homework.isDone">
+                    <label class="switch"> </label>
+                </switch>
+            </label>
         </div>
         <i ng-click="openHomework(homework.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
     </div>
