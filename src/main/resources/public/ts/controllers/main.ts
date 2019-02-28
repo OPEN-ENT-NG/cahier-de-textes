@@ -603,7 +603,10 @@ export let main = ng.controller('MainController',
             await session.save();
             await sessionDrag.duplicateHomework(session)
             $scope.syncPedagogicItems();
+
             $scope.safeApply();
+            $scope.goTo('/session/update/' + session.id );
+
 
         }
 
@@ -611,7 +614,7 @@ export let main = ng.controller('MainController',
                Handle a progression dropped on a session
                 */
         $scope.updateSession = async (idSession, idProgression) => {
-            let progressionDragged, SessionDroped;
+            let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
                 if (progression.id == idProgression)
                 {
@@ -622,6 +625,7 @@ export let main = ng.controller('MainController',
             $scope.calendarItems.map(async session => {
                 if (session.id == idSession) {
                     await session.sync();
+                    sessionDroped = session;
                 }
             });
 
@@ -629,6 +633,9 @@ export let main = ng.controller('MainController',
             $scope.syncPedagogicItems();
 
             $scope.safeApply();
+            $scope.goTo('/session/update/' + idSession );
+
+
         };
 
         /*
@@ -664,6 +671,8 @@ export let main = ng.controller('MainController',
             await session.sync();
             $scope.syncPedagogicItems();
             $scope.safeApply();
+            $scope.goTo('/session/update/' + session.id );
+
 
 
         };
