@@ -129,10 +129,15 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
 
+            if(progressionHomework.opened){
+                $scope.validate = false;
+                $scope.safeApply();
 
+            }
             $scope.progression_session.progression_homeworks.splice(i,1);
             if(progressionHomework.id)
                 $scope.toastHttpCall (await progressionHomework.delete());
+
 
         };
 
@@ -170,9 +175,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         $scope.openProgressionSession = async (progressionSession: ProgressionSession)=>{
             $scope.progression_session = progressionSession;
             $scope.safeApply();
-
             $scope.goTo('/progression/'+ progressionSession.id);
-            //  $scope.safeApply();
         };
 
         $scope.back = () => {

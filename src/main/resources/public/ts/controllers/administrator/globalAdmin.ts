@@ -98,7 +98,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .last()
                 .value();
             if (date)
-                return moment(date).format("DD-MM-YYYY HH:mm");
+                return moment(date).format("DD/MM/YYYY HH:mm");
             else
                 return '-';
         };
@@ -110,7 +110,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .last()
                 .value();
             if (date)
-                return moment(date).format("DD-MM-YYYY HH:mm");
+                return moment(date).format("DD/MM/YYYY HH:mm");
             else
                 return '-';
         };

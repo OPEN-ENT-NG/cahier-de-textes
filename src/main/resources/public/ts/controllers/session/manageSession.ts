@@ -13,16 +13,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.session.opened = false;
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
-        $scope.isSelectSubjectAndAudienceSession=true;
+        $scope.isSelectSubjectAndAudienceSession = true;
         $scope.validate = false;
-        $scope.disableFieldSetSubjectAndAudienceSession= (audience:any,subject:any)=>{
-            if(!audience || !subject){
-                $scope.isSelectSubjectAndAudienceSession=true;
-            }else{
-                $scope.isSelectSubjectAndAudienceSession=false;
-                $scope.session.opened = ! $scope.session.opened;
+        $scope.disableFieldSetSubjectAndAudienceSession = (audience: any, subject: any) => {
+            if (!audience || !subject) {
+                $scope.isSelectSubjectAndAudienceSession = true;
+            } else {
+                $scope.isSelectSubjectAndAudienceSession = false;
+                $scope.session.opened = !$scope.session.opened;
             }
         }
+
         function modeIsReadOnly() {
             let currentPath = $location.path();
             return currentPath.includes('view') || $attrs.readOnly;
@@ -33,18 +34,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
 
-        $scope.$watch(() => $scope.session.audience,  () => {
-            if($scope.session.audience)
+        $scope.$watch(() => $scope.session.audience, () => {
+            if ($scope.session.audience)
                 $scope.session.homeworks.forEach(h => h.audience = $scope.session.audience);
             $scope.safeApply();
         });
 
-        $scope.$watch(() => $scope.session.subject,  () => {
-            if($scope.session.subject)
+        $scope.$watch(() => $scope.session.subject, () => {
+            if ($scope.session.subject)
                 $scope.session.homeworks.forEach(h => h.subject = $scope.session.subject);
             $scope.safeApply();
         });
-
 
 
         $scope.isValidForm = () => {
@@ -56,9 +56,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.endTime;
 
             let homeworkFormsAreValids = true;
-            for(let h of $scope.session.homeworks) {
+            for (let h of $scope.session.homeworks) {
                 homeworkFormsAreValids = h.isValidForm();
-                if(!homeworkFormsAreValids)
+                if (!homeworkFormsAreValids)
                     break;
             }
 
@@ -80,18 +80,18 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.saveSession = async () => {
-            if(!$scope.isValidForm){
+            if (!$scope.isValidForm) {
                 $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                 return;
             }
 
             // Sauvegarde de la session
-            let sessionSaveResponse = await $scope.session.save(  $scope.placeholder );
+            let sessionSaveResponse = await $scope.session.save($scope.placeholder);
 
             if (sessionSaveResponse.succeed) {
-                if(!$scope.session.id && sessionSaveResponse.data.id) {
+                if (!$scope.session.id && sessionSaveResponse.data.id) {
                     $scope.session.id = sessionSaveResponse.data.id;
-                } else if (!$scope.session.id && !sessionSaveResponse.data.id){
+                } else if (!$scope.session.id && !sessionSaveResponse.data.id) {
                     $scope.notifications.push(new Toast('Error no id for session', 'error'));
                     return;
                 }
@@ -106,13 +106,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function saveSessionHomeworks() {
             let hasSucceed = true;
             $scope.session.homeworks.forEach(async h => {
-                if(!h.attachedToDate && h.session.courseId){
+                if (!h.attachedToDate && h.session.courseId) {
                     if ($scope.session && $scope.session.id) {
                         h.session.id = $scope.session.id;
                     }
                 }
-                let { succeed } = await h.save();
-                if(!succeed) {
+                let {succeed} = await h.save();
+                if (!succeed) {
                     hasSucceed = false;
                 }
             });
@@ -140,6 +140,21 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             });
             homework.opened = !homework.opened;
             $scope.safeApply();
+        };
+
+        $scope.deleteHomework = async (homework: any, i ) => {
+            if (!homework.id) {
+                $scope.localRemoveHomework(i)
+                if (homework.opened) {
+                    $scope.validate = false;
+                    $scope.safeApply();
+                }
+            } else {
+                let {succeed} = $scope.toastHttpCall(await homework.delete());
+                if (succeed) {
+                    $scope.localRemoveHomework($scope.session.homeworks.findIndex(x => x.id == homework.id));
+                }
+            }
         };
 
         $scope.closeHomework = () => {

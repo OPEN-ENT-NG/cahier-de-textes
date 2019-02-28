@@ -1,7 +1,7 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Structure, Teacher, Utils} from './index';
+import {Structure, Teacher, Toast, Utils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
@@ -12,7 +12,7 @@ export class Homework {
     plainTextDescription: string = '';
     dueDate: Date = moment().toDate();
     color: string;
-
+    idTemp : number;
     session_id: number;
     session_date: string;
     workloadWeek: WorkloadWeek;

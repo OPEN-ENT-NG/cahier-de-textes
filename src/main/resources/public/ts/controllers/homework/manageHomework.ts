@@ -19,13 +19,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
         $scope.isInsideSessionForm = false;
         $scope.isSelectSubjectAndAudienceHomework = true;
+        $scope.validate = false;
 
         $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
-                if(!audience || !subject){
-                    $scope.isSelectSubjectAndAudienceHomework=true;
-                }else{
-                    $scope.isSelectSubjectAndAudienceHomework=false;
-                }
+            if(!audience || !subject){
+                $scope.isSelectSubjectAndAudienceHomework=true;
+            }else{
+                $scope.isSelectSubjectAndAudienceHomework=false;
+            }
         };
 
         $scope.openHomework = (homework: Homework) => {
@@ -70,7 +71,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.sessionsToAttachTo = [];
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
                 let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) &&
-                    (c.subject) ? c.subject.id === $scope.homework.subject.id
+                (c.subject) ? c.subject.id === $scope.homework.subject.id
                     : false );
 
                 // We only keep the courses without a session attached to.
@@ -103,7 +104,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 $scope.sessionsToAttachTo.push($scope.homework.session);
             }
-           else  if($scope.sessionsToAttachTo.length == 1){
+            else  if($scope.sessionsToAttachTo.length == 1){
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
 
                 $scope.homework.session = $scope.sessionsToAttachTo[0];
@@ -159,18 +160,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         $scope.deleteHomework = async (index: any) => {
-            if($scope.isInsideSessionForm && !$scope.homework.id){
-                $scope.$parent.localRemoveHomework(index);
-            } else {
-                let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
-                if(succeed) {
-                    if($scope.isInsideSessionForm){
-                        $scope.$parent.localRemoveHomework(index);
-                    } else {
-                        window.history.back();
-                    }
-                }
+            // if($scope.isInsideSessionForm && !$scope.homework.id){
+            //     $scope.$parent.localRemoveHomework(index);
+            //
+            // } else {
+            let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
+            if(succeed) {
+                // if($scope.isInsideSessionForm){
+                //     $scope.$parent.localRemoveHomework(index);
+                // } else {
+                window.history.back();
             }
+            //  }
+            //}
         };
 
         $scope.saveHomework = async (publish = false) => {

@@ -80,7 +80,6 @@
                         <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
                             inside-session-form="true"
                             class="ng-scope"
-                            ng-controller="manageProgessionCtrl"
                             static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
                         </tbody>
 
@@ -90,14 +89,13 @@
                         </div>
 
                     </table>
-                    <button ng-if="!validate"
+                    <button ng-show="!validate"
                             class="float-none display-inline-block margin-top-md"
-                            ng-disabled="!areValidHomeworks()"
                             ng-click="addProgressionHomework()">
                         <i18n>homework.manage.create</i18n>
                     </button>
 
-                    <button ng-if="validate"
+                    <button ng-show="validate"
                             class="float-none display-inline-block margin-top-md"
                             ng-disabled="!areValidHomeworks()"
                             ng-click="newProgressionHomework()">

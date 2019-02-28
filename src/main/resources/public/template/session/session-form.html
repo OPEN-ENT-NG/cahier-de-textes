@@ -133,12 +133,12 @@
                         static-include="/diary/public/template/homework/homework-formPrinter.html"></tr>
                     </tbody>
                 </table>
-                <button ng-if="!validate"
+                <button ng-show="!validate"
                         class="float-none display-inline-block margin-top-md"
                         ng-click="addHomework()">
                     <i18n>homework.manage.create</i18n>
                 </button>
-                <button ng-if="validate"
+                <button ng-show="validate"
                         class="float-none display-inline-block margin-top-md"
                         ng-disabled="!areValidHomeworks()"
                         ng-click="closeHomework()">
