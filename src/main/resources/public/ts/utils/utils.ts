@@ -1,4 +1,4 @@
-import {model, moment} from 'entcore';
+import {angular, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 
 export class Utils {
@@ -74,5 +74,26 @@ export class Utils {
 
     static isAChildOrAParent(type) {
         return type === "ELEVE" || type === "PERSELEVE"
+    }
+
+    static startBlobDownload(dataBlob, suggestedFileName) {
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            // for IE
+            window.navigator.msSaveOrOpenBlob(dataBlob, suggestedFileName);
+        } else {
+            // for Non-IE (chrome, firefox etc.)
+            var urlObject = URL.createObjectURL(dataBlob);
+
+            var downloadLink = angular.element('<a>Download</a>');
+            downloadLink.css('display', 'none');
+            downloadLink.attr('href', urlObject);
+            downloadLink.attr('download', suggestedFileName);
+            angular.element(document.body).append(downloadLink);
+            downloadLink[0].click();
+
+            // cleanup
+            downloadLink.remove();
+            URL.revokeObjectURL(urlObject);
+        }
     }
 }
