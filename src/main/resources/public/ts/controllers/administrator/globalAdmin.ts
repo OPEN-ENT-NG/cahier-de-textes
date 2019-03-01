@@ -76,6 +76,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.printPdf = () => {
             let sessionsToPdf = getSelectedSessions();
             console.log(sessionsToPdf);
+            renderDiariesToPDF();
         };
 
         /**
@@ -183,7 +184,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                         sessions: item,
                         sessionIds: $scope.getSessionsIds(item),
                         teacher: null,
-                        visaForm: $scope.visaForm
+                        visa: $scope.visaForm
                     };
 
                     createCanvas(dataVisa).then(async (canvasData) => {
@@ -196,7 +197,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                             Visa.uploadVisaPdf(canvasData, $scope);
                         visa.nb_sessions = dataVisa.sessions.length;
                         visa.sessionIds = dataVisa.sessionIds;
-                        visa.teacher = dataVisa.teacher;
+                        visa.teacher = dataVisa.sessions[0].teacher;
                         visas.all.push(visa);
                         let {succeed} = await
                             visas.save();
@@ -228,9 +229,37 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.syncSessionsWithVisa();
             });
         };
+
         $scope.visaFormIsvalid = () => {
             return $scope.visaForm.comment &&
                 $scope.visaForm.comment.length;
+        };
+
+
+        let renderDiariesToPDF = async () => {
+
+            $scope.printPdf.loading = true;
+            $scope.safeApply();
+
+            let sessionsGroups = getSelectedSessions();
+            let allDataPdf = [];
+
+            sessionsGroups.forEach((item) => {
+                let dataPdf = {
+                    sessions: item,
+                    sessionIds: $scope.getSessionsIds(item),
+                    teacher: null
+                };
+                allDataPdf.push(dataPdf);
+            });
+
+            let canvasData = await createCanvas(allDataPdf);
+            let canvasPdf = createPDF(canvasData);
+            Utils.startBlobDownload(canvasPdf.pdfBlob, lang.translate("visa.manage.create.success") + " - " + Utils.getDisplayDateTime(moment()));
+            $scope.printPdf.loading = false;
+            $scope.selectOrUnselectAllSessions(false);
+            $scope.updateOptionToaster();
+            $scope.syncSessionsWithVisa();
         };
 
         /**
@@ -240,49 +269,79 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
 
-        async function createCanvas(dataVisa) {
-            let sessions = dataVisa.sessions;
-            let sessionIds = dataVisa.sessionIds;
-            //useFUll var
-            let joinSessionsIds = sessionIds.join('-');
-            dataVisa.teacher = sessions[0].teacher;
-            let teacherLabel = sessions[0].teacher.displayName;
-            let subjectLabel = sessions[0].subject.label;
-            let audienceLabel = sessions[0].audience.name;
-            let username = model.me.username;
-            let comment = dataVisa.visaForm.comment;
-            let result = {original: null, canvas: null, data: {joinSessionsIds: joinSessionsIds}};
+        async function createCanvas(data) {
 
-            // Get the divs
+            //htmlContent:
+            let htmlTitle1 = (titleDiary, sessions) => {
+                titleDiary = `<div style="padding:10px" class="text-center">` +
+                    `<h1>${lang.translate("diary.title")}</h1>` +
+                    `<h2>${sessions[0].teacher.firstName }&nbsp;${sessions[0].teacher.lastName}&nbsp;-&nbsp;${sessions[0].subject.label}&nbsp;-&nbsp;${sessions[0].audience.name}</h2>`;
+                return titleDiary;
+            };
 
-            $(`.diary${joinSessionsIds}`).clone().appendTo("#list-diary-to-pdf");
+            let htmlTitle2 = (titleDiary, username, comment) => {
+                titleDiary += `<h4>${lang.translate("visa.approve.date")}&nbsp;` +
+                    `${lang.translate("by")}&nbsp;${username}</h4>` +
+                    `<p><b>${lang.translate("sessions.admin.comment")}:&nbsp;</b> ${comment} </p>`;
+                return titleDiary;
+            };
 
-            // Convert the divs into canvas
+            let htmlTitle3 = (titleDiary) => {
+                titleDiary += `</div><h4 style="padding:10px" >${lang.translate("the")}&nbsp;${Utils.getDisplayDate(moment())}&nbsp;${lang.translate("to2")}&nbsp;${Utils.getDisplayTime(moment())}&nbsp;</h4>`;
+                return titleDiary;
+            };
 
-            let diaryDiv = $(`#list-diary-to-pdf > .diary${joinSessionsIds}`);
-            let titleDiary =
-                `<div class="text-center">` +
-                `<h1>${lang.translate("diary.title")}</h1>` +
-                `<h2>${teacherLabel}&nbsp;-&nbsp;${subjectLabel}&nbsp;-&nbsp;${audienceLabel}</h2>` +
-                `<h4>${lang.translate("visa.approve.date")}&nbsp;${Utils.getDisplayDate(moment())}&nbsp;${lang.translate("to2")}&nbsp;${Utils.getDisplayTime(moment())}&nbsp;` +
-                `${lang.translate("by")}&nbsp;${sessions[0].teacher.firstName }&nbsp;${sessions[0].teacher.lastName }</h4>` +
-                `<p><b>${lang.translate("sessions.admin.comment")}:&nbsp;</b> ${comment} </p>` +
-                `</div>`;
-            diaryDiv.prepend(titleDiary);
+            let createTitle = (sessions, target, visa?) => {
+                // Convert the divs into canvas
+                let titleDiary = htmlTitle1("", sessions);
+                if (visa && visa.comment) {
+                    titleDiary = htmlTitle2(titleDiary, model.me.username, visa.comment);
+                }
+                titleDiary = htmlTitle3(titleDiary);
 
-            diaryDiv.css('padding', '30px');
-            let canvas = await html2canvas(diaryDiv[0], {letterRendering: true});
+                return titleDiary;
+            };
 
-            result.original = $(`#list-diary-to-pdf > .diary${joinSessionsIds}`)[0];
-            result.canvas = $(canvas)[0];
-            $(canvas).appendTo($('#canvas-diary-to-pdf'));
+            let sessions, target, targetName, htmlContent, title;
+
+            if (Array.isArray(data)) {
+                target = "#all";
+                let finalContent = "";
+                data.forEach((item) => {
+                    sessions = item.sessions;
+                    targetName = item.sessionIds.join('-');
+                    $(`#list-diary-to-pdf > .diary${targetName}`).remove();
+                    $(`.diary${targetName}`).clone().appendTo("#list-diary-to-pdf");
+                    htmlContent = $(`#list-diary-to-pdf > .diary${targetName}`);
+                    title = createTitle(sessions, targetName);
+                    htmlContent.prepend(title);
+                    target = $(`#list-diary-to-pdf > .diary${targetName}`);
+                    finalContent += htmlContent.html();
+                });
+                htmlContent.html(finalContent);
+            } else {
+                sessions = data.sessions;
+                targetName = data.sessionIds.join('-');
+                $(`#list-diary-to-pdf > .diary${targetName}`).remove();
+                $(`.diary${targetName}`).clone().appendTo("#list-diary-to-pdf");
+                htmlContent = $(`#list-diary-to-pdf > .diary${targetName}`);
+                title = createTitle(sessions, targetName, data.visa);
+                htmlContent.prepend(title);
+                target = $(`#list-diary-to-pdf > .diary${targetName}`);
+            }
 
 
+            let result = {original: null, canvas: null, data: {targetName: targetName}};
+            let canvas = await html2canvas(htmlContent[0], {letterRendering: true});
+
+            result.original = target[0];
+            result.canvas = canvas;
             return result;
+
         }
 
         function createPDF(canvasData) {
-            let joinSessionsIds = canvasData.data.joinSessionsIds;
+            let targetName = canvasData.data.targetName;
 
             // Create the canvas into PDF
             let pdf = new jsPDF('p', 'pt', 'a4', true);
@@ -299,7 +358,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 let dWidth = 778;
                 let dHeight = 1120;
 
-                let onePageCanvasName = "onePageCanvas_diary-canvas" + joinSessionsIds;
+                let onePageCanvasName = "onePageCanvas_diary-canvas" + targetName;
 
                 (window as any)[onePageCanvasName] = document.createElement("canvas");
                 let onePageCanvas = (window as any)[onePageCanvasName];
