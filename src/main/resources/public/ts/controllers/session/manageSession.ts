@@ -143,15 +143,18 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.deleteHomework = async (homework: any, i ) => {
+
             if (!homework.id) {
-                $scope.localRemoveHomework(i)
                 if (homework.opened) {
                     $scope.validate = false;
                     $scope.safeApply();
                 }
+                $scope.localRemoveHomework(i);
+
             } else {
-                let {succeed} = $scope.toastHttpCall(await homework.delete());
-                if (succeed) {
+              //  let {succeed} = $scope.toastHttpCall(await homework.delete());
+                // if (succeed) {
+                 if (true) {
                     $scope.localRemoveHomework($scope.session.homeworks.findIndex(x => x.id == homework.id));
                 }
             }
@@ -187,6 +190,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.homeworks[foundIndex] = homework;
             }
         };
+
         $scope.localRemoveHomework = (indexToDeletedeletedHomework) => {
             $scope.session.homeworks.splice(indexToDeletedeletedHomework, 1);
             $scope.safeApply();
