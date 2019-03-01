@@ -45,20 +45,23 @@
         <!-- Workload -->
         <span class="twelve" ng-repeat="workload in homework.workloadWeek.all">
                      <label ng-if="workload.numDayString == (homework.dueDate | date:'dd')"
-                            ngclass="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
+                            ng-class="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
                             [[workload.description]]
                      </label>
             </span>
     </div>
-    <div>
-            <span class="twelve">
-                <label>
-                    <i18n>homework.workload</i18n>
-                    <input type="text" class="width-10">
-                    <i18n>minutes</i18n>
-                </label>
-            </span>
-    </div>
+
+    <!--Fonctionnalité pas encore faite-->
+
+    <!--<div>-->
+            <!--<span class="twelve">-->
+                <!--<label>-->
+                    <!--<i18n>homework.workload</i18n>-->
+                    <!--<input type="text" class="width-10">-->
+                    <!--<i18n>minutes</i18n>-->
+                <!--</label>-->
+            <!--</span>-->
+    <!--</div>-->
 
     <!-- switch publish -->
     <div class="flex twelve-mobile">
