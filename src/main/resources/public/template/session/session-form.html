@@ -17,17 +17,17 @@
         </div>
     </div>
 
-    <div class="six cell twelve-mobile text-right">
-        TEST TOAST (a supprimer quand résolu)
-        <button class="float-none display-inline-block" ng-if="!session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="publishSession()">
-            <i18n>publish</i18n>
-        </button>
-        <button class="float-none display-inline-block" ng-if="session.isPublished"
-                ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">
-            <i18n>unpublish</i18n>
-        </button>
-    </div>
+    <!--<div class="six cell twelve-mobile text-right">-->
+        <!--TEST TOAST (a supprimer quand résolu)-->
+        <!--<button class="float-none display-inline-block" ng-if="!session.isPublished"-->
+                <!--ng-disabled="!isValidForm()" type="button" ng-click="publishSessionToast()">-->
+            <!--<i18n>publish</i18n>-->
+        <!--</button>-->
+        <!--<button class="float-none display-inline-block" ng-if="session.isPublished"-->
+                <!--ng-disabled="!isValidForm()" type="button" ng-click="unpublishSession()">-->
+            <!--<i18n>unpublish</i18n>-->
+        <!--</button>-->
+    <!--</div>-->
 
     <fieldset class="row card remove-margin padding-md border-widht-fieldset"
               ng-click="session.opened = !session.opened"

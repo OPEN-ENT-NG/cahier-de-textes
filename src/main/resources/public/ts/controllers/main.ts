@@ -480,11 +480,11 @@ export let main = ng.controller('MainController',
 
             $scope.setProgress(homework);
         };
-        $scope.publishSession = (item ,event) =>   {
+        $scope.publishSession = async (item ,event) =>   {
             event.stopPropagation();
             let sessionToPublish = new Session($scope.structure);
             sessionToPublish.id = item.id;
-            sessionToPublish.publish();
+            $scope.toastHttpCall(await sessionToPublish.publish())
             $scope.syncPedagogicItems();
 
             $scope.safeApply();
