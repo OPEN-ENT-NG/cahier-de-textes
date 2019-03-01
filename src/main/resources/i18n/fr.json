@@ -192,6 +192,7 @@
   "sessions.admin.main.title": "Gestion des cahiers de texte",
   "sessions.admin.button.goTo": "Gestions des visas",
   "visa.manage.title": "Visas du cahier de textes",
+
   "visa.manage.choosePdf": "Visa du",
   "visa.manage.viser": "Viser",
   "visa.manage.create.success": "Visa(s) créé(s)",

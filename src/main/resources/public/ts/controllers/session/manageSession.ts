@@ -1,5 +1,5 @@
 import {Behaviours, idiom as lang, model, moment, ng} from 'entcore';
-import {Course, Toast, Session, Subjects} from '../../model';
+import {Course, Toast, Session, Subjects, Utils} from '../../model';
 import {Homework} from '../../model/homework';
 import {ProgressionHomework} from "../../model/Progression";
 
@@ -81,13 +81,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.saveSession = async () => {
             if (!$scope.isValidForm) {
+
                 $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                 return;
             }
 
             // Sauvegarde de la session
             let sessionSaveResponse = await $scope.session.save($scope.placeholder);
-
+            $scope.toastHttpCall(Utils.setToastMessage(sessionSaveResponse ,"session.created","session.created.error"));
             if (sessionSaveResponse.succeed) {
                 if (!$scope.session.id && sessionSaveResponse.data.id) {
                     $scope.session.id = sessionSaveResponse.data.id;
