@@ -29,7 +29,7 @@ export class Session {
     courseId: string = null;
     isPublished: boolean = true;
     visas: Visa[] = [];
-    opened: boolean;
+    opened: boolean = false;
     startMoment: any;
     endMoment: any;
 
@@ -224,15 +224,19 @@ export class Session {
         this.color = colors[1];
 
     }
-    async duplicateHomework(session){
-        this.homeworks.map(async homework =>  {
-            await  homework.duplicate(session.id,session.date);
-        });
-    }
+    //  duplicateHomework(session){
+    //     this.homeworks.map(async homework =>  {
+    //          homework.duplicate(session.id,session.date);
+    //     });
+    // }
 
     getSessionInfo(session: Session) {
         this.subject = session.subject;
-        this.homeworks = session.homeworks;
+        session.homeworks.map( homework =>  {
+           homework.due_date = this.date;
+           delete homework.id ;
+            this.homeworks.push(homework);
+        });
         this.teacher = session.teacher;
         this.color = session.color;
         this.audience = session.audience;

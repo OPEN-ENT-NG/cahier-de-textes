@@ -552,7 +552,7 @@ export let main = ng.controller('MainController',
         /*
         Handle a session drop on another session
          */
-        $scope.sessionToSession = (idSessionDrag , idSessionDrop) =>{
+        $scope.sessionToSession = async (idSessionDrag , idSessionDrop) =>{
             let sessionDrag,sessionDrop;
             console.log("sessionToSession");
             $scope.calendarItems.map(async session => {
@@ -591,8 +591,8 @@ export let main = ng.controller('MainController',
             date = date.split('/').join('-');
             date = date.split("-");
             let tempDateAnnee = date[2];
-            date[2]=date[0];
-            date[0]=tempDateAnnee;
+            date[2] = date[0];
+            date[0] = tempDateAnnee;
             date = date.join("-");
 
             //insert data and refresh calendar
@@ -600,15 +600,16 @@ export let main = ng.controller('MainController',
             let session= new Session($scope.structure,course);
             session.setFromCourseAndSession(course,sessionDrag)
             session.opened = true;
-            await session.save();
-            await sessionDrag.duplicateHomework(session)
-            $scope.syncPedagogicItems();
+            //await session.save();
+            await sessionDrag.duplicateHomework(session);
+            $scope.session = session;
+           // $scope.syncPedagogicItems();
 
-            $scope.safeApply();
-            $scope.goTo('/session/update/' + session.id );
+           // $scope.safeApply();
+            $scope.goTo('/session/create' );
 
 
-        }
+        };
 
         /*
                Handle a progression dropped on a session
@@ -666,12 +667,13 @@ export let main = ng.controller('MainController',
             let session= new Session($scope.structure,course,progressionDragged);
             session.setFromCourse(course);
             session.opened = true;
-            await session.save();
-            await progressionDragged.toSession(session.id);
-            await session.sync();
-            $scope.syncPedagogicItems();
+            $scope.session = session;
+         //   await session.save();
+            // await progressionDragged.toSession(session.id);
+       //     await session.sync();
+          //  $scope.syncPedagogicItems();
             $scope.safeApply();
-            $scope.goTo('/session/update/' + session.id );
+            $scope.goTo('/session/create/' );
 
 
 

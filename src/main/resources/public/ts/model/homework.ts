@@ -166,11 +166,7 @@ export class Homework {
             && this.description.length;
     };
 
-    async duplicate(idSession: any,date) {
-        this.session.id = idSession;
-        this.due_date = date;
-        await this.create();
-    }
+
 }
 
 export class Homeworks {
