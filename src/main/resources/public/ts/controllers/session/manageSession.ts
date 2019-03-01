@@ -87,8 +87,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             // Sauvegarde de la session
-            let sessionSaveResponse = await $scope.session.save($scope.placeholder);
-            $scope.toastHttpCall(Utils.setToastMessage(sessionSaveResponse ,"session.created","session.created.error"));
+            let sessionSaveResponse = $scope.toastHttpCall(await $scope.session.save($scope.placeholder));
             if (sessionSaveResponse.succeed) {
                 if (!$scope.session.id && sessionSaveResponse.data.id) {
                     $scope.session.id = sessionSaveResponse.data.id;
