@@ -182,9 +182,16 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             window.history.back();
         };
 
+        $scope.deleteProgressionSessionToastLess  =  async  (progressionSession : ProgressionSession) => {
+            $scope.toastHttpCall (await progressionSession.delete());
+            await initData();
+            $scope.isReadOnly = !$scope.isReadOnly;
+
+            $scope.safeApply();
+        }
         $scope.deleteProgressions = (progressionsSessions) => {
             progressionsSessions.map(p => {
-                $scope.deleteProgressionSession(p)
+                $scope.deleteProgressionSessionToastLess(p)
             })
         };
 

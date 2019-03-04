@@ -16,11 +16,10 @@
 
     <article class="cell two twelve-mobile">
         <div class="sidebar" ng-class="{opened : searchbar.progression}">
-            <h5 class="large" ng-click="display.progression = !display.progression">
+            <h5 class="large">
                 <i18n>progression</i18n>
-                <i ng-class="display.progression ? 'up-open' : 'down-open'" class="right-magnet"></i>
             </h5>
-            <span ng-show="display.progression" class="filter__input--icon">
+            <span  class="filter__input--icon">
                 <input type="text" ng-change="filterProgression(search)" ng-model="search" placeholder="Rechercher">
             </span>
         </div>
