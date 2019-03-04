@@ -190,7 +190,7 @@
   "sessions.admin.lastEditSession": "Dernière édition",
   "sessions.admin.lastCreatedVisa": "Dernier visa créé",
   "sessions.admin.main.title": "Rechercher des cahiers de textes",
-  "sessions.admin.button.goTo": "Gestions des visas",
+  "sessions.admin.button.goTo": "Rechercher des cahiers de textes",
   "visa.manage.title": "Visas du cahier de textes",
 
   "visa.manage.choosePdf": "Visa du",
