@@ -35,6 +35,7 @@ export class Homework {
     attachedToSession: boolean = true;
     attachedToDate: boolean = false;
     isDone: boolean;
+    isDeleted: boolean= false;
 
     static HOMEWORK_STATE_TODO : number = 1;
     static HOMEWORK_STATE_DONE : number = 2;

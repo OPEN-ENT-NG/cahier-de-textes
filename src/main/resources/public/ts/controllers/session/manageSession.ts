@@ -111,9 +111,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         h.session.id = $scope.session.id;
                     }
                 }
-                let {succeed} = await h.save();
-                if (!succeed) {
-                    hasSucceed = false;
+                if(!h.isDeleted){
+                    let {succeed} = await h.save();
+                    if (!succeed) {
+                        hasSucceed = false;
+                    }
                 }
             });
 
@@ -152,9 +154,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.localRemoveHomework(i);
 
             } else {
-              //  let {succeed} = $scope.toastHttpCall(await homework.delete());
+                //  let {succeed} = $scope.toastHttpCall(await homework.delete());
                 // if (succeed) {
-                 if (true) {
+                if (true) {
                     $scope.localRemoveHomework($scope.session.homeworks.findIndex(x => x.id == homework.id));
                 }
             }

@@ -127,7 +127,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="homework in session.homeworks track by $index"
+                    <tr ng-repeat="homework in session.homeworks track by $index" ng-if="!homework.isDeleted"
                         inside-session-form="true"
                         class="ng-scope"
                         ng-controller="manageHomeworkCtrl"
