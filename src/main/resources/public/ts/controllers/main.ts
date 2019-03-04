@@ -105,7 +105,7 @@ export let main = ng.controller('MainController',
             }
         }
         $scope.changeViewList = function () {
-            $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks');
+            $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks').add('4','day');
             $scope.goTo('/list');
             $scope.display.listView = true
             if(!Utils.isAChildOrAParent(model.me.type)){
@@ -387,7 +387,7 @@ export let main = ng.controller('MainController',
                     if($scope.display.listview)
                         $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
                     else
-                        $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks');
+                        $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks').add('4','day');
                     break;
                 case 'day':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('day');
