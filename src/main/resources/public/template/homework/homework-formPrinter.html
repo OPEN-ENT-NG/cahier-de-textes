@@ -53,15 +53,15 @@
 
     <!--Fonctionnalité pas encore faite-->
 
-    <!--<div>-->
-            <!--<span class="twelve">-->
-                <!--<label>-->
-                    <!--<i18n>homework.workload</i18n>-->
-                    <!--<input type="text" class="width-10">-->
-                    <!--<i18n>minutes</i18n>-->
-                <!--</label>-->
-            <!--</span>-->
-    <!--</div>-->
+    <div>
+            <span class="twelve">
+                <label>
+                    <i18n>homework.workload</i18n>: 
+                    <input  ng-model="homework.estimatedTime" type="number" class="width-10">
+                    <i18n>minutes</i18n>
+                </label>
+            </span>
+    </div>
 
     <!-- switch publish -->
     <div class="flex twelve-mobile">
@@ -105,10 +105,13 @@
 </td>
 
 <!-- Deadline static data -->
-<td ng-if="!homework.opened" class="six vertical-align-top full-td-width text-left">
+<td ng-if="!homework.opened" class="five vertical-align-top full-td-width text-left">
     <p class="twelve" ng-bind-html="[[homework.description]]"></p>
 </td>
 
+<td ng-if="!homework.opened" class="1 vertical-align-top full-td-width text-left">
+    <p class="twelve"  >[[homework.estimatedTime]]</p>
+</td>
 <!-- Button part -->
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!homework.opened" ng-click="$parent.openHomework(homework)">&#xe858;</i>

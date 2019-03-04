@@ -26,6 +26,9 @@
     },
     "due_date": {
       "type": "string"
+    },
+    "estimatedTime": {
+      "type": "number"
     }
   },
   "required": [

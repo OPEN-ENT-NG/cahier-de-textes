@@ -35,8 +35,8 @@ export class Homework {
     attachedToSession: boolean = true;
     attachedToDate: boolean = false;
     isDone: boolean;
-    isDeleted: boolean= false;
-
+    isDeleted: boolean = false;
+    estimatedTime: number = 0;
     static HOMEWORK_STATE_TODO : number = 1;
     static HOMEWORK_STATE_DONE : number = 2;
 
@@ -54,6 +54,7 @@ export class Homework {
             structure_id: this.structure.id,
             session_id: this.session ? this.session.id : null,
             audience_id: this.audience.id,
+            estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
             due_date: Utils.getFormattedDate(this.dueDate),
             description: this.description,
             color: this.color,
@@ -78,6 +79,7 @@ export class Homework {
             type: data.type ? data.type : data.type,
             title: data.title,
             color: data.color,
+            estimatedTime: data.estimatedtime,
             dueDate: Utils.getFormattedDate(data.due_date),
             description: data.description,
             isPublished: data.is_published,

@@ -179,16 +179,17 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id, " +
+        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
                 "color, description, is_published, session_id, due_date, type_id, owner_id " +
                 ", created, modified) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()) RETURNING id";
 
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
         values.add(user.getUserId());
         values.add(homework.getString("audience_id"));
+        values.add(homework.getInteger("estimatedTime"));
         values.add(homework.getString("color"));
         values.add(homework.getString("description"));
         if(homework.getBoolean("is_published") != null) {
@@ -218,7 +219,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void updateHomework(long homeworkId, JsonObject homework, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "UPDATE diary.homework " +
-                "SET subject_id = ?, structure_id = ?, audience_id = ?, " +
+                "SET subject_id = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
                 " color = ?, description = ?, is_published = ?, session_id = ?, due_date = ?, type_id = ?, " +
                 " modified = NOW() " +
                 " WHERE id = ?;";
@@ -226,8 +227,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
         values.add(homework.getString("audience_id"));
+        values.add(homework.getInteger("estimatedTime"));
         values.add(homework.getString("color"));
         values.add(homework.getString("description"));
+
         if(homework.getBoolean("is_published") != null) {
             values.add(homework.getBoolean("is_published"));
         } else {
