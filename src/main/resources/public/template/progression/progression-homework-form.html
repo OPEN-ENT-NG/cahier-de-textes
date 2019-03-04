@@ -8,11 +8,19 @@
             ng-model="progressionHomework.type"
             ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
     </select>
+    <span class="twelve">
+                <label>
+                    <i18n>homework.workload</i18n>:
+                    <input  ng-model="progressionHomework.estimatedTime" type="number" class="width-10">
+                    <i18n>minutes</i18n>
+                </label>
+    </span>
 
 </td>
 <!-- Type static data -->
 <td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
     <p class="twelve">[[progressionHomework.type.label]]</p>
+
 </td>
 
 
@@ -22,10 +30,12 @@
 </td>
 
 <!-- Deadline static data -->
-<td ng-if="!progressionHomework.opened" class="six vertical-align-top full-td-width text-left">
+<td ng-if="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
     <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
 </td>
-
+<td ng-if="!progressionHomework.opened" class="one vertical-align-top ext-left">
+    <p class="twelve" >[[progressionHomework.estimatedTime]]</p>
+</td>
 <!-- Button part -->
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>

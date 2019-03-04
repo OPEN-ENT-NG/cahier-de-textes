@@ -187,6 +187,7 @@ export class ProgressionHomework{
     subject: Subject;
     subject_id;
     p_session: ProgressionSession;
+    estimatedTime: number=0;
     isNewField: boolean=false;
     opened: boolean;
     owner;
@@ -209,6 +210,7 @@ export class ProgressionHomework{
                 id: this.id || null ,
                 description: this.description,
                 subject_id: this.subject ? this.subject.id : this.subject_id,
+                estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
                 owner_id: ownerId,
                 type_id: this.type.id
 
@@ -233,6 +235,7 @@ export class ProgressionHomework{
             subject_id:data.subject_id,
             type_label : data.type_label,
             description: data.description,
+            estimatedTime: data.estimatedtime,
             modified: data.modified,
             created: data.created
         };

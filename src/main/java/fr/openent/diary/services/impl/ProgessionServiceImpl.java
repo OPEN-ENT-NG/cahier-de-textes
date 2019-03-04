@@ -31,7 +31,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         String query = "SELECT ps.id, ps.class as class , title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
                 "array_to_json(array_agg(h.*)) as homeworks from diary.progression_session ps " +
                 " LEFT JOIN ( " +
-                "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
+                "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, estimatedTime, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
                 " FROM  diary.progression_homework " +
                 "INNER JOIN diary.homework_type " +
                 "  ON homework_type.id = progression_homework.type_id " +
@@ -51,7 +51,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         String query = "SELECT ps.id, ps.class as class, title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
                 "array_to_json(array_agg(h.*)) as homeworks from diary.progression_session ps " +
                 " LEFT JOIN ( " +
-                "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
+                "SELECT progression_homework.id as id ,estimatedTime , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
                 " FROM  diary.progression_homework " +
                 "INNER JOIN diary.homework_type " +
                 "  ON homework_type.id = progression_homework.type_id " +
@@ -145,13 +145,14 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         JsonArray params = new JsonArray();
 
         String query = "UPDATE diary.progression_homework " +
-                "SET subject_id = ?, description = ?, owner_id = ? , type_id = ? " +
+                "SET subject_id = ?, description = ?, owner_id = ? , type_id = ?, estimatedTime = ? " +
                 "WHERE id = ?";
 
         params.add(homework.getString("subject_id"))
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
                 .add(homework.getInteger("type_id"))
+                .add(homework.getInteger("estimatedTime"))
                 .add(homework.getInteger("id"))
         ;
 
@@ -277,13 +278,14 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      * @return
      */
     private JsonObject getHomeworkCreationStatement(Number id, JsonObject homework) {
-        String query = "INSERT INTO diary.progression_homework ( progression_session_id , subject_id, description, owner_id, type_id ) " +
+        String query = "INSERT INTO diary.progression_homework ( progression_session_id , subject_id, description, owner_id, type_id, estimatedTime ) " +
                 "values ( ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
                 .add(homework.getString("subject_id"))
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
+                .add(homework.getInteger("estimatedTime"))
                 .add(homework.getInteger("type_id"));
         return new JsonObject()
                 .put(STATEMENT, query)
@@ -325,16 +327,17 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      * @return
      */
     private JsonObject getHomeworksProgressionToHomeworks( JsonObject homework, JsonObject session){
-        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id,  " +
+        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime,  " +
                 " color, description, is_published, session_id, due_date, type_id, owner_id" +
                 " ,created, modified)  " +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?,  " +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  " +
                 " to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()) RETURNING id";
         JsonArray params = new JsonArray()
                 .add(session.getString("subject_id"))
                 .add(session.getString("structure_id"))
                 .add(session.getString("teacher_id"))
                 .add(session.getString("audience_id"))
+                .add(homework.getInteger("estimatedTime"))
                 .add(session.getString("color"))
                 .add(homework.getString("description"))
                 .add(session.getBoolean("is_published"))

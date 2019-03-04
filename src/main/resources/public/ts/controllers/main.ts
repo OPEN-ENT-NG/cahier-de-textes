@@ -668,12 +668,23 @@ export let main = ng.controller('MainController',
             session.setFromCourse(course);
             session.opened = true;
             $scope.session = session;
-         //   await session.save();
-            // await progressionDragged.toSession(session.id);
-       //     await session.sync();
-          //  $scope.syncPedagogicItems();
+             progressionDragged.progression_homeworks.map(
+                 ph => {
+                     let homework = new Homework($scope.structure)
+                     homework.estimatedTime = ph.estimatedTime;
+                     homework.description = ph.description;
+                     homework.subject = ph.subject;
+                     homework.type = ph.type;
+                     session.homeworks.push(homework);
+
+                 }
+             );
+            //await session.save();
+          //  await progressionDragged.toSession(session.id);
+            //await session.sync();
+             $scope.syncPedagogicItems();
             $scope.safeApply();
-            $scope.goTo('/session/create/' );
+            $scope.goTo('/session/create');
 
 
 
