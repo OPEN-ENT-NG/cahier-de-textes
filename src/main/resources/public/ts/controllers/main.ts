@@ -108,6 +108,11 @@ export let main = ng.controller('MainController',
             $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks');
             $scope.goTo('/list');
             $scope.display.listView = true
+            if(!Utils.isAChildOrAParent(model.me.type)){
+                $scope.display.sessionList = true;
+            }else{
+                $scope.display.sessionList = false;
+            }
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true ;
