@@ -196,6 +196,7 @@
   "visa.manage.choosePdf": "Visa du",
   "visa.manage.viser": "Viser",
   "visa.manage.create.success": "Visa(s) créé(s)",
+  "visa.manage.pdfName": "Cahier(s) de texte",
   "visa.manage.create.error": "Erreur lors de la créations de visa(s)",
   "visa.manage.diaryToPrintPDF": "Imprimer en PDF",
   "visa.vise.diary": "Viser les cahiers de textes",

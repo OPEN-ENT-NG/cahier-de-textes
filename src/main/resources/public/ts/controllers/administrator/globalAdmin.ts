@@ -255,7 +255,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
             let canvasData = await createCanvas(allDataPdf);
             let canvasPdf = createPDF(canvasData);
-            Utils.startBlobDownload(canvasPdf.pdfBlob, lang.translate("visa.manage.create.success") + " - " + Utils.getDisplayDateTime(moment()));
+            Utils.startBlobDownload(canvasPdf.pdfBlob, lang.translate("visa.manage.pdfName") + " - " + Utils.getDisplayDateTime(moment()));
             $scope.printPdf.loading = false;
             $scope.selectOrUnselectAllSessions(false);
             $scope.updateOptionToaster();
