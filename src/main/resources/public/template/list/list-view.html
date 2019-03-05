@@ -19,11 +19,13 @@
                         </div>
                         <div class="event cell">
                             <div>
-                            <span  class="round "
+                            <span  ng-show="!display.sessionList" class="round "
                                    ng-class="{'[[pedagogicDay.color]]': true}">
-                                <span ng-show="!display.sessionList">
+                                <span>
                                     [[pedagogicDay.nbHomework]]
                                 </span>
+                            </span>
+                                <span  ng-show="display.sessionList" class="round ">
                             </span>
                             </div>
                         </div>
