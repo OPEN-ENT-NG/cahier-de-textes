@@ -28,9 +28,12 @@ export let main = ng.controller('MainController',
             sessions: true,
             listView: false,
             progression: false,
-            sessionList : false
+            sessionList : false,
+            homeworksFilter: true,
+            todo: true,
+            done: false
         };
-
+        $scope.isAChildOrAParent= Utils.isAChildOrAParent(model.me.type);
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
         $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
@@ -356,7 +359,6 @@ export let main = ng.controller('MainController',
         };
 
         $scope.setProgress = (homework: Homework) => {
-            homework.isDone = !homework.isDone;
             homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
         };
 
@@ -478,7 +480,7 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         };
         $scope.setHomeworkProgress =(homework)=>{
-            if(!homework.isDone)
+            if(homework.isDone)
                 $scope.notifications.push(new Toast('homework.done.notification', 'info'));
             else
                 $scope.notifications.push(new Toast('homework.todo.notification', 'info'));

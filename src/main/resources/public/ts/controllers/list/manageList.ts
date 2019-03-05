@@ -24,9 +24,24 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.displayDay = (pedagogicDay) =>{
-           pedagogicDay.displayed = !pedagogicDay.displayed;
-           $scope.safeApply();
+            pedagogicDay.displayed = !pedagogicDay.displayed;
+            $scope.safeApply();
         };
+
+        $scope.filterHomeworkState = (homework) =>{
+            let isInFilter = false;
+            if($scope.display.homeworksFilter){
+                if($scope.display.todo){
+                    isInFilter =  isInFilter || !homework.isDone;
+                }
+                if($scope.display.done){
+                    isInFilter = isInFilter ||  homework.isDone ;
+                }
+            }else{
+                isInFilter = true;
+            }
+            return isInFilter;
+        }
 
 
 
@@ -69,7 +84,7 @@ export let manageListCtrl = ng.controller('manageListController',
             let containsOnlyCourseBool = true;
             pedagogicDay.pedagogicItems.map(p => {
                 if (p.pedagogicType === PEDAGOGIC_TYPES.TYPE_SESSION || p.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK){
-                     containsOnlyCourseBool = false ;
+                    containsOnlyCourseBool = false ;
 
                 }
             })
@@ -77,9 +92,9 @@ export let manageListCtrl = ng.controller('manageListController',
         }
         //check the display mod and if display session check the homeworks an the sessions which have homeworks
         $scope.displaySession = (displaySession,pedagogicItem) =>{
-           if (displaySession)
-               return pedagogicItem.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK;
-           else
+            if (displaySession)
+                return pedagogicItem.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+            else
                 return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 

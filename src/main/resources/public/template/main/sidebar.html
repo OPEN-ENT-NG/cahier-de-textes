@@ -25,13 +25,13 @@
 
 
         <!--<div class="row margin-bottom-md" ng-if="display.listView">-->
-            <!--<i18n>period.from</i18n>-->
-            <!--<date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"-->
-                         <!--class="date-picker-sm"></date-picker>-->
-            <!--<br/>-->
-            <!--<i18n>to</i18n>-->
-            <!--<date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"-->
-                         <!--class="date-picker-sm"></date-picker>-->
+        <!--<i18n>period.from</i18n>-->
+        <!--<date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"-->
+        <!--class="date-picker-sm"></date-picker>-->
+        <!--<br/>-->
+        <!--<i18n>to</i18n>-->
+        <!--<date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"-->
+        <!--class="date-picker-sm"></date-picker>-->
         <!--</div>-->
 
         <div class="row margin-bottom-md" ng-show="display.listView">
@@ -44,8 +44,22 @@
             <label>
                 <input type="radio" ng-model="display.sessionList" ng-value="false"
                        ng-click="">
-                <i18n>homework</i18n>
-            </label>
+                <i18n>homeworks</i18n>
+            </label>  <i ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter" ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
+            <div class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
+                <div class="ten right-magnet" ng-click="display.todo = !display.todo">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.todo"/>
+                        <span><i18n>todo</i18n></span>
+                    </label>
+                </div>
+                <div class="ten right-magnet" ng-click="display.done = !display.done">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.done"/>
+                        <span><i18n>done</i18n></span>
+                    </label>
+                </div>
+            </div>
         </div>
 
 
@@ -53,14 +67,12 @@
             <div ng-click="display.homeworks = !display.homeworks">
                 <label class="checkbox">
                     <input type="checkbox" ng-model="display.homeworks"/>
-                    <span class="small pointer"><i18n>homeworks</i18n></span>
+                    <span><i18n>homeworks</i18n></span>
                 </label>
-            </div>
-            <div class="row margin-bottom-md" ng-show="!display.listView">
                 <div ng-click="display.sessions = !display.sessions">
                     <label class="checkbox">
                         <input type="checkbox" ng-model="display.sessions">
-                        <span class="small pointer"><i18n>session</i18n></span>
+                        <span><i18n>session</i18n></span>
                     </label>
                 </div>
             </div>

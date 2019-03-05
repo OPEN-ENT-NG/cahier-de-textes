@@ -1,6 +1,6 @@
 
 <!-- HOMEWORKS ONLY-->
-<article  ng-if="pedagogicItem.pedagogicType === TYPE_HOMEWORK" class="pedagogic-item-article">
+<article  ng-if="pedagogicItem.pedagogicType === TYPE_HOMEWORK && filterHomeworkState(pedagogicItem)" class="pedagogic-item-article">
     <div  class="row  list-view-item">
 
         <div  class="eight cell first-content">
@@ -24,18 +24,7 @@
                             [[pedagogicItem.type.label]]&nbsp;
                         <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
-                    <span class="homeworkDone four"
-                          ng-class="{isDone: pedagogicItem.isDone}"
-                          ng-click="setHomeworkProgress(pedagogicItem)"
 
-                          workflow="diary.setProgressHomework">
-
-
-                        <!--<i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"-->
-                        <!--ng-if="homework.isDone" style="color: green;">&#xe871;</i>-->
-                        <!--<i tooltip="[[translate( (pedagogicItem.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"-->
-                        <!--ng-if="!pedagogicItem.isDone" >&#xe871;</i>-->
-                </span>
                 </div>
 
                 <!-- Description -->
@@ -61,7 +50,7 @@
                 </div>
             </label>
             <div class="cell horizontal-spacing twelve-mobile ">
-                <switch class="" ng-model="pedagogicItem.isDone">
+                <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
                     <label class="switch"> </label>
                 </switch>
             </div>
@@ -73,7 +62,7 @@
     </div>
 </article>
 <!--HOMEWORKS FROM SESSIONS-->
-<article  ng-show="pedagogicItem.pedagogicType !== TYPE_COURSE" ng-repeat="homework in pedagogicItem.homeworks"  ng-if="pedagogicItem.pedagogicType !== TYPE_HOMEWORK" class="pedagogic-item-article">
+<article  ng-show="pedagogicItem.pedagogicType !== TYPE_COURSE" ng-repeat="homework in pedagogicItem.homeworks"  ng-if="pedagogicItem.pedagogicType !== TYPE_HOMEWORK  &&  filterHomeworkState(homework)" class="pedagogic-item-article">
     <div  class="row  list-view-item">
         <div  class="eight cell first-content">
             <!-- Subject, Audience and Teacher-->
@@ -96,16 +85,7 @@
                             [[homework.type.label]]&nbsp;
                         <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
-                    <span class="homeworkDone"
-                          ng-class="{isDone: pedagogicItem.homework.isDone}"
-                          ng-click="setHomeworkProgress(pedagogicItem.homework)"
 
-                          workflow="diary.setProgressHomework">
-                     <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"
-                        ng-if="homework.isDone" style="color: green;">&#xe871;</i>
-                     <i tooltip="[[translate( (homework.isDone)? 'homework.indicate.asNotDone' : 'homework.indicate.asDone' )]]"
-                        ng-if="!homework.isDone" >&#xe871;</i>
-                </span>
                 </div>
                 <!-- HOMEWORK DONE -->
                 <!-- Description -->
@@ -130,7 +110,7 @@
                 </div>
             </label>
             <div class="cell horizontal-spacing twelve-mobile ">
-                <switch class="" ng-model="homework.isDone">
+                <switch class="" ng-model="homework.isDone"  ng-change="setHomeworkProgress(homework)">
                     <label class="switch"> </label>
                 </switch>
             </div>
