@@ -1,6 +1,6 @@
 import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
-import {Session, Subjects} from "../../model";
+import {Session, Subjects, Toast} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
 import {Utils} from '../../utils/utils';
 
@@ -183,16 +183,22 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.deleteProgressionSessionToastLess  =  async  (progressionSession : ProgressionSession) => {
-            $scope.toastHttpCall (await progressionSession.delete());
-            await initData();
-            $scope.isReadOnly = !$scope.isReadOnly;
+          let  response = await progressionSession.delete();
+           await initData();
+           $scope.isReadOnly = !$scope.isReadOnly;
 
-            $scope.safeApply();
+           $scope.safeApply();
+
         }
         $scope.deleteProgressions = (progressionsSessions) => {
-            progressionsSessions.map(p => {
-                $scope.deleteProgressionSessionToastLess(p)
+            progressionsSessions.map(async p =>  {
+            await $scope.deleteProgressionSessionToastLess(p);
             })
+
+            $scope.notifications.push(new Toast('delete.progressions', 'confirm'));
+            $scope.safeApply();
+
+
         };
 
         //change the sorting of the progressions

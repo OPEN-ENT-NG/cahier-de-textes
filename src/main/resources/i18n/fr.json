@@ -192,7 +192,7 @@
   "sessions.admin.main.title": "Rechercher des cahiers de textes",
   "sessions.admin.button.goTo": "Rechercher des cahiers de textes",
   "visa.manage.title": "Visas du cahier de textes",
-
+  "delete.progressions":"Suppression de(s) progression(s)",
   "visa.manage.choosePdf": "Visa du",
   "visa.manage.viser": "Viser",
   "visa.manage.create.success": "Visa(s) créé(s)",
