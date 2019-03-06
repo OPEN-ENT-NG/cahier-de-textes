@@ -30,6 +30,15 @@
     background-image: none;
   }
 
+  i.session::before {
+    content: "\e86f";
+    font-family:"generic-icons";
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    background-image:none;
+    color : #fff;
+  }
+
   i.cahier-textes2::before {
     content: "\e86f";
     font-family: "generic-icons";

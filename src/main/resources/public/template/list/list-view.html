@@ -42,10 +42,7 @@
                     </div>
 
                     <div  ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
-                        <div class="date-label">
-                            [[pedagogicDay.fullDayName]] - [[pedagogicDay.nbHomework]]
-                            <i18n>homeworks</i18n>
-                        </div>
+                    
                         <div
                                 ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
                             <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList" static-include="/diary/public/template/list/list-pedagogic-item.html"/>
