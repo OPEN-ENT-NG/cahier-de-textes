@@ -264,10 +264,7 @@ export let main = ng.controller('MainController',
                 let nbHomeworkInSession = 0;
                 let nbHomework = 0;
                 pedagogicItems.forEach(i => {
-                    if (i.pedagogicType === $scope.TYPE_SESSION) {
-                        nbHomework += i.homeworks.length;
 
-                    }
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
                         nbHomework ++;
                     }
