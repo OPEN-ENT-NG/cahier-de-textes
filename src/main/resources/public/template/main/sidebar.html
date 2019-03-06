@@ -1,9 +1,9 @@
-<div class="sidebar ">
+<article class="sidebar ">
     <section id="display-section" class="cell twelve">
 
         <div>
             <h5 class="large cell eleven">
-                <i18n>sidebar.display_mode</i18n> :
+                <i18n>sidebar.display_mode</i18n>
             </h5>
             <!-- Legend -->
             <i class="large help one cell margin-top-Botton-md" ng-if="!display.listView"
@@ -128,7 +128,7 @@
     </section>
 
 
-    <section ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView">
+    <section class="cell twelve" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView">
         <div class="row">
 
             <h5 class="large">
@@ -137,25 +137,25 @@
 
             </h5>
         </div>
-        <input ng-change="filterProgression(search)" class="progression-search" type="text" ng-model="search"  placeholder="Rechercher" >
+        <div class="row">
+            <input ng-change="filterProgression(search)"
+                   class="progression-search cell twelve"
+                   type="text"
+                   ng-model="search"
+                   placeholder="Rechercher">
 
-
-
-
-        <ul  ng-if=" search && search!= '' "class="selectable-list progression-list">
-            <li ng-repeat="progression in progressionsToDisplay.all track by $index" class="progression-item-scrollable eleven progression-item-draggable "
-                lvl-draggable="true" >
-                [[progression.title]]
-                <span ng-show="false">[[progression.id]]</span>
-                <span ng-show="false">[[progression.progression_homeworks.length]]</span>
-                <span ng-if="progression.class && progression.class != ''">([[progression.class]])</span>
-            </li>
-        </ul>
-
-
+            <ul ng-if=" search && search!= '' " class="selectable-list progression-list">
+                <li ng-repeat="progression in progressionsToDisplay.all track by $index"
+                    class="progression-item-scrollable eleven progression-item-draggable "
+                    lvl-draggable="true">
+                    [[progression.title]]
+                    <span ng-show="false">[[progression.id]]</span>
+                    <span ng-show="false">[[progression.progression_homeworks.length]]</span>
+                    <span ng-if="progression.class && progression.class != ''">([[progression.class]])</span>
+                </li>
+            </ul>
+        </div>
     </section>
-
-
 
     <section id="add-section" class="row" ng-if="hasAtLeastOneCreateRight()">
         <div class="cell twelve ">
@@ -176,14 +176,16 @@
             </div>
         </div>
     </section>
+    <section class="row" workflow="diary.adminAccess">
+        <div class="cell twelve">
+            <button class="twelve padding-sm" ng-click="goTo('/administrator/global')">
+                <i18n ng-if="typeUser ==='ENSEIGNANT'">sessions.admin.button.goTo2</i18n>
+                <i18n ng-if="typeUser !='ENSEIGNANT'">sessions.admin.button.goTo</i18n>
+            </button>
+        </div>
+    </section>
 
-
-    <button workflow="diary.adminAccess" class="twelve padding-sm" ng-click="goTo('/visas')">
-        <i18n>sessions.admin.button.goTo</i18n>
-    </button>
-
-
-</div>
+</article>
 <lightbox show="legendLightboxIsVisible" on-close="setLegendLightboxVisible(false);">
     <container template="infoBulleTemplate"></container>
 </lightbox>

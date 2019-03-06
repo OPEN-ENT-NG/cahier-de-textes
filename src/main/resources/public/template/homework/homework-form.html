@@ -13,17 +13,17 @@
                     ng-options="subject.label for subject in subjects.all track by subject.id">
                 <option value="" disabled selected>[[translate('select.subject')]]</option>
             </select>
-            <span class="text-xl margin-left-md">
-                <span style="color: green;" ng-if="homework.isPublished">(<i18n>published</i18n>)</span>
-                <span style="color: red;" ng-if="!homework.isPublished">(<i18n>draft</i18n>)</span>
-            </span>
         </div>
     </div>
-    <fieldset  class="row card padding-md border-widht-fieldset remove-margin" ng-click="openHomework(homework)"
-               ng-disabled="isSelectSubjectAndAudienceHomework">
+    <fieldset class="row cursorDefault card remove-margin padding-md border-widht-fieldset"
+              ng-disabled="isSelectSubjectAndAudienceHomework">
         <h2 class="remove-margin">
             <span ng-if="!isInsideSessionForm"><i18n>homework</i18n></span>
-            <i class="right-magnet" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
+
+            <span ng-if="!isInsideSessionForm" class="margin-left-md" ng-show="homework.opened">
+                <span style="color: green;" ng-if="homework.isPublished">(<i18n>published</i18n>)</span>
+                <span style="color: red;" ng-if="!homework.isPublished">(<i18n>draft</i18n>)</span>
+                </span>
         </h2>
     </fieldset>
     <div class="row card padding-md" ng-if="homework.opened">
@@ -74,16 +74,6 @@
                         </select>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- Workload -->
-        <div class="row">
-            <label class="cell two twelve-mobile"><i18n>homework.week.workload</i18n></label>
-            <div class="cell twelve-mobile ten">
-                   <span ng-repeat="workload in homework.workloadWeek.all">
-                        <span class="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
-                    [[workload.shortDayString]] [[workload.numDayString]]</span>
-                    </span>
             </div>
         </div>
         <!-- Type -->

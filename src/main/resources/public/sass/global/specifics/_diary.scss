@@ -14,33 +14,40 @@ body {
 .text-center { text-align:center!important; }
 .margin-auto { margin:auto; }
 
+.cursorDefault {
+  cursor: default;
+}
 .min-height-textarea {
   min-height: 60px;
+}
+
+input[type="number"] {
+  min-width: 35px;
 }
 
 .inline-block { display: inline-block; }
 .flex { display: flex; }
 .space-around { justify-content: space-around; }
 
-@media screen and (min-width: 780px) {
-  .content-next-to-the-sidebar {
-    &.nine, &.nine-md {
-      width: 73%;
-      margin-left: 2%;
-    }
-    &.ten, &.ten-lg {
-      width: 81.33333%;
-      margin-left: 2%;
-    }
-  }
+.schedule .days .day .timeslots .timeslot {
+  cursor: default;
 }
 
-.sidebar switch {
-  section .row { margin: 5px 0;}
-  .switch .tick {
-    background: #78daff;
-    &:before {
-      background: #2a9cc8;
+.schedule .days .day.single {
+  width: 100%
+}
+
+.sidebar {
+  margin-right: 20px;
+  switch {
+    section .row {
+      margin: 5px 0;
+    }
+    .switch .tick {
+      background: #78daff;
+      &:before {
+        background: #2a9cc8;
+      }
     }
   }
 }

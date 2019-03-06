@@ -1,42 +1,44 @@
-<div class="sidebar cell twelve">
-    <section id="display-section" class="cell twelve">
+<article class="sidebar ">
+    <section id="display-section" class="twelve">
         <!-- Access External Data -->
-        <div workflow="diary.accessExternalData" class="display-inline-block">
-            <div class="card padding-md margin-bottom-md">
+        <div class="display-inline-block">
+            <p class="remove-margin">
                 <i18n>from</i18n>
                 <date-picker
-                         ng-model="filters.startDate"
-                         ng-change="syncPedagogicItems();"
-                         class="date-picker-sm">
+                        ng-model="filters.startDate"
+                        ng-change="syncSessionsWithVisa();"
+                        class="date-picker-sm remove-margin">
                 </date-picker>
-                <br>
+                <br/>
                 <i18n>to</i18n>
                 <date-picker
-                         ng-model="filters.endDate"
-                         ng-change="syncPedagogicItems();"
-                         class="date-picker-sm">
+                        ng-model="filters.endDate"
+                        ng-change="syncSessionsWithVisa();"
+                        class="date-picker-sm remove-margin">
                 </date-picker>
+            </p>
+            <div workflow="diary.accessExternalData">
+                <label class="cell twelve small">
+                    <select
+                            ng-model="structure"
+                            id="structure-list"
+                            class="twelve"
+                            ng-change="switchStructure(structure)"
+                            ng-options="structure as structure.name for structure in structures.all">
+                        <option value="" disabled selected>
+                            [[translate('utils.structure.choose.one')]]
+                        </option>
+                    </select>
+                </label>
+                <label class="cell twelve small">
+                    <select ng-model="teacher"
+                            class="twelve"
+                            ng-change="syncSessionsWithVisa()"
+                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
+                        <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
+                    </select>
+                </label>
             </div>
-            <label class="cell twelve small">
-                <select
-                        ng-model="structure"
-                        id="structure-list"
-                        class="twelve"
-                        ng-change="switchStructure(structure)"
-                        ng-options="structure as structure.name for structure in structures.all">
-                    <option value="" disabled selected>
-                        [[translate('utils.structure.choose.one')]]
-                    </option>
-                </select>
-            </label>
-            <label class="cell twelve small">
-                <select ng-model="teacher"
-                        class="twelve"
-                        ng-change="syncSessionsWithVisa()"
-                        ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
-                    <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
-                </select>
-            </label>
         </div>
     </section>
-</div>
+</article>

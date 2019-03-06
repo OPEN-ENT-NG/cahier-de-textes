@@ -1,7 +1,7 @@
 <div class="session-form">
     <div class="row">
         <div class="six cell twelve-mobile">
-            <select ng-model="session.audience"
+            <select required ng-model="session.audience"
                     ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
                     ng-disabled="session.courseId && session.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
@@ -17,16 +17,14 @@
         </div>
     </div>
 
-    <fieldset class="row card remove-margin padding-md border-widht-fieldset"
-              ng-click="session.opened = !session.opened"
+    <fieldset class="row cursorDefault card remove-margin padding-md border-widht-fieldset"
               ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
         <h2 class="remove-margin">
             <i18n>session</i18n>
-            <span class="margin-left-md">
+            <span class="margin-left-md" ng-show="session.opened">
                 <span style="color: green;" ng-if="session.isPublished">(<i18n>published.f</i18n>)</span>
                 <span style="color: red;" ng-if="!session.isPublished">(<i18n>draft</i18n>)</span>
                 </span>
-            <i class="right-magnet" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </fieldset>
 
@@ -49,31 +47,33 @@
         </label>
         <div class="one"></div>
         <!-- Date -->
-        <div class="three cell horizontal-spacing twelve-mobile">
+        <div class="five cell horizontal-spacing twelve-mobile">
             <label class="row twelve vertical-spacing">
-                <div class="twelve margin-bottom-md">
+                <div class="twelve">
                     <i18n>date</i18n>
                     *
                 </div>
             </label>
 
             <div class="twelve twelve-mobile">
+                <span class="twelve-mobile">
                 <i18n ng-if="!(session.courseId && session.date)">the</i18n>
                 <label ng-model="session.date" ng-if="session.courseId && session.date">
                     [[transformDateToFrenchDate(session.date) | date:'EEEE dd MMMM yyyy']]
                 </label>
                 <date-picker class="date-picker-sm" ng-if="!(session.courseId && session.date)"
                              ng-model="session.date"></date-picker>
+                </span>
                 <i18n>from2</i18n>
-                <label ng-model="session.startTime"
-                       class="margin-left-sm margin-right-sm"
+                <label ng-model="session.startTime" class="margin-left-sm margin-right-sm"
                        ng-if="session.courseId && session.startTime"  >
                     [[session.startTime | date:'HH:mm']]
                 </label>
                 <input type="time"
                        class="margin-left-sm margin-right-sm"
                        ng-if="!(session.courseId && session.startTime)"
-                       ng-model="session.startTime"/>
+                       ng-model="session.startTime"
+                />
                 <i18n>to2</i18n>
                 <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
                        ng-if="session.courseId && session.endTime">
@@ -86,7 +86,7 @@
             </div>
         </div>
         <!-- Publish -->
-        <label class="three cell horizontal-spacing twelve-mobile">
+        <label class="one cell horizontal-spacing twelve-mobile">
             <div class="twelve margin-bottom-md">
                 <i18n>utils.publish</i18n>
             </div>
@@ -114,7 +114,7 @@
                 <table class="twelve">
                     <thead>
                     <tr>
-                        <td class="one text-left ">
+                        <td class="two text-left ">
                             <i18n>deadline</i18n>
                         </td>
                         <td class="one text-left ">
@@ -122,9 +122,6 @@
                         </td>
                         <td class="eight text-left">
                             <i18n>settings.exclusion.description</i18n>
-                        </td>
-                        <td class="one">
-                            <i18n>homework.workload</i18n>
                         </td>
                         <td class="one">&nbsp;</td>
                     </tr>

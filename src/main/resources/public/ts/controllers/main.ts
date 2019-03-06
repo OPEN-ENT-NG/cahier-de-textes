@@ -713,8 +713,8 @@ export let main = ng.controller('MainController',
             },
             mainView: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.pageInitialized) await  init();
                 template.open('main','main');
-
             },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();

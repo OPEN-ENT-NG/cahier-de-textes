@@ -6,25 +6,24 @@
                 <label class="checkbox">
                     <input type="checkbox"
                            ng-model="allSessionsSelect"
-                           ng-change="allSessionsSelect = !$scope.allSessionsSelect && selectOrUnselectAllSessions(allSessionsSelect)"
-                           ng-disabled="!sessions_GroupBy_AudienceSubject || !sessions_GroupBy_AudienceSubject.length">
+                           ng-change="selectOrUnselectAllSessions(allSessionsSelect)">
                     <span></span>
                 </label>
             </th>
             <!--<th width="20%">-->
             <!--<i18n>utils.teachers</i18n>-->
             <!--</th>-->
-            <th width="10%">
+            <th width="15%">
                 <i18n>utils.groups</i18n>
             </th>
             <th width="20%">
                 <i18n>subject</i18n>
             </th>
-            <th width="15%">
-                <i18n>sessions.admin.nbsessions</i18n>
-            </th>
-            <th width="15%">
+            <th width="13%">
                 <i18n>sessions.admin.lastEditSession</i18n>
+            </th>
+            <th width="12%">
+                <i18n>sessions.admin.nbsessions</i18n>
             </th>
             <th width="15%">
                 <i18n>sessions.admin.lastCreatedVisa</i18n>
@@ -52,18 +51,21 @@
                 [[sessionsGroup[0].subject.label]]
             </td>
             <td>
-                [[sessionsGroup.length]]
+                [[getLastEditSession(sessionsGroup)]]
             </td>
             <td>
-                [[getLastEditSession(sessionsGroup)]]
+                [[sessionsGroup.length]]
             </td>
             <td>
                 [[getLastCreatedVisa(sessionsGroup)]]
             </td>
             <td class="text-center">
-                <i ng-if="getVisas(sessionsGroup).length > 0" ng-click="wantDownloadPdf(sessionsGroup)">&#xe857;</i>&nbsp;
-                <i ng-click="openDetails = openDetails != key ? key : null" ng-show='!openDetails || openDetails==0'>&#xe873;</i>
-                <i ng-click="openDetails = null" ng-show='openDetails'>&#xe904;</i>
+                <i tooltip="<i18n>sessions.admin.icon.dwlPdf</i18n>" ng-if="getVisas(sessionsGroup).length > 0"
+                   ng-click="wantDownloadPdf(sessionsGroup)">&#xe857;</i>&nbsp;
+                <i tooltip="<i18n>sessions.admin.icon.see</i18n>"
+                   ng-click="openDetails = openDetails != key ? key : null" ng-show='!openDetails || openDetails==0'>&#xe873;</i>
+                <i ng-click="openDetails = null"
+                   ng-show='openDetails'>&#xe904;</i>
 
             </td>
         </tr>

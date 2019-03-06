@@ -1,10 +1,9 @@
-import {Behaviours, idiom as lang, model, moment, ng} from 'entcore';
-import {Course, Toast, Session, Subjects, Utils} from '../../model';
+import {Behaviours, model, moment, ng} from 'entcore';
+import {Course, Session, Subjects, Toast} from '../../model';
 import {Homework} from '../../model/homework';
-import {ProgressionHomework} from "../../model/Progression";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
-    ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
+    ['$scope', '$routeParams', '$location', '$attrs', '$filter', async function ($scope, $routeParams, $location, $attrs, $filter) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.isReadOnly = modeIsReadOnly();
@@ -22,7 +21,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.isSelectSubjectAndAudienceSession = false;
                 $scope.session.opened = !$scope.session.opened;
             }
-        }
+        };
+
+        $scope.debut = "09:38";
 
         function modeIsReadOnly() {
             let currentPath = $location.path();
@@ -32,7 +33,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.cancelCreation = () => {
             window.history.back();
         };
-
 
         $scope.$watch(() => $scope.session.audience, () => {
             if ($scope.session.audience)

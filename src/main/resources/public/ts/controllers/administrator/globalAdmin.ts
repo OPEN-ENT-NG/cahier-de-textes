@@ -17,15 +17,32 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
         $scope.filters = {
-            startDate: moment().subtract(1, "years"),
+            startDate: moment(),
             endDate: moment()
+        };
+        //Set default date 09-01 to 07-15 of current school year
+        if (parseInt($scope.filters.startDate.format('MM')) < 9) {
+            $scope.filters.startDate = $scope.filters.startDate.date(1).month(8).subtract(1, "years");
+            $scope.filters.endDate = $scope.filters.endDate.date(15).month(6);
+        }
+        else {
+            $scope.filters.startDate = $scope.filters.startDate.date(1).month(8);
+            $scope.filters.endDate = $scope.filters.endDate.date(15).month(6).add(1, "years");
         }
 
         /**
          * Init de la vue ***
          */
         $scope.syncSessionsWithVisa = async () => {
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacher.id);
+            let teacherId;
+            if (model.me.type == "ENSEIGNANT") {
+                teacherId = model.me.userId;
+            }
+            else {
+                teacherId = $scope.teacher.id;
+            }
+
+            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, teacherId);
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => h.isInsideDiary = true);
@@ -35,9 +52,12 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
                 $scope.selectedSessions[key] = false;
             });
+            $scope.allSessionsSelect = false;
             $scope.safeApply();
         };
-
+        if (model.me.type == "ENSEIGNANT") {
+            $scope.syncSessionsWithVisa();
+        }
 
         /**
          *   Actions de la vue *****
@@ -122,13 +142,15 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .value();
         };
 
-        $scope.selectOrUnselectAllSessions = function (targetValue: boolean) {
+        $scope.selectOrUnselectAllSessions = function () {
+            let targetValue = $scope.allSessionsSelect;
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = targetValue;
             });
             $scope.safeApply();
         };
         $scope.unselectAllSessions = function () {
+            $scope.allSessionsSelect = false;
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = false;
             });
@@ -224,7 +246,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.closeVisaCreateBox();
                 $scope.safeApply();
                 $scope.toastHttpCall(response);
-                $scope.selectOrUnselectAllSessions(false);
+                $scope.selectOrUnselectAllSessions();
                 $scope.updateOptionToaster();
                 $scope.syncSessionsWithVisa();
             });
@@ -257,7 +279,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             let canvasPdf = createPDF(canvasData);
             Utils.startBlobDownload(canvasPdf.pdfBlob, lang.translate("visa.manage.pdfName") + " - " + Utils.getDisplayDateTime(moment()));
             $scope.printPdf.loading = false;
-            $scope.selectOrUnselectAllSessions(false);
+            $scope.selectOrUnselectAllSessions();
             $scope.updateOptionToaster();
             $scope.syncSessionsWithVisa();
         };

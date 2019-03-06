@@ -109,9 +109,6 @@
     <p class="twelve" ng-bind-html="[[homework.description]]"></p>
 </td>
 
-<td ng-if="!homework.opened" class="1 vertical-align-top full-td-width text-left">
-    <p class="twelve"  >[[homework.estimatedTime]]</p>
-</td>
 <!-- Button part -->
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!homework.opened" ng-click="$parent.openHomework(homework)">&#xe858;</i>
