@@ -31,54 +31,48 @@
             <table class="twelve">
                 <thead>
                 <tr>
-                    <th class="one text-left">
-                        <i18n>&nbsp</i18n>
+                    <th >
+
                     </th>
-                    <th class="one text-left" ng-click="changeSortType('title')">
-                        <i ng-if="sort.progression === 'title' " ng-class="sort.reverse ? 'up-open' : 'down-open'"
-                           class="left-magnet"></i>
+                    <th class="six text-left" ng-click="changeSortType('title')">
+                        <!--<i ng-if="sort.progression === 'title' " ng-class="sort.reverse ? 'up-open' : 'down-open'"-->
+                           <!--class="left-magnet"></i>-->
 
                         <i18n>title</i18n>
 
                     </th>
-                    <th class="one text-left" ng-click="changeSortType('class')">
-                        <i ng-if="sort.progression === 'class' " ng-class="sort.reverse ? 'up-open' : 'down-open'"
-                           class="left-magnet"></i>
-                        <i18n>progression.niveau</i18n>
+                    <th class="two text-left" ng-click="changeSortType('class')">
+                           <i18n>progression.niveau</i18n>
                     </th>
 
-                    <th class="one text-left" ng-click="changeSortType('subject.label')">
-                        <i ng-if="sort.progression === 'subject.label' "
-                           ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
+                    <th class="two text-left" ng-click="changeSortType('subject.label')">
                         <i18n>subject</i18n>
                     </th>
-                    <th class="five text-left" ng-click="changeSortType('progression_homeworks.length')">
-                        <i ng-if="sort.progression === 'progression_homeworks.length' "
-                           ng-class="sort.reverse ? 'up-open' : 'down-open'" class="left-magnet"></i>
-                        <i18n>homeworks.attached</i18n>
+                    <th class="two text-left" ng-click="changeSortType('progression_homeworks.length')">
+                         <i18n>homeworks.attached</i18n>
                     </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="progression_session in progressionsToDisplay.all |  orderBy: sort.progression : sort.reverse  ">
-                    <td class="one text-left">
+                    <td class="text-left">
                         <label class="checkbox">
                             <input type="checkbox" ng-model="progression_session.selected" ng-change="safeApply()">
                             <span></span>
                         </label>
                     </td>
 
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="four text-left">
                         [[progression_session.title]]
                     </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-left">
                         [[progression_session.class]]
                     </td>
 
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="one text-left">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-left">
                         [[progression_session.subject.label]]
                     </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="five text-left">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-right">
                         [[progression_session.progression_homeworks.length]]
                     </td>
                 </tr>
