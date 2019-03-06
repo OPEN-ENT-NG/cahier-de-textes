@@ -605,7 +605,7 @@ export let main = ng.controller('MainController',
             session.setFromCourseAndSession(course,sessionDrag)
             session.opened = true;
             //await session.save();
-            await sessionDrag.duplicateHomework(session);
+        //    await sessionDrag.duplicateHomework(session);
             $scope.session = session;
            // $scope.syncPedagogicItems();
 
