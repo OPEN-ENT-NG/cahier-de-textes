@@ -16,9 +16,6 @@ import {ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
     ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
-
-
-
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = model.calendar;
         $scope.notifications = [];
@@ -605,11 +602,11 @@ export let main = ng.controller('MainController',
             session.setFromCourseAndSession(course,sessionDrag)
             session.opened = true;
             //await session.save();
-        //    await sessionDrag.duplicateHomework(session);
+            //    await sessionDrag.duplicateHomework(session);
             $scope.session = session;
-           // $scope.syncPedagogicItems();
+            // $scope.syncPedagogicItems();
 
-           // $scope.safeApply();
+            // $scope.safeApply();
             $scope.goTo('/session/create' );
 
 
@@ -672,21 +669,21 @@ export let main = ng.controller('MainController',
             session.setFromCourse(course);
             session.opened = true;
             $scope.session = session;
-             progressionDragged.progression_homeworks.map(
-                 ph => {
-                     let homework = new Homework($scope.structure)
-                     homework.estimatedTime = ph.estimatedTime;
-                     homework.description = ph.description;
-                     homework.subject = ph.subject;
-                     homework.type = ph.type;
-                     session.homeworks.push(homework);
+            progressionDragged.progression_homeworks.map(
+                ph => {
+                    let homework = new Homework($scope.structure)
+                    homework.estimatedTime = ph.estimatedTime;
+                    homework.description = ph.description;
+                    homework.subject = ph.subject;
+                    homework.type = ph.type;
+                    session.homeworks.push(homework);
 
-                 }
-             );
+                }
+            );
             //await session.save();
-          //  await progressionDragged.toSession(session.id);
+            //  await progressionDragged.toSession(session.id);
             //await session.sync();
-             $scope.syncPedagogicItems();
+            $scope.syncPedagogicItems();
             $scope.safeApply();
             $scope.goTo('/session/create');
 

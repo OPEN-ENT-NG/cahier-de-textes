@@ -1,0 +1,46 @@
+<div ng-controller="ManageCalendarTooltip">
+    <div ng-if="test(item)">
+        <article class="tooltip-course " >
+            <div class="header cell twelve ellipsis [[item.color]]">[[item.title]]</div>
+            <div>
+        <span>
+            [[item.startDisplayTime]] - [[item.endDisplayTime]]
+        </span>
+
+            </div>
+            <em class="metadata">
+                <span > [[item.audience.name]]</span>
+            </em>
+            <div>
+       <span >
+               <span ng-if="room !== null && room !=''">
+                   <i18n>utils.room</i18n>: [[item.room]]
+               </span>
+           </span>
+            </div>
+            <div ng-if="item.homeworks.length && item.homeworks.length > 0">
+                [[item.homeworks.length]] <i18n>homeworks</i18n>
+            </div>
+
+
+            <!-- COURSES -->
+            <!--<div ng-if="!test(item)">-->
+            <!--<div>-->
+            <!--<span ng-repeat="teacher in item.teachers">[[teacher.displayName]] </span>-->
+            <!--</div>-->
+            <!--<em class="metadata">-->
+            <!--<span ng-repeat="className in item.classes">[[className]]</span>-->
+            <!--<span ng-repeat="groupName in item.groups">[[groupName]]</span>-->
+            <!--</em>-->
+            <!--<div>-->
+            <!--<span ng-repeat="roomLabel in item.roomLabels">-->
+            <!--<span ng-if="roomLabel !== null && roomLabel !=''">-->
+            <!--<i18n>edt.utils.room</i18n>: [[roomLabel]]-->
+            <!--</span>-->
+            <!--</span>-->
+            <!--</div>-->
+            <!--</div>-->
+        </article>
+    </div>
+
+</div>

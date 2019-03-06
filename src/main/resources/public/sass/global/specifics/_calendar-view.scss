@@ -193,3 +193,19 @@ i.homework::before {
 .timeslot {
   cursor: default;
 }
+
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tooltip-course {
+  padding: 11px;
+  text-align: center;
+  .header {
+    color: white;
+    border-radius: 9px;
+    padding: 1px 6px;
+  }
+}
