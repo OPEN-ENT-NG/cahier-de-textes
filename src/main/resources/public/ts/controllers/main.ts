@@ -305,24 +305,13 @@ export let main = ng.controller('MainController',
 
 
         function containsSession(c: any) {
-            let hasOneSession = false;
-            c.pedagogicItems.map(p =>{
-                if( p instanceof Session)
-                    hasOneSession = true;
-            });
-            return hasOneSession;
+            return c.nbSession != 0;
+
         }
 
         function containsHomeworks(c: any) {
-            let hasOneHomework = false;
-            c.pedagogicItems.map(p =>{
-                if( p instanceof Homework)
-                    hasOneHomework = true;
-                else if(p instanceof Session){
-                    hasOneHomework =  p.homeworks  && p.homeworks.length > 0 ;
-                }
-            });
-            return hasOneHomework;
+
+            return c.nbHomework != 0;
         }
 
         $scope.initDisplay = () =>{
@@ -339,11 +328,11 @@ export let main = ng.controller('MainController',
             //display session
             $scope.pedagogicDays.map(c =>{
                 containsSession(c) ;
-                if( containsSession(c)  && nbSessionDisplayed < displayedNumberSession ) {
+                if( containsSession(c)  && nbSessionDisplayed < 3 ) {
                     c.displayed = true;
                     nbSessionDisplayed++;
                 }
-                if(containsHomeworks(c)  && nbHomeworkDisplayed < displayedNumberHomework ) {
+                if(containsHomeworks(c)  && nbHomeworkDisplayed < 3 ) {
                     c.displayed = true;
                     nbHomeworkDisplayed++;
                 }
