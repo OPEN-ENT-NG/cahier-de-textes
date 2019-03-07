@@ -102,7 +102,7 @@
         <i18n>visa.manage.title</i18n>
     </h3>
     <div ng-repeat="visa_pdf in visas_pdfChoice | orderBy: 'moment':true">
-        <p ng-click="visa_pdf.downloadPdf(visa_pdf.visa_id)">
+        <p ng-click="visa_pdf.downloadPdf()">
             <i>&#xe857;</i>&nbsp;
             <i18n>visa.manage.choosePdf</i18n>&nbsp;
             [[visa_pdf.displayDate]]

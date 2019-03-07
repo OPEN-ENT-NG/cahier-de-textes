@@ -1,4 +1,4 @@
-import {moment} from 'entcore';
+import {idiom as lang, moment} from 'entcore';
 import http from 'axios';
 import {Structure, Teacher, Utils} from './index';
 
@@ -45,7 +45,12 @@ export class Visa {
     }
 
     async downloadPdf(): Promise<void> {
-        window.location.href = `/diary/visa/${this.id}/pdf`;
+        let response = await http({
+            url: `/diary/visa/${this.id}/pdf`,
+            method: "GET",
+            responseType: "blob"
+        });
+        Utils.startBlobDownload(response.data, lang.translate("visa.manage.choosePdf") + " " + this.displayDate + ".pdf");
     }
 
     static async uploadVisaPdf(canvasData, $scope) {

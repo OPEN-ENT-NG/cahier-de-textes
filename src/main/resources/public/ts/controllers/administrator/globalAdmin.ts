@@ -147,6 +147,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = targetValue;
             });
+            $scope.updateOptionToaster();
             $scope.safeApply();
         };
         $scope.unselectAllSessions = function () {
@@ -154,6 +155,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = false;
             });
+            $scope.updateOptionToaster();
             $scope.safeApply();
         };
 
