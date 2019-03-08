@@ -201,11 +201,13 @@ i.homework::before {
 }
 
 .tooltip-course {
-  padding: 11px;
-  text-align: center;
+  max-width: 400px;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: left;
+  display: block;
   .header {
     color: white;
-    border-radius: 9px;
     padding: 1px 6px;
   }
 }

@@ -2,24 +2,22 @@
     <div ng-if="test(item)">
         <article class="tooltip-course " >
             <div class="header cell twelve ellipsis [[item.color]]">[[item.title]]</div>
-            <div>
-        <span>
-            [[item.startDisplayTime]] - [[item.endDisplayTime]]
-        </span>
+                <h2>
+                   [[item.startDisplayTime]] - [[item.endDisplayTime]] ([[item.startDisplayDate]])
+                </h2>
 
-            </div>
             <em class="metadata">
                 <span > [[item.audience.name]]</span>
             </em>
             <div>
-       <span >
-               <span ng-if="room !== null && room !=''">
+            <span>
+               <span ng-if="item.room !== null && item.room !=''">
                    <i18n>utils.room</i18n>: [[item.room]]
                </span>
            </span>
             </div>
             <div ng-if="item.homeworks.length && item.homeworks.length > 0">
-                [[item.homeworks.length]] <i18n>homeworks</i18n>
+               <i>&#xe80d;</i> [[item.homeworks.length]] <i18n>homeworks</i18n>
             </div>
 
 
