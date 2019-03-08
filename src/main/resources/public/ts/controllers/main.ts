@@ -679,6 +679,9 @@ export let main = ng.controller('MainController',
 
 
         };
+        $scope.hasListRight = () =>{
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
+        }
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
@@ -720,8 +723,9 @@ export let main = ng.controller('MainController',
             manageList: async()=>{
                 if(!$scope.structureInitialized) await initializeStructure();
                 if(!$scope.pageInitialized) await  init();
-                template.open('main','list/list-view');
-
+                if(model.me.hasWorkflow(WORKFLOW_RIGHTS.listView)) {
+                    template.open('main', 'list/list-view');
+                }
             }
         });
 
