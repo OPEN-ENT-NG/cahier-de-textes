@@ -279,14 +279,15 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      */
     private JsonObject getHomeworkCreationStatement(Number id, JsonObject homework) {
         String query = "INSERT INTO diary.progression_homework ( progression_session_id , subject_id, description, owner_id, type_id, estimatedTime ) " +
-                "values ( ?, ?, ?, ?, ?)";
+                "values ( ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
                 .add(homework.getString("subject_id"))
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
+                .add(homework.getInteger("type_id"))
                 .add(homework.getInteger("estimatedTime"))
-                .add(homework.getInteger("type_id"));
+                ;
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params)
