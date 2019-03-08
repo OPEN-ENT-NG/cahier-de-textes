@@ -1,29 +1,29 @@
 <article class="sidebar ">
     <section id="display-section" class="twelve">
+        <div ng-if="hasListRight()">
+            <div>
+                <h5 class="large cell eleven">
+                    <i18n>sidebar.display_mode</i18n>
+                </h5>
+                <!-- Legend -->
+                <i class="large help one cell margin-top-Botton-md" ng-if="!display.listView"
+                   tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+            </div>
 
-        <div>
-            <h5 class="large cell eleven">
-                <i18n>sidebar.display_mode</i18n>
-            </h5>
-            <!-- Legend -->
-            <i class="large help one cell margin-top-Botton-md" ng-if="!display.listView"
-               tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+            <label class="cell twelve text-xl margin-bottom-md">
+                <i tooltip="calendar"
+                   class="margin-sm"
+                   ng-class="display.listView ? 'opacity-icon' : 'selected'"
+                   ng-click="changeViewCalendar()">&#xe8b3;</i>
+                <i tooltip="list"
+                   class="margin-sm"
+                   ng-class="display.listView ? 'selected' : 'opacity-icon'"
+                   ng-click="changeViewList()"
+                   ng-model="display.listView">&#xe8b8;</i>
+
+            </label>
+
         </div>
-
-        <label class="cell twelve text-xl margin-bottom-md">
-            <i tooltip="calendar"
-               class="margin-sm"
-               ng-class="display.listView ? 'opacity-icon' : 'selected'"
-               ng-click="changeViewCalendar()">&#xe8b3;</i>
-            <i tooltip="list"
-               class="margin-sm"
-               ng-class="display.listView ? 'selected' : 'opacity-icon'"
-               ng-click="changeViewList()"
-               ng-model="display.listView">&#xe8b8;</i>
-
-        </label>
-
-
         <!--<div class="row margin-bottom-md" ng-if="display.listView">-->
         <!--<i18n>period.from</i18n>-->
         <!--<date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"-->
