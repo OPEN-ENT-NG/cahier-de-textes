@@ -25,7 +25,9 @@
                 <span style="color: red;" ng-if="!homework.isPublished">(<i18n>draft</i18n>)</span>
                 </span>
         </h2>
+
     </fieldset>
+
     <div class="row card padding-md" ng-if="homework.opened">
         <!-- Deadline -->
         <div class="row">
@@ -73,6 +75,7 @@
                                 session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
                         </select>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -86,6 +89,18 @@
                         ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
                 </select>
             </div>
+        </div>
+
+        <div class="row form-row">
+
+                <label  class="cell two twelve-mobile">
+                    <i18n>homework.workload</i18n>:
+
+
+                </label>
+            <span class="cell ten twelve-mobile">
+                         <input  ng-model="homework.estimatedTime" type="number" class="width-10">   <i18n>minutes</i18n>
+            </span>
         </div>
         <!-- Publish -->
         <div class="row form-row">

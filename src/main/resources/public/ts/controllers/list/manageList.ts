@@ -70,7 +70,6 @@ export let manageListCtrl = ng.controller('manageListController',
             }
             $scope.safeApply();
         };
-        console.log(  $scope.pedagogicItems);
         $scope.changeViewCalendar = function () {
             $scope.goTo('/view');
             $scope.display.listView = false;
