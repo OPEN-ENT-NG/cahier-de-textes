@@ -17,6 +17,11 @@ body {
 .cursorDefault {
   cursor: default;
 }
+
+.cursorPointer {
+  cursor: pointer;
+}
+
 .min-height-textarea {
   min-height: 60px;
 }
@@ -24,7 +29,6 @@ body {
 input[type="number"] {
   min-width: 35px;
 }
-
 .inline-block { display: inline-block; }
 .flex { display: flex; }
 .space-around { justify-content: space-around; }

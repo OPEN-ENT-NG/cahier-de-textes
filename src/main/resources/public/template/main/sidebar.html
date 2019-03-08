@@ -36,14 +36,12 @@
 
         <div class="row margin-bottom-md" ng-show="display.listView">
 
-            <label>
-                <input type="radio" ng-model="display.sessionList" ng-value="true"
-                       ng-click="">
+            <label class="cursorPointer">
+                <input type="radio" ng-model="display.sessionList" ng-value="true">
                 <i18n>session</i18n>
             </label><br/>
-            <label>
-                <input type="radio" ng-model="display.sessionList" ng-value="false"
-                       ng-click="">
+            <label class="cursorPointer">
+                <input type="radio" ng-model="display.sessionList" ng-value="false">
                 <i18n>homeworks</i18n>
             </label>  <i ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter" ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
             <div class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
