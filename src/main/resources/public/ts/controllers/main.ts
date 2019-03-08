@@ -514,7 +514,8 @@ export let main = ng.controller('MainController',
 
 //handle the drop event
         $scope.dropped = function(dragEl, dropEl) {
-
+            if (dragEl == dropEl)
+                return;
             // this is your application logic, do whatever makes sense
             let progression = $( '#'+dragEl );
             let id_progressionOrSession = progression[0].children[0].textContent;
@@ -544,7 +545,6 @@ export let main = ng.controller('MainController',
          */
         $scope.sessionToSession = async (idSessionDrag , idSessionDrop) =>{
             let sessionDrag,sessionDrop;
-            console.log("sessionToSession");
             $scope.calendarItems.map(async session => {
                 if (session.id == idSessionDrag) {
                     sessionDrag = session;

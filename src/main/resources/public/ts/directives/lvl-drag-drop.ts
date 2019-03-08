@@ -1,5 +1,4 @@
-import { angular,ng } from 'entcore';
-
+import {angular, ng} from 'entcore';
 
 
 export const lvlDraggable = ng.directive('lvlDraggable', ['$rootScope', 'uuidDrag', function ($rootScope, uuid) {
@@ -16,7 +15,6 @@ export const lvlDraggable = ng.directive('lvlDraggable', ['$rootScope', 'uuidDra
             }
             el.bind("dragstart", function (e) {
                 e.originalEvent.dataTransfer.setData('text', id);
-                console.log('drag');
                 $rootScope.$emit("LVL-DRAG-START");
             });
 
