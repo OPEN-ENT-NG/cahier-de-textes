@@ -106,14 +106,14 @@
             <editor ng-model="session.description"></editor>
         </div>
 
-        <div class="padding-md margin-bottom-md">
+        <div ng-if="session.homeworks.length > 0" class="padding-md margin-bottom-md">
             <h2>
                 <i18n>homeworks</i18n>
             </h2>
             <article class="responsive-table row">
                 <table class="twelve">
                     <thead>
-                    <tr>
+                    <tr ng-if="session.homeworks.length && !session.homeworks[0].opened">
                         <td class="two text-left ">
                             <i18n>deadline</i18n>
                         </td>
@@ -122,6 +122,18 @@
                         </td>
                         <td class="eight text-left">
                             <i18n>settings.exclusion.description</i18n>
+                        </td>
+                        <td class="one">&nbsp;</td>
+                    </tr>
+                    <tr ng-if="session.homeworks.length && session.homeworks.length > 0 && session.homeworks[0].opened">
+                        <td class="two text-left ">
+
+                        </td>
+                        <td class="one text-left ">
+                            <i18n>settings.exclusion.description</i18n>
+                        </td>
+                        <td class="eight text-left">
+
                         </td>
                         <td class="one">&nbsp;</td>
                     </tr>
@@ -148,6 +160,16 @@
             </article>
 
         </div>
+
+        <div ng-if="session.homeworks.length < 1" class="padding-md margin-bottom-md">
+            <button ng-show="!validate"
+                    class="float-none display-inline-block margin-top-md"
+                    ng-click="addHomework()">
+                <i18n>homework.manage.create</i18n>
+            </button>
+        </div>
+
+
     </div>
 
 </div>
