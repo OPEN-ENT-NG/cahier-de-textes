@@ -100,20 +100,25 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         function clearDublicateSessions(sessionsToAttachTo){
             sessionsToAttachTo.map(s => {
-                if(!(s instanceof Session)){
-                    sessionsToAttachTo.splice( sessionsToAttachTo.indexOf(s),1);
+                if (!(s instanceof Session)) {
+                    sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(s), 1);
                     $scope.homework.session = $scope.sessionsToAttachTo[0];
 
                 }
-                if(s && s.id === $scope.session.id){
+                if ($scope.session.id && s && s.id === $scope.session.id) {
                     s.firstText = lang.translate("session.manage.linkhomework");
                 }
-                if(s)
-                    sessionsToAttachTo.map( ss => {
-                        if( s.id === ss.id  && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0){
-                                sessionsToAttachTo.splice( sessionsToAttachTo.indexOf(ss),1);
-                            }
+                if (s) {
+                    sessionsToAttachTo.map(ss => {
+                        if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
+                            sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
+                        }
                     })
+                    if(!s.id && !$scope.session.id && s.date  == $scope.session.date){
+                        s.firstText = lang.translate("session.manage.linkhomework");
+                    }
+                }
+
             })
 
         }
