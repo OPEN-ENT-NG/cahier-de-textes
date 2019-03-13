@@ -100,17 +100,22 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         function clearDublicateSessions(sessionsToAttachTo){
             sessionsToAttachTo.map(s => {
-                if(s.id === $scope.session.id){
+                if(!(s instanceof Session)){
+                    sessionsToAttachTo.splice( sessionsToAttachTo.indexOf(s),1);
+                    $scope.homework.session = $scope.sessionsToAttachTo[0];
+
+                }
+                if(s && s.id === $scope.session.id){
                     s.firstText = lang.translate("session.manage.linkhomework");
                 }
-                sessionsToAttachTo.map( ss => {
-                    if( s.id === ss.id  && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0){
-                        sessionsToAttachTo.splice( sessionsToAttachTo.indexOf(ss),1);
-
-                    }
-
-                })
+                if(s)
+                    sessionsToAttachTo.map( ss => {
+                        if( s.id === ss.id  && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0){
+                                sessionsToAttachTo.splice( sessionsToAttachTo.indexOf(ss),1);
+                            }
+                    })
             })
+
         }
 
         $scope.attachToSession = () => {
@@ -123,7 +128,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
             clearDublicateSessions($scope.sessionsToAttachTo);
 
-            if ($scope.sessionsToAttachTo.length < 1 && $scope.isInsideSessionForm) {
+            //If only one session or no session then push the current one
+            if ($scope.sessionsToAttachTo && $scope.sessionsToAttachTo.length < 1 && $scope.isInsideSessionForm) {
 
                 $scope.homework.session = $scope.session;
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
@@ -132,12 +138,20 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
             else if ($scope.sessionsToAttachTo.length == 1 ) {
                 $scope.homework.session = $scope.sessionsToAttachTo[0];
-            } else if ($scope.sessionsToAttachTo.length > 1) {
-                if( $scope.homework.dueDate)
-                    $scope.homework.session = $scope.sessionsToAttachTo[0];
-                else
-                    $scope.homework.session = $scope.sessionsToAttachTo[1];
             }
+            else if ($scope.sessionsToAttachTo.length > 1) {
+                $scope.homework.session = $scope.sessionsToAttachTo[1];
+                // if( $scope.homework.dueDate) {
+                //     $scope.homework.session = $scope.sessionsToAttachTo[0];
+                // }
+                // else {
+                //     $scope.homework.session = $scope.sessionsToAttachTo[1];
+                // }
+            }
+            // if($scope.sessionsToAttachTo.length > 0) {
+            //     $scope.homework.session = $scope.sessionsToAttachTo[0];
+            //     $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
+            // }
             else {
                 $scope.homework.session = undefined;
                 $scope.attachToDate();
