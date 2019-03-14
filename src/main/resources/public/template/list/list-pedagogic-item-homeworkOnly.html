@@ -7,11 +7,11 @@
             <!-- Subject, Audience and Teacher-->
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                <span class="bold">
-                    [[pedagogicItem.subject.label]] &nbsp;
+                <span>
+                    <b>[[pedagogicItem.subject.label]] &nbsp;</b>
                 </span>
-                <span class="bold">
-                    [[pedagogicItem.audience.name]] &nbsp;
+                <span>
+                    <b>[[pedagogicItem.audience.name]] &nbsp;</b>
                 </span>
                 <span>
                     [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]

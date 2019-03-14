@@ -1,11 +1,10 @@
 <div class="session-view">
     <div class="row margin-bottom-md" ng-if="!session.isInsideDiary">
-        <span class="color-bloc" ng-style="{'background-color': session.color}"></span> &nbsp;
         <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.firstName]] [[session.teacher.lastName]]</b>
     </div>
     <div class="row card padding-md" ng-click="session.opened = !session.opened">
         <h2 class="remove-margin">
-            <i18n>session</i18n> - [[session.title]]
+            [[session.title]]
             <i class="right-magnet" ng-if="!session.isInsideDiary" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </div>
