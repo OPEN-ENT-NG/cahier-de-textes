@@ -1,108 +1,24 @@
-<div id="crumbs">
-    <ul class="remove-padding">
-        <a href="#" ng-click="goTo('/view')">
-            <i18n><span><li>diary.title</li></span></i18n>
-        </a>&nbsp;>&nbsp;
-        <a href="#" ng-click="goTo('/progressions/view')">
-            <i18n><span><li>progression.title</li></span></i18n>
-        </a>&nbsp;>&nbsp;
-        <i18n><span><li>progression.creation</li></span></i18n>
-    </ul>
-</div>
+<div ng-controller="manageProgessionCtrl">
 
-<h1>
-    <i18n><span class="no-style ng-scope">progression.add.title</span></i18n>
-</h1>
+    <div id="crumbs">
+        <ul class="remove-padding">
+            <a href="#" ng-click="goTo('/view')">
+                <i18n><span><li>diary.title</li></span></i18n>
+            </a>&nbsp;>&nbsp;
+            <a href="#" ng-click="goTo('/progressions/view')">
+                <i18n><span><li>progression.title</li></span></i18n>
+            </a>&nbsp;>&nbsp;
+            <i18n><span><li>progression.creation</li></span></i18n>
+        </ul>
+    </div>
 
-<div class="progression_session-form" ng-controller="manageProgessionCtrl">
-
-    <div class="twelve cell twelve-mobile">
-        <div class="row card padding-md margin-bottom-lg">
-            <div class="row">
-                <!-- Subject -->
-                <label class="three cell horizontal-spacing twelve-mobile">
-                    <div class="twelve">
-                        <i18n>subject</i18n>
-                    </div>
-                    <span class="cell twelve-mobile">
-                        <i18n class="twelve" ng-if="!progression_session.subject">select.subject</i18n>
-                        <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
-                                ng-disabled="progression_session.courseId && progression_session.subject"
-                                ng-options="subject.label for subject in subjects.all track by subject.id">
-                            <option value="" disabled selected>[[translate('select.subject')]]</option>
-                        </select>
-                    </span>
-                </label>
-                <!-- Title -->
-                <label class="four cell horizontal-spacing twelve-mobile">
-                    <div class="twelve">
-                        <i18n>title</i18n>
-                        *
-                    </div>
-                    <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.title"/>
-                </label>
-                <!-- Class/Group -->
-                <label class="four cell horizontal-spacing twelve-mobile">
-                    <div class="twelve">
-                        <i18n>progression.niveau</i18n>
-                    </div>
-                    <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.class"/>
-                </label>
-            </div>
-
-            <!-- Description-->
-            <div class="row twelve vertical-spacing">
-                <span class="twelve margin-20">
-                    <i18n>utils.description</i18n>
-                </span>
-                <editor ng-model="progression_session.description"></editor>
-            </div>
-
-            <div class="padding-md margin-bottom-md">
-                <h2>
-                    <i18n>homeworks</i18n>
-                </h2>
-                <article class="responsive-table row">
-                    <table class="twelve">
-                        <thead>
-                        <tr>
-                            <td class="one text-left">
-                                <i18n>homework.manage.type</i18n>
-                            </td>
-
-                            <td class="eight text-left">
-                                <i18n>settings.exclusion.description</i18n>
-                            </td>
-
-                            <td class="one">&nbsp;</td>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
-                            inside-session-form="true"
-                            class="ng-scope"
-                            static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
-                        </tbody>
-                    </table>
-                    <button ng-show="!validate"
-                            class="float-none display-inline-block margin-top-md"
-                            ng-click="addProgressionHomework()">
-                        <i18n>homework.manage.create</i18n>
-                    </button>
-
-                    <button ng-show="validate"
-                            class="float-none display-inline-block margin-top-md"
-                            ng-disabled="!areValidHomeworks()"
-                            ng-click="newProgressionHomework()">
-                        <i18n>validate</i18n>
-                    </button>
-
-                </article>
-
-            </div>
+    <div class="row">
+        <div class="six cell twelve-mobile">
+            <h1>
+                <i18n><span class="no-style ng-scope">progression.add.title</span></i18n>
+            </h1>
         </div>
-
-        <div class="row text-right">
+        <div class="six cell zero-mobile text-right zero-mobile">
             <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
                 <i18n>utils.cancel</i18n>
             </button>
@@ -110,6 +26,107 @@
                     type="button"  ng-click="validProgressionsSessionForm()">
                 <i18n>utils.save</i18n>
             </button>
+        </div>
+    </div>
+
+    <div class="progression_session-form">
+
+        <div class="twelve cell twelve-mobile">
+
+            <div class="row card padding-md margin-bottom-lg">
+                <div class="row">
+                    <!-- Subject -->
+                    <label class="three cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>subject</i18n>
+                        </div>
+                        <span class="cell twelve-mobile">
+                        <i18n class="twelve" ng-if="!progression_session.subject">select.subject</i18n>
+                        <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
+                                ng-disabled="progression_session.courseId && progression_session.subject"
+                                ng-options="subject.label for subject in subjects.all track by subject.id">
+                            <option value="" disabled selected>[[translate('select.subject')]]</option>
+                        </select>
+                    </span>
+                    </label>
+                    <!-- Title -->
+                    <label class="four cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>title</i18n>
+                            *
+                        </div>
+                        <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.title"/>
+                    </label>
+                    <!-- Class/Group -->
+                    <label class="four cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>progression.niveau</i18n>
+                        </div>
+                        <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.class"/>
+                    </label>
+                </div>
+
+                <!-- Description-->
+                <div class="row twelve vertical-spacing">
+                <span class="twelve margin-20">
+                    <i18n>utils.description</i18n>
+                </span>
+                    <editor ng-model="progression_session.description"></editor>
+                </div>
+
+                <div class="padding-md margin-bottom-md">
+                    <h2>
+                        <i18n>homeworks</i18n>
+                    </h2>
+                    <article class="responsive-table row">
+                        <table class="twelve">
+                            <thead>
+                            <tr>
+                                <td class="one text-left">
+                                    <i18n>homework.manage.type</i18n>
+                                </td>
+
+                                <td class="eight text-left">
+                                    <i18n>settings.exclusion.description</i18n>
+                                </td>
+
+                                <td class="one">&nbsp;</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
+                                inside-session-form="true"
+                                class="ng-scope"
+                                static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
+                            </tbody>
+                        </table>
+                        <button ng-show="!validate"
+                                class="float-none display-inline-block margin-top-md"
+                                ng-click="addProgressionHomework()">
+                            <i18n>homework.manage.create</i18n>
+                        </button>
+
+                        <button ng-show="validate"
+                                class="float-none display-inline-block margin-top-md"
+                                ng-disabled="!areValidHomeworks()"
+                                ng-click="newProgressionHomework()">
+                            <i18n>validate</i18n>
+                        </button>
+
+                    </article>
+
+                </div>
+            </div>
+
+            <div class="row text-right">
+                <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
+                    <i18n>utils.cancel</i18n>
+                </button>
+                <button class="float-none display-inline-block" ng-disabled="!progression_session.isValidForm()"
+                        type="button"  ng-click="validProgressionsSessionForm()">
+                    <i18n>utils.save</i18n>
+                </button>
+            </div>
         </div>
 
     </div>
