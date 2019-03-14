@@ -4,8 +4,7 @@
     </div>
 
     <article class="row padding-md" ng-click="homework.opened = !homework.opened">
-        <h2 class="eight cell remove-margin">
-            <i18n>homework</i18n> -
+        <h2 class="two cell remove-margin">
             <span>[[homework.type.label]]</span>
             <span ng-if="!homework.isInsideDiary">-
                 <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
@@ -18,15 +17,15 @@
             <i  ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
 
-        <div workflow="diary.setProgressHomework"  class="three cell twelve-mobile" ng-click="$event.stopPropagation();">
+        <div workflow="diary.setProgressHomework"  class="three cell twelve-mobile margin-top-sm" ng-click="$event.stopPropagation();">
             <!--<switch ng-show="!homework.isDone" ng-model="homework.isDone" ng-click="setHomeworkProgress(homework)" ></switch>-->
 
-            <label  class="six cell twelve-mobile">
-                <div ng-show="homework.isDone" class="six margin-bottom-md">
+            <label class="cell horizontal-spacing twelve-mobile">
+                <div ng-show="homework.isDone" class="six">
                     <i18n style="color:green;">done</i18n>
 
                 </div>
-                <div ng-show="!homework.isDone" class="twelve margin-bottom-md">
+                <div ng-show="!homework.isDone" class="twelve">
                     <i18n style="color:red;">todo</i18n>
 
                 </div>

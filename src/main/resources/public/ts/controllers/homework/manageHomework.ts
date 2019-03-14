@@ -20,6 +20,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.isInsideSessionForm = false;
         $scope.isSelectSubjectAndAudienceHomework = true;
         $scope.validate = false;
+        $scope.homework.opened = true;
 
         $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
             if(!audience || !subject){
