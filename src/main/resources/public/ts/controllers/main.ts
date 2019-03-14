@@ -254,6 +254,21 @@ export let main = ng.controller('MainController',
                 return obj;
             }, {});
 
+            $scope.getNbHomework = (pedagogicDay) =>{
+                let nbHomework = 0;
+                pedagogicDay.pedagogicItems.map(p => {
+                    if(p.pedagogicType === $scope.TYPE_HOMEWORK){
+                        if($scope.display.todo && !p.isDone)     {
+                            nbHomework++;
+                        }
+                        if($scope.display.done && p.isDone){
+                            nbHomework++;
+
+                        }
+                    }
+                });
+                return nbHomework;
+            };
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
 

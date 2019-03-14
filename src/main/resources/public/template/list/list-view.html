@@ -36,7 +36,7 @@
                         <span  ng-show="!display.sessionList" class="round "
                                ng-class="{'[[pedagogicDay.color]]': true}">
                             <span>
-                                [[pedagogicDay.nbHomework]]
+                                [[getNbHomework(pedagogicDay)]]
                             </span>
                         </span>
                             <span  ng-show="display.sessionList" class="round ">
