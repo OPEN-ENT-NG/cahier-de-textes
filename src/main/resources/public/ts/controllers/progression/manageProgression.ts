@@ -55,8 +55,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                         psession.setSubject(subject);
                     }
                 })
+                $scope.progressionsToDisplay.push(psession);
             });
-            $scope.progressionsToDisplay = $scope.progression_sessions;
 
             if($scope.progression_session.title) {
                 $scope.subjects.all.forEach(subject => {
@@ -123,8 +123,10 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.filterProgression = (search) =>{
+        $scope.
+            filterProgression = (search) =>{
             $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progression_sessions.all);
+
         }
 
         $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
