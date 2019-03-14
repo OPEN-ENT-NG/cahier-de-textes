@@ -7,54 +7,68 @@
             <!-- Subject, Audience and Teacher-->
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                <span class="normal">
-                            [[pedagogicItem.subject.label]] &nbsp;
-                    <span class="small">
-                                [[pedagogicItem.audience.name]] [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]&nbsp;
-                            </span>
-                        </span>
+                <span class="bold">
+                    [[pedagogicItem.subject.label]] &nbsp;
+                </span>
+                <span class="bold">
+                    [[pedagogicItem.audience.name]] &nbsp;
+                </span>
+                <span>
+                    [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]
+                </span>
                 <!--<i ng-if="pedagogicItem.description"-->
                 <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
-                    </span>
+            </span>
             <div ng-show="!display.sessionList">
-                <div class="row inline-block medium-importance ">
-                    <!--devoir --> <span  ><i>&#xe80d;</i></span>
-                    <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
-                          ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                <div class="row inline-block medium-importance margin-top-md">
+
+                    <!--devoir -->
+                    <div class="cell horizontal-spacing twelve-mobile">
+                        <span ><i>&#xe80d;</i></span>
+                        <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
+                              ng-click="pedagogicItem.opened = !pedagogicItem.opened">
                             [[pedagogicItem.type.label]]&nbsp;
-                        <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
+                            <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
+                    </div>
 
-                </div>
+                    <!-- Il faut récupérer cette donnée mais ne nous l'avons pas pour le moment -->
+                    <!--<div class="cell horizontal-spacing twelve-mobile">-->
+                        <!--<span>-->
+                            <!--<i18n>homework.manage.give</i18n> :-->
+                        <!--</span>-->
+                    <!--</div>-->
 
-                <!-- Description -->
-                <div ng-if="pedagogicItem.opened && pedagogicItem.description"
-                     class="row"
-                     ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                    <div ng-if="pedagogicItem.opened"
-                         class="read-only-description"
-                         bind-html="pedagogicItem.description"></div>
+                    <div class="horizontal-spacing twelve-mobile" ng-if="isAChildOrAParent">
+                        <div class="cell horizontal-spacing twelve-mobile ">
+                            <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
+                                <label class="switch"> </label>
+                            </switch>
+                        </div>
+                        <label class="cell twelve-mobile">
+                            <div ng-show="pedagogicItem.isDone" class="six">
+                                <i18n style="color:green;">done</i18n>
+                            </div>
+                            <div ng-show="!pedagogicItem.isDone" class="twelve">
+                                <i18n style="color:red;">todo</i18n>
+                            </div>
+                        </label>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="cell four" ng-if="isAChildOrAParent">
-            <label class="six cell twelve-mobile">
-                <div ng-show="pedagogicItem.isDone" class="six margin-bottom-md">
-                    <i18n style="color:green;">done</i18n>
-
+            <!-- Description -->
+            <div ng-if="pedagogicItem.opened && pedagogicItem.description"
+                 class="twelve-mobile"
+                 ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                <div ng-if="pedagogicItem.opened"
+                     class="read-only-description"
+                     bind-html="pedagogicItem.description">
                 </div>
-                <div ng-show="!pedagogicItem.isDone" class="twelve margin-bottom-md">
-                    <i18n style="color:red;">todo</i18n>
-
-                </div>
-            </label>
-            <div class="cell horizontal-spacing twelve-mobile ">
-                <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
-                    <label class="switch"> </label>
-                </switch>
             </div>
+
         </div>
+
         <!-- HOMEWORK DONE -->
 
         <i ng-click="openHomework(pedagogicItem.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
