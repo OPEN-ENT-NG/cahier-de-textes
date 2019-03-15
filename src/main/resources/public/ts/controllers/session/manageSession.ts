@@ -1,4 +1,4 @@
-import {Behaviours, model, moment, ng} from 'entcore';
+import {_, Behaviours, model, moment, ng} from 'entcore';
 import {Course, Session, Subjects, Toast} from '../../model';
 import {Homework} from '../../model/homework';
 
@@ -164,12 +164,29 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
         };
 
+        $scope.cancelHomework = () =>{
+            $scope.validate = false;
+            $scope.formIsOpened = false;
+
+            $scope.session.homeworks.map((h, index) => {
+                if (h.opened) {
+                    h.opened = false;
+                }
+            //TODO CANCEL AND BACK the OLD DATAS if any
+                // if(){
+                //
+                // }
+            });
+
+        };
         $scope.closeHomework = () => {
+
             $scope.validate = false;
             $scope.formIsOpened = false;
             $scope.session.homeworks.map(h => {
                 if (h.opened) {
                     h.opened = false;
+                    h.alreadyValidate = true
                 }
             });
             $scope.safeApply();

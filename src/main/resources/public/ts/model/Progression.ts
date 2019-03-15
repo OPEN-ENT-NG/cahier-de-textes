@@ -184,6 +184,7 @@ export class ProgressionHomework{
     type: HomeworkType;
     type_id;
     type_label;
+    alreadyValidate: boolean = false;
     subject: Subject;
     subject_id;
     p_session: ProgressionSession;

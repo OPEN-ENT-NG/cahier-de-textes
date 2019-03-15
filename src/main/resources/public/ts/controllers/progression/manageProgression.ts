@@ -57,6 +57,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 })
             });
 
+
+
             if($scope.progression_session.title) {
                 $scope.subjects.all.forEach(subject => {
                     if ($scope.progression_session.subject_id == subject.id) {
@@ -66,7 +68,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 ;
             }
 
-           await $scope.homeworkTypes.sync();
+            await $scope.homeworkTypes.sync();
             $scope.safeApply();
         };
 
@@ -74,6 +76,10 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
 
         });
+
+
+
+
 
         $scope.getIsReadOnly = () => {
             return modeIsReadOnly();
@@ -111,6 +117,12 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         });
 
         $scope.openProgressionHomework = (progressionHomework: ProgressionHomework) => {
+            $scope.oldProgressionHomework = [];
+
+            $scope.oldProgressionHomework[0] = progressionHomework.description;
+            $scope.oldProgressionHomework[1] = progressionHomework.estimatedTime;
+            $scope.oldProgressionHomework[2] = progressionHomework.subject;
+
             $scope.validate = true;
             $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
@@ -122,11 +134,10 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.
-            filterProgression = (search) =>{
+        $scope.filterProgression = (search) =>{
             $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progression_sessions.all);
 
-        }
+        };
 
         $scope.deleteProgressionHomework = async (progressionHomework: ProgressionHomework,i) => {
 
@@ -142,11 +153,38 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
-        $scope.newProgressionHomework = () => {
+
+        $scope.cancelProgressionHomework = () =>{
             $scope.validate = false;
-           $scope.progression_session.progression_homeworks.map(p => {
+            $scope.progression_session.progression_homeworks.map((p, index) => {
                 if(p.opened){
                     p.opened = false ;
+                    if( !p.id){
+                        if(!p.alreadyValidate )
+                            $scope.progression_session.progression_homeworks.splice(index,1);
+                        else{
+                            p.description = $scope.oldProgressionHomework[0];
+                            p.estimatedTime = $scope.oldProgressionHomework[1];
+                            p.subject = $scope.oldProgressionHomework[2];
+                        }
+                    }
+                    else{
+                        p.description = $scope.oldProgressionHomework[0];
+                        p.estimatedTime = $scope.oldProgressionHomework[1];
+                        p.subject = $scope.oldProgressionHomework[2];
+                    }
+                }
+            });
+
+            $scope.safeApply();
+
+        };
+        $scope.newProgressionHomework = () => {
+            $scope.validate = false;
+            $scope.progression_session.progression_homeworks.map(p => {
+                if(p.opened){
+                    p.opened = false ;
+                    p.alreadyValidate = true;
                 }
             });
 
@@ -184,16 +222,16 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.deleteProgressionSessionToastLess  =  async  (progressionSession : ProgressionSession) => {
-          let  response = await progressionSession.delete();
-           await initData();
-           $scope.isReadOnly = !$scope.isReadOnly;
+            let  response = await progressionSession.delete();
+            await initData();
+            $scope.isReadOnly = !$scope.isReadOnly;
 
-           $scope.safeApply();
+            $scope.safeApply();
 
         }
         $scope.deleteProgressions = (progressionsSessions) => {
             progressionsSessions.map(async p =>  {
-            await $scope.deleteProgressionSessionToastLess(p);
+                await $scope.deleteProgressionSessionToastLess(p);
             })
 
             $scope.notifications.push(new Toast('delete.progressions', 'confirm'));

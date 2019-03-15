@@ -39,7 +39,7 @@ export class Homework {
     estimatedTime: number = 0;
     static HOMEWORK_STATE_TODO : number = 1;
     static HOMEWORK_STATE_DONE : number = 2;
-
+    alreadyValidate :boolean = false;
     constructor (structure: Structure) {
         this.structure = structure;
         this.color = 'pink';
@@ -166,7 +166,8 @@ export class Homework {
             && validSessionOrDueDate
             && this.type
             && this.description
-            && this.description.length;
+            && this.description.length
+            && this.description.length != 0 ;
     };
 
 
