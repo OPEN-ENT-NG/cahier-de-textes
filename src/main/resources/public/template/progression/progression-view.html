@@ -41,14 +41,14 @@
                         <i18n>title</i18n>
 
                     </th>
-                    <th class="two text-left" ng-click="changeSortType('class')">
+                    <th class="two text-center" ng-click="changeSortType('class')">
                            <i18n>progression.niveau</i18n>
                     </th>
 
                     <th class="two text-left" ng-click="changeSortType('subject.label')">
                         <i18n>subject</i18n>
                     </th>
-                    <th class="two text-left" ng-click="changeSortType('progression_homeworks.length')">
+                    <th class="two text-center" ng-click="changeSortType('progression_homeworks.length')">
                          <i18n>homeworks.attached</i18n>
                     </th>
                 </tr>
@@ -65,14 +65,14 @@
                     <td ng-click="$parent.openProgressionSession(progression_session)" class="four text-left">
                         [[progression_session.title]]
                     </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-left">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
                         [[progression_session.class]]
                     </td>
 
                     <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-left">
                         [[progression_session.subject.label]]
                     </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-right">
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
                         [[progression_session.progression_homeworks.length]]
                     </td>
                 </tr>
