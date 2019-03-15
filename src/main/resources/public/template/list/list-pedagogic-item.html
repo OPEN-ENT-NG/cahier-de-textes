@@ -4,32 +4,39 @@
     <div class="row  list-view-item">
         <div  class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
-
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                <span class="normal">
-                            [[pedagogicItem.subject.label]] &nbsp;
-                    <span class="small">
-                    [[pedagogicItem.audience.name]] [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]&nbsp;
-                            <em ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
-                [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
-            </em>
-                            </span>
-                        </span>
+                <span>
+                    <b>[[pedagogicItem.subject.label]] &nbsp;</b>
+                </span>
+                <span>
+                    <b>[[pedagogicItem.audience.name]] &nbsp;</b>
+                </span>
+                <span>
+                    [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]
+                </span> &nbsp;
+                <span ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
+                    [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
+                </span>
+            </span>
+
                 <!--<i ng-if="pedagogicItem.description"-->
                 <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
-                    </span>
+
             <i ng-if="isClickableByStudentOrParent(pedagogicItem)" class="right-magnet" ng-click="openSession(pedagogicItem.id)" tooltip="[[translate('session.consult')]]">&#xe8aa;</i>
             <i ng-if="pedagogicItem.pedagogicType == 3" class="right-magnet" ng-click="openSessionFromCourse(pedagogicItem)" tooltip="[[translate('session.consult')]]">&#xe8aa;</i>
             <br/>
-            <i>&#xe86f;</i>
 
-            <span class="small" ng-if="pedagogicItem.title">
+            <div class="row inline-block horizontal-spacing medium-importance margin-top-md">
+                <i>&#xe86f;</i>
+                <span class="small" ng-if="pedagogicItem.title">
                      [[pedagogicItem.title]]
-            </span>
-            <span class="small" ng-if="pedagogicItem.room">
+                </span>
+                <span class="small" ng-if="pedagogicItem.room">
                    -   <i18n>utils.room</i18n>[[pedagogicItem.room]]
-            </span>
+                </span>
+            </div>
+
 
             <!-- Description -->
             <div ng-if="pedagogicItem.opened && pedagogicItem.description"
