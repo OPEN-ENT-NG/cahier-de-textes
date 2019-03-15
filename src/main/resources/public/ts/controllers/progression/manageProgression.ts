@@ -55,7 +55,6 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                         psession.setSubject(subject);
                     }
                 })
-                $scope.progressionsToDisplay.push(psession);
             });
 
             if($scope.progression_session.title) {
