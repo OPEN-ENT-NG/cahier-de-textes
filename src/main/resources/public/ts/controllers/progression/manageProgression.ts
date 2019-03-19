@@ -57,6 +57,14 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 })
             });
 
+            $scope.progressionsToDisplay.all.map(psession => {
+                $scope.subjects.all.forEach( subject =>{
+                    if(psession.subject_id == subject.id){
+                        psession.setSubject(subject);
+                    }
+                })
+            });
+
 
 
             if($scope.progression_session.title) {
