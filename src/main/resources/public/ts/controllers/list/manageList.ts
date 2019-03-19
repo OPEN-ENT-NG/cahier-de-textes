@@ -41,8 +41,17 @@ export let manageListCtrl = ng.controller('manageListController',
                 isInFilter = true;
             }
             return isInFilter;
-        }
+        };
 
+        $scope.setHomeworkProgress =(homework)=>{
+            if(homework.isDone)
+                $scope.notifications.push(new Toast('homework.done.notification', 'info'));
+            else
+                $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
+
+            $scope.setProgress(homework);
+            $scope.safeApply();
+        };
 
 
         $scope.isClickableByStudentOrParent = (pedagogicItem) => {

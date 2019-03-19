@@ -477,14 +477,7 @@ export let main = ng.controller('MainController',
             }
             $scope.safeApply();
         };
-        $scope.setHomeworkProgress =(homework)=>{
-            if(homework.isDone)
-                $scope.notifications.push(new Toast('homework.done.notification', 'info'));
-            else
-                $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
 
-            $scope.setProgress(homework);
-        };
         $scope.publishSession = async (item ,event) =>   {
             event.stopPropagation();
             let sessionToPublish = new Session($scope.structure);
