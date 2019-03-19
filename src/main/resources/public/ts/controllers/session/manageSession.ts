@@ -20,7 +20,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.isSelectSubjectAndAudienceSession = true;
             } else {
                 $scope.isSelectSubjectAndAudienceSession = false;
-                $scope.session.opened = !$scope.session.opened;
+                $scope.session.opened = true;
             }
         };
 
