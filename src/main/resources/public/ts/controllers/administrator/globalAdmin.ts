@@ -355,9 +355,15 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 target = $(`#list-diary-to-pdf > .diary${targetName}`);
             }
 
+            $(htmlContent).width(778);
 
             let result = {original: null, canvas: null, data: {targetName: targetName}};
-            let canvas = await html2canvas(htmlContent[0], {letterRendering: true});
+            let canvas = await html2canvas(htmlContent[0], {
+                letterRendering: true,
+                scale: 1,
+                windowWidth: 778,
+                width: 778
+            });
 
             result.original = target[0];
             result.canvas = canvas;
@@ -367,7 +373,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         function createPDF(canvasData) {
             let targetName = canvasData.data.targetName;
-
             // Create the canvas into PDF
             let pdf = new jsPDF('p', 'pt', 'a4', true);
 
