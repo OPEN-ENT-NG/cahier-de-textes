@@ -41,6 +41,10 @@ input[type="number"] {
   width: 100%
 }
 
+tr th label input[type=checkbox]:checked + span::before {
+  border-color: #fff;
+}
+
 .sidebar {
   margin-right: 20px;
   switch {
