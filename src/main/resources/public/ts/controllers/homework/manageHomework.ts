@@ -20,7 +20,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.isInsideSessionForm = false;
         $scope.isSelectSubjectAndAudienceHomework = true;
         $scope.validate = false;
-        $scope.homework.opened = true;
+        $scope.homework.opened = false;
 
         $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
             if(!audience || !subject){
@@ -91,7 +91,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 //         $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
                 //     }
                 // }
-                $scope.attachToSession();
+                if ($scope.isInsideSessionForm) {
+                    $scope.attachToSession();
+                }
 
                 $scope.safeApply();
             });
@@ -127,7 +129,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToSession = () => {
             $scope.homework.attachedToSession = true;
             $scope.homework.attachedToDate = false;
-
+            console.log("Session");
             if($scope.homework.dueDate) {
                 $scope.sessionsToAttachTo.unshift($scope.homework.session);
 
