@@ -1,7 +1,7 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView">
-    <h1 ng-if="!isAChildOrAParent">
+    <h1 >
         <a href="#" ng-click="changeViewCalendar()">
-        <i18n>diary.title</i18n>
+           <i18n>diary.title</i18n>
         </a>
     </h1>
     <h1 ng-if="isAChildOrAParent">
@@ -13,10 +13,10 @@
         <article class="twelve row " ng-if="display.listView">
 
             <i18n>period.from</i18n>
-            <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
+            <date-picker  ng-model="filters.startDate" ng-change="syncPedagogicItems();"
                          class="no-margin date-picker-sm"></date-picker>
             <i18n>to</i18n>
-            <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
+          <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
                          class="no-margin date-picker-sm"></date-picker>
         </article>
 

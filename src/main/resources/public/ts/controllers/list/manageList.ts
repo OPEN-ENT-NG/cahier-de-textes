@@ -9,9 +9,12 @@ export let manageListCtrl = ng.controller('manageListController',
     ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        $scope.display.listView= true;
-        $scope.indexItemsDisplayed = [];
+        $scope.display.listView = true;
 
+        $scope.indexItemsDisplayed = [];
+        $scope.plap = () => {
+            $scope.plop = true;
+        }
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
@@ -96,13 +99,5 @@ export let manageListCtrl = ng.controller('manageListController',
                 return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
-        $scope.changeViewList = function () {
-            $scope.goTo('/list');
-            $scope.display.listView = true;
-            if ($scope.display.listView) {
-                $scope.display.sessions = true;
-                $scope.display.homeworks = true ;
-            }
-        }
 
     }]);
