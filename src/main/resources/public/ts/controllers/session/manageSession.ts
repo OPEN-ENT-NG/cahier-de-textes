@@ -56,14 +56,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.startTime
                 && $scope.session.endTime;
 
-            let homeworkFormsAreValids = true;
-            for (let h of $scope.session.homeworks) {
-                homeworkFormsAreValids = h.isValidForm();
-                if (!homeworkFormsAreValids)
-                    break;
-            }
+            // let homeworkFormsAreValids = true;
+            // for (let h of $scope.session.homeworks) {
+            //     homeworkFormsAreValids = h.isValidForm();
+            //     if (!homeworkFormsAreValids)
+            //         break;
+            // }
 
-            return sessionFormIsValid && homeworkFormsAreValids;
+            return sessionFormIsValid ;
         };
 
         $scope.publishSession = async () => {
@@ -112,7 +112,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         h.session.id = $scope.session.id;
                     }
                 }
-                if(!h.isDeleted){
+                if(!h.isDeleted && h.isValidForm()){
                     let {succeed} = await h.save();
                     if (!succeed) {
                         hasSucceed = false;
