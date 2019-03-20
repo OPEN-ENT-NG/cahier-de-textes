@@ -125,15 +125,16 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.getLastCreatedVisa = (sessionsGroup) => {
+
             var date = _.chain($scope.getVisas(sessionsGroup))
                 .pluck("created")
                 .sort()
                 .last()
                 .value();
             if (date)
-                return moment(date).format("DD/MM/YYYY HH:mm");
+                return lang.translate("sessions.admin.Visa.sateOk");
             else
-                return '-';
+                return lang.translate("sessions.admin.Visa.sateKo");
         };
 
         $scope.getSessionsIds = (sessionsGroup) => {
