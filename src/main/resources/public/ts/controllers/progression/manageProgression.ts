@@ -7,7 +7,6 @@ import {Utils} from '../../utils/utils';
 export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        console.log('manageProgressionCtrl');
 
         function modeIsReadOnly() {
             let currentPath = $location.path();

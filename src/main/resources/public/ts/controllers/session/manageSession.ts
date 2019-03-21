@@ -167,8 +167,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
             }
         };
-        //TODO CANCEL AND BACK the OLD DATAS if any
-        //TODO THE CANCEL IS NOT WORKING FOR THE MOMENT
+
         $scope.cancelHomework = () =>{
             $scope.validate = false;
             $scope.formIsOpened = false;

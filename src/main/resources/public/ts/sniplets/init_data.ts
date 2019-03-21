@@ -2,7 +2,6 @@ import {Toast, Utils} from "../model";
 import {homeworkType} from "./homeworkType";
 import http from "axios";
 
-console.log("init data");
 
 export const initData = {
     title: 'Init data',

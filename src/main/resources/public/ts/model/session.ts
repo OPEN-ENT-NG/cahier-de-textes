@@ -192,7 +192,6 @@ export class Session {
     }
 
     async publish() {
-        //console.log("Publier");
         let response = await http.post('/diary/session/publish/' + this.id);
         return Utils.setToastMessage(response, 'session.published','session.published.error');
     }

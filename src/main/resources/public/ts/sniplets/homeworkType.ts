@@ -1,7 +1,6 @@
 import {HomeworkType, Toast} from "../model";
 import {HomeworkTypes} from "../model";
 
-console.log("homework_type");
 
 export const homeworkType = {
     title: 'Homework type',

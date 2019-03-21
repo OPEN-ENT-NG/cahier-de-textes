@@ -95,7 +95,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.printPdf = () => {
             let sessionsToPdf = getSelectedSessions();
-            console.log(sessionsToPdf);
             renderDiariesToPDF();
         };
 
