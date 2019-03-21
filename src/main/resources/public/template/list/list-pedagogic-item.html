@@ -1,11 +1,11 @@
 <!-- Session and Course -->
-<article  ng-if="pedagogicItem.pedagogicType !== TYPE_COURSE" class="pedagogic-item-article">
+<article ng-if="pedagogicItem.pedagogicType !== TYPE_COURSE" class="pedagogic-item-article">
     <!-- Sessions -->
     <div class="row  list-view-item">
-        <div  class="twelve cell first-content">
+        <div  ng-click="pedagogicItem.opened = !pedagogicItem.opened" class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
             <span ng-class=" pedagogicItem.description?'hasDescription':''"
-                  ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                  >
                 <span>
                     <b>[[pedagogicItem.subject.label]] &nbsp;</b>
                 </span>
@@ -15,7 +15,7 @@
                 <span>
                     [[pedagogicItem.teacher.firstName]] [[pedagogicItem.teacher.lastName]]
                 </span> &nbsp;
-                <span ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
+                <span class="hoursInView" ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
                     [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
                 </span>
             </span>
