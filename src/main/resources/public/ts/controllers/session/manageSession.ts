@@ -14,6 +14,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.session.teacher = {id: model.me.userId};
         $scope.isSelectSubjectAndAudienceSession = true;
         $scope.validate = false;
+        $scope.oldHomework = new Homework($scope.structure);
         $scope.formIsOpened = false;
         $scope.disableFieldSetSubjectAndAudienceSession = (audience: any, subject: any) => {
             if (!audience || !subject) {
@@ -136,6 +137,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             return back;
         };
         $scope.openHomework = (homework: Homework) => {
+            $scope.oldHomework.copyHomework(homework);
+
             $scope.validate = true;
             $scope.formIsOpened = true;
             $scope.session.homeworks.map(h => {
@@ -173,6 +176,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.homeworks.map((h, index) => {
                 if (h.opened) {
                     h.opened = false;
+                    h.copyHomework($scope.oldHomework);
                 }
                 if(!h.isValidForm())
                     h.isDeleted = true;

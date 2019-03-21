@@ -63,6 +63,20 @@ export class Homework {
         };
     }
 
+    copyHomework (homework: Homework){
+        this.description = homework.description;
+        this.type = homework.type;
+        this.estimatedTime = homework.estimatedTime;
+        if(homework.attachedToDate)
+            this.dueDate = homework.dueDate;
+        else
+            this.session = homework.session;
+        this.attachedToDate =  homework.attachedToDate;
+        this.attachedToSession =  homework.attachedToSession;
+        this.subject = homework.subject;
+
+
+    }
     static formatSqlDataToModel(data: any, structure: Structure){
 
         let subject = new Subject();
