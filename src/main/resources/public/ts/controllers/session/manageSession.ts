@@ -130,7 +130,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             if (!$scope.session.homeworks || $scope.session.homeworks.length == 0)
                 return back;
             $scope.session.homeworks.forEach((item) => {
-                back = back && item.isValidForm();
+                if(!item.isDeleted)
+                    back = back && item.isValidForm();
             });
             return back;
         };
@@ -163,7 +164,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
             }
         };
-
+        //TODO CANCEL AND BACK the OLD DATAS if any
+        //TODO THE CANCEL IS NOT WORKING FOR THE MOMENT
         $scope.cancelHomework = () =>{
             $scope.validate = false;
             $scope.formIsOpened = false;
@@ -172,11 +174,19 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if (h.opened) {
                     h.opened = false;
                 }
-            //TODO CANCEL AND BACK the OLD DATAS if any
+                if(!h.isValidForm())
+                    h.isDeleted = true;
                 // if(){
                 //
                 // }
             });
+
+        };
+        $scope.cancelValidateOnDelete = (homework, index) =>{
+            if(homework.opened){
+                $scope.validate = false;
+                $scope.formIsOpened = false;
+            }
 
         };
         $scope.closeHomework = () => {

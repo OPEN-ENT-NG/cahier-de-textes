@@ -129,7 +129,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToSession = () => {
             $scope.homework.attachedToSession = true;
             $scope.homework.attachedToDate = false;
-            console.log("Session");
             if($scope.homework.dueDate) {
                 $scope.sessionsToAttachTo.unshift($scope.homework.session);
 
