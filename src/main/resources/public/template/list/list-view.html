@@ -1,11 +1,13 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView">
-    <h1 >
+    <h1 ng-if="!isAChildOrAParent" >
         <a href="#" ng-click="changeViewCalendar()">
            <i18n>diary.title</i18n>
         </a>
     </h1>
     <h1 ng-if="isAChildOrAParent">
-        <i18n>diary.title</i18n>
+        <a ng-click="goToViewList()">
+            <i18n>diary.title</i18n>
+        </a>
     </h1>
     <div class="cell three twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></div>
 

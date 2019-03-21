@@ -6,7 +6,7 @@ import {
 } from '../../model';
 
 export let manageListCtrl = ng.controller('manageListController',
-    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+    ['$scope','$window' , '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $route, $location, $timeout, $compile) {
 
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView = true;
@@ -25,6 +25,9 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.goTo('/homework/view/' + homeworkId );
             }
         };
+        $scope.goToViewList = () =>{
+            $window.location.reload();
+        }
 
         $scope.displayDay = (pedagogicDay) =>{
             pedagogicDay.displayed = !pedagogicDay.displayed;
