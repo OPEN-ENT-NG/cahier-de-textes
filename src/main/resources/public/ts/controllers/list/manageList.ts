@@ -6,18 +6,17 @@ import {
 } from '../../model';
 
 export let manageListCtrl = ng.controller('manageListController',
-    ['$scope','$window' , '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $route, $location, $timeout, $compile) {
-
+    ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $route, $location, $timeout, $compile) {
+        $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView = true;
 
         $scope.indexItemsDisplayed = [];
-        $scope.plap = () => {
-            $scope.plop = true;
-        }
+
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
+
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );

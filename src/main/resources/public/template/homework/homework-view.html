@@ -20,21 +20,19 @@
         <div workflow="diary.setProgressHomework"  class="three cell twelve-mobile margin-top-sm" ng-click="$event.stopPropagation();">
             <!--<switch ng-show="!homework.isDone" ng-model="homework.isDone" ng-click="setHomeworkProgress(homework)" ></switch>-->
 
-            <label class="cell horizontal-spacing twelve-mobile">
-                <div ng-show="homework.isDone" class="six">
-                    <i18n style="color:green;">done</i18n>
-
-                </div>
-                <div ng-show="!homework.isDone" class="twelve">
-                    <i18n style="color:red;">todo</i18n>
-
-                </div>
-            </label>
             <div class="cell horizontal-spacing twelve-mobile ">
-                <switch class="" ng-model="homework.isDone"  ng-change="setHomeworkProgress(homework)">
+                <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
                     <label class="switch"> </label>
                 </switch>
             </div>
+            <label class="cell twelve-mobile">
+                <div ng-show="pedagogicItem.isDone" class="six">
+                    <i18n style="color:green;">done</i18n>
+                </div>
+                <div ng-show="!pedagogicItem.isDone" class="twelve">
+                    <i18n style="color:red;">todo</i18n>
+                </div>
+            </label>
         </div>
 
 
