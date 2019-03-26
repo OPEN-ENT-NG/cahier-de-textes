@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.HomeworkService;
 import fr.openent.diary.utils.SqlQueryUtils;
@@ -36,12 +37,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT h.*, to_json(type) as type, to_json(progress_and_state) as progress");
-        query.append(" FROM diary.homework h");
-        query.append(" LEFT JOIN diary.homework_type AS type ON type.id = h.type_id");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework h");
+        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id");
         query.append(" LEFT JOIN (");
         query.append("   SELECT progress.*, homework_state.label as state_label");
-        query.append("   FROM diary.homework_progress progress");
-        query.append("   INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
+        query.append("   FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress");
+        query.append("   INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id");
         query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
         query.append(" WHERE h.id = ").append(homeworkId);
 
@@ -113,12 +114,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         StringBuilder query = new StringBuilder();
         query.append(" SELECT h.*, to_json(type) as type, session.date as session_date, to_json(progress_and_state) as progress ");
         query.append(" FROM diary.homework h");
-        query.append(" LEFT JOIN diary.homework_type AS type ON type.id = h.type_id");
-        query.append(" LEFT JOIN diary.session AS session ON session.id = h.session_id");
+        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id");
+        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session AS session ON session.id = h.session_id");
         query.append(" LEFT JOIN (");
         query.append(" SELECT progress.*, homework_state.label as state_label");
-        query.append(" FROM diary.homework_progress progress");
-        query.append(" INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress");
+        query.append(" INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id");
         query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
 
         if (startDate != null && endDate != null) {
@@ -179,7 +180,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO diary.homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
                 "color, description, is_published, session_id, due_date, type_id, owner_id " +
                 ", created, modified) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
@@ -218,7 +219,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void updateHomework(long homeworkId, JsonObject homework, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "UPDATE diary.homework " +
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework " +
                 "SET subject_id = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
                 " color = ?, description = ?, is_published = ?, session_id = ?, due_date = ?, type_id = ?, " +
                 " modified = NOW() " +
@@ -257,19 +258,19 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void deleteHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "DELETE FROM diary.homework WHERE id = " + homeworkId;
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".homework WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void publishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE diary.homework SET is_published = true WHERE id = " + homeworkId;
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = true WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void unpublishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE diary.homework SET is_published = false WHERE id = " + homeworkId;
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = false WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
@@ -281,7 +282,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         int stateId = "done".equals(state) ? HOMEWORK_STATE_DONE : HOMEWORK_STATE_TODO;
         StringBuilder query = new StringBuilder();
         JsonArray values = new JsonArray();
-        query.append(" INSERT INTO diary.homework_progress (homework_id, state_id, user_id)");
+        query.append(" INSERT INTO " + Diary.DIARY_SCHEMA + ".homework_progress (homework_id, state_id, user_id)");
         query.append(" VALUES (?, ?, ?)");
         query.append(" ON CONFLICT (homework_id, user_id)");
         query.append(" DO UPDATE SET state_id = excluded.state_id");
@@ -296,7 +297,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getHomeworkTypes(String structure_id, Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder();
         JsonArray param = new JsonArray();
-        query.append("SELECT * FROM diary.homework_type " + "WHERE structure_id = ? ORDER BY rank;");
+        query.append("SELECT * FROM " + Diary.DIARY_SCHEMA + ".homework_type " + "WHERE structure_id = ? ORDER BY rank;");
         param.add(structure_id);
 
         Sql.getInstance().prepared(query.toString(), param, SqlResult.validResultHandler(handler));
@@ -304,7 +305,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void createHomeworkType(JsonObject homeworkType, Handler<Either<String, JsonObject>> handler) {
-        String maxQuery = "Select MAX(rank) as max, nextval('diary.homework_type_id_seq') as id from diary.homework_type "
+        String maxQuery = "Select MAX(rank) as max, nextval('" + Diary.DIARY_SCHEMA + ".homework_type_id_seq') as id from " + Diary.DIARY_SCHEMA + ".homework_type "
                 + "where structure_id = '" + homeworkType.getString("structure_id") + "'";
         sql.raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
             @Override
@@ -336,7 +337,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     private JsonObject getInsertHomeworkTypeStatement(JsonObject homeworkType, Number rank) {
-        String query = " INSERT INTO diary.homework_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
+        String query = " INSERT INTO " + Diary.DIARY_SCHEMA + ".homework_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(homeworkType.getString("structure_id"))
                 .add(homeworkType.getString("label"))
@@ -350,7 +351,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void updateHomeworkType(Integer id, JsonObject homeworkType, Handler<Either<String, JsonObject>> handler) {
         JsonArray params = new JsonArray();
-        String query = "UPDATE diary.homework_type SET structure_id = ?, label = ? WHERE id = ?";
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework_type SET structure_id = ?, label = ? WHERE id = ?";
         params.add(homeworkType.getString("structure_id"));
         params.add(homeworkType.getString("label"));
         params.add(id);
@@ -361,9 +362,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void deleteHomeworkType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler) {
         JsonArray params = new JsonArray();
-        String query = "DELETE FROM diary.homework_type ht " +
-                "WHERE not Exists (SELECT 1 from diary.homework h WHERE ht.id =  h.type_id)" +
-                "AND not Exists (SELECT 1 from diary.progression_homework ph WHERE ht.id = ph.type_id) " +
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".homework_type ht " +
+                "WHERE not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".homework h WHERE ht.id =  h.type_id)" +
+                "AND not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".progression_homework ph WHERE ht.id = ph.type_id) " +
                 "AND Exists (SELECT 1 FROM diary.homework_type htt WHERE structure_id = ? HAVING COUNT(htt.id) > 1) " +
                 "AND ht.id = ? RETURNING id";
         params.add(structure_id);
@@ -382,7 +383,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             query.append(" select (date_trunc('week',to_date(?, 'YYYY-MM-DD'))::date) + i as day " );
             query.append(" from generate_series(0,6) i " );
             query.append(" ) z " );
-            query.append(" left outer join diary.homework h on h.due_date = z.day and h.audience_id = ? " );
+            query.append(" left outer join " + Diary.DIARY_SCHEMA + ".homework h on h.due_date = z.day and h.audience_id = ? " );
             query.append(" group by z.day order by z.day " );
 
             JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();

@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.InitService;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
@@ -37,7 +38,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
     @Override
     public void init(final  Handler<Either<String, JsonObject>> handler) {
 
-        String structQuery = "SELECT DISTINCT structure_id as struct from diary.homework_type ";
+        String structQuery = "SELECT DISTINCT structure_id as struct from " + Diary.DIARY_SCHEMA + ".homework_type ";
         sql.raw(structQuery, SqlResult.validResultHandler(new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
@@ -88,7 +89,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
 
     private JsonObject initHomeworkType(JsonObject jsonObject) {
 
-        String query = "INSERT INTO diary.homework_type (structure_id, label, rank) values (? ,? ,?) , (?, ?, ?) , (?, ?, ?) ;";
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework_type (structure_id, label, rank) values (? ,? ,?) , (?, ?, ?) , (?, ?, ?) ;";
 
         JsonArray params = new JsonArray().add(jsonObject.getString("s.id")).add("Exercice(s)").add(1)
                 .add(jsonObject.getString("s.id")).add("Devoir maison").add(2)
@@ -99,9 +100,9 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
                 .put(ACTION, PREPARED);
     }
 
-    public JsonObject getHomeworkStateInitStatement() {
+    private JsonObject getHomeworkStateInitStatement() {
 
-        String query = "INSERT INTO diary.homework_state (id,label) values( 1 ,'todo') , ( 2 , 'done') ON CONFLICT DO NOTHING;";
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework_state (id,label) values( 1 ,'todo') , ( 2 , 'done') ON CONFLICT DO NOTHING;";
 
         return new JsonObject()
                 .put(STATEMENT, query)

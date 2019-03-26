@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.services.InitService;
 import fr.wseduc.rs.Get;
 import fr.wseduc.security.ActionType;
@@ -19,7 +20,7 @@ public class InitController extends ControllerHelper {
     }
 
     @Get("/init")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = WorkflowUtils.VISA_MANAGE , type = ActionType.AUTHENTICATED)
     public void initHomeworksType(final HttpServerRequest request) {
 
         initService.init(new Handler<Either<String, JsonObject>>() {

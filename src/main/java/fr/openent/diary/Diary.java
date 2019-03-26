@@ -11,6 +11,8 @@ import org.entcore.common.storage.StorageFactory;
 
 
 public class Diary extends BaseServer {
+    public final static String DIARY_SCHEMA = "diary";
+    public final static String VIESCO_SCHEMA = "viesco";
 
 	@Override
 	public void start() throws Exception {

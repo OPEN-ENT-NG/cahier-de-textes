@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.ExportPDFService;
 import fr.openent.diary.services.VisaService;
 import fr.wseduc.webutils.Either;
@@ -44,7 +45,7 @@ public class VisaServiceImpl implements VisaService {
     public void getVisaPdfDetails(String visaId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT *");
-        query.append(" FROM diary.visa visa");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".visa visa");
         query.append(" WHERE visa.id = ").append(visaId);
 
         Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(handler));
@@ -53,7 +54,7 @@ public class VisaServiceImpl implements VisaService {
     private JsonObject getVisaSessionStatement(JsonObject visa, UserInfos user) {
         StringBuilder query = new StringBuilder();
         JsonArray values = new JsonArray();
-        query.append("INSERT INTO diary.visa (comment, structure_id, teacher_id, nb_sessions, pdf_details, owner_id, created, modified) ");
+        query.append("INSERT INTO " + Diary.DIARY_SCHEMA + ".visa (comment, structure_id, teacher_id, nb_sessions, pdf_details, owner_id, created, modified) ");
         query.append("VALUES ");
 
         JsonArray sessionIds = visa.getJsonArray("sessionIds");
@@ -67,9 +68,9 @@ public class VisaServiceImpl implements VisaService {
 
         for (int j = 0; j < sessionIds.size(); j++) {
             Integer sessionId = sessionIds.getInteger(j);
-            query.append("INSERT INTO diary.session_visa ( session_id, visa_id) ");
+            query.append("INSERT INTO " + Diary.DIARY_SCHEMA + ".session_visa ( session_id, visa_id) ");
             query.append("VALUES ");
-            query.append("(?, (SELECT currval(pg_get_serial_sequence('diary.visa', 'id'))));");
+            query.append("(?, (SELECT currval(pg_get_serial_sequence('" + Diary.DIARY_SCHEMA + ".visa', 'id'))));");
             values.add(sessionId);
         }
 

@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.SessionService;
 import fr.wseduc.webutils.Either;
@@ -23,11 +24,11 @@ public class SessionServiceImpl  implements SessionService {
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT s.*, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
-        query.append(" FROM diary.session s");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
         query.append(" LEFT JOIN (");
         query.append(" SELECT homework.*, to_json(homework_type) as type");
         query.append(" FROM diary.homework homework");
-        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
+        query.append(" INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id");
         query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
         query.append(" WHERE s.id = ").append(sessionId);
         query.append(" GROUP BY s.id");
@@ -102,7 +103,7 @@ public class SessionServiceImpl  implements SessionService {
         if (agregVisas)
             query.append(" ,array_to_json(array_agg(distinct visa)) as visas");
 
-        query.append(" FROM diary.session s");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
         query.append(" LEFT JOIN (");
         query.append("   SELECT homework.*, to_json(homework_type) as type, to_json(progress_and_state) as progress");
         query.append("   FROM diary.homework homework");

@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.Diary;
 import fr.openent.diary.services.InspectorService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
@@ -17,7 +18,7 @@ public class InspectorServiceImpl implements InspectorService {
     @Override
     public void createInspectorHabilitation(JsonObject habilitation, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO diary.inspector_habilitation (inspector_id, teacher_id, structure_id) " +
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".inspector_habilitation (inspector_id, teacher_id, structure_id) " +
                 "VALUES (?, ?, ?);";
         values.add(habilitation.getString("inspectorId"));
         values.add(habilitation.getString("teacherId"));
@@ -29,7 +30,7 @@ public class InspectorServiceImpl implements InspectorService {
     @Override
     public void deleteInspectorHabilitation(String inspectorId, String teacherId, String structureId, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
-        String query = "DELETE FROM diary.inspector_habilitation " +
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".inspector_habilitation " +
                 "WHERE inspector_id = ? " +
                 "AND teacher_id = ? " +
                 "AND structure_id = ? ";
@@ -43,7 +44,7 @@ public class InspectorServiceImpl implements InspectorService {
 
     @Override
     public void deleteInspector(String inspectorId, Handler<Either<String, JsonArray>> handler) {
-        String query = "DELETE FROM diary.inspector_habilitation WHERE inspector_id = " + inspectorId;
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".inspector_habilitation WHERE inspector_id = " + inspectorId;
         Sql.getInstance().raw(query, SqlResult.validResultHandler(handler));
     }
 
@@ -51,7 +52,7 @@ public class InspectorServiceImpl implements InspectorService {
     @Override
     public void getInspectorHabilitations(String inspectorId, String structureId, UserInfos user, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
-        String query = "SELECT * FROM diary.inspector_habilitation " +
+        String query = "SELECT * FROM " + Diary.DIARY_SCHEMA + ".inspector_habilitation " +
                 " WHERE inspector_id = ? " +
                 " AND structure_id = ? ";
         values.add(inspectorId);
