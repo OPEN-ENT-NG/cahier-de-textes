@@ -221,6 +221,7 @@ export class Session {
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
         this.color = colors[1];
+        this.description = progression.description;
 
     }
     //  duplicateHomework(session){
@@ -232,8 +233,8 @@ export class Session {
     getSessionInfo(session: Session) {
         this.subject = session.subject;
         session.homeworks.map( homework =>  {
-           homework.due_date = this.date;
-           delete homework.id ;
+            homework.due_date = this.date;
+            delete homework.id ;
             this.homeworks.push(homework);
         });
         this.teacher = session.teacher;
