@@ -106,7 +106,7 @@ export class Homework {
             isPublished: data.is_published,
             workload: data.workload,
             isDone: data.progress ? data.progress.state_label === 'done' : undefined,
-            publishDate : data.publish_date
+            publishDate : moment(data.publish_date).format("DD/MM/YYYY")
         };
     }
 

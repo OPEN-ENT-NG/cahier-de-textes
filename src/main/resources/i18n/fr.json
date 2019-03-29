@@ -164,6 +164,8 @@
   "homework.published.error": "Erreur lors de la publication du travail à faire",
   "homework.unpublished": "Travail à faire dépublié",
   "homework.unpublished.error": "Erreur lors de la dépublication du travail à faire",
+  "homework.published.date.child" : "Donné le :",
+  "homework.published.date.teacher" : "Publié le :",
   "todo.for.this.session": "À faire pour cette séance",
   "choose.another.date.or.session": "Choisir une autre Date/Séance",
   "session.create": "Créer une séance",
