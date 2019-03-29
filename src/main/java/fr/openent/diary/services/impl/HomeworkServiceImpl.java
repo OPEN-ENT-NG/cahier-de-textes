@@ -182,9 +182,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         JsonArray values = new JsonArray();
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
                 "color, description, is_published, session_id, due_date, type_id, owner_id " +
-                ", created, modified , publish_date) " +
+                ", created, modified" + ((homework.getBoolean("is_published") == true)? " , publish_date) " : ")" )+
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW(),NOW()) RETURNING id";
+                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()"+((homework.getBoolean("is_published") == true)? " , NOW()) " : ")" )+" RETURNING id";
 
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
