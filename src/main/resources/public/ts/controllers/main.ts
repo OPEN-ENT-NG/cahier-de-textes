@@ -607,7 +607,7 @@ export let main = ng.controller('MainController',
             //insert data and refresh calendar
             await course.sync(date, date);
             let session= new Session($scope.structure,course);
-            session.setFromCourseAndSession(course,sessionDrag)
+            session.setFromCourseAndSession(course,sessionDrag);
             session.opened = true;
             //await session.save();
             //    await sessionDrag.duplicateHomework(session);

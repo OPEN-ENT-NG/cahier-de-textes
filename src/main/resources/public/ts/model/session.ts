@@ -255,7 +255,19 @@ export class Session {
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
         this.color = sessionDrag.color;
+        this.description = sessionDrag.description;
+        this.duplicateHomeworks(sessionDrag);
     }
+
+    duplicateHomeworks(sessionDrag){
+        sessionDrag.homeworks.map( h =>{
+            h.id = undefined;
+            h.dueDate = this.date;
+            h.session =this;
+            this.homeworks.push(h);
+        })
+    }
+
 }
 
 export class Sessions {
