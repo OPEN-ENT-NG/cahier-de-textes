@@ -182,9 +182,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         JsonArray values = new JsonArray();
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
                 "color, description, is_published, session_id, due_date, type_id, owner_id " +
-                ", created, modified) " +
+                ", created, modified , publish_date) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()) RETURNING id";
+                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW(),NOW()) RETURNING id";
 
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
@@ -217,13 +217,16 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void updateHomework(long homeworkId, JsonObject homework, Handler<Either<String, JsonObject>> handler) {
+    public void updateHomework(long homeworkId,boolean publishedChanged, JsonObject homework, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework " +
                 "SET subject_id = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
-                " color = ?, description = ?, is_published = ?, session_id = ?, due_date = ?, type_id = ?, " +
-                " modified = NOW() " +
-                " WHERE id = ?;";
+                " color = ?, description = ?, is_published = ?, session_id = ?, due_date = ?, type_id = ?,   modified = NOW() " ;
+        if(publishedChanged && homework.getBoolean("is_published")){
+            query +=  ",publish_date = NOW ()  " ;
+        }
+
+        query +=  " WHERE id = ?;";
 
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
@@ -264,7 +267,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void publishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = true WHERE id = " + homeworkId;
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = true && publish_date = NOW() WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 

@@ -18,7 +18,7 @@ public interface HomeworkService {
 
     void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
-    void updateHomework(long homeworkId, JsonObject homework, Handler<Either<String, JsonObject>> handler);
+    void updateHomework(long homeworkId,boolean publishedChanged, JsonObject homework, Handler<Either<String, JsonObject>> handler);
 
     void deleteHomework(long homeworkId, Handler<Either<String, JsonObject>> handler);
 
