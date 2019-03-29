@@ -562,6 +562,7 @@ export let main = ng.controller('MainController',
         Handle a session drop on another session
          */
         $scope.sessionToSession = async (idSessionDrag , idSessionDrop) =>{
+            console.log("sTOs");
             let sessionDrag,sessionDrop;
             $scope.calendarItems.map(async session => {
                 if (session.id == idSessionDrag) {
@@ -584,7 +585,7 @@ export let main = ng.controller('MainController',
                Handle a session drop on course
          */
         $scope.sessionToCourse = async (idSession , idCourse,date) =>{
-
+            console.log("sTOc");
             let sessionDrag;
             let course = new Course($scope.structure, idCourse);
 
@@ -614,6 +615,7 @@ export let main = ng.controller('MainController',
             // $scope.syncPedagogicItems();
 
             // $scope.safeApply();
+            console.log($scope.session);
             $scope.goTo('/session/create' );
 
 
