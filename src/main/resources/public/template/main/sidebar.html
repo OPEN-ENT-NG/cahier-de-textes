@@ -1,5 +1,13 @@
 <article class="sidebar ">
     <section id="display-section" class="twelve">
+        <div workflow="diary.accessChildData">
+            <select ng-model="params.child"
+                    class="twelve"
+                    ng-change="params.group = null;params.user = null;syncPedagogicItems()"
+                    ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                <option value="" disabled selected>[[translate('student.choose')]]</option>
+            </select>
+        </div>
         <div ng-if="hasListRight()">
             <div>
                 <h5 class="large cell eleven">
@@ -24,6 +32,7 @@
             </label>
 
         </div>
+
         <!--<div class="row margin-bottom-md" ng-if="display.listView">-->
         <!--<i18n>period.from</i18n>-->
         <!--<date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"-->
@@ -88,14 +97,7 @@
             <!-- Access Own Data -->
 
             <!-- Access Child Data -->
-            <div workflow="diary.accessChildData">
-                <select ng-model="params.child"
-                        class="twelve"
-                        ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                    <option value="" disabled selected>[[translate('student.choose')]]</option>
-                </select>
-            </div>
+
 
             <!-- Access External Data -->
             <div class="margin-top-lg" workflow="diary.accessExternalData">
