@@ -184,7 +184,8 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 "color, description, is_published, session_id, due_date, type_id, owner_id " +
                 ", created, modified" + ((homework.getBoolean("is_published") == true)? " , publish_date) " : ")" )+
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW(), NOW()"+((homework.getBoolean("is_published") == true)? " , NOW()) " : ")" )+" RETURNING id";
+                "to_date(?,'YYYY-MM-DD'), ?, ?, NOW()," +
+                " NOW()"+((homework.getBoolean("is_published") == true)? " , NOW()) " : ")" )+" RETURNING id";
 
         values.add(homework.getString("subject_id"));
         values.add(homework.getString("structure_id"));
