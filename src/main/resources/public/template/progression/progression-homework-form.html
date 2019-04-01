@@ -33,9 +33,6 @@
 <td ng-if="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
     <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
 </td>
-<td ng-if="!progressionHomework.opened" class="one vertical-align-top ext-left">
-    <p class="twelve" >[[progressionHomework.estimatedTime]]</p>
-</td>
 <!-- Button part -->
 <td class="one vertical-align-top vertical-align-top text-right">
     <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
