@@ -85,6 +85,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.sessionsToAttachTo.sort(function (a, b) {
                     return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                 });
+
                 // if ($scope.isInsideSessionForm) {
                 //     $scope.sessionsToAttachTo.unshift($scope.$parent.session);
                 //     if ($scope.$parent.session.id) {
@@ -102,27 +103,31 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         function clearDublicateSessions(sessionsToAttachTo){
+            console.log(sessionsToAttachTo)
             sessionsToAttachTo.map(s => {
                 if (!(s instanceof Session)) {
                     sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(s), 1);
                     $scope.homework.session = $scope.sessionsToAttachTo[0];
-
                 }
                 if ($scope.session.id && s && s.id === $scope.session.id) {
                     s.firstText = lang.translate("session.manage.linkhomework");
                 }
                 if (s) {
-                    sessionsToAttachTo.map(ss => {
-                        if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
-                            sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
-                        }
-                    })
+                       sessionsToAttachTo.map(ss => {
+                           if (!(s instanceof Session)) {
+                               if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
+                                   console.log("plop");
+                                   sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
+                               }
+                           }
+                    });
                     if(!s.id && !$scope.session.id && s.date  == $scope.session.date){
                         s.firstText = lang.translate("session.manage.linkhomework");
                     }
                 }
 
             })
+            console.log(sessionsToAttachTo)
 
         }
 
@@ -133,7 +138,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.sessionsToAttachTo.unshift($scope.homework.session);
 
             }
-            clearDublicateSessions($scope.sessionsToAttachTo);
+
+             clearDublicateSessions($scope.sessionsToAttachTo);
 
             //If only one session or no session then push the current one
             if ($scope.sessionsToAttachTo && $scope.sessionsToAttachTo.length < 1 && $scope.isInsideSessionForm) {
