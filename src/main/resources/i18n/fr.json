@@ -225,7 +225,7 @@
   "progression.session.update": "Progression modifiée",
   "progression.session.update.error": "Erreur lors de la modification de la progression",
   "progression.get.err": "Erreur lors de la récupération de la progression",
-  "progression.niveau": "Niveau",
+  "progression.level": "Niveau",
   "validate": "valider",
   "Status":"Statut"
 }
