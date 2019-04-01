@@ -137,8 +137,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     }
                 }
 
-            })
-            $scope.homework.dueDate = $scope.session.startDate;
+            });
+             // $scope.homework.dueDate = $scope.session.startDate;
 
         }
 
