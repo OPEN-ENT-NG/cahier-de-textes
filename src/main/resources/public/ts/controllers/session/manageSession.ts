@@ -194,10 +194,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
         $scope.closeHomework = () => {
 
+
             $scope.validate = false;
             $scope.formIsOpened = false;
             $scope.session.homeworks.map(h => {
                 if (h.opened) {
+                    h.dueDate = h.session.startDate;
                     h.opened = false;
                     h.alreadyValidate = true
                 }

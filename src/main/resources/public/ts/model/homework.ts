@@ -12,6 +12,7 @@ export class Homework {
     plainTextDescription: string = '';
     dueDate: Date = moment().toDate();
     color: string;
+    dateDisplayed ;
     idTemp : number;
     session_id: number;
     session_date: string;
@@ -37,6 +38,9 @@ export class Homework {
     isDone: boolean;
     isDeleted: boolean = false;
     estimatedTime: number = 0;
+    publishDate ?: any;
+    publishedChanged : boolean = false;
+
     static HOMEWORK_STATE_TODO : number = 1;
     static HOMEWORK_STATE_DONE : number = 2;
     alreadyValidate :boolean = false;
@@ -63,6 +67,9 @@ export class Homework {
         };
     }
 
+      formatDateToDisplay(){
+        this.dateDisplayed = moment(this.dueDate).format('DD/MM/YYYY')
+    }
     copyHomework (homework: Homework){
         this.description = homework.description;
         this.type = homework.type;
@@ -98,7 +105,8 @@ export class Homework {
             description: data.description,
             isPublished: data.is_published,
             workload: data.workload,
-            isDone: data.progress ? data.progress.state_label === 'done' : undefined
+            isDone: data.progress ? data.progress.state_label === 'done' : undefined,
+            publishDate : moment(data.publish_date).format("DD/MM/YYYY")
         };
     }
 
@@ -126,7 +134,7 @@ export class Homework {
     }
 
     async update () {
-        let response = await http.put('/diary/homework/' + this.id, this.toSendFormat());
+        let response = await http.put(`/diary/homework/${this.id}/${this.publishedChanged} `, this.toSendFormat());
         return Utils.setToastMessage(response, 'homework.updated','homework.updated.error');
     }
 

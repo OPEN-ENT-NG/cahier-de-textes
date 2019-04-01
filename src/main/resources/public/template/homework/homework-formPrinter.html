@@ -70,9 +70,15 @@
             :
         </label>
 
-        <switch class="vertical-spacing" ng-model="homework.isPublished">
+        <switch class="vertical-spacing" ng-change="homework.publishedChanged = !homework.publishedChanged" ng-model="homework.isPublished">
             <label class="switch"> </label>
         </switch>
+    </div>
+    <div ng-if="homework.publishDate && homework.isPublished" class="flex twelve-mobile">
+        <label class="vertical-spacing margin-right-md">
+            <i18n>homework.published.date.teacher</i18n>
+             [[homework.publishDate]]
+        </label>
     </div>
 
 </td>

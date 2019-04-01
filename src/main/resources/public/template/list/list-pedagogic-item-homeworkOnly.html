@@ -27,7 +27,9 @@
                         <span ><i>&#xe80d;</i></span>
                         <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
                               ng-click="pedagogicItem.opened = !pedagogicItem.opened">
-                            [[pedagogicItem.type.label]]&nbsp;
+                            [[pedagogicItem.type.label]]&nbsp; -
+                            <span ng-if="isAChildOrAParent"> <i18n>homework.published.date.child</i18n> [[pedagogicItem.publishDate]]</span>
+                            <span ng-if="!isAChildOrAParent"> <i18n>homework.published.date.teacher</i18n> [[pedagogicItem.publishDate]]</span>
                             <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
                     </div>

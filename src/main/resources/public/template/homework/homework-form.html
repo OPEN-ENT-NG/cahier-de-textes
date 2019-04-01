@@ -110,7 +110,7 @@
                 </div>
             </label>
             <div class="cell twelve-mobile ten">
-                <switch class="vertical-spacing" ng-model="homework.isPublished">
+                <switch class="vertical-spacing" ng-change="homework.publishedChanged = ! homework.publishedChanged" ng-model="homework.isPublished">
                     <label class="switch"> </label>
                 </switch>
             </div>

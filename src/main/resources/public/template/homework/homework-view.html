@@ -4,7 +4,7 @@
     </div>
 
     <article class="row padding-md" ng-click="homework.opened = !homework.opened">
-        <h2 class="two cell remove-margin">
+        <h2 class="four cell remove-margin">
             <span>[[homework.type.label]]</span>
             <span ng-if="!homework.isInsideDiary">-
                 <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
@@ -12,6 +12,7 @@
                 <span ng-if="homework.attachedToOtherSession && homework.session">Pour la séance [[homework.session.subject.label]]
                     [[homework.session.startDisplayDate]] ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])</span>
             </span>
+            <i18n>homework.published.date.child</i18n> [[homework.publishDate]]
         </h2>
         <h2 class="right-magnet">
             <i  ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>

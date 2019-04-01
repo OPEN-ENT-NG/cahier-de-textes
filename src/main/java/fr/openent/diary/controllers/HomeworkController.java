@@ -85,13 +85,14 @@ public class HomeworkController extends ControllerHelper {
         }));
     }
 
-    @Put("/homework/:id")
+    @Put("/homework/:id/:publicationStateChanged")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkManage.class)
     public void updateHomework(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "homework", homework -> {
             long homeworkId = Long.parseLong(request.getParam("id"));
-            homeworkService.updateHomework(homeworkId, homework, DefaultResponseHandler.defaultResponseHandler(request));
+            boolean publishChanged = Boolean.parseBoolean(request.getParam("publicationStateChanged"));
+            homeworkService.updateHomework(homeworkId, publishChanged, homework, DefaultResponseHandler.defaultResponseHandler(request));
         });
     }
 
