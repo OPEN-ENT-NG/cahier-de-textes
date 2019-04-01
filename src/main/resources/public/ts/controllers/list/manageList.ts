@@ -101,5 +101,24 @@ export let manageListCtrl = ng.controller('manageListController',
                 return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
+        $scope.hasHomeworksToDisplay = (display, pedagogicDay) => {
+           let hasHomeworkToDisplay = false;
+            if(display.sessionList)
+                hasHomeworkToDisplay = hasHomeworkToDisplay || true;
+            else{
+                pedagogicDay.pedagogicItems.map(p =>{
+                    if(p instanceof Homework && (p.isDone != display.todo || p.isDone == display.done )){
+                        if(display.todo && !p.isDone){
+                            hasHomeworkToDisplay = hasHomeworkToDisplay || true;
 
+                        }
+                        if(display.done && p.isDone){
+                            hasHomeworkToDisplay = hasHomeworkToDisplay || true;
+
+                        }
+                    }
+                })
+            }
+            return hasHomeworkToDisplay;
+        }
     }]);

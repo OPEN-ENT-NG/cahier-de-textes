@@ -371,7 +371,7 @@ export let main = ng.controller('MainController',
         model.calendar.on('date-change', function() {
 
 
-            $scope.calendar=model.calendar;
+            $scope.calendar = model.calendar;
 
             if(!$scope.pageInitialized) return;
 
