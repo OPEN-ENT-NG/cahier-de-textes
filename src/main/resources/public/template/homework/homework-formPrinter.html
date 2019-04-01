@@ -86,7 +86,7 @@
 <!-- Deadline static data -->
 <td ng-if="!homework.opened"
     class="three vertical-align-top text-left">
-    <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dueDate]]</p>
+    <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dateDisplayed]]</p>
     <p ng-if="homework.attachedToSession && !homework.session.firstText" class="margin-bottom-md twelve">
         <i18n>homework.attachedToSession</i18n>
         [[homework.session.startDisplayDate]]

@@ -199,9 +199,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.formIsOpened = false;
             $scope.session.homeworks.map(h => {
                 if (h.opened) {
-                    h.dueDate = h.session.startDate;
                     h.opened = false;
-                    h.alreadyValidate = true
+                    h.alreadyValidate = true;
+                    h.formatDateToDisplay();
                 }
             });
             $scope.safeApply();
