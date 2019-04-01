@@ -45,7 +45,8 @@
                         <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
                                 ng-disabled="progression_session.courseId && progression_session.subject"
                                 ng-options="subject.label for subject in subjects.all track by subject.id">
-                            <option value="" disabled selected>[[translate('select.subject')]]</option>
+                            <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
+                            <option ng-if="subjects.all.length === 1" value="" disabled >[[translate('select.subject')]]</option>
                         </select>
                     </span>
                     </label>
