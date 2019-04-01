@@ -73,7 +73,7 @@ export class Utils {
     }
 
     static isAChildOrAParent(type) {
-        return type === "ELEVE" || type === "PERSELEVE"
+        return type === "ELEVE" || type === "PERSRELELEVE"
     }
 
     static startBlobDownload(dataBlob, suggestedFileName) {
