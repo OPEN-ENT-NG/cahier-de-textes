@@ -12,7 +12,7 @@ public interface SessionService {
 
     void getSession(long sessionId, Handler<Either<String, JsonObject>> handler);
 
-    void getOwnSessions(String startDate, String endDate, String audienceId, String subjectId, UserInfos user, Handler<Either<String, JsonArray>> handler);
+    void getOwnSessions(String structureId, String startDate, String endDate, String audienceId, String subjectId, UserInfos user, Handler<Either<String, JsonArray>> handler);
 
     void getExternalSessions(String startDate, String endDate, String type, String typeId, Handler<Either<String, JsonArray>> handler);
 
@@ -28,6 +28,6 @@ public interface SessionService {
 
     void unpublishSession(long sessionId, Handler<Either<String, JsonObject>> handler);
 
-    void getSessions(String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
+    void getSessions(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
                             boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler);
 }

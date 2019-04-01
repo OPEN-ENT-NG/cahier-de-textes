@@ -46,14 +46,14 @@ public class SessionServiceImpl  implements SessionService {
     }
 
     @Override
-    public void getOwnSessions(String startDate, String endDate, String audienceId, String subjectId, UserInfos user, Handler<Either<String, JsonArray>> handler) {
+    public void getOwnSessions(String structureId, String startDate, String endDate, String audienceId, String subjectId, UserInfos user, Handler<Either<String, JsonArray>> handler) {
         List<String> listAudienceId = audienceId != null ? Arrays.asList(audienceId) : null;
         List<String> listSubjectId = subjectId != null ? Arrays.asList(subjectId) : null;
 
         if (user.getType().equals("Student")) {
             this.getChildSessions(startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getSessions(startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, null, false, false, false, handler);
+            this.getSessions(structureId, startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, null, false, false, false, handler);
         }
     }
 
@@ -62,7 +62,7 @@ public class SessionServiceImpl  implements SessionService {
         List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
         List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
 
-        this.getSessions(startDate, endDate, null, listAudienceId, null, listTeacherId, true, false, false, handler);
+        this.getSessions(null,startDate, endDate, null, listAudienceId, null, listTeacherId, true, false, false, handler);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class SessionServiceImpl  implements SessionService {
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getSessions(startDate, endDate, null, listAudienceId, null, null, false, false, false, handler);
+                this.getSessions(null,startDate, endDate, null, listAudienceId, null, null, false, false, false, handler);
             }
         });
     }
@@ -93,7 +93,7 @@ public class SessionServiceImpl  implements SessionService {
      * @param agregVisas     returns the sessions with the field visas
      * @param handler
      */
-    public void getSessions(String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
+    public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
@@ -149,6 +149,10 @@ public class SessionServiceImpl  implements SessionService {
         if (ownerId != null) {
             query.append(" AND s.owner_id = ?");
             values.add(ownerId);
+        }
+        if(structureID != null){
+            query.append(" AND s.structure_id = ?");
+            values.add(structureID);
         }
 
         query.append(" GROUP BY s.id");

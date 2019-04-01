@@ -177,7 +177,7 @@ export let main = ng.controller('MainController',
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.progressionsToDisplay.sync(),
-                    await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
+                    await $scope.structure.sessions.syncExternalSessions( $scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
 
                 ]);
@@ -190,11 +190,10 @@ export let main = ng.controller('MainController',
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
-
                 await Promise.all([
                     await $scope.structure.homeworks.syncOwnHomeworks($scope.filters.startDate, $scope.filters.endDate),
                     await $scope.progressions.sync(),
-                    await $scope.structure.sessions.syncOwnSessions($scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.structure.sessions.syncOwnSessions($scope.structure,$scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             }
@@ -285,7 +284,8 @@ export let main = ng.controller('MainController',
 
 
                 let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
-                    return p.audience.id
+                    if(p.audience)
+                        return p.audience.id
                 });
                 let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
                 let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
@@ -414,8 +414,10 @@ export let main = ng.controller('MainController',
             return response;
         };
 
-        $scope.switchStructure = (structure: Structure) => {
+        $scope.switchStructure = async (structure: Structure) => {
             $scope.syncStructure(structure);
+            await  $scope.syncPedagogicItems();
+            $scope.safeApply();
         };
 
 

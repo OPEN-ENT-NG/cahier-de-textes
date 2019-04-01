@@ -302,11 +302,11 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncOwnSessions(startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
+    async syncOwnSessions(strutcture: any,startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = `/diary/sessions/own/${startDate}/${endDate}`;
+        let url = `/diary/sessions/own/${startDate}/${endDate}/${this.structure.id}`;
 
         if (audienceId) {
             url += `&audienceId=${audienceId}`;
