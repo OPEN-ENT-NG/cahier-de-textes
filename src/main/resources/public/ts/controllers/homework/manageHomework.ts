@@ -78,7 +78,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
 
             Promise.all([
-                await $scope.sessions.syncOwnSessions(moment(), moment().add(15, 'day'), $scope.homework.audience.id, $scope.homework.subject.id),
+                await $scope.sessions.syncOwnSessions($scope.structure, moment(), moment().add(15, 'day'), $scope.homework.audience.id, $scope.homework.subject.id),
                 await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(15, 'day'))
             ]).then(function () {
                 $scope.sessionsToAttachTo = [];
