@@ -276,7 +276,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-
+            if( $scope.subjects.all.length === 1){
+                $scope.homework.subject = $scope.subjects.all[0];
+            }
             if ($attrs.insideSessionForm) {
                 $scope.homework = $scope.$parent.homework;
                 $scope.isInsideSessionForm = true;

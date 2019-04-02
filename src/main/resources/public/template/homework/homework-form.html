@@ -11,7 +11,7 @@
                         disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
                     ng-model="homework.subject"
                     ng-options="subject.label for subject in subjects.all track by subject.id">
-                <option value="" disabled selected>[[translate('select.subject')]]</option>
+                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
             </select>
         </div>
     </div>

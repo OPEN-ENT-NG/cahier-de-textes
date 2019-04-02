@@ -235,8 +235,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
 
         async function initData() {
-            await Promise.all([
-                $scope.subjects.sync($scope.structure.id, model.me.userId)]);
+            await $scope.subjects.sync($scope.structure.id, model.me.userId)
+            if($scope.subjects.all.length=== 1 && !$scope.session.subject)
+                 $scope.session.subject = $scope.subjects.all[0];
+
+
             if(!$scope.session.id) {
                 if ($routeParams.id) {
                     $scope.session.id = $routeParams.id;

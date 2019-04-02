@@ -47,7 +47,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             await   $scope.progression_sessions.sync();
             await   $scope.progressionsToDisplay.sync();
             await $scope.subjects.sync($scope.structure.id, model.me.userId);
-
+            console.log($scope.subjects);
             $scope.progression_sessions.all.map(psession => {
                 $scope.subjects.all.forEach( subject =>{
                     if(psession.subject_id == subject.id){
@@ -55,6 +55,9 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                     }
                 })
             });
+            if($scope.subjects.all.length === 1){
+                $scope.progression_session.setSubject($scope.subjects.all[0]);
+            }
 
             $scope.progressionsToDisplay.all.map(psession => {
                 $scope.subjects.all.forEach( subject =>{

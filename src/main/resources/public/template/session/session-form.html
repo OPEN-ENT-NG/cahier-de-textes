@@ -12,7 +12,6 @@
                     ng-disabled="session.courseId && session.subject"
                     ng-options="subject.label for subject in subjects.all track by subject.id">
                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
-                <option ng-if="subjects.all.length === 1" value="" disabled >[[translate('select.subject')]]</option>
             </select>
 
         </div>
