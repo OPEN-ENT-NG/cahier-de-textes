@@ -70,6 +70,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         $scope.syncSessionsAndCourses = async () => {
+            if($scope.isReadOnly){
+                $scope.homework.opened = true;
+            }
             if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
                 return;
             }
@@ -315,6 +318,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.back = ()=>{
             $scope.homework.isDone = !$scope.homework.isDone;
             // $scope.setProgress($scope.homework);
+            console.log(window.history)
             window.history.back();
         };
         await initData();
