@@ -191,7 +191,7 @@ export let main = ng.controller('MainController',
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 await Promise.all([
-                    await $scope.structure.homeworks.syncOwnHomeworks($scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.structure.homeworks.syncOwnHomeworks($scope.structure,$scope.filters.startDate, $scope.filters.endDate),
                     await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncOwnSessions($scope.structure,$scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)

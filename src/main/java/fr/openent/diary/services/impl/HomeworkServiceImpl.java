@@ -65,11 +65,11 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getOwnHomeworks(String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler) {
+    public void getOwnHomeworks(String structureId, String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler) {
         if (user.getType().equals("Student")) {
             this.getChildHomeworks(startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getHomeworks(startDate, endDate, user.getUserId(), null, null, false, false, false, handler);
+            this.getHomeworks(structureId,startDate, endDate, user.getUserId(), null, null, false, false, false, handler);
         }
     }
 
@@ -78,7 +78,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
         List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
 
-        this.getHomeworks(startDate, endDate, null, listAudienceId, listTeacherId, true, false, false, handler);
+        this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, true, false, false, handler);
     }
 
     @Override
@@ -91,13 +91,14 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getHomeworks(startDate, endDate, null, listAudienceId, null, true, false, false, handler);
+                this.getHomeworks("", startDate, endDate, null, listAudienceId, null, true, false, false, handler);
             }
         });
     }
 
     /**
      * Query homeworks
+     * @param structureId
      * @param startDate return homeworks in the date or after
      * @param endDate return homeworks in the date or before
      * @param ownerId return homeworks with this ownerId
@@ -108,7 +109,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param agregVisas returns the homeworks with the field visas
      * @param handler
      */
-    private void getHomeworks(String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
+    private void getHomeworks(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
                               boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
@@ -131,7 +132,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             values.add(startDate);
             values.add(endDate);
         }
-
+        if(structureId != ""){
+            query.append(" AND h.structure_id = ?");
+            values.add(structureId);
+        }
         if (listAudienceId != null) {
             query.append(" AND ((h.session_id IS NOT NULL AND session.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray()));
             query.append(" ) OR (h.session_id IS NULL AND h.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray())).append("))");

@@ -212,11 +212,11 @@ export class Homeworks {
         return dataModel;
     }
 
-    async syncOwnHomeworks(startMoment: any, endMoment: any): Promise<void> {
+    async syncOwnHomeworks(structure: any,startMoment: any, endMoment: any): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = `/diary/homeworks/own/${startDate}/${endDate}`;
+        let url = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}`;
 
         await this.syncHomeworks(url);
     }

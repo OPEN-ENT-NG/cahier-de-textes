@@ -33,15 +33,16 @@ public class HomeworkController extends ControllerHelper {
     @SecuredAction(value = WorkflowUtils.HOMEWORK_PUBLISH, type = ActionType.WORKFLOW)
     public void workflow3(final HttpServerRequest request) { }
 
-    @Get("/homeworks/own/:startDate/:endDate")
+    @Get("/homeworks/own/:startDate/:endDate/:structureId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessOwnData.class)
     public void getOwnHomeworks(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             String startDate = request.getParam("startDate");
             String endDate = request.getParam("endDate");
+            String structureId = request.getParam("structureId");
 
-            homeworkService.getOwnHomeworks(startDate, endDate, user, DefaultResponseHandler.arrayResponseHandler(request));
+            homeworkService.getOwnHomeworks(structureId,startDate, endDate, user, DefaultResponseHandler.arrayResponseHandler(request));
         });
     }
 
