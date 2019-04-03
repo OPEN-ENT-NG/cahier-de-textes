@@ -234,6 +234,7 @@ export class Session {
         this.subject = session.subject;
         session.homeworks.map( homework =>  {
             homework.due_date = this.date;
+            homework.session = this;
             delete homework.id ;
             this.homeworks.push(homework);
         });
