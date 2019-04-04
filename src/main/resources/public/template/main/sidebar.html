@@ -33,16 +33,6 @@
 
         </div>
 
-        <!--<div class="row margin-bottom-md" ng-if="display.listView">-->
-        <!--<i18n>period.from</i18n>-->
-        <!--<date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"-->
-        <!--class="date-picker-sm"></date-picker>-->
-        <!--<br/>-->
-        <!--<i18n>to</i18n>-->
-        <!--<date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"-->
-        <!--class="date-picker-sm"></date-picker>-->
-        <!--</div>-->
-
         <div class="row margin-bottom-md" ng-show="display.listView">
 
             <label class="cursorPointer">
@@ -69,38 +59,21 @@
             </div>
         </div>
 
-
+        <!-- Select structure -->
         <div class="row margin-bottom-md" ng-show="!display.listView">
-            <div ng-click="display.homeworks = !display.homeworks">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="display.homeworks"/>
-                    <span><i18n>homeworks</i18n></span>
-                </label>
-                <div ng-click="display.sessions = !display.sessions">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="display.sessions">
-                        <span><i18n>session</i18n></span>
-                    </label>
-                </div>
-            </div>
-            <div ng-if="structures.all.length > 1">
+            <div ng-if="structures.all.length > 1"
+                 class="row display-inline-block margin-top-lg">
                 <select ng-model="structure"
                         id="structure-list"
-                        class="twelve"
+                        class="twelve margin-bottom-mid"
                         ng-change="switchStructure(structure)"
                         ng-options="structure as structure.name for structure in structures.all">
                     <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
                 </select>
             </div>
 
-
-            <!-- Access Own Data -->
-
-            <!-- Access Child Data -->
-
-
             <!-- Access External Data -->
-            <div class="margin-top-lg" workflow="diary.accessExternalData">
+            <div workflow="diary.accessExternalData">
                 <div class="row display-inline-block">
                     <label class="cell twelve small" for="user-list">
                         <select ng-model="params.user"
@@ -121,6 +94,20 @@
                                 ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
                             <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
                         </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Homework / Session -->
+            <div ng-click="display.homeworks = !display.homeworks">
+                <label class="checkbox">
+                    <input type="checkbox" ng-model="display.homeworks"/>
+                    <span><i18n>homeworks</i18n></span>
+                </label>
+                <div ng-click="display.sessions = !display.sessions">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.sessions">
+                        <span><i18n>session</i18n></span>
                     </label>
                 </div>
             </div>
