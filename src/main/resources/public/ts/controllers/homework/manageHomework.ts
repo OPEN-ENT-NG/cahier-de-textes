@@ -13,6 +13,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         }
 
         $scope.homework = new Homework($scope.structure);
+        $scope.sessionsToAttachTo = [];
+
         $scope.sessions = new Sessions($scope.structure);
         $scope.courses = new Courses($scope.structure);
         $scope.subjects = new Subjects();
@@ -305,7 +307,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
 
             // if new homework, we set the default homeworkType
-            if(!$scope.homework.id) {
+            if(!$scope.homework.id && !$scope.homework.type) {
                 $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
             }
 

@@ -101,6 +101,14 @@ export let manageListCtrl = ng.controller('manageListController',
                 return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
+        $scope.hasPedagogicDayToDisplay = (pedagogicDays) => {
+            console.log(pedagogicDays);
+            // pedagogicDays.map(p =>{
+            //
+            // })
+            return true
+        }
+
         $scope.hasHomeworksToDisplay = (display, pedagogicDay) => {
            let hasHomeworkToDisplay = false;
             if(display.sessionList)

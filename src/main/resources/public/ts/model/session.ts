@@ -264,7 +264,7 @@ export class Session {
         sessionDrag.homeworks.map( h =>{
             h.id = undefined;
             h.dueDate = this.date;
-            h.session =this;
+            h.session = this;
             this.homeworks.push(h);
         })
     }

@@ -611,13 +611,8 @@ export let main = ng.controller('MainController',
             let session= new Session($scope.structure,course);
             session.setFromCourseAndSession(course,sessionDrag);
             session.opened = true;
-            //await session.save();
-            //    await sessionDrag.duplicateHomework(session);
             $scope.session = session;
-            // $scope.syncPedagogicItems();
 
-            // $scope.safeApply();
-            console.log($scope.session);
             $scope.goTo('/session/create' );
 
 
@@ -691,8 +686,6 @@ export let main = ng.controller('MainController',
 
                 }
             );
-            //await session.save();
-            //  await progressionDragged.toSession(session.id);
             //await session.sync();
             $scope.syncPedagogicItems();
             $scope.safeApply();
