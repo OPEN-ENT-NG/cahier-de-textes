@@ -184,6 +184,7 @@ export class Homework {
         return this
             && this.structure
             && this.subject
+            && this.estimatedTime >= 0
             && this.audience
             && validSessionOrDueDate
             && this.type

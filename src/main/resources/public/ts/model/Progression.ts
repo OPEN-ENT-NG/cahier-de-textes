@@ -223,7 +223,7 @@ export class ProgressionHomework{
         return this
 
             && this.subject
-
+            && this.estimatedTime >= 0
             && this.type
             && this.description
             && this.description.length;
