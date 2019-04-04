@@ -5,7 +5,7 @@
                             disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
                     ng-model="homework.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
-                <option value="" disabled selected>[[translate('select.audience')]]</option>
+                <option ng-if="structure.audiences.all.length !== 1"  value="" disabled selected>[[translate('select.audience')]]</option>
             </select>
             <select ng-change="syncSessionsAndCourses();homework.session = undefined;
                         disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"

@@ -13,6 +13,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         }
 
         $scope.homework = new Homework($scope.structure);
+        if($scope.structure.audiences.all.length === 1){
+            $scope.homework.audience = $scope.structure.audiences.all[0];
+        }
         $scope.sessionsToAttachTo = [];
 
         $scope.sessions = new Sessions($scope.structure);
@@ -283,6 +286,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
             if( $scope.subjects.all.length === 1){
                 $scope.homework.subject = $scope.subjects.all[0];
+                if($scope.homework.audience)
+                    $scope.homework.opened = true;
             }
             if ($attrs.insideSessionForm) {
                 $scope.homework = $scope.$parent.homework;

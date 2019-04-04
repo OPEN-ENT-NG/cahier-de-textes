@@ -13,6 +13,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.subjects = new Subjects();
         $scope.session.teacher = {id: model.me.userId};
         $scope.isSelectSubjectAndAudienceSession = true;
+
+        if($scope.structure.audiences.all.length === 1){
+            $scope.session.audience = $scope.structure.audiences.all[0];
+        }
         $scope.validate = false;
         $scope.oldHomework = new Homework($scope.structure);
         $scope.formIsOpened = false;
@@ -236,8 +240,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         async function initData() {
             await $scope.subjects.sync($scope.structure.id, model.me.userId)
-            if($scope.subjects.all.length=== 1 && !$scope.session.subject)
-                 $scope.session.subject = $scope.subjects.all[0];
+            if($scope.subjects.all.length === 1 && !$scope.session.subject) {
+                $scope.session.subject = $scope.subjects.all[0];
+                if($scope.session.audience){
+                    $scope.session.opened = true;
+                }
+            }
+
 
 
             if(!$scope.session.id) {
