@@ -4,7 +4,7 @@
     </div>
 
     <article class="row padding-md" ng-click="homework.opened = !homework.opened">
-        <h2 class="four cell remove-margin">
+        <h2 class="eight cell remove-margin">
             <span>[[homework.type.label]]</span>
             <span ng-if="!homework.isInsideDiary">-
                 <span ng-if="homework.attachedToDate">Pour le [[getDisplayDate(homework.dueDate)]]</span>
@@ -36,10 +36,25 @@
             </label>
         </div>
 
+        <div class="twelve cell ">
+            <h4>
+                <div ng-show="homework.estimatedTime !== 0">
+
+                    <i18n>homework.workload</i18n> :
+                    [[homework.estimatedTime]] <i18n>minutes</i18n>
+                </div>
+                <div ng-show="homework.estimatedTime === 0">
+                    <i18n>homework.no.workload</i18n>
+                </div>
+            </h4>
+        </div>
+
+
 
 
 
         <div class="row padding-md" ng-show="homework.opened || homework.isInsideDiary">
+
             <!-- Description-->
             <div class="read-only-description" bind-html="homework.description"></div>
         </div>
