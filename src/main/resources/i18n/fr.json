@@ -177,6 +177,7 @@
   "homework.manage.type": "Type",
   "homework.manage.give": "Donné le",
   "homework.workload": "Durée estimée",
+  "homework.no.workload":"Aucune durée estimée",
   "homework.attachedToSession": "Séance du ",
   "homework.week.workload": "Charge de travail de la semaine",
   "homework.manage.published": "Travail à faire publié",
