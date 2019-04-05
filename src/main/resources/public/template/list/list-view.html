@@ -24,9 +24,9 @@
         </article>
 
     <div class="list-view">
-        <div class="timeline-story vertical-spacing row">
+        <div ng-show="(!display.sessionList && hasPedagogicDayToDisplay(pedagogicDays) ) || display.sessionList" class="timeline-story vertical-spacing row">
             <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
-                 class="twelve cell event-row">
+                 class="twelve cell event-row timeline-story">
                 <div  ng-if="!containsOnlyCourses(pedagogicDay) && hasHomeworksToDisplay(display, pedagogicDay)" >
                     <i  ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet" ng-click="displayDay(pedagogicDay)"></i>
                     <div class="cell date-field text-right">

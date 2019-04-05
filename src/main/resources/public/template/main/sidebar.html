@@ -1,5 +1,16 @@
 <article class="sidebar ">
     <section id="display-section" class="twelve">
+
+        <div ng-if="structures.all.length > 1">
+            <select ng-model="structure"
+                    id="structure-list"
+                    class="twelve"
+                    ng-change="switchStructure(structure)"
+                    ng-options="structure as structure.name for structure in structures.all">
+                <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+            </select>
+        </div>
+
         <div workflow="diary.accessChildData">
             <select ng-model="params.child"
                     class="twelve"
@@ -61,16 +72,6 @@
 
         <!-- Select structure -->
         <div class="row margin-bottom-md" ng-show="!display.listView">
-            <div ng-if="structures.all.length > 1"
-                 class="row display-inline-block margin-top-lg">
-                <select ng-model="structure"
-                        id="structure-list"
-                        class="twelve margin-bottom-mid"
-                        ng-change="switchStructure(structure)"
-                        ng-options="structure as structure.name for structure in structures.all">
-                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-                </select>
-            </div>
 
             <!-- Access External Data -->
             <div workflow="diary.accessExternalData">
