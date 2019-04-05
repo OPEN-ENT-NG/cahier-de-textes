@@ -77,19 +77,24 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if($scope.isReadOnly){
                 $scope.homework.opened = true;
             }
+
             if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
                 return;
             }
             if (!$scope.homework.opened && !$scope.isInsideSessionForm) {
+                if(!$scope.homework.id && !$scope.homework.type) {
+                    $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
+                }
+
                 $scope.homework.opened = true;
             }
+
 
             Promise.all([
                 await $scope.sessions.syncOwnSessions($scope.structure, moment(), moment().add(15, 'day'), $scope.homework.audience.id, $scope.homework.subject.id),
                 await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(15, 'day'))
             ]).then(function () {
                 $scope.sessionsToAttachTo = [];
-                console.log("c");
 
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
                 let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) &&
@@ -135,7 +140,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     sessionsToAttachTo.map(ss => {
                         if (!(s instanceof Session)) {
                             if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
-                                console.log("plop");
                                 sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
                             }
                         }
@@ -309,7 +313,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         $scope.attachToDate();
                     }
                 } else {
-                    $scope.homework.session = $scope.sessionsToAttachTo[0];
+                    if($scope.sessionsToAttachTo)
+                        $scope.homework.session = $scope.sessionsToAttachTo[0];
                     $scope.attachToDate();
                 }
             }
@@ -328,7 +333,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.back = ()=>{
             $scope.homework.isDone = !$scope.homework.isDone;
             // $scope.setProgress($scope.homework);
-            console.log(window.history)
             window.history.back();
         };
         await initData();
