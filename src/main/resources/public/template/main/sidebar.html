@@ -1,16 +1,6 @@
 <article class="sidebar ">
     <section id="display-section" class="twelve">
 
-        <div ng-if="structures.all.length > 1">
-            <select ng-model="structure"
-                    id="structure-list"
-                    class="twelve"
-                    ng-change="switchStructure(structure)"
-                    ng-options="structure as structure.name for structure in structures.all">
-                <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-            </select>
-        </div>
-
         <div workflow="diary.accessChildData">
             <select ng-model="params.child"
                     class="twelve"
@@ -39,9 +29,7 @@
                    ng-class="display.listView ? 'selected' : 'opacity-icon'"
                    ng-click="changeViewList()"
                    ng-model="display.listView">&#xe8b8;</i>
-
             </label>
-
         </div>
 
         <div class="row margin-bottom-md" ng-show="display.listView">
@@ -53,7 +41,8 @@
             <label class="cursorPointer">
                 <input type="radio" ng-model="display.sessionList" ng-value="false">
                 <i18n>homeworks</i18n>
-            </label>  <i ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter" ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
+            </label>  <i ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter"
+                         ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
             <div class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
                 <div class="ten right-magnet" ng-click="display.todo = !display.todo">
                     <label class="checkbox">
@@ -70,8 +59,18 @@
             </div>
         </div>
 
-        <!-- Select structure -->
         <div class="row margin-bottom-md" ng-show="!display.listView">
+
+            <!-- Select structure -->
+            <div ng-if="structures.all.length > 1">
+                <select ng-model="structure"
+                        id="structure-list"
+                        class="twelve margin-bottom-mid"
+                        ng-change="switchStructure(structure)"
+                        ng-options="structure as structure.name for structure in structures.all">
+                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
+                </select>
+            </div>
 
             <!-- Access External Data -->
             <div workflow="diary.accessExternalData">
