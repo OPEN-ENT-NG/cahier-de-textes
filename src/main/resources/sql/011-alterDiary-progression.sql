@@ -1,0 +1,1 @@
+ALTER TABLE diary.progression_session alter column title type character varying(100);
