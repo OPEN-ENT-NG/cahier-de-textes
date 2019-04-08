@@ -49,7 +49,7 @@
                 </div>
                 <!-- Other Seance or Date -- ng-if="!homework.attachedToParentSession || !isInsideSessionForm"-->
                 <div class="row" >
-                    <div class="row margin-bottom-md">
+                    <div class="row margin-bottom-md" ng-show="display.sessionSelect">
                         <label ><!--ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0"-->
                             <input type="radio"
                                    ng-click="attachToSession()"

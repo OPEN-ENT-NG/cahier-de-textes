@@ -7,12 +7,15 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
         $scope.isReadOnly = $scope.isReadOnly || modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
+        $scope.display = {
+            sessionSelect : false
+        }
+
         function modeIsReadOnly() {
             let currentPath = $location.path();
             return currentPath.includes('view');
         }
-
-        $scope.homework = new Homework($scope.structure);
+        $scope.homework ?  $scope.homework = $scope.homework : $scope.homework = new Homework($scope.structure) ;
         if($scope.structure.audiences.all.length === 1){
             $scope.homework.audience = $scope.structure.audiences.all[0];
         }
@@ -21,10 +24,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.courses = new Courses($scope.structure);
         $scope.subjects = new Subjects();
         $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
-        $scope.isInsideSessionForm = false;
+        $scope.isInsideSessionForm =  $attrs.insideSessionForm;
         $scope.isSelectSubjectAndAudienceHomework = true;
         $scope.validate = false;
-        $scope.homework.opened = false;
+        $scope.homework.opened ? $scope.homework.opened :  $scope.homework.opened=false;
 
         $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
             if(!audience || !subject){
@@ -77,16 +80,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if($scope.isReadOnly){
                 $scope.homework.opened = true;
             }
-
             if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
                 return;
             }
+
             if (!$scope.homework.opened && !$scope.isInsideSessionForm) {
                 if(!$scope.homework.id && !$scope.homework.type) {
                     $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
                 }
-
                 $scope.homework.opened = true;
+
             }
 
 
@@ -95,16 +98,15 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group, moment(), moment().add(15, 'day'))
             ]).then(function () {
                 $scope.sessionsToAttachTo = [];
-
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
-                let filteredCourses = $scope.courses.all.filter(c => c.audiences.all.find(a => a.id === $scope.homework.audience.id) &&
-                (c.subject) ? c.subject.id === $scope.homework.subject.id
-                    : false );
+                let filteredCourses = $scope.courses.all.filter(c =>
+                    c.audiences.all.find(a => (a.id === $scope.homework.audience.id) && c.subject)
+                        ? c.subject.id === $scope.homework.subject.id
+                        : false );
 
                 // We only keep the courses without a session attached to.
                 let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
                     && Utils.getFormattedDate(s.startMoment) === Utils.getFormattedDate(c.startMoment))));
-
                 let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                 $scope.sessionsToAttachTo.sort(function (a, b) {
@@ -116,12 +118,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 //         $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => s.id !== $scope.$parent.session.id);
                 //     }
                 // }
+                if(courses.length !== 0 || $scope.sessions.all.length  !== 0){
+                    $scope.display.sessionSelect = true;
+                }else{
+                    $scope.display.sessionSelect = false;
+                    $scope.attachToDate();
+                }
                 if ($scope.isInsideSessionForm) {
                     $scope.attachToSession();
                 }
 
                 $scope.safeApply();
             });
+            $scope.safeApply();
 
 
         };
@@ -155,19 +164,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.attachToSession = () => {
             $scope.homework.attachedToDate = false;
-
             $scope.homework.attachedToSession = true;
             if($scope.session)
                 $scope.homework.dueDate = moment($scope.session.startDate);
-            if($scope.homework.dueDate) {
-                $scope.sessionsToAttachTo.unshift($scope.homework.session);
 
-            }
 
             clearDublicateSessions($scope.sessionsToAttachTo);
 
-            //If only one session or no session then push the current one
-            if ($scope.sessionsToAttachTo && $scope.sessionsToAttachTo.length < 1 && $scope.isInsideSessionForm) {
+            //If no session then push the current one
+
+            if ((!$scope.session.id) || ($scope.sessionsToAttachTo && $scope.sessionsToAttachTo.length <= 0) && $scope.isInsideSessionForm) {
 
                 $scope.homework.session = $scope.session;
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
@@ -194,6 +200,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToDate = () => {
             $scope.homework.attachedToSession = false;
             $scope.homework.attachedToDate = true;
+
             $scope.homework.session = undefined;
             $scope.safeApply();
         };
@@ -215,7 +222,17 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             }
         };
+        $scope.$watch(() => $scope.homework.audience, async () => {
+            if ($scope.homework.audience)
+                await $scope.syncSessionsAndCourses();
+            $scope.safeApply();
+        });
 
+        $scope.$watch(() => $scope.homework.subject, async () => {
+            if ($scope.homework.subject)
+                await $scope.syncSessionsAndCourses();
+            $scope.safeApply();
+        });
         $scope.isValidForm = () => {
             return $scope.homework.isValidForm();
         };
@@ -290,11 +307,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
-            if( $scope.subjects.all.length === 1){
+            if( !$scope.isInsideSessionForm && $scope.subjects.all.length === 1){
                 $scope.homework.subject = $scope.subjects.all[0];
-                if($scope.homework.audience)
+                if($scope.homework.audience){
                     $scope.homework.opened = true;
+                }
             }
+
             await $scope.syncSessionsAndCourses();
 
             if ($attrs.insideSessionForm) {
@@ -303,6 +322,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 if($scope.homework.id){
                     await $scope.homework.sync();
                 }
+                $scope.attachToSession();
             } else {
                 $scope.homework.id = $routeParams.id ? $routeParams.id : undefined;
                 if($scope.homework.id){

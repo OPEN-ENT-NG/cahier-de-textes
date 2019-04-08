@@ -150,7 +150,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     h.opened = false;
                 }
             });
-            homework.opened = !homework.opened;
+            homework.opened = true;
             $scope.safeApply();
         };
 
@@ -219,6 +219,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             newHomework.isNewField = true;
             $scope.session.homeworks.push(newHomework);
             $scope.openHomework(newHomework);
+
             $scope.safeApply();
         };
 
@@ -246,14 +247,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.session.opened = true;
                 }
             }
-
-
-
             if(!$scope.session.id) {
+
                 if ($routeParams.id) {
                     $scope.session.id = $routeParams.id;
                     await $scope.session.sync();
+
                     $scope.session.opened = true;
+
                 }
                 else if ($routeParams.courseId && $routeParams.date) {
                     let course = new Course($scope.structure, $routeParams.courseId);
@@ -261,6 +262,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.session.setFromCourse(course);
                     $scope.session.opened = true;
                 }
+
             }else{
                 $scope.session.opened = true;
             }
