@@ -113,7 +113,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             let hasSucceed = true;
             $scope.session.homeworks.forEach(async h => {
                 if (!h.attachedToDate && h.session.courseId) {
-                    if ($scope.session && $scope.session.id) {
+                    if ($scope.session && !h.session.id) {
                         h.session.id = $scope.session.id;
                     }
                 }
@@ -252,7 +252,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if ($routeParams.id) {
                     $scope.session.id = $routeParams.id;
                     await $scope.session.sync();
-
                     $scope.session.opened = true;
 
                 }
