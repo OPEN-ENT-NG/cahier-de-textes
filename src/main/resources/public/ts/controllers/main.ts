@@ -225,7 +225,20 @@ export let main = ng.controller('MainController',
             });
 
 
-            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
+            if(Utils.isAChildOrAParent(model.me.type)){
+                    $scope.structure.sessions.all.map((s,i) =>{
+                        if(!s.isPublished){
+                            $scope.structure.sessions.all.splice(i,1);
+                        }
+                    })
+                $scope.structure.homeworks.all.map((h,i) =>{
+                    if(!h.isPublished){
+                        $scope.structure.homeworks.all.splice(i,1);
+                    }
+                })
+                }
+
+                $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
             let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
             $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
