@@ -7,7 +7,7 @@
         <h2 class="eight cell remove-margin">
             <span>[[homework.type.label]]</span>
             <span ng-if="!homework.isInsideDiary"> -
-                <span ng-if="homework.attachedToDate"><i18n>homework.for.date</i18n>[[getDisplayDate(homework.dueDate)]]</span>
+                <span ng-if="homework.attachedToDate"><i18n>homework.for.date</i18n> [[getDisplayDate(homework.dueDate)]]</span>
                 <span ng-if="homework.attachedToParentSession"><i18n>for.this.session</i18n></span>
                 <span ng-if="homework.attachedToOtherSession && homework.session">&nbsp;
                     <i18n>todo.for.session</i18n>
