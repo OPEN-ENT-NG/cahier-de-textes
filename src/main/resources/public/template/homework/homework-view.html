@@ -14,8 +14,11 @@
                     [[homework.session.subject.label]] [[homework.session.startDisplayDate]]
                     ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
                 </span>
-            </span> -
+            </span>
+            <span ng-show="homework.publishDate !== 'Invalid date'">
+                 -
             <i18n>homework.manage.give</i18n> [[homework.publishDate]]
+                </span>
         </h2>
         <h2 class="right-magnet">
             <i  ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
