@@ -24,7 +24,7 @@
         </article>
 
     <div class="list-view">
-        <div ng-show="(!display.sessionList && hasPedagogicDayToDisplay(pedagogicDays) ) || display.sessionList" class="timeline-story vertical-spacing row">
+        <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display)" class="timeline-story vertical-spacing row">
             <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
                  class="twelve cell event-row timeline-story">
                 <div  ng-if="!containsOnlyCourses(pedagogicDay) && hasHomeworksToDisplay(display, pedagogicDay)" >

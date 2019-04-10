@@ -101,16 +101,32 @@ export let manageListCtrl = ng.controller('manageListController',
                 return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
-        $scope.hasPedagogicDayToDisplay = (pedagogicDays) => {
-            console.log(pedagogicDays);
-            // pedagogicDays.map(p =>{
-            //
-            // })
-            return true
+        $scope.hasPedagogicDayToDisplay = (pedagogicDays, display) => {
+            let hasOneDayToDisplay=false;
+            if(pedagogicDays)
+                pedagogicDays.map(p =>{
+                    p.pedagogicItems.map( pd => {
+                        if(display.sessionList && pd instanceof Session){
+                            hasOneDayToDisplay = true;
+                        }
+                        if(!display.sessionList && pd instanceof Homework){
+
+                            if(Utils.isAChildOrAParent(model.me.type) ){
+                              if( display.todo || display.done)
+                                  hasOneDayToDisplay = true;
+                              else
+                                  hasOneDayToDisplay = false;
+                            }else{
+                                hasOneDayToDisplay = true;
+                            }
+                        }
+                    })
+                });
+            return hasOneDayToDisplay
         }
 
         $scope.hasHomeworksToDisplay = (display, pedagogicDay) => {
-           let hasHomeworkToDisplay = false;
+            let hasHomeworkToDisplay = false;
             if(display.sessionList)
                 hasHomeworkToDisplay = hasHomeworkToDisplay || true;
             else{

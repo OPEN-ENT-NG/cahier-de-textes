@@ -41,9 +41,9 @@
             <label class="cursorPointer">
                 <input type="radio" ng-model="display.sessionList" ng-value="false">
                 <i18n>homeworks</i18n>
-            </label>  <i ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter"
+            </label>  <i ng-show="!display.sessionList" ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter"
                          ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
-            <div class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
+            <div ng-show="!display.sessionList" class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
                 <div class="ten right-magnet" ng-click="display.todo = !display.todo">
                     <label class="checkbox">
                         <input type="checkbox" ng-model="display.todo"/>
