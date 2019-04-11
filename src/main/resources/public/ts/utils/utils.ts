@@ -76,6 +76,14 @@ export class Utils {
         return type === "ELEVE" || type === "PERSRELELEVE"
     }
 
+    static isChild(type) {
+        return type === "ELEVE"
+    }
+
+    static isRelative(type) {
+        return type === "PERSRELELEVE"
+    }
+
     static startBlobDownload(dataBlob, suggestedFileName) {
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
             // for IE

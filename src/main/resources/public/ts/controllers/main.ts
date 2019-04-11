@@ -27,10 +27,11 @@ export let main = ng.controller('MainController',
             progression: false,
             sessionList : false,
             homeworksFilter: true,
-            todo: true,
-            done: false
         };
-        $scope.isAChildOrAParent= Utils.isAChildOrAParent(model.me.type);
+        $scope.isAChildOrAParent = Utils.isAChildOrAParent(model.me.type);
+        $scope.isChild = Utils.isChild(model.me.type);
+        $scope.isRelative = Utils.isRelative(model.me.type);
+
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
         $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
@@ -69,6 +70,16 @@ export let main = ng.controller('MainController',
                 await placingLoader();
                 initializeData();
             }, 100);
+
+            if(Utils.isRelative(model.me.type)) {
+                $scope.display.todo = true;
+                $scope.display.done = true;
+            };
+
+            if(Utils.isChild(model.me.type)) {
+                $scope.display.todo = true;
+                $scope.display.done = false;
+            };
         }
 
         async function placingLoader(exit: number = 0) {
