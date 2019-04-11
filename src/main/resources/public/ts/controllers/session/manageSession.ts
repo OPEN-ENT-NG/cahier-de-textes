@@ -59,7 +59,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.audience
                 && $scope.session.date
                 && $scope.session.startTime
-                && $scope.session.endTime;
+                && $scope.session.endTime
+                && moment($scope.session.endTime).isAfter(moment($scope.session.startTime).add(14,"minutes"));
 
             // let homeworkFormsAreValids = true;
             // for (let h of $scope.session.homeworks) {
