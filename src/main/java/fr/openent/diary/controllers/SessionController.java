@@ -28,26 +28,29 @@ public class SessionController extends ControllerHelper {
     }
 
     @SecuredAction(value = WorkflowUtils.SESSION_READ, type = ActionType.WORKFLOW)
-    public void workflow1(final HttpServerRequest request) { }
+    public void workflow1(final HttpServerRequest request) {
+    }
 
     @SecuredAction(value = WorkflowUtils.SESSION_MANAGE, type = ActionType.WORKFLOW)
-    public void workflow2(final HttpServerRequest request) { }
+    public void workflow2(final HttpServerRequest request) {
+    }
 
     @SecuredAction(value = WorkflowUtils.SESSION_PUBLISH, type = ActionType.WORKFLOW)
-    public void workflow3(final HttpServerRequest request) { }
+    public void workflow3(final HttpServerRequest request) {
+    }
 
     @Get("/sessions/own/:startDate/:endDate/:structureId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessOwnData.class)
     public void getOwnSessions(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, user ->  {
+        UserUtils.getUserInfos(eb, request, user -> {
             String startDate = request.getParam("startDate");
             String endDate = request.getParam("endDate");
             String structureId = request.getParam("structureId");
             String audienceId = request.getParam("audienceId");
             String subjectId = request.getParam("subjectId");
 
-            sessionService.getOwnSessions(structureId,startDate, endDate, audienceId, subjectId, user, DefaultResponseHandler.arrayResponseHandler(request));
+            sessionService.getOwnSessions(structureId, startDate, endDate, audienceId, subjectId, user, DefaultResponseHandler.arrayResponseHandler(request));
         });
     }
 
@@ -83,7 +86,7 @@ public class SessionController extends ControllerHelper {
         String endDate = request.getParam("endDate");
         String teacherId = request.getParam("teacherId");
         List<String> listTeacherId = Arrays.asList(teacherId);
-        sessionService.getSessions("",startDate, endDate, null, null, null, listTeacherId, true, false, true,
+        sessionService.getSessions(null, startDate, endDate, null, null, null, listTeacherId, true, false, true,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 
