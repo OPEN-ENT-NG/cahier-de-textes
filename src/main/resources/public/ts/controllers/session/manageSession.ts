@@ -107,7 +107,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             $scope.safeApply();
-            window.history.back();
+            $scope.goTo("/view");
         };
 
         async function saveSessionHomeworks() {
