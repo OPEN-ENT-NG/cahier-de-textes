@@ -28,18 +28,11 @@
                         <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
                               ng-click="pedagogicItem.opened = !pedagogicItem.opened">
                             [[pedagogicItem.type.label]]&nbsp; -
-                            <span ng-if="isAChildOrAParent && homework.publishDate !== 'Invalid date'"> <i18n>homework.published.date.child</i18n> [[pedagogicItem.publishDate]]</span>
-                            <span ng-if="!isAChildOrAParent && homework.publishDate !== 'Invalid date'"> <i18n>homework.published.date.teacher</i18n> [[pedagogicItem.publishDate]]</span>
+                            <span ng-if="isAChildOrAParent && pedagogicItem.publishDate !== 'Invalid date'"> <i18n>homework.published.date.child</i18n> [[pedagogicItem.publishDate]]</span>
+                            <span ng-if="!isAChildOrAParent && pedagogicItem.publishDate !== 'Invalid date'"> <i18n>homework.published.date.teacher</i18n> [[pedagogicItem.publishDate]]</span>
                             <!--<i ng-class="homework.opened  ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
                         </span>
                     </div>
-
-                    <!-- Il faut récupérer cette donnée mais ne nous l'avons pas pour le moment -->
-                    <!--<div class="cell horizontal-spacing twelve-mobile">-->
-                        <!--<span>-->
-                            <!--<i18n>homework.manage.give</i18n> :-->
-                        <!--</span>-->
-                    <!--</div>-->
 
                     <div class="horizontal-spacing twelve-mobile" ng-if="isAChildOrAParent">
                         <div class="cell horizontal-spacing twelve-mobile ">
