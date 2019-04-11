@@ -112,10 +112,14 @@ export let manageListCtrl = ng.controller('manageListController',
                         if(!display.sessionList && pd instanceof Homework){
 
                             if(Utils.isAChildOrAParent(model.me.type) ){
-                              if( display.todo || display.done)
-                                  hasOneDayToDisplay = true;
-                              else
-                                  hasOneDayToDisplay = false;
+                                if( display.todo || display.done) {
+                                    if(display.todo && !pd.isDone)
+                                        hasOneDayToDisplay = true;
+                                    if(display.done && pd.isDone)
+                                        hasOneDayToDisplay = true;
+                                }
+                                else
+                                    hasOneDayToDisplay = false;
                             }else{
                                 hasOneDayToDisplay = true;
                             }
