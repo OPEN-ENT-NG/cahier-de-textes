@@ -6,7 +6,7 @@
                     class="twelve"
                     ng-change="params.group = null;params.user = null;syncPedagogicItems()"
                     ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                <option value="" disabled selected>[[translate('student.choose')]]</option>
+                <option ng-if="students.all.length < 1" value="" disabled selected>[[translate('student.choose')]]</option>
             </select>
         </div>
         <div ng-if="hasListRight()">
