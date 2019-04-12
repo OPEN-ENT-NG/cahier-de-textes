@@ -232,5 +232,6 @@
   "progression.get.err": "Erreur lors de la récupération de la progression",
   "progression.level": "Niveau",
   "validate": "valider",
-  "Status":"Statut"
+  "Status":"Statut",
+  "diary.error.date.is.not.valid"  :"L'heure de fin doit être supérieure de 15 minutes à l'heure de début"
 }

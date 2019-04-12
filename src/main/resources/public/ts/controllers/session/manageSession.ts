@@ -52,6 +52,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.safeApply();
         });
 
+        $scope.validDate = () =>{
+            return moment($scope.session.endTime).isAfter(moment($scope.session.startTime).add(14,"minutes"));
+        };
 
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
@@ -60,7 +63,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime
-                && moment($scope.session.endTime).isAfter(moment($scope.session.startTime).add(14,"minutes"));
+                && $scope.validDate;
 
             // let homeworkFormsAreValids = true;
             // for (let h of $scope.session.homeworks) {

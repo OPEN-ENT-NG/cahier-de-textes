@@ -146,6 +146,7 @@
                         static-include="/diary/public/template/homework/homework-formPrinter.html"></tr>
                     </tbody>
                 </table>
+
                 <button ng-show="!validate"
                         class="float-none display-inline-block margin-top-md"
                         ng-click="addHomework()">
@@ -174,7 +175,9 @@
                 <i18n>homework.manage.create</i18n>
             </button>
         </div>
-
+        <div ng-if="!validDate()" class="warning ">
+            <i18n>diary.error.date.is.not.valid</i18n>
+        </div>
 
     </div>
 
