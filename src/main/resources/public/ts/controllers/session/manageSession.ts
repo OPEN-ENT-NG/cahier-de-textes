@@ -263,10 +263,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     let course = new Course($scope.structure, $routeParams.courseId);
                     await course.sync($routeParams.date, $routeParams.date);
                     $scope.session.setFromCourse(course);
-                    $scope.session.opened = true;
+                    if($scope.session.subject && $scope.session.audience)
+                        $scope.session.opened = true;
+
+
                 }
 
             }else{
+                console.log('pli')
+
                 $scope.session.opened = true;
             }
             $scope.placeholder = "Séance du " + moment($scope.session.date).format("DD/MM/YYYY");
