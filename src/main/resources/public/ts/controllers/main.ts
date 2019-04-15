@@ -75,6 +75,10 @@ export let main = ng.controller('MainController',
                 $scope.display.todo = true;
                 $scope.display.done = true;
             };
+            if(model.me.type === "ENSEIGNANT"){
+                $scope.display.todo = true;
+                $scope.display.done = true;
+            }
 
             if(Utils.isChild(model.me.type)) {
                 $scope.display.todo = true;
