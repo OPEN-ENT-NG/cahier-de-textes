@@ -59,6 +59,11 @@
                 </div>
             </div>
         </div>
+        <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays,display)" >
+        <span ng-show="!display.sessionList"><i18n>diary.empty.viewlist.homework</i18n></span>
+            <span ng-show="display.sessionList"><i18n>diary.empty.viewlist.session</i18n></span>
+
+        </div>
     </div>
 </div>
 </div>

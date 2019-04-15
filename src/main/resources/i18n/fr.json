@@ -1,6 +1,9 @@
 {
   "diary": "Cahier de textes",
   "diary.title": "Cahier de textes",
+  "diary.empty.viewlist.homework": "Vous n'avez pas de travail à faire durant cette période",
+  "diary.empty.viewlist.session": "Vous n'avez pas de séance durant cette période",
+
   "notify.saved": "La donnée a été sauvegardée",
   "notify.modified": "La donnée a été modifiée",
   "notify.deleted": "La donnée a été supprimée",
