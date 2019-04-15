@@ -127,12 +127,12 @@
         </div>
 
         <div ng-if="session.homeworks.length" class="margin-bottom-md">
-            <h2>
+            <h2 ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
                 <i18n>homeworks</i18n>
             </h2>
             <div class="responsive-table row" ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
 
-                <table class="twelve">
+                <table class="twelve" ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
                     <thead>
                     <tr>
                         <td class="two text-left padding-left-md">
@@ -186,7 +186,7 @@
                     </tbody>
                 </table>
 
-            </div>
+                </div>
 
             <div class="row">
 
@@ -196,7 +196,7 @@
                     <container template="formHomework"></container>
                 </div>
 
-                <button ng-show="!validate"
+        <button ng-show="!validate"
                         class="float-none display-inline-block margin-top-md"
                         ng-click="addHomework()">
                     <i18n>homework.manage.create</i18n>
@@ -214,11 +214,9 @@
                     <i18n>utils.cancel</i18n>
                 </button>
 
-            </div>
-        </div>
-
+            </div></div>
         <div ng-if="!validDate()" class="warning ">
-            <i18n>diary.error.date.is.not.valid</i18n>
+            <i18n>diary.error.date.is.not.valid</i18n></div>
         </div>
     </div>
 </div>
