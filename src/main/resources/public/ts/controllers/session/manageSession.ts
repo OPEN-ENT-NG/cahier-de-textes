@@ -63,7 +63,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 && $scope.session.date
                 && $scope.session.startTime
                 && $scope.session.endTime
-                && $scope.validDate;
+                && $scope.validDate();
 
             // let homeworkFormsAreValids = true;
             // for (let h of $scope.session.homeworks) {
