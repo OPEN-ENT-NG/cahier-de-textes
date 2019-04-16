@@ -143,8 +143,7 @@
                     <div class="row">
                         <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
                              ng-if="!progressionHomework.isDeleted"
-                             inside-session-form="true"
-                             ng-controller="manageHomeworkCtrl">
+                             inside-session-form="true">
                             <container template="formProgressionHomework"></container>
                         </div>
 
