@@ -2,6 +2,7 @@ import { model, Behaviours } from 'entcore';
 import { Courses, Subjects, Sessions, Homeworks, Audiences, Teachers, Students, USER_TYPES } from './index';
 import { Eventer } from 'entcore-toolkit';
 import {Personnels} from './Personnel';
+import {SessionTypes} from './session';
 
 export class Structure {
     id: string;
@@ -15,6 +16,7 @@ export class Structure {
     students: Students;
     personnels: Personnels;
     eventer: Eventer = new Eventer();
+    types : SessionTypes;
 
     /**
      * Structure constructor. Can take an id and a name in parameter
@@ -25,6 +27,7 @@ export class Structure {
         if (typeof id === 'string') { this.id = id; }
         if (typeof name === 'string') { this.name = name; }
         this.subjects = new Subjects();
+        this.types = new SessionTypes(this.id);
         this.audiences = new Audiences();
         this.courses = new Courses(this);
         this.sessions = new Sessions(this);
@@ -43,6 +46,7 @@ export class Structure {
         return new Promise((resolve, reject) => {
             let syncedCollections = {
                 subjects: false,
+                types: false,
                 audiences: false,
                 teachers: false,
                 personnels: false,
@@ -62,6 +66,8 @@ export class Structure {
             };
 
             this.subjects.sync(this.id).then(() => { syncedCollections.subjects = true; endSync(); });
+            this.types.sync().then(() => { syncedCollections.types = true; endSync(); });
+
             this.audiences.sync(this.id).then(() => {
                 syncedCollections.audiences = true; endSync();
                 if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {

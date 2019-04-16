@@ -1,16 +1,16 @@
-import {_, Behaviours, model, moment, ng} from 'entcore';
-import {Course, Session, Subjects, Toast} from '../../model';
-import {Homework} from '../../model/homework';
+import {Behaviours, model, moment, ng} from 'entcore';
+import {Course, Homework, Session, SessionTypes, Subjects, Toast} from '../../model';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', '$filter', async function ($scope, $routeParams, $location, $attrs, $filter) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
         $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
         //$scope.session.opened = false;
         $scope.subjects = new Subjects();
+        $scope.sessionTypes = new SessionTypes($scope.structure.id);
+
         $scope.session.teacher = {id: model.me.userId};
         $scope.isSelectSubjectAndAudienceSession = true;
 
@@ -59,6 +59,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
                 && $scope.session.subject
+                && $scope.session.type
                 && $scope.session.audience
                 && $scope.session.date
                 && $scope.session.startTime
@@ -200,6 +201,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
         };
+
         $scope.closeHomework = () => {
 
 
@@ -242,9 +244,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.safeApply();
         };
 
-
         async function initData() {
-            await $scope.subjects.sync($scope.structure.id, model.me.userId)
+            await $scope.sessionTypes.sync();
+            await $scope.subjects.sync($scope.structure.id, model.me.userId);
+
             if($scope.subjects.all.length === 1 && !$scope.session.subject) {
                 $scope.session.subject = $scope.subjects.all[0];
                 if($scope.session.audience){
@@ -274,6 +277,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                 $scope.session.opened = true;
             }
+            // if new session, we set the default sessionType
+            if (!$scope.session.id && !$scope.session.type) {
+                $scope.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
+            }
+
+
             $scope.placeholder = "Séance du " + moment($scope.session.date).format("DD/MM/YYYY");
 
             $scope.safeApply();

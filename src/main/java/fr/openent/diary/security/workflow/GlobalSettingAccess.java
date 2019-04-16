@@ -7,11 +7,11 @@ import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.user.UserInfos;
 
-public class HomeworkTypeSetting implements ResourcesProvider {
+public class GlobalSettingAccess implements ResourcesProvider {
 
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.CDT_ACCESS_SETTING));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.GLOBAL_ACCESS_SETTING));
     }
 }

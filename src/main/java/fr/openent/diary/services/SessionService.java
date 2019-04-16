@@ -30,4 +30,13 @@ public interface SessionService {
 
     void getSessions(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
                             boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler);
+
+    void getSessionTypes(String structure_id, Handler<Either<String, JsonArray>> handler);
+
+    void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler);
+
+    void updateSessionType(Integer id, JsonObject sessionType, Handler<Either<String, JsonObject>> handler);
+
+    void deleteSessionType(Integer sessionTypeId, Handler<Either<String, JsonObject>> handler);
+
 }

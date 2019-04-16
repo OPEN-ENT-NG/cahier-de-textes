@@ -13,6 +13,7 @@ const colors = ['grey', 'green'];
 export class Session {
     id: string;
     subject: Subject;
+    type: SessionType;
     structure: Structure;
     teacher: Teacher;
     audience: any;
@@ -32,7 +33,6 @@ export class Session {
     opened: boolean = false;
     startMoment: any;
     endMoment: any;
-
     startDisplayDate: string;
     startDisplayTime: string;
 
@@ -62,6 +62,8 @@ export class Session {
             audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
+            type: structure.types.all.find(t => t.id === data.type_id),
+
             id: data.id,
             title: data.title,
             room: data.room,
@@ -84,6 +86,7 @@ export class Session {
         return {
             id: this.id ? this.id : null,
             subject_id: this.subject.id,
+            type_id: this.type.id,
             structure_id: this.structure.id,
             title: this.title ?  this.title : placeholder,
             color: this.color,
@@ -100,6 +103,7 @@ export class Session {
     }
 
     init(structure: Structure){
+        this.type = Mix.castAs(SessionType, this.type);
         this.structure = structure;
         this.date = moment(this.date).toDate();
         this.startMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
@@ -214,6 +218,7 @@ export class Session {
     setFromCourseAndProgression(progression: ProgressionSession,course: Course) {
         this.subject = progression.subject;
         this.title = progression.title;
+        this.type = progression.type;
         this.courseId = course._id;
         this.teacher = course.teachers[0];
         this.room = course.rooms[0];
@@ -238,6 +243,7 @@ export class Session {
             delete homework.id ;
             this.homeworks.push(homework);
         });
+        this.type = session.type;
         this.teacher = session.teacher;
         this.color = session.color;
         this.audience = session.audience;
@@ -250,6 +256,10 @@ export class Session {
         this.courseId = course._id;
         this.teacher = sessionDrag.teacher;
         this.room = sessionDrag.room;
+        this.type = sessionDrag.type;
+        console.log(sessionDrag.type)
+        console.log(sessionDrag)
+
         if(!this.subject)
             this.subject = sessionDrag.subject;
         this.date = this.startTime = course.startMoment.toDate();
@@ -347,10 +357,63 @@ export class Sessions {
 
     async syncSessions (url: string){
         let { data } = await http.get(url);
-
+        console.log(data);
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
         });
+    }
+}
+
+export class SessionType {
+    id: number;
+    structure_id: string;
+    label: string;
+    rank: number;
+
+    constructor (id_structure?: string) {
+        if (id_structure) this.structure_id = id_structure;
+    }
+
+    toJson() {
+        return {
+            id: this.id,
+            structure_id: this.structure_id,
+            label: this.label,
+            rank: this.rank
+        }
+    }
+
+    async create() {
+        let response = await http.post(`/diary/session-type` , this.toJson());
+        return Utils.setToastMessage(response,'cdt.session.type.create', 'cdt.session.type.create.error')
+    }
+
+    async update() {
+        let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
+        return Utils.setToastMessage(response,'cdt.session.type.update', 'cdt.session.type.update.error')
+    }
+
+    async delete() {
+        let response = await http.delete(`/diary/session-type/${this.id}`);
+        return Utils.setToastMessage(response,'cdt.session.type.deleted', 'cdt.session.type.delete.error')
+    }
+}
+
+export class SessionTypes {
+    all: SessionType[] = [];
+    id: number;
+    structure_id: string;
+    label: string;
+
+    constructor (id_structure?: string) {
+        if (id_structure) this.structure_id = id_structure;
+    }
+
+    async sync (): Promise<void> {
+        let { data } = await http.get(`/diary/session-types?idStructure=${this.structure_id}`);
+        this.all = Mix.castArrayAs(SessionType, data);
+        this.id = data.id;
+        this.label = data.label;
     }
 }

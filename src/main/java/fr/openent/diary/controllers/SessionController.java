@@ -141,4 +141,44 @@ public class SessionController extends ControllerHelper {
         long sessionId = Long.parseLong(request.getParam("id"));
         sessionService.unpublishSession(sessionId, DefaultResponseHandler.defaultResponseHandler(request));
     }
+
+    @Get("/session-types")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(SessionRead.class)
+    public void getSessionTypes(final HttpServerRequest request) {
+        if (!request.params().contains("idStructure")) {
+            badRequest(request);
+            return;
+        }
+        final String structure_id = request.params().get("idStructure");
+        sessionService.getSessionTypes(structure_id, DefaultResponseHandler.arrayResponseHandler(request));
+    }
+
+    @Post("/session-type")
+    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING, type = ActionType.WORKFLOW)
+    @ResourceFilter(GlobalSettingAccess.class)
+    public void createSessionType(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, sessionType -> {
+            sessionService.createSessionType(sessionType, DefaultResponseHandler.defaultResponseHandler(request));
+        });
+    }
+
+    @Put("/session-type/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(GlobalSettingAccess.class)
+    public void updateSessionType(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, sessionType -> {
+            Integer sessionTypeId = Integer.parseInt(request.getParam("id"));
+            sessionService.updateSessionType(sessionTypeId, sessionType, DefaultResponseHandler.defaultResponseHandler(request));
+        });
+    }
+
+    @Delete("/session-type/:id")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(GlobalSettingAccess.class)
+    public void deleteSessionType(final HttpServerRequest request) {
+        Integer sessionTypeId = Integer.parseInt(request.getParam("id"));
+        sessionService.deleteSessionType(sessionTypeId, DefaultResponseHandler.defaultResponseHandler(request));
+    }
+
 }

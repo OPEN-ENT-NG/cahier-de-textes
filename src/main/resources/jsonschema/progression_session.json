@@ -21,6 +21,9 @@
     "owner_id":{
       "type": "string"
     },
+    "type_id":{
+      "type":"number"
+    },
     "progression_homework": {
       "type": ["array", "null" ]
     }

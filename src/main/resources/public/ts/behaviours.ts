@@ -2,6 +2,7 @@ import {Behaviours} from 'entcore';
 import {inspector} from "./sniplets/inspector";
 import {homeworkType} from "./sniplets/homeworkType";
 import {initData} from "./sniplets/init_data";
+import {sessionType} from "./sniplets/sessionType";
 
 const diaryBehaviours = {
     rights: {
@@ -31,6 +32,7 @@ const diaryBehaviours = {
     sniplets: {
         inspector,
         homework_type: homeworkType,
+        session_type: sessionType,
         init_data: initData
     }
 };

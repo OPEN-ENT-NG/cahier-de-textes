@@ -20,7 +20,7 @@ public class InitController extends ControllerHelper {
     }
 
     @Get("/init")
-    @SecuredAction(value = WorkflowUtils.VISA_MANAGE , type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING , type = ActionType.AUTHENTICATED)
     public void initHomeworksType(final HttpServerRequest request) {
 
         initService.init(new Handler<Either<String, JsonObject>>() {

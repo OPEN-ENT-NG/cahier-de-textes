@@ -36,7 +36,7 @@
             <div class="row card padding-md margin-bottom-lg">
                 <div class="row">
                     <!-- Subject -->
-                    <label class="three cell horizontal-spacing twelve-mobile">
+                    <label class="four cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>subject</i18n>
                         </div>
@@ -50,20 +50,33 @@
                     </span>
                     </label>
                     <!-- Title -->
-                    <label class="four cell horizontal-spacing twelve-mobile">
+                    <label class="six cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>title</i18n>
                             *
                         </div>
                         <input maxlength="100" type="text" class="twelve twelve-mobile" ng-model="progression_session.title"/>
                     </label>
-                    <!-- Class/Group -->
+                    <!-- TYPE SESSION -->
                     <label class="four cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>homework.manage.type</i18n>
+                        </div>
+                        <div class="cell twelve-mobile twelve">
+                            <select required class="formSessionType"  ng-model="progression_session.type"
+                                    ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
+                            </select>
+                        </div>
+                    </label>
+                    <!-- Class/Group -->
+                    <label class="six cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>progression.level</i18n>
                         </div>
                         <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.class"/>
                     </label>
+
+
                 </div>
 
                 <!-- Description-->

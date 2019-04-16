@@ -1,5 +1,5 @@
 <div class="homework-type ten cell">
-    <toasts notifications="notifications"></toasts>
+    <toasts notifications="data.notifications"></toasts>
     <article class="row">
 
         <h3 class="row">
@@ -30,7 +30,7 @@
                         class="twelve twelve-mobile skills-list-proposition">
                         <span class="three cell twelve-mobile">[[homeworkType.label]]</span>
                         <i class="pencil icon-grey" data-ng-click="prepareUpdate(homeworkType);"></i>
-                        <i ng-show="!hideTrash" class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
+                        <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
                     </li>
                 </ul>
         </div>

@@ -122,16 +122,16 @@ public class HomeworkController extends ControllerHelper {
     }
 
     @Get("/homework-types/:idStructure")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    @ResourceFilter(HomeworkTypeSetting.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkRead.class)
     public void getHomeworkTypes(final HttpServerRequest request) {
         final String structure_id = request.params().get("idStructure");
         homeworkService.getHomeworkTypes(structure_id, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Post("/homework-type")
-    @SecuredAction(value = WorkflowUtils.CDT_ACCESS_SETTING, type = ActionType.WORKFLOW)
-    @ResourceFilter(HomeworkTypeSetting.class)
+    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING, type = ActionType.WORKFLOW)
+    @ResourceFilter(GlobalSettingAccess.class)
     public void createHomeworkType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request,
                 homeworkType -> {
@@ -141,7 +141,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework-type/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkTypeSetting.class)
+    @ResourceFilter(GlobalSettingAccess.class)
     public void updateHomeworkType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request,
                 homeworkType -> {
@@ -152,7 +152,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Delete("/homework-type/:id/:idStructure")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkTypeSetting.class)
+    @ResourceFilter(GlobalSettingAccess.class)
     public void deleteHomeworkType(final HttpServerRequest request) {
         Integer homeworkTypeId = Integer.parseInt(request.getParam("id"));
         final String structure_id = request.params().get("idStructure");
