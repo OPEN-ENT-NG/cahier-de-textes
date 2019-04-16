@@ -88,7 +88,7 @@
                 <i18n>to2</i18n>
                 <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
                        ng-if="session.courseId && session.endTime">
-                       [[session.endTime | date:'HH:mm']]
+                    [[session.endTime | date:'HH:mm']]
                 </label>
                 <input type="time"
                        class="margin-left-sm margin-right-sm"
@@ -132,7 +132,7 @@
             </h2>
             <div class="responsive-table row" ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
 
-                <table class="twelve" ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
+                <table class="twelve">
                     <thead>
                     <tr>
                         <td class="two text-left padding-left-md">
@@ -149,10 +149,8 @@
                     </thead>
 
                     <tbody>
-
                         <tr ng-repeat="homework in session.homeworks track by $index" ng-if="!homework.isDeleted"
                             inside-session-form="true"
-
                             ng-controller="manageHomeworkCtrl">
                             <!-- Deadline static data -->
                             <td ng-if="!homework.opened" class="three vertical-align-top text-left">
@@ -188,7 +186,7 @@
                     </tbody>
                 </table>
 
-                </div>
+            </div>
 
             <div class="row">
 
@@ -216,7 +214,8 @@
                     <i18n>utils.cancel</i18n>
                 </button>
 
-            </div></div>
+            </div>
+        </div></div>
         <div ng-if="!validDate()" class="warning ">
             <i18n>diary.error.date.is.not.valid</i18n></div>
         </div>

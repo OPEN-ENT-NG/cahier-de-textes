@@ -138,7 +138,9 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
 
+                    <div class="row">
                         <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
                              ng-if="!progressionHomework.isDeleted"
                              inside-session-form="true"
@@ -176,7 +178,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
 
                 <div class="row text-right">
                     <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
