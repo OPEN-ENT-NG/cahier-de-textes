@@ -241,19 +241,19 @@ export let main = ng.controller('MainController',
 
 
             if(Utils.isAChildOrAParent(model.me.type)){
-                    $scope.structure.sessions.all.map((s,i) =>{
-                        if(!s.isPublished){
-                            $scope.structure.sessions.all.splice(i,1);
-                        }
-                    })
+                $scope.structure.sessions.all.map((s,i) =>{
+                    if(!s.isPublished){
+                        $scope.structure.sessions.all.splice(i,1);
+                    }
+                })
                 $scope.structure.homeworks.all.map((h,i) =>{
                     if(!h.isPublished){
                         $scope.structure.homeworks.all.splice(i,1);
                     }
                 })
-                }
+            }
 
-                $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
+            $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
             let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
             $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
@@ -285,12 +285,11 @@ export let main = ng.controller('MainController',
                 let nbHomework = 0;
                 pedagogicDay.pedagogicItems.map(p => {
                     if(p.pedagogicType === $scope.TYPE_HOMEWORK){
-                        if($scope.display.todo && !p.isDone)     {
+                        if($scope.display.todo && !p.isDone){
                             nbHomework++;
                         }
                         if($scope.display.done && p.isDone){
                             nbHomework++;
-
                         }
                     }
                 });
@@ -353,8 +352,19 @@ export let main = ng.controller('MainController',
         }
 
         function containsHomeworks(c: any) {
+            let isDisplayedByDefault = false
+            c.pedagogicItems.map(pi => {
+                if(pi.pedagogicType === $scope.TYPE_HOMEWORK )
+                    if($scope.isChild){
+                        if(!pi.isDone){
+                            isDisplayedByDefault = true;
 
-            return c.nbHomework != 0;
+                        }
+                    }else{
+                        isDisplayedByDefault = true;
+                    }
+            });
+            return c.nbHomework !=  0 && isDisplayedByDefault ;
         }
 
         $scope.initDisplay = () =>{
@@ -362,6 +372,8 @@ export let main = ng.controller('MainController',
             displayedNumberSession =  displayedNumberHomework;
             let nbSessionDisplayed = 0;
             let nbHomeworkDisplayed = 0;
+            let indexMinChildHomework = $scope.pedagogicDays.length
+            let indexMaxChildHomework = -1;
 
             //hiding all the days
             $scope.pedagogicDays.map(c =>{
@@ -369,18 +381,34 @@ export let main = ng.controller('MainController',
             });
 
             //display session
-            $scope.pedagogicDays.map(c =>{
+            $scope.pedagogicDays.map((c,index) =>{
+                if(c.shortDate === "17/04")
+                    console.log(c);
+
                 containsSession(c) ;
-                if( containsSession(c)  && nbSessionDisplayed < 3 ) {
+                if(  containsSession(c)  && nbSessionDisplayed < 3 ) {
                     c.displayed = true;
                     nbSessionDisplayed++;
                 }
-                if(containsHomeworks(c)  && nbHomeworkDisplayed < 3 ) {
-                    c.displayed = true;
+                if( containsHomeworks(c)  && nbHomeworkDisplayed < 3 ) {
+                    if($scope.isChild){
+                        (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework ;
+                        (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework ;
+                    }else{
+                        c.displayed = true;
+
+                    }
                     nbHomeworkDisplayed++;
                 }
             });
+            if($scope.isChild){
+                $scope.pedagogicDays.map((c,index) =>{
+                    if(index => indexMinChildHomework && index <= indexMaxChildHomework){
+                        c.displayed = true;
+                    }
+                })
 
+            }
 
         };
 
@@ -488,9 +516,9 @@ export let main = ng.controller('MainController',
             return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
         };
 
-        // $scope.hasBothViewMode = () => {
-        //     return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
-        // };
+// $scope.hasBothViewMode = () => {
+//     return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
+// };
 
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {

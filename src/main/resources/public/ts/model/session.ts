@@ -257,8 +257,6 @@ export class Session {
         this.teacher = sessionDrag.teacher;
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
-        console.log(sessionDrag.type)
-        console.log(sessionDrag)
 
         if(!this.subject)
             this.subject = sessionDrag.subject;
@@ -357,7 +355,6 @@ export class Sessions {
 
     async syncSessions (url: string){
         let { data } = await http.get(url);
-        console.log(data);
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
