@@ -1,0 +1,37 @@
+<div class="homework-type ten cell">
+    <toasts notifications="data.notifications"></toasts>
+    <article class="row">
+
+        <h3 class="row">
+            [[lang.translate('cdt.session.type.title')]]
+        </h3>
+
+        <div class="cell twelve-mobile twelve">
+            <ul class="settings-list">
+                <li class="twelve skill-list-proposition">
+                    <input type="text"
+                           class="input-libelle"
+                           placeholder="[[lang.translate('cdt.session.type.placeholder')]]"
+                           ng-model="data.input"
+                           ng-maxlength="50"
+                           maxlength="50"
+                           minlength="1"/>
+                    <button class="right-button" data-ng-click="onClick(sessionTypeInput)">
+                        <span ng-if="data.updateMode">[[lang.translate('item.modify')]]</span>
+                        <span ng-if="!data.updateMode">[[lang.translate('evaluations.add')]]</span>
+                    </button>
+                    <button class="right-button" ng-if="data.updateMode" data-ng-click="cancelUpdateSessionTypeInput()">
+                       [[lang.translate('viescolaire.utils.cancel')]]
+                    </button>
+                </li>
+                <li ng-repeat="sessionType in sessionTypes.all track by $index"
+                    class="twelve twelve-mobile skills-list-proposition">
+                    <span class="three cell twelve-mobile">[[sessionType.label]]</span>
+                    <i class="pencil icon-grey" data-ng-click="editSessionTypeInput(sessionType);"></i>
+                    <i ng-show="sessionTypes.all.length > 1" class="trash icon-grey" data-ng-click="deleteSessionType(sessionType);"></i>
+                </li>
+            </ul>
+        </div>
+
+    </article>
+</div>

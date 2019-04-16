@@ -7,7 +7,7 @@ import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks, HomeworkType, WorkloadWeek} from './homework';
-import {Session} from "./session";
+import {Session,SessionType} from "./session";
 import {subscript} from "entcore/types/src/ts/editor/options";
 import forEach = require("core-js/fn/array/for-each");
 
@@ -25,13 +25,16 @@ export class ProgressionSession implements  Selectable{
     class: string;
     owner_id;
     subject_id;
+    type_id;
     homeworks;
     eventer: Eventer;
+    type:SessionType;
 
     progression_homeworks: ProgressionHomework[] = [];
 
     constructor(){
         this.subject = new Subject();
+        this.type = new SessionType();
         this.eventer = new Eventer();
         this.title= "";
         this.class = "";
@@ -52,9 +55,15 @@ export class ProgressionSession implements  Selectable{
         this.subject = subject;
     }
 
+    public setType (type: SessionType){
+        this.type = type;
+    }
+
     init(){
         if(this.subject_id)
             this.subject.id = this.subject_id;
+        if(this.type_id)
+            this.type.id = this.type_id;
     }
 
 
@@ -95,6 +104,7 @@ export class ProgressionSession implements  Selectable{
             class : this.class,
             annotation : this.annotation,
             owner_id: this.owner ? this.owner.id : this.owner_id,
+            type_id : this.type.id ? this.type.id : this.type_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
 
         };
@@ -104,6 +114,7 @@ export class ProgressionSession implements  Selectable{
         return this
             && this.title
             && this.subject.id
+            && this.type.id
             && this.description
             && this.description.length;
     };
@@ -124,6 +135,7 @@ export class ProgressionSession implements  Selectable{
             description: data.description,
             owner_id: data.owner_id,
             subject_id : data.subject_id,
+            type_id : data.type_id,
             progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
             created: data.created
@@ -211,9 +223,9 @@ export class ProgressionHomework{
                 id: this.id || null ,
                 description: this.description,
                 subject_id: this.subject ? this.subject.id : this.subject_id,
+                type_id: this.type ? this.type.id : this.type_id,
                 estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
                 owner_id: ownerId,
-                type_id: this.type.id
 
             };
     }

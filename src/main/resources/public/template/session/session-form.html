@@ -30,7 +30,7 @@
 
     <div class="row card padding-md" ng-if="session.opened">
         <!-- Title -->
-        <label class="three cell twelve-mobile">
+        <label class="two cell twelve-mobile">
             <div class="twelve">
                 <i18n>title</i18n>
                 *
@@ -39,11 +39,24 @@
         </label>
         <div class="one"></div>
         <!-- Room -->
-        <label class="three cell horizontal-spacing twelve-mobile">
+        <label class="two cell horizontal-spacing twelve-mobile">
             <div class="twelve">
                 <i18n>utils.room</i18n>
             </div>
             <input type="text" class="twelve twelve-mobile" ng-model="session.room" maxlength="8"/>
+        </label>
+        <div class="one"></div>
+        <!-- Type -->
+        <label class="cell horizontal-spacing twelve-mobile">
+            <div class="twelve">
+                <i18n>homework.manage.type</i18n>
+            </div>
+            <div class="cell twelve-mobile ten">
+                <select class="formSessionType" required ng-model="session.type"
+                        ng-change="changeSelect(session.type)"
+                        ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
+                </select>
+            </div>
         </label>
         <div class="one"></div>
         <!-- Date -->

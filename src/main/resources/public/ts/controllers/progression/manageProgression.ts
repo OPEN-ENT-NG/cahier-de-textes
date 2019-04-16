@@ -1,6 +1,6 @@
 import {Behaviours, idiom as lang, model, ng} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
-import {Session, Subjects, Toast} from "../../model";
+import {Session, SessionTypes, Subjects, Toast} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
 import {Utils} from '../../utils/utils';
 
@@ -41,11 +41,13 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.progression_session.owner = {id: model.me.userId};
 
             $scope.isReadOnly = modeIsReadOnly();
-
+            $scope.sessionTypes = new SessionTypes($scope.structure.id);
             $scope.subjects = new Subjects();
             $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
             await   $scope.progression_sessions.sync();
             await   $scope.progressionsToDisplay.sync();
+            await   $scope.sessionTypes.sync();
+            console.log($scope.sessionTypes);
             await $scope.subjects.sync($scope.structure.id, model.me.userId);
             console.log($scope.subjects);
             $scope.progression_sessions.all.map(psession => {
@@ -53,16 +55,28 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                     if(psession.subject_id == subject.id){
                         psession.setSubject(subject);
                     }
+                });
+                $scope.sessionTypes.all.forEach( type =>{
+                    if(psession.type_id == type.id){
+                        psession.setType(type);
+                    }
                 })
             });
+
             if($scope.subjects.all.length === 1){
                 $scope.progression_session.setSubject($scope.subjects.all[0]);
             }
+
 
             $scope.progressionsToDisplay.all.map(psession => {
                 $scope.subjects.all.forEach( subject =>{
                     if(psession.subject_id == subject.id){
                         psession.setSubject(subject);
+                    }
+                })
+                $scope.sessionTypes.all.forEach( type =>{
+                    if(psession.type_id == type.id){
+                        psession.setType(type);
                     }
                 })
             });
@@ -74,8 +88,12 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                     if ($scope.progression_session.subject_id == subject.id) {
                         $scope.progression_session.setSubject(subject);
                     }
-                })
-                ;
+                });
+                $scope.sessionTypes.all.forEach( type =>{
+                    if($scope.progression_session.type_id == type.id){
+                        $scope.progression_session.setType(type);
+                    }
+                });
             }
 
             await $scope.homeworkTypes.sync();

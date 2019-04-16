@@ -3,8 +3,10 @@ package fr.openent.diary.services.impl;
 import fr.openent.diary.Diary;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.SessionService;
+import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -23,15 +25,16 @@ public class SessionServiceImpl  implements SessionService {
     @Override
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
-        query.append(" SELECT s.*, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
+        query.append(" SELECT s.*, to_json(type_session) as type, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
+        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id");
         query.append(" LEFT JOIN (");
         query.append(" SELECT homework.*, to_json(homework_type) as type");
         query.append(" FROM diary.homework homework");
         query.append(" INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id");
         query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
         query.append(" WHERE s.id = ").append(sessionId);
-        query.append(" GROUP BY s.id");
+        query.append(" GROUP BY s.id, type_session");
 
         Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
             if (result.isRight()) {
@@ -175,6 +178,8 @@ public class SessionServiceImpl  implements SessionService {
     }
 
     private void cleanSession(JsonObject session) {
+        if (session.getString("type") != null)
+            session.put("type", new JsonObject(session.getString("type")));
         session.put("homeworks", new JsonArray(session.getString("homeworks")));
         if (session.getJsonArray("homeworks").contains(null)) {
             session.put("homeworks", new JsonArray());
@@ -184,13 +189,14 @@ public class SessionServiceImpl  implements SessionService {
     @Override
     public void createSession(JsonObject session, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO diary.session (subject_id, structure_id, teacher_id, audience_id, title, " +
+        String query = "INSERT INTO diary.session (subject_id, type_id, structure_id, teacher_id, audience_id, title, " +
                 "room, color, description, annotation, is_published, course_id, owner_id, " +
                 "date, start_time, end_time, created, modified) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
 
         values.add(session.getString("subject_id"));
+        values.add(session.getInteger("type_id"));
         values.add(session.getString("structure_id"));
         values.add(user.getUserId());
         values.add(session.getString("audience_id"));
@@ -223,12 +229,13 @@ public class SessionServiceImpl  implements SessionService {
     public void updateSession(long sessionId, JsonObject session, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "UPDATE diary.session" +
-                " SET subject_id = ?, structure_id = ?, audience_id = ?, title = ?, " +
+                " SET subject_id = ?, type_id = ?, structure_id = ?, audience_id = ?, title = ?, " +
                 " room = ?, color = ?, description = ?, annotation = ?, is_published = ?, course_id = ?, " +
                 " date = to_date(?,'YYYY-MM-DD'), start_time = to_timestamp(?, 'hh24:mi:ss'), end_time = to_timestamp(?, 'hh24:mi:ss'), modified = NOW()" +
                 " WHERE id = ?;";
 
         values.add(session.getString("subject_id"));
+        values.add(session.getInteger("type_id"));
         values.add(session.getString("structure_id"));
         values.add(session.getString("audience_id"));
         values.add(session.getString("title"));
@@ -267,6 +274,46 @@ public class SessionServiceImpl  implements SessionService {
     @Override
     public void unpublishSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         String query = "UPDATE diary.session SET is_published = false WHERE id = " + sessionId;
+        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getSessionTypes(String structure_id, Handler<Either<String, JsonArray>> handler) {
+        StringBuilder query = new StringBuilder();
+        JsonArray param = new JsonArray();
+        query.append("SELECT * FROM " + Diary.DIARY_SCHEMA + ".session_type " + "WHERE structure_id = ? ORDER BY rank;");
+
+        param.add(structure_id);
+
+        Sql.getInstance().prepared(query.toString(), param, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
+        String query = " INSERT INTO " + Diary.DIARY_SCHEMA + ".session_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
+        JsonArray body = new JsonArray();
+
+        body.add(sessionType.getString("structure_id"));
+        body.add(sessionType.getString("label"));
+        body.add(1);
+        Sql.getInstance().prepared(query, body, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void updateSessionType(Integer id, JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
+        JsonArray body = new JsonArray();
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".session_type SET structure_id = ?, label = ? WHERE id = ?";
+
+        body.add(sessionType.getString("structure_id"));
+        body.add(sessionType.getString("label"));
+        body.add(id);
+
+        Sql.getInstance().prepared(query, body, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deleteSessionType(Integer sessionTypeId, Handler<Either<String, JsonObject>> handler) {
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".session_type WHERE id = " + sessionTypeId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 }

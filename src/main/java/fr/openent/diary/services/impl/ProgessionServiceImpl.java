@@ -30,13 +30,15 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         JsonArray params =  new JsonArray();
 
         String query = "SELECT ps.id, ps.class as class , title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
-                "array_to_json(array_agg(h.*)) as homeworks from " + Diary.DIARY_SCHEMA + ".progression_session ps " +
+                "array_to_json(array_agg(h.*)) as homeworks , ps.type_id as type_id"+
+                " from " + Diary.DIARY_SCHEMA + ".progression_session ps " +
                 " LEFT JOIN ( " +
                 "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, estimatedTime, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
                 " FROM  " + Diary.DIARY_SCHEMA + ".progression_homework " +
+
                 "INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type " +
                 "  ON homework_type.id = progression_homework.type_id " +
-                " ) h ON h.progression_session_id = ps.id" +
+                " ) h ON h.progression_session_id = ps.id"  +
                 " where ps.id = ? " +
                 " GROUP BY ps.id"  ;
 
@@ -50,13 +52,15 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         JsonArray params =  new JsonArray();
 
         String query = "SELECT ps.id, ps.class as class, title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
-                "array_to_json(array_agg(h.*)) as homeworks from " + Diary.DIARY_SCHEMA + ".progression_session ps " +
+                "array_to_json(array_agg(h.*)) as homeworks , ps.type_id as type_id" +
+                " FROM " + Diary.DIARY_SCHEMA + ".progression_session ps " +
                 " LEFT JOIN ( " +
                 "SELECT progression_homework.id as id ,estimatedTime , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
                 " FROM  " + Diary.DIARY_SCHEMA + ".progression_homework " +
+
                 "INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type " +
                 "  ON homework_type.id = progression_homework.type_id " +
-                " ) h ON h.progression_session_id = ps.id" +
+                " ) h ON h.progression_session_id = ps.id " +
                 " where ps.owner_id = ? " +
 
                 " GROUP BY ps.id" +
@@ -119,9 +123,10 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     private JsonObject getProgressionSessionUpdateStatement(JsonObject progression, String progressionId) {
         JsonArray params;
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".progression_session " +
-                "SET subject_id = ? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ? " +
+                "SET subject_id = ?,type_id =? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ? " +
                 "Where progression_session.id = ?  ";
         params =  new JsonArray().add(progression.getString("subject_id"))
+                .add(progression.getInteger("type_id"))
                 .add(progression.getString("title"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
@@ -171,7 +176,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         JsonArray params;
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session" +
-                "(subject_id,title, description, annotation, owner_id, class) " +
+                "(subject_id,title, description, annotation, owner_id, class ,type_id) " +
                 "values ( ?, ?, ?, ?, ?, ? ) " +
                 "RETURNING id;";
 
@@ -181,7 +186,8 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
-                .add(progression.getString("class"));
+                .add(progression.getString("class"))
+                .add(progression.getString("type_id"));
 
         Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
@@ -253,7 +259,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      * @return
      */
     private JsonObject getProgressionSessionCreationstatement(Number id, JsonObject progression) {
-        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session ( id , subject_id ,title, description, annotation, owner_id, class) " +
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session ( id , subject_id ,title, description, annotation, owner_id, class, type_id) " +
                 "values ( ?, ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
@@ -262,7 +268,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
-                 .add(progression.getString("class"));
+                .add(progression.getString("class"))
+                .add(progression.getInteger("type_id"))
+                ;
 
         return new JsonObject()
                 .put(STATEMENT, query)
@@ -356,7 +364,8 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     @Override
     public void progressionToSession(JsonObject progression, String idProgression, String idSession, Handler<Either<String, JsonObject>> handler) {
 
-        String getIdQuery = "SELECT id as id, subject_id, color, structure_id, teacher_id, date, is_published, audience_id from " + Diary.DIARY_SCHEMA + ".session where id = " + idSession ;
+        String getIdQuery = "SELECT id as id, subject_id, color, structure_id, teacher_id, date, is_published, audience_id, type_id " +
+                "from " + Diary.DIARY_SCHEMA + ".session where id = " + idSession ;
         sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
@@ -396,12 +405,13 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     private JsonObject getSessionUpdateStatement(JsonObject progression, Number sessionId) {
         JsonArray params;
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".session " +
-                "SET subject_id = ? , description = ? , annotation = ?, owner_id = ? " +
+                "SET subject_id = ? , description = ? , annotation = ?, owner_id = ?, type_id = ? " +
                 "Where session.id = ?  ";
         params =  new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
+                .add(progression.getInteger("type_id"))
                 .add(sessionId);
 
         return new JsonObject()

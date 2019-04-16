@@ -34,13 +34,18 @@
                     <th >
 
                     </th>
-                    <th class="six text-left" ng-click="changeSortType('title')">
+                    <th class="four text-left" ng-click="changeSortType('title')">
                         <!--<i ng-if="sort.progression === 'title' " ng-class="sort.reverse ? 'up-open' : 'down-open'"-->
                            <!--class="left-magnet"></i>-->
 
                         <i18n>title</i18n>
 
                     </th>
+                    <th class="two text-center" ng-click="changeSortType('class')">
+                        <i18n>progression.type</i18n>
+                    </th>
+
+
                     <th class="two text-center" ng-click="changeSortType('class')">
                            <i18n>progression.level</i18n>
                     </th>
@@ -65,6 +70,10 @@
                     <td ng-click="$parent.openProgressionSession(progression_session)" class="four text-left">
                         [[progression_session.title]]
                     </td>
+                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
+                        [[progression_session.type.label]]
+                    </td>
+
                     <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
                         [[progression_session.class]]
                     </td>
