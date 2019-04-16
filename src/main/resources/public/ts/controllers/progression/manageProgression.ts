@@ -1,4 +1,4 @@
-import {Behaviours, idiom as lang, model, ng} from 'entcore';
+import {Behaviours, idiom as lang, model, ng, template} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
 import {Session, SessionTypes, Subjects, Toast} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
@@ -226,6 +226,8 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             newProgressionHomework.isNewField = true;
             $scope.progression_session.progression_homeworks.push(newProgressionHomework);
             $scope.openProgressionHomework(newProgressionHomework);
+
+            template.open('formProgressionHomework', '/progression/progression-homework-form');
             $scope.safeApply();
         };
 

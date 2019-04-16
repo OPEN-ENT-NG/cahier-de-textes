@@ -80,22 +80,33 @@
                 </div>
 
                 <!-- Description-->
-                <div class="row twelve vertical-spacing">
-                <span class="twelve margin-20">
-                    <i18n>utils.description</i18n>
-                </span>
+                <div class="row">
+                    <div class="row twelve vertical-spacing">
+                        <span class="twelve margin-20">
+                            <i18n>utils.description</i18n>
+                        </span>
+                    </div>
                     <editor ng-model="progression_session.description"></editor>
                 </div>
 
-                <div class="padding-md margin-bottom-md">
+                <div ng-if="progression_session.progression_homeworks.length < 1" class="padding-md margin-bottom-md">
+                    <button ng-show="!validate"
+                            class="float-none display-inline-block margin-top-md"
+                            ng-click="addProgressionHomework()">
+                        <i18n>homework.manage.create</i18n>
+                    </button>
+                </div>
+
+                <div ng-if="progression_session.progression_homeworks.length" class="margin-bottom-md">
                     <h2>
                         <i18n>homeworks</i18n>
                     </h2>
-                    <article class="responsive-table row">
+                    <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length
+                            && !progression_session.progression_homeworks[0].opened && progression_session.progression_homeworks[0].type">
                         <table class="twelve">
                             <thead>
                             <tr>
-                                <td class="one text-left">
+                                <td class="one text-left padding-left-md">
                                     <i18n>homework.manage.type</i18n>
                                 </td>
 
@@ -108,11 +119,32 @@
                             </thead>
                             <tbody>
                             <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
-                                inside-session-form="true"
-                                class="ng-scope"
-                                static-include="/diary/public/template/progression/progression-homework-form.html"></tr>
+                                inside-session-form="true">
+                                <!-- Type static data -->
+                                <td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
+                                    <p class="twelve">[[progressionHomework.type.label]]</p>
+                                </td>
+                                <!-- Description -->
+                                <td ng-if="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
+                                    <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
+                                </td>
+                                <!-- Button part -->
+                                <td ng-if="!progressionHomework.opened">
+                                    <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                    <i ng-show="!progressionHomework.opened" class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="row">
+                        <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
+                             ng-if="!progressionHomework.isDeleted"
+                             inside-session-form="true">
+                            <container template="formProgressionHomework"></container>
+                        </div>
+
                         <button ng-show="!validate"
                                 class="float-none display-inline-block margin-top-md"
                                 ng-click="addProgressionHomework()">
@@ -132,22 +164,20 @@
                                 ng-click="cancelProgressionHomework()">
                             <i18n>utils.cancel</i18n>
                         </button>
-                    </article>
+                    </div>
+                </div>
 
+                <div class="row text-right">
+                    <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
+                        <i18n>utils.cancel</i18n>
+                    </button>
+                    <button class="float-none display-inline-block" ng-disabled="!progression_session.isValidForm()"
+                            type="button"  ng-click="validProgressionsSessionForm()">
+                        <i18n>utils.save</i18n>
+                    </button>
                 </div>
             </div>
 
-            <div class="row text-right">
-                <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
-                    <i18n>utils.cancel</i18n>
-                </button>
-                <button class="float-none display-inline-block" ng-disabled="!progression_session.isValidForm()"
-                        type="button"  ng-click="validProgressionsSessionForm()">
-                    <i18n>utils.save</i18n>
-                </button>
-            </div>
         </div>
 
     </div>
-
-</div>

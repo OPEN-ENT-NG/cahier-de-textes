@@ -1,4 +1,4 @@
-import {Behaviours, model, moment, ng} from 'entcore';
+import {Behaviours, model, moment, ng, template} from 'entcore';
 import {Course, Homework, Session, SessionTypes, Subjects, Toast} from '../../model';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
@@ -226,6 +226,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.homeworks.push(newHomework);
             $scope.openHomework(newHomework);
 
+            template.open('formHomework', '/homework/homework-formPrinter');
             $scope.safeApply();
         };
 
