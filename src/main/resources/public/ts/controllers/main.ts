@@ -84,6 +84,10 @@ export let main = ng.controller('MainController',
                 $scope.display.todo = true;
                 $scope.display.done = false;
             };
+
+            if($scope.structure.students.all.length < 2) {
+                $scope.params.child = $scope.structure.students.all[0];
+            }
         }
 
         async function placingLoader(exit: number = 0) {
