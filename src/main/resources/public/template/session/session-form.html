@@ -88,7 +88,7 @@
                 <i18n>to2</i18n>
                 <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
                        ng-if="session.courseId && session.endTime">
-                    [[session.endTime | date:'HH:mm']]
+                       [[session.endTime | date:'HH:mm']]
                 </label>
                 <input type="time"
                        class="margin-left-sm margin-right-sm"
@@ -127,7 +127,7 @@
         </div>
 
         <div ng-if="session.homeworks.length" class="margin-bottom-md">
-            <h2 ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
+            <h2>
                 <i18n>homeworks</i18n>
             </h2>
             <div class="responsive-table row" ng-if="session.homeworks.length && !session.homeworks[0].opened && session.homeworks[0].type">
@@ -149,18 +149,20 @@
                     </thead>
 
                     <tbody>
-                    <tr ng-repeat="homework in session.homeworks track by $index" ng-if="!homework.isDeleted"
-                        inside-session-form="true"
-                        ng-controller="manageHomeworkCtrl">
-                        <!-- Deadline static data -->
-                        <td ng-if="!homework.opened" class="three vertical-align-top text-left">
-                            <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dateDisplayed]]</p>
-                            <p ng-if="homework.attachedToSession && !homework.session.firstText" class="margin-bottom-md twelve">
-                                <i18n>homework.attachedToSession</i18n>
-                                [[homework.session.startDisplayDate]]
-                                [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
-                                [[homework.session.subject.label]]
-                            </p>
+
+                        <tr ng-repeat="homework in session.homeworks track by $index" ng-if="!homework.isDeleted"
+                            inside-session-form="true"
+
+                            ng-controller="manageHomeworkCtrl">
+                            <!-- Deadline static data -->
+                            <td ng-if="!homework.opened" class="three vertical-align-top text-left">
+                                <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dateDisplayed]]</p>
+                                <p ng-if="homework.attachedToSession && !homework.session.firstText" class="margin-bottom-md twelve">
+                                    <i18n>homework.attachedToSession</i18n>
+                                    [[homework.session.startDisplayDate]]
+                                    [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
+                                    [[homework.session.subject.label]]
+                                </p>
 
                             <p ng-if="homework.attachedToSession && homework.session.firstText" class="margin-bottom-md twelve">
                                 <i18n>todo.for.this.session</i18n>

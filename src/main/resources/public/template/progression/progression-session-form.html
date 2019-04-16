@@ -103,7 +103,9 @@
                     </h2>
                     <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length
                             && !progression_session.progression_homeworks[0].opened && progression_session.progression_homeworks[0].type">
-                        <table class="twelve">
+                        <table class="twelve" ng-if="progression_session.progression_homeworks.length
+                            && !progression_session.progression_homeworks[0].opened
+                            && progression_session.progression_homeworks[0].type">
                             <thead>
                             <tr>
                                 <td class="one text-left padding-left-md">
@@ -136,6 +138,14 @@
                             </tr>
                             </tbody>
                         </table>
+
+                        <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
+                             ng-if="!progressionHomework.isDeleted"
+                             inside-session-form="true"
+                             ng-controller="manageHomeworkCtrl">
+                            <container template="formProgressionHomework"></container>
+                        </div>
+
                     </div>
 
                     <div class="row">
@@ -166,6 +176,7 @@
                         </button>
                     </div>
                 </div>
+            </div>
 
                 <div class="row text-right">
                     <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
