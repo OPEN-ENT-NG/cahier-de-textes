@@ -1,43 +1,47 @@
+<div ng-if="progressionHomework.opened" class="padding-md">
+    <!-- Deadline -->
+    <div ng-if="progressionHomework.opened" class="float-left three vertical-align-top text-left">
+        <div class="ten twelve-mobile">
+            <label>
+                <i18n>homework.manage.type</i18n>
+                :
+            </label>
+        </div>
 
-<!-- Deadline static data -->
+        <!-- Type -->
+        <div class="row">
+            <select class="ten"
+                    ng-if="progressionHomework.opened"
+                    required
+                    ng-model="progressionHomework.type"
+                    ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
+            </select>
+        </div>
 
-<!-- Type -->
-<td ng-if="progressionHomework.opened" class="two vertical-align-top text-left ">
-    <select class="twelve"
-            required
-            ng-model="progressionHomework.type"
-            ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
-    </select>
-    <span class="twelve">
-                <label>
-                    <i18n>homework.workload</i18n>:
-                    <input  ng-model="progressionHomework.estimatedTime" min="0" type="number" class="width-15">
+        <!--Estimated Time-->
+        <div>
+        <span class="ten">
+            <label>
+                <i18n>homework.workload</i18n>
+                :
+                <input ng-model="progressionHomework.estimatedTime" min="0" type="number" class="two">
                     <i18n>minutes</i18n>
-                </label>
-    </span>
+            </label>
+        </span>
+        </div>
+    </div>
 
-</td>
-<!-- Type static data -->
-<td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
-    <p class="twelve">[[progressionHomework.type.label]]</p>
+    <!-- Description-->
+    <div ng-if="progressionHomework.opened" class="nine float-none display-inline-block vertical-align-top text-left">
+        <div class="twelve-mobile">
+            <label>
+                <i18n>utils.description</i18n>
+                :
+            </label>
+        </div>
 
-</td>
-
-
-<!-- Description-->
-<td ng-if="progressionHomework.opened" class="six vertical-align-top full-td-width text-left">
-    <editor class="twelve" ng-model="progressionHomework.description"></editor>
-</td>
-
-<!-- Deadline static data -->
-<td ng-if="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
-    <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
-</td>
-<!-- Button part -->
-<td class="one vertical-align-top vertical-align-top text-right">
-    <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
-    <i class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
-
-</td>
+        <editor class="twelve" ng-model="progressionHomework.description"></editor>
+    </div>
+</div>
 
 

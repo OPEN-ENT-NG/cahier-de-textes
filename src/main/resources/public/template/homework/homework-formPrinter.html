@@ -1,59 +1,61 @@
-<!-- Deadline -->
-<td ng-if="homework.opened"
-    class="three vertical-align-top text-left">
-    <div class="flex twelve-mobile">
-        <label>
-            <i18n>deadline</i18n>
-            :
-        </label>
-
-        <div class="six flex margin-auto space-around margin-bottom-md">
-            <label><!-- ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0"-->
-                <input type="radio"
-                       ng-click="attachToSession()"
-                       ng-checked="homework.attachedToSession"
-                       value="true">
-                <span class="no-style ng-scope"><i18n>session</i18n></span>
-            </label><br>
+<div ng-if="homework.opened" class="padding-md">
+    <!-- Deadline -->
+    <div ng-if="homework.opened" class="float-left three vertical-align-top text-left">
+        <div class="ten flex twelve-mobile">
             <label>
-                <input type="radio"
-                       ng-click="attachToDate()"
-                       ng-checked="homework.attachedToDate"
-                       value="false">
-                <span class="no-style ng-scope"><i18n>date</i18n></span>
+                <i18n>deadline</i18n>
+                :
             </label>
+
+            <div class="six flex margin-auto space-around margin-bottom-md">
+                <label><!-- ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0"-->
+                    <input type="radio"
+                           ng-click="attachToSession()"
+                           ng-checked="homework.attachedToSession"
+                           value="true">
+                    <span class="no-style ng-scope"><i18n>session</i18n></span>
+                </label><br>
+                <label>
+                    <input type="radio"
+                           ng-click="attachToDate()"
+                           ng-checked="homework.attachedToDate"
+                           value="false">
+                    <span class="no-style ng-scope"><i18n>date</i18n></span>
+                </label>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <date-picker class="date-picker-sm" ng-if="homework.attachedToDate"
-                     ng-model="homework.dueDate" ng-change="syncWorkloadWeek()"></date-picker>
-        <select class="twelve" ng-if="!homework.attachedToDate" ng-model="homework.session"
-                ng-change="syncWorkloadWeek()"
-                ng-options="session as (session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime
+        <div class="row">
+            <date-picker class="date-picker-sm" ng-if="homework.attachedToDate"
+                         ng-model="homework.dueDate" ng-change="syncWorkloadWeek()"></date-picker>
+            <select class="ten"
+                    ng-if="!homework.attachedToDate"
+                    ng-model="homework.session"
+                    ng-change="syncWorkloadWeek()"
+                    ng-options="session as (session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime
                 + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
-        </select>
+            </select>
 
-        <!-- Type -->
-        <select class="twelve" ng-if="homework.opened"
-                required
-                ng-model="homework.type"
-                ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
-        </select>
-    </div>
+            <!-- Type -->
+            <select class="ten" ng-if="homework.opened"
+                    required
+                    ng-model="homework.type"
+                    ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
+            </select>
+        </div>
 
-    <div class="margin10v">
-        <!-- Workload -->
-        <span class="twelve" ng-repeat="workload in homework.workloadWeek.all">
+        <div class="margin10v">
+            <!-- Workload -->
+            <span class="ten" ng-repeat="workload in homework.workloadWeek.all">
                      <label ng-if="workload.numDayString == (homework.dueDate | date:'dd')"
                             ng-class="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
                             [[workload.description]]
                      </label>
             </span>
-    </div>
+        </div>
 
-    <!--Estimated Time-->
-    <div>
-        <span class="twelve">
+        <!--Estimated Time-->
+        <div>
+        <span class="ten">
             <label>
                 <i18n>homework.workload</i18n>
                 :
@@ -61,63 +63,36 @@
                     <i18n>minutes</i18n>
             </label>
         </span>
+        </div>
+
+        <!-- switch publish -->
+        <div class="flex twelve-mobile">
+            <label class="vertical-spacing margin-right-md">
+                <i18n>utils.publish</i18n>
+                :
+            </label>
+
+            <switch class="vertical-spacing" ng-change="homework.publishedChanged = !homework.publishedChanged" ng-model="homework.isPublished">
+                <label class="switch"> </label>
+            </switch>
+        </div>
+        <div ng-if="homework.publishDate && homework.isPublished" class="flex twelve-mobile">
+            <label class="vertical-spacing margin-right-md">
+                <i18n>homework.published.date.teacher</i18n>
+                [[homework.publishDate]]
+            </label>
+        </div>
     </div>
 
-    <!-- switch publish -->
-    <div class="flex twelve-mobile">
-        <label class="vertical-spacing margin-right-md">
-            <i18n>utils.publish</i18n>
-            :
-        </label>
+    <!-- Description-->
+    <div ng-if="homework.opened" class="nine float-none display-inline-block vertical-align-top text-left">
+        <div class="twelve-mobile">
+            <label>
+                <i18n>utils.description</i18n>
+                :
+            </label>
+        </div>
 
-        <switch class="vertical-spacing" ng-change="homework.publishedChanged = !homework.publishedChanged" ng-model="homework.isPublished">
-            <label class="switch"> </label>
-        </switch>
+        <editor class="twelve" ng-model="homework.description"></editor>
     </div>
-    <div ng-if="homework.publishDate && homework.isPublished" class="flex twelve-mobile">
-        <label class="vertical-spacing margin-right-md">
-            <i18n>homework.published.date.teacher</i18n>
-             [[homework.publishDate]]
-        </label>
-    </div>
-
-</td>
-
-<!-- Deadline static data -->
-<td ng-if="!homework.opened"
-    class="three vertical-align-top text-left">
-    <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dateDisplayed]]</p>
-    <p ng-if="homework.attachedToSession && !homework.session.firstText" class="margin-bottom-md twelve">
-        <i18n>homework.attachedToSession</i18n>
-        [[homework.session.startDisplayDate]]
-        [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
-        [[homework.session.subject.label]]
-    </p>
-
-    <p ng-if="homework.attachedToSession && homework.session.firstText" class="margin-bottom-md twelve">
-     <i18n>todo.for.this.session</i18n>
-    </p>
-
-</td>
-
-<!-- Type static data -->
-<td ng-if="!homework.opened" class="two vertical-align-top text-left ">
-    <p class="twelve">[[homework.type.label]]</p>
-</td>
-
-<!-- Description-->
-<td ng-if="homework.opened" class="six vertical-align-top full-td-width text-left">
-    <editor class="twelve" ng-model="homework.description"></editor>
-</td>
-
-<!-- Deadline static data -->
-<td ng-if="!homework.opened" class="five vertical-align-top full-td-width text-left">
-    <p class="twelve" ng-bind-html="[[homework.description]]"></p>
-</td>
-
-<!-- Button part -->
-<td class="one vertical-align-top vertical-align-top text-right">
-    <i ng-show="!homework.opened && $parent.areValidHomeworks()" ng-click="$parent.openHomework(homework)">&#xe858;</i>
-    <i ng-show="!homework.opened" class="trash right-magnet" ng-click="deleteHomework($index);$parent.cancelValidateOnDelete(homework,$index);"></i>
-</td>
-
+</div>
