@@ -149,15 +149,6 @@
                             <container template="formProgressionHomework"></container>
                         </div>
 
-                    </div>
-
-                    <div class="row">
-                        <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
-                             ng-if="!progressionHomework.isDeleted"
-                             inside-session-form="true">
-                            <container template="formProgressionHomework"></container>
-                        </div>
-
                         <button ng-show="!validate"
                                 class="float-none display-inline-block margin-top-md"
                                 ng-click="addProgressionHomework()">
