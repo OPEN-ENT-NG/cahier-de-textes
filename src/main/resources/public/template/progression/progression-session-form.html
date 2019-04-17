@@ -65,6 +65,8 @@
                         <div class="cell twelve-mobile twelve">
                             <select required class="formSessionType"  ng-model="progression_session.type"
                                     ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
+                                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.type')]]</option>
+
                             </select>
                         </div>
                     </label>

@@ -110,6 +110,7 @@
   "creation.groups.choose": "Choisisser un(e)/des groupes(s)/classe(s)",
   "select.audience": "Sélectionner un groupe/classe",
   "select.subject": "Sélectionner la matière",
+  "select.type":"Sélectionner le type de progression",
   "printer.audience": "Groupe / Classe",
   "printer.subject": "La matière",
   "student.choose": "Choisisser votre enfant",

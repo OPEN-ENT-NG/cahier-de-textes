@@ -177,7 +177,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         JsonArray params;
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session" +
                 "(subject_id,title, description, annotation, owner_id, class ,type_id) " +
-                "values ( ?, ?, ?, ?, ?, ? ) " +
+                "values ( ?, ?, ?, ?, ?, ?,? ) " +
                 "RETURNING id;";
 
 
@@ -187,7 +187,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
                 .add(progression.getString("class"))
-                .add(progression.getString("type_id"));
+                .add(progression.getInteger("type_id"));
 
         Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
 
@@ -260,7 +260,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
      */
     private JsonObject getProgressionSessionCreationstatement(Number id, JsonObject progression) {
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session ( id , subject_id ,title, description, annotation, owner_id, class, type_id) " +
-                "values ( ?, ?, ?, ?, ?, ?, ?)";
+                "values ( ?, ?, ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
                 .add(progression.getString("subject_id"))
