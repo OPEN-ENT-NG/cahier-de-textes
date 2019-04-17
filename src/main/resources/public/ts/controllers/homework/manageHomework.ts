@@ -2,6 +2,7 @@ import {idiom as lang, model, moment, ng} from 'entcore';
 import {Courses, Session, Sessions, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 import {Utils} from '../../utils/utils';
+import {ProgressionHomework} from "../../model/Progression";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -265,13 +266,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
-        $scope.deleteHomework = async (index: any) => {
+        $scope.deleteHomework = async (index: any, i) => {
             if($scope.isInsideSessionForm && !$scope.homework.id){
                 $scope.homework.isDeleted=true;
 
             } else {
+                $scope.session.homeworks.splice(i,1);
                 let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
-                if(true) {
+                if(succeed) {
                     if($scope.isInsideSessionForm){
                         $scope.homework.isDeleted=true;
                     } else {
