@@ -28,87 +28,94 @@
     </fieldset>
 
     <div class="row card padding-md" ng-if="session.opened">
-        <!-- Title -->
-        <label class="four cell twelve-mobile">
-            <div class="twelve">
-                <i18n>title</i18n>
-            </div>
-            <input type="text" placeholder="[[placeholder]]" class="twelve twelve-mobile" ng-model="session.title"/>
-        </label>
-        <div class="one"></div>
-        <!-- Room -->
-        <label class="two cell horizontal-spacing twelve-mobile">
-            <div class="twelve">
-                <i18n>utils.room</i18n>
-            </div>
-            <input type="text" class="twelve twelve-mobile" ng-model="session.room" maxlength="8"/>
-        </label>
-        <div class="one"></div>
-        <!-- Type -->
-        <label class="two cell horizontal-spacing twelve-mobile">
-            <div class="twelve">
-                <i18n>homework.manage.type</i18n>
-            </div>
-            <div class="cell twelve-mobile ten">
-                <select class="formSessionType" required ng-model="session.type"
-                        ng-change="changeSelect(session.type)"
-                        ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
-                </select>
-            </div>
-        </label>
-        <div class="one"></div>
-        <!-- Date -->
-        <div class="three cell horizontal-spacing twelve-mobile">
-            <label class="row twelve vertical-spacing">
-                <div class="twelve margin-bottom-md">
-                    <i18n>date</i18n>
-                    *
+        <div class="row">
+            <!-- Title -->
+            <label class="four cell twelve-mobile">
+                <div class="twelve">
+                    <i18n>title</i18n>
+                </div>
+                <input type="text" placeholder="[[placeholder]]" class="twelve twelve-mobile" ng-model="session.title"/>
+            </label>
+            <div class="one"></div>
+            <!-- Room -->
+            <label class="two cell horizontal-spacing twelve-mobile">
+                <div class="twelve">
+                    <i18n>utils.room</i18n>
+                </div>
+                <input type="text" class="twelve twelve-mobile" ng-model="session.room" maxlength="8"/>
+            </label>
+            <div class="one"></div>
+            <!-- Type -->
+            <label class="two cell horizontal-spacing twelve-mobile">
+                <div class="twelve">
+                    <i18n>homework.manage.type</i18n>
+                </div>
+                <div class="cell twelve-mobile ten">
+                    <select class="formSessionType" required ng-model="session.type"
+                            ng-change="changeSelect(session.type)"
+                            ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
+                    </select>
                 </div>
             </label>
+            <div class="one"></div>
+            <!-- Date -->
+            <div class="three cell horizontal-spacing twelve-mobile">
+                <label class="row twelve vertical-spacing">
+                    <div class="twelve margin-bottom-md">
+                        <i18n>date</i18n>
+                        *
+                    </div>
+                </label>
 
-            <div class="twelve twelve-mobile">
-                <span class="twelve-mobile">
-                    <i18n ng-if="!(session.courseId && session.date)">the</i18n>
-                    <label ng-model="session.date" ng-if="session.courseId && session.date">
-                        [[transformDateToFrenchDate(session.date) | date:'EEEE dd MMMM yyyy']]
+                <div class="twelve twelve-mobile">
+                    <span class="twelve-mobile">
+                        <i18n ng-if="!(session.courseId && session.date)">the</i18n>
+                        <label ng-model="session.date" ng-if="session.courseId && session.date">
+                            [[transformDateToFrenchDate(session.date) | date:'EEEE dd MMMM yyyy']]
+                        </label>
+                        <date-picker class="date-picker-sm" ng-if="!(session.courseId && session.date)"
+                                     ng-model="session.date">
+                        </date-picker>
+                    </span>
+                    <i18n>from2</i18n>
+                    <label ng-model="session.startTime" class="margin-left-sm margin-right-sm"
+                           ng-if="session.courseId && session.startTime">
+                        [[session.startTime | date:'HH:mm']]
                     </label>
-                    <date-picker class="date-picker-sm" ng-if="!(session.courseId && session.date)"
-                                 ng-model="session.date">
-                    </date-picker>
-                </span>
-                <i18n>from2</i18n>
-                <label ng-model="session.startTime" class="margin-left-sm margin-right-sm"
-                       ng-if="session.courseId && session.startTime">
-                    [[session.startTime | date:'HH:mm']]
-                </label>
-                <input type="time"
-                       class="margin-left-sm margin-right-sm"
-                       ng-if="!(session.courseId && session.startTime)"
-                       ng-model="session.startTime"/>
-                <i18n>to2</i18n>
-                <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
-                       ng-if="session.courseId && session.endTime">
-                    [[session.endTime | date:'HH:mm']]
-                </label>
-                <input type="time"
-                       class="margin-left-sm margin-right-sm"
-                       ng-if="!(session.courseId && session.endTime)"
-                       ng-model="session.endTime"/>
+                    <input type="time"
+                           class="margin-left-sm margin-right-sm"
+                           ng-if="!(session.courseId && session.startTime)"
+                           ng-model="session.startTime"/>
+                    <i18n>to2</i18n>
+                    <label ng-model="session.endTime" class="margin-left-sm margin-right-sm"
+                           ng-if="session.courseId && session.endTime">
+                        [[session.endTime | date:'HH:mm']]
+                    </label>
+                    <input type="time"
+                           class="margin-left-sm margin-right-sm"
+                           ng-if="!(session.courseId && session.endTime)"
+                           ng-model="session.endTime"/>
+                </div>
             </div>
+
+            <!-- Publish -->
+            <label class="one cell horizontal-spacing twelve-mobile">
+                <div class="twelve margin-bottom-md">
+                    <i18n>utils.publish</i18n>
+                </div>
+                <switch class="vertical-spacing" ng-model="session.isPublished">
+                    <label class="switch"> </label>
+                </switch>
+            </label>
+            <div class="one"></div>
         </div>
 
-        <!-- Publish -->
-        <label class="one cell horizontal-spacing twelve-mobile">
-            <div class="twelve margin-bottom-md">
-                <i18n>utils.publish</i18n>
-            </div>
-            <switch class="vertical-spacing" ng-model="session.isPublished">
-                <label class="switch"> </label>
-            </switch>
-        </label>
-        <div class="one"></div>
+        <!-- Warning date -->
+        <div ng-if="!validDate()" class="warning ">
+            <i18n>diary.error.date.is.not.valid</i18n>
+        </div>
 
-        <!-- Description-->
+        <!-- Description -->
         <div class="row">
             <div class="row twelve vertical-spacing">
                 <span class="twelve margin-20">
@@ -217,9 +224,6 @@
             </div>
         </div>
 
-        <div ng-if="!validDate()" class="warning ">
-            <i18n>diary.error.date.is.not.valid</i18n>
-        </div>
     </div>
 </div>
 </div>

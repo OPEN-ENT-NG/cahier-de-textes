@@ -271,16 +271,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
-        $scope.deleteHomework = async (index: any, i) => {
+        $scope.deleteHomework = async (index: any) => {
             if($scope.isInsideSessionForm && !$scope.homework.id){
-                $scope.homework.isDeleted=true;
-
+                $scope.homework.isDeleted = true;
             } else {
-                $scope.session.homeworks.splice(i,1);
                 let { succeed } = $scope.toastHttpCall(await $scope.homework.delete());
                 if(succeed) {
                     if($scope.isInsideSessionForm){
-                        $scope.homework.isDeleted=true;
+                        $scope.homework.isDeleted = true;
                     } else {
                         window.history.back();
                     }
