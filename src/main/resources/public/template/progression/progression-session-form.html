@@ -36,13 +36,13 @@
             <div class="row card padding-md margin-bottom-lg">
                 <div class="row">
                     <!-- Subject -->
-                    <label class="two cell horizontal-spacing twelve-mobile">
+                    <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>subject</i18n>
                         </div>
                         <span class="cell twelve-mobile">
                             <i18n class="twelve" ng-if="!progression_session.subject">select.subject</i18n>
-                            <select required ng-model="progression_session.subject" class="twelve twelve-mobile"
+                            <select required ng-model="progression_session.subject" class="twelve-mobile"
                                     ng-disabled="progression_session.courseId && progression_session.subject"
                                     ng-options="subject.label for subject in subjects.all track by subject.id">
                                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
@@ -50,12 +50,12 @@
                         </span>
                     </label>
                     <!-- TYPE SESSION -->
-                    <label class="two cell horizontal-spacing twelve-mobile">
+                    <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>homework.manage.type</i18n>
                         </div>
-                        <div class="cell twelve-mobile twelve">
-                            <select required class="formSessionType"  ng-model="progression_session.type"
+                        <div class="cell twelve-mobile">
+                            <select required class="formSessionType twelve twelve-mobile"  ng-model="progression_session.type"
                                     ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
                                 <option  value="" disabled selected>[[translate('select.type')]]</option>
 
