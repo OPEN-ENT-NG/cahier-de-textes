@@ -121,6 +121,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     if ($scope.session && !h.session.id) {
                         h.session.id = $scope.session.id;
                     }
+
+                }
+                if(!h.attachedToDate){
                     h.dueDate = h.session.startMoment;
                 }
                 if(!h.isDeleted && h.isValidForm()){
