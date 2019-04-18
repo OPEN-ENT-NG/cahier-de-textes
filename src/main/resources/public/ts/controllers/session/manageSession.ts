@@ -92,7 +92,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.saveSession = async () => {
             if (!$scope.isValidForm) {
-
                 $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                 return;
             }
@@ -126,6 +125,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if(!h.attachedToDate){
                     h.dueDate = h.session.startMoment;
                 }
+
                 if(!h.isDeleted && h.isValidForm()){
                     let {succeed} = await h.save();
                     if (!succeed) {
