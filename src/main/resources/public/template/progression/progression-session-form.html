@@ -91,7 +91,8 @@
                     <editor ng-model="progression_session.description"></editor>
                 </div>
 
-                <div ng-if="progression_session.progression_homeworks.length < 1" class="padding-md margin-bottom-md">
+<!-- HOMEWORKS -->
+                <div ng-if="progression_session.progression_homeworks.length < 1 " class="padding-md margin-bottom-md">
                     <button ng-show="!validate"
                             class="float-none display-inline-block margin-top-md"
                             ng-click="addProgressionHomework()">
@@ -103,8 +104,9 @@
                     <h2>
                         <i18n>homeworks</i18n>
                     </h2>
-                    <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length
-                            && !progression_session.progression_homeworks[0].opened && progression_session.progression_homeworks[0].type">
+
+                    <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length &&
+                    (( progression_session.progression_homeworks.length == 1 && !progression_session.progression_homeworks[0].opened) ||  progression_session.progression_homeworks.length > 1)">
                         <table class="twelve">
                             <thead>
                             <tr>
@@ -120,19 +122,18 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
-                                inside-session-form="true">
+                            <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index">
                                 <!-- Type static data -->
-                                <td ng-if="!progressionHomework.opened" class="two vertical-align-top text-left ">
+                                <td ng-show="!progressionHomework.opened" class="two vertical-align-top text-left ">
                                     <p class="twelve">[[progressionHomework.type.label]]</p>
                                 </td>
                                 <!-- Description -->
-                                <td ng-if="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
+                                <td ng-show="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
                                     <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
                                 </td>
                                 <!-- Button part -->
-                                <td ng-if="!progressionHomework.opened">
-                                    <i ng-show="!progressionHomework.opened" ng-click="$parent.openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                <td ng-show="!progressionHomework.opened">
+                                    <i ng-show="!progressionHomework.opened" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
                                     <i ng-show="!progressionHomework.opened" class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
                                 </td>
                             </tr>
@@ -142,9 +143,51 @@
 
                     <div class="row">
                         <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
-                             ng-if="!progressionHomework.isDeleted"
-                             inside-session-form="true">
-                            <container template="formProgressionHomework"></container>
+                             ng-show="!progressionHomework.isDeleted">
+                            <div ng-if="progressionHomework.opened" class="padding-md">
+                                <!-- Deadline -->
+                                <div ng-if="progressionHomework.opened" class="float-left three vertical-align-top text-left">
+                                    <div class="ten twelve-mobile">
+                                        <label>
+                                            <i18n>homework.manage.type</i18n>
+                                            :
+                                        </label>
+                                    </div>
+
+                                    <!-- Type -->
+                                    <div class="row">
+                                        <select class="ten"
+                                                ng-if="progressionHomework.opened"
+                                                required
+                                                ng-model="progressionHomework.type"
+                                                ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
+                                        </select>
+                                    </div>
+                                    <!--Estimated Time-->
+                                    <div>
+                                          <span class="ten">
+                                                <label>
+                                              <i18n>homework.workload</i18n>
+                                                    :
+                                                      <input ng-model="progressionHomework.estimatedTime" min="0" type="number" class="two">
+                                                   <i18n>minutes</i18n>
+                                                   </label>
+                                               </span>
+                                    </div>
+                                </div>
+
+                                <!-- Description-->
+                                <div ng-if="progressionHomework.opened" class="nine float-none display-inline-block vertical-align-top text-left">
+                                    <div class="twelve-mobile">
+                                        <label>
+                                            <i18n>utils.description</i18n>
+                                            :
+                                        </label>
+                                    </div>
+
+                                    <editor class="twelve" ng-model="progressionHomework.description"></editor>
+                                </div>
+                            </div>
                         </div>
 
                         <button ng-show="!validate"
