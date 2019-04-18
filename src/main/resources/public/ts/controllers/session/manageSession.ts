@@ -139,6 +139,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             return hasSucceed;
         }
 
+        $scope.hasOneHomeworkInList = () =>{
+            let hasOneHomework = false;
+            $scope.session.homeworks.map(h =>{
+                if(!h.isDeleted && !h.opened )
+                    hasOneHomework = true;
+            });
+            return hasOneHomework;
+        }
 
         // region Gestion des homework
         $scope.areValidHomeworks = () => {

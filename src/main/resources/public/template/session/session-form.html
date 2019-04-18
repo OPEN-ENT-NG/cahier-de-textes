@@ -137,8 +137,7 @@
             <h2>
                 <i18n>homeworks</i18n>
             </h2>
-            <div class="responsive-table row" ng-if="session.homeworks.length  ">
-                [[session.homeworks.length]]
+            <div class="responsive-table row" ng-if="session.homeworks.length && hasOneHomeworkInList()">
                 <table class="twelve">
                     <thead>
                     <tr>
