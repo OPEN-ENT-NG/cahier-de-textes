@@ -121,6 +121,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     if ($scope.session && !h.session.id) {
                         h.session.id = $scope.session.id;
                     }
+                    h.dueDate = h.session.startMoment;
                 }
                 if(!h.isDeleted && h.isValidForm()){
                     let {succeed} = await h.save();
@@ -128,6 +129,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         hasSucceed = false;
                     }
                 }
+                console.log( h.session);
+
             });
 
             return hasSucceed;

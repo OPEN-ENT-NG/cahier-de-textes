@@ -9,7 +9,6 @@ export class Audience {
 
     constructor ( name: string, id?, type?) {
         this.name = name;
-        console.log(id);
         if(id)
             this.id = id;
         else

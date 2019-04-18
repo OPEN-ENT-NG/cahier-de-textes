@@ -387,7 +387,6 @@ export let main = ng.controller('MainController',
             //display session
             $scope.pedagogicDays.map((c,index) =>{
                 if(c.shortDate === "17/04")
-                    console.log(c);
 
                 containsSession(c) ;
                 if(  containsSession(c)  && nbSessionDisplayed < 3 ) {

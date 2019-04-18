@@ -57,7 +57,7 @@
                         <div class="cell twelve-mobile twelve">
                             <select required class="formSessionType"  ng-model="progression_session.type"
                                     ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
-                                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.type')]]</option>
+                                <option  value="" disabled selected>[[translate('select.type')]]</option>
 
                             </select>
                         </div>
@@ -105,9 +105,7 @@
                     </h2>
                     <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length
                             && !progression_session.progression_homeworks[0].opened && progression_session.progression_homeworks[0].type">
-                        <table class="twelve" ng-if="progression_session.progression_homeworks.length
-                            && !progression_session.progression_homeworks[0].opened
-                            && progression_session.progression_homeworks[0].type">
+                        <table class="twelve">
                             <thead>
                             <tr>
                                 <td class="one text-left padding-left-md">

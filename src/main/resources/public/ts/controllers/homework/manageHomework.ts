@@ -83,7 +83,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             }
             if(!$scope.homework.audience || !$scope.homework.subject || $scope.isReadOnly) {
-                
+
                 return;
             }
 
@@ -148,7 +148,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
                 if ($scope.session && $scope.session.id && s && s.id === $scope.session.id) {
                     s.firstText = lang.translate("session.manage.linkhomework");
-                    if(! $scope.homework.opened){
+                    if(! $scope.homework.opened && ! $scope.homework.session){
                         $scope.homework.session = s;
                     }
                 }
@@ -157,6 +157,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         if (!(s instanceof Session)) {
                             if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
                                 sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
+                                console.log("plpo")
                             }
                         }
                     });
@@ -182,9 +183,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToSession = () => {
             $scope.homework.attachedToDate = false;
             $scope.homework.attachedToSession = true;
-            if($scope.session)
+            if($scope.session){
                 $scope.homework.dueDate = moment($scope.session.startDate);
+            }
 
+            if($scope.homework.session){
+                $scope.homework.dueDate = moment($scope.homework.session.startDate);
+            }
 
             clearDublicateSessions($scope.sessionsToAttachTo);
 
@@ -197,19 +202,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework.session.firstText = lang.translate("session.manage.linkhomework");
                 $scope.sessionsToAttachTo.push($scope.homework.session);
             }
-             if ($scope.sessionsToAttachTo.length == 1 ) {
+            if ($scope.sessionsToAttachTo.length == 1 ) {
                 $scope.homework.session = $scope.sessionsToAttachTo[0];
 
-             }
-             if ($scope.sessionsToAttachTo.length > 1 && $scope.homework.opened) {
+            }
+            if ($scope.sessionsToAttachTo.length > 1 && $scope.homework.opened) {
                 $scope.homework.session = $scope.sessionsToAttachTo[1];
             }
             else if($scope.homework.opened && !$scope.sessionsToAttachTo.length ){
                 $scope.homework.session = undefined;
+
                 $scope.attachToDate();
 
-             }
-
+            }
 
             $scope.safeApply();
 
