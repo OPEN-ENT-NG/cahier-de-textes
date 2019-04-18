@@ -180,9 +180,8 @@
 
                         <!-- Description -->
                         <td ng-if="!homework.opened" class="five vertical-align-top full-td-width text-left">
-                            <p class="twelve" ng-bind-html="[[homework.description]]"></p>
+                            <p class="twelve" bind-html="homework.description"></p>
                         </td>
-
                         <!-- Button part -->
                         <td ng-if="!homework.opened">
                             <i ng-show="!homework.opened && $parent.areValidHomeworks()" ng-click="$parent.openHomework(homework)">&#xe858;</i>
