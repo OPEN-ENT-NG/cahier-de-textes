@@ -345,11 +345,35 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncSessionsWithVisa(startMoment: any, endMoment: any, teacherId?: string): Promise<void> {
+    async syncSessionsWithVisa(startMoment: any, endMoment: any, teacherId?: string,
+                               subjectsId?: string, audiencesId?: string,
+                               displayVisa?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
-        let url = `/diary/sessions/visa/${startDate}/${endDate}/${teacherId}`;
+        let filter = (audiencesId || subjectsId || displayVisa) ? '?' : '';
 
+        if (subjectsId) {
+            if (filter.length > 1) {
+                filter += `&subjectId=${subjectsId}`;
+            } else {
+                filter += `subjectId=${subjectsId}`;
+            }
+        }
+        if (audiencesId) {
+            if (filter.length > 1) {
+                filter += `&audienceId=${audiencesId}`;
+            } else {
+                filter += `audienceId=${audiencesId}`;
+            }
+        }
+        if (displayVisa) {
+            if (filter.length > 1) {
+                filter += `&visa=${displayVisa}`;
+            } else {
+                filter += `visa=${displayVisa}`;
+            }
+        }
+        let url = `/diary/sessions/visa/${startDate}/${endDate}/${teacherId}${filter}`;
         await this.syncSessions(url);
     }
 

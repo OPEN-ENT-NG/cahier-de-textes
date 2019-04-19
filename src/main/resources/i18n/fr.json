@@ -49,6 +49,7 @@
   "date": "Date",
   "legend": "Légende",
   "subject": "Matière",
+  "subjects": "Matière(s)",
   "loading": "Chargement",
   "import.file": "Importer",
   "share.users": "Utilisateurs",
