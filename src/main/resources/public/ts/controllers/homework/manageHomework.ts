@@ -166,7 +166,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
 
             });
-            console.log(sessionsToAttachTo);
 
         }
 
@@ -345,7 +344,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 if($scope.homework.id){
                     await $scope.homework.sync();
                 }
-                console.log("is insde form")
                 $scope.attachToSession();
             } else {
 

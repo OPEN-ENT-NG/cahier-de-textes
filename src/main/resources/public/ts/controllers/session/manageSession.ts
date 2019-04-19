@@ -132,7 +132,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         hasSucceed = false;
                     }
                 }
-                console.log( h.session);
 
             });
 
@@ -288,7 +287,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
 
             }else{
-                console.log('pli')
 
                 $scope.session.opened = true;
             }

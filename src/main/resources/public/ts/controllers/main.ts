@@ -681,6 +681,7 @@ export let main = ng.controller('MainController',
                Handle a progression dropped on a session
                 */
         $scope.updateSession = async (idSession, idProgression) => {
+
             let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
                 if (progression.id == idProgression)
@@ -688,14 +689,27 @@ export let main = ng.controller('MainController',
                     progressionDragged = progression;
                 }
             });
-            await progressionDragged.toSession(idSession);
+            // progressionDragged.toSession(idSession);
+
             $scope.calendarItems.map(async session => {
                 if (session.id == idSession) {
-                    await session.sync();
                     sessionDroped = session;
                 }
             });
+            sessionDroped.setFromProgression(progressionDragged);
+            progressionDragged.progression_homeworks.map(
+                ph => {
+                    let homework = new Homework($scope.structure)
+                    homework.estimatedTime = ph.estimatedTime;
+                    homework.description = ph.description;
+                    homework.subject = ph.subject;
+                    homework.type = ph.type;
+                    sessionDroped.homeworks.push(homework);
 
+                }
+            );
+
+            $scope.session = sessionDroped;
 
             $scope.syncPedagogicItems();
 
@@ -709,7 +723,6 @@ export let main = ng.controller('MainController',
         Handle a progression dropped on a course
          */
         $scope.createSessionFromProgression = async (idProgression,idCourse,date) =>{
-
             let progressionDragged;
             $scope.progressions.all.map(progression => {
                 if (progression.id == idProgression)

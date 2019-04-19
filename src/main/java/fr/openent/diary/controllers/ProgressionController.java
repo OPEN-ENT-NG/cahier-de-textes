@@ -113,7 +113,7 @@ public class ProgressionController extends ControllerHelper {
         }));
 
     }
-
+//TODO CHECK IF STILL CALLED
     @Put("/progression/to/session/:idProgression/:idSession")
     @SecuredAction(value = "",type = ActionType.RESOURCE)
     @ResourceFilter(SessionManage.class)

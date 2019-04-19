@@ -214,7 +214,13 @@ export class Session {
             notify.error('session.sync.err');
         }
     }
+    setFromProgression (progression){
+            this.subject = progression.subject;
+            this.title = progression.title;
+            this.type = progression.type;
+            this.description = progression.description;
 
+    }
     setFromCourseAndProgression(progression: ProgressionSession,course: Course) {
         this.subject = progression.subject;
         this.title = progression.title;
@@ -384,6 +390,8 @@ export class Sessions {
             i.init(this.structure);
         });
     }
+
+
 }
 
 export class SessionType {

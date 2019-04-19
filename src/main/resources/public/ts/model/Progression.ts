@@ -156,11 +156,7 @@ export class ProgressionSession implements  Selectable{
         }
     }
 
-    async toSession(idSession){
-        let response = await http.put(`/diary/progression/to/session/${this.id}/${idSession}` , this.toJson());
-        return Utils.setToastMessage(response, 'session.updated','session.updated.error');
 
-    }
 }
 
 
