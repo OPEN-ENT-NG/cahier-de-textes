@@ -4,13 +4,13 @@
     </div>
     <div class="row card padding-md" ng-click="session.opened = !session.opened">
         <h2 class="remove-margin">
-            [[session.title]] <i18n>type</i18n> [[session.type.label]]
+            [[session.title]]
             <i class="right-magnet" ng-if="!session.isInsideDiary" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </div>
     <div class="row card padding-md margin-bottom-md" ng-show="session.opened || session.isInsideDiary">
         <div class="row">
-            <span class="gray">[[session.startDisplayDate]] &nbsp; [[session.startDisplayTime]] - [[session.endDisplayTime]]</span>
+            <span class="gray">[[session.type.label]] &nbsp; [[session.startDisplayDate]] &nbsp; [[session.startDisplayTime]] - [[session.endDisplayTime]]</span>
         </div>
         <!-- Description-->
         <div class="read-only-description" bind-html="session.description"></div>

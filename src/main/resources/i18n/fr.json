@@ -171,7 +171,7 @@
   "homework.published.date.teacher" : "Publié le :",
   "todo.for.this.session": "À faire pour cette séance",
   "for.this.session": "Pour cette séance",
-  "todo.for.session": "Pour la séance",
+  "todo.for.session": "Pour la séance : ",
   "choose.another.date.or.session": "Choisir une autre Date/Séance",
   "session.create": "Créer une séance",
   "session.manage.linkhomework": "Lier à cette séance",

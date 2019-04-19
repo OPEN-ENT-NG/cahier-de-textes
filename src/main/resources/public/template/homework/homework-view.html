@@ -6,11 +6,11 @@
     <article class="row padding-md" ng-click="homework.opened = !homework.opened">
         <h2 class="eight cell remove-margin">
             <span>[[homework.type.label]]</span>
-            <span ng-if="!homework.isInsideDiary"> -
-                <span ng-if="homework.attachedToDate"><i18n>homework.for.date</i18n> [[getDisplayDate(homework.dueDate)]]</span>
-                <span ng-if="homework.attachedToParentSession"><i18n>for.this.session</i18n></span>
-                <span ng-if="homework.attachedToOtherSession && homework.session">&nbsp;
-                    <i18n>todo.for.session</i18n>
+            <span ng-if="!homework.isInsideDiary">
+                <span ng-if="homework.attachedToDate"> - <i18n>homework.for.date</i18n> [[getDisplayDate(homework.dueDate)]]</span>
+                <span ng-if="homework.attachedToParentSession"> - <i18n>for.this.session</i18n></span>
+                <span ng-if="homework.attachedToSession && homework.session">
+                    - <i18n>todo.for.session</i18n>
                     [[homework.session.subject.label]] [[homework.session.startDisplayDate]]
                     ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
                 </span>
@@ -55,7 +55,7 @@
             </h4>
         </div>
 
-        <div class="row padding-md" ng-show="homework.opened || homework.isInsideDiary">
+        <div class="row" ng-show="homework.opened || homework.isInsideDiary">
 
             <!-- Description-->
             <div class="read-only-description" bind-html="homework.description"></div>
