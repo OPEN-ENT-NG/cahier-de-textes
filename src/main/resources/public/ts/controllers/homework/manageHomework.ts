@@ -20,7 +20,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         if($scope.structure.audiences.all.length === 1){
             $scope.homework.audience = $scope.structure.audiences.all[0];
         }
-
+        let isInit= false;
         $scope.sessions = new Sessions($scope.structure);
         $scope.courses = new Courses($scope.structure);
         $scope.subjects = new Subjects();
@@ -129,7 +129,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.attachToDate();
 
                 }
-                if ($scope.isInsideSessionForm) {
+                if ($scope.isInsideSessionForm && !$scope.homework.id) {
                     $scope.attachToSession();
                 }
                 $scope.safeApply();
@@ -148,27 +148,25 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
                 if ($scope.session && $scope.session.id && s && s.id === $scope.session.id) {
                     s.firstText = lang.translate("session.manage.linkhomework");
-                    if(! $scope.homework.opened && ! $scope.homework.session){
-                        $scope.homework.session = s;
-                    }
+                }
+                if((! $scope.homework.opened && ! $scope.homework.session )|| ($scope.homework && $scope.homework.session.id == s.id) ){
+                    $scope.homework.session = s;
                 }
                 if (s) {
                     sessionsToAttachTo.map(ss => {
                         if (!(s instanceof Session)) {
                             if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
                                 sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
-                                console.log("plpo")
                             }
                         }
                     });
                     if($scope.session && !s.id && !$scope.session.id && s.date  == $scope.session.date){
                         s.firstText = lang.translate("session.manage.linkhomework");
-
-
                     }
                 }
 
             });
+            console.log(sessionsToAttachTo);
 
         }
 
@@ -326,6 +324,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         };
 
         async function initData() {
+            $scope.homework.isInit = true;
+
+            console.log("init");
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
@@ -343,9 +344,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.isInsideSessionForm = true;
                 if($scope.homework.id){
                     await $scope.homework.sync();
-
-
                 }
+                console.log("is insde form")
                 $scope.attachToSession();
             } else {
 
@@ -380,6 +380,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             // $scope.setProgress($scope.homework);
             window.history.back();
         };
-        await initData();
+        if(!$scope.homework.isInit)
+            await initData();
     }]
 );
