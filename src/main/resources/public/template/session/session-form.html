@@ -134,7 +134,7 @@
         </div>
 
         <div ng-if="session.homeworks.length" class="margin-bottom-md">
-            <h2>
+            <h2 ng-if="session.homeworks.length && hasOneHomeworkInList()">
                 <i18n>homeworks</i18n>
             </h2>
             <div class="responsive-table row" ng-if="session.homeworks.length && hasOneHomeworkInList()">
