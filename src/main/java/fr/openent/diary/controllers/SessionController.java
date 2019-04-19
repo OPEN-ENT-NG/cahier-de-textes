@@ -173,12 +173,13 @@ public class SessionController extends ControllerHelper {
         });
     }
 
-    @Delete("/session-type/:id")
+    @Delete("/session-type/:id/:structureId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(GlobalSettingAccess.class)
     public void deleteSessionType(final HttpServerRequest request) {
         Integer sessionTypeId = Integer.parseInt(request.getParam("id"));
-        sessionService.deleteSessionType(sessionTypeId, DefaultResponseHandler.defaultResponseHandler(request));
+        String structureId = request.getParam("structureId");
+        sessionService.deleteSessionType(sessionTypeId, structureId, DefaultResponseHandler.defaultResponseHandler(request));
     }
 
 }

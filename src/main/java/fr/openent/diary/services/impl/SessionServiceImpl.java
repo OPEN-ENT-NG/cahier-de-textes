@@ -312,8 +312,16 @@ public class SessionServiceImpl  implements SessionService {
     }
 
     @Override
-    public void deleteSessionType(Integer sessionTypeId, Handler<Either<String, JsonObject>> handler) {
-        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".session_type WHERE id = " + sessionTypeId;
-        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+    public void deleteSessionType(Integer sessionTypeId, String structure_id, Handler<Either<String, JsonObject>> handler) {
+        JsonArray params = new JsonArray();
+
+        String query = "DELETE FROM diary.session_type WHERE id = ? AND Exists " +
+                "(SELECT 1 FROM diary.session_type st " +
+                "WHERE structure_id = ? HAVING COUNT(st.id) > 1)";
+
+        params.add(sessionTypeId);
+        params.add(structure_id);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }
 }

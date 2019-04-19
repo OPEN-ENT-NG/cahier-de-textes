@@ -53,25 +53,28 @@ export const sessionType = {
             if (sessionType.that.data.input.length > 1) {
                 if (sessionType.that.data.updateMode) {
                     sessionType.that.updateSessionType();
-                    sessionType.that.data.updateMode = false;
                 } else {
                     sessionType.that.createSessionType(sessionTypeInput);
                 }
-                sessionType.that.data.input = "";
-                await this.sessionTypes.sync();
-                this.safeApply();
             }
         },
 
         createSessionType: async function(event: SessionType) {
             event.label = sessionType.that.data.input;
             this.toastHttpCall(await event.create());
+            sessionType.that.data.input = "";
+            await this.sessionTypes.sync();
+            this.safeApply();
         },
 
         updateSessionType: async function () {
             this.sessionTypeInput.label = sessionType.that.data.input;
             this.sessionTypeInput.id = sessionType.that.data.updateId;
             this.toastHttpCall(await this.sessionTypeInput.update());
+            sessionType.that.data.updateMode = false;
+            sessionType.that.data.input = "";
+            await this.sessionTypes.sync();
+            this.safeApply();
         },
 
         editSessionTypeInput: async function (event: SessionType) {
@@ -88,13 +91,15 @@ export const sessionType = {
         },
 
         deleteSessionType: async function (event: SessionType) {
-            this.toastHttpCall(await event.delete());
-            if (sessionType.that.data.updateMode) {
-                sessionType.that.data.updateMode = false;
-                sessionType.that.data.input = "";
+            if (this.sessionTypes.all.length > 1) {
+                this.toastHttpCall(await event.delete());
+                if (sessionType.that.data.updateMode) {
+                    sessionType.that.data.updateMode = false;
+                    sessionType.that.data.input = "";
+                }
+                await this.sessionTypes.sync();
+                this.safeApply();
             }
-            await this.sessionTypes.sync();
-            this.safeApply();
         },
     }
 };

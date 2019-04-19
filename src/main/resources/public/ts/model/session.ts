@@ -392,7 +392,7 @@ export class SessionType {
     }
 
     async delete() {
-        let response = await http.delete(`/diary/session-type/${this.id}`);
+        let response = await http.delete(`/diary/session-type/${this.id}/${this.structure_id}`);
         return Utils.setToastMessage(response,'cdt.session.type.deleted', 'cdt.session.type.delete.error')
     }
 }
