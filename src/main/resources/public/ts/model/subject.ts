@@ -13,6 +13,10 @@ export class Subject {
         this.code = subjectCode;
         this.teacherId = teacherId;
     }
+
+    toString() {
+        return this.label;
+    }
 }
 
 export class Subjects {
@@ -38,6 +42,7 @@ export class Subjects {
                 url += `?teacherId=${teacherId}`
             }
             let subjects = await http.get(url);
+            this.all = [];
             subjects.data.forEach((subject) => {
                 this.all.push(new Subject(subject.subjectId, subject.subjectLabel, subject.subjectCode, subject.teacherId));
                 this.mapping[subject.subjectId] = subject.subjectLabel;

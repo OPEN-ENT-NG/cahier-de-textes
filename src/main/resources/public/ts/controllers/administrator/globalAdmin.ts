@@ -1,5 +1,5 @@
-import {_, idiom as lang, model, moment, ng} from 'entcore';
-import {Sessions} from '../../model/index';
+import {_, idiom as lang, model, moment, ng, angular} from 'entcore';
+import {Sessions, Subjects, Audiences} from '../../model/index';
 import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
 import {Utils} from "../../utils/utils";
@@ -12,6 +12,14 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.allSessionsSelect = false;
         $scope.showOptionToaster = false;
+        $scope.subjects = new Subjects();
+        $scope.audiences = new Audiences();
+        $scope.displayVisa = false;
+        $scope.params = {
+            subjects: [],
+            audiences: []
+        };
+        $scope.displayVisa = false;
         $scope.openDetails = null;
         $scope.selectedSessions = {};
         $scope.visas_pdfChoice = [];
@@ -34,15 +42,20 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
          * Init de la vue ***
          */
         $scope.syncSessionsWithVisa = async () => {
-            let teacherId;
+            // let teacherId;
             if (model.me.type == "ENSEIGNANT") {
-                teacherId = model.me.userId;
+                $scope.teacherId = model.me.userId;
             }
             else {
-                teacherId = $scope.teacher.id;
+                $scope.teacherId = $scope.teacher.id;
             }
 
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, teacherId);
+            await Promise.all([
+                await $scope.subjects.sync($scope.structure.id, $scope.teacherId),
+                await $scope.audiences.sync($scope.structure.id)
+            ]);
+
+            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => h.isInsideDiary = true);
@@ -55,6 +68,47 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.allSessionsSelect = false;
             $scope.safeApply();
         };
+
+        $scope.updateDatas = async (event) => {
+            // Checking if event is triggered when selecting an element inside multiCombo
+            if (event.target.tagName !== 'BUTTON') {
+                $scope.params.subjects = [];
+                $scope.params.audiences = [];
+
+
+                angular.forEach($scope.course.groups, function(value, key) {
+                    if (Object.getPrototypeOf(value).constructor.name === "Subject") {
+                        $scope.params.subjects[key] = value;
+                    }
+                    if (Object.getPrototypeOf(value).constructor.name === "Audience") {
+                        $scope.params.audiences[key] = value;
+                    }
+                });
+
+                await $scope.sessions.syncSessionsWithVisa(
+                    $scope.filters.startDate,
+                    $scope.filters.endDate,
+                    $scope.teacherId,
+                    // filter empty args in array
+                    $scope.params.subjects.map(array => array.id).filter(function () { return true }).toString(),
+                    $scope.params.audiences.map(array => array.id).filter(function () { return true }).toString(),
+                    $scope.displayVisa.toString()
+                );
+                $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject($scope.sessions.all);
+                $scope.safeApply();
+            }
+        };
+
+        $scope.toggleVisa = async (event) => {
+            $scope.displayVisa = !$scope.displayVisa;
+            $scope.updateDatas(event);
+        };
+
+        $scope.dropItem = async (item, event) => {
+            $scope.course.groups = _.without($scope.course.groups, item);
+            $scope.updateDatas(event);
+        };
+
         if (model.me.type == "ENSEIGNANT") {
             $scope.syncSessionsWithVisa();
         }

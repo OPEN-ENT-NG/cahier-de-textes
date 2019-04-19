@@ -38,6 +38,49 @@
                         <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
                     </select>
                 </label>
+                <div ng-show="teacher">
+                    <!--matière-->
+                    <div class="cell twelve small">
+                        <multi-combo
+                                title="[[translate('subjects')]]"
+                                combo-model="subjects.all"
+                                search-on="label"
+                                order-by="label"
+                                filtered-model="course.groups"
+                                ng-click="updateDatas($event)">
+                        </multi-combo>
+                        <div class="select-blocks remove-margin-bottom">
+                            <div ng-repeat="subject in params.subjects | filter:'' track by $index"
+                                 ng-click="dropItem(subject, $event)">
+                                [[subject.label]]
+                            </div>
+                        </div>
+                    </div>
+                    <!--classe-->
+                    <div class="cell twelve small">
+                        <multi-combo
+                                title="[[translate('utils.groups')]]"
+                                combo-model="audiences.all"
+                                search-on="name"
+                                order-by="name"
+                                filtered-model="course.groups"
+                                ng-click="updateDatas($event)">
+                        </multi-combo>
+                        <div class="select-blocks remove-margin-bottom">
+                            <div ng-repeat="audience in params.audiences | filter:'' track by $index"
+                                 ng-click="dropItem(audience, $event)">
+                                [[audience.name]]
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--visés-->
+                    <label class="checkbox">
+                        <input type="checkbox" data-ng-click="toggleVisa($event)"/>
+                        <span><i18n>sessions.admin.Visa.sateOk</i18n></span>
+                    </label>
+                </div>
+
             </div>
         </div>
     </section>

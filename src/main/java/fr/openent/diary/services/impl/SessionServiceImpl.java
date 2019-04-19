@@ -100,23 +100,24 @@ public class SessionServiceImpl  implements SessionService {
                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
+        String finalQuery;
 
-        // todo: Retirer le produit cartésien
+        query.append("WITH homework_and_type as (");
+        query.append("SELECT homework.*, to_json(homework_type) as type, to_json(progress_and_state) as progress");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework homework");
+        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
+        query.append(" LEFT JOIN ( ");
+        query.append(" SELECT progress.*, homework_state.label as state_label");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress");
+        query.append(" INNER JOIN diary.homework_state");
+        query.append(" ON progress.state_id = homework_state.id");
+        query.append(") as progress_and_state ON (homework.id = progress_and_state.homework_id))");
         query.append(" SELECT s.*, array_to_json(array_agg(homework_and_type)) as homeworks");
         if (agregVisas)
             query.append(" ,array_to_json(array_agg(distinct visa)) as visas");
 
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
-        query.append(" LEFT JOIN (");
-        query.append("   SELECT homework.*, to_json(homework_type) as type, to_json(progress_and_state) as progress");
-        query.append("   FROM diary.homework homework");
-        query.append("   INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
-        query.append("   LEFT JOIN (");
-        query.append("     SELECT progress.*, homework_state.label as state_label");
-        query.append("     FROM diary.homework_progress progress");
-        query.append("     INNER JOIN diary.homework_state ON progress.state_id = homework_state.id");
-        query.append("   ) as progress_and_state ON (homework.id = progress_and_state.homework_id)");
-        query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
+        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s ");
+        query.append(" LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)");
 
         if (agregVisas) {
             query.append(" LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id");
@@ -153,15 +154,20 @@ public class SessionServiceImpl  implements SessionService {
             query.append(" AND s.owner_id = ?");
             values.add(ownerId);
         }
-        if(structureID != null){
+
+        if (structureID != null){
             query.append(" AND s.structure_id = ?");
             values.add(structureID);
         }
 
+        if (agregVisas && onlyVised) {
+            query.append(" AND visa IS NOT NULL");
+        }
+
         query.append(" GROUP BY s.id");
         query.append(" ORDER BY s.date ASC");
-
-        Sql.getInstance().prepared(query.toString().replaceFirst("AND", "WHERE"), values, SqlResult.validResultHandler(result -> {
+        finalQuery = query.toString().replaceFirst("AND", "WHERE");
+        Sql.getInstance().prepared(finalQuery, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
                 JsonArray arraySession = result.right().getValue();

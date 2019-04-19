@@ -18,7 +18,7 @@ CREATE TABLE diary.session_type (
 ALTER TABLE diary.session
     ADD COLUMN type_id integer,
     ADD CONSTRAINT fk_session_type FOREIGN KEY (type_id) REFERENCES diary.session_type(id) ON DELETE CASCADE;
-
+CREATE INDEX idx_type_id ON diary.session(type_id);
 
 ALTER TABLE diary.progression_session
     ADD COLUMN type_id integer,
