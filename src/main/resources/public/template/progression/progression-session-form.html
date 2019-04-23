@@ -92,7 +92,7 @@
                     <editor ng-model="progression_session.description"></editor>
                 </div>
 
-<!-- HOMEWORKS -->
+                <!-- HOMEWORKS -->
                 <div ng-if="progression_session.progression_homeworks.length < 1 " class="padding-md margin-bottom-md">
                     <button ng-show="!validate"
                             class="float-none display-inline-block margin-top-md"
@@ -134,7 +134,7 @@
                                 </td>
                                 <!-- Button part -->
                                 <td ng-show="!progressionHomework.opened">
-                                    <i ng-show="!progressionHomework.opened" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                    <i ng-show="!progressionHomework.opened && areValidHomeworks()" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
                                     <i ng-show="!progressionHomework.opened" class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
                                 </td>
                             </tr>
@@ -227,3 +227,4 @@
         </div>
 
     </div>
+</div>
