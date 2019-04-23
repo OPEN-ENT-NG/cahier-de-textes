@@ -22,7 +22,7 @@
             <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
                 <i18n>utils.cancel</i18n>
             </button>
-            <button class="float-none display-inline-block" ng-disabled="!progression_session.isValidForm()"
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()"
                     type="button"  ng-click="validProgressionsSessionForm()">
                 <i18n>utils.save</i18n>
             </button>
@@ -53,6 +53,7 @@
                     <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>homework.manage.type</i18n>
+                            *
                         </div>
                         <div class="cell twelve-mobile">
                             <select required class="formSessionType twelve twelve-mobile"  ng-model="progression_session.type"
@@ -129,7 +130,7 @@
                                 </td>
                                 <!-- Description -->
                                 <td ng-show="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
-                                    <p class="twelve" ng-bind-html="[[progressionHomework.description]]"></p>
+                                    <p class="twelve" bind-html=[[progressionHomework.description]]></p>
                                 </td>
                                 <!-- Button part -->
                                 <td ng-show="!progressionHomework.opened">
@@ -216,7 +217,7 @@
                     <button class="float-none display-inline-block cancel" type="button" ng-click="back()">
                         <i18n>utils.cancel</i18n>
                     </button>
-                    <button class="float-none display-inline-block" ng-disabled="!progression_session.isValidForm()"
+                    <button class="float-none display-inline-block" ng-disabled="!isValidForm()"
                             type="button"  ng-click="validProgressionsSessionForm()">
                         <i18n>utils.save</i18n>
                     </button>

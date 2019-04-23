@@ -128,6 +128,14 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         };
 
+        $scope.isValidForm = () => {
+            let sessionFormIsValid = $scope.progression_session
+                && $scope.progression_session.subject
+                && $scope.progression_session.type
+                && $scope.progression_session.title;
+            return sessionFormIsValid ;
+        };
+
         $scope.areValidHomeworks = () =>{
             var back = true;
             if (!$scope.progression_session.progression_homeworks || $scope.progression_session.progression_homeworks.length == 0)
