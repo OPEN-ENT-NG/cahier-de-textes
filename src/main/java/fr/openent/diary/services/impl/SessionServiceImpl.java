@@ -26,6 +26,9 @@ public class SessionServiceImpl  implements SessionService {
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT s.*, to_json(type_session) as type, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
+        query.append(",(SELECT 1 From diary.session_visa ");
+        query.append("        inner join diary.session on session.id = session_visa.session_id");
+        query.append("        where session.id = ").append(sessionId).append("LIMIT 1) as one_visa");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
         query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id");
         query.append(" LEFT JOIN (");
@@ -35,7 +38,6 @@ public class SessionServiceImpl  implements SessionService {
         query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
         query.append(" WHERE s.id = ").append(sessionId);
         query.append(" GROUP BY s.id, type_session");
-
         Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
             if (result.isRight()) {
                 JsonObject session = result.right().getValue();
@@ -97,7 +99,7 @@ public class SessionServiceImpl  implements SessionService {
      * @param handler
      */
     public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
-                             boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                            boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
         String finalQuery;

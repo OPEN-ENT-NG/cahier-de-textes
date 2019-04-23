@@ -11,10 +11,12 @@
                 <i18n><span>session.manage.create</span></i18n>
             </h1>
         </div>
+
         <div class="six cell zero-mobile text-right zero-mobile">
             <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
+
             <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession"
                     ng-click="saveSession()">
                 <i18n>utils.save</i18n>
@@ -38,12 +40,13 @@
     </div>
 
     <div class="row text-right">
-        <button ng-if="session.id" class="left-magnet cancel" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
+        <button ng-if="session.id" ng-disabled="session.one_visa" class="left-magnet" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
             <i18n>utils.delete</i18n>
         </button>
         <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
             <i18n>utils.cancel</i18n>
         </button>
+        <div ng-show="session.one_visa" class="warning"><i18n>session.submit.error.visa</i18n></div>
         <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>

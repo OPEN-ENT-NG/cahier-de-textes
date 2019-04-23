@@ -35,7 +35,7 @@ export class Session {
     endMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
-
+    one_visa ?:boolean;
     endDisplayDate: string;
     endDisplayTime: string;
     isDisplayed:boolean = false;
@@ -78,7 +78,8 @@ export class Session {
             visas: data.visas && data.visas !== "[null]" ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id: null,
             modified: data.modified,
-            created: data.created
+            created: data.created,
+            one_visa : data.one_visa
         };
     }
 
