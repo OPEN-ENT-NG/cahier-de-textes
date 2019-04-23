@@ -131,7 +131,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.progression_session
                 && $scope.progression_session.subject
-                && $scope.progression_session.type
+                && $scope.progression_session.type.label
                 && $scope.progression_session.title;
             return sessionFormIsValid ;
         };

@@ -59,7 +59,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.isValidForm = () => {
             let sessionFormIsValid = $scope.session
                 && $scope.session.subject
-                && $scope.session.type
+                && $scope.session.type.label
                 && $scope.session.audience
                 && $scope.session.date
                 && $scope.session.startTime
