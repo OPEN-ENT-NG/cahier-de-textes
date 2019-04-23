@@ -150,7 +150,7 @@
   "session.deleted": "Séance supprimée",
   "session.deleted.error": "Erreur lors de la suppression de la séance",
   "session.created": "Séance créée",
-  "session.submit.error.visa":"La session a été visé, vous ne pouvez pas la supprimer",
+  "session.submit.error.visa":"La session a été visée, vous ne pouvez pas la supprimer",
   "session.created.error": "Erreur lors de la création de la séance",
   "session.updated": "Séance modifiée",
   "session.updated.error": "Erreur lors de la modification de la séance",
