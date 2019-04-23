@@ -9,7 +9,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.entcore.common.service.impl.SqlCrudService;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
@@ -18,7 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SessionServiceImpl  implements SessionService {
+public class SessionServiceImpl implements SessionService {
+    private static final String STATEMENT = "statement" ;
+    private static final String VALUES = "values" ;
+    private static final String ACTION = "action" ;
+    private static final String PREPARED = "prepared" ;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
 
     private DiaryService diaryService = new DiaryServiceImpl();
 
@@ -298,37 +304,72 @@ public class SessionServiceImpl  implements SessionService {
 
     @Override
     public void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
-        String query = " INSERT INTO " + Diary.DIARY_SCHEMA + ".session_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
-        JsonArray body = new JsonArray();
+        String maxQuery = "SELECT MAX(rank) as max, nextval('" + Diary.DIARY_SCHEMA + ".session_type_id_seq') as id from " + Diary.DIARY_SCHEMA + ".session_type "
+                + "WHERE structure_id = '" + sessionType.getString("structure_id") + "'";
+        Sql.getInstance().raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    try {
+                        final Number rank = event.right().getValue().getInteger("max");
+                        final Number id = event.right().getValue().getInteger("id");
 
-        body.add(sessionType.getString("structure_id"));
-        body.add(sessionType.getString("label"));
-        body.add(1);
-        Sql.getInstance().prepared(query, body, SqlResult.validUniqueResultHandler(handler));
+                        JsonArray statements = new JsonArray();
+                        statements.add(getInsertSessionTypeStatement(sessionType, rank.intValue() + 1));
+                        Sql.getInstance().transaction(statements, new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> event) {
+                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
+                            }
+                        });
+                    }
+                    catch (ClassCastException e) {
+                        LOGGER.error("An error occurred when insert homework_type", e);
+                        handler.handle(new Either.Left<String, JsonObject>("Error creating type"));
+                    }
+                } else {
+                    LOGGER.error("An error occurred when selecting max");
+                    handler.handle(new Either.Left<String, JsonObject>("Error while retrieving data"));
+                }
+            }
+        }));
+    }
+
+    private JsonObject getInsertSessionTypeStatement(JsonObject sessionType, Number rank) {
+        String query = " INSERT INTO " + Diary.DIARY_SCHEMA + ".session_type(structure_id, label, rank)" + "VALUES (?, ?, ?)";
+        JsonArray params = new JsonArray()
+                .add(sessionType.getString("structure_id"))
+                .add(sessionType.getString("label"))
+                .add(rank);
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
     }
 
     @Override
     public void updateSessionType(Integer id, JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
-        JsonArray body = new JsonArray();
+        JsonArray params = new JsonArray();
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".session_type SET structure_id = ?, label = ? WHERE id = ?";
 
-        body.add(sessionType.getString("structure_id"));
-        body.add(sessionType.getString("label"));
-        body.add(id);
+        params.add(sessionType.getString("structure_id"));
+        params.add(sessionType.getString("label"));
+        params.add(id);
 
-        Sql.getInstance().prepared(query, body, SqlResult.validUniqueResultHandler(handler));
+        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void deleteSessionType(Integer sessionTypeId, String structure_id, Handler<Either<String, JsonObject>> handler) {
+    public void deleteSessionType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler) {
         JsonArray params = new JsonArray();
 
-        String query = "DELETE FROM diary.session_type WHERE id = ? AND Exists " +
-                "(SELECT 1 FROM diary.session_type st " +
-                "WHERE structure_id = ? HAVING COUNT(st.id) > 1)";
-
-        params.add(sessionTypeId);
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".session_type st " +
+                "WHERE not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".session s WHERE st.id =  s.type_id)" +
+                "AND not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".progression_session ps WHERE st.id = ps.type_id) " +
+                "AND Exists (SELECT 1 FROM diary.session_type stt WHERE structure_id = ? HAVING COUNT(stt.id) > 1) " +
+                "AND st.id = ? RETURNING id";
         params.add(structure_id);
+        params.add(id);
 
         Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }

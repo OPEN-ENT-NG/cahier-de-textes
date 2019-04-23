@@ -1,4 +1,5 @@
 import {SessionType, SessionTypes, Toast} from "../model";
+import {homeworkType} from "./homeworkType";
 
 export const sessionType = {
     title: 'Session type',
@@ -40,6 +41,15 @@ export const sessionType = {
             });
         },
 
+        isLast: function () {
+            if(this.sessionTypes.all.length <= 1) {
+                sessionType.that.data.hideTrash = true;
+            }
+            else {
+                sessionType.that.data.hideTrash = false;
+            }
+        },
+
         toastHttpCall: (response) => {
             if (response.succeed) {
                 sessionType.that.data.notifications.push(new Toast(response.toastMessage, 'confirm'));
@@ -65,6 +75,7 @@ export const sessionType = {
             sessionType.that.data.input = "";
             await this.sessionTypes.sync();
             this.safeApply();
+            this.isLast();
         },
 
         updateSessionType: async function () {
@@ -91,15 +102,10 @@ export const sessionType = {
         },
 
         deleteSessionType: async function (event: SessionType) {
-            if (this.sessionTypes.all.length > 1) {
-                this.toastHttpCall(await event.delete());
-                if (sessionType.that.data.updateMode) {
-                    sessionType.that.data.updateMode = false;
-                    sessionType.that.data.input = "";
-                }
-                await this.sessionTypes.sync();
-                this.safeApply();
-            }
+            this.toastHttpCall(await event.delete());
+            await this.sessionTypes.sync();
+            this.safeApply(sessionType.that);
+            this.isLast();
         },
     }
 };
