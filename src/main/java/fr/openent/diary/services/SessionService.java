@@ -37,6 +37,6 @@ public interface SessionService {
 
     void updateSessionType(Integer id, JsonObject sessionType, Handler<Either<String, JsonObject>> handler);
 
-    void deleteSessionType(Integer sessionTypeId, String structure_id, Handler<Either<String, JsonObject>> handler);
+    void deleteSessionType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler);
 
 }

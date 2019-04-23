@@ -40,8 +40,6 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
 
         String homeworkTypeQuery = "SELECT DISTINCT structure_id as struct from " + Diary.DIARY_SCHEMA + ".homework_type";
         String sessionTypeQuery = "SELECT DISTINCT structure_id as struct from " + Diary.DIARY_SCHEMA + ".session_type";
-
-
         Future<JsonArray> HomeworkType = Future.future();
         sql.raw(homeworkTypeQuery, SqlResult.validResultHandler(event -> {
             JsonArray structuresHomeworkTypeRegistered = new JsonArray();
@@ -115,7 +113,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".session_type (structure_id, label, rank) values (? ,? ,?) , (?, ?, ?) ;";
 
         JsonArray params = new JsonArray().add(structId).add("Cours").add(1)
-                .add(structId).add("Autre").add(1);
+                .add(structId).add("Autre").add(2);
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params )

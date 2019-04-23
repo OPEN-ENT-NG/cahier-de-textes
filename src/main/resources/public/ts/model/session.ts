@@ -425,8 +425,14 @@ export class SessionType {
     }
 
     async delete() {
-        let response = await http.delete(`/diary/session-type/${this.id}/${this.structure_id}`);
-        return Utils.setToastMessage(response,'cdt.session.type.deleted', 'cdt.session.type.delete.error')
+        let {data} = await http.delete(`/diary/session-type/${this.id}/${this.structure_id}`);
+        if (data.id != undefined) {
+            let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
+            return Utils.setToastMessage(response,'cdt.session.type.deleted', 'cdt.session.type.delete.error')
+        }
+        else {
+            notify.error('cdt.session.type.delete.impossible')
+        }
     }
 }
 

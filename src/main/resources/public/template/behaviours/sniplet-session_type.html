@@ -28,7 +28,7 @@
                     class="twelve twelve-mobile skills-list-proposition">
                     <span class="three cell twelve-mobile">[[sessionType.label]]</span>
                     <i class="pencil icon-grey" data-ng-click="editSessionTypeInput(sessionType);"></i>
-                    <i ng-show="sessionTypes.all.length > 1" class="trash icon-grey" data-ng-click="deleteSessionType(sessionType);"></i>
+                    <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteSessionType(sessionType);"></i>
                 </li>
             </ul>
         </div>
