@@ -159,6 +159,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             $scope.oldProgressionHomework[2] = progressionHomework.subject;
 
             $scope.validate = true;
+            $scope.hidePencil = true;
             $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
                     p.opened = false ;

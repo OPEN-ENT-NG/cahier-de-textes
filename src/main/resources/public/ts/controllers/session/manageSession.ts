@@ -163,6 +163,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.oldHomework.copyHomework(homework);
 
             $scope.validate = true;
+            $scope.hidePencil = true;
             $scope.formIsOpened = true;
             $scope.session.homeworks.map(h => {
                 if (h.opened) {
