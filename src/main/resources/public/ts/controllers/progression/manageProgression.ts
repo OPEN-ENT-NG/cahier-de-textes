@@ -36,6 +36,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
                 $scope.safeApply();
             }
             $scope.validate = false;
+            $scope.hidePencil = false;
             $scope.display.progression = true;
 
             $scope.progression_session.owner = {id: model.me.userId};
@@ -190,6 +191,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
 
         $scope.cancelProgressionHomework = () =>{
             $scope.validate = false;
+            $scope.hidePencil = false;
             $scope.progression_session.progression_homeworks.map((p, index) => {
                 if(p.opened){
                     p.opened = false ;
@@ -215,6 +217,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
         $scope.newProgressionHomework = () => {
             $scope.validate = false;
+            $scope.hidePencil = false;
             $scope.progression_session.progression_homeworks.map(p => {
                 if(p.opened){
                     p.opened = false ;
@@ -234,6 +237,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
             newProgressionHomework.isNewField = true;
             $scope.progression_session.progression_homeworks.push(newProgressionHomework);
             $scope.openProgressionHomework(newProgressionHomework);
+            $scope.hidePencil = true;
 
             template.open('formProgressionHomework', '/progression/progression-homework-form');
             $scope.safeApply();

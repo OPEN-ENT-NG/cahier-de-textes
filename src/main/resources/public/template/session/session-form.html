@@ -185,7 +185,7 @@
                         </td>
                         <!-- Button part -->
                         <td ng-if="!homework.opened">
-                            <i ng-show="!homework.opened && $parent.areValidHomeworks()" ng-click="$parent.openHomework(homework)">&#xe858;</i>
+                            <i ng-show="!homework.opened && !hidePencil" ng-click="$parent.openHomework(homework)">&#xe858;</i>
                             <i ng-show="!homework.opened" class="trash right-magnet" ng-click="deleteHomework($index);$parent.cancelValidateOnDelete(homework,$index);"></i>
                         </td>
                     </tr>

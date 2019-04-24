@@ -134,7 +134,7 @@
                                 </td>
                                 <!-- Button part -->
                                 <td ng-show="!progressionHomework.opened">
-                                    <i ng-show="!progressionHomework.opened && areValidHomeworks()" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                    <i ng-show="!progressionHomework.opened && !hidePencil" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
                                     <i ng-show="!progressionHomework.opened" class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
                                 </td>
                             </tr>

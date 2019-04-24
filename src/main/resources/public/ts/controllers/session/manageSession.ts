@@ -18,6 +18,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.audience = $scope.structure.audiences.all[0];
         }
         $scope.validate = false;
+        $scope.hidePencil = false;
         $scope.oldHomework = new Homework($scope.structure);
         $scope.formIsOpened = false;
         $scope.disableFieldSetSubjectAndAudienceSession = (audience: any, subject: any) => {
@@ -28,8 +29,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.opened = true;
             }
         };
-
-        $scope.debut = "09:38";
 
         function modeIsReadOnly() {
             let currentPath = $location.path();
@@ -194,6 +193,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         $scope.cancelHomework = () =>{
             $scope.validate = false;
+            $scope.hidePencil = false;
             $scope.formIsOpened = false;
 
             $scope.session.homeworks.map((h, index) => {
@@ -203,9 +203,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
                 if(!h.isValidForm())
                     h.isDeleted = true;
-                // if(){
-                //
-                // }
             });
 
         };
@@ -218,9 +215,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         };
 
         $scope.closeHomework = () => {
-
-
             $scope.validate = false;
+            $scope.hidePencil = false;
             $scope.formIsOpened = false;
             $scope.session.homeworks.map(h => {
                 if (h.opened) {
@@ -240,7 +236,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             newHomework.isNewField = true;
             $scope.session.homeworks.push(newHomework);
             $scope.openHomework(newHomework);
-
+            $scope.hidePencil = true;
             template.open('formHomework', '/homework/homework-formPrinter');
             $scope.safeApply();
         };
