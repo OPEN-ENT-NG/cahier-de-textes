@@ -216,10 +216,10 @@ export class Session {
         }
     }
     setFromProgression (progression){
-            this.subject = progression.subject;
-            this.title = progression.title;
-            this.type = progression.type;
-            this.description = progression.description;
+        this.subject = progression.subject;
+        this.title = progression.title;
+        this.type = progression.type;
+        this.description = progression.description;
 
     }
     setFromCourseAndProgression(progression: ProgressionSession,course: Course) {
@@ -243,7 +243,10 @@ export class Session {
     // }
 
     getSessionInfo(session: Session) {
-        this.subject = session.subject;
+
+        this.subject = new Subject();
+        this.subject.id = session.subject.id;
+
         session.homeworks.map( homework =>  {
             homework.due_date = this.date;
             homework.session = this;
@@ -264,9 +267,9 @@ export class Session {
         this.teacher = sessionDrag.teacher;
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
+        this.subject = new Subject();
+        this.subject.id = sessionDrag.subject.id;
 
-        if(!this.subject)
-            this.subject = sessionDrag.subject;
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];

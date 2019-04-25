@@ -1,5 +1,5 @@
 import {Behaviours, model, moment, ng, template} from 'entcore';
-import {Course, Homework, Session, SessionTypes, Subjects, Toast} from '../../model';
+import {Course, Homework, Session, SessionTypes, Subject, Subjects, Toast} from '../../model';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$routeParams', '$location', '$attrs', '$filter', async function ($scope, $routeParams, $location, $attrs, $filter) {
@@ -7,7 +7,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
         $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
-        //$scope.session.opened = false;
+           //$scope.session.opened = false;
         $scope.subjects = new Subjects();
         $scope.sessionTypes = new SessionTypes($scope.structure.id);
 
@@ -267,7 +267,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         async function initData() {
             await $scope.sessionTypes.sync();
             await $scope.subjects.sync($scope.structure.id, model.me.userId);
-
             if($scope.subjects.all.length === 1 && !$scope.session.subject) {
                 $scope.session.subject = $scope.subjects.all[0];
                 if($scope.session.audience){
