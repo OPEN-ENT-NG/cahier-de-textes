@@ -119,7 +119,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.homeworks.forEach(async h => {
                 if (!h.attachedToDate && h.session.courseId) {
                     if ($scope.session && !h.session.id) {
-                        h.session.id = $scope.session.id;
+                        if (!h.session.type.id) {
+                            h.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
+                        }
+                        let sessionSaveResponse = await h.session.save();
+                        if(sessionSaveResponse.succeed) {
+                            h.session.id = sessionSaveResponse.data.id;
+                        }
                     }
 
                 }
@@ -224,6 +230,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     h.opened = false;
                     h.alreadyValidate = true;
                     h.formatDateToDisplay();
+
                 }
             });
             $scope.safeApply();

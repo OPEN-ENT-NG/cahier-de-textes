@@ -1,5 +1,5 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import {Courses, Session, Sessions, Subjects, Toast} from '../../model';
+import {Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
 import {Utils} from '../../utils/utils';
 import {ProgressionHomework} from "../../model/Progression";
@@ -28,6 +28,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.isInsideSessionForm =  $attrs.insideSessionForm;
         $scope.isSelectSubjectAndAudienceHomework = true;
         $scope.validate = false;
+        $scope.sessionTypes = new SessionTypes($scope.structure.id);
+
         $scope.homework.opened ? $scope.homework.opened :  $scope.homework.opened=false;
 
         $scope.disableFieldSetSubjectAndAudienceHomework = (audience:any,subject:any)=> {
@@ -147,12 +149,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 }
                 if ($scope.session && $scope.session.id && s && s.id === $scope.session.id) {
+
                     s.firstText = lang.translate("session.manage.linkhomework");
                 }
-                if((! $scope.homework.opened && ! $scope.homework.session )|| ($scope.homework && $scope.homework.session.id == s.id) ){
+                if((! $scope.homework.opened && ! $scope.homework.session )
+                    || ($scope.homework && $scope.homework.session && $scope.homework.session.id && $scope.homework.session.id == s.id) ){
+
                     $scope.homework.session = s;
                 }
                 if (s) {
+
                     sessionsToAttachTo.map(ss => {
                         if (!(s instanceof Session)) {
                             if (s.id === ss.id && sessionsToAttachTo.indexOf(ss) !== sessionsToAttachTo.indexOf(s) && sessionsToAttachTo.indexOf(ss) !== 0) {
@@ -183,7 +189,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if($scope.session){
                 $scope.homework.dueDate = moment($scope.session.startDate);
             }
-
+            //
             if($scope.homework.session){
                 $scope.homework.dueDate = moment($scope.homework.session.startDate);
             }
@@ -192,7 +198,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             //If no session then push the current one
 
-
+            //
             if ($scope.session && !$scope.session.id || ($scope.sessionsToAttachTo && $scope.sessionsToAttachTo.length <= 0) && $scope.isInsideSessionForm ) {
                 sessionAlreadyPushed();
                 $scope.homework.session = $scope.session;
@@ -290,6 +296,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             else {
                 // Creating session from course before saving the homework
                 if(!$scope.homework.attachedToDate && !$scope.homework.session.id && $scope.homework.session.courseId){
+                    if (!$scope.homework.session.type.id) {
+                        $scope.homework.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
+                    }
                     let sessionSaveResponse = await $scope.homework.session.save();
                     if(sessionSaveResponse.succeed) {
                         $scope.homework.session.id = sessionSaveResponse.data.id;
@@ -324,6 +333,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         async function initData() {
             $scope.homework.isInit = true;
+            await $scope.sessionTypes.sync();
 
             console.log("init");
             await Promise.all([
