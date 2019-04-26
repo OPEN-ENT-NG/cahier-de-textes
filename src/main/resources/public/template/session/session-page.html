@@ -46,10 +46,9 @@
         <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
             <i18n>utils.cancel</i18n>
         </button>
-        <div ng-show="session.one_visa" class="warning"><i18n>session.submit.error.visa</i18n></div>
         <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>
-
+        <div ng-show="session.one_visa" class="warning"><i18n>session.submit.error.visa</i18n></div>
     </div>
 </div>
