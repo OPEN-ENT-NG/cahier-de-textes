@@ -36,7 +36,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         }
 
         $scope.cancelCreation = () => {
-            window.history.back();
+            $scope.goTo("/main");
         };
 
         $scope.$watch(() => $scope.session.audience, () => {

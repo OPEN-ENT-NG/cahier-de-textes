@@ -17,7 +17,8 @@ import {ProgressionSessions} from "../model/Progression";
 export let main = ng.controller('MainController',
     ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        $scope.calendar = model.calendar;
+        $scope.calendar = ($scope.calendar)? $scope.calendar : model.calendar;
+        console.log("MainCtrl")
         $scope.notifications = [];
         $scope.legendLightboxIsVisible = false;
         $scope.display = {
@@ -388,7 +389,7 @@ export let main = ng.controller('MainController',
             $scope.pedagogicDays.map((c,index) =>{
                 if(c.shortDate === "17/04")
 
-                containsSession(c) ;
+                    containsSession(c) ;
                 if(  containsSession(c)  && nbSessionDisplayed < 3 ) {
                     c.displayed = true;
                     nbSessionDisplayed++;
@@ -575,6 +576,7 @@ export let main = ng.controller('MainController',
 
         $scope.calendarUpdateItem = (item) => {
             $scope.params.updateItem = item;
+            console.log(item);
             $scope.goTo('/create');
         };
 
@@ -597,22 +599,31 @@ export let main = ng.controller('MainController',
                 return;
             // this is your application logic, do whatever makes sense
             let progression = $( '#'+dragEl );
+            const typeCourse = "TYPE_COURSE" ;
+            const typeSession = "TYPE_SESSION";
             let id_progressionOrSession = progression[0].children[0].textContent;
             let sessionOrCourse = $('#'+dropEl);
-            let typeCourseSession =sessionOrCourse[0].classList[2];
-            let idCourseSession = sessionOrCourse[0].children[0].textContent;;
+            let typeCourseSession= "";
+            let idCourseSession = sessionOrCourse[0].children[0].textContent;
+            if($(sessionOrCourse).hasClass(typeSession)){
+                typeCourseSession =typeSession;
+            }else if($(sessionOrCourse).hasClass(typeCourse)){
+                typeCourseSession = typeCourse;
+            }
+
+
             if(progression[0].classList[2]=="progression-item-draggable"){
-                if (typeCourseSession == "TYPE_SESSION"){
+                if (typeCourseSession == typeSession){
                     $scope.updateSession(idCourseSession,id_progressionOrSession);
-                }else if(typeCourseSession == "TYPE_COURSE"){
+                }else if(typeCourseSession == typeCourse){
                     let date = sessionOrCourse[0].children[1].textContent;
                     $scope.createSessionFromProgression(id_progressionOrSession,idCourseSession,date);
                 }
-            }else if (progression[0].classList[2] == "TYPE_SESSION" ){
-                if (typeCourseSession == "TYPE_SESSION" ){
+            }else if ($(progression[0]).hasClass(typeSession)){
+                if (typeCourseSession == typeSession ){
                     $scope.sessionToSession(id_progressionOrSession,idCourseSession)
                 }else
-                if(typeCourseSession == "TYPE_COURSE" ){
+                if(typeCourseSession == typeCourse ){
                     let date = sessionOrCourse[0].children[1].textContent;
                     $scope.sessionToCourse(id_progressionOrSession,idCourseSession,date)
                 }
