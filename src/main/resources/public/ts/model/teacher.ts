@@ -18,7 +18,7 @@ export class Teacher {
     }
 
     toString () {
-        return this.displayName;
+        return (this.displayName) ? this.displayName : this.firstName + " " +  this.lastName;
     }
 }
 

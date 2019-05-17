@@ -1,6 +1,6 @@
 <div class="session-view">
     <div class="row margin-bottom-md" ng-if="!session.isInsideDiary">
-        <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.firstName]] [[session.teacher.lastName]]</b>
+        <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.toString()]] </b>
     </div>
     <div class="row card padding-md" ng-click="session.opened = !session.opened">
         <h2 class="remove-margin">
