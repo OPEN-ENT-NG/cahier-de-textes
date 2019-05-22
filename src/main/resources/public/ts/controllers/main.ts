@@ -715,7 +715,6 @@ export let main = ng.controller('MainController',
                     homework.description = ph.description;
                     homework.subject = ph.subject;
                     homework.type = ph.type;
-                    homework.session = sessionDroped ;
                     sessionDroped.homeworks.push(homework);
 
                 }

@@ -249,7 +249,6 @@ export class Session {
 
         session.homeworks.map( homework =>  {
             homework.due_date = this.date;
-            homework.session = this;
             delete homework.id ;
             this.homeworks.push(homework);
         });
@@ -260,6 +259,7 @@ export class Session {
         this.opened = true;
         this.room = session.room;
         this.description = session.description;
+
     }
 
     setFromCourseAndSession(course: Course, sessionDrag: Session) {
@@ -280,9 +280,8 @@ export class Session {
 
     duplicateHomeworks(sessionDrag){
         sessionDrag.homeworks.map( h =>{
-            h.id = undefined;
+            delete h.id ;
             h.dueDate = this.date;
-            h.session = this;
             this.homeworks.push(h);
         })
     }
