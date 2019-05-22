@@ -100,17 +100,17 @@
 
             <!-- Homework / Session -->
             <div ng-click="display.homeworks = !display.homeworks">
+            <label class="checkbox">
+                <input type="checkbox" ng-model="display.homeworks"/>
+                <span><i18n>homeworks</i18n></span>
+            </label>
+            <div ng-click="display.sessions = !display.sessions">
                 <label class="checkbox">
-                    <input type="checkbox" ng-model="display.homeworks"/>
-                    <span><i18n>homeworks</i18n></span>
+                    <input type="checkbox" ng-model="display.sessions">
+                    <span><i18n>session</i18n></span>
                 </label>
-                <div ng-click="display.sessions = !display.sessions">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="display.sessions">
-                        <span><i18n>session</i18n></span>
-                    </label>
-                </div>
             </div>
+        </div>
         </div>
     </section>
 

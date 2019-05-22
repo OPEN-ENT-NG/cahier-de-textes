@@ -226,7 +226,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.attachToDate = () => {
             $scope.homework.attachedToSession = false;
             $scope.homework.attachedToDate = true;
-
             $scope.homework.session = undefined;
             $scope.safeApply();
         };
@@ -335,7 +334,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.homework.isInit = true;
             await $scope.sessionTypes.sync();
 
-            console.log("init");
             await Promise.all([
                 $scope.homeworkTypes.sync(),
                 $scope.subjects.sync($scope.structure.id, model.me.userId)]);
@@ -377,10 +375,32 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
             }
 
-            await $scope.syncWorkloadWeek();
+            // await $scope.syncWorkloadWeek();
 
             $scope.safeApply();
             $scope.fixEditor();
+        };
+
+        $scope.getNbHomeworkByDay = () => {
+            let nbHomework = 0;
+            if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
+                $scope.sessionsToAttachTo.map(s => {
+                    if ($scope.homework.session.startDisplayDate == s.startDisplayDate) {
+                        s.homeworks.forEach(homework => {
+                            if(!homework.opened)
+                                nbHomework ++;
+                        })
+                    }
+                });
+            }
+            else if ($scope.sessionsToAttachTo && $scope.homework.attachedToDate) {
+                $scope.sessionsToAttachTo.map(d => {
+                    if (moment($scope.homework.dueDate).format("DD/MM/YYYY") == d.startDisplayDate) {
+                        nbHomework += d.homeworks.length;
+                    }
+                })
+            }
+            return nbHomework;
         };
 
         $scope.back = ()=>{

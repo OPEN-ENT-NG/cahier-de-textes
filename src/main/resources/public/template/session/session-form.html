@@ -246,32 +246,29 @@
                                 </select>
                             </div>
 
+                            <!--Estimated Time-->
                             <div class="margin10v">
-                                <!-- Workload -->
-                                <span class="ten" ng-repeat="workload in homework.workloadWeek.all">
-                     <label ng-if="workload.numDayString == (homework.dueDate | date:'dd')"
-                            ng-class="workloadDay" tooltip="[[workload.description]]" ng-class="workload.color">
-                            [[workload.description]]
-                     </label>
-                        </span>
+                                <span class="ten">
+                                    <label>
+                                        <i18n>homework.workload</i18n>
+                                        <input class="two margin-right-sm margin-left-sm"
+                                               ng-model="homework.estimatedTime" min="0" type="number">
+                                        <i18n>minutes</i18n>
+                                    </label>
+                                </span>
                             </div>
 
-                            <!--Estimated Time-->
-                            <div>
-                                <span class="ten">
-
+                            <!-- Workload -->
+                            <div class="margin10v"
+                                 ng-if="sessionsToAttachTo ||  homework.attachedToDate">
+                                <span ng-if="getNbHomeworkByDay() !== 0" class="ten">
                                     <label>
-
-                                        <i18n>homework.workload</i18n>
-
-                                        :
-
-                                        <input ng-model="homework.estimatedTime" min="0" type="number" class="two">
-
-                                        <i18n>minutes</i18n>
-
+                                        [[getNbHomeworkByDay()]]
                                     </label>
-
+                                    <i18n>homework(s)</i18n>
+                                </span>
+                                <span ng-if="getNbHomeworkByDay() === 0" class="ten">
+                                    <i18n>diary.empty.homework</i18n>
                                 </span>
                             </div>
 
@@ -286,6 +283,7 @@
                                     <label class="switch"> </label>
                                 </switch>
                             </div>
+
                             <div ng-if="homework.publishDate && homework.isPublished" class="flex twelve-mobile">
                                 <label class="vertical-spacing margin-right-md">
                                     <i18n>homework.published.date.teacher</i18n>

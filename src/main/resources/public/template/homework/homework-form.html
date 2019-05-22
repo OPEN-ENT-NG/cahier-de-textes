@@ -92,16 +92,27 @@
         </div>
 
         <div class="row form-row">
-
                 <label  class="cell two twelve-mobile">
-                    <i18n>homework.workload</i18n>:
-
-
+                    <i18n>homework.workload</i18n>
                 </label>
             <span class="cell two twelve-mobile">
-                <input  ng-model="homework.estimatedTime" min="0" type="number" class="width-15">   <i18n>minutes</i18n>
+                <input  ng-model="homework.estimatedTime" min="0" type="number" class="two"> <i18n>minutes</i18n>
             </span>
         </div>
+
+        <!-- Workload -->
+        <div class="row form-row" ng-if="sessionsToAttachTo || homework.attachedToDate">
+            <label class="cell two twelve-mobile">
+                <i18n>Homework(s)</i18n>
+            </label>
+            <span ng-if="getNbHomeworkByDay() !== 0" class="ten">
+                [[getNbHomeworkByDay()]]
+            </span>
+            <span ng-if="getNbHomeworkByDay() === 0" class="ten">
+                <i18n>none</i18n>
+            </span>
+        </div>
+
         <!-- Publish -->
         <div class="row form-row">
             <label class="two cell twelve-mobile">
@@ -115,6 +126,7 @@
                 </switch>
             </div>
         </div>
+
         <!-- Description-->
         <div class="row">
             <editor ng-model="homework.description"></editor>
