@@ -49,6 +49,6 @@
         <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>
-        <div ng-show="session.one_visa" class="warning"><i18n>session.submit.error.visa</i18n></div>
+        <div ng-show="session.one_visa && !isAChildOrAParent" class="warning"><i18n>session.submit.error.visa</i18n></div>
     </div>
 </div>
