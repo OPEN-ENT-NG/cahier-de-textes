@@ -111,15 +111,9 @@ public class SessionServiceImpl implements SessionService {
         String finalQuery;
 
         query.append("WITH homework_and_type as (");
-        query.append("SELECT homework.*, to_json(homework_type) as type, to_json(progress_and_state) as progress");
+        query.append("SELECT homework.*, to_json(homework_type) as type");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework homework");
-        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id");
-        query.append(" LEFT JOIN ( ");
-        query.append(" SELECT progress.*, homework_state.label as state_label");
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress");
-        query.append(" INNER JOIN diary.homework_state");
-        query.append(" ON progress.state_id = homework_state.id");
-        query.append(") as progress_and_state ON (homework.id = progress_and_state.homework_id))");
+        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id )");
         query.append(" SELECT s.*, array_to_json(array_agg(homework_and_type)) as homeworks");
         if (agregVisas)
             query.append(" ,array_to_json(array_agg(distinct visa)) as visas");

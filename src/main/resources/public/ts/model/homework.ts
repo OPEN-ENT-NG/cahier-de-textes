@@ -5,6 +5,7 @@ import {Structure, Teacher, Toast, Utils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
+import {USER_TYPES} from '../utils/const/user-types';
 
 export class Homework {
     id: string;
@@ -155,9 +156,23 @@ export class Homework {
     }
 
     async sync(): Promise<void> {
-        let {data} = await http.get('/diary/homework/' + this.id);
-        Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+        if(model.me.type === USER_TYPES.teacher || model.me.type === USER_TYPES.personnel) {
+            let {data} = await http.get('/diary/homework/' + this.id);
+            Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+        }else{
+            let studentId ;
+
+            if(model.me.type === USER_TYPES.student){
+                studentId = model.me.userId
+            }else{
+                studentId = "stop";
+            }
+            let {data} = await http.get('/diary/homework/' + this.id + "/" + studentId);
+            Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+        }
+
         this.init();
+
     }
 
     init(){
