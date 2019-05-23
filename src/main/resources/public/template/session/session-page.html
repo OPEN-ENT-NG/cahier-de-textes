@@ -1,6 +1,6 @@
 <div ng-controller="manageSessionCtrl">
     <div id="crumbs">
-        <ul class="remove-padding"><a ng-click="goTo('/view')">
+        <ul class="remove-padding"><a ng-click="$parent.syncPedagogicItems(); back();">
             <i18n><span><li>diary.title</li></span></i18n>
         </a>&nbsp;>&nbsp;<i18n><span><li>session</li></span></i18n>
         </ul>
@@ -13,7 +13,7 @@
         </div>
 
         <div class="six cell zero-mobile text-right zero-mobile">
-            <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
+            <button class="float-none display-inline-block cancel" type="button" ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
 
@@ -43,7 +43,7 @@
         <button ng-if="session.id" ng-disabled="session.one_visa" class="left-magnet" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
             <i18n>utils.delete</i18n>
         </button>
-        <button class="float-none display-inline-block cancel" type="button" ng-click="cancelCreation()" workflow="diary.manageSession">
+        <button class="float-none display-inline-block cancel" type="button" ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
             <i18n>utils.cancel</i18n>
         </button>
         <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
