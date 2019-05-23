@@ -32,6 +32,7 @@ export let main = ng.controller('MainController',
         $scope.isAChildOrAParent = Utils.isAChildOrAParent(model.me.type);
         $scope.isChild = Utils.isChild(model.me.type);
         $scope.isRelative = Utils.isRelative(model.me.type);
+        $scope.isTeacher = Utils.isTeacher(model.me.type);
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;

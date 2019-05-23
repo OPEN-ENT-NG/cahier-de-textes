@@ -84,6 +84,10 @@ export class Utils {
         return type === "PERSRELELEVE"
     }
 
+    static isTeacher(type) {
+        return type === "ENSEIGNANT"
+    }
+
     static startBlobDownload(dataBlob, suggestedFileName) {
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
             // for IE
