@@ -63,7 +63,6 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler) {
-        System.out.println(user.getType());
         StringBuilder query = new StringBuilder();
         query.append(" SELECT h.*, to_json(type) as type");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework h");

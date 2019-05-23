@@ -1,4 +1,4 @@
-import {Behaviours, model, moment, ng, template} from 'entcore';
+import {Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Course, Homework, Session, SessionTypes, Subject, Subjects, Toast} from '../../model';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
@@ -119,12 +119,19 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session.homeworks.forEach(async h => {
                 if (!h.attachedToDate && h.session.courseId) {
                     if ($scope.session && !h.session.id) {
+
                         if (!h.session.type.id) {
                             h.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                         }
-                        let sessionSaveResponse = await h.session.save();
-                        if(sessionSaveResponse.succeed) {
-                            h.session.id = sessionSaveResponse.data.id;
+                        if(h.session.firstText !== lang.translate("session.manage.linkhomework")){
+                            let sessionSaveResponse = await h.session.save();
+                            if(sessionSaveResponse.succeed) {
+                                h.session.id = sessionSaveResponse.data.id;
+                            }
+
+                        }else{
+                            h.session.id = $scope.session.id;
+
                         }
                     }
 
