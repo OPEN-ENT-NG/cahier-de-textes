@@ -8,7 +8,7 @@ import org.entcore.common.user.UserInfos;
 
 public interface HomeworkService {
 
-    void getHomework(long homeworkId, Handler<Either<String, JsonObject>> handler);
+    void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
     void getOwnHomeworks(String structureId,String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler);
 
@@ -37,4 +37,6 @@ public interface HomeworkService {
     void deleteHomeworkType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler);
 
     void getWorkloadWeek(final String dateInWeek, final String audienceId, Handler<Either<String, JsonArray>> handler);
+
+    void getHomeworkStudent(long homeworkId, String studentId, UserInfos user, Handler<Either<String, JsonObject>> handler);
 }

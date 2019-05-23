@@ -24,10 +24,10 @@
             <i  ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
         </h2>
 
-        <div ng-if="isAChildOrAParent" class="three cell twelve-mobile margin-top-sm" ng-click="$event.stopPropagation();">
+        <div  workflow="diary.setProgressHomework" class="three cell twelve-mobile margin-top-sm" ng-click="$event.stopPropagation();">
             <!--<switch ng-show="!homework.isDone" ng-model="homework.isDone" ng-click="setHomeworkProgress(homework)" ></switch>-->
 
-            <div workflow="diary.setProgressHomework" class="cell horizontal-spacing twelve-mobile">
+            <div class="cell horizontal-spacing twelve-mobile">
                 <switch class="" ng-model="homework.isDone" ng-change="setHomeworkProgress(homework)">
                     <label class="switch"> </label>
                 </switch>

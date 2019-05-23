@@ -46,6 +46,7 @@ public class HomeworkController extends ControllerHelper {
         });
     }
 
+
     @Get("/homeworks/external/:startDate/:endDate/:type/:typeId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessExternalData.class)
@@ -73,9 +74,25 @@ public class HomeworkController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkRead.class)
     public void getHomework(final HttpServerRequest request) {
-        long homeworkId = Long.parseLong(request.getParam("id"));
-        homeworkService.getHomework(homeworkId, DefaultResponseHandler.defaultResponseHandler(request));
+        UserUtils.getUserInfos(eb, request, user -> {
+            long homeworkId = Long.parseLong(request.getParam("id"));
+            homeworkService.getHomework(homeworkId, user, DefaultResponseHandler.defaultResponseHandler(request));
+
+        });
     }
+
+    @Get("/homework/:id/:studentId")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(HomeworkRead.class)
+    public void getHomeworkStudent(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            long homeworkId = Long.parseLong(request.getParam("id"));
+            String studentId = (request.getParam("studentId"));
+            homeworkService.getHomeworkStudent(homeworkId,studentId, user, DefaultResponseHandler.defaultResponseHandler(request));
+
+        });
+    }
+
 
     @Post("/homework")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
