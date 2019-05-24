@@ -177,12 +177,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if($scope.session && !$scope.session.id  && moment(s.startTime).format("DD/MM/YYYY HH:mm:ss") === moment($scope.session.startTime).format("DD/MM/YYYY HH:mm:ss")){
                         s.firstText = lang.translate("session.manage.linkhomework");
                     }
-                    sessionsToAttachTo.map(ss => {
-                        if($scope.session  && moment(sessionTime).isAfter(moment(ss.date).add(-1,"minutes"))
-                            &&   !moment($scope.session.date).isSame(moment(ss.date))) {
-                            sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(ss), 1);
+                        if($scope.session  && moment(sessionTime).isAfter(moment(s.date).add(moment(s.startTime).hour(),"hours").add(moment(s.startTime).minutes() - 1,"minutes"))
+                           && s.firstText !== lang.translate("session.manage.linkhomework")) {
+                            sessionsToAttachTo.splice(sessionsToAttachTo.indexOf(s), 1);
                         }
-                    });
 
                 });
 
