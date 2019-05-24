@@ -13,6 +13,7 @@ export class Course {
     structure: Structure;
     teachers: Teachers;
     subject: Subject;
+    exceptionnal ?: string;
 
     dayOfWeek: any;
     rooms: any;
@@ -50,6 +51,7 @@ export class Course {
             dayOfWeek: data.dayOfWeek,
             endDate: data.endDate,
             rooms: data.roomLabels,
+            exceptionnal : data.exceptionnal,
             startDate: data.startDate,
             teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
             subject: structure.subjects.all.find(t => t.id === data.subjectId),
