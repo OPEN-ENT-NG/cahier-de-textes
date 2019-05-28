@@ -7,7 +7,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
         $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
-           //$scope.session.opened = false;
+        //$scope.session.opened = false;
         $scope.subjects = new Subjects();
         $scope.sessionTypes = new SessionTypes($scope.structure.id);
 
@@ -114,21 +114,42 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.goTo("/view");
         };
 
+
+        function setSessionIdHomeworks(session) {
+            $scope.session.homeworks.map(async h => {
+                if(h.session.isSameSession(session) ){
+                    h.session.id = session.id
+                }
+                if(!h.isDeleted && h.isValidForm()&& h.session.id && !h.isSaved ){
+                    let {succeed} = await h.save();
+
+                }
+            })
+        }
+
         async function saveSessionHomeworks() {
             let hasSucceed = true;
-            $scope.session.homeworks.forEach(async h => {
+            await $scope.session.homeworks.map(async h =>  {
+                $scope.session.homeworks.map(hh =>{
+                    if(h.session && hh.session && h.session.isSameSession(hh.session) && hh != h){
+                        hh.session.cc = "test";
+
+                    }
+                })
                 if (!h.attachedToDate && h.session.courseId) {
                     if ($scope.session && !h.session.id) {
-
                         if (!h.session.type.id) {
                             h.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                         }
                         if(h.session.firstText !== lang.translate("session.manage.linkhomework")){
-                            let sessionSaveResponse = await h.session.save();
-                            if(sessionSaveResponse.succeed) {
-                                h.session.id = sessionSaveResponse.data.id;
+                            if(!h.session.cc){
+                                h.isSaved = true
+                                let sessionSaveResponse = await h.session.save();
+                                if (sessionSaveResponse.succeed) {
+                                    h.session.id = sessionSaveResponse.data.id;
+                                    setSessionIdHomeworks( h.session)
+                                }
                             }
-
                         }else{
                             h.session.id = $scope.session.id;
 
@@ -139,15 +160,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if(!h.attachedToDate){
                     h.dueDate = h.session.startMoment;
                 }
-
-                if(!h.isDeleted && h.isValidForm()){
+                if(!h.isDeleted && h.isValidForm()&& h.session.id ){
                     let {succeed} = await h.save();
                     if (!succeed) {
                         hasSucceed = false;
                     }
                 }
-
             });
+
+
 
             return hasSucceed;
         }

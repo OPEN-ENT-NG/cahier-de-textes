@@ -250,6 +250,11 @@ export class Session {
         session.homeworks.map( homework =>  {
             homework.due_date = this.date;
             delete homework.id ;
+            delete homework.session ;
+            homework.subject = session.subject;
+            homework.teacher = session.teacher;
+            homework.audience = session.audience;
+
             this.homeworks.push(homework);
         });
         this.type = session.type;
@@ -281,9 +286,21 @@ export class Session {
     duplicateHomeworks(sessionDrag){
         sessionDrag.homeworks.map( h =>{
             delete h.id ;
+            delete h.session;
             h.dueDate = this.date;
+            h.audience = this.audience;
+            h.subject = this.subject;
+            h.teacher = this.teacher;
             this.homeworks.push(h);
         })
+    }
+
+    isSameSession(session : Session){
+        let currentSessionTime = moment(this.date).add(moment(this.startTime).hour(),'hours').add(moment(this.startTime).minutes(),'minutes');
+        let otherSessionTime = moment(session.date).add(moment(session.startTime).hour(),'hours').add(moment(session.startTime).minutes(),'minutes');
+
+        return (moment(otherSessionTime).isSame(moment(currentSessionTime)))
+
     }
 
 }

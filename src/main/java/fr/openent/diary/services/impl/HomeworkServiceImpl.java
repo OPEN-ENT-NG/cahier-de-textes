@@ -81,7 +81,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     private void cleanHomework(JsonObject homework){
-        homework.put("type", new JsonObject(homework.getString("type")));
+        if(homework.getString("type") != null)
+            homework.put("type", new JsonObject(homework.getString("type")));
+
         if(homework.getString("progress") != null)
             homework.put("progress", new JsonObject(homework.getString("progress")));
     }
