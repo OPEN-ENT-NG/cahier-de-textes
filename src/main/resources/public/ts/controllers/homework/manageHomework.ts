@@ -144,19 +144,20 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
 
         function checkIsAfter(isAcourse: boolean,s: Session ,sessionTime) {
-
-            let sessionIsACourse = s.date === s.startTime;
-            let isAfter = false ;
-
-
-
-            if( moment(s.date).format("YYYY/MM/DD") === moment($scope.session.date).format("YYYY/MM/DD")
-                && moment(s.startTime).hours()*60+ moment(s.startTime).minutes() < moment($scope.session.startTime).hours()*60+ moment($scope.session.startTime).minutes())
-                isAfter = true;
+            if($scope.session) {
+                let sessionIsACourse = s.date === s.startTime;
+                let isAfter = false;
 
 
+                if (moment(s.date).format("YYYY/MM/DD") === moment($scope.session.date).format("YYYY/MM/DD")
+                    && moment(s.startTime).hours() * 60 + moment(s.startTime).minutes() < moment($scope.session.startTime).hours() * 60 + moment($scope.session.startTime).minutes())
+                    isAfter = true;
 
-            return isAfter;
+
+                return isAfter;
+            }else{
+                return false;
+            }
         }
 
 
@@ -165,13 +166,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
          */
         function linkSession() {
             let isIndependant = true;
-            let isAcourse = $scope.session.date === $scope.session.startTime
+            let isAcourse = $scope.session &&  $scope.session.date === $scope.session.startTime
             let i = 0;
             while(i < $scope.sessionsToAttachTo.length){
                 let s = $scope.sessionsToAttachTo[i];
                 i++
-                if ((s.isSameSession($scope.session))
-                    ||( s.id && $scope.session.id && $scope.session.id === s.id )){
+                if ($scope.session && (s.isSameSession($scope.session))
+                    ||( $scope.session &&  s.id && $scope.session.id && $scope.session.id === s.id )){
                     s.firstText = lang.translate("session.manage.linkhomework")
                     isIndependant = false;
                 }
@@ -189,11 +190,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.homework.session = s
 
             }
-            if(isIndependant && !$scope.session.id){
+            if(isIndependant && $scope.session &&!$scope.session.id){
                 $scope.session.firstText = lang.translate("session.manage.linkhomework")
                 // $scope.sessionsToAttachTo.unshift($scope.session)
 
             }
+
             return $scope.sessionsToAttachTo;
         }
 
