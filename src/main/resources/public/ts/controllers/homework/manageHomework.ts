@@ -190,9 +190,9 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.homework.session = s
 
             }
-            if(isIndependant && $scope.session &&!$scope.session.id){
+            if(isIndependant && $scope.session && !$scope.session.id){
                 $scope.session.firstText = lang.translate("session.manage.linkhomework")
-                // $scope.sessionsToAttachTo.unshift($scope.session)
+                $scope.sessionsToAttachTo.unshift($scope.session)
 
             }
 
