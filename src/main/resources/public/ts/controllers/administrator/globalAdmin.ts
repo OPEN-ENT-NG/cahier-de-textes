@@ -55,6 +55,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 await $scope.audiences.sync($scope.structure.id)
             ]);
 
+            $scope.sessions.structure = $scope.structure;
             await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
@@ -74,7 +75,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             if (event.target.tagName !== 'BUTTON') {
                 $scope.params.subjects = [];
                 $scope.params.audiences = [];
-
+                $scope.sessions.structure = $scope.structure;
 
                 angular.forEach($scope.course.groups, function(value, key) {
                     if (Object.getPrototypeOf(value).constructor.name === "Subject") {
