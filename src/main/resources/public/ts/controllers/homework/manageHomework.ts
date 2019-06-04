@@ -68,10 +68,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
             if($scope.homework.attachedToDate){
                 $scope.homework.formatDateToDisplay();
-
             }
-
-
+            $scope.safeApply();
         };
 
         $scope.updateHomeworkData = () =>{
@@ -398,19 +396,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         $scope.getNbHomeworkByDay = () => {
             let nbHomework = 0;
             if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
-                $scope.sessionsToAttachTo.map(s => {
-                    if ($scope.homework.session.startDisplayDate == s.startDisplayDate) {
-                        s.homeworks.forEach(homework => {
-                            if(!homework.opened)
-                                nbHomework ++;
-                        })
+                $scope.pedagogicDays.map(p => {
+                    if (moment($scope.homework.session.startDisplayDate).format("MM/DD") == p.shortDate) {
+                        nbHomework = p.nbHomework;
                     }
                 });
             }
             else if ($scope.sessionsToAttachTo && $scope.homework.attachedToDate) {
-                $scope.sessionsToAttachTo.map(d => {
-                    if (moment($scope.homework.dueDate).format("DD/MM/YYYY") == d.startDisplayDate) {
-                        nbHomework += d.homeworks.length;
+                $scope.pedagogicDays.map(p => {
+                    if (moment($scope.homework.dateDisplayed).format("MM/DD") == p.shortDate) {
+                        nbHomework = p.nbHomework;
                     }
                 })
             }
