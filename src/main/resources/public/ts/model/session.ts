@@ -324,7 +324,7 @@ export class Sessions {
 
     static groupByLevelANdSubject(sessions) {
         return _.groupBy(sessions, function (item) {
-            return (item.audience.id)? item.audience.id : item.audience_id + '#' + (item.subject.id) ? item.subject.id : item.subject_id;
+            return (item.audience && item.audience.id)? item.audience.id : item.audience_id + '#' + (item.subject && item.subject.id) ? item.subject.id : item.subject_id;
         });
     }
 
