@@ -98,7 +98,7 @@ export class Session {
             annotation: this.annotation,
             is_published: this.isPublished,
             audience_id: this.audience.id,
-            room: this.room,
+            room: (this.room)? this.room : '',
             course_id: this.courseId
         };
     }
