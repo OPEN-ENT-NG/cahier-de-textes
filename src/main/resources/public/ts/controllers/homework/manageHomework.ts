@@ -387,29 +387,27 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
             }
 
-            // await $scope.syncWorkloadWeek();
-
             $scope.safeApply();
             $scope.fixEditor();
         };
 
         $scope.getNbHomeworkByDay = () => {
-            let nbHomework = 0;
+            let nbPublishHomework = 0;
             if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
                 $scope.pedagogicDays.map(p => {
-                    if (moment($scope.homework.session.startDisplayDate).format("MM/DD") == p.shortDate) {
-                        nbHomework = p.nbHomework;
+                    if (moment($scope.homework.session.date).format('DD/MM') == p.shortDate) {
+                        nbPublishHomework = p.nbPublishHomework;
                     }
                 });
             }
             else if ($scope.sessionsToAttachTo && $scope.homework.attachedToDate) {
                 $scope.pedagogicDays.map(p => {
-                    if (moment($scope.homework.dateDisplayed).format("MM/DD") == p.shortDate) {
-                        nbHomework = p.nbHomework;
+                    if (moment($scope.homework.dueDate).format("DD/MM") == p.shortDate) {
+                        nbPublishHomework = p.nbPublishHomework;
                     }
                 })
             }
-            return nbHomework;
+            return nbPublishHomework;
         };
 
         $scope.back = ()=>{

@@ -303,14 +303,16 @@ export let main = ng.controller('MainController',
             };
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
-
-
-                let nbHomeworkInSession = 0;
+                let nbPublishHomework = 0;
                 let nbHomework = 0;
                 pedagogicItems.forEach(i => {
-
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
-                        nbHomework ++;
+                        if (i.isPublished) {
+                            nbPublishHomework ++;
+                        }
+                        else {
+                            nbHomework ++;
+                        }
                     }
                 });
 
@@ -339,6 +341,7 @@ export let main = ng.controller('MainController',
                     dayName: moment(key).format('dddd'),
                     shortDayName: moment(key).format('dd'),
                     nbHomework: nbHomework,
+                    nbPublishHomework: nbPublishHomework,
                     nbSession: nbSession,
                     nbCourse: nbCourse,
                     nbCourseAndSession: nbCourseAndSession,
