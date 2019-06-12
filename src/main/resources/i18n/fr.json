@@ -202,7 +202,7 @@
   "sidebar.display_mode": "Mode d'affichage",
   "sessions.admin.nbsessions": "Nb séances",
   "sessions.admin.comment": "Commentaire",
-  "sessions.admin.backOnDiary": "Retour aux cahiers de textes",
+  "sessions.admin.backOnDiary": "Vue calendaire",
   "sessions.admin.lastEditSession": "Édité le",
   "sessions.admin.lastCreatedVisa": "État",
   "sessions.admin.Visa.sateOk": "Visés",
