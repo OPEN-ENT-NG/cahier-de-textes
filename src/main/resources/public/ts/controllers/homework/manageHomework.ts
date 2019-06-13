@@ -396,14 +396,22 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
                 $scope.pedagogicDays.map(p => {
                     if (moment($scope.homework.session.date).format('DD/MM') == p.shortDate) {
-                        nbPublishHomework = p.nbPublishHomework;
+                        p.audience.map(a => {
+                            if ($scope.homework.audience.id == a) {
+                                nbPublishHomework = p.nbPublishHomework[a];
+                            }
+                        })
                     }
                 });
             }
             else if ($scope.sessionsToAttachTo && $scope.homework.attachedToDate) {
                 $scope.pedagogicDays.map(p => {
                     if (moment($scope.homework.dueDate).format("DD/MM") == p.shortDate) {
-                        nbPublishHomework = p.nbPublishHomework;
+                        p.audience.map(a => {
+                            if ($scope.homework.audience.id == a) {
+                                nbPublishHomework = p.nbPublishHomework[a];
+                            }
+                        })
                     }
                 })
             }
