@@ -57,7 +57,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
          */
         $scope.syncSessionsWithVisa = async () => {
             // let teacherId;
+
                 $scope.teacherId = $scope.teacher.id;
+
             await Promise.all([
                 await $scope.subjects.sync($scope.structure.id, $scope.teacherId),
                 await $scope.audiences.sync($scope.structure.id)
@@ -138,8 +140,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.teacher = new Teacher();
 
             $scope.teacher.id = model.me.userId ;
-            $scope.syncSessionsWithVisa();
+            $scope.teacher.id = model.me.id ;
         }
+
 
 
         /**
