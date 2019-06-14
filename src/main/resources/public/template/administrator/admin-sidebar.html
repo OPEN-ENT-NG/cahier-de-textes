@@ -17,13 +17,13 @@
                         class="date-picker-sm remove-margin">
                 </date-picker>
             </p>
-            <div class="margin-top-lg" workflow="diary.accessExternalData">
+            <div class="margin-top-lg" >
                 <label class="cell twelve small">
                     <select
                             ng-model="structure"
                             id="structure-list"
                             class="twelve"
-                            ng-change="switchStructure(structure)"
+                            ng-change="switchStructure(structure);structureSwitchEvent();"
                             ng-options="structure as structure.name for structure in structures.all">
                         <option value="" disabled selected>
                             [[translate('utils.structure.choose.one')]]
@@ -33,7 +33,7 @@
                 <label class="cell twelve small">
                     <select ng-model="teacher"
                             class="twelve"
-                            ng-change="syncSessionsWithVisa()"
+                            ng-change="clearSubjects();syncSessionsWithVisa()"
                             ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
                         <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
                     </select>
@@ -42,6 +42,7 @@
                     <!--matière-->
                     <div class="cell twelve small">
                         <multi-combo
+                                ng-show="subjects.all.length && subjects.all.length > 1 "
                                 title="[[translate('subjects')]]"
                                 combo-model="subjects.all"
                                 search-on="label"
@@ -49,11 +50,14 @@
                                 filtered-model="course.groups"
                                 ng-click="updateDatas($event)">
                         </multi-combo>
-                        <div class="select-blocks remove-margin-bottom">
+                        <div   ng-show="subjects.all.length && subjects.all.length > 1 " class="select-blocks remove-margin-bottom">
                             <div ng-repeat="subject in params.subjects | filter:'' track by $index"
                                  ng-click="dropItem(subject, $event)">
                                 [[subject.label]]
                             </div>
+                        </div>
+                        <div ng-show="subjects.all.length && subjects.all.length === 1">
+                            <select disabled><option>[[ subjects.all[0].label ]]</option></select>
                         </div>
                     </div>
                     <!--classe-->

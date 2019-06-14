@@ -3,7 +3,7 @@ import {Sessions, Subjects, Audiences} from '../../model/index';
 import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
 import {Utils} from "../../utils/utils";
-import {Visa, Visas} from "../../model";
+import {Teacher, Visa, Visas} from "../../model";
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
@@ -38,25 +38,42 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.filters.endDate = $scope.filters.endDate.date(15).month(6).add(1, "years");
         }
 
+        $scope.changeStructure = async (structure) =>{
+          await  $scope.$parent.switchStructure(structure);
+          await  $scope.syncSessionsWithVisa();
+
+
+
+        }
+
+        $scope.structureSwitchEvent = () =>{
+            $scope.teacher = null;
+            $scope.sessions_GroupBy_AudienceSubject = [];
+            $scope.safeApply();
+
+        }
         /**
          * Init de la vue ***
          */
         $scope.syncSessionsWithVisa = async () => {
             // let teacherId;
-            if (model.me.type == "ENSEIGNANT") {
-                $scope.teacherId = model.me.userId;
-            }
-            else {
                 $scope.teacherId = $scope.teacher.id;
-            }
-
             await Promise.all([
                 await $scope.subjects.sync($scope.structure.id, $scope.teacherId),
                 await $scope.audiences.sync($scope.structure.id)
             ]);
 
             $scope.sessions.structure = $scope.structure;
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
+            if($scope.subjects.all.length && $scope.subjects.all.length === 1  ){
+                $scope.params.subjects.push($scope.subjects.all[0]);
+                $scope.course.groups.push($scope.subjects.all[0]);
+                await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId,$scope.subjects.all[0].id);
+
+            }else{
+                await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
+
+            }
+
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => h.isInsideDiary = true);
@@ -67,7 +84,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.selectedSessions[key] = false;
             });
             $scope.allSessionsSelect = false;
+
+
             $scope.safeApply();
+
         };
 
         $scope.updateDatas = async (event) => {
@@ -105,14 +125,22 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.updateDatas(event);
         };
 
+        $scope.clearSubjects = () =>{
+            $scope.course.groups =[];
+            $scope.params.subjects = [];
+        }
         $scope.dropItem = async (item, event) => {
             $scope.course.groups = _.without($scope.course.groups, item);
             $scope.updateDatas(event);
         };
 
         if (model.me.type == "ENSEIGNANT") {
+            $scope.teacher = new Teacher();
+
+            $scope.teacher.id = model.me.userId ;
             $scope.syncSessionsWithVisa();
         }
+
 
         /**
          *   Actions de la vue *****
