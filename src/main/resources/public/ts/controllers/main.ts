@@ -310,7 +310,7 @@ export let main = ng.controller('MainController',
                 pedagogicItems.forEach(i => {
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
                         $scope.structure.audiences.all.map(a => {
-                            if (i.audience.id == a.id) {
+                            if (i.audience !== undefined && i.audience.id == a.id) {
                                 if (i.isPublished) {
                                     (publishedHomeworkByAudience[i.audience.id])
                                         ?  publishedHomeworkByAudience[i.audience.id] ++
