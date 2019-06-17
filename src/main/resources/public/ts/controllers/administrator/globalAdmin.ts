@@ -140,7 +140,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.teacher = new Teacher();
 
             $scope.teacher.id = model.me.userId ;
-            $scope.teacher.id = model.me.id ;
+            $scope.syncSessionsWithVisa();
         }
 
 
