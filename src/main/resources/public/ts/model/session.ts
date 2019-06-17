@@ -324,7 +324,15 @@ export class Sessions {
 
     static groupByLevelANdSubject(sessions) {
         return _.groupBy(sessions, function (item) {
-            return (item.audience && item.audience.id)? item.audience.id : item.audience_id + '#' + (item.subject && item.subject.id) ? item.subject.id : item.subject_id;
+            if(item.audience && item.audience.id){
+                let temp =  item.audience.id + "#"
+                temp +=  (item.subject)? item.subject.id : item.subject_id
+                return temp
+            }else{
+                let temp =  item.audience_id + "#"
+                temp +=  (item.subject)? item.subject.id : item.subject_id
+                return temp
+            }
         });
     }
 
