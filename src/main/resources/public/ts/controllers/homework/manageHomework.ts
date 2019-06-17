@@ -114,10 +114,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         : false );
 
                 // We only keep the courses without a session attached to.
-                let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
-                    && Utils.getFormattedDate(s.startMoment) === Utils.getFormattedDate(c.startMoment))));
-                let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
 
+                let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
+                    && Utils.getFormattedDate(s.startMoment) === Utils.getFormattedDate(c.startMoment))) && moment(c.endCourse).isAfter(moment(c.endDate))  );
+                let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                 $scope.sessionsToAttachTo.sort(function (a, b) {
                     return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
@@ -393,7 +393,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
         $scope.getNbHomeworkByDay = () => {
             let nbPublishHomework = 0;
-            if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
+           if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
                 $scope.pedagogicDays.map(p => {
                     if (moment($scope.homework.session.date).format('DD/MM') == p.shortDate) {
                         p.audience.map(a => {

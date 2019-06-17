@@ -23,7 +23,7 @@ export class Course {
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
-
+    endCourse:any;
     endDate: any;
     endMoment: any;
     endDisplayDate: string;
@@ -50,6 +50,7 @@ export class Course {
             audiences: audiences,
             dayOfWeek: data.dayOfWeek,
             endDate: data.endDate,
+            endCourse: data.endCourse,
             rooms: data.roomLabels,
             exceptionnal : data.exceptionnal,
             startDate: data.startDate,
