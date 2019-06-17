@@ -66,14 +66,16 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             ]);
 
             $scope.sessions.structure = $scope.structure;
-            console.log($scope.course.groups)
-            if($scope.subjects.all.length  ){
+            if($scope.subjects.all.length && $scope.subjects.all.length === 1  ){
                 $scope.params.subjects.push($scope.subjects.all[0]);
                 $scope.course.groups.push($scope.subjects.all[0]);
-            }
-            console.log($scope.course.groups)
+                await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId,$scope.subjects.all[0].id);
 
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
+            }else{
+                await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.teacherId);
+
+            }
+
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => h.isInsideDiary = true);
