@@ -34,11 +34,11 @@
                     <select ng-model="teacher"
                             class="twelve"
                             ng-change="clearSubjects();syncSessionsWithVisa()"
-                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
+                            ng-options="teacher as teacher.displayName for teacher in structure.teachers.all | orderBy:'lastName' track by teacher.id "  >
                         <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
                     </select>
                 </label>
-                <div ng-show="teacher">
+                <div >
                     <!--matière-->
                     <div class="cell twelve small">
                         <multi-combo
@@ -80,8 +80,13 @@
 
                     <!--visés-->
                     <label class="checkbox">
-                        <input type="checkbox" data-ng-click="toggleVisa($event)"/>
+                        <input type="checkbox" ng-model="vised" data-ng-click="toggleVisa($event)"/>
                         <span><i18n>sessions.admin.Visa.sateOk</i18n></span>
+                    </label>
+                    <!--non visés-->
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="notVised" data-ng-click="toggleVisa($event)"/>
+                        <span><i18n>sessions.admin.Visa.sateKo</i18n></span>
                     </label>
                 </div>
 

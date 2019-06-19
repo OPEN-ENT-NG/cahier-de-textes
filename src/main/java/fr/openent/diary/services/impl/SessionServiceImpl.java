@@ -64,7 +64,7 @@ public class SessionServiceImpl implements SessionService {
         if (user.getType().equals("Student")) {
             this.getChildSessions(startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getSessions(structureId, startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, null, false, false, false, handler);
+            this.getSessions(structureId, startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, null, false, false,false, false, handler);
         }
     }
 
@@ -73,7 +73,7 @@ public class SessionServiceImpl implements SessionService {
         List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
         List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
 
-        this.getSessions(null,startDate, endDate, null, listAudienceId, null, listTeacherId, true, false, false, handler);
+        this.getSessions(null,startDate, endDate, null, listAudienceId, null, listTeacherId, true, false,false, false, handler);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class SessionServiceImpl implements SessionService {
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getSessions(null,startDate, endDate, null, listAudienceId, null, null, false, false, false, handler);
+                this.getSessions(null,startDate, endDate, null, listAudienceId, null, null, false, false,false, false, handler);
             }
         });
     }
@@ -101,11 +101,12 @@ public class SessionServiceImpl implements SessionService {
      * @param listTeacherId  return sessions with a teacher_id field inside this list
      * @param onlyPublished  returns only published sessions
      * @param onlyVised      returns only the sessions with visa
+     * @param onlyNotVised   returns only the sessions without visa
      * @param agregVisas     returns the sessions with the field visas
      * @param handler
      */
     public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
-                            boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                            boolean onlyPublished, boolean onlyVised,boolean onlyNotVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         StringBuilder query = new StringBuilder();
         String finalQuery;
@@ -162,8 +163,11 @@ public class SessionServiceImpl implements SessionService {
             values.add(structureID);
         }
 
-        if (agregVisas && onlyVised) {
+        if (agregVisas && onlyVised && !onlyNotVised) {
             query.append(" AND visa IS NOT NULL");
+        }
+        if(agregVisas && onlyNotVised && !onlyVised){
+            query.append(" AND visa IS NULL");
         }
 
         query.append(" GROUP BY s.id");
