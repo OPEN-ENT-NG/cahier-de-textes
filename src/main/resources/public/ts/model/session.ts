@@ -379,18 +379,31 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncSessionsWithVisa(startMoment: any, endMoment: any, teacherId?: string,
+    async syncSessionsWithVisa(startMoment: any, endMoment: any, structureId:string ,teacherId?: string,
                                subjectsId?: string, audiencesId?: string,
-                               displayVisa?: string): Promise<void> {
+                               vised?:boolean ,notVised?:boolean): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
-        let filter = (audiencesId || subjectsId || displayVisa) ? '?' : '';
-
+        let filter = (structureId ||teacherId ||audiencesId || subjectsId || vised || notVised) ? '?' : '';
+        if(structureId){
+            if (filter.length > 1) {
+                filter += `&structureId=${structureId}`;
+            } else {
+                filter += `structureId=${structureId}`;
+            }
+        }
+        if(teacherId){
+            if (filter.length > 1) {
+                filter += `&teacherId=${teacherId}`;
+            } else {
+                filter += `teacherId=${teacherId}`;
+            }
+        }
         if (subjectsId) {
             if (filter.length > 1) {
-                filter += `&subjectId=${subjectsId}`;
+                filter += `&subjectsId=${subjectsId}`;
             } else {
-                filter += `subjectId=${subjectsId}`;
+                filter += `subjectsId=${subjectsId}`;
             }
         }
         if (audiencesId) {
@@ -400,14 +413,21 @@ export class Sessions {
                 filter += `audienceId=${audiencesId}`;
             }
         }
-        if (displayVisa) {
+        if (vised) {
             if (filter.length > 1) {
-                filter += `&visa=${displayVisa}`;
+                filter += `&vised=${vised}`;
             } else {
-                filter += `visa=${displayVisa}`;
+                filter += `vised=${vised}`;
             }
         }
-        let url = `/diary/sessions/visa/${startDate}/${endDate}/${teacherId}${filter}`;
+        if (notVised) {
+            if (filter.length > 1) {
+                filter += `&notVised=${notVised}`;
+            } else {
+                filter += `notVised=${notVised}`;
+            }
+        }
+        let url = `/diary/sessions/visa/${startDate}/${endDate}${filter}`;
         await this.syncSessions(url);
     }
 

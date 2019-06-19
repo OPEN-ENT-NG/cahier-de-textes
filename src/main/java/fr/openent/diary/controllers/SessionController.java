@@ -78,20 +78,21 @@ public class SessionController extends ControllerHelper {
     }
 
 
-    @Get("/sessions/visa/:startDate/:endDate/:teacherId")
+    @Get("/sessions/visa/:startDate/:endDate")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AdminAccess.class)
     public void getSessionsWithVisaField(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String teacherId = request.getParam("teacherId");
-        Boolean displayVisa = request.getParam("visa") != null && Boolean.parseBoolean(request.getParam("visa"));
+        Boolean onlyVised = request.getParam("vised") != null && Boolean.parseBoolean(request.getParam("vised"));
+        Boolean onlyNotVised = request.getParam("notVised") != null && Boolean.parseBoolean(request.getParam("notVised"));
 
         List<String> listTeacherId = teacherId != null ? Arrays.asList(teacherId) : null;
         List<String> listAudienceId = request.getParam("audienceId") != null ? Arrays.asList(request.getParam("audienceId").split("\\s*,\\s*")) : null;
-        List<String> listSubjectId = request.getParam("subjectId") != null ? Arrays.asList(request.getParam("subjectId").split("\\s*,\\s*")) : null;
-
-        sessionService.getSessions(null, startDate, endDate, null, listAudienceId, listSubjectId, listTeacherId, true, displayVisa, true,
+        List<String> listSubjectId = request.getParam("subjectsId") != null ? Arrays.asList(request.getParam("subjectsId").split("\\s*,\\s*")) : null;
+        String StructureId = request.getParam("structureId") != null ? request.getParam("structureId") : null;
+        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listSubjectId, listTeacherId, true, onlyVised, onlyNotVised,true,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 
