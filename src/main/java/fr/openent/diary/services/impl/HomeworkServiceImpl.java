@@ -487,24 +487,15 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getWorkloadWeek(final String date, final String audienceId, Handler<Either<String, JsonArray>> handler) {
-        if (date != null && !date.isEmpty()) {
+    public void getWorkload(String structureId, String audienceId, String dueDate, boolean isPublished, Handler<Either<String, JsonArray>> handler) {
+        JsonArray params = new JsonArray();
+        String query = "SELECT COUNT(*) FROM " + Diary.DIARY_SCHEMA + ".homework " +
+                "WHERE structure_id = ? AND audience_id = ? AND due_date = ? AND is_published = true";
+        params.add(structureId);
+        params.add(audienceId);
+        params.add(dueDate);
 
-            StringBuilder query = new StringBuilder();
-            query.append(" select z.day, COALESCE(sum(h.workload),0) as total, count(h.*) as count from  " );
-            query.append(" ( " );
-            query.append(" select (date_trunc('week',to_date(?, 'YYYY-MM-DD'))::date) + i as day " );
-            query.append(" from generate_series(0,6) i " );
-            query.append(" ) z " );
-            query.append(" left outer join " + Diary.DIARY_SCHEMA + ".homework h on h.due_date = z.day and h.audience_id = ? " );
-            query.append(" group by z.day order by z.day " );
-
-            JsonArray parameters = new fr.wseduc.webutils.collections.JsonArray();
-            parameters.add(date);
-            parameters.add(audienceId);
-
-            Sql.getInstance().prepared(query.toString(), parameters, SqlResult.validResultHandler(handler));
-        }
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
     }
 
 }

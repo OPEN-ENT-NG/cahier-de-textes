@@ -218,8 +218,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.localRemoveHomework(i);
 
             } else {
-                //  let {succeed} = $scope.toastHttpCall(await homework.delete());
-                // if (succeed) {
                 if (true) {
                     $scope.localRemoveHomework($scope.session.homeworks.findIndex(x => x.id == homework.id));
                 }
@@ -241,7 +239,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             });
 
         };
-        $scope.cancelValidateOnDelete = (homework, index) =>{
+        $scope.cancelValidateOnDelete = async (homework, index) =>{
             if(homework.opened){
                 $scope.validate = false;
                 $scope.formIsOpened = false;

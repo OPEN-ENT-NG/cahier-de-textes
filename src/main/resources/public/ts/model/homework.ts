@@ -17,7 +17,7 @@ export class Homework {
     idTemp : number;
     session_id: number;
     session_date: string;
-    workloadWeek: WorkloadWeek;
+    workloadDay: WorkloadDay;
     structure: Structure;
     type: HomeworkType;
     teacher: Teacher;
@@ -184,7 +184,7 @@ export class Homework {
             this.startMoment = moment(this.dueDate);
         }
 
-        this.workloadWeek = new WorkloadWeek(this.audience);
+        this.workloadDay = new WorkloadDay(this.structure, this.audience, this.dueDate, this.isPublished);
         this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
     }
 
@@ -331,36 +331,49 @@ export class Workload {
     shortDayString: string;
     numDayString;
     color: string;
-    description: string;
+    Title: string;
+    title: string;
 
     static getWorkloadColor(workload: number){
-        if (0 < workload && workload <= 2) {
-            return 'green';
+        if (0 <= workload && workload <= 2) {
+            return 'green-text';
         } else if (2 < workload && workload <= 4) {
-            return 'yellow';
+            return 'yellow-text';
         } else if (4 < workload) {
-            return 'red';
+            return 'red-text';
         }
     }
 
-    getDescription(){
-        return this.count + ' ' + (this.count > 0 ? lang.translate('homeworks') : lang.translate('homework'));
+    getHomeworkTitle(){
+        return (this.count > 0 ? lang.translate('Homeworks') : lang.translate('Homework'));
     }
+
+    getHomeworktitle(){
+        return (this.count > 0 ? lang.translate('homeworks') : lang.translate('homework'));
+    }
+
 
     init(){
         this.shortDayString = moment(this.day).format('dddd').substring(0, 1).toUpperCase(); // 'lundi' -> 'lu' -> 'L'
         this.numDayString = moment(this.day).format('DD'); // 15
         this.color = Workload.getWorkloadColor(this.count);
-        this.description = this.getDescription();
+        this.Title = this.getHomeworkTitle();
+        this.title = this.getHomeworktitle();
     }
 }
 
-export class WorkloadWeek {
+export class WorkloadDay {
     all: Workload[];
+    structure: any;
     audience: any;
+    dueDate: any;
+    isPublished: boolean;
 
-    constructor(audience: any) {
+    constructor(structure: any, audience: any, dueDate: any, isPublished: any) {
+        this.structure = structure;
+        this.dueDate = dueDate;
         this.audience = audience;
+        this.isPublished = isPublished;
     }
 
     static formatSqlDataToModel(data: any[]) {
@@ -375,9 +388,9 @@ export class WorkloadWeek {
         return dataModel;
     };
 
-    async sync(dateInWeek: any): Promise<void> {
-        let {data} = await http.get(`/diary/workload-week/${Utils.getFormattedDate(dateInWeek)}/${this.audience.id}`);
-        this.all = Mix.castArrayAs(Workload, WorkloadWeek.formatSqlDataToModel(data));
+    async sync(date: any): Promise<void> {
+        let {data} = await http.get(`/diary/workload/${this.structure.id}/${this.audience.id}/${Utils.getFormattedDate(date)}/${this.isPublished}`);
+        this.all = Mix.castArrayAs(Workload, WorkloadDay.formatSqlDataToModel(data));
         this.all.forEach(w => w.init());
     }
 }

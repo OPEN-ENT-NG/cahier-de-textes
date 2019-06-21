@@ -304,23 +304,9 @@ export let main = ng.controller('MainController',
 
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
-                let nbPublishHomework = 0;
                 let nbHomework = 0;
-                let publishedHomeworkByAudience = {};
                 pedagogicItems.forEach(i => {
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
-                        $scope.structure.audiences.all.map(a => {
-                            if (i.audience !== undefined && i.audience.id == a.id) {
-                                if (i.isPublished) {
-                                    (publishedHomeworkByAudience[i.audience.id])
-                                        ?  publishedHomeworkByAudience[i.audience.id] ++
-                                        : publishedHomeworkByAudience[i.audience.id] = 1;
-                                }
-                                return publishedHomeworkByAudience;
-                            }
-                        })
-                    }
-                    else {
                         nbHomework ++;
                     }
                 });
@@ -349,12 +335,10 @@ export let main = ng.controller('MainController',
                     dayName: moment(key).format('dddd'),
                     shortDayName: moment(key).format('dd'),
                     nbHomework: nbHomework,
-                    nbPublishHomework: publishedHomeworkByAudience,
                     nbSession: nbSession,
                     nbCourse: nbCourse,
                     nbCourseAndSession: nbCourseAndSession,
                     homeworksAreForOneAudienceOnly: homeworksAreForOneAudienceOnly,
-                    audience: audienceIds,
                     color: Workload.getWorkloadColor(nbHomework)
                 };
             });

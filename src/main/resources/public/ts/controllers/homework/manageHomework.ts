@@ -1,8 +1,7 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
 import {Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
-import {Homework, HomeworkTypes, WorkloadWeek} from '../../model/homework';
+import {Homework, HomeworkTypes, WorkloadDay} from '../../model/homework';
 import {Utils} from '../../utils/utils';
-import {ProgressionHomework} from "../../model/Progression";
 import indexOf = require('core-js/fn/array/index-of');
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
@@ -50,20 +49,20 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.safeApply();
         };
 
-        $scope.syncWorkloadWeek = async () => {
+        $scope.syncWorkloadDay = async () => {
             if($scope.homework.audience) {
-                let dateInWeek = undefined;
+                let date = undefined;
                 if($scope.homework.attachedToDate){
-                    dateInWeek = $scope.homework.dueDate;
+                    date = $scope.homework.dueDate;
                 } else if($scope.homework.session) {
-                    dateInWeek = $scope.homework.session.startMoment;
+                    date = $scope.homework.session.startMoment;
                 } else {
-                    $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
+                    $scope.homework.workloadDay = new WorkloadDay($scope.homework.structure, $scope.homework.audience, $scope.homework.dueDate, $scope.homework.isPublished);
                     $scope.safeApply();
                     return;
                 }
-                $scope.homework.workloadWeek = new WorkloadWeek($scope.homework.audience);
-                await $scope.homework.workloadWeek.sync(dateInWeek);
+                $scope.homework.workloadDay = new WorkloadDay($scope.homework.structure, $scope.homework.audience, $scope.homework.dueDate, $scope.homework.isPublished);
+                await $scope.homework.workloadDay.sync(date);
                 $scope.safeApply();
             }
             if($scope.homework.attachedToDate){
@@ -296,7 +295,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     } else {
                         window.history.back();
                     }
-                }
+                };
             }
         };
 
@@ -345,6 +344,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         async function initData() {
             $scope.homework.isInit = true;
             await $scope.sessionTypes.sync();
+            await $scope.syncWorkloadDay();
 
             await Promise.all([
                 $scope.homeworkTypes.sync(),
@@ -389,33 +389,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
             $scope.safeApply();
             $scope.fixEditor();
-        };
-
-        $scope.getNbHomeworkByDay = () => {
-            let nbPublishHomework = 0;
-           if($scope.sessionsToAttachTo && $scope.homework.attachedToSession) {
-                $scope.pedagogicDays.map(p => {
-                    if (moment($scope.homework.session.date).format('DD/MM') == p.shortDate) {
-                        p.audience.map(a => {
-                            if ($scope.homework.audience.id == a) {
-                                nbPublishHomework = p.nbPublishHomework[a];
-                            }
-                        })
-                    }
-                });
-            }
-            else if ($scope.sessionsToAttachTo && $scope.homework.attachedToDate) {
-                $scope.pedagogicDays.map(p => {
-                    if (moment($scope.homework.dueDate).format("DD/MM") == p.shortDate) {
-                        p.audience.map(a => {
-                            if ($scope.homework.audience.id == a) {
-                                nbPublishHomework = p.nbPublishHomework[a];
-                            }
-                        })
-                    }
-                })
-            }
-            return nbPublishHomework;
         };
 
         $scope.back = ()=>{

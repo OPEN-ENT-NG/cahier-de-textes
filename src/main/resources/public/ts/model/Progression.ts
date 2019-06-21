@@ -6,7 +6,7 @@ import {Course, Structure, Subject, Teacher, Utils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
-import {Homework, Homeworks, HomeworkType, WorkloadWeek} from './homework';
+import {Homework, Homeworks, HomeworkType, WorkloadDay} from './homework';
 import {Session,SessionType} from "./session";
 import {subscript} from "entcore/types/src/ts/editor/options";
 import forEach = require("core-js/fn/array/for-each");

@@ -16,6 +16,8 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
+import java.util.Date;
+
 public class HomeworkController extends ControllerHelper {
 
     private HomeworkService homeworkService;
@@ -176,14 +178,21 @@ public class HomeworkController extends ControllerHelper {
         homeworkService.deleteHomeworkType(homeworkTypeId, structure_id, DefaultResponseHandler.defaultResponseHandler(request));
     }
 
-    @Get("/workload-week/:date/:audienceId")
+    @Get("/workload/:structureId/:audienceId/:dueDate/:isPublished")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(HomeworkRead.class)
-    public void getWorkloadWeek(final HttpServerRequest request) {
-        String date = request.getParam("date");
-        String audienceId = request.getParam("audienceId");
+    public void getWorkload(final HttpServerRequest request) {
+        if(!request.params().contains("dueDate") || !request.params().contains("isPublished")) {
+            badRequest(request);
+            return;
+        }
 
-        homeworkService.getWorkloadWeek(date, audienceId, DefaultResponseHandler.arrayResponseHandler(request));
+        String structureId = request.getParam("structureId");
+        String audienceId = request.getParam("audienceId");
+        String dueDate = request.getParam("dueDate");
+        Boolean isPublished = Boolean.parseBoolean(request.getParam("isPublished"));
+
+        homeworkService.getWorkload(structureId, audienceId, dueDate, isPublished, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Post("/homework/progress/:id/:state")

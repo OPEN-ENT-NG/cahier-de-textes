@@ -2,7 +2,7 @@
     <div class="row">
         <div class="six cell twelve-mobile">
             <select required ng-model="session.audience"
-                    ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
+                    ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject);"
                     ng-disabled="session.courseId && session.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
                 <option ng-if="structure.audiences.all.length !== 1"  value="" disabled selected>[[translate('select.audience')]]</option>
@@ -136,7 +136,7 @@
 
         <div ng-if="session.homeworks.length" class="margin-bottom-md">
             <h2 ng-if="session.homeworks.length && hasOneHomeworkInList()">
-                <i18n>homeworks</i18n>
+                <i18n>Homeworks</i18n>
             </h2>
             <div class="responsive-table row" ng-show="session.homeworks.length && hasOneHomeworkInList()">
                 <table class="twelve">
@@ -211,16 +211,16 @@
                                 </label>
 
                                 <div class="six flex margin-auto space-around margin-bottom-md">
-                                    <label><!-- ng-if="sessionsToAttachTo && sessionsToAttachTo.length > 0"-->
+                                    <label>
                                         <input type="radio"
-                                               ng-click="attachToSession()"
+                                               ng-click="attachToSession(); syncWorkloadDay();"
                                                ng-checked="homework.attachedToSession"
                                                value="true">
                                         <span class="no-style ng-scope"><i18n>session</i18n></span>
                                     </label><br>
                                     <label>
                                         <input type="radio"
-                                               ng-click="attachToDate()"
+                                               ng-click="attachToDate(); syncWorkloadDay();"
                                                ng-checked="homework.attachedToDate"
                                                value="false">
                                         <span class="no-style ng-scope"><i18n>date</i18n></span>
@@ -229,11 +229,11 @@
                             </div>
                             <div class="row">
                                 <date-picker class="date-picker-sm" ng-if="homework.attachedToDate"
-                                             ng-model="homework.dueDate" ng-change="syncWorkloadWeek()"></date-picker>
+                                             ng-model="homework.dueDate" ng-change="syncWorkloadDay()"></date-picker>
                                 <select class="ten"
                                         ng-if="!homework.attachedToDate"
                                         ng-model="homework.session"
-                                        ng-change="syncWorkloadWeek()"
+                                        ng-click="syncWorkloadDay()"
                                         ng-options="session as (session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime
                 + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
                                 </select>
@@ -259,16 +259,12 @@
                             </div>
 
                             <!-- Workload -->
-                            <div class="margin10v"
-                                 ng-if="sessionsToAttachTo ||  homework.attachedToDate">
-                                <span ng-if="getNbHomeworkByDay() !== 0" class="ten">
-                                    <label>
-                                        [[getNbHomeworkByDay()]]
+                            <div ng-if="sessionsToAttachTo ||  homework.attachedToDate">
+                                <span class="ten" ng-repeat="workload in homework.workloadDay.all">
+                                    <label ng-class="workload.color">
+                                        [[workload.count]]
                                     </label>
-                                    <i18n>homework(s)</i18n>
-                                </span>
-                                <span ng-if="getNbHomeworkByDay() === 0" class="ten">
-                                    <i18n>diary.empty.homework</i18n>
+                                    <label>[[workload.title]]</label>
                                 </span>
                             </div>
 
@@ -308,7 +304,7 @@
 
                 <button ng-show="!validate"
                         class="float-none display-inline-block margin-top-md"
-                        ng-click="addHomework()">
+                        ng-click="addHomework();">
                     <i18n>homework.manage.create</i18n>
                 </button>
                 <button ng-show="validate"

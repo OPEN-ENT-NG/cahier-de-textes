@@ -36,7 +36,7 @@ public interface HomeworkService {
 
     void deleteHomeworkType(Integer id, String structure_id, Handler<Either<String, JsonObject>> handler);
 
-    void getWorkloadWeek(final String dateInWeek, final String audienceId, Handler<Either<String, JsonArray>> handler);
+    void getWorkload(String structureId, String audienceId, String dueDate, boolean isPublished, Handler<Either<String, JsonArray>> handler);
 
     void getHomeworkStudent(long homeworkId, String studentId, UserInfos user, Handler<Either<String, JsonObject>> handler);
 }
