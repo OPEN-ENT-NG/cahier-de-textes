@@ -1,4 +1,4 @@
-import {_, idiom as lang, model, moment, ng, angular} from 'entcore';
+import {_, idiom as lang, model, moment, ng, angular, notify} from 'entcore';
 import {Sessions, Subjects, Audiences} from '../../model/index';
 import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
@@ -146,8 +146,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.teacher = new Teacher();
                 $scope.teacher.id = model.me.userId;
             }
-
             await $scope.audiences.sync($scope.structure.id);
+            await $scope.subjects.sync($scope.structure.id);
+            console.log($scope.subjects.all)
             await $scope.syncSessionsWithVisa();
         }
 
@@ -170,6 +171,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.wantDownloadPdf = (sessionsGroups) => {
             $scope.visas_pdfChoice = $scope.getVisas(sessionsGroups);
+            $scope.visas_pdfChoice.map(visa =>{
+                visa.displayDate = moment(visa.created).format("DD/MM/YYYY");
+            })
             $scope.visaPdfDownloadBox = true;
         };
 
@@ -184,12 +188,13 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.closeVisaCreateBox = () => {
             $scope.visas_pdfChoice = [];
-            $scope.visaCreateBox = null;
+            $scope.visaCreateBox = false;
+            $scope.showOptionToaster = false;
+
         };
 
         $scope.printPdf = () => {
             let sessionsToPdf = getSelectedSessions();
-            renderDiariesToPDF();
         };
 
         /**
@@ -284,6 +289,17 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             comment: null
         };
 
+
+        let updateNbSessions = (sessionsGroups) => {
+            $scope.visaForm.nbSessions =
+                _.chain($scope.sessionsGroups)
+                    .filter(item => item.selected == true)
+                    .pluck('nbSessions')
+                    .reduce((count, num) => count + num)
+                    .value();
+        };
+
+
         $scope.submitVisaForm = async () => {
             if (!$scope.visaFormIsvalid) {
                 return;
@@ -293,59 +309,28 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.safeApply();
 
             let sessionsGroups = getSelectedSessions();
-            let promises_array: Array<any> = [];
-            sessionsGroups.forEach((item) => {
+            console.log(sessionsGroups);
+            updateNbSessions(sessionsGroups);
 
-                promises_array.push(new Promise(function (resolve, reject) {
-
-                    let dataVisa = {
-                        sessions: item,
-                        sessionIds: $scope.getSessionsIds(item),
-                        teacher: null,
-                        visa: $scope.visaForm
-                    };
-
-                    createCanvas(dataVisa).then(async (canvasData) => {
-                        canvasData = createPDF(canvasData)
-                        let visas = new Visas($scope.structure);
-
+            let visas = new Visas($scope.structure);
+            if($scope.visaFormIsvalid){
+                console.log(sessionsGroups);
+                sessionsGroups.forEach((visaSession)=>{
+                    if (visaSession) {
                         let visa = new Visa($scope.structure);
-                        visa.comment = $scope.visaForm.comment;
-                        visa.fileId = await
-                            Visa.uploadVisaPdf(canvasData, $scope);
-                        visa.nb_sessions = dataVisa.sessions.length;
-                        visa.sessionIds = dataVisa.sessionIds;
-                        visa.teacher = dataVisa.sessions[0].teacher;
+                        visa.mapFormData(visaSession,$scope.visaForm.comment)
                         visas.all.push(visa);
-                        let {succeed} = await
-                            visas.save();
-                        if (succeed) {
-                            resolve(true);
-                        } else {
-                            reject(false);
-                        }
-                    });
-
-                }));
-            });
-            Promise.all(promises_array).then(result => {
-                let response = {
-                    succeed: true,
-                    toastMessage: lang.translate("visa.manage.create.success")
-                };
-                if (_.contains(result, false)) {
-                    response.succeed = false;
-                    response.toastMessage = lang.translate("visa.manage.create.error")
+                    }
+                })
+                let {succeed} = await visas.save();
+                if (succeed) {
+                    $scope.syncSessionsWithVisa();
+                    $scope.closeVisaCreateBox();
+                    $scope.safeApply();
                 }
-                $scope.visaForm.loading = false;
-                $scope.safeApply();
-                $scope.closeVisaCreateBox();
-                $scope.safeApply();
-                $scope.toastHttpCall(response);
-                $scope.selectOrUnselectAllSessions();
-                $scope.updateOptionToaster();
-                $scope.syncSessionsWithVisa();
-            });
+            }
+
+
         };
 
         $scope.visaFormIsvalid = () => {
@@ -353,176 +338,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.visaForm.comment.length;
         };
 
-
-        let renderDiariesToPDF = async () => {
-
-            $scope.printPdf.loading = true;
-            $scope.safeApply();
-
-            let sessionsGroups = getSelectedSessions();
-            let allDataPdf = [];
-
-            sessionsGroups.forEach((item) => {
-                let dataPdf = {
-                    sessions: item,
-                    sessionIds: $scope.getSessionsIds(item),
-                    teacher: null
-                };
-                allDataPdf.push(dataPdf);
-            });
-
-            let canvasData = await createCanvas(allDataPdf);
-            let canvasPdf = createPDF(canvasData);
-            Utils.startBlobDownload(canvasPdf.pdfBlob, lang.translate("visa.manage.pdfName") + " - " + Utils.getDisplayDateTime(moment()));
-            $scope.printPdf.loading = false;
-            $scope.selectOrUnselectAllSessions();
-            $scope.updateOptionToaster();
-            $scope.syncSessionsWithVisa();
-        };
-
-        /**
-         *  utils to create PDF
-         **/
-
-        (window as any).jsPDF = jsPDF;
-        (window as any).html2canvas = html2canvas;
-
-        async function createCanvas(data) {
-
-            //htmlContent:
-            let htmlTitle1 = (titleDiary, sessions) => {
-                titleDiary = `<div style="padding:10px" class="text-center">` +
-                    `<h1>${lang.translate("diary.title")}</h1>` +
-                    `<h2>${sessions[0].teacher.firstName }&nbsp;${sessions[0].teacher.lastName}&nbsp;-&nbsp;${sessions[0].subject.label}&nbsp;-&nbsp;${sessions[0].audience.name}</h2>`;
-                return titleDiary;
-            };
-
-            let htmlTitle2 = (titleDiary, username, comment) => {
-                titleDiary += `<h4>${lang.translate("visa.approve.date")}&nbsp;` +
-                    `${lang.translate("by")}&nbsp;${username}</h4>` +
-                    `<p><b>${lang.translate("sessions.admin.comment")}:&nbsp;</b> ${comment} </p>`;
-                return titleDiary;
-            };
-
-            let htmlTitle3 = (titleDiary) => {
-                titleDiary += `</div><h4 style="padding:10px" >${lang.translate("the")}&nbsp;${Utils.getDisplayDate(moment())}&nbsp;${lang.translate("to2")}&nbsp;${Utils.getDisplayTime(moment())}&nbsp;</h4>`;
-                return titleDiary;
-            };
-
-            let createTitle = (sessions, target, visa?) => {
-                // Convert the divs into canvas
-                let titleDiary = htmlTitle1("", sessions);
-                if (visa && visa.comment) {
-                    titleDiary = htmlTitle2(titleDiary, model.me.username, visa.comment);
-                }
-                titleDiary = htmlTitle3(titleDiary);
-
-                return titleDiary;
-            };
-
-            let sessions, target, targetName, htmlContent, title;
-
-            if (Array.isArray(data)) {
-                target = "#all";
-                let finalContent = "";
-                data.forEach((item) => {
-                    sessions = item.sessions;
-                    targetName = item.sessionIds.join('-');
-                    $(`#list-diary-to-pdf > .diary${targetName}`).remove();
-                    $(`.diary${targetName}`).clone().appendTo("#list-diary-to-pdf");
-                    htmlContent = $(`#list-diary-to-pdf > .diary${targetName}`);
-                    title = createTitle(sessions, targetName);
-                    htmlContent.prepend(title);
-                    target = $(`#list-diary-to-pdf > .diary${targetName}`);
-                    finalContent += htmlContent.html();
-                });
-                htmlContent.html(finalContent);
-            } else {
-                sessions = data.sessions;
-                targetName = data.sessionIds.join('-');
-                $(`#list-diary-to-pdf > .diary${targetName}`).remove();
-                $(`.diary${targetName}`).clone().appendTo("#list-diary-to-pdf");
-                htmlContent = $(`#list-diary-to-pdf > .diary${targetName}`);
-                title = createTitle(sessions, targetName, data.visa);
-                htmlContent.prepend(title);
-                target = $(`#list-diary-to-pdf > .diary${targetName}`);
-            }
-
-            $(htmlContent).width(778);
-
-            let result = {original: null, canvas: null, data: {targetName: targetName}};
-            let canvas = await html2canvas(htmlContent[0], {
-                letterRendering: true,
-                scale: 1,
-                windowWidth: 778,
-                width: 778
-            });
-
-            result.original = target[0];
-            result.canvas = canvas;
-            return result;
-
-        }
-
-        function createPDF(canvasData) {
-            let targetName = canvasData.data.targetName;
-            // Create the canvas into PDF
-            let pdf = new jsPDF('p', 'pt', 'a4', true);
-
-            for (let i = 0; i <= canvasData.original.clientHeight / 980; i++) {
-                //! This is all just html2canvas stuff
-                let srcImg = canvasData.canvas;
-                let sX = 0;
-                let sY = 1120 * i; // start 980 pixels down for every new page
-                let sWidth = 778;
-                let sHeight = 1120;
-                let dX = 0;
-                let dY = 0;
-                let dWidth = 778;
-                let dHeight = 1120;
-
-                let onePageCanvasName = "onePageCanvas_diary-canvas" + targetName;
-
-                (window as any)[onePageCanvasName] = document.createElement("canvas");
-                let onePageCanvas = (window as any)[onePageCanvasName];
-                onePageCanvas.setAttribute('width', 778);
-                onePageCanvas.setAttribute('height', 1120);
-                let ctx = onePageCanvas.getContext('2d');
-                // details on this usage of this function:
-                // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Slicing
-                ctx.drawImage(srcImg, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
-
-                // document.body.appendChild(canvas);
-                let canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
-
-                let width = onePageCanvas.width;
-                let height = onePageCanvas.clientHeight;
-
-                //! If we're on anything other than the first page,
-                // add another page
-                if (i > 0) {
-                    pdf.addPage(595, 842); //8.5" x 11" in pts (in*72)
-                }
-                //! now we declare that we're working on that page
-                pdf.setPage(i + 1);
-                //! now we add content to that page!
-                pdf.addImage(canvasDataURL, 'PNG', 0, 0, (width * .72), (height * .71), '', 'FAST');
-            }
-            canvasData.pdfBlob = pdf.output('blob');
-
-            canvasData.original.remove();
-            canvasData.canvas.remove();
-
-            return canvasData;
-        }
         $scope.init();
-
-
-        /**
-         *  Fin Generation du pdf pour les visas
-         **/
-        /**
-         *  End Visas actions ************
-         **/
 
     }]);

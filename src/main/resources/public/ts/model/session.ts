@@ -84,6 +84,7 @@ export class Session {
     }
 
     toSendFormat(placeholder?) {
+
         return {
             id: this.id ? this.id : null,
             subject_id: this.subject.id,
@@ -94,7 +95,7 @@ export class Session {
             date: Utils.getFormattedDate(this.date),
             start_time: Utils.getFormattedTime(this.startTime),
             end_time: Utils.getFormattedTime(this.endTime),
-            description: this.description,
+            description: Utils.htmlToXhtml(this.description),
             annotation: this.annotation,
             is_published: this.isPublished,
             audience_id: this.audience.id,

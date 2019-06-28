@@ -35,7 +35,7 @@ public class VisaController extends ControllerHelper {
 
     public VisaController(VisaServiceImpl visaService, Storage storage) {
         this.visaService = visaService;
-        this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, storage, config);
+        this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
         this.storage = storage;
     }
 
@@ -59,9 +59,10 @@ public class VisaController extends ControllerHelper {
         }));
     }
 
+
     @Post("/visa/pdf")
-    @SecuredAction(value ="", type = ActionType.AUTHENTICATED)
-    public void postPDFforVisa(final HttpServerRequest request){
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void postPDFforVisa(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
 
             VisaController.this.storage.writeUploadFile(request, uploaded -> {

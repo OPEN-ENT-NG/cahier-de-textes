@@ -21,6 +21,11 @@ export class Utils {
         }
         return response;
     }
+    static htmlToXhtml(html){
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var xhtml = new XMLSerializer().serializeToString(doc);
+        return xhtml;
+    }
 
     static getFormattedDate(date) {
         return moment(date).format(FORMAT.formattedDate);

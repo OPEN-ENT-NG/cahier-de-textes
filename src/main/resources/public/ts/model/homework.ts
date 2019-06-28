@@ -61,7 +61,7 @@ export class Homework {
             audience_id: this.audience.id,
             estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
             due_date: Utils.getFormattedDate(this.dueDate),
-            description: this.description,
+            description: Utils.htmlToXhtml(this.description),
             color: this.color,
             is_published: this.isPublished,
             workload: this.workload
