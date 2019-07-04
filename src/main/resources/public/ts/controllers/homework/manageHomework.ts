@@ -55,7 +55,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 if($scope.homework.attachedToDate){
                     date = $scope.homework.dueDate;
                 } else if($scope.homework.session) {
-                    date = $scope.homework.session.startMoment;
+                    date = $scope.homework.session.date;
                 } else {
                     $scope.homework.workloadDay = new WorkloadDay($scope.homework.structure, $scope.homework.audience, $scope.homework.dueDate, $scope.homework.isPublished);
                     $scope.safeApply();
@@ -344,7 +344,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         async function initData() {
             $scope.homework.isInit = true;
             await $scope.sessionTypes.sync();
-            await $scope.syncWorkloadDay();
 
             await Promise.all([
                 $scope.homeworkTypes.sync(),
@@ -386,7 +385,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if(!$scope.homework.id && !$scope.homework.type) {
                 $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
             }
-
+            await $scope.syncWorkloadDay();
             $scope.safeApply();
             $scope.fixEditor();
         };
