@@ -141,13 +141,11 @@ public class SessionServiceImpl implements SessionService {
     public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
                                          boolean onlyPublished, boolean onlyVised, boolean onlyNotVised, boolean agregVisas,  JsonArray values, Handler<Either<String, JsonArray>> handler) {
         String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) as homeworks" +
-                ((agregVisas) ? "array_to_json(array_agg(distinct visa)) as visas" : " ") +
+                ((agregVisas) ? " ,array_to_json(array_agg(distinct visa)) as visas" : " ") +
+                " FROM diary.session s " +
                 ((agregVisas) ? " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id " +
                 " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
-                " FROM diary.session s " +
                 " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)" +
-                " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id  " +
-                " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id " +
                 ((onlyPublished) ? " AND s.is_published = true " : " ");
 
         query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, values, query);
