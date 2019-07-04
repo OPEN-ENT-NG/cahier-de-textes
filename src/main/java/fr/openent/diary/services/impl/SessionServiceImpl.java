@@ -32,16 +32,16 @@ public class SessionServiceImpl implements SessionService {
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT s.*, to_json(type_session) as type, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
-        query.append(",(SELECT 1 From diary.session_visa ");
-        query.append("        inner join diary.session on session.id = session_visa.session_id");
-        query.append("        where session.id = ").append(sessionId).append("LIMIT 1) as one_visa");
+        query.append(",(SELECT 1 FROM diary.session_visa");
+        query.append(" INNER JOIN diary.session on session.id = session_visa.session_id");
+        query.append(" WHERE session.id = ").append(sessionId).append("LIMIT 1) AS one_visa");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
         query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id");
         query.append(" LEFT JOIN (");
         query.append(" SELECT homework.*, to_json(homework_type) as type");
         query.append(" FROM diary.homework homework");
         query.append(" INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id");
-        query.append(" )  as homework_and_type ON (s.id = homework_and_type.session_id)");
+        query.append(" ) as homework_and_type ON (s.id = homework_and_type.session_id)");
         query.append(" WHERE s.id = ").append(sessionId);
         query.append(" GROUP BY s.id, type_session");
         Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
@@ -91,6 +91,114 @@ public class SessionServiceImpl implements SessionService {
         });
     }
 
+    public String getWithSessionsQuery(String structureID, String startDate, String endDate, String ownerId,
+                                       List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId, boolean onlyPublished,  JsonArray values) {
+        String query =  " WITH homework_and_type as " +
+                        " ( " +
+                        " SELECT homework.*, to_json(homework_type) as type " +
+                        " FROM " + Diary.DIARY_SCHEMA + ".homework" +
+                        " INNER JOIN diary.homework_type ON homework.type_id = homework_type.id " +
+                        " INNER JOIN diary.session s ON (homework.session_id = s.id)" +
+                        ((onlyPublished) ? " AND s.is_published = true " : " ");
+
+        if (startDate != null && endDate != null) {
+            query += " AND homework.due_date >= to_date(?,'YYYY-MM-DD')";
+            query += " AND homework.due_date <= to_date(?,'YYYY-MM-DD')";
+            values.add(startDate);
+            values.add(endDate);
+        }
+        if (listAudienceId != null) {
+            query += " AND homework.audience_id IN " + (Sql.listPrepared(listAudienceId.toArray()));
+            for (String audienceId : listAudienceId) {
+                values.add(audienceId);
+            }
+        }
+        if (listSubjectId != null) {
+            query += " AND homework.subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
+            for (String subjectId : listSubjectId) {
+                values.add(subjectId);
+            }
+        }
+        if (listTeacherId != null) {
+            query += " AND homework.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
+            for (String teacherId : listTeacherId) {
+                values.add(teacherId);
+            }
+        }
+        if (ownerId != null) {
+            query += " AND homework.owner_id = ?";
+            values.add(ownerId);
+        }
+        if (structureID != null){
+            query += " AND homework.structure_id = ?";
+            values.add(structureID);
+        }
+
+        query += " ) ";
+        return query.replaceFirst("AND", "WHERE");
+    }
+
+    public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
+                                         boolean onlyPublished, boolean onlyVised, boolean onlyNotVised, boolean agregVisas,  JsonArray values, Handler<Either<String, JsonArray>> handler) {
+        String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) as homeworks" +
+                ((agregVisas) ? "array_to_json(array_agg(distinct visa)) as visas" : " ") +
+                ((agregVisas) ? " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id " +
+                " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
+                " FROM diary.session s " +
+                " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)" +
+                " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id  " +
+                " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id " +
+                ((onlyPublished) ? " AND s.is_published = true " : " ");
+
+        query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, values, query);
+
+        if (agregVisas && onlyVised && !onlyNotVised) {
+            query += " AND visa IS NOT NULL";
+        }
+        if (agregVisas && onlyNotVised && !onlyVised){
+            query += " AND visa IS NULL";
+        }
+        query += " GROUP BY s.id " + " ORDER BY s.date ASC ";
+        return query.replaceFirst("AND", "WHERE");
+    }
+
+    private String getWhereContentGetSessionQuery(String structureID, String startDate, String endDate, String ownerId,
+                                                  List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId, JsonArray values, String query) {
+        if (startDate != null && endDate != null) {
+            query += " AND s.date >= to_date(?,'YYYY-MM-DD')";
+            query += " AND s.date <= to_date(?,'YYYY-MM-DD')";
+            values.add(startDate);
+            values.add(endDate);
+        }
+        if (listAudienceId != null) {
+            query += " AND s.audience_id IN " + (Sql.listPrepared(listAudienceId.toArray()));
+            for (String audienceId : listAudienceId) {
+                values.add(audienceId);
+            }
+        }
+        if (listSubjectId != null) {
+            query += " AND s.subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
+            for (String subjectId : listSubjectId) {
+                values.add(subjectId);
+            }
+        }
+        if (listTeacherId != null) {
+            query += " AND s.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
+            for (String teacherId : listTeacherId) {
+                values.add(teacherId);
+            }
+        }
+        if (ownerId != null) {
+            query += " AND s.owner_id = ?";
+            values.add(ownerId);
+        }
+        if (structureID != null){
+            query += " AND s.structure_id = ?";
+            values.add(structureID);
+        }
+        return query;
+    }
+
     /**
      * Query sessions
      *
@@ -106,86 +214,23 @@ public class SessionServiceImpl implements SessionService {
      * @param handler
      */
     public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
-                            boolean onlyPublished, boolean onlyVised,boolean onlyNotVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                            boolean onlyPublished, boolean onlyVised, boolean onlyNotVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
-        StringBuilder query = new StringBuilder();
-        String finalQuery;
 
-        query.append("WITH homework_and_type as (");
-        query.append("SELECT homework.*, to_json(homework_type) as type");
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework homework");
-        query.append(" INNER JOIN diary.homework_type ON homework.type_id = homework_type.id )");
-        query.append(" SELECT s.*, array_to_json(array_agg(homework_and_type)) as homeworks");
-        if (agregVisas)
-            query.append(" ,array_to_json(array_agg(distinct visa)) as visas");
-
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s ");
-        query.append(" LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)");
-
-        if (agregVisas) {
-            query.append(" LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id");
-            query.append(" LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id");
-        }
-
-        if (startDate != null && endDate != null) {
-            query.append(" AND s.date >= to_date(?,'YYYY-MM-DD')");
-            query.append(" AND s.date <= to_date(?,'YYYY-MM-DD')");
-            values.add(startDate);
-            values.add(endDate);
-        }
-
-        if (listAudienceId != null) {
-            query.append(" AND s.audience_id IN ").append(Sql.listPrepared(listAudienceId.toArray()));
-            values.addAll(new JsonArray(listAudienceId));
-        }
-
-        if (listSubjectId != null) {
-            query.append(" AND s.subject_id IN ").append(Sql.listPrepared(listSubjectId.toArray()));
-            values.addAll(new JsonArray(listSubjectId));
-        }
-
-        if (listTeacherId != null) {
-            query.append(" AND s.teacher_id IN ").append(Sql.listPrepared(listTeacherId.toArray()));
-            values.addAll(new JsonArray(listTeacherId));
-        }
-
-        if (onlyPublished) {
-            query.append(" AND s.is_published = true");
-        }
-
-        if (ownerId != null) {
-            query.append(" AND s.owner_id = ?");
-            values.add(ownerId);
-        }
-
-        if (structureID != null){
-            query.append(" AND s.structure_id = ?");
-            values.add(structureID);
-        }
-
-        if (agregVisas && onlyVised && !onlyNotVised) {
-            query.append(" AND visa IS NOT NULL");
-        }
-        if(agregVisas && onlyNotVised && !onlyVised){
-            query.append(" AND visa IS NULL");
-        }
-
-        query.append(" GROUP BY s.id");
-        query.append(" ORDER BY s.date ASC");
-        finalQuery = query.toString().replaceFirst("AND", "WHERE");
-        Sql.getInstance().prepared(finalQuery, values, SqlResult.validResultHandler(result -> {
+        String query;
+        query = this.getWithSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, onlyPublished, values)
+                + this.getSelectSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, onlyPublished, onlyVised, onlyNotVised, agregVisas, values, handler);
+        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
                 JsonArray arraySession = result.right().getValue();
                 for (int i = 0; i < arraySession.size(); i++) {
                     cleanSession(arraySession.getJsonObject(i));
                 }
-
                 handler.handle(new Either.Right<>(arraySession));
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
-
         }));
     }
 

@@ -44,7 +44,7 @@ public class HomeworkController extends ControllerHelper {
             String endDate = request.getParam("endDate");
             String structureId = request.getParam("structureId");
 
-            homeworkService.getOwnHomeworks(structureId,startDate, endDate, user, DefaultResponseHandler.arrayResponseHandler(request));
+            homeworkService.getOwnHomeworks(structureId, startDate, endDate, user, DefaultResponseHandler.arrayResponseHandler(request));
         });
     }
 
@@ -65,11 +65,12 @@ public class HomeworkController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessChildData.class)
     public void getChildHomeworks(final HttpServerRequest request) {
+        String structureId = request.getParam("structureId");
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String childId = request.getParam("childId");
 
-        homeworkService.getChildHomeworks(startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
+        homeworkService.getChildHomeworks(structureId, startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Get("/homework/:id")

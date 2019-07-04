@@ -1,0 +1,1 @@
+CREATE INDEX idx_session_date ON diary.session USING btree (date DESC);

@@ -346,7 +346,7 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncOwnSessions(strutcture: any,startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
+    async syncOwnSessions(structure: any,startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
