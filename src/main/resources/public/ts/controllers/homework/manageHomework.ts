@@ -114,8 +114,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 // We only keep the courses without a session attached to.
 
-                let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s => s.courseId == c._id
-                    && Utils.getFormattedDate(s.startMoment) === Utils.getFormattedDate(c.startMoment))) && moment(c.endCourse).isAfter(moment(c.endDate))  );
+                let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s =>
+                    s.courseId == c._id && Utils.getFormattedDate(s.startMoment) ===
+                    Utils.getFormattedDate(c.startMoment))) && (moment(c.endCourse).isAfter(moment(c.endDate)) || moment(c.endCourse).isSame(c.endDate))
+                );
                 let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
                 $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                 $scope.sessionsToAttachTo.sort(function (a, b) {
