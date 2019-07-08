@@ -2,6 +2,7 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.AdminAccess;
+import fr.openent.diary.security.workflow.GlobalSettingAccess;
 import fr.openent.diary.security.workflow.VisaManage;
 import fr.openent.diary.services.ExportPDFService;
 import fr.openent.diary.services.VisaService;
@@ -15,6 +16,7 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -23,7 +25,10 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 
@@ -98,6 +103,43 @@ public class VisaController extends ControllerHelper {
                             .end(pdf)
             );
 
+        });
+    }
+
+    @Post("/visas/topdf")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(GlobalSettingAccess.class)
+    public void sessionsToPdf(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            RequestUtils.bodyToJson(request, json -> {
+                try {
+                    this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
+                    JsonObject sessionsGroup = json.getJsonObject("visas");
+                    sessionsGroup.put("owner_id", "");
+                    sessionsGroup.put("created", "");
+                    sessionsGroup.put("modified", "");
+                    sessionsGroup.put("printPDF", true);
+                    this.exportPDFService.generatePDF(request, sessionsGroup, "visa.xhtml", new Handler<Buffer>() {
+                        @Override
+                        public void handle(Buffer buffer) {
+                            String fileName;
+                            try {
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                Date date = new Date();
+                                fileName = dateFormat.format(date) + "-" + sessionsGroup.getString("audience") + "-" + sessionsGroup.getString("subject") + "-" + sessionsGroup.getString("teacher");
+                            } catch (Exception e) {
+                                fileName = "exportpdf";
+                            }
+                            request.response()
+                                    .putHeader("Content-type", "application/pdf; charset=utf-8")
+                                    .putHeader("Content-Disposition", "attachment; filename=" + fileName + ".pdf")
+                                    .end(buffer);
+                        }
+                    });
+                } catch (Exception e) {
+                    badRequest(request, "Can't create pdfs");
+                }
+            });
         });
     }
 }

@@ -10,8 +10,8 @@ export class Utils {
      * @param errorMessage
      * @returns {any}
      */
-    static setToastMessage(response, message, errorMessage){
-        if(response.status === 200 || response.status === 201){
+    static setToastMessage(response, message, errorMessage) {
+        if (response.status === 200 || response.status === 201) {
             response.succeed = true;
             response.toastMessage = message;
 
@@ -21,7 +21,8 @@ export class Utils {
         }
         return response;
     }
-    static htmlToXhtml(html){
+
+    static htmlToXhtml(html) {
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var xhtml = new XMLSerializer().serializeToString(doc);
         return xhtml;
@@ -36,7 +37,7 @@ export class Utils {
     }
 
     static getFormattedDateTime(date, time?) {
-        if(!!time){
+        if (!!time) {
             return moment(Utils.getFormattedDate(date) + ' ' + Utils.getFormattedTime(time)).format(FORMAT.formattedDateTime);
         } else {
             return moment(date).format(FORMAT.formattedDateTime);
@@ -58,10 +59,10 @@ export class Utils {
     static safeApply(that) {
         return new Promise((resolve, reject) => {
             let phase = (that.$root !== null) ? that.$root.$$phase : undefined;
-            if(phase === '$apply' || phase === '$digest') {
-                if(resolve && (typeof(resolve) === 'function')) resolve();
+            if (phase === '$apply' || phase === '$digest') {
+                if (resolve && (typeof (resolve) === 'function')) resolve();
             } else {
-                if (resolve && (typeof(resolve) === 'function')) that.$apply(resolve);
+                if (resolve && (typeof (resolve) === 'function')) that.$apply(resolve);
                 else that.$apply();
             }
         });
@@ -73,8 +74,8 @@ export class Utils {
     }
 
 
-    static filterProgression = (search , array) =>{
-       return  array.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()) );
+    static filterProgression = (search, array) => {
+        return array.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()));
     }
 
     static isAChildOrAParent(type) {
@@ -112,5 +113,17 @@ export class Utils {
             downloadLink.remove();
             URL.revokeObjectURL(urlObject);
         }
+    }
+
+    static getFileNameByContentDisposition(contentDisposition) {
+        var regex = /filename[^;=\n]*=(UTF-8(['"]*))?(.*)/;
+        var matches = regex.exec(contentDisposition);
+        var filename;
+
+        if (matches != null && matches[3]) {
+            filename = matches[3].replace(/['"]/g, '');
+        }
+
+        return decodeURI(filename);
     }
 }

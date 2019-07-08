@@ -91,7 +91,8 @@ public class VisaServiceImpl implements VisaService {
 
         JsonArray sessionIds = visa.getJsonArray("sessionIds");
         query.append("(?, ?, ?, ?, ?, ?, ?, ?);");
-        values.add(visa.getString("comment"));
+        String comment = visa.getString("comment");
+        values.add(comment == null || comment.isEmpty() ? "" : comment);
         values.add(visa.getString("structure_id"));
         values.add(visa.getString("teacher_id"));
         values.add(visa.getJsonArray("sessionIds").size());
@@ -119,7 +120,6 @@ public class VisaServiceImpl implements VisaService {
 
 
     public String getPDFName(final JsonObject visa) {
-
         final String fileName = visa.getString("teacher_id") + "_" + visa.getString("structure_id") + visa.getString("owner_id") + "_" + visa.getString("created") + ".pdf";
         return fileName;
     }

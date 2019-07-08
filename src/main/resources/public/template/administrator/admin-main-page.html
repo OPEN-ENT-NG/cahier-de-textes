@@ -22,11 +22,10 @@
                     <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
                         <i18n>visa.manage.viser</i18n>
                     </button>
-                    <button disabled ng-class="{'loading': printPdf.loading}"
-                            class="disabled"
+                    <button ng-class="{'loading': printPdf.loading}"
                             ng-click="printPdf()">
-                        <i18n>visa.manage.diaryToPrintPDF</i18n>
                         <span class="loader"></span>
+                        <i18n>visa.manage.diaryToPrintPDF</i18n>
                     </button>
                 </div>
             </div>

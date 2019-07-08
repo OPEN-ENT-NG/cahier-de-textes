@@ -325,15 +325,12 @@ export class Sessions {
 
     static groupByLevelANdSubject(sessions) {
         return _.groupBy(sessions, function (item) {
-            if(item.audience && item.audience.id){
-                let temp =  item.audience.id + "#"
-                temp +=  (item.subject)? item.subject.id : item.subject_id
-                return temp
-            }else{
-                let temp =  item.audience_id + "#"
-                temp +=  (item.subject)? item.subject.id : item.subject_id
-                return temp
-            }
+            let temp = (item.audience) ? item.audience.id : item.audience_id;
+            temp = "#";
+            temp += (item.subject) ? item.subject.id : item.subject_id;
+            temp += "#";
+            temp += (item.teacher) ? item.teacher.id : item.teacher_id;
+            return temp
         });
     }
 
@@ -346,7 +343,7 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncOwnSessions(structure: any,startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
+    async syncOwnSessions(strutcture: any,startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 

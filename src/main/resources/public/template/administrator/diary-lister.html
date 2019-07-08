@@ -13,10 +13,13 @@
             <!--<th width="20%">-->
             <!--<i18n>utils.teachers</i18n>-->
             <!--</th>-->
-            <th width="15%">
+            <th width="10%">
                 <i18n>utils.groups</i18n>
             </th>
-            <th width="20%">
+            <th width="10%">
+                <i18n>utils.teacher</i18n>
+            </th>
+            <th width="15%">
                 <i18n>subject</i18n>
             </th>
             <th width="13%">
@@ -46,6 +49,9 @@
             <!--</td>-->
             <td>
                 [[sessionsGroup[0].audience.name]]
+            </td>
+            <td>
+                [[sessionsGroup[0].teacher.displayName]]
             </td>
             <td>
                 [[sessionsGroup[0].subject.label]]
@@ -105,7 +111,7 @@
         <p ng-click="visa_pdf.downloadPdf()">
             <i>&#xe857;</i>&nbsp;
             <i18n>visa.manage.choosePdf</i18n>&nbsp;
-            [[visa_pdf.displayDate]]
+            [[visa_pdf.displayDwlName]]
         </p>
     </div>
 </lightbox>
@@ -124,7 +130,7 @@
                       id="comment"></textarea>
         </div>
         <div class="cell twelve">
-            <button class="right-magnet" ng-class="{'loading': visaForm.loading}" ng-disabled="!visaFormIsvalid()"
+            <button class="right-magnet" ng-class="{'loading': visaForm.loading}"
                     ng-click="submitVisaForm()">
                 <i18n>visa.vise.diary</i18n>
                 <span class="loader"></span>

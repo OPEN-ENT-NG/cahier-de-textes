@@ -1,12 +1,12 @@
 import http from 'axios';
 import {Structure, Teacher, Utils} from './index';
-import {model, moment,idiom as lang} from 'entcore';
+import {idiom as lang, model, moment} from 'entcore';
 
 export class Visa {
 
     id: number;
     comment: string = null;
-    sessionIds: any =  [];
+    sessionIds: any = [];
     sessions: any = [];
     structure: Structure;
     teacher: Teacher;
@@ -30,32 +30,32 @@ export class Visa {
         this.created = moment().format("YYYY/MM/DD")
 
 
-
         return {
             comment: this.comment,
             sessionIds: this.sessionIds,
-            user : model.me.username,
+            user: model.me.username,
             audience: this.sessions[0].audience.name,// n.audience.name,
-            subject:  this.sessions[0].subject.label,
+            subject: this.sessions[0].subject.label,
             teacher: this.sessions[0].teacher.toString(),
+            stuctureName: this.structure.name,
             sessions: this.sessions.map((n) => {
                 return {
                     audience: n.audience.name,// n.audience.name,
-                    subject:  n.subject.label,
+                    subject: n.subject.label,
                     teacher: n.teacher.toString(),
                     title: n.title,
                     type: n.type.label,
                     startDisplayDate: n.startDisplayDate,
                     startDisplayTime: n.startDisplayTime,
                     endDisplayTime: n.endDisplayTime,
-                    hasDescription: ($.parseHTML( n.description ) && $.parseHTML( n.description ).length !== 0)?  true : false,
+                    hasDescription: ($.parseHTML(n.description) && $.parseHTML(n.description).length !== 0) ? true : false,
                     description: Utils.htmlToXhtml(n.description),
                     annotation: n.annotation,
 
-                    homeworks: n.homeworks.map(h =>{
-                        return{
-                            estimatedTime: (h.estimatedTime && h.estimatedTime !== 0 ) ? h.estimatedTime : lang.translate( "homework.no.workload"),
-                            hasEstimatedTime : (h.estimatedTime && h.estimatedTime !== 0 ) ? true : false,
+                    homeworks: n.homeworks.map(h => {
+                        return {
+                            estimatedTime: (h.estimatedTime && h.estimatedTime !== 0) ? h.estimatedTime : lang.translate("homework.no.workload"),
+                            hasEstimatedTime: (h.estimatedTime && h.estimatedTime !== 0) ? true : false,
                             due_date: Utils.getFormattedDate(h.dueDate),
                             description: Utils.htmlToXhtml(h.description),
                             type: h.type.label,
@@ -75,7 +75,7 @@ export class Visa {
         };
     }
 
-    mapFormData(FormData , comment) {
+    mapFormData(FormData, comment) {
         this.comment = comment;
         this.sessions = FormData;
         this.teacher = FormData[0].teacher
@@ -106,6 +106,41 @@ export class Visas {
             structure_id: this.structure.id,
             visas: this.all.map((n) => n.toSendFormat())
         };
+    }
+
+    async getPDF(callback) {
+        let visasList = this.toSendFormat()["visas"];
+        if (visasList && visasList.length) {
+            let promiseArray = [];
+            for (let i = 0, imax = visasList.length; i < imax; i++) {
+                let config = {
+                    url: `/diary/visas/topdf`,
+                    method: 'post',
+                    data: {visas: visasList[i]},
+                    responseType: 'arraybuffer',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/pdf'
+                    }
+                };
+                promiseArray.push((http(config)));
+            }
+            Promise.all(promiseArray).then(reponses => {
+                for (let j = 0, jmax = reponses.length; j < jmax; j++) {
+                    (function (response) {
+                        let filename = Utils.getFileNameByContentDisposition(response.headers['content-disposition']);
+                        const url = window.URL.createObjectURL(new Blob([response['data']]));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', filename); //or any other extension
+                        document.body.appendChild(link);
+                        link.click();
+                    })
+                    (reponses[j]);
+                }
+                callback();
+            });
+        }
     }
 
     async save() {

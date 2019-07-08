@@ -15,9 +15,9 @@ import {Utils} from '../utils/utils';
 import {ProgressionSessions} from "../model/Progression";
 
 export let main = ng.controller('MainController',
-    ['$scope' ,'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        $scope.calendar = ($scope.calendar)? $scope.calendar : model.calendar;
+        $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
         console.log("MainCtrl")
         $scope.notifications = [];
         $scope.legendLightboxIsVisible = false;
@@ -26,7 +26,7 @@ export let main = ng.controller('MainController',
             sessions: true,
             listView: false,
             progression: false,
-            sessionList : false,
+            sessionList: false,
             homeworksFilter: true,
         };
         $scope.isAChildOrAParent = Utils.isAChildOrAParent(model.me.type);
@@ -43,9 +43,9 @@ export let main = ng.controller('MainController',
             endDate: moment().endOf('isoWeek').toDate()
         };
 
-        $scope.setLegendLightboxVisible = (state:boolean) => {
+        $scope.setLegendLightboxVisible = (state: boolean) => {
             $scope.legendLightboxIsVisible = state;
-            if($scope.legendLightboxIsVisible){
+            if ($scope.legendLightboxIsVisible) {
                 template.open('infoBulleTemplate', 'main/toolTip-legendeTemplate');
             }
         };
@@ -63,7 +63,7 @@ export let main = ng.controller('MainController',
 
         function init() {
             $scope.search = "";
-            $scope.typeUser= model.me.type;
+            $scope.typeUser = model.me.type;
             $scope.pageInitialized = false;
             $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
                 && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
@@ -73,21 +73,23 @@ export let main = ng.controller('MainController',
                 initializeData();
             }, 100);
 
-            if(Utils.isRelative(model.me.type)) {
+            if (Utils.isRelative(model.me.type)) {
                 $scope.display.todo = true;
                 $scope.display.done = true;
-            };
-            if(model.me.type === "ENSEIGNANT"){
+            }
+            ;
+            if (model.me.type === "ENSEIGNANT") {
                 $scope.display.todo = true;
                 $scope.display.done = true;
             }
 
-            if(Utils.isChild(model.me.type)) {
+            if (Utils.isChild(model.me.type)) {
                 $scope.display.todo = true;
                 $scope.display.done = false;
-            };
+            }
+            ;
 
-            if($scope.structure.students.all.length < 2) {
+            if ($scope.structure.students.all.length < 2) {
                 $scope.params.child = $scope.structure.students.all[0];
             }
         }
@@ -97,8 +99,7 @@ export let main = ng.controller('MainController',
                 await $timeout(function () {
                     if ($('.drawing-zone').length > 0) {
                         $('#loader-calendar').appendTo('.drawing-zone');
-                    }
-                    else {
+                    } else {
                         placingLoader(++exit);
                     }
                 }, 200);
@@ -122,21 +123,21 @@ export let main = ng.controller('MainController',
             $scope.display.listView = false
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
-                $scope.display.homeworks = true ;
+                $scope.display.homeworks = true;
             }
         }
         $scope.changeViewList = function () {
-            $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks').add('4','day');
+            $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
             $scope.goTo('/list');
             $scope.display.listView = true
-            if(!Utils.isAChildOrAParent(model.me.type)){
+            if (!Utils.isAChildOrAParent(model.me.type)) {
                 $scope.display.sessionList = true;
-            }else{
+            } else {
                 $scope.display.sessionList = false;
             }
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
-                $scope.display.homeworks = true ;
+                $scope.display.homeworks = true;
             }
         };
         $scope.createHomeworksLoop = function (pedagogicItem) {
@@ -185,8 +186,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
-            $scope.progressions.all =[];
-
+            $scope.progressions.all = [];
 
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
@@ -198,7 +198,7 @@ export let main = ng.controller('MainController',
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.progressionsToDisplay.sync(),
-                    await $scope.structure.sessions.syncExternalSessions( $scope.filters.startDate, $scope.filters.endDate, type, typeId),
+                    await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
 
                 ]);
@@ -212,9 +212,9 @@ export let main = ng.controller('MainController',
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 await Promise.all([
-                    await $scope.structure.homeworks.syncOwnHomeworks($scope.structure,$scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
                     await $scope.progressions.sync(),
-                    await $scope.structure.sessions.syncOwnSessions($scope.structure,$scope.filters.startDate, $scope.filters.endDate),
+                    await $scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, $scope.params.user, $scope.params.group, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             }
@@ -223,15 +223,15 @@ export let main = ng.controller('MainController',
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
-            delete($scope.session);
+            delete ($scope.session);
 
             $scope.safeApply();
         };
         /*
         display the progressions that match the search query
          */
-        $scope.filterProgression = (search) =>{
-            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progressions.all);
+        $scope.filterProgression = (search) => {
+            $scope.progressionsToDisplay.all = Utils.filterProgression(search, $scope.progressions.all);
         };
 
 
@@ -246,15 +246,15 @@ export let main = ng.controller('MainController',
             });
 
 
-            if(Utils.isAChildOrAParent(model.me.type)){
-                $scope.structure.sessions.all.map((s,i) =>{
-                    if(!s.isPublished){
-                        $scope.structure.sessions.all.splice(i,1);
+            if (Utils.isAChildOrAParent(model.me.type)) {
+                $scope.structure.sessions.all.map((s, i) => {
+                    if (!s.isPublished) {
+                        $scope.structure.sessions.all.splice(i, 1);
                     }
                 })
-                $scope.structure.homeworks.all.map((h,i) =>{
-                    if(!h.isPublished){
-                        $scope.structure.homeworks.all.splice(i,1);
+                $scope.structure.homeworks.all.map((h, i) => {
+                    if (!h.isPublished) {
+                        $scope.structure.homeworks.all.splice(i, 1);
                     }
                 })
             }
@@ -287,14 +287,14 @@ export let main = ng.controller('MainController',
                 return obj;
             }, {});
 
-            $scope.getNbHomework = (pedagogicDay) =>{
+            $scope.getNbHomework = (pedagogicDay) => {
                 let nbHomework = 0;
                 pedagogicDay.pedagogicItems.map(p => {
-                    if(p.pedagogicType === $scope.TYPE_HOMEWORK){
-                        if($scope.display.todo && !p.isDone){
+                    if (p.pedagogicType === $scope.TYPE_HOMEWORK) {
+                        if ($scope.display.todo && !p.isDone) {
                             nbHomework++;
                         }
-                        if($scope.display.done && p.isDone){
+                        if ($scope.display.done && p.isDone) {
                             nbHomework++;
                         }
                     }
@@ -304,16 +304,18 @@ export let main = ng.controller('MainController',
 
             let pedagogicDays = Object.keys(group_to_values).map(function (key) {
                 let pedagogicItems = group_to_values[key];
+                let nbPublishHomework = 0;
                 let nbHomework = 0;
+                let publishedHomeworkByAudience = {};
                 pedagogicItems.forEach(i => {
                     if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
-                        nbHomework ++;
+                        nbHomework++;
                     }
                 });
 
 
                 let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
-                    if(p.audience)
+                    if (p.audience)
                         return p.audience.id
                 });
                 let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
@@ -335,10 +337,12 @@ export let main = ng.controller('MainController',
                     dayName: moment(key).format('dddd'),
                     shortDayName: moment(key).format('dd'),
                     nbHomework: nbHomework,
+                    nbPublishHomework: publishedHomeworkByAudience,
                     nbSession: nbSession,
                     nbCourse: nbCourse,
                     nbCourseAndSession: nbCourseAndSession,
                     homeworksAreForOneAudienceOnly: homeworksAreForOneAudienceOnly,
+                    audience: audienceIds,
                     color: Workload.getWorkloadColor(nbHomework)
                 };
             });
@@ -356,55 +360,55 @@ export let main = ng.controller('MainController',
         function containsHomeworks(c: any) {
             let isDisplayedByDefault = false
             c.pedagogicItems.map(pi => {
-                if(pi.pedagogicType === $scope.TYPE_HOMEWORK )
-                    if($scope.isChild){
-                        if(!pi.isDone){
+                if (pi.pedagogicType === $scope.TYPE_HOMEWORK)
+                    if ($scope.isChild) {
+                        if (!pi.isDone) {
                             isDisplayedByDefault = true;
 
                         }
-                    }else{
+                    } else {
                         isDisplayedByDefault = true;
                     }
             });
-            return c.nbHomework !=  0 && isDisplayedByDefault ;
+            return c.nbHomework != 0 && isDisplayedByDefault;
         }
 
-        $scope.initDisplay = () =>{
-            let displayedNumberSession,displayedNumberHomework = 3 ;
-            displayedNumberSession =  displayedNumberHomework;
+        $scope.initDisplay = () => {
+            let displayedNumberSession, displayedNumberHomework = 3;
+            displayedNumberSession = displayedNumberHomework;
             let nbSessionDisplayed = 0;
             let nbHomeworkDisplayed = 0;
             let indexMinChildHomework = $scope.pedagogicDays.length
             let indexMaxChildHomework = -1;
 
             //hiding all the days
-            $scope.pedagogicDays.map(c =>{
+            $scope.pedagogicDays.map(c => {
                 c.displayed = false;
             });
 
             //display session
-            $scope.pedagogicDays.map((c,index) =>{
-                if(c.shortDate === "17/04")
+            $scope.pedagogicDays.map((c, index) => {
+                if (c.shortDate === "17/04")
 
-                    containsSession(c) ;
-                if(  containsSession(c)  && nbSessionDisplayed < 3 ) {
+                    containsSession(c);
+                if (containsSession(c) && nbSessionDisplayed < 3) {
                     c.displayed = true;
                     nbSessionDisplayed++;
                 }
-                if( containsHomeworks(c)  && nbHomeworkDisplayed < 3 ) {
-                    if($scope.isChild){
-                        (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework ;
-                        (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework ;
-                    }else{
+                if (containsHomeworks(c) && nbHomeworkDisplayed < 3) {
+                    if ($scope.isChild) {
+                        (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework;
+                        (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework;
+                    } else {
                         c.displayed = true;
 
                     }
                     nbHomeworkDisplayed++;
                 }
             });
-            if($scope.isChild){
-                $scope.pedagogicDays.map((c,index) =>{
-                    if(index => indexMinChildHomework && index <= indexMaxChildHomework){
+            if ($scope.isChild) {
+                $scope.pedagogicDays.map((c, index) => {
+                    if (index => indexMinChildHomework && index <= indexMaxChildHomework) {
                         c.displayed = true;
                     }
                 })
@@ -424,27 +428,26 @@ export let main = ng.controller('MainController',
         };
 
 
-
-        model.calendar.on('date-change', function() {
+        model.calendar.on('date-change', function () {
 
 
             $scope.calendar = model.calendar;
 
-            if(!$scope.pageInitialized) return;
+            if (!$scope.pageInitialized) return;
 
             let calendarMode = $scope.calendar.increment;
             let momentFirstDay = moment($scope.calendar.firstDay);
-            switch(calendarMode){
+            switch (calendarMode) {
                 case 'month':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('month');
                     $scope.filters.endDate = momentFirstDay.clone().endOf('month');
                     break;
                 case 'week':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
-                    if($scope.display.listview)
+                    if ($scope.display.listview)
                         $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
                     else
-                        $scope.filters.endDate = moment($scope.filters.startDate).add('2','weeks').add('4','day');
+                        $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
                     break;
                 case 'day':
                     $scope.filters.startDate = momentFirstDay.clone().startOf('day');
@@ -472,13 +475,13 @@ export let main = ng.controller('MainController',
         };
 
         $scope.switchStructure = async (structure: Structure) => {
-            $scope.syncStructure(structure);
-            await  $scope.syncPedagogicItems();
+            await $scope.syncStructure(structure);
+            await $scope.syncPedagogicItems();
             $scope.safeApply();
         };
 
 
-        $scope.newProgressionForm = () =>{
+        $scope.newProgressionForm = () => {
             $scope.goTo('/progression/create');
 
             $scope.safeApply();
@@ -495,11 +498,11 @@ export let main = ng.controller('MainController',
             return new Promise((resolve, reject) => {
                 let phase = $scope.$root.$$phase;
                 if (phase === '$apply' || phase === '$digest') {
-                    if (resolve && (typeof(resolve) === 'function')) {
+                    if (resolve && (typeof (resolve) === 'function')) {
                         resolve();
                     }
                 } else {
-                    if (resolve && (typeof(resolve) === 'function')) {
+                    if (resolve && (typeof (resolve) === 'function')) {
                         $scope.$apply(resolve);
                     } else {
                         $scope.$apply()();
@@ -537,8 +540,8 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         };
 
-        $scope.setHomeworkProgress =(homework)=>{
-            if(homework.isDone)
+        $scope.setHomeworkProgress = (homework) => {
+            if (homework.isDone)
                 $scope.notifications.push(new Toast('homework.done.notification', 'info'));
             else
                 $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
@@ -547,7 +550,7 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
         };
 
-        $scope.publishSession = async (item ,event) =>   {
+        $scope.publishSession = async (item, event) => {
             event.stopPropagation();
             let sessionToPublish = new Session($scope.structure);
             sessionToPublish.id = item.id;
@@ -556,7 +559,7 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply();
         };
-        $scope.newProgressionForm = () =>{
+        $scope.newProgressionForm = () => {
             $scope.goTo('/progression/create');
 
             $scope.safeApply();
@@ -591,38 +594,37 @@ export let main = ng.controller('MainController',
 
 
 //handle the drop event
-        $scope.dropped = function(dragEl, dropEl) {
+        $scope.dropped = function (dragEl, dropEl) {
             if (dragEl == dropEl)
                 return;
             // this is your application logic, do whatever makes sense
-            let progression = $( '#'+dragEl );
-            const typeCourse = "TYPE_COURSE" ;
+            let progression = $('#' + dragEl);
+            const typeCourse = "TYPE_COURSE";
             const typeSession = "TYPE_SESSION";
             let id_progressionOrSession = progression[0].children[0].textContent;
-            let sessionOrCourse = $('#'+dropEl);
-            let typeCourseSession= "";
+            let sessionOrCourse = $('#' + dropEl);
+            let typeCourseSession = "";
             let idCourseSession = sessionOrCourse[0].children[0].textContent;
-            if($(sessionOrCourse).hasClass(typeSession)){
-                typeCourseSession =typeSession;
-            }else if($(sessionOrCourse).hasClass(typeCourse)){
+            if ($(sessionOrCourse).hasClass(typeSession)) {
+                typeCourseSession = typeSession;
+            } else if ($(sessionOrCourse).hasClass(typeCourse)) {
                 typeCourseSession = typeCourse;
             }
 
 
-            if(progression[0].classList[2]=="progression-item-draggable"){
-                if (typeCourseSession == typeSession){
-                    $scope.updateSession(idCourseSession,id_progressionOrSession);
-                }else if(typeCourseSession == typeCourse){
+            if (progression[0].classList[2] == "progression-item-draggable") {
+                if (typeCourseSession == typeSession) {
+                    $scope.updateSession(idCourseSession, id_progressionOrSession);
+                } else if (typeCourseSession == typeCourse) {
                     let date = sessionOrCourse[0].children[1].textContent;
-                    $scope.createSessionFromProgression(id_progressionOrSession,idCourseSession,date);
+                    $scope.createSessionFromProgression(id_progressionOrSession, idCourseSession, date);
                 }
-            }else if ($(progression[0]).hasClass(typeSession)){
-                if (typeCourseSession == typeSession ){
-                    $scope.sessionToSession(id_progressionOrSession,idCourseSession)
-                }else
-                if(typeCourseSession == typeCourse ){
+            } else if ($(progression[0]).hasClass(typeSession)) {
+                if (typeCourseSession == typeSession) {
+                    $scope.sessionToSession(id_progressionOrSession, idCourseSession)
+                } else if (typeCourseSession == typeCourse) {
                     let date = sessionOrCourse[0].children[1].textContent;
-                    $scope.sessionToCourse(id_progressionOrSession,idCourseSession,date)
+                    $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date)
                 }
 
             }
@@ -630,9 +632,9 @@ export let main = ng.controller('MainController',
         /*
         Handle a session drop on another session
          */
-        $scope.sessionToSession = async (idSessionDrag , idSessionDrop) =>{
+        $scope.sessionToSession = async (idSessionDrag, idSessionDrop) => {
             console.log("sTOs");
-            let sessionDrag,sessionDrop;
+            let sessionDrag, sessionDrop;
             $scope.calendarItems.map(async session => {
                 if (session.id == idSessionDrag) {
                     sessionDrag = session;
@@ -645,22 +647,21 @@ export let main = ng.controller('MainController',
             });
             $scope.session.getSessionInfo(sessionDrag);
 
-            $scope.goTo('/session/update/' + $scope.session.id );
+            $scope.goTo('/session/update/' + $scope.session.id);
         };
-
 
 
         /*
                Handle a session drop on course
          */
-        $scope.sessionToCourse = async (idSession , idCourse,date) =>{
+        $scope.sessionToCourse = async (idSession, idCourse, date) => {
             console.log("sTOc");
             let sessionDrag;
             let course = new Course($scope.structure, idCourse);
 
             $scope.calendarItems.map(async session => {
                 if (session.id == idSession) {
-                    sessionDrag= session;
+                    sessionDrag = session;
                 }
             });
 
@@ -675,12 +676,12 @@ export let main = ng.controller('MainController',
 
             //insert data and refresh calendar
             await course.sync(date, date);
-            let session= new Session($scope.structure,course);
-            session.setFromCourseAndSession(course,sessionDrag);
+            let session = new Session($scope.structure, course);
+            session.setFromCourseAndSession(course, sessionDrag);
             session.opened = true;
             $scope.session = session;
 
-            $scope.goTo('/session/create' );
+            $scope.goTo('/session/create');
 
 
         };
@@ -692,8 +693,7 @@ export let main = ng.controller('MainController',
 
             let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
-                if (progression.id == idProgression)
-                {
+                if (progression.id == idProgression) {
                     progressionDragged = progression;
                 }
             });
@@ -722,7 +722,7 @@ export let main = ng.controller('MainController',
             $scope.syncPedagogicItems();
 
             $scope.safeApply();
-            $scope.goTo('/session/update/' + idSession );
+            $scope.goTo('/session/update/' + idSession);
 
 
         };
@@ -730,11 +730,10 @@ export let main = ng.controller('MainController',
         /*
         Handle a progression dropped on a course
          */
-        $scope.createSessionFromProgression = async (idProgression,idCourse,date) =>{
+        $scope.createSessionFromProgression = async (idProgression, idCourse, date) => {
             let progressionDragged;
             $scope.progressions.all.map(progression => {
-                if (progression.id == idProgression)
-                {
+                if (progression.id == idProgression) {
                     progressionDragged = progression;
                 }
             });
@@ -745,13 +744,13 @@ export let main = ng.controller('MainController',
             date = date.split('/').join('-');
             date = date.split("-");
             let tempDateAnnee = date[2];
-            date[2]=date[0];
-            date[0]=tempDateAnnee;
+            date[2] = date[0];
+            date[0] = tempDateAnnee;
             date = date.join("-");
 
             //insert data and refresh calendar
             await course.sync(date, date);
-            let session= new Session($scope.structure,course,progressionDragged);
+            let session = new Session($scope.structure, course, progressionDragged);
             session.setFromCourse(course);
             session.opened = true;
             $scope.session = session;
@@ -772,36 +771,35 @@ export let main = ng.controller('MainController',
             $scope.goTo('/session/create');
 
 
-
         };
-        $scope.hasListRight = () =>{
+        $scope.hasListRight = () => {
             return model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
         }
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                if(Utils.isAChildOrAParent(model.me.type) && !$scope.pageInitialized){
+                if (Utils.isAChildOrAParent(model.me.type) && !$scope.pageInitialized) {
                     $scope.goTo("/list")
-                }else if (model.me.type === "PERSEDUCNAT"){
+                } else if (model.me.type === "PERSEDUCNAT") {
                     $scope.goTo("/administrator/global");
-                }else{
-                    if(!$scope.pageInitialized) await  init();
+                } else {
+                    if (!$scope.pageInitialized) await init();
                     template.open('main', 'main');
                 }
             },
-            viewProgression :async()=>{
-                if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main','progression/progression-view');
+            viewProgression: async () => {
+                if (!$scope.structureInitialized) await initializeStructure();
+                template.open('main', 'progression/progression-view');
             },
-            manageProgression :async() =>{
-                if(!$scope.structureInitialized) await initializeStructure();
-                template.open('main','progression/progression-session-form');
+            manageProgression: async () => {
+                if (!$scope.structureInitialized) await initializeStructure();
+                template.open('main', 'progression/progression-session-form');
 
             },
-            mainView: async()=>{
-                if(!$scope.structureInitialized) await initializeStructure();
-                if (!$scope.pageInitialized) await  init();
-                template.open('main','main');
+            mainView: async () => {
+                if (!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.pageInitialized) await init();
+                template.open('main', 'main');
             },
             manageSession: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
@@ -816,10 +814,10 @@ export let main = ng.controller('MainController',
                 if (!$scope.structureInitialized) await initializeStructure();
                 template.open('main', 'administrator/admin-main-page');
             },
-            manageList: async()=>{
-                if(!$scope.structureInitialized) await initializeStructure();
-                if(!$scope.pageInitialized) await  init();
-                if(model.me.hasWorkflow(WORKFLOW_RIGHTS.listView)) {
+            manageList: async () => {
+                if (!$scope.structureInitialized) await initializeStructure();
+                if (!$scope.pageInitialized) await init();
+                if (model.me.hasWorkflow(WORKFLOW_RIGHTS.listView)) {
                     template.open('main', 'list/list-view');
                 }
             }

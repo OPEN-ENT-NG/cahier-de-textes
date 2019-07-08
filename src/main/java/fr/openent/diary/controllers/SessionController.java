@@ -2,7 +2,9 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.*;
+import fr.openent.diary.services.ExportPDFService;
 import fr.openent.diary.services.SessionService;
+import fr.openent.diary.services.impl.ExportPDFServiceImpl;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
@@ -22,9 +24,11 @@ import java.util.List;
 public class SessionController extends ControllerHelper {
 
     private SessionService sessionService;
+    private ExportPDFService exportPDFService;
 
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
+        this.exportPDFService = new ExportPDFServiceImpl(vertx, null, config);
     }
 
     @SecuredAction(value = WorkflowUtils.SESSION_READ, type = ActionType.WORKFLOW)
@@ -84,15 +88,14 @@ public class SessionController extends ControllerHelper {
     public void getSessionsWithVisaField(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
-        String teacherId = request.getParam("teacherId");
         Boolean onlyVised = request.getParam("vised") != null && Boolean.parseBoolean(request.getParam("vised"));
         Boolean onlyNotVised = request.getParam("notVised") != null && Boolean.parseBoolean(request.getParam("notVised"));
 
-        List<String> listTeacherId = teacherId != null ? Arrays.asList(teacherId) : null;
+        List<String> listTeacherId = request.getParam("teachersId") != null ? Arrays.asList(request.getParam("teachersId").split("\\s*,\\s*")) : null;
         List<String> listAudienceId = request.getParam("audienceId") != null ? Arrays.asList(request.getParam("audienceId").split("\\s*,\\s*")) : null;
         List<String> listSubjectId = request.getParam("subjectsId") != null ? Arrays.asList(request.getParam("subjectsId").split("\\s*,\\s*")) : null;
         String StructureId = request.getParam("structureId") != null ? request.getParam("structureId") : null;
-        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listSubjectId, listTeacherId, true, onlyVised, onlyNotVised,true,
+        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listSubjectId, listTeacherId, true, onlyVised, onlyNotVised, true,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 
@@ -187,5 +190,4 @@ public class SessionController extends ControllerHelper {
         String structureId = request.getParam("structureId");
         sessionService.deleteSessionType(sessionTypeId, structureId, DefaultResponseHandler.defaultResponseHandler(request));
     }
-
 }
