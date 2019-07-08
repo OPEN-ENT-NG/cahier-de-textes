@@ -392,9 +392,9 @@ export class Sessions {
         }
         if(teacherId){
             if (filter.length > 1) {
-                filter += `&teacherId=${teacherId}`;
+                filter += `&teachersId=${teacherId}`;
             } else {
-                filter += `teacherId=${teacherId}`;
+                filter += `teachersId=${teacherId}`;
             }
         }
         if (subjectsId) {

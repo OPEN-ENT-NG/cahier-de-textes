@@ -87,11 +87,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.updateDatas = async (event) => {
             // Checking if event is triggered when selecting an element inside multiCombo
             if ((event && event.target && event.target.tagName !== 'BUTTON')) {
-                $scope.params.subjects = [];
-                $scope.params.audiences = [];
-                $scope.params.teachers = [];
+                // $scope.params.subjects = [];
+                // $scope.params.audiences = [];
+                // $scope.params.teachers = [];
                 $scope.sessions.structure = $scope.structure;
-
                 angular.forEach($scope.dataToUpdate, function (value, key) {
                     if (Object.getPrototypeOf(value).constructor.name === "Subject") {
                         $scope.params.subjects[key] = value;
@@ -105,7 +104,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 });
 
                 await $scope.canUpdateSessionsWithVisa();
-                $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject($scope.sessions.all);
                 $scope.safeApply();
             }
         };
@@ -122,6 +120,11 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.dropItem = (item, event) => {
             $scope.dataToUpdate = _.without($scope.dataToUpdate, item);
+            if ((event && event.target && event.target.tagName !== 'BUTTON')) {
+                $scope.params.subjects = [];
+                $scope.params.audiences = [];
+                $scope.params.teachers = [];
+            }
             $scope.updateDatas(event);
         };
 
@@ -141,9 +144,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 teachers: []
             };
             if (model.me.type == "ENSEIGNANT") {
-                $scope.params.teachers = _.find($scope.structure.teachers.all, {id: model.me.userId});
+                $scope.params.teachers = [_.find($scope.structure.teachers.all, {id: model.me.userId})];
             }
             $scope.canUpdateSessionsWithVisa();
+            $scope.safeApply();
         };
 
 
