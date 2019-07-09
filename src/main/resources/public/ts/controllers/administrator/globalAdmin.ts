@@ -86,26 +86,32 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.updateDatas = async (event) => {
             // Checking if event is triggered when selecting an element inside multiCombo
-            if ((event && event.target && event.target.tagName !== 'BUTTON')) {
-                // $scope.params.subjects = [];
-                // $scope.params.audiences = [];
-                // $scope.params.teachers = [];
-                $scope.sessions.structure = $scope.structure;
-                angular.forEach($scope.dataToUpdate, function (value, key) {
-                    if (Object.getPrototypeOf(value).constructor.name === "Subject") {
-                        $scope.params.subjects[key] = value;
-                    }
-                    if (Object.getPrototypeOf(value).constructor.name === "Audience") {
-                        $scope.params.audiences[key] = value;
-                    }
-                    if (Object.getPrototypeOf(value).constructor.name === "Teacher") {
-                        $scope.params.teachers[key] = value;
-                    }
-                });
-
-                await $scope.canUpdateSessionsWithVisa();
-                $scope.safeApply();
+            $scope.sessions.structure = $scope.structure;
+            if (event.target.tagName == 'BUTTON') {
+                if (event.target.innerHTML == lang.translate("subjects")) {
+                    $scope.params.subjects = [];
+                }
+                if (event.target.innerHTML == lang.translate("utils.teachers")) {
+                    $scope.params.teachers = [];
+                }
+                if (event.target.innerHTML == lang.translate("utils.groups")) {
+                    $scope.params.audiences = [];
+                }
             }
+            angular.forEach($scope.dataToUpdate, function (value, key) {
+                if (Object.getPrototypeOf(value).constructor.name === "Subject") {
+                    $scope.params.subjects[key] = value;
+                }
+                if (Object.getPrototypeOf(value).constructor.name === "Audience") {
+                    $scope.params.audiences[key] = value;
+                }
+                if (Object.getPrototypeOf(value).constructor.name === "Teacher") {
+                    $scope.params.teachers[key] = value;
+                }
+            });
+
+            await $scope.canUpdateSessionsWithVisa();
+            $scope.safeApply();
         };
 
         $scope.toggleVisa = async (event) => {
@@ -120,11 +126,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.dropItem = (item, event) => {
             $scope.dataToUpdate = _.without($scope.dataToUpdate, item);
-            if ((event && event.target && event.target.tagName !== 'BUTTON')) {
-                $scope.params.subjects = [];
-                $scope.params.audiences = [];
-                $scope.params.teachers = [];
-            }
+            $scope.params.subjects = _.without($scope.params.subjects, item);
+            $scope.params.audiences = _.without($scope.params.audiences, item);
+            $scope.params.teachers = _.without($scope.params.teachers, item);
+
             $scope.updateDatas(event);
         };
 
