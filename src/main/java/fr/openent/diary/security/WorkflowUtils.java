@@ -10,7 +10,7 @@ public final class WorkflowUtils {
     static public final String CHILDREN_READ = "children.red";
 
     static public final String ADMIN_ACCESS = "administrator.read";
-    static public final String VISA_MANAGE = "administrator.manage";
+    static public final String ADMIN_VISA_MANAGE = "administrator.visa.manage";
 
     static public final String SESSION_READ = "session.read";
     static public final String SESSION_MANAGE = "session.manage";
@@ -21,7 +21,9 @@ public final class WorkflowUtils {
     static public final String HOMEWORK_PUBLISH = "homework.publish";
     static public final String HOMEWORK_SET_PROGRESS = "homework.set.progress";
 
-    static public final String GLOBAL_ACCESS_SETTING = "global.access.setting";
+    static public final String VIESCO_SETTING_INIT_DATA = "viesco.setting.initalisation.data";
+    static public final String VIESCO_SETTING_HOMEWORK_AND_SESSION_TYPE_READ = "viesco.setting.homework.and.session.type.read";
+    static public final String VIESCO_SETTING_HOMEWORK_AND_SESSION_TYPE_MANAGE = "viesco.setting.homework.and.session.type.manage";
 
     static public final String VIEW_CALENDAR = "view.calendar";
     static public final String VIEW_LIST = "view.list";

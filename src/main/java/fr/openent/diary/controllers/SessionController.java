@@ -152,8 +152,8 @@ public class SessionController extends ControllerHelper {
     }
 
     @Get("/session-types")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    @ResourceFilter(SessionRead.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeRead.class)
     public void getSessionTypes(final HttpServerRequest request) {
         if (!request.params().contains("idStructure")) {
             badRequest(request);
@@ -164,8 +164,8 @@ public class SessionController extends ControllerHelper {
     }
 
     @Post("/session-type")
-    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING, type = ActionType.WORKFLOW)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void createSessionType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, sessionType -> {
             sessionService.createSessionType(sessionType, DefaultResponseHandler.defaultResponseHandler(request));
@@ -174,7 +174,7 @@ public class SessionController extends ControllerHelper {
 
     @Put("/session-type/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void updateSessionType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, sessionType -> {
             Integer sessionTypeId = Integer.parseInt(request.getParam("id"));
@@ -184,7 +184,7 @@ public class SessionController extends ControllerHelper {
 
     @Delete("/session-type/:id/:structureId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void deleteSessionType(final HttpServerRequest request) {
         Integer sessionTypeId = Integer.parseInt(request.getParam("id"));
         String structureId = request.getParam("structureId");

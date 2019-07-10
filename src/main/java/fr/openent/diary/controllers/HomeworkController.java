@@ -35,6 +35,12 @@ public class HomeworkController extends ControllerHelper {
     @SecuredAction(value = WorkflowUtils.HOMEWORK_PUBLISH, type = ActionType.WORKFLOW)
     public void workflow3(final HttpServerRequest request) { }
 
+    @SecuredAction(value = WorkflowUtils.VIESCO_SETTING_HOMEWORK_AND_SESSION_TYPE_READ, type = ActionType.WORKFLOW)
+    public void workflow4(final HttpServerRequest request) { }
+
+    @SecuredAction(value = WorkflowUtils.VIESCO_SETTING_HOMEWORK_AND_SESSION_TYPE_MANAGE, type = ActionType.WORKFLOW)
+    public void workflow5(final HttpServerRequest request) { }
+
     @Get("/homeworks/own/:startDate/:endDate/:structureId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessOwnData.class)
@@ -143,15 +149,15 @@ public class HomeworkController extends ControllerHelper {
 
     @Get("/homework-types/:idStructure")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(HomeworkRead.class)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeRead.class)
     public void getHomeworkTypes(final HttpServerRequest request) {
         final String structure_id = request.params().get("idStructure");
         homeworkService.getHomeworkTypes(structure_id, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Post("/homework-type")
-    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING, type = ActionType.WORKFLOW)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void createHomeworkType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request,
                 homeworkType -> {
@@ -161,7 +167,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework-type/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void updateHomeworkType(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request,
                 homeworkType -> {
@@ -172,7 +178,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Delete("/homework-type/:id/:idStructure")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(GlobalSettingAccess.class)
+    @ResourceFilter(ViescoSettingHomeworkSessionTypeManage.class)
     public void deleteHomeworkType(final HttpServerRequest request) {
         Integer homeworkTypeId = Integer.parseInt(request.getParam("id"));
         final String structure_id = request.params().get("idStructure");

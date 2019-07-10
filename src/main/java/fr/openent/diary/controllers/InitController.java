@@ -20,8 +20,8 @@ public class InitController extends ControllerHelper {
     }
 
     @Get("/init")
-    @SecuredAction(value = WorkflowUtils.GLOBAL_ACCESS_SETTING , type = ActionType.AUTHENTICATED)
-    public void initHomeworksType(final HttpServerRequest request) {
+    @SecuredAction(value = WorkflowUtils.VIESCO_SETTING_INIT_DATA , type = ActionType.WORKFLOW)
+    public void initHomeworksAndSessionsType(final HttpServerRequest request) {
 
         initService.init(new Handler<Either<String, JsonObject>>() {
             @Override

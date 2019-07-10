@@ -18,6 +18,9 @@ const diaryBehaviours = {
             publishHomework: "fr.openent.diary.controllers.HomeworkController|workflow3",
             setProgressHomework: "fr.openent.diary.controllers.HomeworkController|setProgressHomework",
 
+            viescoSettingHomeworkAndSessionTypeRead: "fr.openent.diary.controllers.HomeworkController|workflow4",
+            viescoSettingHomeworkAndSessionTypeManage: "fr.openent.diary.controllers.HomeworkController|workflow5",
+
             readSession: "fr.openent.diary.controllers.SessionController|workflow1",
             manageSession: "fr.openent.diary.controllers.SessionController|workflow2",
             publishSession: "fr.openent.diary.controllers.SessionController|workflow3",

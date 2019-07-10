@@ -7,11 +7,11 @@ import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.http.filter.ResourcesProvider;
 import org.entcore.common.user.UserInfos;
 
-public class GlobalSettingAccess implements ResourcesProvider {
+public class ViescoSettingHomeworkSessionTypeRead implements ResourcesProvider {
 
     @Override
     public void authorize(HttpServerRequest resourceRequest, Binding binding, UserInfos user,
                           Handler<Boolean> handler) {
-        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.GLOBAL_ACCESS_SETTING));
+        handler.handle(WorkflowUtils.hasRight(user, WorkflowUtils.VIESCO_SETTING_HOMEWORK_AND_SESSION_TYPE_READ));
     }
 }
