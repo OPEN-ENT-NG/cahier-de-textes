@@ -9,9 +9,9 @@
                 <option value="" disabled>[[translate('student.choose')]]</option>
             </select>
         </div>
-        <div ng-if="hasListRight()">
+        <div>
             <div>
-                <h5 class="large cell eleven">
+                <h5 workflow="diary.listView" class="large cell eleven">
                     <i18n>sidebar.display_mode</i18n>
                 </h5>
                 <!-- Legend -->
@@ -19,7 +19,7 @@
                    tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
             </div>
 
-            <label class="cell twelve text-xl margin-bottom-md">
+            <label workflow="diary.listView" class="cell twelve text-xl margin-bottom-md">
                 <i tooltip="calendar"
                    class="margin-sm"
                    ng-class="display.listView ? 'opacity-icon' : 'selected'"
@@ -43,7 +43,7 @@
                 <i18n>Homeworks</i18n>
             </label>  <i ng-show="!display.sessionList" ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter"
                          ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
-            <div ng-show="!display.sessionList" class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
+            <div workflow="diary.listView" ng-show="!display.sessionList" class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
                 <div class="ten right-magnet" ng-click="display.todo = !display.todo">
                     <label class="checkbox">
                         <input type="checkbox" ng-model="display.todo"/>

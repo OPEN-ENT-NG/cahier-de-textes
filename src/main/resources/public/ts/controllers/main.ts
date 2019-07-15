@@ -772,9 +772,6 @@ export let main = ng.controller('MainController',
 
 
         };
-        $scope.hasListRight = () => {
-            return model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
-        }
         route({
             main: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
