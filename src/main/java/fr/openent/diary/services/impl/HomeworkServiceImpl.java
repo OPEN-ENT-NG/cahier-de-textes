@@ -235,9 +235,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 " AS progress_and_state ON (h.id = progress_and_state.homework_id)" +
                 " ORDER BY h.due_date ASC";
 
-        query = getWhereContentGetHomeworkQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values, query);
-
-        return query;
+        return query.replaceFirst("AND", "WHERE");
     }
 
     /**
