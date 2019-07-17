@@ -18,8 +18,8 @@
             "template-path" : $diaryTemplatePath
         },
         "pdf-generator" : {
-            url : $pdfGeneratorUrl,
-            auth : $pdfGeneratorAuth
+            "url" : $pdfGeneratorUrl,
+            "auth" : $pdfGeneratorAuth
         },
         "entcore.port" : 8009
       }
