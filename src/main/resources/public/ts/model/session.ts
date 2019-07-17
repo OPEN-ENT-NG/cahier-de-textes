@@ -326,7 +326,7 @@ export class Sessions {
     static groupByLevelANdSubject(sessions) {
         return _.groupBy(sessions, function (item) {
             let temp = (item.audience) ? item.audience.id : item.audience_id;
-            temp = "#";
+            temp += "#";
             temp += (item.subject) ? item.subject.id : item.subject_id;
             temp += "#";
             temp += (item.teacher) ? item.teacher.id : item.teacher_id;
