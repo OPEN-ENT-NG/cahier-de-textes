@@ -107,7 +107,7 @@ public class VisaController extends ControllerHelper {
 
     @Post("/visas/topdf")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(AdminAccess.class)
+    @ResourceFilter(AdminVisaManage.class)
     public void sessionsToPdf(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             RequestUtils.bodyToJson(request, json -> {

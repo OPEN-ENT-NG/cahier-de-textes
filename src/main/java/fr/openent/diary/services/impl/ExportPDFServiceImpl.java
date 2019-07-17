@@ -133,6 +133,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
 
 
     private void webServiceNodePdfGeneratorPost(String file, String nodePdfGeneratorUrl, Handler<Either<String, Buffer>> handler) {
+        final String pdfGeneratorAuth = config.getJsonObject("pdf-generator").getString("auth");
         AtomicBoolean responseIsSent = new AtomicBoolean(false);
         URI url;
         try {
@@ -178,7 +179,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         final String boundary = UUID.randomUUID().toString();
         httpClientRequest.setChunked(true)
                 .putHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary)
-                .putHeader(HttpHeaders.AUTHORIZATION, "Basic toto")
+                .putHeader("Authorization", pdfGeneratorAuth)
                 .putHeader(HttpHeaders.ACCEPT, "*/*")
                 .end(multipartBody(file, boundary));
 
