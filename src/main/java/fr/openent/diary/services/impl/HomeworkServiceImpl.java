@@ -223,7 +223,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public String getSelectHomeworkStudentQuery(String structureID, String startDate, String endDate, String ownerId,
                                                 List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished,
                                                 JsonArray values, String studentId) {
-       String query = " SELECT h.*, " + " to_json(progress_and_state)cadzf! as progress" +
+       String query = " SELECT h.*, " + " to_json(progress_and_state) as progress" +
                 " FROM homework_filter h" +
                 " INNER JOIN diary.homework_type AS type ON type.id = h.type_id" +
                 " LEFT JOIN (" +
