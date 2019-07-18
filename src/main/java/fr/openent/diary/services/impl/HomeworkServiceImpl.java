@@ -89,7 +89,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void getOwnHomeworks(String structureId, String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler) {
         if (user.getType().equals("Student")) {
-            this.getChildHomeworks(structureId, startDate, endDate, user.getUserId(), handler);
+            this.getChildHomeworks(startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
             this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, false, false, false, handler);
         }
@@ -104,7 +104,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getChildHomeworks(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler) {
+    public void getChildHomeworks(String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler) {
         // Get child audiences
         diaryService.getAudienceFromChild(childId, response -> {
             if(response.isRight()){
@@ -113,7 +113,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getStudentHomeworks(structureId, childId, startDate, endDate, null, listAudienceId, null, true, false, false,  handler);
+                this.getStudentHomeworks("", childId, startDate, endDate, null, listAudienceId, null, true, false, false,  handler);
             }
         });
     }

@@ -14,7 +14,7 @@ public interface HomeworkService {
 
     void getExternalHomeworks( String startDate, String endDate, String type, String typeId, Handler<Either<String, JsonArray>> handler);
 
-    void getChildHomeworks(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
+    void getChildHomeworks(String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
 
     void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
