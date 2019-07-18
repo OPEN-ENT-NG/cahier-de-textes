@@ -137,10 +137,10 @@
         background: #ff2011;
       }
     }
-    .round > span {
-      filter: invert(100%);
-      -webkit-filter: invert(100%);
-    }
+    //.round > span {
+    //  filter: invert(100%);
+    //  -webkit-filter: invert(100%);
+    //}
 
     &::before {
       background-color: #bbb;
