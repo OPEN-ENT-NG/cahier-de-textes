@@ -74,11 +74,12 @@ public class SessionController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessChildData.class)
     public void getChildSessions(final HttpServerRequest request) {
+        String structureId = request.getParam("structureId");
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String childId = request.getParam("childId");
 
-        sessionService.getChildSessions(startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
+        sessionService.getChildSessions(structureId, startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
 

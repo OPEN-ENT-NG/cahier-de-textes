@@ -250,7 +250,7 @@ export class Homeworks {
         let startDate = Utils.getFormattedDate(startMoment);
         let endDate = Utils.getFormattedDate(endMoment);
 
-        let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}`;
+        let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}/${this.structure.id}`;
 
         await this.syncHomeworks(url);
     }

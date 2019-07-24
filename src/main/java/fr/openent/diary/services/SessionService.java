@@ -16,7 +16,7 @@ public interface SessionService {
 
     void getExternalSessions(String startDate, String endDate, String type, String typeId, Handler<Either<String, JsonArray>> handler);
 
-    void getChildSessions(String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
+    void getChildSessions(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
 
     void createSession(JsonObject session, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
