@@ -67,14 +67,13 @@ public class HomeworkController extends ControllerHelper {
         homeworkService.getExternalHomeworks(startDate, endDate, type, typeId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
-    @Get("/homeworks/child/:startDate/:endDate/:childId/:structureId")
+    @Get("/homeworks/child/:startDate/:endDate/:childId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessChildData.class)
     public void getChildHomeworks(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String childId = request.getParam("childId");
-        String structureId = request.getParam("structureId");
 
         homeworkService.getChildHomeworks(startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
     }

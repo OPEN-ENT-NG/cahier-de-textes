@@ -91,7 +91,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         if (user.getType().equals("Student")) {
             this.getChildHomeworks(startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, false, false, false, handler);
+            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, false, handler);
         }
     }
 
@@ -100,7 +100,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
         List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
 
-        this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, true, false, false, handler);
+        this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, true, handler);
     }
 
     @Override
@@ -113,26 +113,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getStudentHomeworks("", childId, startDate, endDate, null, listAudienceId, null, true, false, false,  handler);
+                this.getStudentHomeworks("", childId, startDate, endDate, null, listAudienceId, null, true,  handler);
             }
         });
     }
 
     /**
      * Query homeworks
-     * @param structureId
+     * @param structureId return homeworks with structure Id
      * @param startDate return homeworks in the date or after
      * @param endDate return homeworks in the date or before
      * @param ownerId return homeworks with this ownerId
      * @param listAudienceId return homeworks with a audience_id field inside this list
      * @param listTeacherId return homeworks with a teacher_id field inside this list
      * @param onlyPublished returns only published homeworks
-     * @param onlyVised returns only the homeworks with visa
-     * @param agregVisas returns the homeworks with the field visas
      * @param handler
      */
     private void getHomeworks(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                              boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         String query;
 
@@ -154,7 +152,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         }));
     }
 
-    public String getSelectHomeworkQuery() {
+    private String getSelectHomeworkQuery() {
         String query = " SELECT h.*" +
                 " FROM homework_filter h" +
                 " LEFT JOIN diary.session s ON (h.session_id = s.id)" +
@@ -174,7 +172,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             values.add(endDate);
         }
 
-        if(structureID != ""){
+        if(structureID != ("")){
             query += " AND h.structure_id = ?";
             values.add(structureID);
         }
@@ -206,7 +204,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
 
-    public String getCTEHomeworkQuery(String structureID, String startDate, String endDate, String ownerId,
+    private String getCTEHomeworkQuery(String structureID, String startDate, String endDate, String ownerId,
                                               List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished,
                                               JsonArray values) {
         String query = " WITH homework_filter AS (" +
@@ -220,9 +218,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         return query.replaceFirst("AND", "WHERE");
     }
 
-    public String getSelectHomeworkStudentQuery(String structureID, String startDate, String endDate, String ownerId,
-                                                List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished,
-                                                JsonArray values, String studentId) {
+    private String getSelectHomeworkStudentQuery(String studentId) {
        String query = " SELECT h.*, " + " to_json(progress_and_state) as progress" +
                 " FROM homework_filter h" +
                 " INNER JOIN diary.homework_type AS type ON type.id = h.type_id" +
@@ -240,26 +236,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     /**
      * Query homeworks
-     * @param structureId
-     * @param studentId
+     * @param structureId return homeworks with this structureId
+     * @param studentId return homework with this studentId
      * @param startDate return homeworks in the date or after
      * @param endDate return homeworks in the date or before
      * @param ownerId return homeworks with this ownerId
      * @param listAudienceId return homeworks with a audience_id field inside this list
      * @param listTeacherId return homeworks with a teacher_id field inside this list
      * @param onlyPublished returns only published homeworks
-     * @param onlyVised returns only the homeworks with visa
-     * @param agregVisas returns the homeworks with the field visas
      * @param handler
      */
     private void getStudentHomeworks(String structureId, String studentId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                              boolean onlyPublished, boolean onlyVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+                              boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
 
         JsonArray values = new JsonArray();
 
         String query;
         query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values)
-                + this.getSelectHomeworkStudentQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values, studentId);
+                + this.getSelectHomeworkStudentQuery(studentId);
 
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
         // Formatting String into JsonObject
