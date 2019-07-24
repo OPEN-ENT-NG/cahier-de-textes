@@ -160,7 +160,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if(!h.attachedToDate){
                     h.dueDate = h.session.startMoment;
                 }
-                if(!h.isDeleted && h.isValidForm()&& h.session.id ){
+                if(!h.isDeleted && h.isValidForm()&& (h.attachedToDate || h.session.id)){
                     let {succeed} = await h.save();
                     if (!succeed) {
                         hasSucceed = false;
