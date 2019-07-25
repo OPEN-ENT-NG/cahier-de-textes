@@ -127,13 +127,13 @@
       border: solid 3px #F9F9F9;
       background: #666;
       text-align: center;
-      &.green {
-        background: #46bfaf;
+      &.green-text{
+        background: #30b32f;
       }
-      &.yellow{
+      &.yellow-text{
         background: #ffd900;
       }
-      &.red{
+      &.red-text{
         background: #ff2011;
       }
     }
@@ -141,6 +141,10 @@
     //  filter: invert(100%);
     //  -webkit-filter: invert(100%);
     //}
+
+    .white-text {
+      color: white;
+    }
 
     &::before {
       background-color: #bbb;
