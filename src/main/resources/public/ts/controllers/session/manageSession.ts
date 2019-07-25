@@ -107,11 +107,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     return;
                 }
                 await saveSessionHomeworks();
-
             }
-
+            await $scope.syncPedagogicItems();
             $scope.safeApply();
-            $scope.goTo("/view");
+            window.history.back();
         };
 
 
@@ -129,19 +128,18 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         async function saveSessionHomeworks() {
             let hasSucceed = true;
-            await $scope.session.homeworks.map(async h =>  {
+            await $scope.session.homeworks.map(async h => {
                 $scope.session.homeworks.map(hh =>{
-                    if(h.session && hh.session && h.session.isSameSession(hh.session) && hh != h){
+                    if(h.session && hh.session && h.session.isSameSession(hh.session) && hh != h) {
                         hh.session.cc = "test";
-
                     }
-                })
+                });
                 if (!h.attachedToDate && h.session.courseId) {
                     if ($scope.session && !h.session.id) {
                         if (!h.session.type.id) {
                             h.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                         }
-                        if(h.session.firstText !== lang.translate("session.manage.linkhomework")){
+                        if(h.session.firstText !== lang.translate("session.manage.linkhomework")) {
                             if(!h.session.cc){
                                 h.isSaved = true
                                 let sessionSaveResponse = await h.session.save();
@@ -150,12 +148,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                                     setSessionIdHomeworks( h.session)
                                 }
                             }
-                        }else{
+                        }
+                        else {
                             h.session.id = $scope.session.id;
-
                         }
                     }
-
                 }
                 if(!h.attachedToDate){
                     h.dueDate = h.session.startMoment;
@@ -166,6 +163,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         hasSucceed = false;
                     }
                 }
+                $scope.safeApply();
             });
 
 
