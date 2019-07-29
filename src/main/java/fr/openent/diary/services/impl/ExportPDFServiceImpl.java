@@ -31,13 +31,12 @@ import static fr.wseduc.webutils.http.Renders.badRequest;
 
 
 public class ExportPDFServiceImpl implements ExportPDFService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExportPDFServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ExportPDFServiceImpl.class);
     private String pdfGeneratorURL;
     private JsonObject config;
     private Vertx vertx;
     private Renders renders;
     private Storage storage;
-    private static final Logger log = LoggerFactory.getLogger(VisaServiceImpl.class);
     private String authHeader;
 
 
@@ -47,8 +46,12 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         this.vertx = vertx;
         this.renders = new Renders(this.vertx, this.config);
         this.storage = storage;
-        this.authHeader = "Basic " + config.getJsonObject("pdf-generator").getString("auth");
-        this.pdfGeneratorURL = config.getJsonObject("pdf-generator").getString("url");
+        try {
+            this.authHeader = "Basic " + (config.getJsonObject("pdf-generator").getString("auth"));
+            this.pdfGeneratorURL = config.getJsonObject("pdf-generator").getString("url");
+        } catch (Exception e) {
+            log.info("can not get pdf generator var");
+        }
 
     }
 
@@ -70,7 +73,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                 try {
                     bytes = processedTemplate.getBytes(StandardCharsets.UTF_8);
                 } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     badRequest(request, "Can not make the xhtml file");
                     return;
                 }
