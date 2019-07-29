@@ -32,13 +32,13 @@ import static fr.wseduc.webutils.http.Renders.badRequest;
 
 public class ExportPDFServiceImpl implements ExportPDFService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportPDFServiceImpl.class);
-    private final String pdfGeneratorURL;
+    private String pdfGeneratorURL;
     private JsonObject config;
     private Vertx vertx;
     private Renders renders;
     private Storage storage;
     private static final Logger log = LoggerFactory.getLogger(VisaServiceImpl.class);
-    private final String authHeader;
+    private String authHeader;
 
 
     public ExportPDFServiceImpl(Vertx vertx, Storage storage, JsonObject config) {
