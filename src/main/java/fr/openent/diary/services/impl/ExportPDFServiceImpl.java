@@ -12,7 +12,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.ProxyOptions;
+import org.entcore.common.pdf.PdfException;
 import org.entcore.common.storage.Storage;
+import org.entcore.common.user.UserInfos;
+import org.entcore.common.user.UserUtils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -22,16 +25,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static fr.wseduc.webutils.Utils.isEmpty;
+import static fr.wseduc.webutils.Utils.isNotEmpty;
 import static fr.wseduc.webutils.http.Renders.badRequest;
 
 
 public class ExportPDFServiceImpl implements ExportPDFService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportPDFServiceImpl.class);
+    private final String pdfGeneratorURL;
     private JsonObject config;
     private Vertx vertx;
     private Renders renders;
     private Storage storage;
     private static final Logger log = LoggerFactory.getLogger(VisaServiceImpl.class);
+    private final String authHeader;
 
 
     public ExportPDFServiceImpl(Vertx vertx, Storage storage, JsonObject config) {
@@ -40,10 +47,12 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         this.vertx = vertx;
         this.renders = new Renders(this.vertx, this.config);
         this.storage = storage;
+        this.authHeader = "Basic " + config.getJsonObject("pdf-generator").getString("auth");
+        this.pdfGeneratorURL = config.getJsonObject("pdf-generator").getString("url");
 
     }
 
-    public void generatePDF(final HttpServerRequest request, final JsonObject templateProps, final String templateName, final Handler<Buffer> handler) {
+    public void generatePDF(final HttpServerRequest request, UserInfos user, final JsonObject templateProps, final String templateName, final Handler<Buffer> handler) {
         final String templatePath = config.getJsonObject("exports").getString("template-path");
 
         String absolutePathPrefix = FileResolver.absolutePath("./");
@@ -66,7 +75,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                     return;
                 }
 
-                callNodePdfGenerator(bytes, bufferEither -> {
+                callNodePdfGenerator(bytes, user, bufferEither -> {
 
                     if (bufferEither.isLeft()) {
                         badRequest(request, bufferEither.left().getValue());
@@ -111,14 +120,19 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         return vertx.createHttpClient(options);
     }
 
-    private static Buffer multipartBody(String content, String boundary) {
+    private static Buffer multipartBody(String content, String token, String boundary) {
         Buffer buffer = Buffer.buffer();
         // Add name
         buffer.appendString("--" + boundary + "\r\n")
                 .appendString("Content-Disposition: form-data; name=\"name\"\r\n")
                 .appendString("\r\n")
                 .appendString("exportFile" + "\r\n");
-
+        if (isNotEmpty(token)) {
+            buffer.appendString("--" + boundary + "\r\n");
+            buffer.appendString("Content-Disposition: form-data; name=\"token\"\r\n");
+            buffer.appendString("\r\n");
+            buffer.appendString(token + "\r\n");
+        }
         // Add file
         buffer.appendString("--" + boundary + "\r\n")
                 .appendString("Content-Disposition: form-data; name=\"template\"; filename=\"file\"\r\n")
@@ -131,9 +145,17 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         return buffer;
     }
 
+    public String createToken(UserInfos user) throws Exception {
 
-    private void webServiceNodePdfGeneratorPost(String file, String nodePdfGeneratorUrl, Handler<Either<String, Buffer>> handler) {
-        final String pdfGeneratorAuth = config.getJsonObject("pdf-generator").getString("auth");
+        final String token = UserUtils.createJWTToken(vertx, user, null, null);
+        if (isEmpty(token)) {
+            throw new PdfException("invalid.token");
+        }
+        return token;
+    }
+
+
+    private void webServiceNodePdfGeneratorPost(String file, String token, String nodePdfGeneratorUrl, Handler<Either<String, Buffer>> handler) {
         AtomicBoolean responseIsSent = new AtomicBoolean(false);
         URI url;
         try {
@@ -179,16 +201,23 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         final String boundary = UUID.randomUUID().toString();
         httpClientRequest.setChunked(true)
                 .putHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary)
-                .putHeader("Authorization", pdfGeneratorAuth)
+                .putHeader("Authorization", authHeader)
                 .putHeader(HttpHeaders.ACCEPT, "*/*")
-                .end(multipartBody(file, boundary));
+                .end(multipartBody(file, token, boundary));
 
     }
 
-    private void callNodePdfGenerator(byte[] bytes, Handler<Either<String, Buffer>> asyncResultHandler) {
-        String nodePdfGeneratorUrl = "https://generate.pdf.com";
+    private void callNodePdfGenerator(byte[] bytes, UserInfos user, Handler<Either<String, Buffer>> asyncResultHandler) {
+        String token = null;
+        try {
+            token = createToken(user);
+        } catch (Exception e) {
+            log.error("Can not generate token, pdf create without token.", e);
+        }
+
+        String nodePdfGeneratorUrl = pdfGeneratorURL;
         webServiceNodePdfGeneratorPost(Buffer.buffer(bytes).toString(),
-                nodePdfGeneratorUrl, asyncResultHandler);
+                token, nodePdfGeneratorUrl, asyncResultHandler);
 
     }
 }

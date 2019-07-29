@@ -118,7 +118,7 @@ public class VisaController extends ControllerHelper {
                     sessionsGroup.put("created", "");
                     sessionsGroup.put("modified", "");
                     sessionsGroup.put("printPDF", true);
-                    this.exportPDFService.generatePDF(request, sessionsGroup, "visa.xhtml", new Handler<Buffer>() {
+                    this.exportPDFService.generatePDF(request, user, sessionsGroup, "visa.xhtml", new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer buffer) {
                             String fileName;

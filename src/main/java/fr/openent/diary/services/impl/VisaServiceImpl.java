@@ -51,7 +51,7 @@ public class VisaServiceImpl implements VisaService {
 
             String fileName = getPDFName(visa);
 
-            generatePDF(request, visa, pdf -> {
+            generatePDF(request, user, visa, pdf -> {
                 this.exportPDFService.storePDF(pdf, fileName, response -> {
 
                     if (response.isLeft()) {
@@ -114,8 +114,8 @@ public class VisaServiceImpl implements VisaService {
 
     }
 
-    private void generatePDF(final HttpServerRequest request, final JsonObject arrayVisaSessions, final Handler<Buffer> handler) {
-        this.exportPDFService.generatePDF(request, arrayVisaSessions, "visa.xhtml", handler);
+    private void generatePDF(final HttpServerRequest request, UserInfos user, final JsonObject arrayVisaSessions, final Handler<Buffer> handler) {
+        this.exportPDFService.generatePDF(request, user, arrayVisaSessions, "visa.xhtml", handler);
     }
 
 

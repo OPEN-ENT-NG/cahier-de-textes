@@ -15,11 +15,11 @@
         "mode" : "${mode}",
 		"sql": true,
         "exports" : {
-            "template-path" : $diaryTemplatePath
+            "template-path" : "public/template/pdf/"
         },
         "pdf-generator" : {
-            "url" : $pdfGeneratorUrl,
-            "auth" : $pdfGeneratorAuth
+            "url" : "$pdfGeneratorUrl",
+            "auth" : "$pdfGeneratorAuth"
         },
         "entcore.port" : 8009
       }
