@@ -1,4 +1,4 @@
-import {_, angular, model, moment, notify} from 'entcore';
+import {model, moment} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, Utils} from './index';
@@ -23,7 +23,7 @@ export class Course {
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
-    endCourse:any;
+    endCourse: any;
     endDate: any;
     endMoment: any;
     endDisplayDate: string;
@@ -35,7 +35,7 @@ export class Course {
     is_periodic: boolean = false;
     locked: boolean = true;
 
-    constructor (structure: Structure, id: string) {
+    constructor(structure: Structure, id: string) {
         this.structure = structure;
         this._id = id;
     }
@@ -43,7 +43,10 @@ export class Course {
     static formatSqlDataToModel(data: any, structure: Structure) {
 
         let audiences = new Audiences();
-        let audienceNameArray = data.classes.concat(data.groups);
+        let audienceNameArray = data && data.classes && data.classes.concat ? data.classes : [];
+        if (data && data.groups) {
+            audienceNameArray = audienceNameArray.concat(data.groups);
+        }
         audiences.all = structure.audiences.all.filter(t => audienceNameArray.includes(t.name))
         return {
             _id: data._id,
@@ -52,11 +55,11 @@ export class Course {
             endDate: data.endDate,
             endCourse: data.endCourse,
             rooms: data.roomLabels,
-            exceptionnal : data.exceptionnal,
+            exceptionnal: data.exceptionnal,
             startDate: data.startDate,
             teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
             subject: structure.subjects.all.find(t => t.id === data.subjectId),
-            color: data.color ? data.color :colors[Math.floor(Math.random() * colors.length)],
+            color: data.color ? data.color : colors[Math.floor(Math.random() * colors.length)],
         };
     }
 
@@ -93,7 +96,7 @@ export class Courses {
     origin: Course[];
     structure: Structure;
 
-    constructor (structure: Structure) {
+    constructor(structure: Structure) {
         this.structure = structure;
         this.all = [];
         this.origin = [];
@@ -114,18 +117,18 @@ export class Courses {
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
         let firstDate = Utils.getFormattedDate(startMoment);
-        let endDate =  Utils.getFormattedDate(endMoment);
+        let endDate = Utils.getFormattedDate(endMoment);
         let filter = '';
 
         if (audience === null)
-            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher? teacher.id : model.me.userId}`;
+            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher ? teacher.id : model.me.userId}`;
         if (teacher === null && audience !== null)
             filter += `group=${audience.name}`;
         if (model.me.type === USER_TYPES.student && model.me.classes && model.me.classes.length)
             filter = `group=${model.me.classes[0]}`;
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let { data } = await http.get(uri);
+        let {data} = await http.get(uri);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
