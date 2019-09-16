@@ -58,7 +58,9 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public void getAudienceFromChild(String childId, Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder("");
-        query.append("MATCH (n:User) - [IN] -> (g:Group) - [] -> (c:Class ) where n.id = {id} RETURN c.id as audienceId");
+        query.append("MATCH (n:User)-[:IN]->(pg:ProfileGroup)-[:DEPENDS]->(c:Class) WHERE n.id = {id} RETURN c.id as audienceId ")
+        .append("UNION ")
+        .append("MATCH (n:User)-[:IN]->(fg:FunctionalGroup) WHERE n.id = {id} RETURN DISTINCT fg.id as audienceId;");
         JsonObject params = new JsonObject().put("id", childId);
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }

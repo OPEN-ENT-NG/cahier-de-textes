@@ -4,6 +4,8 @@ import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
 
+declare let window: any;
+
 export class Structure {
     id: string;
     name: string;
@@ -50,6 +52,7 @@ export class Structure {
         await this.subjects.sync(this.id);
         await this.types.sync();
         await this.audiences.sync(this.id);
+        window.audiences = this.audiences;
         if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
             await this.students.sync();
         }
