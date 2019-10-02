@@ -144,29 +144,9 @@
         </div>
     </section>
 
-    <section id="add-section" class="row" ng-if="hasAtLeastOneCreateRight()">
-        <div class="cell twelve ">
-            <h5 class="large" ng-click="display.add = !display.add">
-                <i18n>utils.add</i18n>
-                <i ng-class="display.add ? 'up-open' : 'down-open'" class="right-magnet"></i>
-            </h5>
-            <div class="row" ng-show="display.add">
-                <div class="twelve cell small">
-                    <button workflow="diary.manageHomework" class="twelve padding-sm cancel" ng-click="goTo('/homework/create/')">
-                        <i18n>homework</i18n>
-                    </button>
-                    <br/>
-                    <button workflow="diary.manageSession" class="twelve padding-sm cancel" ng-click="goTo('/session/create/')">
-                        <i18n>session</i18n>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="row" workflow="diary.adminAccess">
         <div class="cell twelve">
-            <button class="twelve padding-sm" ng-click="goTo('/administrator/global')">
+            <button class="twelve padding-sm margin-top-sm" ng-click="goTo('/administrator/global')">
                 <i18n ng-if="typeUser ==='ENSEIGNANT'">sessions.admin.button.goTo2</i18n>
                 <i18n ng-if="typeUser !='ENSEIGNANT'">sessions.admin.button.goTo</i18n>
             </button>

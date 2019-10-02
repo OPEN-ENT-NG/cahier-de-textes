@@ -217,3 +217,15 @@ span.no-style {
 .datepicker {
   display: none;
 }
+
+// New version of button in calendar view
+.calendar-button {
+  border: none;
+  box-shadow: none;
+  background: forestgreen !important;
+
+  &:hover {
+    background-color: darkgreen !important;
+  }
+}
+
