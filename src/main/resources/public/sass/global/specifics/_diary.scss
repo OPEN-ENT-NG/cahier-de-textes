@@ -222,10 +222,10 @@ span.no-style {
 .calendar-button {
   border: none;
   box-shadow: none;
-  background: $diary-forestgreen !important;
+  background: $diary-forestgreen;
 
   &:hover {
-    background-color: $diary-darkgreen !important;
+    background-color: $diary-darkgreen;
   }
 }
 
