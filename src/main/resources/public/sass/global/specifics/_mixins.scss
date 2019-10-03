@@ -1,3 +1,7 @@
+/* New colors for button in calendar */
+$diary-forestgreen: #22c95a;
+$diary-darkgreen: #18873d;
+
 @mixin keyframes($animationName){
   @-webkit-keyframes #{$animationName} {
     @content;
@@ -18,6 +22,3 @@
     transform: rotate(360deg);
   }
 }
-
-$diary-forestgreen: #22c95a;
-$diary-darkgreen: #18873d;
