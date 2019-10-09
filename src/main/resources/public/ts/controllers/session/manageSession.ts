@@ -98,6 +98,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             // Sauvegarde de la session
+            $scope.session.is_empty = false;
             let sessionSaveResponse = $scope.toastHttpCall(await $scope.session.save($scope.placeholder));
             if (sessionSaveResponse.succeed) {
                 if (!$scope.session.id && sessionSaveResponse.data.id) {

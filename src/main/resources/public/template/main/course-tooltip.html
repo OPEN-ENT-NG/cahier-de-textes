@@ -1,7 +1,7 @@
 <div ng-controller="ManageCalendarTooltip">
     <div ng-if="test(item)">
         <article class="tooltip-course " >
-            <div class="header cell twelve ellipsis [[item.color]]">[[item.title]]</div>
+            <div class="header cell twelve ellipsis" ng-style="{'background-color': item.color}">[[item.title]]</div>
                 <h2>
                    [[item.startDisplayTime]] - [[item.endDisplayTime]] ([[item.startDisplayDate]])
                 </h2>

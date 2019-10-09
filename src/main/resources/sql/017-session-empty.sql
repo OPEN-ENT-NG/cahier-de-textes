@@ -1,0 +1,1 @@
+ALTER TABLE diary.session ADD COLUMN is_empty boolean NOT NULL DEFAULT true

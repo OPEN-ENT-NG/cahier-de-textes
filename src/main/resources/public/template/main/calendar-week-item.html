@@ -3,7 +3,7 @@
      lvl-draggable
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item.id]]</span>
-    <div  class="twelve">
+    <div class="cell nine text-item">
         <div ng-if="item.exceptionnal" class="text-ellipsis overflow-hidden">
                         [[item.startDisplayTime]]&nbsp;[[item.exceptionnal]]
         </div>
@@ -12,14 +12,18 @@
         </div>
         <div class="text-ellipsis overflow-hidden">
             [[item.endDisplayTime]]&nbsp;[[item.audience.name]]
-            <span class="pull-right">
-                <span ng-if="item.homeworks.length > 0">[[item.homeworks.length]] <i>&#xe80d;</i></span>
-                <i class="margin-left-sm"
-                   ng-click="publishSession(item,$event)"
-                   ng-if="!item.isPublished"
-                   tooltip="utils.publish">&#xe904;</i>
-            </span>
         </div>
+    </div>
+    <div class="cell three" ng-if="item.homeworks.length > 0" ng-style="{ 'height': '100%' }">
+        <span class="pull-right homework-item text-center">
+            <i>&#xe80d;</i>
+            <br>
+            <span>[[item.homeworks.length]] </span>
+            <i class="margin-left-sm"
+               ng-click="publishSession(item,$event)"
+               ng-if="!item.isPublished"
+               tooltip="utils.publish">&#xe904;</i>
+        </span>
     </div>
 </div>
 
@@ -28,7 +32,7 @@
     <span ng-show="false">[[item._id]]</span>
     <span ng-show="false">[[item.startDisplayDate]]</span>
 
-    <div class="twelve">
+    <div class="twelve text-item">
         <div ng-if="item.exceptionnal" class="text-ellipsis overflow-hidden">
             [[item.startDisplayTime]]&nbsp;[[item.exceptionnal]]
         </div>

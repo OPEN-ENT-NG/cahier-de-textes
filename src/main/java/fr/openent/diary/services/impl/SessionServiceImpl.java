@@ -245,9 +245,9 @@ public class SessionServiceImpl implements SessionService {
     public void createSession(JsonObject session, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "INSERT INTO diary.session (subject_id, type_id, structure_id, teacher_id, audience_id, title, " +
-                "room, color, description, annotation, is_published, course_id, owner_id, " +
+                "room, color, description, annotation, is_published, is_empty, course_id, owner_id, " +
                 "date, start_time, end_time, created, modified) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
 
         values.add(session.getString("subject_id"));
@@ -264,6 +264,12 @@ public class SessionServiceImpl implements SessionService {
             values.add(session.getBoolean("is_published"));
         } else {
             values.add(false);
+        }
+
+        if (session.getBoolean("is_empty") != null) {
+            values.add(session.getBoolean("is_empty"));
+        } else {
+            values.add(true);
         }
 
         if (session.getString("course_id") != null) {
@@ -285,7 +291,7 @@ public class SessionServiceImpl implements SessionService {
         JsonArray values = new JsonArray();
         String query = "UPDATE diary.session" +
                 " SET subject_id = ?, type_id = ?, structure_id = ?, audience_id = ?, title = ?, " +
-                " room = ?, color = ?, description = ?, annotation = ?, is_published = ?, course_id = ?, " +
+                " room = ?, color = ?, description = ?, annotation = ?, is_published = ?, is_empty = ?, course_id = ?, " +
                 " date = to_date(?,'YYYY-MM-DD'), start_time = to_timestamp(?, 'hh24:mi:ss'), end_time = to_timestamp(?, 'hh24:mi:ss'), modified = NOW()" +
                 " WHERE id = ?;";
 
@@ -299,6 +305,7 @@ public class SessionServiceImpl implements SessionService {
         values.add(session.getString("description"));
         values.add(session.getString("annotation"));
         values.add(session.getBoolean("is_published"));
+        values.add(session.getBoolean("is_empty"));
         if (session.getString("course_id") == null) {
             values.addNull();
         } else {

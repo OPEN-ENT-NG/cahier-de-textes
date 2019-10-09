@@ -8,7 +8,7 @@ import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
 import {ProgressionSession} from "./Progression";
 
-const colors = ['grey', 'green'];
+const colors = ['#7E7E7E', '#00ab6f', '#ff9700'];
 
 export class Session {
     id: string;
@@ -41,6 +41,7 @@ export class Session {
     isDisplayed:boolean = false;
     is_periodic: boolean = false;
     locked: boolean = true;
+    is_empty: boolean = true;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
 
@@ -79,7 +80,8 @@ export class Session {
             courseId: data.course_id ? data.course_id: null,
             modified: data.modified,
             created: data.created,
-            one_visa : data.one_visa
+            one_visa : data.one_visa,
+            is_empty: data.is_empty
         };
     }
 
@@ -100,7 +102,8 @@ export class Session {
             is_published: this.isPublished,
             audience_id: this.audience.id,
             room: (this.room)? this.room : '',
-            course_id: this.courseId
+            course_id: this.courseId,
+            is_empty: this.is_empty
         };
     }
 
@@ -118,9 +121,6 @@ export class Session {
         this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
         this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
 
-        if(this.courseId){
-            this.color = colors[1];
-        }
 
         if (this.visas.every(v => v === null)) {
             this.visas = [];
@@ -143,6 +143,14 @@ export class Session {
         }
 
         this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
+
+        if (this.courseId) {
+            if (this.is_empty) {
+                this.color = colors[2];
+            } else {
+                this.color = colors[1];
+            }
+        }
     }
 
     async mapFromCourse() {
