@@ -1,11 +1,19 @@
-<div class="homework-content" ng-style="{'border-color': homework.color, 'color': homework.color}"
+<div class="homework-content" ng-style="{'background-color': homework.color, 'border-color': homework.color }"
            ng-click="openHomework(homework.id)" >
+    <div class="row-homework">
+        <div class="three cell">
+            <i class="icon-homework homework"></i>
+        </div>
 
-    <div class="row text-ellipsis overflow-hidden">
-        [[homework.subject.label]]
+        <div class="nine cell">
+            <span class="row text-ellipsis overflow-hidden">
+                [[homework.subject.label]]
+            </span>
+            <span>
+                [[homework.audience.name]]
+                <i ng-if="!homework.isPublished"  class="right-magnet">&#xe904;</i>
+            </span>
+        </div>
     </div>
 
-    <div class="row">
-        <span>[[homework.audience.name]] <i ng-if="!homework.isPublished"  class="right-magnet">&#xe904;</i></span>
-    </div>
 </div>

@@ -8,11 +8,12 @@
                 }">
         <div ng-if="day.dailyHomeworks.length <= 1">
             <div ng-repeat="homework in day.dailyHomeworks">
-                <div static-include="/diary/public/template/directives/daily-homework-item.html" style="padding: 1px;"></div>
+                <div static-include="/diary/public/template/directives/daily-homework-item.html"></div>
             </div>
         </div>
 
-        <div class="opener" ng-if="day.dailyHomeworks.length > 1" ng-click="toggleShowHwDetail(day)">
+        <div class="homework-by-days padding-left-md padding-right-md" ng-if="day.dailyHomeworks.length > 1" ng-click="toggleShowHwDetail(day)">
+            <i class="pull-left homework"></i>
             <span id="dailyeventlongtitle"><i18n>Homeworks</i18n></span>
             <span id="dailyeventshorttitle">TAF</span>
             ([[day.dailyHomeworks.length]])

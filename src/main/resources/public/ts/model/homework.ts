@@ -47,7 +47,7 @@ export class Homework {
     alreadyValidate :boolean = false;
     constructor (structure: Structure) {
         this.structure = structure;
-        this.color = 'pink';
+        this.color = '#ff9700';
         this.dueDate = moment().toDate();
     }
 
