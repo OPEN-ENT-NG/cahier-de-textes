@@ -38,7 +38,7 @@ export class Audiences {
      */
     async sync (structureId: string) {
         try {
-            let audiences = await http.get('/viescolaire/classes?idEtablissement=' + structureId);
+            let audiences = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true');
             console.log(audiences);
 
             this.all = Mix.castArrayAs(Audience, audiences.data);
