@@ -222,16 +222,10 @@ export let main = ng.controller('MainController',
         $scope.selectFilter = async(model, item) => {
             if ($scope.searchTeachers.teacher) {
                 $scope.params.user = item;
-                if ($scope.params.group) {
-                    $scope.params.group = null;
-                }
             }
 
             if ($scope.searchClass.class) {
                 $scope.params.group = item;
-                if ($scope.params.user) {
-                    $scope.params.user = null;
-                }
             }
 
             $scope.searchTeachers.teachers = [];
