@@ -34,6 +34,141 @@
   height: 100%;
 }
 
+.diary-choice-view {
+  display: inline-flex;
+  align-items: center;
+}
+
+/*
+ Refacto calendar CDT, override des classes présentes dans la directive calendar -- DEBUT
+ */
+.datepicker table thead tr {
+  background: $diary-forestgreen;
+  th:hover {
+    background: $diary-darkgreen;
+  }
+}
+
+.calendar-container {
+  background-color: $white;
+
+  i.calendar::before {
+    color: $diary-forestgreen;
+  }
+
+  .calendar-current-week {
+    background: $white;
+    padding-right: 0;
+    margin-bottom: 8px;
+    line-height: 39px;
+
+    .cyan {
+      background-color: $diary-forestgreen;
+
+      &:hover {
+        background-color: $diary-darkgreen;
+      }
+    }
+
+    .calendarFiltersButtons {
+      .displayModeButtons {
+        margin: 0px;
+      }
+      .nextPrevious {
+        button {
+          background-color: $diary-forestgreen;
+          &:hover {
+            background-color: $diary-darkgreen;
+          }
+        }
+      }
+    }
+
+    button {
+      color: $white;
+      border-radius: 0px;
+      padding: 8px 15px 8px;
+
+      i18n {
+        text-transform: uppercase;
+      }
+    }
+
+    span[ng-if="display.mode === 'week'"] {
+      color: $white;
+      background: $diary-forestgreen;
+      height: 100%;
+      display: inline-block;
+      padding: 0 10px;
+    }
+  }
+
+  .next-timeslots, .previous-timeslots {
+    margin-bottom: 0;
+
+
+    &:disabled {
+      background: #e6e6e6;
+
+      &:hover {
+        background: #e6e6e6;
+      }
+
+      &::before {
+        content: " ";
+      }
+    }
+  }
+
+  .schedule {
+      legend.timeslots {
+        background: $white;
+        color: $black;
+      }
+    }
+    .days {
+    height: auto;
+
+    .day {
+      legend {
+        background: $white;
+        color: $black;
+        text-transform: uppercase;
+      }
+
+      .timeslots {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        .timeslot {
+          background: $white;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+        }
+      }
+    }
+  }
+}
+/*
+ Refacto calendar CDT, override des classes présentes dans la directive calendar -- FIN
+ */
+
+.title-sidebar {
+  background-color: $diary-forestgreen;
+
+  h5, i {
+    color: $white;
+  }
+}
+
+.diary-search {
+  padding-bottom: 15px;
+  padding-top: 20px;
+  margin: 0px 5px;
+}
+
 .icon-homework {
   font-size: 16px;
 }
@@ -126,7 +261,7 @@
   height: 40px;
   min-height: 40px;
   width: calc(100% / 7) !important;
-  background: #ddd !important;
+  background: #ffe5bf !important;
 
   &.sixDays {
     width: calc(100% / 6) !important;

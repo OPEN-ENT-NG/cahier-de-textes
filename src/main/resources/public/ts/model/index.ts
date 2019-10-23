@@ -10,6 +10,7 @@ export * from './student';
 export * from './Personnel';
 export * from './visa';
 export * from './Toast';
+export * from './User';
 
 export * from '../utils/utils';
 export * from '../utils/const/user-types';

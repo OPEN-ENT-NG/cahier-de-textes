@@ -1,0 +1,9 @@
+i {
+  &.diary-view-calendar::before {
+    content: "\e8b3";
+  }
+
+  &.diary-view-list::before {
+    content: "\e8b8";
+  }
+}

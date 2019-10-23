@@ -13,12 +13,21 @@ import {
 } from '../model';
 import {Utils} from '../utils/utils';
 import {ProgressionSessions} from "../model/Progression";
+import {SearchService, StructureService, TimeSlot} from "../services";
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout', '$compile', async function ($scope, route, $location, $timeout, $compile) {
+    ['$scope', 'route', '$location', 'StructureService', 'SearchService', '$timeout', '$compile', async function ($scope, route, $location, StructureService: StructureService, SearchService: SearchService, $timeout, $compile) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
-        console.log("MainCtrl")
+        console.log("MainCtrl");
+        $scope.searchTeachers = {
+            teacher: null,
+            teachers: null
+        };
+        $scope.searchClass = {
+            class: null,
+            listClass: null
+        };
         $scope.notifications = [];
         $scope.legendLightboxIsVisible = false;
         $scope.display = {
@@ -57,9 +66,27 @@ export let main = ng.controller('MainController',
          */
         $scope.syncStructure = async (structure: Structure) => {
             $scope.structure = structure;
+            /* Load time slot for calendar, with StructureService(Presence) */
+            if ($scope.structure.id) {
+                const structure_slots = await StructureService.getSlotProfile($scope.structure.id);
+                if (Object.keys(structure_slots).length > 0) {
+                    const startTAF = (model.calendar.timeSlots.all[0].start).toString();
+                    const endTAF = (model.calendar.timeSlots.all[0].start + 1).toString();
+                    const ts: TimeSlot = { id: "0", name: "Travail à Faire", startHour: "0" + startTAF +":00", endHour: "0" + endTAF +":00" };
+                    $scope.time_slot = {
+                        list: [ts].concat(structure_slots.slots)
+                    };
+                }
+                else {
+                    $scope.time_slot = {
+                        list: null
+                    };
+                }
+            }
             $scope.structure.eventer.once('refresh', () => $scope.safeApply());
             await $scope.structure.sync();
         };
+
 
         function init() {
             $scope.search = "";
@@ -120,16 +147,16 @@ export let main = ng.controller('MainController',
 
         $scope.changeViewCalendar = function () {
             $scope.goTo('/view');
-            $scope.display.listView = false
+            $scope.display.listView = false;
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true;
             }
-        }
+        };
         $scope.changeViewList = function () {
             $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
             $scope.goTo('/list');
-            $scope.display.listView = true
+            $scope.display.listView = true;
             if (!Utils.isAChildOrAParent(model.me.type)) {
                 $scope.display.sessionList = true;
             } else {
@@ -170,6 +197,63 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
 
         }
+        /* Use SearchService(Presence) for filter */
+        $scope.searchWithFilter = async function (value) {
+            const structureId = $scope.structure.id;
+            const searchValue = value;
+            if ($scope.searchTeachers.teacher) {
+                try {
+                    $scope.searchTeachers.teachers = await SearchService.searchUser(structureId, searchValue, "Teacher");
+                    $scope.safeApply();
+                } catch (err) {
+                    $scope.searchTeachers.teachers = [];
+                }
+            }
+            if ($scope.searchClass.class) {
+                try {
+                    $scope.searchClass.listClass = await SearchService.search(structureId, searchValue);
+                    $scope.safeApply();
+                } catch (err) {
+                    $scope.searchClass.listClass = [];
+                }
+            }
+        };
+        /* Select data(teacher or class) in filter */
+        $scope.selectFilter = async(model, item) => {
+            if ($scope.searchTeachers.teacher) {
+                $scope.params.user = item;
+                if ($scope.params.group) {
+                    $scope.params.group = null;
+                }
+            }
+
+            if ($scope.searchClass.class) {
+                $scope.params.group = item;
+                if ($scope.params.user) {
+                    $scope.params.user = null;
+                }
+            }
+
+            $scope.searchTeachers.teachers = [];
+            $scope.searchTeachers.teacher = null;
+            $scope.searchClass.listClass = [];
+            $scope.searchClass.class = null;
+
+            $scope.syncPedagogicItems();
+        };
+
+        $scope.removeFilter = async function (value) {
+            const v = value;
+            if ($scope.params.user && $scope.params.user.displayName == v) {
+                $scope.params.user = null;
+            } else if ($scope.params.group && $scope.params.group.displayName == v) {
+                $scope.params.group = null;
+            }
+
+
+            $scope.syncPedagogicItems();
+        };
+
 
         $scope.syncPedagogicItems = async (firstRun?: boolean) => {
             if (!firstRun && !$scope.pageInitialized) {
@@ -475,6 +559,12 @@ export let main = ng.controller('MainController',
         };
 
         $scope.switchStructure = async (structure: Structure) => {
+            if ($scope.params.user) {
+                $scope.params.user = null;
+            } else if ($scope.params.group) {
+                $scope.params.group = null;
+            }
+
             await $scope.syncStructure(structure);
             await $scope.syncPedagogicItems();
             $scope.safeApply();

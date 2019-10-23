@@ -3,7 +3,7 @@ import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
 import * as modules from './modules';
-
+import * as services from './services';
 
 for (let directive in directives) {
     ng.directives.push(directives[directive]);
@@ -19,6 +19,11 @@ for (let controller in controllers) {
 for (let module in modules){
      ng.addRequiredModule(module);
 }
+
+for (let service in services) {
+    ng.services.push(services[service]);
+}
+
 
 routes.define(($routeProvider) => {
     $routeProvider

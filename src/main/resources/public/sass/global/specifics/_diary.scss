@@ -224,8 +224,44 @@ span.no-style {
   box-shadow: none;
   background: $diary-forestgreen;
 
+  i18n {
+    text-transform: uppercase;
+  }
+
   &:hover {
     background-color: $diary-darkgreen;
   }
 }
+
+// New version of search bar for Teacher and Class filter
+.search-input {
+  background: $white;
+  padding: 7px;
+  vertical-align: middle;
+
+  input {
+    margin: auto;
+  }
+
+  &.small {
+    margin-right: 15px;
+
+    input {
+      max-width: 75px;
+    }
+  }
+}
+
+ul.search-input-ul {
+  padding: 5px;
+  margin: 0;
+  font-weight: bold;
+
+  li {
+    display: inline;
+    margin: 0 5px;
+
+  }
+}
+
 

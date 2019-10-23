@@ -1,5 +1,16 @@
-<article class="sidebar ">
-    <section id="display-section" class="twelve">
+<article class="sidebar remove-padding">
+
+    <!-- Titre/En-tête Mode d'affichage -->
+    <div class="row title-sidebar padding-left-md">
+        <h5 class="large cell twelve" workflow="diary.listView">
+            <i18n>sidebar.display_mode</i18n>
+            <!-- Legend -->
+            <i class="large help one cell right-magnet" ng-if="!display.listView"
+               tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+        </h5>
+    </div>
+    <!-- Bloc Mode d'affichage -->
+    <section id="display-section" class="cell twelve padding-md">
 
         <div workflow="diary.accessChildData">
             <select ng-model="params.child"
@@ -10,25 +21,24 @@
             </select>
         </div>
         <div>
-            <div>
-                <h5 workflow="diary.listView" class="large cell eleven">
-                    <i18n>sidebar.display_mode</i18n>
-                </h5>
-                <!-- Legend -->
-                <i class="large help one cell margin-top-Botton-md" ng-if="!display.listView"
-                   tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
-            </div>
 
-            <label workflow="diary.listView" class="cell twelve text-xl margin-bottom-md">
-                <i tooltip="calendar"
-                   class="margin-sm"
-                   ng-class="display.listView ? 'opacity-icon' : 'selected'"
-                   ng-click="changeViewCalendar()">&#xe8b3;</i>
-                <i tooltip="list"
-                   class="margin-sm"
-                   ng-class="display.listView ? 'selected' : 'opacity-icon'"
-                   ng-click="changeViewList()"
-                   ng-model="display.listView">&#xe8b8;</i>
+
+            <label workflow="diary.listView" class="cell twelve margin-bottom-md">
+                <span class="six diary-choice-view">
+                    <i tooltip="calendar"
+                       class=" text-xl margin-sm diary-view-calendar"
+                       ng-class="display.listView ? 'opacity-icon' : 'selected'"
+                       ng-click="changeViewCalendar()"></i>
+                    <i18n>calendar</i18n>
+                </span>
+                <span class="six diary-choice-view">
+                    <i tooltip="list"
+                       class=" text-xl margin-sm diary-view-list"
+                       ng-class="display.listView ? 'selected' : 'opacity-icon'"
+                       ng-click="changeViewList()"
+                       ng-model="display.listView"></i>
+                    <i18n>list</i18n>
+                </span>
             </label>
         </div>
 
@@ -72,31 +82,6 @@
                 </select>
             </div>
 
-            <!-- Access External Data -->
-            <div workflow="diary.accessExternalData">
-                <div class="row display-inline-block">
-                    <label class="cell twelve small" for="user-list">
-                        <select ng-model="params.user"
-                                id="user-list"
-                                class="twelve"
-                                ng-change="params.group = null;syncPedagogicItems()"
-                                ng-options="teacher as teacher.displayName for teacher in structure.teachers.all track by teacher.id">
-                            <option value="" disabled selected>[[translate('utils.teacher.choose.one')]]</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="row display-inline-block">
-                    <label class="cell twelve small" for="user-list">
-                        <select ng-model="params.group"
-                                id="group-list"
-                                class="twelve"
-                                ng-change="params.user = null;syncPedagogicItems()"
-                                ng-options="audience as audience.name for audience in structure.audiences.all track by audience.id">
-                            <option value="" disabled selected>[[translate('utils.group.choose.one')]]</option>
-                        </select>
-                    </label>
-                </div>
-            </div>
 
             <!-- Homework / Session -->
             <div ng-click="display.homeworks = !display.homeworks">
@@ -114,16 +99,15 @@
         </div>
     </section>
 
-
-    <section class="cell twelve" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView">
-        <div class="row">
-
-            <h5 class="large">
-                <i18n>progression</i18n>
-                <i class="large one cell right-magnet progression-settings" tooltip="Accéder aux progressions" ng-click="goTo('/progressions/view')" ></i>
-
-            </h5>
-        </div>
+    <!-- Titre/En-tête Progression -->
+    <div class="row title-sidebar padding-left-md">
+        <h5 class="large cell twelve">
+            <i18n>progression</i18n>
+            <i class="large one cell right-magnet progression-settings" tooltip="Accéder aux progressions" ng-click="goTo('/progressions/view')" ></i>
+        </h5>
+    </div>
+    <!-- Bloc Progression -->
+    <section class="cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView">
         <div class="row">
             <input ng-change="filterProgression(search)"
                    class="progression-search cell twelve"
@@ -133,7 +117,7 @@
 
             <ul ng-if=" search && search!= '' " class="selectable-list progression-list">
                 <li ng-repeat="progression in progressionsToDisplay.all track by $index"
-                    class="progression-item-scrollable eleven progression-item-draggable "
+                    class="progression-item-scrollable progression-item-draggable "
                     lvl-draggable="true">
                     [[progression.title]]
                     <span ng-show="false">[[progression.id]]</span>
@@ -144,9 +128,9 @@
         </div>
     </section>
 
-    <section class="row" workflow="diary.adminAccess">
+    <section class="row padding-md" workflow="diary.adminAccess">
         <div class="cell twelve">
-            <button class="twelve padding-sm margin-top-sm" ng-click="goTo('/administrator/global')">
+            <button class="calendar-button twelve padding-sm margin-top-sm" ng-click="goTo('/administrator/global')">
                 <i18n ng-if="typeUser ==='ENSEIGNANT'">sessions.admin.button.goTo2</i18n>
                 <i18n ng-if="typeUser !='ENSEIGNANT'">sessions.admin.button.goTo</i18n>
             </button>

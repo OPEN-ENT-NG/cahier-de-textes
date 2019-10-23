@@ -2,7 +2,6 @@
   background-color: grey;
   color: white;
   transition: background 250ms ease;
-  margin: 2px;
   font-size: 12px;
   padding: 2px;
   border : 1px white solid;
@@ -19,6 +18,10 @@
 
 .progression-search {
   margin :1px;
+
+  &:focus {
+    border-bottom: 2px $diary-forestgreen solid;
+  }
 }
 .progression-settings:before{
   @include fonticon();

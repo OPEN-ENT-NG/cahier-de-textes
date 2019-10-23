@@ -6,16 +6,18 @@
     </div>
     <div class="row" ng-class="{'hide-session':!display.sessions}">
         <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
-                               b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks">
+                               b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks" ng-show="time_slot.list">
         </calendar-daily-events>
-        <div id="calendar-view" class="twelve">
+        <div id="calendar-view" class="twelve calendar-container">
             <calendar
                     enable-display-modes="true"
                     display-template="main/calendar-week-item"
                     display-month-template="main/calendar-month-item"
                     items="calendarItems"
+                    slots="time_slot.list"
                     item-tooltip-template="main/course-tooltip"
-                    show-next-previous-button="true">
+                    show-next-previous-button="true"
+                    ng-show="time_slot.list.length > 0">
             </calendar>
         </div>
     </div>

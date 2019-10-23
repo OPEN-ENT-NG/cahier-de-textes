@@ -4,6 +4,8 @@
   "diary.empty.viewlist.homework": "Aucun travail à faire de prévu pour cette période",
   "diary.empty.viewlist.session": "Aucune séance de prévue pour cette période",
   "diary.empty.homework": "Aucun travail à faire",
+  "diary.search.teacher": "Rechercher un enseignant",
+  "diary.search.group": "Rechercher une classe",
   "notify.saved": "La donnée a été sauvegardée",
   "notify.modified": "La donnée a été modifiée",
   "notify.deleted": "La donnée a été supprimée",
