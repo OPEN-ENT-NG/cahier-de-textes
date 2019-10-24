@@ -17,7 +17,7 @@ export interface SearchService {
 export const SearchService = ng.service('SearchService', (): SearchService => ({
     search: async (structureId: string, value: string) => {
         try {
-            const {data} = await http.get(`/presences/search?structureId=${structureId}&q=${value}`);
+            const {data} = await http.get(`/diary/search?structureId=${structureId}&q=${value}`);
             data.forEach((item) => item.toString = () => item.displayName);
             return data;
         } catch (err) {
@@ -26,7 +26,7 @@ export const SearchService = ng.service('SearchService', (): SearchService => ({
     },
     searchUser: async (structureId: string, value: string, profile: string) => {
         try {
-            const {data} = await http.get(`/presences/search/users?structureId=${structureId}&profile=${profile}&q=${value}&field=firstName&field=lastName`);
+            const {data} = await http.get(`/diary/search/users?structureId=${structureId}&profile=${profile}&q=${value}&field=firstName&field=lastName`);
             data.forEach((user) => user.toString = () => user.displayName);
             return data;
         } catch (err) {

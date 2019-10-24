@@ -13,6 +13,7 @@ import org.entcore.common.storage.StorageFactory;
 public class Diary extends BaseServer {
     public final static String DIARY_SCHEMA = "diary";
     public final static String VIESCO_SCHEMA = "viesco";
+    public final static String SEARCH = "diary.search";
 
 	@Override
 	public void start() throws Exception {
@@ -34,6 +35,7 @@ public class Diary extends BaseServer {
         addController(new HomeworkController(new HomeworkServiceImpl("diary")));
         addController(new InspectorController(new InspectorServiceImpl()));
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
+        addController(new SearchController(eb));
 	}
 
 }

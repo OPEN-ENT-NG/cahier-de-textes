@@ -72,7 +72,7 @@ export let main = ng.controller('MainController',
                 if (Object.keys(structure_slots).length > 0) {
                     const startTAF = (model.calendar.timeSlots.all[0].start).toString();
                     const endTAF = (model.calendar.timeSlots.all[0].start + 1).toString();
-                    const ts: TimeSlot = { id: "0", name: "Travail à Faire", startHour: "0" + startTAF +":00", endHour: "0" + endTAF +":00" };
+                    const ts: TimeSlot = { id: "0", name: lang.translate("Homework"), startHour: "0" + startTAF +":00", endHour: "0" + endTAF +":00" };
                     $scope.time_slot = {
                         list: [ts].concat(structure_slots.slots)
                     };
