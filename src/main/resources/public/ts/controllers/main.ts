@@ -19,7 +19,6 @@ export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', 'StructureService', 'SearchService', '$timeout', '$compile', async function ($scope, route, $location, StructureService: StructureService, SearchService: SearchService, $timeout, $compile) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
-        console.log("MainCtrl");
         $scope.searchTeachers = {
             teacher: null,
             teachers: null
@@ -61,24 +60,26 @@ export let main = ng.controller('MainController',
         $scope.transformDateToFrenchDate = (date: Date) => {
             return moment(date).format("dddd D MMMM YYYY");
         };
-        /**
-         * Synchronize a structure.
-         */
         $scope.syncStructure = async (structure: Structure) => {
             $scope.structure = structure;
+            $scope.structure.eventer.once('refresh', () => $scope.safeApply());
+            await $scope.structure.sync();
+
+            $scope.structure = structure;
             /* Load time slot for calendar, with StructureService(Presence) */
+            console.log($scope.structure);
             if ($scope.structure.id) {
                 const structure_slots = await StructureService.getSlotProfile($scope.structure.id);
                 if (Object.keys(structure_slots).length > 0) {
                     const startTAF = (model.calendar.timeSlots.all[0].start).toString();
                     const endTAF = (model.calendar.timeSlots.all[0].start + 1).toString();
                     const ts: TimeSlot = { id: "0", name: lang.translate("Homework"), startHour: "0" + startTAF +":00", endHour: "0" + endTAF +":00" };
-                    $scope.time_slot = {
+                    $scope.timeSlot = {
                         list: [ts].concat(structure_slots.slots)
                     };
                 }
                 else {
-                    $scope.time_slot = {
+                    $scope.timeSlot = {
                         list: null
                     };
                 }
@@ -197,6 +198,7 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
 
         }
+
         /* Use SearchService(Presence) for filter */
         $scope.searchWithFilter = async function (value) {
             const structureId = $scope.structure.id;
@@ -219,7 +221,7 @@ export let main = ng.controller('MainController',
             }
         };
         /* Select data(teacher or class) in filter */
-        $scope.selectFilter = async(model, item) => {
+        $scope.selectFilter = async (model, item) => {
             if ($scope.searchTeachers.teacher) {
                 $scope.params.user = item;
             }
@@ -660,7 +662,6 @@ export let main = ng.controller('MainController',
 
         $scope.calendarUpdateItem = (item) => {
             $scope.params.updateItem = item;
-            console.log(item);
             $scope.goTo('/create');
         };
 

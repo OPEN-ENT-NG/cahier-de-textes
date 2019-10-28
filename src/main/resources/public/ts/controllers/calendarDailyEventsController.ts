@@ -315,6 +315,9 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
         });
 
         $scope.$watch(() => $scope.calendar.timeSlots.all[0].beginning,  (newVal, oldVal) => {
+            console.log("//////////////////////////");
+            console.log($scope.calendar);
+            console.log("//////////////////////////");
             setDaysContent();
             $scope.safeApply();
         });
