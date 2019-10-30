@@ -5,19 +5,24 @@
         <div class="loader"></div>
     </div>
     <div class="row" ng-class="{'hide-session':!display.sessions}">
-        <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
-                               b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks" ng-show="timeSlot.list">
-        </calendar-daily-events>
+        <div class="homeworks-row" ng-show="calendar.increment != 'month'">
+            <div class="timeslot ng-binding ng-scope">
+                <i18n>Homeworks</i18n>
+            </div>
+            <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
+                                   b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks">
+            </calendar-daily-events>
+        </div>
         <div id="calendar-view" class="twelve calendar-container">
             <calendar
-                    enable-display-modes="timeSlot.list.length == 0"
+                    enable-display-modes="true"
                     display-template="main/calendar-week-item"
                     display-month-template="main/calendar-month-item"
                     items="calendarItems"
-
+                    slots="timeSlot.list"
                     item-tooltip-template="main/course-tooltip"
-                    show-next-previous-button="timeSlot.list.length == 0"
-                    ng-show="timeSlot.list.length > 0">
+                    show-next-previous-button="true"
+            >
             </calendar>
         </div>
     </div>

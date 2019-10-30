@@ -62,27 +62,13 @@ export let main = ng.controller('MainController',
         };
         $scope.syncStructure = async (structure: Structure) => {
             $scope.structure = structure;
-            $scope.structure.eventer.once('refresh', () => $scope.safeApply());
-            await $scope.structure.sync();
-
-            $scope.structure = structure;
             /* Load time slot for calendar, with StructureService(Presence) */
-            console.log($scope.structure);
             if ($scope.structure.id) {
+                $scope.timeSlot = {
+                    list: null
+                };
                 const structure_slots = await StructureService.getSlotProfile($scope.structure.id);
-                if (Object.keys(structure_slots).length > 0) {
-                    const startTAF = (model.calendar.timeSlots.all[0].start).toString();
-                    const endTAF = (model.calendar.timeSlots.all[0].start + 1).toString();
-                    const ts: TimeSlot = { id: "0", name: lang.translate("Homework"), startHour: "0" + startTAF +":00", endHour: "0" + endTAF +":00" };
-                    $scope.timeSlot = {
-                        list: [ts].concat(structure_slots.slots)
-                    };
-                }
-                else {
-                    $scope.timeSlot = {
-                        list: null
-                    };
-                }
+                if (Object.keys(structure_slots).length > 0) $scope.timeSlot.list = structure_slots.slots;
             }
             $scope.structure.eventer.once('refresh', () => $scope.safeApply());
             await $scope.structure.sync();
@@ -98,7 +84,7 @@ export let main = ng.controller('MainController',
 
             $timeout(async function () {
                 await placingLoader();
-                initializeData();
+                await initializeData();
             }, 100);
 
             if (Utils.isRelative(model.me.type)) {
@@ -507,10 +493,7 @@ export let main = ng.controller('MainController',
             $scope.selectedPedagogicDay = pedagogicDay;
         };
 
-
         model.calendar.on('date-change', function () {
-
-
             $scope.calendar = model.calendar;
 
             if (!$scope.pageInitialized) return;

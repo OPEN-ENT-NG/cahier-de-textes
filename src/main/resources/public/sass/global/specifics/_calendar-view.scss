@@ -124,6 +124,7 @@
       legend.timeslots {
         background: $white;
         color: $black;
+        padding-top: 44px;
       }
     }
     .days {
@@ -140,6 +141,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        padding-top: 41px;
 
         .timeslot {
           background: $white;
@@ -227,7 +229,7 @@
   display: none; }
 
 .diary-container.diary-show-calendar .timeslots {
-  display: initial; }
+  display: inline-block; }
 
 .diary-container.diary-show-calendar .homeworkpanel {
   padding: 0px !important; }
@@ -237,8 +239,19 @@
   display: none;
 }
 
-.diary-container.diary-show-homeworks calendar-daily-events {
-  display: initial;
+.diary-container.diary-show-homeworks .homeworks-row {
+  display: flex;
+  position: relative;
+  top: 168px;
+  z-index: 1;
+  .timeslot {
+    color: $black;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    box-sizing: border-box;
+    width: 130px;
+  }
 }
 
 .diary-container .previous-timeslots {
@@ -250,7 +263,7 @@
 }
 
 .diary-container .schedule-item {
-  margin-top: 0px;
+  margin-top: 40px;
 }
 
 .diary-container [resizable] {
@@ -279,9 +292,8 @@
 }
 
 .diary-container calendar-daily-events {
-  display: none;
-  margin-left: 130px !important;
-  width: calc(100% - 130px);
+  position: static;
+  flex: 1 1 0;
 }
 
 calendar-daily-events {
