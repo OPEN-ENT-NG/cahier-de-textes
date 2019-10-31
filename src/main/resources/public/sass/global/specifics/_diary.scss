@@ -78,6 +78,19 @@ section.main {
   margin-left: 63px;
 }
 
+.content {
+  display: flex;
+
+  .side-navbar {
+    width: 130px;
+  }
+
+  .main-content {
+    flex: 1 1 0;
+  }
+
+}
+
 .schedule .days .day .timeslots .timeslot {
   cursor: default;
 }

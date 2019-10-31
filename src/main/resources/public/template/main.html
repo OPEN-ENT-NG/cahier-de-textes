@@ -32,19 +32,51 @@
                     </li>
                 </ul>
             </div>
-        </div>
+            <!-- Filter Zone (Teacher and Class) -->
+            <div workflow="diary.accessExternalData" class="seven cell twelve-mobile">
+                <!-- Teacher search bar -->
+                <div class="cell four margin-right-md">
+                    <div class="cell twelve search-input">
+                        <async-autocomplete data-ng-disabled="false"
+                                            data-ng-model="searchTeachers.teacher"
+                                            data-ng-change="selectFilter"
+                                            data-options="searchTeachers.teachers"
+                                            on-search="searchWithFilter"
+                                            data-placeholder="diary.search.teacher"
+                                            search="searchTeachers.teacher">
+                        </async-autocomplete>
+                    </div>
+                    <!-- Teacher selected via filter -->
+                    <div class="cell twelve" ng-show="params.user.displayName">
+                        <ul class="cell twelve search-input-ul">
+                            <li>
+                                [[params.user.displayName]] <i class="close" data-ng-click="removeFilter(params.user.displayName)"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-        <!-- Classes/Groups search bar -->
-        <div class="cell four paddingLeft">
-            <div class="cell twelve search-input">
-                <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="searchClass.class"
-                                    data-ng-change="selectFilter"
-                                    data-options="searchClass.listClass"
-                                    on-search="searchWithFilter"
-                                    data-placeholder="diary.search.group"
-                                    search="searchClass.class">
-                </async-autocomplete>
+                <!-- Classes/Groups search bar -->
+                <div class="cell four paddingLeft">
+                    <div class="cell twelve search-input">
+                        <async-autocomplete data-ng-disabled="false"
+                                            data-ng-model="searchClass.class"
+                                            data-ng-change="selectFilter"
+                                            data-options="searchClass.listClass"
+                                            on-search="searchWithFilter"
+                                            data-placeholder="diary.search.group"
+                                            search="searchClass.class">
+                        </async-autocomplete>
+                    </div>
+                    <!-- Class selected via filter -->
+                    <div class="cell twelve" ng-show="params.group.displayName">
+                        <ul class="cell twelve search-input-ul">
+                            <li>
+                                [[params.group.displayName]] <i class="close" data-ng-click="removeFilter(params.group.displayName)"></i>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             <!-- Class selected via filter -->
             <div class="cell twelve" ng-show="params.group.displayName">
@@ -55,6 +87,7 @@
                     </li>
                 </ul>
             </div>
+            <div class="clear"></div>
         </div>
     </div>
     <!-- Manage session and homework -->
