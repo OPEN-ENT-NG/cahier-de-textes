@@ -29,7 +29,8 @@ const diaryBehaviours = {
             listView: "fr.openent.diary.controllers.DiaryController|workflow2",
             accessOwnData: "fr.openent.diary.controllers.DiaryController|workflow3",
             accessChildData: "fr.openent.diary.controllers.DiaryController|workflow4",
-            accessExternalData: "fr.openent.diary.controllers.SearchController|searchUsers"
+            accessExternalData: "fr.openent.diary.controllers.SearchController|workflow5",
+            diarySearch: "fr.openent.diary.controllers.SearchController|searchUsers"
         },
     },
     sniplets: {
