@@ -1,0 +1,133 @@
+.side-navbar {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  height: calc(100% - 64px);
+  width: 80px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 1;
+
+  .main-nav {
+    z-index: 1;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+    left: 0;
+    width: 80px;
+    align-items: center;
+    display: flex;
+    position: fixed;
+    top: 64px;
+    height: calc(100% - 64px);
+
+    .first-item {
+      margin-top: 20px;
+      position: absolute;
+      top: 0;
+    }
+
+    .list-item {
+      height: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-direction: column;
+    }
+  }
+
+  .item {
+    color: #222;
+    position: relative;
+    display: block;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-size: 24px;
+    width: 100%;
+    box-sizing: border-box;
+
+    span {
+      display: block;
+      font-size: 12px;
+      line-height: 16px;
+      padding: 5px;
+    }
+
+    &:hover {
+      color: $diary-darkgreen;
+    }
+
+    &.active, &:hover {
+      > i::after {
+        background-color: $diary-darkgreen;
+      }
+    }
+
+
+  }
+
+  i {
+    &:after {
+      content: " ";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      display: block;
+      background-color: transparent;
+      width: 5px;
+    }
+  }
+}
+
+.sub-items {
+  position: absolute;
+  font-size: 16px;
+  display: block;
+  min-width: 200px;
+  text-align: left;
+  top: 0;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+  padding: 10px;
+  transition: all 0.5s cubic-bezier(.25, .8, .25, 1);
+  left: -500%;
+
+  &.hovered {
+    left: 100%;
+  }
+
+  h2 {
+    color: $diary-darkgreen;
+    font-weight: bold;
+    line-height: 20px;
+  }
+
+  .sub-nav {
+    padding: 7px 0;
+
+    &:hover, &.active {
+      color: $diary-darkgreen !important;
+
+      i::after {
+        background-color: $diary-darkgreen;
+        left: -10px;
+      }
+    }
+
+    &:hover {
+      i {
+        color: $diary-darkgreen;
+      }
+    }
+
+
+    i {
+      font-size: 22px;
+      width: 40px;
+      display: inline-block;
+      text-align: center;
+    }
+  }
+}
+

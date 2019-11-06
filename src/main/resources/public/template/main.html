@@ -50,7 +50,8 @@
                     <div class="cell twelve" ng-show="params.user.displayName">
                         <ul class="cell twelve search-input-ul">
                             <li>
-                                [[params.user.displayName]] <i class="close" data-ng-click="removeFilter(params.user.displayName)"></i>
+                                [[params.user.displayName]] <i class="close"
+                                                               data-ng-click="removeFilter(params.user.displayName)"></i>
                             </li>
                         </ul>
                     </div>
@@ -72,7 +73,8 @@
                     <div class="cell twelve" ng-show="params.group.displayName">
                         <ul class="cell twelve search-input-ul">
                             <li>
-                                [[params.group.displayName]] <i class="close" data-ng-click="removeFilter(params.group.displayName)"></i>
+                                [[params.group.displayName]] <i class="close"
+                                                                data-ng-click="removeFilter(params.group.displayName)"></i>
                             </li>
                         </ul>
                     </div>
@@ -87,7 +89,6 @@
                     </li>
                 </ul>
             </div>
-            <div class="clear"></div>
         </div>
     </div>
     <!-- Manage session and homework -->
@@ -109,5 +110,6 @@
          static-include="/diary/public/template/main/sidebar.html"></div>
 
     <div class="cell nine twelve-mobile main-content" ng-show="!display.listView"
-         static-include="/diary/public/template/main/calendar-view.html"></div>
+        static-include="/diary/public/template/main/calendar-view.html">
+    </div>
 </div>
