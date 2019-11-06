@@ -17,6 +17,8 @@ import {SearchService, StructureService} from "../services";
 
 declare let window: any;
 
+declare let window: any;
+
 export let main = ng.controller('MainController',
     ['$scope', 'route', '$location', 'StructureService', 'SearchService', '$timeout', '$compile', async function ($scope, route, $location, StructureService: StructureService, SearchService: SearchService, $timeout, $compile) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
