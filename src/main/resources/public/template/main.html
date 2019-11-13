@@ -1,9 +1,12 @@
 <div class="row">
     <div class="cell three twelve-mobile">
         <app-title class="zero-mobile">
-            <h1 class="application-title">
-                <i18n>diary.title</i18n>
-            </h1>
+            <div class="title-area">
+                <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+                <h1 class="application-title">
+                    <i18n>diary.title</i18n>
+                </h1>
+            </div>
         </app-title>
     </div>
     <!-- Filter Zone (Teacher and Class) -->
@@ -24,7 +27,8 @@
             <div class="cell twelve" ng-show="params.user.displayName">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[params.user.displayName]] <i class="close" data-ng-click="removeFilter(params.user.displayName)"></i>
+                        [[params.user.displayName]] <i class="close"
+                                                       data-ng-click="removeFilter(params.user.displayName)"></i>
                     </li>
                 </ul>
             </div>
@@ -46,7 +50,8 @@
             <div class="cell twelve" ng-show="params.group.displayName">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[params.group.displayName]] <i class="close" data-ng-click="removeFilter(params.group.displayName)"></i>
+                        [[params.group.displayName]] <i class="close"
+                                                        data-ng-click="removeFilter(params.group.displayName)"></i>
                     </li>
                 </ul>
             </div>
@@ -54,10 +59,12 @@
     </div>
     <!-- Manage session and homework -->
     <div class="cell nine twelve-mobile">
-        <button workflow="diary.manageHomework" class="padding-md margin-left-md calendar-button pull-right" ng-click="goTo('/homework/create/')">
+        <button workflow="diary.manageHomework" class="padding-md margin-left-md calendar-button pull-right"
+                ng-click="goTo('/homework/create/')">
             <i18n>homework.create</i18n>
         </button>
-        <button workflow="diary.manageSession" class="padding-md calendar-button pull-right" ng-click="goTo('/session/create/')">
+        <button workflow="diary.manageSession" class="padding-md calendar-button pull-right"
+                ng-click="goTo('/session/create/')">
             <i18n>session.create</i18n>
         </button>
     </div>
@@ -65,9 +72,9 @@
 </div>
 
 <div class="row">
-    <div class="cell three twelve-mobile"
+    <div class="cell three twelve-mobile sidebar-content"
          static-include="/diary/public/template/main/sidebar.html"></div>
 
-    <div class="cell nine twelve-mobile" ng-show="!display.listView"
+    <div class="cell nine twelve-mobile main-content" ng-show="!display.listView"
          static-include="/diary/public/template/main/calendar-view.html"></div>
 </div>

@@ -1,7 +1,7 @@
 <article class="sidebar remove-padding">
 
     <!-- Titre/En-tête Mode d'affichage -->
-    <div class="row title-sidebar padding-left-md">
+    <div class="row title-sidebar padding-left-md padding-right-md">
         <h5 class="large cell twelve" workflow="diary.listView">
             <i18n>sidebar.display_mode</i18n>
             <!-- Legend -->
@@ -10,8 +10,7 @@
         </h5>
     </div>
     <!-- Bloc Mode d'affichage -->
-    <section id="display-section" class="cell twelve padding-md">
-
+    <section id="display-section" class="cell twelve padding-left-md padding-bottom-sm padding-top-sm">
         <div workflow="diary.accessChildData">
             <select ng-model="params.child"
                     class="twelve"
@@ -20,90 +19,33 @@
                 <option value="" disabled>[[translate('student.choose')]]</option>
             </select>
         </div>
-        <div>
 
-
-            <label workflow="diary.listView" class="cell twelve margin-bottom-md">
+        <label workflow="diary.listView" class="cell twelve margin-bottom-md">
                 <span class="six diary-choice-view">
-                    <i tooltip="calendar"
-                       class=" text-xl margin-sm diary-view-calendar"
-                       ng-class="display.listView ? 'opacity-icon' : 'selected'"
-                       ng-click="changeViewCalendar()"></i>
+                    <div ng-include="'/diary/public/img/calendaire.svg'"
+                         class="margin-sm cursorPointer"
+                         ng-class="display.listView ? 'opacity-icon' : 'selected'"
+                         ng-click="changeViewCalendar()"></div>
                     <i18n>calendar</i18n>
                 </span>
-                <span class="six diary-choice-view">
-                    <i tooltip="list"
-                       class=" text-xl margin-sm diary-view-list"
-                       ng-class="display.listView ? 'selected' : 'opacity-icon'"
-                       ng-click="changeViewList()"
-                       ng-model="display.listView"></i>
+            <span class="six diary-choice-view">
+                    <div ng-include="'/diary/public/img/liste.svg'"
+                         class="margin-sm cursorPointer"
+                         ng-class="display.listView ? 'selected' : 'opacity-icon'"
+                         ng-click="changeViewList()"
+                         ng-model="display.listView"></div>
                     <i18n>list</i18n>
                 </span>
-            </label>
-        </div>
-
-        <div class="row margin-bottom-md" ng-show="display.listView">
-
-            <label class="cursorPointer">
-                <input type="radio" ng-model="display.sessionList" ng-value="true">
-                <i18n>session</i18n>
-            </label><br/>
-            <label class="cursorPointer">
-                <input type="radio" ng-model="display.sessionList" ng-value="false">
-                <i18n>Homeworks</i18n>
-            </label>  <i ng-show="!display.sessionList" ng-if="isAChildOrAParent" data-ng-click="display.homeworksFilter = !display.homeworksFilter"
-                         ng-class="display.homeworksFilter ? 'up-open' : 'down-open'" class="right-magnet"></i>
-            <div workflow="diary.listView" ng-show="!display.sessionList" class="row" ng-if="display.homeworksFilter && isAChildOrAParent" >
-                <div class="ten right-magnet" ng-click="display.todo = !display.todo">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="display.todo"/>
-                        <span><i18n>todo</i18n></span>
-                    </label>
-                </div>
-                <div class="ten right-magnet" ng-click="display.done = !display.done">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="display.done"/>
-                        <span><i18n>done</i18n></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="row margin-bottom-md" ng-show="!display.listView">
-
-            <!-- Select structure -->
-            <div ng-if="structures.all.length > 1">
-                <select ng-model="structure"
-                        id="structure-list"
-                        class="twelve margin-bottom-mid"
-                        ng-change="switchStructure(structure)"
-                        ng-options="structure as structure.name for structure in structures.all">
-                    <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
-                </select>
-            </div>
-
-
-            <!-- Homework / Session -->
-            <div ng-click="display.homeworks = !display.homeworks">
-            <label class="checkbox">
-                <input type="checkbox" ng-model="display.homeworks"/>
-                <span><i18n>Homeworks</i18n></span>
-            </label>
-            <div ng-click="display.sessions = !display.sessions">
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="display.sessions">
-                    <span><i18n>sessions</i18n></span>
-                </label>
-            </div>
-        </div>
-        </div>
+        </label>
     </section>
 
     <!-- Titre/En-tête Progression -->
-    <div class="row title-sidebar padding-left-md">
+    <div class="row title-sidebar padding-left-md padding-right-md">
         <h5 class="large cell twelve">
-            <i18n>progression</i18n>
-            <i class="large one cell right-magnet progression-settings" tooltip="Accéder aux progressions" ng-click="goTo('/progressions/view')" ></i>
+            <i18n>progressions</i18n>
+            <div ng-include="'/diary/public/img/' + (showProgression ? 'plus.svg' : 'moins.svg')"
+                 class="large one cell right-magnet close-bloc cursorPointer"
+                 ng-click="changeShowProgression()"></div>
         </h5>
     </div>
     <!-- Bloc Progression -->
@@ -127,16 +69,6 @@
             </ul>
         </div>
     </section>
-
-    <section class="row padding-md" workflow="diary.adminAccess">
-        <div class="cell twelve">
-            <button class="calendar-button twelve padding-sm margin-top-sm" ng-click="goTo('/administrator/global')">
-                <i18n ng-if="typeUser ==='ENSEIGNANT'">sessions.admin.button.goTo2</i18n>
-                <i18n ng-if="typeUser !='ENSEIGNANT'">sessions.admin.button.goTo</i18n>
-            </button>
-        </div>
-    </section>
-
 </article>
 <lightbox show="legendLightboxIsVisible" on-close="setLegendLightboxVisible(false);">
     <container template="infoBulleTemplate"></container>

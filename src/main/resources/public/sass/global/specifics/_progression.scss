@@ -1,5 +1,5 @@
 .progression-item-scrollable{
-  background-color: grey;
+  background-color: $diary-grey;
   color: white;
   transition: background 250ms ease;
   font-size: 12px;
@@ -23,10 +23,10 @@
     border-bottom: 2px $diary-forestgreen solid;
   }
 }
-.progression-settings:before{
+/*.progression-settings:before{
   @include fonticon();
   content:'\e854';
-}
+}*/
 
 .sidebar {
 

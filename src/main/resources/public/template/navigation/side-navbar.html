@@ -1,0 +1,48 @@
+<div class="main-nav">
+    <div class="first-item">
+        <div role="menuitem" class="item"
+             data-ng-click="hoverIn('STRUCTURES')"
+             data-ng-mouseover="hoverIn('STRUCTURES')"
+             data-ng-mouseleave="hoverOut()"
+             ng-if="structures.length > 1">
+            <i class="text-xl margin-sm icon diary-view-carousel"></i>
+            <span><i18n>utils.structure.choose</i18n></span>
+        </div>
+    </div>
+
+    <div class="list-item">
+        <a role="menuitem" href="diary#/view" class="item" ng-class="{active: getCurrentState() === 'view'}" ng-click="changeViewCalendar()">
+            <div ng-include="[[icons.dashboard.path]]" class="icon"></div>
+            <span><i18n>home</i18n></span>
+        </a>
+
+        <a role="menuitem" href="diary#/administrator/global" class="item" ng-class="{active: getCurrentState() === 'administrator'}">
+            <div ng-include="[[icons.diary.path]]" class="icon"></div>
+            <span><i18n>diary.title</i18n></span>
+        </a>
+
+        <a role="menuitem" href="diary#/progressions/view" class="item"
+           ng-class="{active: getCurrentState() === 'progressions'}">
+            <div ng-include="[[icons.progression.path]]" class="icon"></div>
+            <span><i18n>progression.title</i18n></span>
+        </a>
+    </div>
+</div>
+
+<div class="sub-nav">
+    <div class="sub-items" ng-class="{hovered: menu.hovered === 'STRUCTURES'}"
+         data-ng-mouseover="hoverIn('STRUCTURES')"
+         data-ng-mouseleave="hoverOut()"
+         ng-if="structures.length > 1">
+        <h2>
+            <i18n>utils.structure</i18n>
+        </h2>
+        <div ng-repeat="structure in structures" class="item"
+             ng-class="{active: menu.structure.id === structure.id}"
+             data-ng-click="setStructure(structure)">
+            <i class="icon">&nbsp;</i>
+            <span>[[structure.name]]</span>
+        </div>
+    </div>
+</div>
+</div>

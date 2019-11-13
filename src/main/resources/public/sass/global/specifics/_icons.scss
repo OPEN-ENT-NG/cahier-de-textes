@@ -6,4 +6,28 @@ i {
   &.diary-view-list::before {
     content: "\e8b8";
   }
+
+  &.diary-view-carousel::before {
+    content: "\e90d";
+  }
+
+  &.diary-view-puzzle-piece::before {
+    content: "\e918";
+  }
+
+  &.diary-view-chart-bar::before {
+    content: "\e810";
+  }
+
+  &.diary-view-window::before {
+    content: "\f56e";
+  }
+
+  &.open-bloc::before {
+    content: "\e932";
+  }
+
+  &.close-bloc::before {
+    content: "\e931";
+  }
 }

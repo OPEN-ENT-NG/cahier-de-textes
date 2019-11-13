@@ -162,6 +162,13 @@
 
   h5, i {
     color: $white;
+    fill: $white;
+    text-transform: uppercase;
+  }
+
+  svg {
+    display: block;
+    margin: 0 auto;
   }
 }
 
@@ -334,8 +341,8 @@ calendar-daily-events {
   display: inline-block;
   border-radius: 2px;
   box-shadow: none;
-  background: #AAA;
-  color : #fff;
+  background: $diary-grey;
+  color : $white;
 }
 
 i.homework::before {
@@ -344,7 +351,7 @@ i.homework::before {
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
-  color : #fff;
+  color : $white;
 }
 
 .filter2.diary.selected {

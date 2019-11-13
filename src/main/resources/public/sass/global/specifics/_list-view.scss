@@ -1,11 +1,12 @@
 .list-view {
 
   .pedagogic-day {
-    border: 1px solid black;
+    border: 1px solid $black;
     border-radius: 10px;
-    background: white;
+    background: $white;
     &.selected {
       background: gray;
+      fill: gray;
     }
   }
 
@@ -36,7 +37,7 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     background-image:none;
-    color : #fff;
+    color : $white;
   }
 
   i.cahier-textes2::before {
@@ -48,7 +49,7 @@
   }
 
   .border-black {
-    border: 2px solid black;
+    border: 2px solid $black;
   }
 
   .list-view-item {
@@ -138,7 +139,7 @@
     }
 
     .white-text {
-      color: white;
+      color: $white;
     }
 
     &::before {

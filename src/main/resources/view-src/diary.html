@@ -12,6 +12,7 @@
 
 <body ng-controller="MainController" class="cdt">
     <toasts notifications="notifications"></toasts>
+	<div ng-controller="navigationController" class="side-navbar" static-include="/diary/public/template/navigation/side-navbar.html"></div>
 	<portal>
 		<container template="main"></container>
 	</portal>

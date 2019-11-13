@@ -39,8 +39,6 @@ export class Audiences {
     async sync (structureId: string) {
         try {
             let audiences = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true');
-            console.log(audiences);
-
             this.all = Mix.castArrayAs(Audience, audiences.data);
             this.all.sort((g,gg)=> {
                 if(g.type_group < gg.type_group)

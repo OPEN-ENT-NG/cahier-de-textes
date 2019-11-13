@@ -1,16 +1,19 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView">
-    <h1 ng-if="!isAChildOrAParent" >
-        <a href="#" ng-click="changeViewCalendar()">
-           <i18n>diary.title</i18n>
-        </a>
-    </h1>
-
+    <div class="title-area">
+        <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+        <h1 ng-if="!isAChildOrAParent">
+            <a href="#" ng-click="changeViewCalendar()">
+                <i18n>diary.title</i18n>
+            </a>
+        </h1>
+    </div>
     <h1 ng-if="isAChildOrAParent">
         <a ng-click="goToViewList()">
             <i18n>diary.title</i18n>
         </a>
     </h1>
-    <div class="cell three twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></div>
+    <div class="cell three twelve-mobile sidebar-content"
+         static-include="/diary/public/template/main/sidebar.html"></div>
 
     <div class="cell nine twelve-mobile">
         <article class="twelve row " ng-if="display.listView">
@@ -23,41 +26,44 @@
                          class="no-margin date-picker-sm"></date-picker>
         </article>
 
-    <div class="list-view">
-        <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display)" class="timeline-story vertical-spacing row">
-            <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
-                 class="twelve cell event-row timeline-story">
-                <div  ng-if="!containsOnlyCourses(pedagogicDay) && hasHomeworksToDisplay(display, pedagogicDay)" >
-                    <i ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet" ng-click="displayDay(pedagogicDay)"></i>
-                    <div class="cell date-field text-right">
+        <div class="list-view">
+            <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display)" class="timeline-story vertical-spacing row">
+                <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
+                     class="twelve cell event-row timeline-story">
+                    <div ng-if="!containsOnlyCourses(pedagogicDay) && hasHomeworksToDisplay(display, pedagogicDay)">
+                        <i ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet"
+                           ng-click="displayDay(pedagogicDay)"></i>
+                        <div class="cell date-field text-right">
                         <span class="label">
                             [[pedagogicDay.fullDayName]]
                         </span>
-                    </div>
-                    <div class="event cell">
-                        <div>
+                        </div>
+                        <div class="event cell">
+                            <div>
                             <span class="round"
-                                   ng-class="{'[[pedagogicDay.color]]': true}">
+                                  ng-class="{'[[pedagogicDay.color]]': true}">
                                 <span class="white-text">
                                     [[getNbHomework(pedagogicDay)]]
                                 </span>
                             </span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div  ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
-                        <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
-                            <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList" static-include="/diary/public/template/list/list-pedagogic-item.html"/>
-                            <div ng-if="displaySession(display.sessionList,pedagogicItem) && !display.sessionList" static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"/>
+                        <div ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
+                            <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
+                                <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList"
+                                     static-include="/diary/public/template/list/list-pedagogic-item.html"/>
+                                <div ng-if="displaySession(display.sessionList,pedagogicItem) && !display.sessionList"
+                                     static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"/>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays,display)" >
-            <span ng-show="!display.sessionList"><i18n>diary.empty.viewlist.homework</i18n></span>
-            <span ng-show="display.sessionList"><i18n>diary.empty.viewlist.session</i18n></span>
+            <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays,display)">
+                <span ng-show="!display.sessionList"><i18n>diary.empty.viewlist.homework</i18n></span>
+                <span ng-show="display.sessionList"><i18n>diary.empty.viewlist.session</i18n></span>
+            </div>
         </div>
     </div>
-</div>
 </div>
