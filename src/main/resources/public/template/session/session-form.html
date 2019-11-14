@@ -13,7 +13,7 @@
                     ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
                     ng-disabled="session.courseId && session.subject"
                     ng-options=
-                            "subject.label group by groupBy(subject) for subject in subjects.all"
+                            "subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'"
             >
                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
             </select>

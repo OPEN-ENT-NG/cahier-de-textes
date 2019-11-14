@@ -1,8 +1,9 @@
 import {Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Course, Homework, Session, SessionTypes, Subject, Subjects, Toast} from '../../model';
+import {SubjectService} from "../../services";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
-    ['$scope', '$routeParams', '$location', '$attrs', '$filter', async function ($scope, $routeParams, $location, $attrs, $filter) {
+    ['$scope', '$routeParams', '$location', '$attrs', '$filter', 'SubjectService', async function ($scope, $routeParams, $location, $attrs, $filter, SubjectService: SubjectService) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
@@ -289,15 +290,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         async function initData() {
             await $scope.sessionTypes.sync();
-            await $scope.subjects.sync($scope.structure.id, model.me.userId);
-            $scope.groupBy = (x) => x.teacherId !== undefined ? "Mes disciplines" : "Autres disciplines";
-
-            if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
-                $scope.session.subject = $scope.subjects.all[0];
-                if ($scope.session.audience) {
-                    $scope.session.opened = true;
-                }
-            }
+            await initSubjects();
 
             if (!$scope.session.id) {
 
@@ -330,9 +323,35 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.fixEditor();
         }
 
+        async function initSubjects() {
+            await Promise.all([
+                $scope.subjects.sync($scope.structure.id),
+                SubjectService.getTeacherSubjects($scope.structure.id, model.me.userId)
+            ]).then((subjectsList: Subject[][]) => {
+                subjectsList.filter(subjects => subjects).forEach((subjects) => {
+                    subjects.forEach((subject) => {
+                        if (Object.keys($scope.subjects.mapping).indexOf(subject.id) === -1) {
+                            $scope.subjects.all.push(subject);
+                            $scope.subjects.mapping[subject.id] = subject.label;
+                        } else if (subject.teacherId !== undefined) {
+                            const subjectIndex = $scope.subjects.all.map(s => s['id']).indexOf(subject.id);
+                            $scope.subjects.all[subjectIndex].teacherId = subject.teacherId;
+                        }
+                    });
+                });
+                $scope.groupBy = (x) => x.teacherId !== undefined ? lang.translate("subjects.teacher") : lang.translate("subjects.structure");
+                if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
+                    $scope.session.subject = $scope.subjects.all[0];
+                    if ($scope.session.audience) {
+                        $scope.session.opened = true;
+                    }
+                }
+            });
+        }
+
         $scope.back = () => {
             window.history.back();
-        }
+        };
 
         await initData();
     }]

@@ -57,6 +57,8 @@
   "legend": "Légende",
   "subject": "Matière",
   "subjects": "Matière(s)",
+  "subjects.teacher": "Mes disciplines",
+  "subjects.structure": "Autres disciplines",
   "loading": "Chargement",
   "import.file": "Importer",
   "share.users": "Utilisateurs",

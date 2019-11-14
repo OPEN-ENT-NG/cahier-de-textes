@@ -1,5 +1,6 @@
 import {model, notify} from 'entcore';
 import http from 'axios';
+import {Structure} from "./structure";
 
 export class Subject {
     id: string;
@@ -29,27 +30,17 @@ export class Subjects {
     }
 
     /**
-     * Synchronize subjects provides by the structure
+     * Synchronize subjects provided by the structure
      * @param structureId structure id
      * @param teacherId
      * @returns {Promise<void>}
      */
     async sync(structureId: string, teacherId?: string): Promise<void> {
-        if (typeof structureId !== 'string') {
-            return;
-        }
         try {
             let url = `/directory/timetable/subjects/${structureId}`;
-            let subjects = await http.get(url);
-            let teacherSubjects = null;
             this.all = [];
-            if (teacherId !== undefined) {
-                url += `?teacherId=${teacherId}`;
-                teacherSubjects = await http.get(url);
-                teacherSubjects.data.forEach((subject) => {
-                    this.initSubject(subject);
-                });
-            }
+            if (teacherId !== undefined) url += `?teacherId=${teacherId}`;
+            let subjects = await http.get(url);
             subjects.data.forEach((subject) => {
                 if (Object.keys(this.mapping).indexOf(subject.subjectId) === -1) {
                     this.initSubject(subject);
