@@ -1,16 +1,20 @@
 <div class="session-form">
     <div class="row">
-        <div class="six cell twelve-mobile">
+        <div class="seven cell twelve-mobile">
             <select required ng-model="session.audience"
                     ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject);"
                     ng-disabled="session.courseId && session.audience"
                     ng-options="audience.name for audience in structure.audiences.all track by audience.id">
-                <option ng-if="structure.audiences.all.length !== 1"  value="" disabled selected>[[translate('select.audience')]]</option>
+                <option ng-if="structure.audiences.all.length !== 1" value="" disabled selected>
+                    [[translate('select.audience')]]
+                </option>
             </select>
             <select required ng-model="session.subject"
                     ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
                     ng-disabled="session.courseId && session.subject"
-                    ng-options="subject.label for subject in subjects.all track by subject.id">
+                    ng-options=
+                            "subject.label group by groupBy(subject) for subject in subjects.all"
+            >
                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
             </select>
         </div>
@@ -34,7 +38,8 @@
                 <div class="twelve">
                     <i18n>title</i18n>
                 </div>
-                <input type="text" placeholder="[[placeholder]]" class="twelve twelve-mobile" maxlength="50" ng-model="session.title"/>
+                <input type="text" placeholder="[[placeholder]]" class="twelve twelve-mobile" maxlength="50"
+                       ng-model="session.title"/>
             </label>
             <div class="one"></div>
             <!-- Room -->
@@ -161,15 +166,18 @@
                         ng-controller="manageHomeworkCtrl">
                         <!-- Deadline static data -->
                         <td ng-if="!homework.opened" class="three vertical-align-top text-left">
-                            <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve"> [[homework.dateDisplayed]]</p>
-                            <p ng-if="homework.attachedToSession && !homework.session.firstText" class="margin-bottom-md twelve">
+                            <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve">
+                                [[homework.dateDisplayed]]</p>
+                            <p ng-if="homework.attachedToSession && !homework.session.firstText"
+                               class="margin-bottom-md twelve">
                                 <i18n>homework.attachedToSession</i18n>
                                 [[homework.session.startDisplayDate]]
                                 [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
                                 [[homework.session.subject.label]]
                             </p>
 
-                            <p ng-if="homework.attachedToSession && homework.session.firstText" class="margin-bottom-md twelve">
+                            <p ng-if="homework.attachedToSession && homework.session.firstText"
+                               class="margin-bottom-md twelve">
                                 <i18n>todo.for.this.session</i18n>
                             </p>
                         </td>
@@ -186,7 +194,8 @@
                         <!-- Button part -->
                         <td ng-if="!homework.opened">
                             <i ng-show="!homework.opened && !hidePencil" ng-click="$parent.openHomework(homework)">&#xe858;</i>
-                            <i ng-show="!homework.opened" class="trash right-magnet" ng-click="deleteHomework($index);$parent.cancelValidateOnDelete(homework,$index);"></i>
+                            <i ng-show="!homework.opened" class="trash right-magnet"
+                               ng-click="deleteHomework($index);$parent.cancelValidateOnDelete(homework,$index);"></i>
                         </td>
                     </tr>
                     </tbody>
@@ -275,7 +284,9 @@
                                     :
                                 </label>
 
-                                <switch class="vertical-spacing" ng-change="homework.publishedChanged = !homework.publishedChanged" ng-model="homework.isPublished">
+                                <switch class="vertical-spacing"
+                                        ng-change="homework.publishedChanged = !homework.publishedChanged"
+                                        ng-model="homework.isPublished">
                                     <label class="switch"> </label>
                                 </switch>
                             </div>
@@ -289,7 +300,8 @@
                         </div>
 
                         <!-- Description-->
-                        <div ng-if="homework.opened" class="nine float-none display-inline-block vertical-align-top text-left">
+                        <div ng-if="homework.opened"
+                             class="nine float-none display-inline-block vertical-align-top text-left">
                             <div class="twelve-mobile">
                                 <label>
                                     <i18n>utils.description</i18n>

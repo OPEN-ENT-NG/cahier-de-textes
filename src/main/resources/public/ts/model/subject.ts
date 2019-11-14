@@ -1,4 +1,4 @@
-import { model, notify } from 'entcore';
+import {model, notify} from 'entcore';
 import http from 'axios';
 
 export class Subject {
@@ -7,7 +7,7 @@ export class Subject {
     code: string;
     teacherId: string;
 
-    constructor (subjectId?: string, subjectLabel?: string, subjectCode?: string, teacherId?: string) {
+    constructor(subjectId?: string, subjectLabel?: string, subjectCode?: string, teacherId?: string) {
         this.id = subjectId;
         this.label = subjectLabel;
         this.code = subjectCode;
@@ -23,7 +23,7 @@ export class Subjects {
     all: Subject[];
     mapping: any;
 
-    constructor () {
+    constructor() {
         this.all = [];
         this.mapping = {};
     }
@@ -34,22 +34,35 @@ export class Subjects {
      * @param teacherId
      * @returns {Promise<void>}
      */
-    async sync (structureId: string, teacherId?: string): Promise<void> {
-        if (typeof structureId !== 'string') { return; }
+    async sync(structureId: string, teacherId?: string): Promise<void> {
+        if (typeof structureId !== 'string') {
+            return;
+        }
         try {
             let url = `/directory/timetable/subjects/${structureId}`;
-            if(teacherId !== undefined){
-                url += `?teacherId=${teacherId}`
-            }
             let subjects = await http.get(url);
+            let teacherSubjects = null;
             this.all = [];
+            if (teacherId !== undefined) {
+                url += `?teacherId=${teacherId}`;
+                teacherSubjects = await http.get(url);
+                teacherSubjects.data.forEach((subject) => {
+                    this.initSubject(subject);
+                });
+            }
             subjects.data.forEach((subject) => {
-                this.all.push(new Subject(subject.subjectId, subject.subjectLabel, subject.subjectCode, subject.teacherId));
-                this.mapping[subject.subjectId] = subject.subjectLabel;
+                if (Object.keys(this.mapping).indexOf(subject.subjectId) === -1) {
+                    this.initSubject(subject);
+                }
             });
             return;
         } catch (e) {
             notify.error('app.notify.e500');
         }
+    }
+
+    private initSubject(subject: any) {
+        this.all.push(new Subject(subject.subjectId, subject.subjectLabel, subject.subjectCode, subject.teacherId));
+        this.mapping[subject.subjectId] = subject.subjectLabel;
     }
 }
