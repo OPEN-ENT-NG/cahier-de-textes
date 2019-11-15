@@ -1,5 +1,5 @@
 .progression-item-scrollable{
-  background-color: $diary-grey;
+  background-color: blue;
   color: white;
   transition: background 250ms ease;
   font-size: 12px;
@@ -20,7 +20,7 @@
   margin :1px;
 
   &:focus {
-    border-bottom: 2px $diary-forestgreen solid;
+    border-bottom: 2px $diary-darkgreen solid;
   }
 }
 /*.progression-settings:before{

@@ -69,6 +69,7 @@ export let main = ng.controller('MainController',
             await $scope.structure.audiences.sync($scope.structure.id);
             /* Load time slot for calendar, with StructureService(Presence) */
             if ($scope.structure && $scope.structure.id) {
+                $scope.structure.sync();
                 $scope.timeSlot = {
                     list: null
                 };
@@ -170,10 +171,7 @@ export let main = ng.controller('MainController',
 
         async function initializeData(structure?: Structure) {
             $scope.isRefreshingCalendar = true;
-
             structure ? await $scope.syncStructure(structure) : await initializeStructure();
-            $scope.structure.homeworks = new Homeworks($scope.structure);
-            $scope.structure.sessions = new Sessions($scope.structure);
             $scope.progressions = new ProgressionSessions(model.me.userId);
             $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
             if(!$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);

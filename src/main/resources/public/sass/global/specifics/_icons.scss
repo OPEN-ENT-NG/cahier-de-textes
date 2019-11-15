@@ -30,4 +30,19 @@ i {
   &.close-bloc::before {
     content: "\e931";
   }
+
+  &.diary-up::before {
+    content: "\e838";
+  }
+
+  &.diary-calendar::before {
+    content: "\e917";
+  }
+
+  &.diary-file::before {
+    content: "\e945";
+  }
+
+  &.diary-homework::before {
+  }
 }

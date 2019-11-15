@@ -132,6 +132,10 @@ tr th label input[type=checkbox]:checked + span::before {
   }
 }
 
+.toggle-buttons {
+  background-color: $diary-darkgreen;
+}
+
 .main-content {
   top: -40px;
 }
@@ -309,14 +313,14 @@ span.no-style {
 .calendar-button {
   border: none;
   box-shadow: none;
-  background: $diary-forestgreen;
+  background: $diary-darkgreen;
 
   i18n {
     text-transform: uppercase;
   }
 
   &:hover {
-    background-color: $diary-darkgreen;
+    background-color: $diary-darkengreen;
   }
 }
 

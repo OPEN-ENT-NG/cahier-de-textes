@@ -1,7 +1,7 @@
 .async-autocomplete {
   .input-async-autocomplete {
     input[type="text"]:focus {
-      border-bottom: 2px solid $diary-forestgreen !important;
+      border-bottom: 2px solid $diary-darkgreen !important;
     }
 
     &.loading {
@@ -11,7 +11,7 @@
         content: '\e85a';
         position: absolute;
         right: 10px;
-        color: $diary-forestgreen;
+        color: $diary-darkgreen;
         animation: spinner 1.25s linear infinite;
       }
     }
@@ -22,7 +22,7 @@
     display: block;
 
     li:hover {
-      background-color: $diary-forestgreen;
+      background-color: $diary-darkgreen;
     }
   }
 

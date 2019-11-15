@@ -1,7 +1,7 @@
 import {_, angular, idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
-import {Sessions, Teacher, Visa, Visas} from "../../model";
+import {Sessions, Teacher, Utils, Visa, Visas} from "../../model";
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
@@ -21,6 +21,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.selectedSessions = {};
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
+        $scope.homeworks = [];
         $scope.filters = {
             startDate: moment(),
             endDate: moment()
@@ -44,10 +45,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         let getIds = (collection) => {
             return collection
+                .filter(x => x)
                 .map(array => array.id)
-                .filter(function () {
-                    return true
-                })
                 .toString()
         };
         /**
@@ -58,17 +57,23 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             let teachers = $scope.params.teachers.length ? getIds($scope.params.teachers) : null;
             let subjects = $scope.params.subjects.length ? getIds($scope.params.subjects) : null;
             let audiences = $scope.params.audiences.length ? getIds($scope.params.audiences) : null;
-
             await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.structure.id, teachers, subjects, audiences, $scope.vised, $scope.notVised);
-
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
-                s.homeworks.forEach(h => h.isInsideDiary = true);
-
+                s.homeworks.forEach(h => {
+                    h.isInsideDiary = true;
+                    if ($scope.homeworks.map(sh => sh.id).indexOf(h.id) === -1) $scope.homeworks.push(h);
+                });
             });
-            $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject($scope.sessions.all);
+            const sessions = [...$scope.homeworks, ...$scope.sessions.all];
+            $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject(sessions);
             _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
                 $scope.selectedSessions[key] = false;
+                $scope.sessions_GroupBy_AudienceSubject[key] = item.sort((a, b) => {
+                    const dateA = a.dueDate ? a.dueDate : a.startMoment;
+                    const dateB = b.dueDate ? b.dueDate : b.startMoment;
+                    return moment(dateA).diff(moment(dateB));
+                });
             });
             $scope.allSessionsSelect = false;
             $scope.safeApply();
@@ -205,6 +210,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.getVisas = (sessionsGroup) => {
             return _.chain(sessionsGroup)
                     .pluck('visas')
+                    .filter(x => x)
                     .flatten()
                     .uniq(function (visa) {
                         return visa.id;
@@ -219,7 +225,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .last()
                 .value();
             if (date)
-                return moment(date).format("DD/MM/YYYY HH:mm");
+                return moment(date).format("DD/MM/YYYY");
             else
                 return '-';
         };
@@ -235,6 +241,23 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 return lang.translate("sessions.admin.Visa.sateOk");
             else
                 return lang.translate("sessions.admin.Visa.sateKo");
+        };
+
+        $scope.getFormattedTimeSlot = (timeSlot) => {
+            if (timeSlot.dueDate) {
+                return lang.translate('homework.for.date') + ' ' + Utils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
+            }
+            return Utils.formatDate(timeSlot.startMoment, 'DD/MM/YYYY') + ' '
+                + lang.translate('from2') + ' '
+                + Utils.formatDate(timeSlot.startMoment, 'HH:mm') + ' '
+                + lang.translate('to2') + ' '
+                + Utils.formatDate(timeSlot.endMoment, 'HH:mm');
+        };
+
+        $scope.getSessionTitle = (timeSlot) => {
+            if(timeSlot.title) return timeSlot.title;
+            if(timeSlot.attachedToSession) return lang.translate("homework.for.date") + ' ' +  Utils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
+            return $scope.getFormattedTimeSlot(timeSlot);
         };
 
         $scope.getSessionsIds = (sessionsGroup) => {

@@ -143,7 +143,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         }
                         if (h.session.firstText !== lang.translate("session.manage.linkhomework")) {
                             if (!h.session.cc) {
-                                h.isSaved = true
+                                h.isSaved = true;
                                 let sessionSaveResponse = await h.session.save();
                                 if (sessionSaveResponse.succeed) {
                                     h.session.id = sessionSaveResponse.data.id;
@@ -155,9 +155,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         }
                     }
                 }
-                if (!h.attachedToDate) {
-                    h.dueDate = h.session.startMoment;
-                }
+                h.dueDate = h.session.date;
+                h.dueDate.setHours(h.session.startTime.getHours());
+                h.dueDate.setMinutes(h.session.startTime.getMinutes());
                 if (!h.isDeleted && h.isValidForm() && (h.attachedToDate || h.session.id)) {
                     let {succeed} = await h.save();
                     if (!succeed) {

@@ -44,6 +44,10 @@ export class Utils {
         }
     }
 
+    static formatDate(date, format) {
+        return moment(date).format(format);
+    }
+
     static getDisplayDate(date) {
         return moment(date).format(FORMAT.displayDate);
     }
