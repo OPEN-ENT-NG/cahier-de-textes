@@ -18,7 +18,7 @@ export class Session {
     teacher: Teacher;
     audience: any;
     title: string;
-    color: string = _.first(colors);
+    color: string = colors[1];
     date: Date = moment().toDate();
     startTime: any = (moment().set({'hour': '08', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();

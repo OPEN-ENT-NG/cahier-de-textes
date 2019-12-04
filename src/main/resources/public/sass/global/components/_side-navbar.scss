@@ -28,11 +28,17 @@
     }
 
     .list-item {
-      height: 40%;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-direction: column;
+
+      &.three_items {
+        height: 40%;
+      }
+      &.two_items {
+        height: 30%;
+      }
     }
 
     .item{

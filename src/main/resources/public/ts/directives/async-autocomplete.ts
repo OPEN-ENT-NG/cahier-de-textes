@@ -31,7 +31,7 @@ export const asyncAutocomplete = ng.directive('asyncAutocomplete', ['$timeout', 
                 <ul class="ten cell right-magnet">
                     <li class="display-more block-container">
                         <a class="cell right-spacing">
-                            [[translate('noresult')]]
+                            <i18n>noresult</i18n>
                         </a>
                     </li>
                 </ul>

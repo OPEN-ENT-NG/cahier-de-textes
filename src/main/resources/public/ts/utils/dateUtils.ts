@@ -1,5 +1,6 @@
 import {angular, idiom as lang, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
+import http from "axios";
 
 export class DateUtils {
 
@@ -60,7 +61,7 @@ export class DateUtils {
         return moment(date).format(FORMAT.displayDateTime);
     }
 
-    static  getFormattedTimeSlotDate(timeSlot) {
+    static getFormattedTimeSlotDate(timeSlot) {
         if (timeSlot.dueDate) {
             return lang.translate('homework.for.date') + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
         }
@@ -140,5 +141,10 @@ export class DateUtils {
         }
 
         return decodeURI(filename);
+    }
+
+    static async getSchoolYearDates(structureId) {
+        let {data} = await http.get(`viescolaire/settings/periode/schoolyear?structureId=` + structureId);
+        return data;
     }
 }

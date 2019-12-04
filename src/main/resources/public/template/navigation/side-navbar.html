@@ -12,8 +12,10 @@
         </div>
     </div>
 
-    <div class="list-item">
-        <a role="menuitem" href="diary#/view" class="item" ng-class="{active: getCurrentState() === 'view'}"
+    <div class="list-item" ng-class="userType === 'ENSEIGNANT' ? 'three_items' : 'two_items'">
+        <a role="menuitem" ng-href="[[userType === 'ENSEIGNANT' ? 'diary#/view' : 'diary#/administrator/global']]"
+           class="item"
+           ng-class="{active: (userType === 'ENSEIGNANT' ? (getCurrentState() === 'view' || getCurrentState() === '') : (getCurrentState() === 'administrator'))}"
            ng-click="changeViewCalendar()">
             <div ng-include="[[icons.dashboard.path]]" class="icon"></div>
             <span>
@@ -21,16 +23,22 @@
             </span>
         </a>
 
-        <a role="menuitem" href="diary#/administrator/global" class="item"
-           ng-class="{active: getCurrentState() === 'administrator'}">
-            <div ng-include="[[icons.diary.path]]" class="icon"></div>
-            <span>
+        <a role="menuitem" ng-href="[[userType === 'ENSEIGNANT' ? 'diary#/administrator/global' : 'diary#/view']]"
+           class="item"
+           ng-class="{active: (userType === 'ENSEIGNANT' ? (getCurrentState() === 'administrator') : (getCurrentState() === 'view' || getCurrentState() === ''))}">
+            <div ng-include="[[userType === 'ENSEIGNANT' ? icons.diary.path : icons.calendar.path]]"
+                 class="icon"></div>
+            <span ng-if="userType === 'ENSEIGNANT'">
                 <i18n>diary.title</i18n>
+            </span>
+            <span ng-if="userType !== 'ENSEIGNANT'">
+                <i18n>sessions.admin.backOnDiary</i18n>
             </span>
         </a>
 
         <a role="menuitem" href="diary#/progressions/view" class="item"
-           ng-class="{active: getCurrentState() === 'progressions'}">
+           ng-class="{active: getCurrentState() === 'progressions'}"
+           ng-if="userType === 'ENSEIGNANT'">
             <div ng-include="[[icons.progression.path]]" class="icon"></div>
             <span>
                 <i18n>progression.title</i18n>

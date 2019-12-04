@@ -40,7 +40,7 @@
     </section>
 
     <!-- Titre/En-tête Progression -->
-    <div class="row title-sidebar padding-left-md padding-right-md">
+    <div ng-if="typeUser ==='ENSEIGNANT'" class="row title-sidebar padding-left-md padding-right-md">
         <h5 class="large cell twelve">
             <i18n>progressions</i18n>
             <div ng-include="'/diary/public/img/' + (showProgression ? 'plus.svg' : 'moins.svg')"

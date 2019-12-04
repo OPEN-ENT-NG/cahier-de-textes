@@ -72,11 +72,11 @@
                     >
                         <i18n>sessions.admin.icon.dwlPdf</i18n>
                     </button>
-                    <button disabled>
+                    <button disabled ng-if="userType == 'ENSEIGNANT'">
                         <i18n>sessions.admin.merge</i18n>
                     </button>
-                    <button disabled>
-                        <span>sessions.admin.share</span>
+                    <button disabled ng-if="userType == 'ENSEIGNANT'">
+                        <i18n>sessions.admin.share</i18n>
                     </button>
                 </div>
             </div>

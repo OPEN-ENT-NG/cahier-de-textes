@@ -10,6 +10,7 @@ interface Structure {
 export let navigationController = ng.controller("navigationController",
     ['$scope', async function ($scope) {
         $scope.public = false;
+        $scope.userType = model.me.type;
 
         async function init() {
             $scope.icons = {
@@ -23,6 +24,10 @@ export let navigationController = ng.controller("navigationController",
                 },
                 dashboard: {
                     path: "/diary/public/img/view-dashboard.svg",
+                    alt: "",
+                },
+                calendar: {
+                    path: "/diary/public/img/calendaire.svg",
                     alt: "",
                 }
             };

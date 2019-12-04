@@ -2,7 +2,8 @@
 
   h1 {
     color: $black;
-    font-size: 28px
+    font-size: 28px;
+    font-weight: bold;
   }
 
   input[type=checkbox] + span::before {

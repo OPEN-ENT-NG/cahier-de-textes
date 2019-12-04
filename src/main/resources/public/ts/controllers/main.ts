@@ -648,8 +648,7 @@ export let main = ng.controller('MainController',
                 typeCourseSession = typeCourse;
             }
 
-
-            if (progression[0].classList[2] == "progression-item-draggable") {
+            if (progression[0].classList.contains("progression-item-draggable")) {
                 if (typeCourseSession == typeSession) {
                     $scope.updateSession(idCourseSession, id_progressionOrSession);
                 } else if (typeCourseSession == typeCourse) {
@@ -682,7 +681,6 @@ export let main = ng.controller('MainController',
                 }
             });
             $scope.session.getSessionInfo(sessionDrag);
-
             $scope.goTo('/session/update/' + $scope.session.id);
         };
 
@@ -725,7 +723,6 @@ export let main = ng.controller('MainController',
                Handle a progression dropped on a session
                 */
         $scope.updateSession = async (idSession, idProgression) => {
-
             let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
                 if (progression.id == idProgression) {
@@ -787,6 +784,7 @@ export let main = ng.controller('MainController',
             await course.sync(date, date);
             let session = new Session($scope.structure, course, progressionDragged);
             session.setFromCourse(course);
+            console.log("session", session);
             session.opened = true;
             $scope.session = session;
             progressionDragged.progression_homeworks.map(

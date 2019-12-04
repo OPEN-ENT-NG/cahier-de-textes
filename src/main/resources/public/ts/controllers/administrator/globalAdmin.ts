@@ -10,13 +10,16 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
         $scope.vised = true;
-        $scope.notVised = false;
+        $scope.notVised = true;
         $scope.archived = false;
         $scope.sharedWithMe = false;
         $scope.published = true;
         $scope.notPublished = true;
         $scope.autocomplete = AutocompleteUtils;
-
+        $scope.filters = {
+            startDate: moment(),
+            endDate: moment()
+        };
 
         $scope.userType = model.me.type;
 
@@ -28,19 +31,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
         $scope.homeworks = [];
-        $scope.filters = {
-            startDate: moment(),
-            endDate: moment()
-        };
-        //Set default date 09-01 to 07-15 of current school year
-        if (parseInt($scope.filters.startDate.format('MM')) < 9) {
-            $scope.filters.startDate = $scope.filters.startDate.date(1).month(8).subtract(1, "years");
-            $scope.filters.endDate = $scope.filters.endDate.date(15).month(6);
-        } else {
-            $scope.filters.startDate = $scope.filters.startDate.date(1).month(8);
-            $scope.filters.endDate = $scope.filters.endDate.date(15).month(6).add(1, "years");
-        }
-
         $scope.structureSwitchEvent = async () => {
             $scope.teacher = null;
             $scope.teacherId = null;
@@ -163,8 +153,13 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.init = async () => {
+            const schoolYears = await DateUtils.getSchoolYearDates($scope.structure.id);
+            $scope.filters.startDate = moment(schoolYears.start_date);
+            $scope.filters.endDate = moment();
+
             AutocompleteUtils.init($scope.structure);
             $scope.sessions.structure = $scope.structure;
+
             if ($scope.userType == "ENSEIGNANT") {
                 AutocompleteUtils.setTeachersSelected([_.find($scope.structure.teachers.all, {id: model.me.userId})]);
             }
@@ -289,10 +284,12 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.filterTeacherOptions = async (value) => {
             await AutocompleteUtils.filterTeacherOptions(value);
+            $scope.safeApply();
         };
 
         $scope.filterClassOptions = async (value) => {
             await AutocompleteUtils.filterClassOptions(value);
+            $scope.safeApply();
         };
 
         $scope.selectTeacher = async (model, item) => {
@@ -400,6 +397,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
 
         $scope.$watch(() => $scope.structure, async () => {
+<<<<<<< HEAD
             $scope.init();
+=======
+            await $scope.init();
+>>>>>>> feat(diary) MCDT-309: MCDT-313: change filter table feature
         });
     }]);

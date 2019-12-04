@@ -64,6 +64,7 @@ export class AutocompleteUtils {
             this.teacherOptions = await this.searchTeachers(value);
         } catch (err) {
             this.teacherOptions = [];
+            throw err;
         }
     };
 
@@ -72,6 +73,7 @@ export class AutocompleteUtils {
             this.classOptions = await this.searchClasses(value);
         } catch (err) {
             this.classOptions = [];
+            throw err;
         }
     }
 

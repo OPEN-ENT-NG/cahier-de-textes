@@ -290,8 +290,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
         async function initData() {
             await $scope.sessionTypes.sync();
-            await initSubjects();
-
             if (!$scope.session.id) {
 
                 if ($routeParams.id) {
@@ -318,7 +316,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
 
             $scope.placeholder = "Séance du " + moment($scope.session.date).format("DD/MM/YYYY");
-
+            await initSubjects();
             $scope.safeApply();
             $scope.fixEditor();
         }
@@ -347,6 +345,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     }
                 }
             });
+            const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
+            if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];
         }
 
         $scope.back = () => {
