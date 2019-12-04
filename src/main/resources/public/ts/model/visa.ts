@@ -40,9 +40,10 @@ export class Visa {
             stuctureName: this.structure.name,
             sessions: this.sessions.map((n) => {
                 const homeworks = n.homeworks ? n.homeworks : [];
+                const nLabel = n.subject ? n.subject.label : '';
                 return {
-                    audience: n.audience.name,// n.audience.name,
-                    subject: n.subject.label,
+                    audience: n.audience.name,
+                    subject: nLabel,
                     teacher: n.teacher.toString(),
                     title: n.title,
                     type: n.type.label,
