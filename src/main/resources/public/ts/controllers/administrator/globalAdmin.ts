@@ -45,18 +45,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .map(array => array.id)
                 .toString()
         };
-        /**
-         * Init de la vue ***
-         */
-        /*let syncSessionsWithVisa = async () => {
-            // let teacherId;
-            let teachers = $scope.params.teachers.length ? getIds($scope.params.teachers) : null;
-            let audiences = $scope.params.audiences.length ? getIds($scope.params.audiences) : null;
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.structure.id, teachers, audiences, $scope.vised, $scope.notVised);
-
-
-        };*/
-
 
         $scope.filterList = async () => {
             $scope.selectOrUnselectAllSessions(false);
@@ -397,10 +385,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
 
         $scope.$watch(() => $scope.structure, async () => {
-<<<<<<< HEAD
             $scope.init();
-=======
-            await $scope.init();
->>>>>>> feat(diary) MCDT-309: MCDT-313: change filter table feature
         });
     }]);
