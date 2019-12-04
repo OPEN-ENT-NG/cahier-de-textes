@@ -108,17 +108,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.safeApply();
         };
 
-
-        /*$scope.canUpdateSessionsWithVisa = async () => {
-            if ($scope.structure.id && $scope.filters.startDate && $scope.filters.endDate &&
-                ($scope.params.teachers.length || $scope.params.audiences.length)) {
-                await syncSessionsWithVisa();
-            } else {
-                $scope.sessions_GroupBy_AudienceSubject = [];
-            }
-            $scope.safeApply();
-        };*/
-
         $scope.updateDatas = async (event) => {
             // Checking if event is triggered when selecting an element inside multiCombo
             $scope.sessions.structure = $scope.structure;
@@ -175,6 +164,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.init = async () => {
             AutocompleteUtils.init($scope.structure);
+            $scope.sessions.structure = $scope.structure;
             if ($scope.userType == "ENSEIGNANT") {
                 AutocompleteUtils.setTeachersSelected([_.find($scope.structure.teachers.all, {id: model.me.userId})]);
             }
@@ -190,7 +180,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.updateOptionToaster = () => {
-            if($scope.sessionsUnselected().length > 0) $scope.allSessionsSelect = false;
+            if ($scope.sessionsUnselected().length > 0) $scope.allSessionsSelect = false;
             $scope.showOptionToaster = _.chain($scope.selectedSessions)
                 .map(item => item)
                 .contains(true)
@@ -281,7 +271,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.selectOrUnselectAllSessions = function (isSelected = null) {
-            if(isSelected) $scope.allSessionsSelect = isSelected;
+            if (isSelected) $scope.allSessionsSelect = isSelected;
             let targetValue = $scope.allSessionsSelect;
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = targetValue;
@@ -305,24 +295,24 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             await AutocompleteUtils.filterClassOptions(value);
         };
 
-        $scope.selectTeacher = async (model, item) =>  {
+        $scope.selectTeacher = async (model, item) => {
             AutocompleteUtils.selectTeacher(model, item);
             await $scope.filterList();
             AutocompleteUtils.resetSearchFields();
         };
 
-        $scope.selectClass = async (model, item) =>  {
+        $scope.selectClass = async (model, item) => {
             AutocompleteUtils.selectClass(model, item);
             await $scope.filterList();
             AutocompleteUtils.resetSearchFields();
         };
 
-        $scope.removeTeacher = async (value) =>  {
+        $scope.removeTeacher = async (value) => {
             AutocompleteUtils.removeTeacherSelected(value);
             await $scope.filterList();
         };
 
-        $scope.removeClass = async (value) =>  {
+        $scope.removeClass = async (value) => {
             AutocompleteUtils.removeClassSelected(value);
             await $scope.filterList();
         };
