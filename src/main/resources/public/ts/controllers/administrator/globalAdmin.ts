@@ -408,13 +408,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             }
         };
 
-        $scope.init();
 
         $scope.$watch(() => $scope.structure, async () => {
-            AutocompleteUtils.init($scope.structure);
-            if ($scope.userType != "ENSEIGNANT") {
-                $scope.sessions.structure = $scope.structure;
-                await $scope.filterList();
-            }
+            $scope.init();
         });
     }]);

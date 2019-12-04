@@ -25,7 +25,7 @@ export class Course {
     startMoment: any;
     startDisplayDate: string;
     startDisplayTime: string;
-    endCourse:any;
+    endCourse: any;
     endDate: any;
     endMoment: any;
     endDisplayDate: string;
@@ -37,7 +37,7 @@ export class Course {
     is_periodic: boolean = false;
     locked: boolean = true;
 
-    constructor (structure: Structure, id: string) {
+    constructor(structure: Structure, id: string) {
         this.structure = structure;
         this._id = id;
     }
@@ -98,7 +98,7 @@ export class Courses {
     origin: Course[];
     structure: Structure;
 
-    constructor (structure: Structure) {
+    constructor(structure: Structure) {
         this.structure = structure;
         this.all = [];
         this.origin = [];
@@ -119,21 +119,21 @@ export class Courses {
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
         let firstDate = DateUtils.getFormattedDate(startMoment);
-        let endDate =  DateUtils.getFormattedDate(endMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
 
-        if (audience === null && model.me.type !== USER_TYPES.student)
-            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher? teacher.id : model.me.userId}`;
-        if (teacher === null && audience !== null)
+        if (!audience && model.me.type !== USER_TYPES.student) {
+            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher ? teacher.id : model.me.userId}`;
+        }
+        if (!teacher && audience)
             filter += `group=${audience.name}`;
         if (model.me.type === USER_TYPES.student && model.me.classes && model.me.classes.length)
-            if(window.audiences && window.audiences.all.length > 0) {
+            if (window.audiences && window.audiences.all.length > 0) {
                 window.audiences.all.forEach((audience: Audience) => filter += `&group=${audience.name}`);
             }
-            // filter = `group=${model.me.classes[0]}`;
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let { data } = await http.get(uri);
+        let {data} = await http.get(uri);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
