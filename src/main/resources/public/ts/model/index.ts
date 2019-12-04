@@ -12,7 +12,7 @@ export * from './visa';
 export * from './Toast';
 export * from './User';
 
-export * from '../utils/utils';
+export * from '../utils/dateUtils';
 export * from '../utils/const/user-types';
 export * from '../utils/const/daysOfWeek';
 export * from '../utils/const/comboLabels';

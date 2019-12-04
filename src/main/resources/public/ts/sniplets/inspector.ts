@@ -1,7 +1,7 @@
 import {_, http, notify, idiom as lang} from 'entcore';
 import {Inspector, InspectorHabilitation} from '../model/inspector';
 import {Structure, Structures} from '../model';
-import {Utils} from '../utils/utils';
+import {DateUtils} from '../utils/dateUtils';
 
 export const inspector = {
     title: 'Inspector Management',

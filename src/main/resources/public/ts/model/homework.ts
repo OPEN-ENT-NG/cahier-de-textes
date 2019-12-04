@@ -1,7 +1,7 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Structure, Teacher, Toast, Utils} from './index';
+import {Structure, Teacher, Toast, DateUtils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
@@ -60,8 +60,8 @@ export class Homework {
             session_id: this.session ? this.session.id : null,
             audience_id: this.audience.id,
             estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
-            due_date: Utils.getFormattedDate(this.dueDate),
-            description: Utils.htmlToXhtml(this.description),
+            due_date: DateUtils.getFormattedDate(this.dueDate),
+            description: DateUtils.htmlToXhtml(this.description),
             color: this.color,
             is_published: this.isPublished,
             workload: this.workload
@@ -102,7 +102,7 @@ export class Homework {
             title: data.title,
             color: data.color,
             estimatedTime: data.estimatedtime,
-            dueDate: Utils.getFormattedDate(data.due_date),
+            dueDate: DateUtils.getFormattedDate(data.due_date),
             description: data.description,
             isPublished: data.is_published,
             workload: data.workload,
@@ -124,35 +124,35 @@ export class Homework {
         let state = stateId == Homework.HOMEWORK_STATE_DONE ? 'done' : 'todo';
         let response = await http.post(`/diary/homework/progress/${this.id}/${state}`);
 
-        return Utils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
+        return DateUtils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
 
 
     }
 
     async create () {
         let response = await http.post('/diary/homework', this.toSendFormat());
-        return Utils.setToastMessage(response, 'homework.created','homework.created.error');
+        return DateUtils.setToastMessage(response, 'homework.created','homework.created.error');
     }
 
     async update () {
         let response = await http.put(`/diary/homework/${this.id}/${this.publishedChanged} `, this.toSendFormat());
-        return Utils.setToastMessage(response, 'homework.updated','homework.updated.error');
+        return DateUtils.setToastMessage(response, 'homework.updated','homework.updated.error');
     }
 
     async delete() {
         let response = await http.delete('/diary/homework/' + this.id);
-        return Utils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
+        return DateUtils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
     }
 
     async publish() {
         let response = await http.post('/diary/homework/publish/' + this.id);
-        return Utils.setToastMessage(response, 'homework.published','homework.published.error');
+        return DateUtils.setToastMessage(response, 'homework.published','homework.published.error');
     }
 
 
     async unpublish() {
         let response = await http.post('/diary/homework/unpublish/' + this.id);
-        return Utils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
+        return DateUtils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
     }
 
     async sync(): Promise<void> {
@@ -185,7 +185,7 @@ export class Homework {
         }
 
         this.workloadDay = new WorkloadDay(this.structure, this.audience, this.dueDate, this.isPublished);
-        this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
+        this.plainTextDescription = DateUtils.convertHtmlToPlainText(this.description);
     }
 
 
@@ -229,8 +229,8 @@ export class Homeworks {
     }
 
     async syncOwnHomeworks(structure: any,startMoment: any, endMoment: any): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}`;
 
@@ -238,8 +238,8 @@ export class Homeworks {
     }
 
     async syncExternalHomeworks(startMoment: any, endMoment: any, type?: string, typeId?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/homeworks/external/${startDate}/${endDate}/${type}/${typeId}`;
 
@@ -247,8 +247,8 @@ export class Homeworks {
     }
 
     async syncChildHomeworks(startMoment: any, endMoment: any, childId?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}/${this.structure.id}`;
 
@@ -257,7 +257,6 @@ export class Homeworks {
 
     async syncHomeworks (url: string){
         let { data } = await http.get(url);
-
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init();
@@ -286,19 +285,19 @@ export class HomeworkType {
 
     async create() {
         let response = await http.post(`/diary/homework-type` , this.toJson());
-        return Utils.setToastMessage(response,'cdt.homework.type.create', 'cdt.homework.type.create.error')
+        return DateUtils.setToastMessage(response,'cdt.homework.type.create', 'cdt.homework.type.create.error')
     }
 
     async update() {
         let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
-        return Utils.setToastMessage(response,'cdt.homework.type.update', 'cdt.homework.type.update.error')
+        return DateUtils.setToastMessage(response,'cdt.homework.type.update', 'cdt.homework.type.update.error')
     }
 
     async delete() {
         let {data} = await http.delete(`/diary/homework-type/${this.id}/${this.structure_id}`);
         if (data.id != undefined) {
             let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
-            return Utils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')
+            return DateUtils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')
         }
         else {
             notify.error('cdt.homework.type.delete.impossible')
@@ -389,7 +388,7 @@ export class WorkloadDay {
     };
 
     async sync(date: any): Promise<void> {
-        let {data} = await http.get(`/diary/workload/${this.structure.id}/${this.audience.id}/${Utils.getFormattedDate(date)}/${this.isPublished}`);
+        let {data} = await http.get(`/diary/workload/${this.structure.id}/${this.audience.id}/${DateUtils.getFormattedDate(date)}/${this.isPublished}`);
         this.all = Mix.castArrayAs(Workload, WorkloadDay.formatSqlDataToModel(data));
         this.all.forEach(w => w.init());
     }

@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SessionServiceImpl implements SessionService {
-    private static final String STATEMENT = "statement" ;
-    private static final String VALUES = "values" ;
-    private static final String ACTION = "action" ;
-    private static final String PREPARED = "prepared" ;
+    private static final String STATEMENT = "statement";
+    private static final String VALUES = "values";
+    private static final String ACTION = "action";
+    private static final String PREPARED = "prepared";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
 
     private DiaryService diaryService = new DiaryServiceImpl();
@@ -64,7 +64,7 @@ public class SessionServiceImpl implements SessionService {
         if (user.getType().equals("Student")) {
             this.getChildSessions(structureId, startDate, endDate, user.getUserId(), handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getSessions(structureId, startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, null, false, false,false, false, handler);
+            this.getSessions(structureId, startDate, endDate, user.getUserId(), listAudienceId, listSubjectId, false, false, false, false, false, handler);
         }
     }
 
@@ -73,7 +73,7 @@ public class SessionServiceImpl implements SessionService {
         List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
         List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
 
-        this.getSessions(null,startDate, endDate, null, listAudienceId, null, listTeacherId, true, false,false, false, handler);
+        this.getSessions(null, startDate, endDate, null, listAudienceId, listTeacherId, true, false, false, false, false, handler);
     }
 
     @Override
@@ -86,20 +86,20 @@ public class SessionServiceImpl implements SessionService {
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getSessions(structureId, startDate, endDate, null, listAudienceId, null, null, true, false,false, false, handler);
+                this.getSessions(structureId, startDate, endDate, null, listAudienceId, null, true, false, false, false, false, handler);
             }
         });
     }
 
     public String getWithSessionsQuery(String structureID, String startDate, String endDate, String ownerId,
-                                       List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId, boolean onlyPublished,  JsonArray values) {
-        String query =  " WITH homework_and_type as " +
-                        " ( " +
-                        " SELECT homework.*, to_json(homework_type) as type " +
-                        " FROM " + Diary.DIARY_SCHEMA + ".homework" +
-                        " INNER JOIN diary.homework_type ON homework.type_id = homework_type.id " +
-                        " INNER JOIN diary.session s ON (homework.session_id = s.id)" +
-                        ((onlyPublished) ? " AND s.is_published = true " : " ");
+                                       List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished, JsonArray values) {
+        String query = " WITH homework_and_type as " +
+                " ( " +
+                " SELECT homework.*, to_json(homework_type) as type " +
+                " FROM " + Diary.DIARY_SCHEMA + ".homework" +
+                " INNER JOIN diary.homework_type ON homework.type_id = homework_type.id " +
+                " INNER JOIN diary.session s ON (homework.session_id = s.id)" +
+                ((onlyPublished) ? " AND s.is_published = true " : " ");
 
         if (startDate != null && endDate != null) {
             query += " AND homework.due_date >= to_date(?,'YYYY-MM-DD')";
@@ -113,12 +113,6 @@ public class SessionServiceImpl implements SessionService {
                 values.add(audienceId);
             }
         }
-        if (listSubjectId != null) {
-            query += " AND homework.subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
-            for (String subjectId : listSubjectId) {
-                values.add(subjectId);
-            }
-        }
         if (listTeacherId != null) {
             query += " AND homework.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
             for (String teacherId : listTeacherId) {
@@ -129,7 +123,7 @@ public class SessionServiceImpl implements SessionService {
             query += " AND homework.owner_id = ?";
             values.add(ownerId);
         }
-        if (structureID != null){
+        if (structureID != null) {
             query += " AND homework.structure_id = ?";
             values.add(structureID);
         }
@@ -138,22 +132,29 @@ public class SessionServiceImpl implements SessionService {
         return query.replaceFirst("AND", "WHERE");
     }
 
-    public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
-                                         boolean onlyPublished, boolean onlyVised, boolean onlyNotVised, boolean agregVisas,  JsonArray values, Handler<Either<String, JsonArray>> handler) {
+    public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
+                                         boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, JsonArray values, Handler<Either<String, JsonArray>> handler) {
         String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) as homeworks" +
                 ((agregVisas) ? " ,array_to_json(array_agg(distinct visa)) as visas" : " ") +
                 " FROM diary.session s " +
                 ((agregVisas) ? " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id " +
-                " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
-                " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)" +
-                ((onlyPublished) ? " AND s.is_published = true " : " ");
+                        " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
+                " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)";
 
-        query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, values, query);
+        if (published && !notPublished) {
+            query += " AND s.is_published = true ";
+        }
 
-        if (agregVisas && onlyVised && !onlyNotVised) {
+        if (notPublished && !published) {
+            query += " AND s.is_published = false ";
+        }
+
+        query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, values, query);
+
+        if (agregVisas && vised && !notVised) {
             query += " AND visa IS NOT NULL";
         }
-        if (agregVisas && onlyNotVised && !onlyVised){
+        if (agregVisas && notVised && !vised) {
             query += " AND visa IS NULL";
         }
         query += " GROUP BY s.id " + " ORDER BY s.date ASC ";
@@ -161,7 +162,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     private String getWhereContentGetSessionQuery(String structureID, String startDate, String endDate, String ownerId,
-                                                  List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId, JsonArray values, String query) {
+                                                  List<String> listAudienceId, List<String> listTeacherId, JsonArray values, String query) {
         if (startDate != null && endDate != null) {
             query += " AND s.date >= to_date(?,'YYYY-MM-DD')";
             query += " AND s.date <= to_date(?,'YYYY-MM-DD')";
@@ -174,12 +175,6 @@ public class SessionServiceImpl implements SessionService {
                 values.add(audienceId);
             }
         }
-        if (listSubjectId != null) {
-            query += " AND s.subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
-            for (String subjectId : listSubjectId) {
-                values.add(subjectId);
-            }
-        }
         if (listTeacherId != null) {
             query += " AND s.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
             for (String teacherId : listTeacherId) {
@@ -190,7 +185,7 @@ public class SessionServiceImpl implements SessionService {
             query += " AND s.owner_id = ?";
             values.add(ownerId);
         }
-        if (structureID != null){
+        if (structureID != null) {
             query += " AND s.structure_id = ?";
             values.add(structureID);
         }
@@ -205,19 +200,20 @@ public class SessionServiceImpl implements SessionService {
      * @param ownerId        return sessions with this ownerId
      * @param listAudienceId return sessions with a audience_id field inside this list
      * @param listTeacherId  return sessions with a teacher_id field inside this list
-     * @param onlyPublished  returns only published sessions
-     * @param onlyVised      returns only the sessions with visa
-     * @param onlyNotVised   returns only the sessions without visa
+     * @param published      returns published sessions
+     * @param notPublished   returns not published sessions
+     * @param vised          returns the sessions with visa
+     * @param notVised       returns the sessions without visa
      * @param agregVisas     returns the sessions with the field visas
      * @param handler
      */
-    public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listSubjectId, List<String> listTeacherId,
-                            boolean onlyPublished, boolean onlyVised, boolean onlyNotVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
+    public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
+                            boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
 
         String query;
-        query = this.getWithSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, onlyPublished, values)
-                + this.getSelectSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listSubjectId, listTeacherId, onlyPublished, onlyVised, onlyNotVised, agregVisas, values, handler);
+        query = this.getWithSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, published, values)
+                + this.getSelectSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, published, notPublished, vised, notVised, agregVisas, values, handler);
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
@@ -370,8 +366,7 @@ public class SessionServiceImpl implements SessionService {
                                 handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
                             }
                         });
-                    }
-                    catch (ClassCastException e) {
+                    } catch (ClassCastException e) {
                         LOGGER.error("An error occurred when insert homework_type", e);
                         handler.handle(new Either.Left<String, JsonObject>("Error creating type"));
                     }

@@ -1,12 +1,12 @@
 <div class="cell twelve">
     <div class="flex-table">
 
-        <div class="flex-row row__15 flex-head" role="rowgroup">
+        <div class="flex-row  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'" role="rowgroup">
             <div class="flex-col col__1 empty-take-space text-center" role="cell">
                 <label class="checkbox">
                     <input type="checkbox"
                            ng-model="allSessionsSelect"
-                           ng-change="selectOrUnselectAllSessions(allSessionsSelect)">
+                           ng-change="selectOrUnselectAllSessions()">
                     <span></span>
                 </label>
             </div>
@@ -16,7 +16,7 @@
             <div class="flex-col col__2 text-center" role="cell">
                 <i18n>subjects</i18n>
             </div>
-            <div class="flex-col col__2 text-center" role="cell">
+            <div class="flex-col col__2 text-center" role="cell" ng-if="userType !== 'ENSEIGNANT'">
                 <i18n>utils.teacher</i18n>
             </div>
             <div class="flex-col col__2 text-center" role="cell">
@@ -37,7 +37,8 @@
              class="flex-body"
              role="rowgroup">
             <div class="flex-content">
-                <div class="flex-row row__15" ng-click="openDetails = openDetails != key ? key : null">
+                <div class="flex-row" ng-click="openDetails = openDetails != key ? key : null"
+                     ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'">
                     <div class="flex-col col__1 empty-take-space" role="cell">
                         <label class="checkbox">
                             <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
@@ -50,7 +51,7 @@
                     <div class="flex-col col__2" role="cell">
                         [[sessionsGroup[0].subject.label]]
                     </div>
-                    <div class="flex-col col__2" role="cell">
+                    <div class="flex-col col__2" role="cell" ng-if="userType !== 'ENSEIGNANT'">
                         [[sessionsGroup[0].teacher.toString()]]
                     </div>
                     <div class="flex-col col__2" role="cell">
@@ -62,11 +63,11 @@
                     <div class="flex-col col__2" role="cell">
                     </div>
                     <div class="flex-col col__2" role="cell">
-                        [[getLastCreatedVisa(sessionsGroup)]]
+                        <span>[[getLastCreatedVisa(sessionsGroup)]]</span>
                     </div>
                 </div>
             </div>
-            <div class="flex-collapse" ng-class="{'openDetails': openDetails == key}">
+            <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
                     <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__15"
                          ng-class="timeSlot.dueDate ? 'homework-slot' : 'session-slot'" role="rowgroup">
@@ -78,8 +79,8 @@
                             <span class="eleven">[[getSessionTitle(timeSlot)]]</span>
                         </div>
                         <div class="flex-col col__5" role="cell">
-                            <i class="text-xl two margin-sm icon diary-calendar"></i>
-                            <span class="ten">[[getFormattedTimeSlot(timeSlot)]]</span>
+                            <i class="text-xl one margin-sm icon diary-calendar"></i>
+                            <span class="eleven">[[getFormattedTimeSlotDate(timeSlot)]]</span>
                         </div>
                         <div class="flex-col col__3" role="cell">
                             <i class="text-xl two margin-sm icon diary-file"></i>
@@ -98,135 +99,6 @@
             </div>
         </div>
     </div>
-
-
-    <!--<table class="twelve table-layout-fixed text-center">
-        <thead>
-        <tr>
-            <th width="5%" class="empty-take-space text-center">
-                <label class="checkbox">
-                    <input type="checkbox"
-                           ng-model="allSessionsSelect"
-                           ng-change="selectOrUnselectAllSessions(allSessionsSelect)">
-                    <span></span>
-                </label>
-            </th>
-            <th class="text-center">
-                <i18n>utils.group</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>subjects</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>teacher</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>sessions.admin.lastUpdateSession</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>sessions.admin.numberSessions</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>sessions.admin.merged</i18n>
-            </th>
-            <th class="text-center">
-                <i18n>sessions.admin.state</i18n>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat-start="(key, sessionsGroup) in sessions_GroupBy_AudienceSubject"
-            ng-click="openDetails = openDetails != key ? key : null">
-            <td>
-                <label class="checkbox">
-                    <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
-                    <span></span>
-                </label>
-            </td>
-            <td>
-                [[sessionsGroup[0].audience.name]]
-            </td>
-            <td>
-                [[sessionsGroup[0].subject.label]]
-            </td>
-            <td>
-                [[sessionsGroup[0].teacher.name]]
-            </td>
-            <td>
-                [[getLastEditSession(sessionsGroup)]]
-            </td>
-            <td>
-                [[sessionsGroup.length]]
-            </td>
-            <td>
-            </td>
-            <td>
-                [[getLastCreatedVisa(sessionsGroup)]]
-            </td>
-            <td>
-                <i tooltip="<i18n>sessions.admin.icon.dwlPdf</i18n>" ng-if="getVisas(sessionsGroup).length > 0"
-                   ng-click="wantDownloadPdf(sessionsGroup)">&#xe857;</i>&nbsp;
-                <i tooltip="<i18n>sessions.admin.icon.see</i18n>"
-                   ng-click="openDetails = openDetails != key ? key : null" ng-show='!openDetails || openDetails==0'>&#xe873;</i>
-                <i ng-click="openDetails = null"
-                   ng-show='openDetails'>&#xe904;</i>
-
-            </td>
-        </tr>
-        <tr ng-repeat-end>
-            <td colspan="8" ng-show="openDetails == key" class="flex-table"
-                ng-class="{'openDetails': openDetails == key}">
-                <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__12"
-                     ng-class="timeSlot.dueDate ? 'homework-slot' : 'session-slot'" role="rowgroup">
-                    <div class="flex-col time-slot-type" role="cell"></div>
-                    <div class="flex-col col__3 time-slot-title" role="cell">[[getSessionTitle(timeSlot)]]</div>
-                    <div class="flex-col col__3" role="cell">[[getFormattedTimeSlot(timeSlot)]]</div>
-                    <div class="flex-col col__3" role="cell">[[timeSlot.type.label]]</div>
-                    <div class="flex-col col__2" role="cell">
-                        <i18n ng-if="timeSlot.isPublished">published</i18n>
-                        <i18n ng-if="!timeSlot.isPublished">notpublished</i18n>
-                        <i class="text-xl margin-sm icon diary-up"></i>
-                    </div>
-                </div>
-            </td>
-        </tr>
-         <tr >
-             <td class="time-slot-type"></td>
-             <td colspan="2" class="time-slot-title">[[getSessionTitle(timeSlot)]]</td>
-             <td colspan="2">[[getFormattedTimeSlot(timeSlot)]]</td>
-             <td colspan="2">[[timeSlot.type.label]]</td>
-             <td ng-class="timeSlot.isPublished ? 'published' : 'notpublished'">
-                 <i18n ng-if="timeSlot.isPublished">published</i18n>
-                 <i18n ng-if="!timeSlot.isPublished">notpublished</i18n>
-                 <i class="text-xl margin-sm icon diary-up"></i>
-             </td>
-
-
-            <td colspan="7" class="remove-padding" style="padding-left: 50px;">
-                 <div class="diary[[getSessionsIds(sessionsGroup).join('-')]]">
-                     <div ng-repeat="session in sessionsGroup" class="twelve">
-                         <div class="row margin-bottom-lg"
-                              static-include="/diary/public/template/session/session-view.html"
-                              read-only="true"
-                              inside-diary="true">
-                         </div>
-                         <div class="padding-md"
-                              ng-if="session.homeworks.length > 0">
-                             <div class="row">
-                                 <div class="eleven right-magnet"
-                                      ng-repeat="homework in session.homeworks"
-                                      is-inside-session-form="true"
-                                      inside-diary="true"
-                                      static-include="/diary/public/template/homework/homework-view.html"></div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </td>
-         </tr>
-        </tbody>
-
-    </table>-->
 </div>
 
 <lightbox show="visaPdfDownloadBox" on-close="closeVisaPdfDownloadBox()">
@@ -244,6 +116,7 @@
 
 <lightbox workflow="diary.manageVisa"
           show="visaCreateBox"
+          class="create-visa"
           on-close="closeVisaCreateBox()">
     <form>
         <div class="cell twelve">

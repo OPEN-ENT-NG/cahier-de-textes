@@ -1,0 +1,38 @@
+/* New colors for button in calendar */
+$diary-darkgreen: #00ab6f;
+$diary-darkengreen: #009256;
+$diary-green: rgba($diary-darkgreen, 0.18);
+$diary-darkorange: #ff9700;
+$diary-orange: rgba($diary-darkorange, 0.18);
+$diary-white: #fff;
+$diary-black: #222;
+$diary-grey: #AAA;
+$diary-blue: #4bafd5;
+$diary-blue-light: #78daff;
+$diary-blue-dark: #2a9cc8;
+
+/* New colors for session in calendar */
+$session-forestgreen: #00ab6f;
+$session-orange: #ff9700;
+$session-grey: #7E7E7E;
+
+@mixin keyframes($animationName){
+  @-webkit-keyframes #{$animationName} {
+    @content;
+  }
+  @-moz-keyframes #{$animationName} {
+    @content;
+  }
+  @-o-keyframes #{$animationName} {
+    @content;
+  }
+  @keyframes #{$animationName} {
+    @content;
+  }
+}
+
+@include keyframes(spinner) {
+  to {
+    transform: rotate(360deg);
+  }
+}

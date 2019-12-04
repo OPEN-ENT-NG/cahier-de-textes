@@ -1,7 +1,7 @@
 import { model, moment, _, notify } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import { Structure,  Utils} from './index';
+import { Structure,  DateUtils} from './index';
 import {Personnel} from './Personnel';
 
 export class Inspector {
@@ -41,12 +41,12 @@ export class InspectorHabilitation {
 
     async create () {
         let response = await http.post(`/diary/inspector-habilitation`, this.toSendingFormat());
-        return Utils.setToastMessage(response, 'inspector.habilitation.created','inspector.habilitation.created.error');
+        return DateUtils.setToastMessage(response, 'inspector.habilitation.created','inspector.habilitation.created.error');
     }
 
     async delete() {
         let response = await http.delete(`/diary/inspector-habilitation/${this.inspector.id}/${this.teacher.id}/${this.structure.id}`);
-        return Utils.setToastMessage(response, 'inspector.habilitation.deleted','inspector.habilitation.deleted.error');
+        return DateUtils.setToastMessage(response, 'inspector.habilitation.deleted','inspector.habilitation.deleted.error');
     }
 
     constructor (inspector: Inspector, teacher: any, structure: Structure) {

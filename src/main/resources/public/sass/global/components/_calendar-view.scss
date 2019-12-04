@@ -1,7 +1,7 @@
 .hide-session {
   .schedule-item-content {
     &.session {
-      display:none;
+      display: none;
     }
   }
 }
@@ -44,6 +44,7 @@
  */
 .datepicker table thead tr {
   background: $diary-darkgreen;
+
   th:hover {
     background: $diary-darkengreen;
   }
@@ -74,9 +75,11 @@
       .displayModeButtons {
         margin: 0px;
       }
+
       .nextPrevious {
         button {
           background-color: $diary-darkgreen;
+
           &:hover {
             background-color: $diary-darkengreen;
           }
@@ -121,13 +124,14 @@
   }
 
   .schedule {
-      legend.timeslots {
-        background: $white;
-        color: $black;
-        padding-top: 44px;
-      }
+    legend.timeslots {
+      background: $white;
+      color: $black;
+      padding-top: 44px;
     }
-    .days {
+  }
+
+  .days {
     height: auto;
 
     .day {
@@ -153,6 +157,7 @@
     }
   }
 }
+
 /*
  Refacto calendar CDT, override des classes présentes dans la directive calendar -- FIN
  */
@@ -196,11 +201,11 @@
   width: 100%;
   vertical-align: middle;
   justify-content: center;
-  top:60px;
+  top: 60px;
   height: calc(100% - 60px);
 }
 
-@media  (max-width: 1125px) {
+@media (max-width: 1125px) {
   #dailyeventlongtitle {
     display: none;
   }
@@ -221,25 +226,30 @@
 }
 
 .diary-container button.previous-timeslots, .diary-container button.next-timeslots {
-  left: -3px; }
+  left: -3px;
+}
 
 
 .diary-container calendar-daily-events .days .day {
   height: auto;
-  min-height: 100px; }
+  min-height: 100px;
+}
 
 .diary-container calendar-daily-events .days {
   z-index: 998;
 }
 
 .diary-container .timeslots {
-  display: none; }
+  display: none;
+}
 
 .diary-container.diary-show-calendar .timeslots {
-  display: inline-block; }
+  display: inline-block;
+}
 
 .diary-container.diary-show-calendar .homeworkpanel {
-  padding: 0px !important; }
+  padding: 0px !important;
+}
 
 
 .diary-container.diary-show-homeworks:not(.diary-show-calendar) .daily-events {
@@ -249,8 +259,9 @@
 .diary-container.diary-show-homeworks .homeworks-row {
   display: flex;
   position: relative;
-  top: 168px;
+  top: 127px;
   z-index: 1;
+
   .timeslot {
     color: $black;
     height: 40px;
@@ -262,7 +273,7 @@
 }
 
 .diary-container .previous-timeslots {
-  height:20px;
+  height: 20px;
 }
 
 .diary-container .schedule .days {
@@ -286,6 +297,7 @@
   &.sixDays {
     width: calc(100% / 6) !important;
   }
+
   &.fiveDays {
     width: calc(100% / 5) !important;
   }
@@ -306,6 +318,7 @@
 calendar-daily-events {
   padding-left: 0px !important;
 }
+
 .homework-content {
   //height: 32px;
   padding: 5px;
@@ -334,7 +347,7 @@ calendar-daily-events {
 
 .filter2 {
   height: 39px;
-  font-size : 30px;
+  font-size: 30px;
   line-height: 42px;
   text-align: center;
   width: 50px !important;
@@ -342,25 +355,25 @@ calendar-daily-events {
   border-radius: 2px;
   box-shadow: none;
   background: $diary-grey;
-  color : $white;
+  color: $white;
 }
 
 i.homework::before {
   content: "\e80d";
-  font-family:"generic-icons";
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  background-image:none;
-  color : $white;
+  font-family: "generic-icons";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: none;
+  color: $white;
 }
 
 .filter2.diary.selected {
-  box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.26) inset;
   background-color: #763294;
 }
 
 .filter2.homework.selected {
-  box-shadow: 0 2px 3px rgba(0,0,0,0.26) inset;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.26) inset;
   background-color: #46bfaf;
 }
 
@@ -368,12 +381,13 @@ i.homework::before {
   position: relative;
 
   .left-side {
-    position:absolute;
+    position: absolute;
     left: 0px;
     right: 30px;
   }
+
   .right-side {
-    position:absolute;
+    position: absolute;
     right: 0px;
     width: 30px;
   }
@@ -395,11 +409,13 @@ i.homework::before {
   padding: 10px;
   text-align: left;
   display: block;
+
   .header {
     color: white;
     padding: 1px 6px;
   }
 }
-.month-day  .n-more {
+
+.month-day .n-more {
   display: none;
 }

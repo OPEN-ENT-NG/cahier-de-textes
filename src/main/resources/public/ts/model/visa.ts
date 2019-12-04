@@ -1,5 +1,5 @@
 import http from 'axios';
-import {Structure, Teacher, Utils} from './index';
+import {Structure, Teacher, DateUtils} from './index';
 import {idiom as lang, model, moment} from 'entcore';
 
 export class Visa {
@@ -39,32 +39,33 @@ export class Visa {
             teacher: this.sessions[0].teacher.toString(),
             stuctureName: this.structure.name,
             sessions: this.sessions.map((n) => {
+                const homeworks = n.homeworks ? n.homeworks : [];
                 return {
                     audience: n.audience.name,// n.audience.name,
                     subject: n.subject.label,
                     teacher: n.teacher.toString(),
                     title: n.title,
                     type: n.type.label,
-                    startDisplayDate: n.startDisplayDate,
-                    startDisplayTime: n.startDisplayTime,
-                    endDisplayTime: n.endDisplayTime,
+                    startDisplayDate: DateUtils.formatDate((n.dueDate ? n.dueDate : n.startMoment), 'DD/MM/YYYY'),
+                    startDisplayTime: n.dueDate ? null : DateUtils.formatDate(n.startMoment, 'HH:mm'),
+                    endDisplayTime: n.dueDate ? null : DateUtils.formatDate(n.endDisplayTime, 'HH:mm'),
                     hasDescription: ($.parseHTML(n.description) && $.parseHTML(n.description).length !== 0) ? true : false,
-                    description: Utils.htmlToXhtml(n.description),
-                    annotation: n.annotation,
+                    description: DateUtils.htmlToXhtml(n.description),
+                    annotation: n.dueDate ? null : n.annotation,
 
-                    homeworks: n.homeworks.map(h => {
+                    homeworks: homeworks.map(h => {
                         return {
                             estimatedTime: (h.estimatedTime && h.estimatedTime !== 0) ? h.estimatedTime : lang.translate("homework.no.workload"),
                             hasEstimatedTime: (h.estimatedTime && h.estimatedTime !== 0) ? true : false,
-                            due_date: Utils.getFormattedDate(h.dueDate),
-                            description: Utils.htmlToXhtml(h.description),
+                            due_date: DateUtils.getFormattedDate(h.dueDate),
+                            description: DateUtils.htmlToXhtml(h.description),
                             type: h.type.label,
                             color: h.color,
                             is_published: h.isPublished,
                             workload: h.workload
                         }
                     }),
-                    hasHomeworks: n.homeworks.length > 0
+                    hasHomeworks: homeworks.length > 0
                 }
             }),
             structure_id: this.structure.id,
@@ -128,7 +129,7 @@ export class Visas {
             Promise.all(promiseArray).then(reponses => {
                 for (let j = 0, jmax = reponses.length; j < jmax; j++) {
                     (function (response) {
-                        let filename = Utils.getFileNameByContentDisposition(response.headers['content-disposition']);
+                        let filename = DateUtils.getFileNameByContentDisposition(response.headers['content-disposition']);
                         const url = window.URL.createObjectURL(new Blob([response['data']]));
                         const link = document.createElement('a');
                         link.href = url;
@@ -149,7 +150,7 @@ export class Visas {
 
     async create() {
         let response = await http.post('/diary/visas', this.toSendFormat());
-        return Utils.setToastMessage(response, 'visas.created', 'visas.created.error');
+        return DateUtils.setToastMessage(response, 'visas.created', 'visas.created.error');
     }
 
 }

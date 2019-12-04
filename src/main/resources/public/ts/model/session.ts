@@ -1,7 +1,7 @@
 import {_, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Course, Structure, Subject, Teacher, Utils} from './index';
+import {Course, Structure, Subject, Teacher, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
@@ -59,7 +59,6 @@ export class Session {
     }
 
     static formatSqlDataToModel(data: any, structure: Structure) {
-
         return {
             audience: structure.audiences.all.find(t => t.id === data.audience_id),
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
@@ -71,7 +70,7 @@ export class Session {
             room: data.room,
             color: data.color,
             isPublished: data.is_published,
-            date: Utils.getFormattedDate(data.date),
+            date: DateUtils.getFormattedDate(data.date),
             startTime: data.start_time,
             endTime: data.end_time,
             description: data.description,
@@ -95,10 +94,10 @@ export class Session {
             structure_id: this.structure.id,
             title: this.title ? this.title : placeholder,
             color: this.color,
-            date: Utils.getFormattedDate(this.date),
-            start_time: Utils.getFormattedTime(this.startTime),
-            end_time: Utils.getFormattedTime(this.endTime),
-            description: Utils.htmlToXhtml(this.description),
+            date: DateUtils.getFormattedDate(this.date),
+            start_time: DateUtils.getFormattedTime(this.startTime),
+            end_time: DateUtils.getFormattedTime(this.endTime),
+            description: DateUtils.htmlToXhtml(this.description),
             annotation: this.annotation,
             is_published: this.isPublished,
             audience_id: this.audience.id,
@@ -112,15 +111,15 @@ export class Session {
         this.type = Mix.castAs(SessionType, this.type);
         this.structure = structure;
         this.date = moment(this.date).toDate();
-        this.startMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
+        this.startMoment = moment(DateUtils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
         this.startTime = moment(this.startTime, FORMAT.formattedTime).toDate();
-        this.startDisplayDate = Utils.getDisplayDate(this.startMoment);
-        this.startDisplayTime = Utils.getDisplayTime(this.startMoment);
+        this.startDisplayDate = DateUtils.getDisplayDate(this.startMoment);
+        this.startDisplayTime = DateUtils.getDisplayTime(this.startMoment);
 
-        this.endMoment = moment(Utils.getFormattedDateTime(this.date, moment(this.endTime, FORMAT.formattedTime)));
+        this.endMoment = moment(DateUtils.getFormattedDateTime(this.date, moment(this.endTime, FORMAT.formattedTime)));
         this.endTime = moment(this.endTime, FORMAT.formattedTime).toDate();
-        this.endDisplayDate = Utils.getDisplayTime(this.endMoment);
-        this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
+        this.endDisplayDate = DateUtils.getDisplayTime(this.endMoment);
+        this.endDisplayTime = DateUtils.getDisplayTime(this.endMoment);
 
 
         if (this.visas.every(v => v === null)) {
@@ -138,12 +137,12 @@ export class Session {
             this.homeworks.forEach(h => {
                 h.structure = this.structure;
                 h.session = this;
-                h.session_date = Utils.getFormattedDate(this.date);
+                h.session_date = DateUtils.getFormattedDate(this.date);
                 h.init();
             });
         }
 
-        this.plainTextDescription = Utils.convertHtmlToPlainText(this.description);
+        this.plainTextDescription = DateUtils.convertHtmlToPlainText(this.description);
 
         if (this.courseId) {
             if (this.is_empty) {
@@ -190,30 +189,30 @@ export class Session {
     async save(placeholder?) {
         if (this.id) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat(placeholder));
-            return Utils.setToastMessage(response, 'session.updated', 'session.updated.error');
+            return DateUtils.setToastMessage(response, 'session.updated', 'session.updated.error');
 
         } else {
             let response = await http.post('/diary/session', this.toSendFormat(placeholder));
             this.id = response.data.id;
 
-            return Utils.setToastMessage(response, 'session.created', 'session.created.error');
+            return DateUtils.setToastMessage(response, 'session.created', 'session.created.error');
 
         }
     }
 
     async delete() {
         let response = await http.delete('/diary/session/' + this.id);
-        return Utils.setToastMessage(response, 'session.deleted', 'session.deleted.error');
+        return DateUtils.setToastMessage(response, 'session.deleted', 'session.deleted.error');
     }
 
     async publish() {
         let response = await http.post('/diary/session/publish/' + this.id);
-        return Utils.setToastMessage(response, 'session.published', 'session.published.error');
+        return DateUtils.setToastMessage(response, 'session.published', 'session.published.error');
     }
 
     async unpublish() {
         let response = await http.post('/diary/session/unpublish/' + this.id);
-        return Utils.setToastMessage(response, 'session.unpublished', 'session.unpublished.error');
+        return DateUtils.setToastMessage(response, 'session.unpublished', 'session.unpublished.error');
     }
 
     async sync() {
@@ -347,8 +346,8 @@ export class Sessions {
     }
 
     async syncWithAudienceAndSubject(startMoment: any, endMoment: any, typeId?: string, type?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/lesson/${this.structure.id}/${startDate}/${endDate}/null`;
 
@@ -356,8 +355,8 @@ export class Sessions {
     }
 
     async syncOwnSessions(strutcture: any, startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/sessions/own/${startDate}/${endDate}/${this.structure.id}`;
 
@@ -373,8 +372,8 @@ export class Sessions {
     }
 
     async syncExternalSessions(startMoment: any, endMoment: any, type?: string, typeId?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/sessions/external/${startDate}/${endDate}/${type}/${typeId}`;
 
@@ -382,62 +381,40 @@ export class Sessions {
     }
 
     async syncChildSessions(startMoment: any, endMoment: any, childId?: string): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
         let url = `/diary/sessions/child/${startDate}/${endDate}/${childId}`;
 
         await this.syncSessions(url);
     }
 
-    async syncSessionsWithVisa(startMoment: any, endMoment: any, structureId: string, teacherId?: string,
-                               subjectsId?: string, audiencesId?: string,
-                               vised?: boolean, notVised?: boolean): Promise<void> {
-        let startDate = Utils.getFormattedDate(startMoment);
-        let endDate = Utils.getFormattedDate(endMoment);
-        let filter = (structureId || teacherId || audiencesId || subjectsId || vised || notVised) ? '?' : '';
-        if (structureId) {
-            if (filter.length > 1) {
-                filter += `&structureId=${structureId}`;
-            } else {
-                filter += `structureId=${structureId}`;
-            }
-        }
-        if (teacherId) {
-            if (filter.length > 1) {
-                filter += `&teachersId=${teacherId}`;
-            } else {
-                filter += `teachersId=${teacherId}`;
-            }
-        }
-        if (subjectsId) {
-            if (filter.length > 1) {
-                filter += `&subjectsId=${subjectsId}`;
-            } else {
-                filter += `subjectsId=${subjectsId}`;
-            }
-        }
-        if (audiencesId) {
-            if (filter.length > 1) {
-                filter += `&audienceId=${audiencesId}`;
-            } else {
-                filter += `audienceId=${audiencesId}`;
-            }
-        }
-        if (vised) {
-            if (filter.length > 1) {
-                filter += `&vised=${vised}`;
-            } else {
-                filter += `vised=${vised}`;
-            }
-        }
-        if (notVised) {
-            if (filter.length > 1) {
-                filter += `&notVised=${notVised}`;
-            } else {
-                filter += `notVised=${notVised}`;
-            }
-        }
-        let url = `/diary/sessions/visa/${startDate}/${endDate}${filter}`;
+    async syncSessionsWithVisa(startMoment: any,
+                               endMoment: any,
+                               structureId: string,
+                               teachersId?: string,
+                               audiencesId?: string,
+                               vised?: boolean,
+                               notVised?: boolean,
+                               archived?: boolean,
+                               sharedWithMe?: boolean,
+                               published?: boolean,
+                               notPublished?: boolean): Promise<void> {
+
+        let startDate = DateUtils.getFormattedDate(startMoment);
+        let endDate = DateUtils.getFormattedDate(endMoment);
+
+        let filter = (structureId || teachersId || audiencesId || vised || notVised ||
+            archived || sharedWithMe || published || notPublished) ? '?' : '';
+
+        if (structureId) filter += `structureId=${structureId}&`;
+        if (teachersId) filter += `teachersId=${teachersId}&`;
+        if (audiencesId) filter += `audienceId=${audiencesId}&`;
+        if (vised) filter += `vised=${vised}&`;
+        if (notVised) filter += `notVised=${notVised}&`;
+        if (published) filter += `published=${published}&`;
+        if (notPublished) filter += `notPublished=${notPublished}&`;
+
+        let url = `/diary/sessions/visa/${startDate}/${endDate}${filter.slice(0,-1)}`;
         await this.syncSessions(url);
     }
 
@@ -473,19 +450,19 @@ export class SessionType {
 
     async create() {
         let response = await http.post(`/diary/session-type`, this.toJson());
-        return Utils.setToastMessage(response, 'cdt.session.type.create', 'cdt.session.type.create.error')
+        return DateUtils.setToastMessage(response, 'cdt.session.type.create', 'cdt.session.type.create.error')
     }
 
     async update() {
         let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
-        return Utils.setToastMessage(response, 'cdt.session.type.update', 'cdt.session.type.update.error')
+        return DateUtils.setToastMessage(response, 'cdt.session.type.update', 'cdt.session.type.update.error')
     }
 
     async delete() {
         let {data} = await http.delete(`/diary/session-type/${this.id}/${this.structure_id}`);
         if (data.id != undefined) {
             let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
-            return Utils.setToastMessage(response, 'cdt.session.type.deleted', 'cdt.session.type.delete.error')
+            return DateUtils.setToastMessage(response, 'cdt.session.type.deleted', 'cdt.session.type.delete.error')
         } else {
             notify.error('cdt.session.type.delete.impossible')
         }

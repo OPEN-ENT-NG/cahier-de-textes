@@ -27,7 +27,7 @@ export const asyncAutocomplete = ng.directive('asyncAutocomplete', ['$timeout', 
                     </li>
                 </ul>
             </div>
-            <div ng-if="match && match.length === 0">
+            <div ng-show="match && match.length === 0 && search.length">
                 <ul class="ten cell right-magnet">
                     <li class="display-more block-container">
                         <a class="cell right-spacing">
@@ -66,12 +66,12 @@ export const asyncAutocomplete = ng.directive('asyncAutocomplete', ['$timeout', 
             $scope.$apply();
         });
 
-        $scope.select = (option) => $scope.$eval($scope.ngChange)($scope.ngModel, option);
+        $scope.select = (option) => {
+            $scope.$eval($scope.ngChange)($scope.ngModel, option);
+            closeDropDown();
+        };
 
-        const closeDropDown = function (e: Event) {
-            if ($element.find(e.target).length > 0 || dropDownContainer.find(e.target).length > 0) {
-                return;
-            }
+        const closeDropDown = function () {
             setLoadingStatus(false);
             $scope.match = undefined;
             $scope.$apply();
@@ -110,8 +110,8 @@ export const asyncAutocomplete = ng.directive('asyncAutocomplete', ['$timeout', 
         });
 
         $('body').on('click', ($event) => {
-            if ($scope.match) {
-                closeDropDown($event);
+            if ($scope.match && !$element.find($event.target).length && !dropDownContainer.find($event.target).length) {
+                closeDropDown();
             }
         });
 

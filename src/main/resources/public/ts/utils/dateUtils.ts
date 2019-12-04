@@ -1,7 +1,7 @@
-import {angular, moment} from 'entcore';
+import {angular, idiom as lang, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 
-export class Utils {
+export class DateUtils {
 
     /**
      * Add the fields succeed and toastMessage to the response
@@ -38,7 +38,7 @@ export class Utils {
 
     static getFormattedDateTime(date, time?) {
         if (!!time) {
-            return moment(Utils.getFormattedDate(date) + ' ' + Utils.getFormattedTime(time)).format(FORMAT.formattedDateTime);
+            return moment(DateUtils.getFormattedDate(date) + ' ' + DateUtils.getFormattedTime(time)).format(FORMAT.formattedDateTime);
         } else {
             return moment(date).format(FORMAT.formattedDateTime);
         }
@@ -59,6 +59,17 @@ export class Utils {
     static getDisplayDateTime(date) {
         return moment(date).format(FORMAT.displayDateTime);
     }
+
+    static  getFormattedTimeSlotDate(timeSlot) {
+        if (timeSlot.dueDate) {
+            return lang.translate('homework.for.date') + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
+        }
+        return DateUtils.formatDate(timeSlot.startMoment, 'DD/MM/YYYY') + ' '
+            + lang.translate('from2') + ' '
+            + DateUtils.formatDate(timeSlot.startMoment, 'HH:mm') + ' '
+            + lang.translate('to2') + ' '
+            + DateUtils.formatDate(timeSlot.endMoment, 'HH:mm');
+    };
 
     static safeApply(that) {
         return new Promise((resolve, reject) => {

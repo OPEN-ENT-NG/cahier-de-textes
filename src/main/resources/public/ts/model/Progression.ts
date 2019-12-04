@@ -2,7 +2,7 @@
 import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
-import {Course, Structure, Subject, Teacher, Utils} from './index';
+import {Course, Structure, Subject, Teacher, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
@@ -41,13 +41,13 @@ export class ProgressionSession implements  Selectable{
     }
     async create(){
         let response = await http.post('/diary/progression/create' , this.toJson());
-        return Utils.setToastMessage(response, 'progression.session.create','progression.session.create.error');
+        return DateUtils.setToastMessage(response, 'progression.session.create','progression.session.create.error');
 
     }
 
     async update(){
         let response = await  http.put(`/diary/progression/update/${this.id}`, this.toJson());
-        return Utils.setToastMessage(response, 'progression.session.update','progression.session.update.error');
+        return DateUtils.setToastMessage(response, 'progression.session.update','progression.session.update.error');
 
     }
 
@@ -149,7 +149,7 @@ export class ProgressionSession implements  Selectable{
     async delete() {
         try {
             let response = await http.delete(`/diary/progression/${this.id}`);
-            return Utils.setToastMessage(response, 'progression.session.delete','progression.session.delete.error');
+            return DateUtils.setToastMessage(response, 'progression.session.delete','progression.session.delete.error');
 
         }catch (e){
             console.error(e);
@@ -255,7 +255,7 @@ export class ProgressionHomework{
     async delete() {
         try {
             let response = await http.delete(`/diary/progression/homework/${this.id}`);
-            return Utils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
+            return DateUtils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
 
         }catch (e){
             console.error(e);

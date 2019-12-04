@@ -2,7 +2,7 @@ import {Behaviours, idiom as lang, model, ng, template} from 'entcore';
 import {ProgressionHomework, ProgressionSession, ProgressionSessions} from "../../model/Progression";
 import {Session, SessionTypes, Subjects, Toast} from "../../model";
 import {Homework, HomeworkTypes} from "../../model/homework";
-import {Utils} from '../../utils/utils';
+import {DateUtils} from '../../utils/dateUtils';
 
 export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location','$attrs', async function ($scope, $routeParams, $location, $attrs) {
@@ -171,7 +171,7 @@ export let manageProgressionCtrl  = ng.controller("manageProgessionCtrl",
         };
 
         $scope.filterProgression = (search) =>{
-            $scope.progressionsToDisplay.all =  Utils.filterProgression( search,  $scope.progression_sessions.all);
+            $scope.progressionsToDisplay.all =  DateUtils.filterProgression( search,  $scope.progression_sessions.all);
 
         };
 

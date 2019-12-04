@@ -1,5 +1,5 @@
 import {Behaviours, model,moment, ng} from 'entcore';
-import {Utils} from '../../utils/utils';
+import {DateUtils} from '../../utils/dateUtils';
 import {
     Course, Homework, Homeworks, Toast, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
     Workload
@@ -12,7 +12,6 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.display.listView = true;
 
         $scope.indexItemsDisplayed = [];
-
         if ($scope.homeworks) {
             $scope.homeworks.syncHomeworks();
         }
@@ -50,7 +49,7 @@ export let manageListCtrl = ng.controller('manageListController',
 
 
         $scope.isClickableByStudentOrParent = (pedagogicItem) => {
-            if (Utils.isAChildOrAParent(model.me.type)){
+            if (DateUtils.isAChildOrAParent(model.me.type)){
                 if(pedagogicItem.isPublished){
                     return pedagogicItem.pedagogicType === 2;
                 }else{
@@ -70,7 +69,7 @@ export let manageListCtrl = ng.controller('manageListController',
         };
         $scope.openSessionFromCourse = (calendar_course) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
-                $scope.goTo('/session/create/' + calendar_course._id + '/' + Utils.getFormattedDate(calendar_course.startMoment));
+                $scope.goTo('/session/create/' + calendar_course._id + '/' + DateUtils.getFormattedDate(calendar_course.startMoment));
             }
             $scope.safeApply();
         };
@@ -111,7 +110,7 @@ export let manageListCtrl = ng.controller('manageListController',
                         }
                         if(!display.sessionList && pd instanceof Homework){
 
-                            if(Utils.isAChildOrAParent(model.me.type) ){
+                            if(DateUtils.isAChildOrAParent(model.me.type) ){
                                 if( display.todo || display.done) {
                                     if(display.todo && !pd.isDone)
                                         hasOneDayToDisplay = true;

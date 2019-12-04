@@ -89,14 +89,15 @@ public class SessionController extends ControllerHelper {
     public void getSessionsWithVisaField(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
-        Boolean onlyVised = request.getParam("vised") != null && Boolean.parseBoolean(request.getParam("vised"));
-        Boolean onlyNotVised = request.getParam("notVised") != null && Boolean.parseBoolean(request.getParam("notVised"));
+        Boolean vised = request.getParam("vised") != null && Boolean.parseBoolean(request.getParam("vised"));
+        Boolean notVised = request.getParam("notVised") != null && Boolean.parseBoolean(request.getParam("notVised"));
+        Boolean published = request.getParam("published") != null && Boolean.parseBoolean(request.getParam("published"));
+        Boolean notPublished = request.getParam("notPublished") != null && Boolean.parseBoolean(request.getParam("notPublished"));
 
         List<String> listTeacherId = request.getParam("teachersId") != null ? Arrays.asList(request.getParam("teachersId").split("\\s*,\\s*")) : null;
         List<String> listAudienceId = request.getParam("audienceId") != null ? Arrays.asList(request.getParam("audienceId").split("\\s*,\\s*")) : null;
-        List<String> listSubjectId = request.getParam("subjectsId") != null ? Arrays.asList(request.getParam("subjectsId").split("\\s*,\\s*")) : null;
         String StructureId = request.getParam("structureId") != null ? request.getParam("structureId") : null;
-        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listSubjectId, listTeacherId, true, onlyVised, onlyNotVised, true,
+        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listTeacherId, published, notPublished, vised, notVised, true,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 

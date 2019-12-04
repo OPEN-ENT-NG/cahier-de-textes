@@ -1,6 +1,7 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.security.workflow.AdminAccess;
 import fr.openent.diary.security.workflow.SearchRight;
 import fr.openent.diary.services.SearchService;
 import fr.openent.diary.services.impl.DefaultSearchService;
@@ -86,7 +87,7 @@ public class SearchController extends ControllerHelper {
     @Get("/search")
     @ApiDoc("Search for a student or a group")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(SearchRight.class)
+    @ResourceFilter(AdminAccess.class)
     public void search(HttpServerRequest request) {
         if (request.params().contains("q") && !"".equals(request.params().get("q").trim())
                 && request.params().contains("structureId")) {

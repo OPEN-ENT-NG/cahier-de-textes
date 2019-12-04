@@ -1,7 +1,9 @@
 import {_, angular, idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
+import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
-import {Sessions, Teacher, Utils, Visa, Visas} from "../../model";
+import {Sessions, Teacher, DateUtils, Visa, Visas} from "../../model";
+
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
@@ -9,13 +11,17 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         (window as any).html2canvas = html2canvas;
         $scope.vised = true;
         $scope.notVised = false;
-        $scope.allSessionsSelect = false;
+        $scope.archived = false;
+        $scope.sharedWithMe = false;
+        $scope.published = true;
+        $scope.notPublished = true;
+        $scope.autocomplete = AutocompleteUtils;
+
+
+        $scope.userType = model.me.type;
+
+        $scope.allSessionsSelect = true;
         $scope.showOptionToaster = false;
-        $scope.params = {
-            subjects: [],
-            audiences: [],
-            teachers: []
-        };
         $scope.displayVisa = false;
         $scope.openDetails = null;
         $scope.selectedSessions = {};
@@ -52,12 +58,34 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         /**
          * Init de la vue ***
          */
-        let syncSessionsWithVisa = async () => {
+        /*let syncSessionsWithVisa = async () => {
             // let teacherId;
             let teachers = $scope.params.teachers.length ? getIds($scope.params.teachers) : null;
-            let subjects = $scope.params.subjects.length ? getIds($scope.params.subjects) : null;
             let audiences = $scope.params.audiences.length ? getIds($scope.params.audiences) : null;
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.structure.id, teachers, subjects, audiences, $scope.vised, $scope.notVised);
+            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate, $scope.filters.endDate, $scope.structure.id, teachers, audiences, $scope.vised, $scope.notVised);
+
+
+        };*/
+
+
+        $scope.filterList = async () => {
+            $scope.selectOrUnselectAllSessions(false);
+            $scope.homeworks = [];
+            const teachersSelected = AutocompleteUtils.getTeachersSelected();
+            const classesSelected = AutocompleteUtils.getClassesSelected();
+            let teachers = teachersSelected.length ? getIds(teachersSelected) : null;
+            let audiences = classesSelected.length ? getIds(classesSelected) : null;
+            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate,
+                $scope.filters.endDate,
+                $scope.structure.id,
+                teachers,
+                audiences,
+                $scope.vised,
+                $scope.notVised,
+                $scope.archived,
+                $scope.sharedWithMe,
+                $scope.published,
+                $scope.notPublished);
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => {
@@ -67,6 +95,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             });
             const sessions = [...$scope.homeworks, ...$scope.sessions.all];
             $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject(sessions);
+
             _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
                 $scope.selectedSessions[key] = false;
                 $scope.sessions_GroupBy_AudienceSubject[key] = item.sort((a, b) => {
@@ -79,23 +108,21 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.safeApply();
         };
 
-        $scope.canUpdateSessionsWithVisa = async () => {
+
+        /*$scope.canUpdateSessionsWithVisa = async () => {
             if ($scope.structure.id && $scope.filters.startDate && $scope.filters.endDate &&
-                ($scope.params.teachers.length || $scope.params.subjects.length || $scope.params.audiences.length)) {
+                ($scope.params.teachers.length || $scope.params.audiences.length)) {
                 await syncSessionsWithVisa();
             } else {
                 $scope.sessions_GroupBy_AudienceSubject = [];
             }
             $scope.safeApply();
-        };
+        };*/
 
         $scope.updateDatas = async (event) => {
             // Checking if event is triggered when selecting an element inside multiCombo
             $scope.sessions.structure = $scope.structure;
             if (event.target.tagName == 'BUTTON') {
-                if (event.target.innerHTML == lang.translate("subjects")) {
-                    $scope.params.subjects = [];
-                }
                 if (event.target.innerHTML == lang.translate("utils.teachers")) {
                     $scope.params.teachers = [];
                 }
@@ -104,9 +131,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 }
             }
             angular.forEach($scope.dataToUpdate, function (value, key) {
-                if (Object.getPrototypeOf(value).constructor.name === "Subject") {
-                    $scope.params.subjects[key] = value;
-                }
                 if (Object.getPrototypeOf(value).constructor.name === "Audience") {
                     $scope.params.audiences[key] = value;
                 }
@@ -124,40 +148,37 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.updateDatas(event);
         };
 
+        $scope.toggleVised = () => {
+            $scope.vised = !$scope.vised;
+            if (!$scope.vised && !$scope.notVised) $scope.toggleNotVised();
+        };
+
+        $scope.toggleNotVised = () => {
+            $scope.notVised = !$scope.notVised;
+            if (!$scope.vised && !$scope.notVised) $scope.toggleVised();
+        };
+
+        $scope.togglePublished = () => {
+            $scope.published = !$scope.published;
+            if (!$scope.published && !$scope.notPublished) $scope.toggleNotPublished();
+        };
+
+        $scope.toggleNotPublished = () => {
+            $scope.notPublished = !$scope.notPublished;
+            if (!$scope.published && !$scope.notPublished) $scope.togglePublished();
+        };
+
         $scope.clearSubjects = () => {
             $scope.course.groups = [];
             $scope.params.subjects = [];
         };
 
-        $scope.dropItem = (item, event) => {
-            $scope.dataToUpdate = _.without($scope.dataToUpdate, item);
-            $scope.params.subjects = _.without($scope.params.subjects, item);
-            $scope.params.audiences = _.without($scope.params.audiences, item);
-            $scope.params.teachers = _.without($scope.params.teachers, item);
-
-            $scope.updateDatas(event);
-        };
-
-        let dropAllItems = (collection) => {
-            collection.map((item) => {
-                $scope.dataToUpdate = _.without($scope.dataToUpdate, item);
-            });
-        };
-
-        $scope.init = () => {
-            dropAllItems($scope.params.audiences);
-            dropAllItems($scope.params.subjects);
-            dropAllItems($scope.params.teachers);
-            $scope.params = {
-                subjects: [],
-                audiences: [],
-                teachers: []
-            };
-            if (model.me.type == "ENSEIGNANT") {
-                $scope.params.teachers = [_.find($scope.structure.teachers.all, {id: model.me.userId})];
+        $scope.init = async () => {
+            AutocompleteUtils.init($scope.structure);
+            if ($scope.userType == "ENSEIGNANT") {
+                AutocompleteUtils.setTeachersSelected([_.find($scope.structure.teachers.all, {id: model.me.userId})]);
             }
-            $scope.canUpdateSessionsWithVisa();
-            $scope.safeApply();
+            await $scope.filterList();
         };
 
 
@@ -169,11 +190,11 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.updateOptionToaster = () => {
+            if($scope.sessionsUnselected().length > 0) $scope.allSessionsSelect = false;
             $scope.showOptionToaster = _.chain($scope.selectedSessions)
                 .map(item => item)
                 .contains(true)
                 .value();
-            $scope.safeApply();
         };
 
 
@@ -243,21 +264,14 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 return lang.translate("sessions.admin.Visa.sateKo");
         };
 
-        $scope.getFormattedTimeSlot = (timeSlot) => {
-            if (timeSlot.dueDate) {
-                return lang.translate('homework.for.date') + ' ' + Utils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
-            }
-            return Utils.formatDate(timeSlot.startMoment, 'DD/MM/YYYY') + ' '
-                + lang.translate('from2') + ' '
-                + Utils.formatDate(timeSlot.startMoment, 'HH:mm') + ' '
-                + lang.translate('to2') + ' '
-                + Utils.formatDate(timeSlot.endMoment, 'HH:mm');
+        $scope.getSessionTitle = (timeSlot) => {
+            if (timeSlot.title) return timeSlot.title;
+            if (timeSlot.attachedToSession) return lang.translate("homework.for.date") + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
+            return DateUtils.getFormattedTimeSlotDate(timeSlot);
         };
 
-        $scope.getSessionTitle = (timeSlot) => {
-            if(timeSlot.title) return timeSlot.title;
-            if(timeSlot.attachedToSession) return lang.translate("homework.for.date") + ' ' +  Utils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
-            return $scope.getFormattedTimeSlot(timeSlot);
+        $scope.getFormattedTimeSlotDate = (timeSlot) => {
+            return DateUtils.getFormattedTimeSlotDate(timeSlot);
         };
 
         $scope.getSessionsIds = (sessionsGroup) => {
@@ -266,7 +280,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .value();
         };
 
-        $scope.selectOrUnselectAllSessions = function () {
+        $scope.selectOrUnselectAllSessions = function (isSelected = null) {
+            if(isSelected) $scope.allSessionsSelect = isSelected;
             let targetValue = $scope.allSessionsSelect;
             _.each($scope.selectedSessions, function (value, key, obj) {
                 obj[key] = targetValue;
@@ -274,17 +289,46 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.updateOptionToaster();
             $scope.safeApply();
         };
-        $scope.unselectAllSessions = function () {
-            $scope.allSessionsSelect = false;
-            _.each($scope.selectedSessions, function (value, key, obj) {
-                obj[key] = false;
-            });
-            $scope.updateOptionToaster();
-            $scope.safeApply();
+
+        $scope.sessionsSelected = () => {
+            return Object.keys($scope.selectedSessions).filter(x => $scope.selectedSessions[x] === true);
+        };
+        $scope.sessionsUnselected = () => {
+            return Object.keys($scope.selectedSessions).filter(x => $scope.selectedSessions[x] === false);
+        };
+
+        $scope.filterTeacherOptions = async (value) => {
+            await AutocompleteUtils.filterTeacherOptions(value);
+        };
+
+        $scope.filterClassOptions = async (value) => {
+            await AutocompleteUtils.filterClassOptions(value);
+        };
+
+        $scope.selectTeacher = async (model, item) =>  {
+            AutocompleteUtils.selectTeacher(model, item);
+            await $scope.filterList();
+            AutocompleteUtils.resetSearchFields();
+        };
+
+        $scope.selectClass = async (model, item) =>  {
+            AutocompleteUtils.selectClass(model, item);
+            await $scope.filterList();
+            AutocompleteUtils.resetSearchFields();
+        };
+
+        $scope.removeTeacher = async (value) =>  {
+            AutocompleteUtils.removeTeacherSelected(value);
+            await $scope.filterList();
+        };
+
+        $scope.removeClass = async (value) =>  {
+            AutocompleteUtils.removeClassSelected(value);
+            await $scope.filterList();
         };
 
         /**
-         * Utils  *********
+         * DateUtils  *********
          */
 
         let getSelectedSessions = () => {
@@ -314,7 +358,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             comment: null
         };
 
-
         let updateNbSessions = (sessionsGroups) => {
             $scope.visaForm.nbSessions =
                 _.chain($scope.sessionsGroups)
@@ -329,7 +372,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             sessionsGroups.forEach((visaSession) => {
                 if (visaSession) {
                     let visa = new Visa($scope.structure);
-                    visa.mapFormData(visaSession, $scope.visaForm.comment)
+                    visa.mapFormData(visaSession, $scope.visaForm.comment);
                     visas.all.push(visa);
                 }
             });
@@ -343,7 +386,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             let visas = createVisasData(sessionsGroups);
             visas.getPDF(() => {
                 $scope.printPdf.loading = false;
-                $scope.unselectAllSessions();
+                $scope.selectOrUnselectAllSessions(false);
             });
         };
 
@@ -358,12 +401,20 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             let {succeed} = await visas.save();
 
             if (succeed) {
-                await $scope.canUpdateSessionsWithVisa();
-                $scope.unselectAllSessions();
+                await $scope.filterList();
+                $scope.selectOrUnselectAllSessions(false);
                 $scope.closeVisaCreateBox();
                 $scope.safeApply();
             }
         };
 
         $scope.init();
+
+        $scope.$watch(() => $scope.structure, async () => {
+            AutocompleteUtils.init($scope.structure);
+            if ($scope.userType != "ENSEIGNANT") {
+                $scope.sessions.structure = $scope.structure;
+                await $scope.filterList();
+            }
+        });
     }]);

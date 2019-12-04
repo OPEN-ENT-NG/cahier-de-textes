@@ -94,22 +94,29 @@ tr th label input[type=checkbox]:checked + span::before {
   border-color: $white;
 }
 
-.title-area {
-  display: flex;
-  height: 60px;
-  margin-bottom: 10px;
-  img {
-    max-height: 60px;
-    margin-right: 10px;
-  }
-  h1 {
-    flex-shrink: 0;
-    font-size: 36px;
-    font-weight: bold;
-    color: $black;
-    a {
-      color: $black;
+.row {
+  width: 100%;
+  .title-area {
+    display: flex;
+    height: 60px;
+    margin-bottom: 10px;
+    img {
+      max-height: 60px;
+      margin-right: 10px;
     }
+    h1 {
+      flex-shrink: 0;
+      font-size: 36px;
+      font-weight: bold;
+      color: $black;
+      a {
+        color: $black;
+      }
+    }
+  }
+
+  .close {
+    cursor: pointer;
   }
 }
 
@@ -134,10 +141,27 @@ tr th label input[type=checkbox]:checked + span::before {
 
 .toggle-buttons {
   background-color: $diary-darkgreen;
+
+  button {
+    &:hover {
+      color: $diary-darkgreen;
+    }
+
+    &:disabled {
+      cursor: default;
+      color: rgba($white, 0.4);
+      &:hover {
+        background-color: $diary-darkgreen;
+        color: rgba($white, 0.4);
+      }
+    }
+  }
 }
 
 .main-content {
-  top: -40px;
+  #calendar-view {
+    margin-top: -40px;
+  }
 }
 
 .sidebar-content, .main-content {
@@ -347,12 +371,7 @@ ul.search-input-ul {
   padding: 5px;
   margin: 0;
   font-weight: bold;
-
-  li {
-    display: inline;
-    margin: 0 5px;
-
-  }
+  list-style-type: none;
 }
 
 

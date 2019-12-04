@@ -1,7 +1,7 @@
 import {model, moment} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, Utils} from './index';
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
@@ -70,14 +70,14 @@ export class Course {
         if (this.startDate) {
             this.startMoment = moment(this.startDate);
             this.startDate = this.startMoment.toDate();
-            this.startDisplayDate = Utils.getDisplayDate(this.startMoment);
-            this.startDisplayTime = Utils.getDisplayTime(this.startMoment);
+            this.startDisplayDate = DateUtils.getDisplayDate(this.startMoment);
+            this.startDisplayTime = DateUtils.getDisplayTime(this.startMoment);
         }
         if (this.endDate) {
             this.endMoment = moment(this.endDate);
             this.endDate = this.endMoment.toDate();
-            this.endDisplayDate = Utils.getDisplayDate(this.endMoment);
-            this.endDisplayTime = Utils.getDisplayTime(this.endMoment);
+            this.endDisplayDate = DateUtils.getDisplayDate(this.endMoment);
+            this.endDisplayTime = DateUtils.getDisplayTime(this.endMoment);
         }
     }
 
@@ -118,8 +118,8 @@ export class Courses {
      * @returns {Promise<void>} Returns a promise.
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
-        let firstDate = Utils.getFormattedDate(startMoment);
-        let endDate =  Utils.getFormattedDate(endMoment);
+        let firstDate = DateUtils.getFormattedDate(startMoment);
+        let endDate =  DateUtils.getFormattedDate(endMoment);
         let filter = '';
 
         if (audience === null && model.me.type !== USER_TYPES.student)

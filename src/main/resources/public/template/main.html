@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="cell three twelve-mobile">
+    <div class="cell four twelve-mobile">
         <app-title class="zero-mobile">
             <div class="title-area">
                 <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
@@ -13,86 +13,50 @@
     <div workflow="diary.diarySearch" class="seven cell twelve-mobile">
         <!-- Teacher search bar -->
         <div class="cell four margin-right-md">
-            <div class="cell twelve search-input">
+            <div class="cell search-input">
                 <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="searchTeachers.teacher"
-                                    data-ng-change="selectFilter"
-                                    data-options="searchTeachers.teachers"
-                                    on-search="searchWithFilter"
+                                    data-ng-model="autocomplete.teacher"
+                                    data-ng-change="selectTeacher"
+                                    data-options="autocomplete.teacherOptions"
+                                    on-search="filterTeacherOptions"
                                     data-placeholder="diary.search.teacher"
-                                    search="searchTeachers.teacher">
+                                    search="autocomplete.teacher">
                 </async-autocomplete>
             </div>
             <!-- Teacher selected via filter -->
-            <div class="cell twelve" ng-show="params.user.displayName">
+            <div class="cell twelve" ng-show="teacherSelected && teacherSelected.displayName !== ''">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[params.user.displayName]] <i class="close"
-                                                       data-ng-click="removeFilter(params.user.displayName)"></i>
+                        [[teacherSelected.displayName]] <i class="close"
+                                                       data-ng-click="removeTeacher(teacherSelected)"></i>
                     </li>
                 </ul>
             </div>
-            <!-- Filter Zone (Teacher and Class) -->
-            <div workflow="diary.accessExternalData" class="seven cell twelve-mobile">
-                <!-- Teacher search bar -->
-                <div class="cell four margin-right-md">
-                    <div class="cell twelve search-input">
-                        <async-autocomplete data-ng-disabled="false"
-                                            data-ng-model="searchTeachers.teacher"
-                                            data-ng-change="selectFilter"
-                                            data-options="searchTeachers.teachers"
-                                            on-search="searchWithFilter"
-                                            data-placeholder="diary.search.teacher"
-                                            search="searchTeachers.teacher">
-                        </async-autocomplete>
-                    </div>
-                    <!-- Teacher selected via filter -->
-                    <div class="cell twelve" ng-show="params.user.displayName">
-                        <ul class="cell twelve search-input-ul">
-                            <li>
-                                [[params.user.displayName]] <i class="close"
-                                                               data-ng-click="removeFilter(params.user.displayName)"></i>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Classes/Groups search bar -->
-                <div class="cell four paddingLeft">
-                    <div class="cell twelve search-input">
-                        <async-autocomplete data-ng-disabled="false"
-                                            data-ng-model="searchClass.class"
-                                            data-ng-change="selectFilter"
-                                            data-options="searchClass.listClass"
-                                            on-search="searchWithFilter"
-                                            data-placeholder="diary.search.group"
-                                            search="searchClass.class">
-                        </async-autocomplete>
-                    </div>
-                    <!-- Class selected via filter -->
-                    <div class="cell twelve" ng-show="params.group.displayName">
-                        <ul class="cell twelve search-input-ul">
-                            <li>
-                                [[params.group.displayName]] <i class="close"
-                                                                data-ng-click="removeFilter(params.group.displayName)"></i>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+        </div>
+        <div class="cell four margin-right-md">
+            <div class="cell twelve search-input">
+                <async-autocomplete data-ng-disabled="false"
+                                    data-ng-model="autocomplete.class"
+                                    data-ng-change="selectClass"
+                                    data-options="autocomplete.classOptions"
+                                    on-search="filterClassOptions"
+                                    data-placeholder="diary.search.group"
+                                    search="autocomplete.class">
+                </async-autocomplete>
             </div>
             <!-- Class selected via filter -->
-            <div class="cell twelve" ng-show="params.group.displayName">
+            <div class="cell twelve" ng-show="classSelected && classSelected.displayName !== ''">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[params.group.displayName]] <i class="close"
-                                                        data-ng-click="removeFilter(params.group.displayName)"></i>
+                        [[classSelected.displayName]] <i class="close"
+                                                        data-ng-click="removeClass(classSelected)"></i>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
     <!-- Manage session and homework -->
-    <div class="cell nine twelve-mobile">
+    <div class="cell eight twelve-mobile">
         <button workflow="diary.manageHomework" class="padding-md margin-left-md calendar-button pull-right"
                 ng-click="goTo('/homework/create/')">
             <i18n>homework.create</i18n>
@@ -109,7 +73,7 @@
     <div class="cell three twelve-mobile sidebar-content"
          static-include="/diary/public/template/main/sidebar.html"></div>
 
-    <div class="cell nine twelve-mobile main-content" ng-show="!display.listView"
-        static-include="/diary/public/template/main/calendar-view.html">
+    <div class="cell nine twelve-mobile main-content" ng-if="!display.listView"
+         static-include="/diary/public/template/main/calendar-view.html">
     </div>
 </div>

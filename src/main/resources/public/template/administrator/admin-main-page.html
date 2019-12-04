@@ -1,19 +1,58 @@
-<div class="global-administrator-page">
+<div class="global-administrator-page" ng-controller="globalAdminCtrl">
     <div class="row">
-        <button class="right-magnet cancel" ng-click="goTo('/view')">
-            <i18n>sessions.admin.backOnDiary</i18n>
-        </button>
-        <h1 workflow="diary.adminAccess" class="eight">
+        <h1 workflow="diary.adminAccess" class="three cell">
             <i18n>sessions.admin.main.title</i18n>
         </h1>
-    </div>
-    <div workflow="diary.adminAccess" ng-controller="globalAdminCtrl">
-        <div class="row">
-            <div class="cell three twelve-mobile"
-                 static-include="/diary/public/template/administrator/admin-sidebar.html"></div>
-            <div class="cell twelve twelve-mobile visa-diary"
-                 static-include="/diary/public/template/administrator/diary-lister.html">
+        <div class="nine cell twelve-mobile">
+            <!-- Teacher search bar -->
+            <div class="cell six" workflow="diary.diarySearch">
+                <div class="cell eleven search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="autocomplete.teacher"
+                                        data-ng-change="selectTeacher"
+                                        data-options="autocomplete.teacherOptions"
+                                        on-search="filterTeacherOptions"
+                                        data-placeholder="diary.search.teacher"
+                                        search="autocomplete.teacher">
+                    </async-autocomplete>
+                </div>
+                <!-- Teacher selected via filter -->
+                <div class="cell twelve" v-show="autocomplete.teacher && autocomplete.teacher != '' ">
+                    <ul class="cell twelve search-input-ul">
+                        <li ng-repeat="teacher in autocomplete.teachersSelected track by teacher.id" class="twelve">
+                            [[teacher.displayName]] <i class="close"
+                                                       data-ng-click="removeTeacher(teacher)"></i>
+                        </li>
+                    </ul>
+                </div>
             </div>
+            <div class="cell six">
+                <div class="cell eleven search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="autocomplete.class"
+                                        data-ng-change="selectClass"
+                                        data-options="autocomplete.classOptions"
+                                        on-search="filterClassOptions"
+                                        data-placeholder="diary.search.group"
+                                        search="autocomplete.class">
+                    </async-autocomplete>
+                </div>
+                <!-- Class selected via filter -->
+                <div class="cell twelve">
+                    <ul class="cell twelve search-input-ul">
+                        <li ng-repeat="class in autocomplete.classesSelected track by class.id" class="twelve">
+                            [[class.displayName]] <i class="close"
+                                                     data-ng-click="removeClass(class)"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div workflow="diary.adminAccess">
+        <div static-include="/diary/public/template/administrator/admin-sidebar.html"></div>
+        <div class="visa-diary"
+             static-include="/diary/public/template/administrator/diary-lister.html">
         </div>
 
         <section class="toggle-buttons" ng-class="{ hide: showOptionToaster != true }">
@@ -26,6 +65,18 @@
                             ng-click="printPdf()">
                         <span class="loader"></span>
                         <i18n>visa.manage.diaryToPrintPDF</i18n>
+                    </button>
+                    <button workflow="diary.manageVisa"
+                            ng-show="sessionsSelected().length === 1 && getVisas(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]]).length > 0"
+                            ng-click="wantDownloadPdf(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]])"
+                    >
+                        <i18n>sessions.admin.icon.dwlPdf</i18n>
+                    </button>
+                    <button disabled>
+                        <i18n>sessions.admin.merge</i18n>
+                    </button>
+                    <button disabled>
+                        <span>sessions.admin.share</span>
                     </button>
                 </div>
             </div>
