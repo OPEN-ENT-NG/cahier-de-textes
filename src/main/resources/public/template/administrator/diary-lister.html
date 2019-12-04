@@ -70,9 +70,9 @@
             <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
                     <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__15"
-                         ng-class="timeSlot.dueDate ? 'homework-slot' : 'session-slot'" role="rowgroup">
+                         ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup">
                         <div class="flex-col col__1 time-slot-type" role="cell">
-                            <div ng-include="'/diary/public/img/' + (timeSlot.dueDate ? 'inbox.svg' : 'book.svg')"
+                            <div ng-include="'/diary/public/img/' + (isHomeworkInstance(timeSlot) ? 'inbox.svg' : 'book.svg')"
                                  class="large"></div>
                         </div>
                         <div class="flex-col col__4 time-slot-title" role="cell">

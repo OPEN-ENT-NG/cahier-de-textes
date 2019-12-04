@@ -1,5 +1,5 @@
 import http from 'axios';
-import {Structure, Teacher, DateUtils} from './index';
+import {Structure, Teacher, DateUtils, Homework} from './index';
 import {idiom as lang, model, moment} from 'entcore';
 
 export class Visa {
@@ -27,15 +27,15 @@ export class Visa {
 
 
     toSendFormat() {
-        this.created = moment().format("YYYY/MM/DD")
-
+        this.created = moment().format("YYYY/MM/DD");
+        const subjectLabel = this.sessions[0].subject ? this.sessions[0].subject.label : '';
 
         return {
             comment: this.comment,
             sessionIds: this.sessionIds,
             user: model.me.username,
             audience: this.sessions[0].audience.name,// n.audience.name,
-            subject: this.sessions[0].subject.label,
+            subject: subjectLabel,
             teacher: this.sessions[0].teacher.toString(),
             stuctureName: this.structure.name,
             sessions: this.sessions.map((n) => {
@@ -46,12 +46,12 @@ export class Visa {
                     teacher: n.teacher.toString(),
                     title: n.title,
                     type: n.type.label,
-                    startDisplayDate: DateUtils.formatDate((n.dueDate ? n.dueDate : n.startMoment), 'DD/MM/YYYY'),
-                    startDisplayTime: n.dueDate ? null : DateUtils.formatDate(n.startMoment, 'HH:mm'),
-                    endDisplayTime: n.dueDate ? null : DateUtils.formatDate(n.endDisplayTime, 'HH:mm'),
+                    startDisplayDate: DateUtils.formatDate((n instanceof Homework ? n.dueDate : n.startMoment), 'DD/MM/YYYY'),
+                    startDisplayTime: n instanceof Homework ? null : DateUtils.formatDate(n.startMoment, 'HH:mm'),
+                    endDisplayTime: n instanceof Homework ? null : DateUtils.formatDate(n.endDisplayTime, 'HH:mm'),
                     hasDescription: ($.parseHTML(n.description) && $.parseHTML(n.description).length !== 0) ? true : false,
                     description: DateUtils.htmlToXhtml(n.description),
-                    annotation: n.dueDate ? null : n.annotation,
+                    annotation: n instanceof Homework ? null : n.annotation,
 
                     homeworks: homeworks.map(h => {
                         return {
@@ -79,10 +79,12 @@ export class Visa {
     mapFormData(FormData, comment) {
         this.comment = comment;
         this.sessions = FormData;
-        this.teacher = FormData[0].teacher
+        this.teacher = FormData[0].teacher;
         FormData.forEach(vs => {
-            this.sessionIds.push(vs.id);
-        })
+            if(!(vs instanceof Homework)) {
+                this.sessionIds.push(vs.id);
+            }
+        });
         this.nb_sessions = FormData.length
 
     }

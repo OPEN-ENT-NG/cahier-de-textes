@@ -2,7 +2,7 @@ import {_, angular, idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
-import {Sessions, Teacher, DateUtils, Visa, Visas} from "../../model";
+import {Sessions, Teacher, DateUtils, Visa, Visas, Homework} from "../../model";
 
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
@@ -77,8 +77,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
                 $scope.selectedSessions[key] = false;
                 $scope.sessions_GroupBy_AudienceSubject[key] = item.sort((a, b) => {
-                    const dateA = a.dueDate ? a.dueDate : a.startMoment;
-                    const dateB = b.dueDate ? b.dueDate : b.startMoment;
+                    const dateA = $scope.isHomeworkInstance(a) ? a.dueDate : a.startMoment;
+                    const dateB = $scope.isHomeworkInstance(b) ? b.dueDate : b.startMoment;
                     return moment(dateA).diff(moment(dateB));
                 });
             });
@@ -251,6 +251,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             return _.chain(sessionsGroup)
                 .pluck("id")
                 .value();
+        };
+
+        $scope.isHomeworkInstance = (timeSlot) => {
+            return timeSlot instanceof Homework;
         };
 
         $scope.selectOrUnselectAllSessions = function (isSelected = null) {

@@ -1,6 +1,7 @@
 import {angular, idiom as lang, moment} from 'entcore';
 import {FORMAT} from './const/dateFormat';
 import http from "axios";
+import {Homework} from "../model";
 
 export class DateUtils {
 
@@ -62,7 +63,7 @@ export class DateUtils {
     }
 
     static getFormattedTimeSlotDate(timeSlot) {
-        if (timeSlot.dueDate) {
+        if (timeSlot instanceof Homework) {
             return lang.translate('homework.for.date') + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
         }
         return DateUtils.formatDate(timeSlot.startMoment, 'DD/MM/YYYY') + ' '
