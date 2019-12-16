@@ -3,6 +3,8 @@ import * as jsPDF from 'jspdf';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
 import {Sessions, Teacher, DateUtils, Visa, Visas, Homework} from "../../model";
+import * as ts from "typescript/lib/tsserverlibrary";
+import Session = ts.server.Session;
 
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
@@ -203,8 +205,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
          */
         $scope.getVisas = (sessionsGroup) => {
             return _.chain(sessionsGroup)
+                    .filter(x => !(x instanceof Homework))
                     .pluck('visas')
-                    .filter(x => x)
                     .flatten()
                     .uniq(function (visa) {
                         return visa.id;
@@ -225,8 +227,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.getLastCreatedVisa = (sessionsGroup) => {
-
-            var date = _.chain($scope.getVisas(sessionsGroup))
+            const visas = $scope.getVisas(sessionsGroup);
+            const sessionsSize = sessionsGroup.filter(x => !(x instanceof Homework)).length;
+            if (visas.length !== sessionsSize) return lang.translate("sessions.admin.Visa.sateKo");
+            var date = _.chain(visas)
                 .pluck("created")
                 .sort()
                 .last()
