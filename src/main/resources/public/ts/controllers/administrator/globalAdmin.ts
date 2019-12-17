@@ -88,6 +88,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.safeApply();
         };
 
+        $scope.sessionsSize = () => {
+            return Object.keys($scope.sessions_GroupBy_AudienceSubject).length;
+        };
+
         $scope.updateDatas = async (event) => {
             // Checking if event is triggered when selecting an element inside multiCombo
             $scope.sessions.structure = $scope.structure;

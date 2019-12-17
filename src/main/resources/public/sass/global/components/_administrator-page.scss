@@ -34,6 +34,18 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
   }
 
+  .img-none {
+    max-width: 60%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .empty-list {
+    justify-content: start !important;
+    font-size: 16px;
+    color: $diary-grey;
+  }
+
   #list-diary-to-pdf {
     opacity: 0;
     z-index: -5;
