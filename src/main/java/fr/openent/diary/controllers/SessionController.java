@@ -58,16 +58,16 @@ public class SessionController extends ControllerHelper {
         });
     }
 
-    @Get("/sessions/external/:startDate/:endDate/:type/:typeId")
+    @Get("/sessions/external/:startDate/:endDate")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     @ResourceFilter(AccessExternalData.class)
     public void getExternalSessions(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
-        String type = request.getParam("type");
-        String typeId = request.getParam("typeId");
+        String audienceId = request.getParam("audienceId");
+        String teacherId = request.getParam("teacherId");
 
-        sessionService.getExternalSessions(startDate, endDate, type, typeId, DefaultResponseHandler.arrayResponseHandler(request));
+        sessionService.getExternalSessions(startDate, endDate, teacherId, audienceId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Get("/sessions/child/:startDate/:endDate/:childId")

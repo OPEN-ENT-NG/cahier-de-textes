@@ -14,7 +14,7 @@ public interface SessionService {
 
     void getOwnSessions(String structureId, String startDate, String endDate, String audienceId, String subjectId, UserInfos user, Handler<Either<String, JsonArray>> handler);
 
-    void getExternalSessions(String startDate, String endDate, String type, String typeId, Handler<Either<String, JsonArray>> handler);
+    void getExternalSessions(String startDate, String endDate, String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler);
 
     void getChildSessions(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
 

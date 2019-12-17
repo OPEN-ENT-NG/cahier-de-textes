@@ -96,9 +96,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getExternalHomeworks(String startDate, String endDate, String type, String typeId, Handler<Either<String, JsonArray>> handler) {
-        List<String> listAudienceId = "audience".equals(type) ? Arrays.asList(typeId) : null;
-        List<String> listTeacherId = "teacher".equals(type) ? Arrays.asList(typeId) : null;
+    public void getExternalHomeworks(String startDate, String endDate, String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler) {
+        List<String> listAudienceId = audienceId != null && !audienceId.equals("") ? Arrays.asList(audienceId) : null;
+        List<String> listTeacherId = teacherId != null && !teacherId.equals("") ? Arrays.asList(teacherId) : null;
 
         this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, true, handler);
     }

@@ -121,16 +121,15 @@ export class Courses {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
-
-        if (!audience && model.me.type !== USER_TYPES.student) {
-            filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher ? teacher.id : model.me.userId}`;
-        }
-        if (!teacher && audience)
-            filter += `group=${audience.name}`;
-        if (model.me.type === USER_TYPES.student && model.me.classes && model.me.classes.length)
-            if (window.audiences && window.audiences.all.length > 0) {
+        if (model.me.type !== USER_TYPES.student) {
+            if (teacher) filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher ? teacher.id : model.me.userId}?`;
+            if (audience) filter += `group=${audience.name}?`;
+        } else if (model.me.classes && model.me.classes.length) {
+            if (window.audiences && window.audiences.all.length > 0)
                 window.audiences.all.forEach((audience: Audience) => filter += `&group=${audience.name}`);
-            }
+        }
+
+        if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
         let {data} = await http.get(uri);

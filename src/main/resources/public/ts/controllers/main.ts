@@ -190,26 +190,22 @@ export let main = ng.controller('MainController',
         $scope.selectTeacher = async (model, item) =>  {
             AutocompleteUtils.setTeachersSelected([item]);
             AutocompleteUtils.resetSearchFields();
-            $scope.teacherSelected = AutocompleteUtils.getTeachersSelected()[0];
             await $scope.syncPedagogicItems();
         };
 
         $scope.selectClass = async (model, item) =>  {
             AutocompleteUtils.setClassesSelected([item]);
             AutocompleteUtils.resetSearchFields();
-            $scope.classSelected = AutocompleteUtils.getClassesSelected()[0];
             await $scope.syncPedagogicItems();
         };
 
         $scope.removeTeacher = async (value) =>  {
             AutocompleteUtils.removeTeacherSelected(value);
-            $scope.teacherSelected = null;
             await $scope.syncPedagogicItems();
         };
 
         $scope.removeClass = async (value) =>  {
             AutocompleteUtils.removeClassSelected(value);
-            $scope.classSelected = null;
             await $scope.syncPedagogicItems();
         };
 
@@ -228,16 +224,18 @@ export let main = ng.controller('MainController',
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
             $scope.progressions.all = [];
-            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData)
-                && ($scope.teacherSelected && $scope.teacherSelected.id)
-                || ($scope.classSelected && $scope.classSelected.id)) {
-                let typeId = $scope.teacherSelected && $scope.teacherSelected.id ? $scope.teacherSelected.id : $scope.classSelected.id;
-                let type = $scope.teacherSelected && $scope.teacherSelected.id ? 'teacher' : 'audience';
+            const teacherSelected = AutocompleteUtils.getTeachersSelected()[0];
+            const classSelected = AutocompleteUtils.getClassesSelected()[0];
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.diarySearch)
+                && ((teacherSelected && teacherSelected.id)
+                || (classSelected && classSelected.id))) {
+                let teacherId = teacherSelected && teacherSelected.id ? teacherSelected.id : null;
+                let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                 await Promise.all([
-                    await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, type, typeId),
+                    await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
                     await $scope.progressionsToDisplay.sync(),
-                    await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, type, typeId),
-                    await $scope.structure.courses.sync($scope.structure, $scope.teacherSelected, $scope.classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                    await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
+                    await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
 
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
@@ -245,14 +243,14 @@ export let main = ng.controller('MainController',
                     await $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                     await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                    await $scope.structure.courses.sync($scope.structure, $scope.teacherSelected, $scope.classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                    await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 await Promise.all([
                     await $scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
                     await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
-                    await $scope.structure.courses.sync($scope.structure, $scope.teacherSelected, $scope.classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                    await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             }
 
@@ -508,16 +506,6 @@ export let main = ng.controller('MainController',
             $scope.safeApply();
             return response;
         };
-
-        $scope.switchStructure = async (structure: Structure) => {
-            await $scope.syncStructure(structure);
-            $scope.teacherSelected = null;
-            $scope.classSelected = null;
-            AutocompleteUtils.init($scope.structure);
-            await $scope.syncPedagogicItems();
-            $scope.safeApply();
-        };
-
 
         $scope.newProgressionForm = () => {
             $scope.goTo('/progression/create');
@@ -784,7 +772,6 @@ export let main = ng.controller('MainController',
             await course.sync(date, date);
             let session = new Session($scope.structure, course, progressionDragged);
             session.setFromCourse(course);
-            console.log("session", session);
             session.opened = true;
             $scope.session = session;
             progressionDragged.progression_homeworks.map(
@@ -865,6 +852,8 @@ export let main = ng.controller('MainController',
                         }
                     }
                 }
+                AutocompleteUtils.init($scope.structure);
+                $scope.safeApply();
             }
         }
 

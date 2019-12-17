@@ -33,13 +33,13 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
         $scope.homeworks = [];
-        $scope.structureSwitchEvent = async () => {
+        /*$scope.structureSwitchEvent = async () => {
             $scope.teacher = null;
             $scope.teacherId = null;
             $scope.sessions_GroupBy_AudienceSubject = [];
             $scope.init();
             $scope.safeApply();
-        };
+        };*/
 
         let getIds = (collection) => {
             return collection

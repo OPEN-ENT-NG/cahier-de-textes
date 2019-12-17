@@ -24,11 +24,11 @@
                 </async-autocomplete>
             </div>
             <!-- Teacher selected via filter -->
-            <div class="cell twelve" ng-show="teacherSelected && teacherSelected.displayName !== ''">
+            <div class="cell twelve" ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[teacherSelected.displayName]] <i class="close"
-                                                       data-ng-click="removeTeacher(teacherSelected)"></i>
+                        [[autocomplete.teachersSelected[0].displayName]] <i class="close"
+                                                       data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
                     </li>
                 </ul>
             </div>
@@ -45,11 +45,11 @@
                 </async-autocomplete>
             </div>
             <!-- Class selected via filter -->
-            <div class="cell twelve" ng-show="classSelected && classSelected.displayName !== ''">
+            <div class="cell twelve" ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[classSelected.displayName]] <i class="close"
-                                                        data-ng-click="removeClass(classSelected)"></i>
+                        [[autocomplete.classesSelected[0].displayName]] <i class="close"
+                                                        data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
                     </li>
                 </ul>
             </div>
