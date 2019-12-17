@@ -38,7 +38,7 @@
              role="rowgroup">
             <div class="flex-content">
                 <div class="flex-row" ng-click="openDetails = openDetails != key ? key : null"
-                     ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'">
+                     ng-class="{'shadowed': openDetails == key, 'row__15': userType !== 'ENSEIGNANT', 'row__13': userType === 'ENSEIGNANT'}">
                     <div class="flex-col col__1 empty-take-space" role="cell">
                         <label class="checkbox">
                             <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
