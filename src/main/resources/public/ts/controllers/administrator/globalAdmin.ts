@@ -25,7 +25,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.userType = model.me.type;
 
-        $scope.allSessionsSelect = true;
+        $scope.allSessionsSelect = false;
         $scope.showOptionToaster = false;
         $scope.displayVisa = false;
         $scope.openDetails = null;
