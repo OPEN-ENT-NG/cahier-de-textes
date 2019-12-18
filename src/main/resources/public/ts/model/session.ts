@@ -18,7 +18,7 @@ export class Session {
     teacher: Teacher;
     audience: any;
     title: string;
-    color: string = colors[1];
+    color: string = colors[0];
     date: Date = moment().toDate();
     startTime: any = (moment().set({'hour': '08', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
@@ -47,14 +47,13 @@ export class Session {
 
     constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
-        if (course) {
-            this.setFromCourse(course);
-            this.init(structure);
-            this.title = 'Séance du ' + this.startDisplayDate + ' (' + this.startDisplayTime + ':' + this.endDisplayTime + ')'; // TOdo, revoir ce truc
-        }
         if (course && progression) {
             this.setFromCourseAndProgression(progression, course);
             this.init(structure);
+        } else if (course) {
+            this.setFromCourse(course);
+            this.init(structure);
+            this.title = 'Séance du ' + this.startDisplayDate + ' (' + this.startDisplayTime + ':' + this.endDisplayTime + ')';
         }
     }
 
@@ -414,7 +413,7 @@ export class Sessions {
         if (published) filter += `published=${published}&`;
         if (notPublished) filter += `notPublished=${notPublished}&`;
 
-        let url = `/diary/sessions/visa/${startDate}/${endDate}${filter.slice(0,-1)}`;
+        let url = `/diary/sessions/visa/${startDate}/${endDate}${filter.slice(0, -1)}`;
         await this.syncSessions(url);
     }
 
