@@ -1,21 +1,24 @@
-<div ng-if="item.pedagogicType == TYPE_SESSION"  ng-click="openSession(item.id)"
-     class="schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
+<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)"
+     class="flex-row row__6 schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
      lvl-draggable
-     lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
-    <span ng-show="false">[[item.id]]</span>
-    <div>
-        <div ng-if="item.exceptionnal" class="text-ellipsis overflow-hidden">
-                        [[item.startDisplayTime]]&nbsp;[[item.exceptionnal]]
+     lvl-drop-target on-drop="dropped(dragEl, dropEl)">
+
+    <div class="flex-col flex-row" ng-class="item.homeworks.length > 0 && !item.is_empty ? 'col__5': 'col__6' ">
+        <div class="flex-row row__6" ng-if="item.exceptionnal">
+            <div class="flex-col col__2">[[item.startDisplayTime]]</div>
+            <div class="flex-col col__4">[[item.exceptionnal]]</div>
         </div>
-        <div ng-if="!item.exceptionnal" class="text-ellipsis overflow-hidden">
-            [[item.startDisplayTime]]&nbsp;[[item.subject.label]]
+        <div class="flex-row row__6" ng-if="!item.exceptionnal">
+            <div class="flex-col col__2">[[item.startDisplayTime]]</div>
+            <div class="flex-col col__4 subject">[[item.subject.label]]</div>
         </div>
-        <div class="text-ellipsis overflow-hidden">
-            [[item.endDisplayTime]]&nbsp;[[item.audience.name]]
+        <div class="flex-row row__6">
+            <div class="flex-col col__2">[[item.endDisplayTime]]</div>
+            <div class="flex-col col__2">[[item.audience.name]]</div>
         </div>
     </div>
-    <div class="cell three bloc-homework" ng-if="item.homeworks.length > 0 && !item.is_empty">
-        <span class="pull-right homework-item text-center">
+    <div class="flex-col col__1 homework-item" ng-if="item.homeworks.length > 0 && !item.is_empty">
+        <span class="text-center">
             <i class="icon-homework homework"></i>
             <br>
             <span>[[item.homeworks.length]] </span>
@@ -25,10 +28,13 @@
                tooltip="utils.publish">&#xe904;</i>
         </span>
     </div>
+    <span ng-show="false">[[item.id]]</span>
+
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSessionFromCourse(item)" class="schedule-item-content bg-lightgrey TYPE_COURSE pointer session "
-      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+<div ng-if="item.pedagogicType == TYPE_COURSE" ng-click="openSessionFromCourse(item)"
+     class="schedule-item-content bg-lightgrey TYPE_COURSE pointer session "
+     lvl-drop-target on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item._id]]</span>
     <span ng-show="false">[[item.startDisplayDate]]</span>
 
@@ -41,7 +47,8 @@
         </div>
         <div class="text-ellipsis overflow-hidden">
             [[item.endDisplayTime]]&nbsp;
-            <span class="text-ellipsis overflow-hidden"><span ng-repeat="audience in item.audiences.all">[[audience.name]]<span ng-if="!$last">, </span></span></span>
+            <span class="text-ellipsis overflow-hidden"><span ng-repeat="audience in item.audiences.all">[[audience.name]]<span
+                    ng-if="!$last">, </span></span></span>
         </div>
     </div>
 </div>
