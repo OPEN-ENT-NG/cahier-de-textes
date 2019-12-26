@@ -69,7 +69,8 @@
             <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
                     <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__15"
-                         ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup">
+                         ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup"
+                         ng-click="openSessionModal(timeSlot)">
                         <div class="flex-col col__1 time-slot-type" role="cell">
                             <div ng-include="'/diary/public/img/' + (isHomeworkInstance(timeSlot) ? 'inbox.svg' : 'book.svg')"
                                  class="large"></div>
@@ -100,16 +101,16 @@
         <div ng-show="sessionsSize() <= 0"
              class="flex-row row__5"
              role="rowgroup">
-                <div class="flex-col col__2">
-                    <img class="img-none" ng-src="/diary/public/img/nothing.png" alt=""/>
-                </div>
-                <div class="flex-col col__3 empty-list">
-                    <i18n>diary.notAvailable</i18n>
-                </div>
+            <div class="flex-col col__2">
+                <img class="img-none" ng-src="/diary/public/img/nothing.png" alt=""/>
+            </div>
+            <div class="flex-col col__3 empty-list">
+                <i18n>diary.notAvailable</i18n>
             </div>
         </div>
-
     </div>
+
+</div>
 </div>
 
 <lightbox show="visaPdfDownloadBox" on-close="closeVisaPdfDownloadBox()">
@@ -149,6 +150,12 @@
     </form>
 </lightbox>
 
+
+<lightbox show="showSession" class="session-modal">
+    <div class="row margin-bottom-lg modal-include"
+         static-include="/diary/public/template/session/session-modal.html">
+    </div>
+</lightbox>
 
 <div id="list-diary-to-pdf"></div>
 <div id="canvas-diary-to-pdf"></div>

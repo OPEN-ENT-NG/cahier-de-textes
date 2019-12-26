@@ -24,6 +24,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.userType = model.me.type;
+        $scope.showSession = false
 
         $scope.allSessionsSelect = false;
         $scope.showOptionToaster = false;
@@ -32,14 +33,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.selectedSessions = {};
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
+        $scope.openedSession = null;
         $scope.homeworks = [];
-        /*$scope.structureSwitchEvent = async () => {
-            $scope.teacher = null;
-            $scope.teacherId = null;
-            $scope.sessions_GroupBy_AudienceSubject = [];
-            $scope.init();
-            $scope.safeApply();
-        };*/
 
         let getIds = (collection) => {
             return collection
@@ -376,6 +371,13 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.selectOrUnselectAllSessions(false);
             });
         };
+
+        $scope.openSessionModal = async (session: Session) => {
+            // console.log(session);
+            $scope.openedSession = session;
+            $scope.showSession = true;
+        };
+
 
 
         $scope.submitVisaForm = async () => {

@@ -1,0 +1,41 @@
+<!-- Description-->
+<!--        <div class="read-only-description" bind-html=""></div>-->
+<div class="back">
+    <i class="icon arrow-left" ng-click=""></i>
+</div>
+<div class="flex-row row__10 session-content">
+    <div class="flex-row flex-col main-content">
+        <div class="flex-row row__10 head">
+            <div class="flex-col col__3">
+                <i class="text-xl one margin-sm icon diary-calendar"></i>&nbsp;[[openedSession.startDisplayDate]]&nbsp;-&nbsp;[[openedSession.startDisplayTime]]-[[openedSession.endDisplayTime]]
+            </div>
+            <div class="flex-col col__2"><i class="text-xl one margin-sm icon diary-user"></i>[[openedSession.teacher.toString()]]
+            </div>
+            <div class="flex-col col__1"><i class="text-xl two margin-sm icon diary-file"></i>[[openedSession.type.label]]
+            </div>
+            <div class="flex-col col__1">
+                <i class="text-xl two margin-sm icon diary-up"
+                   ng-class="openedSession.isPublished ? 'published' : 'unpublished'"></i>
+                <span class="ten">
+                <i18n ng-if="openedSession.isPublished">published</i18n>
+                <i18n ng-if="!openedSession.isPublished">notpublished.s</i18n>
+            </span>
+            </div>
+            <div class="flex-col col__1"></div>
+            <div class="flex-col col__2 edit-button">
+                <button class="right-magnet calendar-button edit-button" ng-click="goTo('/session/update/' + openedSession.type.id)">
+                    MODIFIER
+                </button>
+            </div>
+        </div>
+        <div class="flex-row row__1 title">
+            <div class="flex-col">[[openedSession.title]]</div>
+        </div>
+        <div class="flex-row row__1 description">
+            <div class="flex-col" bind-html="openedSession.description"></div>
+        </div>
+    </div>
+</div>
+<div class="next">
+    <i class="icon arrow-right" ng-click=""></i>
+</div>

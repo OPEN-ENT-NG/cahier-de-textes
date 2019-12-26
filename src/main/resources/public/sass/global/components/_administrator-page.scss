@@ -127,4 +127,68 @@
     }
   }
 
+
+  .session-modal {
+    .content {
+      width: 97%;
+      min-height: 91%;
+      align-items: stretch;
+
+      .twelve.cell {
+        display: flex;
+        .modal-include {
+          align-items: stretch;
+          .back, .next {
+            display: inline-flex;
+            align-items: center;
+            text-align: center;
+            position: absolute;
+            width: 10%;
+            justify-content: center;
+            top: 50vh;
+            i {
+              cursor: pointer;
+              font-size: 45px
+            }
+          }
+          .back {
+            left: 0;
+          }
+          .next {
+            right: 0;
+          }
+          .session-content {
+            display: inline-flex;
+            width: 80%;
+            align-items: stretch;
+            padding-right: 10%;
+            padding-left: 10%;
+
+            .main-content {
+              min-height: 0;
+
+              .head {
+                height: 25px;
+
+                .edit-button {
+                  justify-content: flex-end;
+                }
+              }
+
+              .title {
+                font-size: 26px;
+                font-weight: bold;
+                height: 50px;
+              }
+
+              .description {
+                align-items: stretch;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
 }

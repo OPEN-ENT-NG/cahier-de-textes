@@ -43,6 +43,15 @@ i {
     content: "\e945";
   }
 
-  &.diary-homework::before {
+  &.diary-user::before {
+    content: "\e870";
   }
+
+  &.arrow-right::before {
+    content: "\e823";
+  }
+  &.arrow-left::before {
+    content: "\e87b";
+  }
+
 }
