@@ -33,8 +33,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.selectedSessions = {};
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
-        $scope.openedSession = null;
+        $scope.openedTimeSlot = null;
         $scope.homeworks = [];
+        $scope.timeSlotsByDate = [];
 
         let getIds = (collection) => {
             return collection
@@ -70,6 +71,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             });
             const sessions = [...$scope.homeworks, ...$scope.sessions.all];
             $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject(sessions);
+            $scope.timeSlotsByDate = getTimeSlotsByDate();
 
             _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
                 $scope.selectedSessions[key] = false;
@@ -84,7 +86,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.sessionsSize = () => {
-            return Object.keys($scope.sessions_GroupBy_AudienceSubject).length;
+            return $scope.sessions_GroupBy_AudienceSubject ? Object.keys($scope.sessions_GroupBy_AudienceSubject).length : 0;
         };
 
         $scope.updateDatas = async (event) => {
@@ -247,7 +249,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.getFormattedTimeSlotDate = (timeSlot) => {
-            return DateUtils.getFormattedTimeSlotDate(timeSlot);
+            if (timeSlot) return DateUtils.getFormattedTimeSlotDate(timeSlot);
         };
 
         $scope.getSessionsIds = (sessionsGroup) => {
@@ -328,6 +330,20 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             });
         };
 
+        let getTimeSlotsByDate = () => {
+            // console.log("test", _.sortBy([1, 2, 3, 4, 5, 6], function(num){ return Math.sin(num); }));
+            console.log("unsorted", _.flatten(_.map($scope.sessions_GroupBy_AudienceSubject, (x) => x)));
+            let x = _.flatten(_.map($scope.sessions_GroupBy_AudienceSubject, (x) => x));
+
+            x = _.sortBy(x, (a) => {
+                const aStartDate = DateUtils.formatDate((a instanceof Homework ? a.dueDate : a.startMoment), 'YYYY/MM/DD');
+                const aStartTime = a instanceof Homework ? null : DateUtils.formatDate(a.startMoment, 'HH:mm');
+                return Math.round(new Date(aStartDate ? aStartDate : '' + (aStartTime ? ' ' + aStartTime : '')).getTime() / 1000);
+            });
+            console.log("sorted", x);
+            return x;
+        };
+
 
         $scope.safeApply();
 
@@ -372,12 +388,37 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             });
         };
 
-        $scope.openSessionModal = async (session: Session) => {
-            // console.log(session);
-            $scope.openedSession = session;
+        $scope.openTimeSlotModal = async (timeSlot: Session | Homework) => {
+            $scope.openedTimeSlot = timeSlot;
             $scope.showSession = true;
         };
 
+        $scope.getTimeSlotIdsByDate = () => {
+            return $scope.timeSlotsByDate.map((x) => (x instanceof Homework ? 'h' : 's') + x.id)
+        };
+
+        $scope.getTimeSlotIndex = () => {
+            if ($scope.openedTimeSlot) return $scope.getTimeSlotIdsByDate()
+                .indexOf(($scope.openedTimeSlot instanceof Homework ? 'h' : 's') + $scope.openedTimeSlot.id);
+        };
+
+
+        $scope.canNavigate = (goingRight: Boolean) => {
+            return $scope.openedTimeSlot
+                && $scope.getTimeSlotIdsByDate()[$scope.getTimeSlotIndex() + (goingRight ? 1 : -1)];
+        };
+
+
+        $scope.timeSlotNavigate = (goingRight: Boolean) => {
+            if ($scope.canNavigate(goingRight)) {
+                const index = $scope.getTimeSlotIndex() + (goingRight ? 1 : -1);
+                $scope.openedTimeSlot = $scope.timeSlotsByDate[index];
+            }
+        };
+
+        $scope.goToEditTimeslot = () => {
+            $scope.goTo(($scope.openedTimeSlot instanceof Homework ? '/homework' : '/session') + '/update/' + $scope.openedTimeSlot.type.id)
+        };
 
 
         $scope.submitVisaForm = async () => {

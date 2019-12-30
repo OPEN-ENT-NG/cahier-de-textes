@@ -139,6 +139,7 @@
         .modal-include {
           align-items: stretch;
           .back, .next {
+            z-index: 1;
             display: inline-flex;
             align-items: center;
             text-align: center;
@@ -147,8 +148,20 @@
             justify-content: center;
             top: 50vh;
             i {
+              color: $diary-grey;
               cursor: pointer;
-              font-size: 45px
+              font-size: 45px;
+              &:hover {
+                color: $session-grey;
+              }
+
+              &.disabled {
+                cursor: default;
+                color: rgba($diary-grey, 0.3);
+                &:hover {
+                  color: rgba($diary-grey, 0.3);
+                }
+              }
             }
           }
           .back {

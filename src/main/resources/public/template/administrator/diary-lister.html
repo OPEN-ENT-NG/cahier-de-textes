@@ -70,7 +70,7 @@
                 <div class="flex-content">
                     <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__15"
                          ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup"
-                         ng-click="openSessionModal(timeSlot)">
+                         ng-click="openTimeSlotModal(timeSlot)">
                         <div class="flex-col col__1 time-slot-type" role="cell">
                             <div ng-include="'/diary/public/img/' + (isHomeworkInstance(timeSlot) ? 'inbox.svg' : 'book.svg')"
                                  class="large"></div>
