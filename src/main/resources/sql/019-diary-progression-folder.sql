@@ -15,4 +15,4 @@ CREATE TABLE diary.progression_folder (
 
 ALTER  TABLE  diary.progression_session
     ADD  progression_folder_id bigint,
-    ADD CONSTRAINT fk_progression_folder_id FOREIGN KEY (progression_folder_id) REFERENCES diary.progression_folder(id) ON DELETE SET NU
+    ADD CONSTRAINT fk_progression_folder_id FOREIGN KEY (progression_folder_id) REFERENCES diary.progression_folder(id) ON DELETE SET NULL
