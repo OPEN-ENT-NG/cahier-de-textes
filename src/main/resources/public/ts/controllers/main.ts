@@ -610,7 +610,7 @@ export let main = ng.controller('MainController',
             let progression = $('#' + dragEl);
             const typeCourse = "TYPE_COURSE";
             const typeSession = "TYPE_SESSION";
-            let id_progressionOrSession = progression[0].children[0].textContent;
+            let id_progressionOrSession = progression.data().sessionId;
             let sessionOrCourse = $('#' + dropEl);
             let typeCourseSession = "";
             let idCourseSession = sessionOrCourse[0].children[0].textContent;
@@ -739,7 +739,7 @@ export let main = ng.controller('MainController',
             let progressionDragged;
             let progressionSessions = $scope.progressionFolders.all.map((f) => f.progressionSessions);
             progressionSessions = [].concat.apply([],progressionSessions);
-            progressionDragged = progressionSessions.find((s) => s.id = idProgression);
+            progressionDragged = progressionSessions.find((s) => s.id == idProgression);
             let course = new Course($scope.structure, idCourse);
 
             // Formating date
@@ -753,6 +753,7 @@ export let main = ng.controller('MainController',
             //insert data and refresh calendar
             await course.sync(date, date);
             let session = new Session($scope.structure, course, progressionDragged);
+            console.log(session);
             session.setFromCourse(course);
             session.opened = true;
             $scope.session = session;
@@ -768,7 +769,7 @@ export let main = ng.controller('MainController',
                 }
             );
             //await session.sync();
-            $scope.syncPedagogicItems();
+            //$scope.syncPedagogicItems();
             $scope.safeApply();
             $scope.goTo('/session/create');
 

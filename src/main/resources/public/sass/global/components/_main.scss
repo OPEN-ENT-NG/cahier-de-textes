@@ -339,10 +339,6 @@ span.no-style {
   box-shadow: none;
   background: $diary-darkgreen;
 
-  i18n {
-    text-transform: uppercase;
-  }
-
   &:hover {
     background-color: $diary-darkengreen;
   }

@@ -25,7 +25,7 @@ export class ProgressionSession implements Selectable {
     homeworks;
     eventer: Eventer;
     type: SessionType;
-    folder: ProgressionFolder;
+    folder_id: number;
 
     progression_homeworks: ProgressionHomework[] = [];
 
@@ -35,7 +35,7 @@ export class ProgressionSession implements Selectable {
         this.eventer = new Eventer();
         this.title = "";
         this.class = "";
-        this.folder = null;
+        this.folder_id = null;
     }
 
     async save() {
@@ -113,7 +113,7 @@ export class ProgressionSession implements Selectable {
             owner_id: this.owner ? this.owner.id : this.owner_id,
             type_id: this.type.id ? this.type.id : this.type_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id),
-            progression_folder_id: this.folder.id
+            progression_folder_id: this.folder_id
         };
     }
 
@@ -158,7 +158,6 @@ export class ProgressionFolder implements Selectable {
     deepStep: number = 0;
     ownerId: null;
 
-    parent: ProgressionFolder = null;
     childFolders: ProgressionFolder[] = [];
 
     static formatSqlDataToModel(data: any, owner_id) {
@@ -215,9 +214,6 @@ export class ProgressionFolders extends Selection<ProgressionFolder> {
         if (nullFoldersLength === -1) {
             this.all.push(new ProgressionFolder());
         }
-        this.all.forEach((f) => {
-            f.parent = this.all.find((x) => x.id === f.parent_id);
-        })
     }
 
     static organizeTree(folders: ProgressionFolder[], currentFolders: ProgressionFolder[] = null, currentDeepStep: number = 0) {

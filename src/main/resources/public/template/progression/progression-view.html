@@ -18,7 +18,7 @@
                 <div class="flex-row create-progression-button">
                     <button workflow="diary.manageSession" class="calendar-button"
                             data-ng-disabled="(!isFolder(selectedItem) || selectedItem.deepStep >= 5)"
-                            data-ng-click="openedCreateFolder = (isFolder(selectedItem) && selectedItem.deepStep < 5)">
+                            data-ng-click="$parent.openedCreateFolder = (isFolder(selectedItem) && selectedItem.deepStep < 5)">
                         <i18n>progression.folder.create</i18n>
                     </button>
                 </div>
@@ -31,12 +31,14 @@
                         <i18n>session.create</i18n>
                     </button>
                 </div>
+                <h3 class="folder-title" ng-show="selectedItem && isFolder(selectedItem)"><i
+                        class="icon diary-folder"></i> [[selectedItem.title]]</h3>
                 <div class="folders-view"
                      ng-show="isFolder(selectedItem) && (selectedItem.childFolders.length > 0)">
-                    <h3 class="folder-title"><i class="icon diary-folder"></i> [[selectedItem.title]]</h3>
                     <div class="flex-row">
                         <div class="flex-card sub-folder" ng-repeat="folder in selectedItem.childFolders"
                              data-ng-mouseup="selectSubItem(folder)"
+                             ng-dblclick="selectItem(folder)"
                              ng-class="{'sub-item-selected': isSelectedSubItem(folder)}"
                              data-item-id="[[folder.id]]"
                              lvl-draggable
@@ -44,7 +46,7 @@
                              on-drop="dropped(dragEl, dropEl)"
                         >
                             <div class="flex-content"><i class="icon diary-folder"></i></div>
-                            <div class="flex-title">[[folder.title]]</div>
+                            <div class="flex-title"><span class="item-no-wrap">[[folder.title]]</span></div>
                         </div>
                     </div>
                 </div>
@@ -123,16 +125,16 @@
                                 ng-click="openUpdateItem(selectedSubItems[0])">
                             <i18n>progression.folder.update</i18n>
                         </button>
-                        <button ng-click="openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
+                        <button ng-click="$parent.openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
                             <i18n>delete</i18n>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <lightbox show="openedCreateFolder"
+            <lightbox show="$parent.openedCreateFolder"
                       class="create-visa"
-                      on-close="closeFolderForm()">
+                      on-close="closeModal()">
                 <h3>
                     <i18n>progression.title</i18n>
                 </h3>
@@ -150,7 +152,6 @@
                             <i18n>progression.create.parent.folder.name</i18n>
                         </label>
                         <select id="parentId"
-                                data-ng-change="changeTest(folder, progressionFolderForm)"
                                 ng-options="folder.id as folder.title for folder in filterCycleFolders()"
                                 ng-model="progressionFolderForm.parent_id">
                             <option ng-if="false" value="" label=""></option>
@@ -168,14 +169,14 @@
                     </div>
                 </form>
             </lightbox>
-            <lightbox show="openedToasterProgressions"
-                      on-close="openedToasterProgressions = false">
+            <lightbox show="$parent.openedToasterProgressions"
+                      on-close="closeModal()">
                 <form>
                     <div class="flex-row">
                         <i18n ng-show="selectedSubItems.length > 0">progression.info.delete</i18n>
                         <i18n ng-show="selectedSubItems.length === 0">progression.session.to.delete</i18n>
                     </div>
-                    <div class="flex-row row__2" v-show="selectedSubItems.length > 0">
+                    <div class="flex-row row__2" ng-show="selectedSubItems.length > 0">
                         <div class="flex-col col__1 justified-button">
                             <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
                                     ng-click="deleteItems(false)">
@@ -191,11 +192,12 @@
                             </button>
                         </div>
                     </div>
-                    <div class="flex-row row__1" v-show="selectedSubItems.length === 0">
-                        <div class="flex-col col__1 justified-button">
+                    <div class="flex-row row__1"
+                         ng-show="selectedSubItems.length <= 0 && getProgressionSessionsChecked().length > 0">
+                        <div class="flex-col col__2 justified-button">
                             <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
-                                    ng-click="deleteItems(false)">
-                                <i18n>progression.deep.choice</i18n>
+                                    ng-click="deleteSessions()">
+                                <i18n>progression.session.delete.confirm</i18n>
                                 <span class="loader"></span>
                             </button>
                         </div>

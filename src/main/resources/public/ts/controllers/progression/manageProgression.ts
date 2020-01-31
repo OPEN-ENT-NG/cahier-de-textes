@@ -1,10 +1,12 @@
-import {_, Behaviours, Folder, idiom as lang, model, ng, template} from 'entcore';
+import {Behaviours, idiom as lang, model, ng, template} from 'entcore';
 import {
     ProgressionFolder,
-    ProgressionFolders, ProgressionHomework,
-    ProgressionSession, ProgressionSessions
+    ProgressionFolders,
+    ProgressionHomework,
+    ProgressionSession,
+    ProgressionSessions
 } from "../../model/Progression";
-import {DateUtils, HomeworkTypes, SessionTypes, Subjects, Toast} from "../../model";
+import {HomeworkTypes, SessionTypes, Subjects} from "../../model";
 
 export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location', async function ($scope, $routeParams, $location) {
@@ -28,7 +30,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.openedFolderIds = [null];
         $scope.selectedItem = null;
         $scope.selectedSubItems = [];
-        $scope.selectedFolderIds = [];
+        $scope.selectedFolderIds = [null];
         $scope.openedCreateFolder = false;
         $scope.openedToasterProgressions = false;
         $scope.optionFolders = [];
@@ -61,12 +63,12 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         async function initData() {
-            $scope.progressionSessionForm = new ProgressionSession();
             $scope.sessionTypes = new SessionTypes($scope.structure.id);
             $scope.subjects = new Subjects();
             await $scope.sessionTypes.sync();
             await $scope.subjects.sync($scope.structure.id, model.me.userId);
             await $scope.initProgressions();
+            await $scope.initForms();
 
             $scope.progressionFolders.forEach((folder) => {
                 folder.progressionSessions.map(psession => {
@@ -96,6 +98,35 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.isReadOnly = modeIsReadOnly();
             $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
 
+            $scope.setSubjectSession();
+
+            await $scope.homeworkTypes.sync();
+            $scope.safeApply();
+        }
+
+        $scope.initProgressions = async () => {
+            $scope.selectedItem = null;
+
+            $scope.progressionFolders = new ProgressionFolders(model.me.userId);
+            await $scope.progressionFolders.sync();
+            $scope.progressionFolders.all.map((x) => {
+                if (x.id === null && x.parent_id === null) {
+                    x.title = lang.translate("progression.my.folders");
+                    x.selected = true;
+                    $scope.selectedItem = x;
+                }
+                return x;
+            });
+
+            $scope.progressionFoldersToDisplay = Object.assign(Object.create(Object.getPrototypeOf($scope.progressionFolders)), $scope.progressionFolders);
+            $scope.progressionFolders.all.filter((x) => x.id);
+            $scope.progressionFoldersToDisplay.all = ProgressionFolders.organizeTree($scope.progressionFoldersToDisplay.all);
+            $scope.subProgressionsItems = $scope.progressionFoldersToDisplay.all;
+
+            $scope.selectedSubItems = [];
+        };
+
+        $scope.setSubjectSession = () => {
             if ($scope.subjects.all.length === 1) {
                 $scope.progressionSessionForm.setSubject($scope.subjects.all[0]);
             }
@@ -112,45 +143,20 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                     }
                 });
             }
-            await $scope.homeworkTypes.sync();
-            $scope.safeApply();
-        }
-
-        $scope.initProgressions = async () => {
-            $scope.progressionFolders = new ProgressionFolders(model.me.userId);
-            await $scope.progressionFolders.sync();
-            $scope.progressionFolders.all.map((x) => {
-                if (x.id === null && x.parent_id === null) x.title = lang.translate("progression.my.folders");
-                return x;
-            });
-
-            $scope.progressionFoldersToDisplay = Object.assign(Object.create(Object.getPrototypeOf($scope.progressionFolders)), $scope.progressionFolders);
-            $scope.progressionFolders.all.filter((x) => x.id);
-            $scope.progressionFoldersToDisplay.all = ProgressionFolders.organizeTree($scope.progressionFoldersToDisplay.all);
-            $scope.subProgressionsItems = $scope.progressionFoldersToDisplay.all;
-
-            $scope.selectedItem = null;
-            $scope.selectedSubItems = [];
         };
 
+        $scope.getRootFolder = () => {
+            return $scope.progressionFolders ? $scope.progressionFolders.all.find((f) => f.id === null) : null;
+        };
 
-        $scope.addFolderSelected = (item) => {
-            if (item instanceof ProgressionFolder) {
-                if (((!$scope.isFilterSearch() || $scope.currentUrlIsManage) && item.childFolders.length === 0)
-                    || ($scope.isFilterSearch() && !$scope.currentUrlIsManage && item.childFolders.length === 0 && item.progressionSessions.length === 0)) {
-                    $scope.selectItem(item);
-                } else {
-                    let index = $scope.selectedFolderIds.indexOf(item.id);
-                    if (index === -1) {
-                        //open folder
-                        $scope.selectedFolderIds.push(item.id);
-                        $scope.selectItem(item);
-                    } else {
-                        //close folder
-                        $scope.selectedFolderIds.splice(index, 1);
-                        if ($scope.selectedItem && $scope.selectedItem.id === item.id) $scope.selectItem(null);
-                    }
-                }
+        $scope.addFolderSelected = (item: ProgressionFolder, removeOnClick: boolean = true) => {
+            let index = $scope.selectedFolderIds.indexOf(item.id);
+            if (index === -1) {
+                //open folder
+                $scope.selectedFolderIds.push(item.id);
+            } else if (removeOnClick) {
+                //close folder
+                $scope.selectedFolderIds.splice(index, 1);
             }
         };
 
@@ -221,22 +227,30 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.isFolder = (item) => item instanceof ProgressionFolder;
 
         $scope.selectItem = (item) => {
+            let oldSelected = $scope.selectedItem;
             if ($scope.selectedItem) {
                 $scope.selectedItem.selected = false;
-                $scope.selectedItem = (!item || (item.id === $scope.selectedItem.id && $scope.isFolder(item) === $scope.isFolder($scope.selectedItem))) ? null : item;
+                $scope.selectedItem = (!item) ? null : item;
                 if ($scope.selectedItem) $scope.selectedItem.selected = true;
             } else {
                 if (item) item.selected = true;
                 $scope.selectedItem = item;
             }
 
-            $scope.getProgressionSessionsChecked().forEach((s) => {
-                s.tableSelected = false;
-            });
-            $scope.updateOptionToaster();
-            $scope.progressionFolderForm.parent = $scope.selectedItem;
-            $scope.progressionSessionForm.folder = $scope.isFolder($scope.selectedItem) ? $scope.selectedItem : null;
-            $scope.selectedSubItems = [];
+            if (item) $scope.addFolderSelected(item, false);
+
+            if (!(oldSelected && item && item.id === oldSelected.id && $scope.isFolder(item) === $scope.isFolder(oldSelected))) {
+                $scope.initForms();
+                $scope.getProgressionSessionsChecked().forEach((s) => {
+                    s.tableSelected = false;
+                });
+
+                let selectedId = $scope.isFolder($scope.selectedItem) ? $scope.selectedItem.id : null;
+                $scope.progressionSessionForm.folder_id = selectedId;
+                $scope.progressionFolderForm.parent_id = selectedId;
+                $scope.selectedSubItems = [];
+                $scope.updateOptionToaster();
+            }
         };
 
         $scope.selectSubItem = (item) => {
@@ -268,14 +282,18 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.submitProgressionFolderForm = async () => {
             $scope.folder_loading = true;
             $scope.safeApply();
-
             let result = await $scope.progressionFolderForm.save();
             if (result.succeed) {
-                $scope.openedCreateFolder = false;
+                $scope.closeModal();
                 await initData();
-                $scope.safeApply();
+                let resultId = result.data ? result.data.id : null;
+                if (resultId) {
+                    let folder = $scope.progressionFolders.all.find((f) => f.id === resultId);
+                    $scope.initWithOldSelectedItem(folder);
+                }
             }
             $scope.folder_loading = false;
+            $scope.safeApply();
         };
 
         $scope.dropped = async (dragEl, dropEl) => {
@@ -290,7 +308,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
             if ((!dropItem.hasClass("folder") && !dropItem.hasClass("sub-folder")) || !folder) return;
             if (dragItem.hasClass("session-item")) {
-                let sessionsChecked= $scope.getProgressionSessionsChecked();
+                let sessionsChecked = $scope.getProgressionSessionsChecked();
 
                 if (sessionsChecked.map((s) => s.id).includes(dragId)) {
                     sessionsChecked.forEach((s) => {
@@ -342,17 +360,29 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                 $scope.goTo('/progressions/view');
                 await initData();
                 $scope.openedCreateFolder = false;
+                let resultId = result.data ? result.data[0]["id"] : null;
+                if (resultId) {
+                    $scope.closeModal();
+                    let folder = $scope.progressionFolders.all.find((f) => {
+                        return f.progressionSessions.find((s) => s.id === resultId);
+                    });
+                    $scope.initWithOldSelectedItem(folder);
+                }
             }
             $scope.safeApply();
+        };
 
+        $scope.openParents = (folder) => {
+            $scope.selectedFolderIds.push(folder.id);
+            if (folder.parent_id)
+                $scope.openParents($scope.progressionFolders.all.find((f) => f.id === folder.parent_id));
         };
 
         $scope.isValidForm = () => {
-            let sessionFormIsValid = $scope.progressionSessionForm
+            return $scope.progressionSessionForm
                 && $scope.progressionSessionForm.subject
                 && $scope.progressionSessionForm.type.label
                 && $scope.progressionSessionForm.title;
-            return sessionFormIsValid;
         };
 
         $scope.areValidHomeworks = () => {
@@ -463,6 +493,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.back = () => {
+            $scope.closeModal();
             window.history.back();
         };
 
@@ -470,7 +501,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             if (item instanceof ProgressionSession) {
                 $scope.progressionSessionForm = item;
                 $scope.showProgressionSessionForm();
-            } else {
+            } else if ($scope.isFolder($scope.selectedItem) && $scope.selectedItem.deepStep < 5) {
                 $scope.progressionFolderForm = item;
                 $scope.openedCreateFolder = true;
             }
@@ -480,6 +511,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.deleteItems = async (deepRemove: boolean) => {
             let folderIds = [];
             let sessionIds = [];
+            let selectedId = $scope.selectedItem.id ? $scope.selectedItem.id : null;
 
             $scope.getProgressionSessionsChecked().forEach((s) => sessionIds.push(s.id));
             $scope.delete_loading = true;
@@ -487,25 +519,70 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                 if (x instanceof ProgressionFolder) ProgressionFolders.idsToRemove(x, deepRemove, folderIds, sessionIds);
             });
 
-            let sessionSucceed = sessionIds.length > 0 ? await ProgressionSessions.delete(sessionIds, model.me.userId) : true;
-            let folderSucceed = folderIds.length > 0 ? await ProgressionFolders.delete(folderIds, model.me.userId) : true;
+            sessionIds.length > 0 ? await ProgressionSessions.delete(sessionIds, model.me.userId) : null;
+            folderIds.length > 0 ? await ProgressionFolders.delete(folderIds, model.me.userId) : null;
 
-            if (sessionSucceed.success || folderSucceed.success) {
-                await initData();
-                $scope.closeFolderForm();
-                $scope.safeApply();
-            }
+            await initData();
+            $scope.closeModal();
+            let folder = $scope.progressionFolders.all.find((f) => f.id === selectedId);
+            $scope.initWithOldSelectedItem(folder);
+
             $scope.delete_loading = false;
-            $scope.openedToasterProgressions = false;
+            $scope.safeApply();
         };
 
-        $scope.closeFolderForm = () => {
-            $scope.openedCreateFolder = false;
-            $scope.progressionFolderForm = new ProgressionFolder();
-            $scope.selectedItem = null;
-            $scope.selectedSubItems = [];
-            $scope.selectedFolderIds = [];
+        $scope.deleteSessions = async () => {
+            $scope.delete_loading = true;
+            let selectedId = $scope.selectedItem.id ? $scope.selectedItem.id : null;
+            let sessionIds = $scope.getProgressionSessionsChecked().map((s) => s.id);
+            sessionIds.length > 0 ? await ProgressionSessions.delete(sessionIds, model.me.userId) : null;
+            await initData();
+            $scope.closeModal();
+
+            let folder = $scope.progressionFolders.all.find((f) => f.id === selectedId);
+            $scope.initWithOldSelectedItem(folder);
+
+            $scope.delete_loading = false;
             $scope.safeApply();
+        };
+
+        $scope.initWithOldSelectedItem = (folder: ProgressionFolder) => {
+            folder.selected = true;
+            $scope.progressionSessionForm.folder_id = folder.id;
+            $scope.selectedItem.selected = false;
+            $scope.selectedItem = folder;
+            $scope.openParents(folder);
+        };
+
+        $scope.closeModal = () => {
+            $scope.openedCreateFolder = false;
+            $scope.openedToasterProgressions = false;
+            $scope.$parent.openedCreateFolder = false;
+            $scope.$parent.openedToasterProgressions = false;
+            $scope.initForms();
+            if ($scope.selectedItem) {
+                $scope.progressionSessionForm.folder_id = $scope.selectedItem.id;
+                $scope.progressionFolderForm.parent_id = $scope.selectedItem.id;
+            }
+
+            $scope.selectedSubItems = [];
+        };
+
+        $scope.closeForms = () => {
+            $scope.selectedItem.selected = false;
+            $scope.selectedItem = $scope.getRootFolder();
+            $scope.selectedItem.selected = true;
+            $scope.selectedFolderIds = [null];
+            $scope.closeModal();
+            $scope.safeApply();
+        };
+
+        $scope.initForms = () => {
+            $scope.progressionFolderForm = new ProgressionFolder();
+            $scope.progressionSessionForm = new ProgressionSession();
+            $scope.progressionSessionForm.folder_id = null;
+            $scope.setSubjectSession();
+            $scope.progressionSessionForm.setOwnerId($scope.progressionFolders.owner_id);
         };
 
         //change the sorting of the progressions

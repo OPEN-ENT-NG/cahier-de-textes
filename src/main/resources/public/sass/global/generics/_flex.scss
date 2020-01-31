@@ -99,7 +99,6 @@
 .flex-card {
   display: flex;
   flex-wrap: wrap;
-  border: 1px solid rgba($diary-grey, 0.7);
   width: 20%;
   min-height: 100px;
   background-color: $diary-white;
@@ -122,6 +121,7 @@
     height: 25%;
     justify-content: center;
     background: $diary-grey;
+    border-radius:  0 0 7px 7px;
     color: #fff;
     transition: all 250ms ease;
   }

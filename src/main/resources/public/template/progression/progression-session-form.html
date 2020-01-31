@@ -55,9 +55,9 @@
                         <div class="twelve">
                             <i18n>progression.create.parent.folder.name</i18n>
                         </div>
-                        <select ng-model="progressionSessionForm.folder"
-                                ng-options="folder.title for folder in progressionFolders.all track by folder.id">
-                            <option ng-if="false" value=""></option>
+                        <select ng-options="folder.id as folder.title for folder in progressionFolders.all"
+                                ng-model="progressionSessionForm.folder_id">
+                            <option ng-if="false" value="" label=""></option>
                         </select>
                     </label>
                     <!-- Title -->
