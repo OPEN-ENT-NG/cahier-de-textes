@@ -1,0 +1,6 @@
+<div ng-controller="manageProgessionCtrl">
+    <div ng-show="isListView"
+         ng-include="'/diary/public/template/progression/progression-view.html'"></div>
+    <div ng-show="!isListView"
+         ng-include="'/diary/public/template/progression/progression-session-form.html'"></div>
+</div>

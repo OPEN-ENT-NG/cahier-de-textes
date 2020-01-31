@@ -13,6 +13,7 @@ export * from './Toast';
 export * from './User';
 
 export * from '../utils/dateUtils';
+export * from '../utils/toastUtils';
 export * from '../utils/const/user-types';
 export * from '../utils/const/daysOfWeek';
 export * from '../utils/const/comboLabels';

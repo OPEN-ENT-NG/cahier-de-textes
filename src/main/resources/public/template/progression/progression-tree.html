@@ -1,0 +1,88 @@
+<div ng-if="!isFilterSearch()" ng-repeat="folder in subProgressionsItems" class="folder-content">
+    <div ng-class="{'selected-item': folder.selected}">
+        <div class="folder "
+             ng-click="addFolderSelected(folder)"
+             ng-class="['include-folders_' + folder.deepStep, {'first-item': folder.id === null && folder.parent_id === null,
+             'opened': selectedFolderIds.indexOf(folder.id) !== -1}]"
+             lvl-draggable
+             lvl-drop-target on-drop="dropped(dragEl, dropEl)"
+        >
+            <span>
+                <i class="icon"
+                   ng-class="selectIconFolder(folder)"></i>
+            [[ folder.title ]]
+            </span>
+        </div>
+    </div>
+    <div ng-show="(selectedFolderIds.indexOf(folder.id) !== -1 || folder.childFolders.length === 0)">
+        <div ng-if="!currentUrlIsManage"
+             class="session-box"
+             ng-repeat="session in folder.progressionSessions">
+            <div class="session progression-item-draggable flex-row row__13"
+                 lvl-draggable="true">
+                <span ng-show="false">[[session.id]]</span>
+                <span ng-show="false">[[session.progression_homeworks.length]]</span>
+                <span class="flex-col col__1"></span>
+                <span class="flex-col"
+                      ng-class="{'col__6': session.class && session.class != '', 'col__10': !session.class || session.class === ''}">[[session.title]]</span>
+                <span class="flex-col col__4"
+                      ng-if="session.class && session.class != ''">([[session.class]])</span>
+                <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
+                                                        class="large ng-scope"></div></span>
+            </div>
+        </div>
+        <div ng-init="subProgressionsItems = folder.childFolders"
+             ng-include="'/diary/public/template/progression/progression-tree.html'"></div>
+    </div>
+</div>
+
+<div ng-if="isFilterSearch()">
+    <div ng-repeat="folder in searchFolders" class="folder-content">
+        <div ng-class="{'selected-item': folder.selected}">
+            <div class="folder "
+                 ng-click="$scope.currentUrlIsManage ? null : addFolderSelected(folder)"
+                 ng-class="['include-folders_' + 0, {'first-item': folder.id === null && folder.parent_id === null,
+             'opened': selectedFolderIds.indexOf(folder.id) !== -1}]"
+            >
+            <span>
+                <i class="icon" ng-class="selectIconFolder(folder)"></i>
+            [[ folder.title ]]
+            </span>
+            </div>
+        </div>
+        <div ng-show="(selectedFolderIds.indexOf(folder.id) !== -1)">
+            <div ng-if="!currentUrlIsManage"
+                 class="session-box"
+                 ng-repeat="session in folder.progressionSessions">
+                <div class="session progression-item-draggable flex-row row__13"
+                     lvl-draggable="true">
+                    <span ng-show="false">[[session.id]]</span>
+                    <span ng-show="false">[[session.progression_homeworks.length]]</span>
+                    <span class="flex-col col__1"></span>
+                    <span class="flex-col"
+                          ng-class="{'col__6': session.class && session.class != '', 'col__10': !session.class || session.class === ''}">[[session.title]]</span>
+                    <span class="flex-col col__4"
+                          ng-if="session.class && session.class != ''">([[session.class]])</span>
+                    <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
+                                                            class="large ng-scope"></div></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="!currentUrlIsManage"
+         class="session-box"
+         ng-repeat="session in searchSessions">
+        <div class="session progression-item-draggable flex-row row__13"
+             lvl-draggable="true">
+            <span ng-show="false">[[session.id]]</span>
+            <span ng-show="false">[[session.progression_homeworks.length]]</span>
+            <span class="flex-col col__1"></span>
+            <span class="flex-col"
+                  ng-class="{'col__6': session.class && session.class != '', 'col__10': !session.class || session.class === ''}">[[session.title]]</span>
+            <span class="flex-col col__4"
+                  ng-if="session.class && session.class != ''">([[session.class]])</span>
+            <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
+                                                    class="large ng-scope"></div></span>
+        </div>
+    </div>
+</div>

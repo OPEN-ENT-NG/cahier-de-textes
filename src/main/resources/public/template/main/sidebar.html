@@ -49,24 +49,17 @@
         </h5>
     </div>
     <!-- Bloc Progression -->
-    <section class="cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView">
+    <section class="progression-container cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView"
+             ng-controller="manageProgessionCtrl">
         <div class="row">
             <input ng-change="filterProgression(search)"
                    class="progression-search cell twelve"
                    type="text"
                    ng-model="search"
                    placeholder="Rechercher">
-
-            <ul ng-if=" search && search!= '' " class="selectable-list progression-list">
-                <li ng-repeat="progression in progressionsToDisplay.all track by $index"
-                    class="progression-item-scrollable progression-item-draggable "
-                    lvl-draggable="true">
-                    [[progression.title]]
-                    <span ng-show="false">[[progression.id]]</span>
-                    <span ng-show="false">[[progression.progression_homeworks.length]]</span>
-                    <span ng-if="progression.class && progression.class != ''">([[progression.class]])</span>
-                </li>
-            </ul>
+            <div class="row margin-bottom-lg progression-tree"
+                 static-include="/diary/public/template/progression/progression-tree.html">
+            </div>
         </div>
     </section>
 </article>

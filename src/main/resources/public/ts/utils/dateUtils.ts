@@ -5,25 +5,6 @@ import {Homework} from "../model";
 
 export class DateUtils {
 
-    /**
-     * Add the fields succeed and toastMessage to the response
-     * @param response
-     * @param message
-     * @param errorMessage
-     * @returns {any}
-     */
-    static setToastMessage(response, message, errorMessage) {
-        if (response.status === 200 || response.status === 201) {
-            response.succeed = true;
-            response.toastMessage = message;
-
-        } else {
-            response.succeed = false;
-            response.toastMessage = errorMessage;
-        }
-        return response;
-    }
-
     static htmlToXhtml(html) {
         var doc = new DOMParser().parseFromString(html, 'text/html');
         var xhtml = new XMLSerializer().serializeToString(doc);
@@ -88,11 +69,6 @@ export class DateUtils {
     static convertHtmlToPlainText(html) {
         let htmlWithSpaces = html.replace(/<\/div>/g, ' </div>');
         return htmlWithSpaces ? String(htmlWithSpaces).replace(/<[^>]+>/gm, '') : '';
-    }
-
-
-    static filterProgression = (search, array) => {
-        return array.filter(c => (c.class) ? c.title.toUpperCase().includes(search.toUpperCase()) || c.class.toUpperCase().includes(search.toUpperCase()) : c.title.toUpperCase().includes(search.toUpperCase()));
     }
 
     static isAChildOrAParent(type) {

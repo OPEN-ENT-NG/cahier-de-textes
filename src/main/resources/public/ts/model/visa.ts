@@ -1,5 +1,5 @@
 import http from 'axios';
-import {Structure, Teacher, DateUtils, Homework} from './index';
+import {Structure, Teacher, DateUtils, Homework, ToastUtils} from './index';
 import {idiom as lang, model, moment} from 'entcore';
 
 export class Visa {
@@ -153,7 +153,7 @@ export class Visas {
 
     async create() {
         let response = await http.post('/diary/visas', this.toSendFormat());
-        return DateUtils.setToastMessage(response, 'visas.created', 'visas.created.error');
+        return ToastUtils.setToastMessage(response, 'visas.created', 'visas.created.error');
     }
 
 }

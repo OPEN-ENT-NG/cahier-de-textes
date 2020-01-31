@@ -1,7 +1,7 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Structure, Teacher, Toast, DateUtils} from './index';
+import {Structure, Teacher, Toast, DateUtils, ToastUtils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
@@ -124,35 +124,35 @@ export class Homework {
         let state = stateId == Homework.HOMEWORK_STATE_DONE ? 'done' : 'todo';
         let response = await http.post(`/diary/homework/progress/${this.id}/${state}`);
 
-        return DateUtils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
+        return ToastUtils.setToastMessage(response, 'homework.setProgress','homework.setProgress.error');
 
 
     }
 
     async create () {
         let response = await http.post('/diary/homework', this.toSendFormat());
-        return DateUtils.setToastMessage(response, 'homework.created','homework.created.error');
+        return ToastUtils.setToastMessage(response, 'homework.created','homework.created.error');
     }
 
     async update () {
         let response = await http.put(`/diary/homework/${this.id}/${this.publishedChanged} `, this.toSendFormat());
-        return DateUtils.setToastMessage(response, 'homework.updated','homework.updated.error');
+        return ToastUtils.setToastMessage(response, 'homework.updated','homework.updated.error');
     }
 
     async delete() {
         let response = await http.delete('/diary/homework/' + this.id);
-        return DateUtils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
+        return ToastUtils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
     }
 
     async publish() {
         let response = await http.post('/diary/homework/publish/' + this.id);
-        return DateUtils.setToastMessage(response, 'homework.published','homework.published.error');
+        return ToastUtils.setToastMessage(response, 'homework.published','homework.published.error');
     }
 
 
     async unpublish() {
         let response = await http.post('/diary/homework/unpublish/' + this.id);
-        return DateUtils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
+        return ToastUtils.setToastMessage(response, 'homework.unpublished','homework.unpublished.error');
     }
 
     async sync(): Promise<void> {
@@ -289,19 +289,19 @@ export class HomeworkType {
 
     async create() {
         let response = await http.post(`/diary/homework-type` , this.toJson());
-        return DateUtils.setToastMessage(response,'cdt.homework.type.create', 'cdt.homework.type.create.error')
+        return ToastUtils.setToastMessage(response,'cdt.homework.type.create', 'cdt.homework.type.create.error')
     }
 
     async update() {
         let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
-        return DateUtils.setToastMessage(response,'cdt.homework.type.update', 'cdt.homework.type.update.error')
+        return ToastUtils.setToastMessage(response,'cdt.homework.type.update', 'cdt.homework.type.update.error')
     }
 
     async delete() {
         let {data} = await http.delete(`/diary/homework-type/${this.id}/${this.structure_id}`);
         if (data.id != undefined) {
             let response = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
-            return DateUtils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')
+            return ToastUtils.setToastMessage(response,'cdt.homework.type.delete', 'cdt.homework.type.delete.error')
         }
         else {
             notify.error('cdt.homework.type.delete.impossible')

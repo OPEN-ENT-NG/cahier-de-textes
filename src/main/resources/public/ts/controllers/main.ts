@@ -5,15 +5,15 @@ import {
     Homeworks,
     PEDAGOGIC_TYPES,
     Session,
-    Sessions,
+    Sessions, SessionTypes,
     Structure,
-    Structures,
+    Structures, Subjects,
     Toast,
     Workload
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocompleteUtils';
-import {ProgressionSessions} from "../model/Progression";
+import {ProgressionFolders} from "../model/Progression";
 import {SearchService, StructureService} from "../services";
 
 declare let window: any;
@@ -38,7 +38,7 @@ export let main = ng.controller('MainController',
         $scope.isRelative = DateUtils.isRelative(model.me.type);
         $scope.isTeacher = DateUtils.isTeacher(model.me.type);
 
-        $scope.showProgression = false;
+        $scope.progressionFolders = new ProgressionFolders(model.me.userId);
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
@@ -103,7 +103,6 @@ export let main = ng.controller('MainController',
             }
             AutocompleteUtils.init($scope.structure);
         }
-
         async function placingLoader(exit: number = 0) {
             if (exit < 20) {
                 await $timeout(function () {
@@ -166,8 +165,6 @@ export let main = ng.controller('MainController',
         async function initializeData(structure?: Structure) {
             $scope.isRefreshingCalendar = true;
             structure ? await $scope.syncStructure(structure) : await initializeStructure();
-            $scope.progressions = new ProgressionSessions(model.me.userId);
-            $scope.progressionsToDisplay = new ProgressionSessions(model.me.userId);
             if (!$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);
             await $scope.syncPedagogicItems(true);
 
@@ -223,7 +220,7 @@ export let main = ng.controller('MainController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
-            $scope.progressions.all = [];
+            $scope.progressionFolders.all = [];
             const teacherSelected = AutocompleteUtils.getTeachersSelected()[0];
             const classSelected = AutocompleteUtils.getClassesSelected()[0];
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.diarySearch)
@@ -233,7 +230,6 @@ export let main = ng.controller('MainController',
                 let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                 await Promise.all([
                     await $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
-                    await $scope.progressionsToDisplay.sync(),
                     await $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
                     await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
 
@@ -241,19 +237,18 @@ export let main = ng.controller('MainController',
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                 await Promise.all([
                     await $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                     await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 await Promise.all([
                     await $scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
-                    await $scope.progressions.sync(),
                     await $scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate),
                     await $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             }
 
+            await initProgressions();
 
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
@@ -262,16 +257,17 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply();
         };
-        /*
-        display the progressions that match the search query
-         */
-        $scope.filterProgression = (search) => {
-            $scope.progressionsToDisplay.all = DateUtils.filterProgression(search, $scope.progressions.all);
-        };
 
-        $scope.changeShowProgression = () => {
-            $scope.showProgression = !$scope.showProgression;
-        };
+        async function initProgressions() {
+            $scope.progressionFolders = new ProgressionFolders(model.me.userId);
+            await $scope.progressionFolders.sync();
+            $scope.progressionFolders.all.map((x) => {
+                if (x.id === null && x.parent_id === null) x.title = lang.translate("progression.my.folders");
+                return x;
+            });
+
+            $scope.progressionFolders.all.filter((x) => x.id);
+        }
 
         $scope.loadPedagogicItems = () => {
             $scope.pedagogicItems = [];
@@ -282,14 +278,12 @@ export let main = ng.controller('MainController',
                 }
                 return item;
             });
-
-
             if (DateUtils.isAChildOrAParent(model.me.type)) {
                 $scope.structure.sessions.all.map((s, i) => {
                     if (!s.isPublished) {
                         $scope.structure.sessions.all.splice(i, 1);
                     }
-                })
+                });
                 $scope.structure.homeworks.all.map((h, i) => {
                     if (!h.isPublished) {
                         $scope.structure.homeworks.all.splice(i, 1);
@@ -507,12 +501,6 @@ export let main = ng.controller('MainController',
             return response;
         };
 
-        $scope.newProgressionForm = () => {
-            $scope.goTo('/progression/create');
-
-            $scope.safeApply();
-        };
-
         $scope.params = {
             user: null,
             group: null,
@@ -585,11 +573,7 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply();
         };
-        $scope.newProgressionForm = () => {
-            $scope.goTo('/progression/create');
 
-            $scope.safeApply();
-        };
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId);
@@ -716,6 +700,7 @@ export let main = ng.controller('MainController',
                 if (progression.id == idProgression) {
                     progressionDragged = progression;
                 }
+                //TODO Edit
             });
             // progressionDragged.toSession(idSession);
 
@@ -752,12 +737,9 @@ export let main = ng.controller('MainController',
          */
         $scope.createSessionFromProgression = async (idProgression, idCourse, date) => {
             let progressionDragged;
-            $scope.progressions.all.map(progression => {
-                if (progression.id == idProgression) {
-                    progressionDragged = progression;
-                }
-            });
-
+            let progressionSessions = $scope.progressionFolders.all.map((f) => f.progressionSessions);
+            progressionSessions = [].concat.apply([],progressionSessions);
+            progressionDragged = progressionSessions.find((s) => s.id = idProgression);
             let course = new Course($scope.structure, idCourse);
 
             // Formating date
@@ -776,7 +758,7 @@ export let main = ng.controller('MainController',
             $scope.session = session;
             progressionDragged.progression_homeworks.map(
                 ph => {
-                    let homework = new Homework($scope.structure)
+                    let homework = new Homework($scope.structure);
                     homework.estimatedTime = ph.estimatedTime;
                     homework.description = ph.description;
                     homework.subject = ph.subject;
@@ -806,11 +788,11 @@ export let main = ng.controller('MainController',
             },
             viewProgression: async () => {
                 if (!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'progression/progression-view');
+                template.open('main', 'progression/progressions');
             },
             manageProgression: async () => {
-                if (!$scope.structureInitialized) await initializeStructure();
-                template.open('main', 'progression/progression-session-form');
+                // if (!$scope.structureInitialized) await initializeStructure();
+                // template.open('main', 'progression/progression-session-form');
 
             },
             mainView: async () => {

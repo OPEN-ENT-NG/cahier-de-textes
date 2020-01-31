@@ -2,8 +2,10 @@ package fr.openent.diary.services;
 
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.user.UserInfos;
 
 public interface ProgressionService {
     /**
@@ -15,10 +17,10 @@ public interface ProgressionService {
 
     /**
      * Delete progression
-     * @param sessionId
+     * @param progression
      * @param handler
      */
-    void deleteProgressions(String  sessionId, Handler<Either<String, JsonArray>> handler);
+    void deleteProgressions(JsonObject progression, Handler<Either<String, JsonArray>> handler);
 
     /**
      * Update progression
@@ -72,4 +74,10 @@ public interface ProgressionService {
      * @param handler
      */
     void getProgression(String progressionId, Handler<Either<String, JsonArray>> handler);
+
+    void createFolder(HttpServerRequest request, JsonObject json, UserInfos user, Handler<Either<String, JsonObject>> handler);
+
+    void deleteProgressionFolders(JsonObject progression, Handler<Either<String, JsonArray>> arrayResponseHandler);
+
+    void updateProgressionFolder(JsonObject progression, String folderId, Handler<Either<String, JsonObject>> defaultResponseHandler);
 }

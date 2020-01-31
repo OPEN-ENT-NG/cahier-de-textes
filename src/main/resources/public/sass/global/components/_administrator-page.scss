@@ -6,12 +6,6 @@
     font-weight: bold;
   }
 
-  input[type=checkbox] + span::before {
-    border: 2px solid $diary-darkgreen;
-    border-radius: 4px;
-  }
-
-
   i.published {
     color: $diary-darkgreen;
   }

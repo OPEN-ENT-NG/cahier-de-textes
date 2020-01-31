@@ -331,8 +331,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         let getTimeSlotsByDate = () => {
-            // console.log("test", _.sortBy([1, 2, 3, 4, 5, 6], function(num){ return Math.sin(num); }));
-            console.log("unsorted", _.flatten(_.map($scope.sessions_GroupBy_AudienceSubject, (x) => x)));
             let x = _.flatten(_.map($scope.sessions_GroupBy_AudienceSubject, (x) => x));
 
             x = _.sortBy(x, (a) => {
@@ -340,7 +338,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 const aStartTime = a instanceof Homework ? null : DateUtils.formatDate(a.startMoment, 'HH:mm');
                 return Math.round(new Date(aStartDate ? aStartDate : '' + (aStartTime ? ' ' + aStartTime : '')).getTime() / 1000);
             });
-            console.log("sorted", x);
             return x;
         };
 

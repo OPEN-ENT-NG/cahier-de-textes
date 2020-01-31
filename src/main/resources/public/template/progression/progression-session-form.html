@@ -1,17 +1,4 @@
-<div ng-controller="manageProgessionCtrl">
-
-    <div id="crumbs">
-        <ul class="remove-padding">
-            <a href="#" ng-click="goTo('/view')">
-                <i18n><span><li>diary.title</li></span></i18n>
-            </a>&nbsp;>&nbsp;
-            <a href="#" ng-click="goTo('/progressions/view')">
-                <i18n><span><li>progression.title</li></span></i18n>
-            </a>&nbsp;>&nbsp;
-            <i18n><span><li>progression.creation</li></span></i18n>
-        </ul>
-    </div>
-
+<div class="manage-progression">
     <div class="row">
         <div class="six cell twelve-mobile">
             <h1>
@@ -23,7 +10,7 @@
                 <i18n>utils.cancel</i18n>
             </button>
             <button class="float-none display-inline-block" ng-disabled="!isValidForm()"
-                    type="button"  ng-click="validProgressionsSessionForm()">
+                    type="button" ng-click="validProgressionsSessionForm()">
                 <i18n>utils.save</i18n>
             </button>
         </div>
@@ -41,9 +28,9 @@
                             <i18n>subject</i18n>
                         </div>
                         <span class="cell twelve-mobile">
-                            <i18n class="twelve" ng-if="!progression_session.subject">select.subject</i18n>
-                            <select required ng-model="progression_session.subject" class="twelve-mobile"
-                                    ng-disabled="progression_session.courseId && progression_session.subject"
+                            <i18n class="twelve" ng-if="!progressionSessionForm.subject">select.subject</i18n>
+                            <select required ng-model="progressionSessionForm.subject" class="twelve-mobile"
+                                    ng-disabled="progressionSessionForm.courseId && progressionSessionForm.subject"
                                     ng-options="subject.label for subject in subjects.all track by subject.id">
                                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
                             </select>
@@ -56,12 +43,22 @@
                             *
                         </div>
                         <div class="cell twelve-mobile">
-                            <select required class="formSessionType twelve twelve-mobile"  ng-model="progression_session.type"
+                            <select required class="formSessionType twelve twelve-mobile"
+                                    ng-model="progressionSessionForm.type"
                                     ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
-                                <option  value="" disabled selected>[[translate('select.type')]]</option>
+                                <option value="" disabled selected>[[translate('select.type')]]</option>
 
                             </select>
                         </div>
+                    </label>
+                    <label class="cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>progression.create.parent.folder.name</i18n>
+                        </div>
+                        <select ng-model="progressionSessionForm.folder"
+                                ng-options="folder.title for folder in progressionFolders.all track by folder.id">
+                            <option ng-if="false" value=""></option>
+                        </select>
                     </label>
                     <!-- Title -->
                     <label class="three cell horizontal-spacing twelve-mobile">
@@ -69,14 +66,16 @@
                             <i18n>title</i18n>
                             *
                         </div>
-                        <input maxlength="100" type="text" class="twelve twelve-mobile" ng-model="progression_session.title"/>
+                        <input maxlength="100" type="text" class="twelve twelve-mobile"
+                               ng-model="progressionSessionForm.title"/>
                     </label>
                     <!-- Class/Group -->
                     <label class="two cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>progression.level</i18n>
                         </div>
-                        <input maxlength="50" type="text" class="twelve twelve-mobile" ng-model="progression_session.class"/>
+                        <input maxlength="50" type="text" class="twelve twelve-mobile"
+                               ng-model="progressionSessionForm.class"/>
                     </label>
 
 
@@ -89,11 +88,11 @@
                             <i18n>utils.description</i18n>
                         </span>
                     </div>
-                    <editor ng-model="progression_session.description"></editor>
+                    <editor ng-model="progressionSessionForm.description"></editor>
                 </div>
 
                 <!-- HOMEWORKS -->
-                <div ng-if="progression_session.progression_homeworks.length < 1 " class="padding-md margin-bottom-md">
+                <div ng-if="progressionSessionForm.progression_homeworks.length < 1 " class="padding-md margin-bottom-md">
                     <button ng-show="!validate"
                             class="float-none display-inline-block margin-top-md"
                             ng-click="addProgressionHomework()">
@@ -101,13 +100,13 @@
                     </button>
                 </div>
 
-                <div ng-if="progression_session.progression_homeworks.length" class="margin-bottom-md">
+                <div ng-if="progressionSessionForm.progression_homeworks.length" class="margin-bottom-md">
                     <h2>
                         <i18n>Homeworks</i18n>
                     </h2>
 
-                    <div class="responsive-table row" ng-if="progression_session.progression_homeworks.length &&
-                    (( progression_session.progression_homeworks.length == 1 && !progression_session.progression_homeworks[0].opened) ||  progression_session.progression_homeworks.length > 1)">
+                    <div class="responsive-table row" ng-if="progressionSessionForm.progression_homeworks.length &&
+                    (( progressionSessionForm.progression_homeworks.length == 1 && !progressionSessionForm.progression_homeworks[0].opened) ||  progressionSessionForm.progression_homeworks.length > 1)">
                         <table class="twelve">
                             <thead>
                             <tr>
@@ -123,19 +122,22 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index">
+                            <tr ng-repeat="progressionHomework in progressionSessionForm.progression_homeworks track by $index">
                                 <!-- Type static data -->
                                 <td ng-show="!progressionHomework.opened" class="two vertical-align-top text-left ">
                                     <p class="twelve">[[progressionHomework.type.label]]</p>
                                 </td>
                                 <!-- Description -->
-                                <td ng-show="!progressionHomework.opened" class="five vertical-align-top full-td-width text-left">
+                                <td ng-show="!progressionHomework.opened"
+                                    class="five vertical-align-top full-td-width text-left">
                                     <p class="twelve" bind-html=[[progressionHomework.description]]></p>
                                 </td>
                                 <!-- Button part -->
                                 <td ng-show="!progressionHomework.opened">
-                                    <i ng-show="!progressionHomework.opened && !hidePencil" ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
-                                    <i ng-show="!progressionHomework.opened" class="trash right-magnet" ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
+                                    <i ng-show="!progressionHomework.opened && !hidePencil"
+                                       ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                    <i ng-show="!progressionHomework.opened" class="trash right-magnet"
+                                       ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
                                 </td>
                             </tr>
                             </tbody>
@@ -143,11 +145,12 @@
                     </div>
 
                     <div class="row">
-                        <div ng-repeat="progressionHomework in progression_session.progression_homeworks track by $index"
+                        <div ng-repeat="progressionHomework in progressionSessionForm.progression_homeworks track by $index"
                              ng-show="!progressionHomework.isDeleted">
                             <div ng-if="progressionHomework.opened" class="padding-md">
                                 <!-- Deadline -->
-                                <div ng-if="progressionHomework.opened" class="float-left three vertical-align-top text-left">
+                                <div ng-if="progressionHomework.opened"
+                                     class="float-left three vertical-align-top text-left">
                                     <div class="ten twelve-mobile">
                                         <label>
                                             <i18n>homework.manage.type</i18n>
@@ -170,7 +173,8 @@
                                                 <label>
                                               <i18n>homework.workload</i18n>
                                                     :
-                                                      <input ng-model="progressionHomework.estimatedTime" min="0" type="number" class="two">
+                                                      <input ng-model="progressionHomework.estimatedTime" min="0"
+                                                             type="number" class="two">
                                                    <i18n>minutes</i18n>
                                                    </label>
                                                </span>
@@ -178,7 +182,8 @@
                                 </div>
 
                                 <!-- Description-->
-                                <div ng-if="progressionHomework.opened" class="nine float-none display-inline-block vertical-align-top text-left">
+                                <div ng-if="progressionHomework.opened"
+                                     class="nine float-none display-inline-block vertical-align-top text-left">
                                     <div class="twelve-mobile">
                                         <label>
                                             <i18n>utils.description</i18n>
@@ -218,7 +223,7 @@
                         <i18n>utils.cancel</i18n>
                     </button>
                     <button class="float-none display-inline-block" ng-disabled="!isValidForm()"
-                            type="button"  ng-click="validProgressionsSessionForm()">
+                            type="button" ng-click="validProgressionsSessionForm()">
                         <i18n>utils.save</i18n>
                     </button>
                 </div>

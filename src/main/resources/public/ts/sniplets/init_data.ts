@@ -1,4 +1,4 @@
-import {Toast, DateUtils} from "../model";
+import {Toast, ToastUtils} from "../model";
 import {homeworkType} from "./homeworkType";
 import http from "axios";
 
@@ -42,7 +42,7 @@ export const initData = {
 
         initData: async function () {
             let response = await http.get(`diary/init`);
-            this.toastHttpCall(DateUtils.setToastMessage(response,'cdt.data.init.success', 'cdt.data.init.error'));
+            this.toastHttpCall(ToastUtils.setToastMessage(response,'cdt.data.init.success', 'cdt.data.init.error'));
             this.safeApply();
         }
     }

@@ -43,6 +43,10 @@ i {
     content: "\e945";
   }
 
+  &.diary-folder::before {
+    content: "\e81b";
+  }
+
   &.diary-user::before {
     content: "\e870";
   }
@@ -52,6 +56,9 @@ i {
   }
   &.arrow-left::before {
     content: "\e87b";
+  }
+  &.arrow-down::before {
+    content: "\e841";
   }
 
 }

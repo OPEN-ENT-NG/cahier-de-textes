@@ -6,7 +6,7 @@ import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.json.Json;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.sql.Sql;
@@ -14,23 +14,30 @@ import org.entcore.common.sql.SqlResult;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
+import org.entcore.common.user.UserInfos;
+
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ProgessionServiceImpl extends SqlCrudService implements ProgressionService {
-    private static final String STATEMENT = "statement" ;
-    private static final String VALUES = "values" ;
-    private static final String ACTION = "action" ;
-    private static final String PREPARED = "prepared" ;
+    private static final String STATEMENT = "statement";
+    private static final String VALUES = "values";
+    private static final String ACTION = "action";
+    private static final String PREPARED = "prepared";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
 
     public ProgessionServiceImpl(String table) {
         super(table);
     }
+
     @Override
     public void getProgression(String progressionId, Handler<Either<String, JsonArray>> handler) {
-        JsonArray params =  new JsonArray();
+        JsonArray params = new JsonArray();
 
         String query = "SELECT ps.id, ps.class as class , title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
-                "array_to_json(array_agg(h.*)) as homeworks , ps.type_id as type_id"+
+                "array_to_json(array_agg(h.*)) as homeworks , ps.type_id as type_id" +
                 " from " + Diary.DIARY_SCHEMA + ".progression_session ps " +
                 " LEFT JOIN ( " +
                 "SELECT progression_homework.id as id , subject_id::VARCHAR, description::TEXT, progression_session_id, estimatedTime, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
@@ -38,49 +45,115 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
                 "INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type " +
                 "  ON homework_type.id = progression_homework.type_id " +
-                " ) h ON h.progression_session_id = ps.id"  +
+                " ) h ON h.progression_session_id = ps.id" +
                 " where ps.id = ? " +
-                " GROUP BY ps.id"  ;
+                " GROUP BY ps.id";
 
         params.add(progressionId);
-        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
 
+    }
+
+    @Override
+    public void createFolder(HttpServerRequest request, JsonObject json, UserInfos user, Handler<Either<String, JsonObject>> handler) {
+        JsonArray values = new JsonArray();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        Date date = new Date();
+        final String currentTime = dateFormat.format(date);
+
+        String query = "INSERT INTO diary.progression_folder (parent_id, teacher_id, title, created, modified) " +
+                "VALUES (?, ?, ?, NOW(), NOW()) RETURNING id";
+
+        Integer parentId = json.getInteger("parent_id");
+        if (parentId == null) values.addNull();
+        else values.add(parentId);
+        values.add(user.getUserId());
+        values.add(json.getString("title"));
+
+        Sql.getInstance().prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void getProgressions(String ownerId, Handler<Either<String, JsonArray>> handler) {
-        JsonArray params =  new JsonArray();
+        JsonArray params = new JsonArray();
 
-        String query = "SELECT ps.id, ps.class as class, title, ps.description, ps.owner_id, ps.modified, ps.created, ps.subject_id ," +
-                "array_to_json(array_agg(h.*)) as homeworks , ps.type_id as type_id" +
-                " FROM " + Diary.DIARY_SCHEMA + ".progression_session ps " +
-                " LEFT JOIN ( " +
-                "SELECT progression_homework.id as id ,estimatedTime , subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
-                " FROM  " + Diary.DIARY_SCHEMA + ".progression_homework " +
 
-                "INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type " +
-                "  ON homework_type.id = progression_homework.type_id " +
-                " ) h ON h.progression_session_id = ps.id " +
-                " where ps.owner_id = ? " +
-
-                " GROUP BY ps.id" +
-                " ORDER BY ps.title";
+        String query = "SELECT fo.id, fo.parent_id, fo.title, fo.modified, fo.created, " +
+                "array_to_json(array_agg(ps.*)) as progressions " +
+                "FROM " + Diary.DIARY_SCHEMA + ".progression_folder fo " +
+                "    FULL JOIN ( " +
+                "    SELECT ps.id, ps.class as class, title, ps.description, ps.progression_folder_id, ps.owner_id, ps.modified, ps.created, ps.subject_id, " +
+                "    array_to_json(array_agg(h.*)) as homeworks, ps.type_id                    as type_id " +
+                "    FROM " + Diary.DIARY_SCHEMA + ".progression_session ps " +
+                "    LEFT JOIN ( " +
+                " SELECT progression_homework.id as id, estimatedTime, subject_id::VARCHAR, description::TEXT, progression_session_id, type_id, homework_type.label::VARCHAR as type_label, owner_id::VARCHAR, created, modified " +
+                " FROM " + Diary.DIARY_SCHEMA + ".progression_homework " +
+                "          INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type " +
+                "                     ON homework_type.id = progression_homework.type_id " +
+                "    ) h ON h.progression_session_id = ps.id " +
+                "    GROUP BY ps.id " +
+                "    ORDER BY ps.title " +
+                ") ps ON ps.progression_folder_id = fo.id " +
+                "WHERE ps.owner_id = ? " +
+                "OR fo.teacher_id = ? " +
+                "GROUP BY fo.id " +
+                "ORDER BY fo.title ";
         params.add(ownerId);
-        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        params.add(ownerId);
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
 
     }
 
     @Override
-    public void deleteProgressions(String progressionId, Handler<Either<String, JsonArray>> handler) {
+    public void deleteProgressions(JsonObject progression, Handler<Either<String, JsonArray>> handler) {
         JsonArray params = new JsonArray();
 
-        String query = "DELETE from " + Diary.DIARY_SCHEMA + ".progression_session" +
-                " WHERE id = ?";
+        String query = "DELETE from " + Diary.DIARY_SCHEMA + ".progression_session WHERE owner_id = ? AND id IN "
+                + Sql.listPrepared(progression.getJsonArray("session_ids").getList());
 
+        params.add(progression.getString("owner_id"));
+        params.addAll(progression.getJsonArray("session_ids"));
 
-        params.add(progressionId);
-        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
+    }
 
+    @Override
+    public void deleteProgressionFolders(JsonObject progression, Handler<Either<String, JsonArray>> handler) {
+        JsonArray params = new JsonArray();
+
+        String query = "DELETE from " + Diary.DIARY_SCHEMA + ".progression_folder WHERE teacher_id = ? AND id IN "
+                + Sql.listPrepared(progression.getJsonArray("folder_ids").getList());
+        ;
+
+        params.add(progression.getString("owner_id"));
+        params.addAll(progression.getJsonArray("folder_ids"));
+
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void updateProgressionFolder(JsonObject progression, String folderId, Handler<Either<String, JsonObject>> handler) {
+        String query = " UPDATE " + Diary.DIARY_SCHEMA + ".progression_folder " +
+                " SET parent_id = ?, title = ? " +
+                " WHERE teacher_id = ? AND id = ? ";
+
+        JsonArray params = new JsonArray();
+        Integer parentId = progression.getInteger("parent_id");
+        if (parentId == null) params.addNull();
+        else params.add(parentId);
+
+        params.add(progression.getString("title"))
+                .add(progression.getString("owner_id"))
+                .add(folderId);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(res -> {
+            if (res.isLeft()) {
+                LOGGER.error("An error occurred when update progression folder", res.left().getValue());
+                handler.handle(new Either.Left<>(res.left().getValue()));
+            }
+            handler.handle(new Either.Right<>(res.right().getValue()));
+        }));
     }
 
     @Override
@@ -89,17 +162,17 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         try {
             JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-            statements.add(getProgressionSessionUpdateStatement(progression,progressionId));
+            statements.add(getProgressionSessionUpdateStatement(progression, progressionId));
 
-            if(progression.containsKey("progression_homeworks")) {
+            if (progression.containsKey("progression_homeworks")) {
                 JsonArray homeworks = progression.getJsonArray("progression_homeworks");
 
                 for (int i = 0; i < homeworks.size(); i++) {
-                    if(homeworks.getJsonObject(i).containsKey("id") && homeworks.getJsonObject(i).getInteger("id") != null){
+                    if (homeworks.getJsonObject(i).containsKey("id") && homeworks.getJsonObject(i).getInteger("id") != null) {
                         statements.add(getUpdateProgressionHomeworksStatement(homeworks.getJsonObject(i)));
 
-                    }else{
-                        statements.add(getHomeworkCreationStatement(Integer.parseInt(progressionId),homeworks.getJsonObject(i)));
+                    } else {
+                        statements.add(getHomeworkCreationStatement(Integer.parseInt(progressionId), homeworks.getJsonObject(i)));
                     }
                 }
             }
@@ -107,7 +180,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 @Override
                 public void handle(Message<JsonObject> event) {
                     Number id = Integer.parseInt(progressionId);
-                    handler.handle(SqlQueryUtils.getTransactionHandler(event,id));
+                    handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
                 }
             });
         } catch (ClassCastException e) {
@@ -117,23 +190,22 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         }
 
 
-
     }
 
     private JsonObject getProgressionSessionUpdateStatement(JsonObject progression, String progressionId) {
         JsonArray params;
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".progression_session " +
-                "SET subject_id = ?,type_id =? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ? " +
+                "SET subject_id = ?,type_id =? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ?, progression_folder_id = ?" +
                 "Where progression_session.id = ?  ";
-        params =  new JsonArray().add(progression.getString("subject_id"))
+        params = new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getInteger("type_id"))
                 .add(progression.getString("title"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
                 .add(progression.getString("class"))
+                .add(progression.getString("progression_folder_id"))
                 .add(progressionId);
-
 
 
         return new JsonObject()
@@ -144,8 +216,8 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
     /**
      * Update the homeworks of a progression
-     * @param homework
      *
+     * @param homework
      */
     private JsonObject getUpdateProgressionHomeworksStatement(JsonObject homework) {
         JsonArray params = new JsonArray();
@@ -163,7 +235,6 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         ;
 
 
-
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params)
@@ -176,12 +247,12 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         JsonArray params;
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session" +
-                "(subject_id,title, description, annotation, owner_id, class ,type_id) " +
-                "values ( ?, ?, ?, ?, ?, ?,? ) " +
+                "(subject_id,title, description, annotation, owner_id, class ,type_id,  progression_folder_id) " +
+                "values ( ?, ?, ?, ?, ?, ?,?, ?) " +
                 "RETURNING id;";
 
 
-        params =  new JsonArray().add(progression.getString("subject_id"))
+        params = new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getString("title"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
@@ -189,14 +260,18 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("class"))
                 .add(progression.getInteger("type_id"));
 
-        Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Integer folder_id = progression.getInteger("progression_folder_id");
+        if (folder_id == null) params.addNull();
+        else params.add(folder_id);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
 
     }
 
 
     @Override
     public void deleteHomeworkProgression(String progressionHomeworkId, Handler<Either<String, JsonArray>> handler) {
-        JsonArray params =  new JsonArray();
+        JsonArray params = new JsonArray();
 
         String query = "DELETE from " + Diary.DIARY_SCHEMA + ".progression_homework" +
                 " WHERE id = ?";
@@ -204,7 +279,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         params.add(progressionHomeworkId);
 
-           Sql.getInstance().prepared(query,params,SqlResult.validResultHandler(handler));
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
 
     }
 
@@ -224,10 +299,10 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                         final Number id = event.right().getValue().getInteger("id");
                         JsonArray homeworks = progression.getJsonArray("progression_homeworks");
                         JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-                        statements.add(getProgressionSessionCreationstatement(id,progression));
+                        statements.add(getProgressionSessionCreationstatement(id, progression));
 
-                        for (int i=0; i<homeworks.size();i++) {
-                            statements.add(getHomeworkCreationStatement(id,homeworks.getJsonObject(i)));
+                        for (int i = 0; i < homeworks.size(); i++) {
+                            statements.add(getHomeworkCreationStatement(id, homeworks.getJsonObject(i)));
                         }
                         sql.transaction(statements, new Handler<Message<JsonObject>>() {
                             @Override
@@ -247,20 +322,20 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
             }
 
 
-
         }));
     }
 
 
     /**
      * Create insert request for a progression
+     *
      * @param id
      * @param progression
      * @return
      */
     private JsonObject getProgressionSessionCreationstatement(Number id, JsonObject progression) {
-        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session ( id , subject_id ,title, description, annotation, owner_id, class, type_id) " +
-                "values ( ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".progression_session ( id , subject_id ,title, description, annotation, owner_id, class, type_id, progression_folder_id) " +
+                "values ( ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         JsonArray params = new JsonArray()
                 .add(id)
                 .add(progression.getString("subject_id"))
@@ -269,8 +344,11 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
                 .add(progression.getString("class"))
-                .add(progression.getInteger("type_id"))
-                ;
+                .add(progression.getInteger("type_id"));
+
+        Integer folder_id = progression.getInteger("progression_folder_id");
+        if (folder_id == null) params.addNull();
+        else params.add(folder_id);
 
         return new JsonObject()
                 .put(STATEMENT, query)
@@ -279,9 +357,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     }
 
 
-
     /**
      * Create insert request for an homework from a progression session
+     *
      * @param id
      * @param homework
      * @return
@@ -295,8 +373,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(homework.getString("description"))
                 .add(homework.getString("owner_id"))
                 .add(homework.getInteger("type_id"))
-                .add(homework.getInteger("estimatedTime"))
-                ;
+                .add(homework.getInteger("estimatedTime"));
         return new JsonObject()
                 .put(STATEMENT, query)
                 .put(VALUES, params)
@@ -305,11 +382,12 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
     /**
      * Get all the params from session needed to create an homework
+     *
      * @param event
      * @return
      */
     private JsonObject getSessionJsonObject(Either<String, JsonObject> event) {
-        JsonObject session =new JsonObject();
+        JsonObject session = new JsonObject();
         final Integer id = event.right().getValue().getInteger("id");
 
         final String subject_id = event.right().getValue().getString("subject_id");
@@ -319,24 +397,25 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         final String audience_id = event.right().getValue().getString("audience_id");
         final String date = event.right().getValue().getString("date");
         final boolean is_published = event.right().getValue().getBoolean("is_published");
-        session.put("subject_id",subject_id)
-                .put("color",color)
-                .put("structure_id",structure_id)
-                .put("teacher_id",teacher_id)
-                .put("audience_id",audience_id)
-                .put("is_published",is_published)
-                .put("date",date)
-                .put("id",id);
+        session.put("subject_id", subject_id)
+                .put("color", color)
+                .put("structure_id", structure_id)
+                .put("teacher_id", teacher_id)
+                .put("audience_id", audience_id)
+                .put("is_published", is_published)
+                .put("date", date)
+                .put("id", id);
         return session;
     }
 
     /**
      * Create homeworks from progression_homeworks
+     *
      * @param session
      * @param homework
      * @return
      */
-    private JsonObject getHomeworksProgressionToHomeworks( JsonObject homework, JsonObject session){
+    private JsonObject getHomeworksProgressionToHomeworks(JsonObject homework, JsonObject session) {
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime,  " +
                 " color, description, is_published, session_id, due_date, type_id, owner_id" +
                 " ,created, modified)  " +
@@ -361,11 +440,12 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .put(ACTION, PREPARED);
 
     }
+
     @Override
     public void progressionToSession(JsonObject progression, String idProgression, String idSession, Handler<Either<String, JsonObject>> handler) {
 
         String getIdQuery = "SELECT id as id, subject_id, color, structure_id, teacher_id, date, is_published, audience_id, type_id " +
-                "from " + Diary.DIARY_SCHEMA + ".session where id = " + idSession ;
+                "from " + Diary.DIARY_SCHEMA + ".session where id = " + idSession;
         sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
@@ -373,14 +453,14 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                     try {
                         final Number id = event.right().getValue().getInteger("id");
 
-                        JsonObject session= getSessionJsonObject( event);
+                        JsonObject session = getSessionJsonObject(event);
 
                         JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
                         JsonArray homeworks = progression.getJsonArray("progression_homeworks");
-                        statements.add(getSessionUpdateStatement(progression,id));
+                        statements.add(getSessionUpdateStatement(progression, id));
 
-                        for (int i=0; i<homeworks.size();i++) {
-                            statements.add(getHomeworksProgressionToHomeworks(homeworks.getJsonObject(i),session));
+                        for (int i = 0; i < homeworks.size(); i++) {
+                            statements.add(getHomeworksProgressionToHomeworks(homeworks.getJsonObject(i), session));
                         }
                         sql.transaction(statements, new Handler<Message<JsonObject>>() {
                             @Override
@@ -402,12 +482,13 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
         }));
 
     }
+
     private JsonObject getSessionUpdateStatement(JsonObject progression, Number sessionId) {
         JsonArray params;
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".session " +
                 "SET subject_id = ? , description = ? , annotation = ?, owner_id = ?, type_id = ? " +
                 "Where session.id = ?  ";
-        params =  new JsonArray().add(progression.getString("subject_id"))
+        params = new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getString("description"))
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))

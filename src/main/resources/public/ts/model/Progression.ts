@@ -1,79 +1,84 @@
 ///<reference path="session.ts"/>
-import {_, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
-import {Course, Structure, Subject, Teacher, DateUtils} from './index';
+import {Subject, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {FORMAT} from '../utils/const/dateFormat';
-import {Visa} from './visa';
-import {Homework, Homeworks, HomeworkType, WorkloadDay} from './homework';
-import {Session,SessionType} from "./session";
-import {subscript} from "entcore/types/src/ts/editor/options";
-import forEach = require("core-js/fn/array/for-each");
+import {HomeworkType} from './homework';
+import {SessionType} from "./session";
 
 
-export class ProgressionSession implements  Selectable{
-    selected: boolean;
-    id: string;
+export class ProgressionSession implements Selectable {
+    selected: boolean = false;
+    tableSelected: boolean = false;
+    id: number;
     subject: Subject;
     title: string;
     description: string = "";
     plainTextDescription: string = "";
     annotation: string = "";
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
-    owner ;
+    owner;
     class: string;
     owner_id;
     subject_id;
     type_id;
     homeworks;
     eventer: Eventer;
-    type:SessionType;
+    type: SessionType;
+    folder: ProgressionFolder;
 
     progression_homeworks: ProgressionHomework[] = [];
 
-    constructor(){
+    constructor() {
         this.subject = new Subject();
         this.type = new SessionType();
         this.eventer = new Eventer();
-        this.title= "";
+        this.title = "";
         this.class = "";
-    }
-    async create(){
-        let response = await http.post('/diary/progression/create' , this.toJson());
-        return DateUtils.setToastMessage(response, 'progression.session.create','progression.session.create.error');
-
+        this.folder = null;
     }
 
-    async update(){
-        let response = await  http.put(`/diary/progression/update/${this.id}`, this.toJson());
-        return DateUtils.setToastMessage(response, 'progression.session.update','progression.session.update.error');
+    async save() {
+        if (this.id) {
+            return this.update();
+        }
+        return this.create();
+    }
+
+    async create() {
+        let response = await http.post('/diary/progression/create', this.toJson());
+        return ToastUtils.setToastMessage(response, 'progression.session.create', 'progression.session.create.error');
 
     }
 
-    public setSubject(subject: Subject){
+    async update() {
+        let response = await http.put(`/diary/progression/update/${this.id}`, this.toJson());
+        return ToastUtils.setToastMessage(response, 'progression.session.updated', 'progression.session.update.error');
+
+    }
+
+    public setSubject(subject: Subject) {
         this.subject = subject;
     }
 
-    public setType (type: SessionType){
+    public setType(type: SessionType) {
         this.type = type;
     }
 
-    init(){
-        if(this.subject_id)
+    init() {
+        if (this.subject_id)
             this.subject.id = this.subject_id;
-        if(this.type_id)
+        if (this.type_id)
             this.type.id = this.type_id;
     }
 
 
     async get() {
-        if(!this.title) {
+        if (!this.title) {
             try {
-
                 let {data} = await http.get('/diary/progression/' + this.id);
                 Mix.extend(this, data[0]);
-                this.progression_homeworks = [] ;
+                this.progression_homeworks = [];
 
                 let json = JSON.parse(this.homeworks.toString());
                 json.forEach(i => this.progression_homeworks.push(Mix.castAs(ProgressionHomework, ProgressionHomework.formatSqlDataToModel(i))));
@@ -85,30 +90,33 @@ export class ProgressionSession implements  Selectable{
         }
 
     }
-    private  homeworksToJson(owner_id?) {
+
+    private homeworksToJson(owner_id?) {
         let json = [];
         this.progression_homeworks.map(p => {
             let jsonLine = p.toJson(this.owner ? this.owner.id : owner_id);
-            if(jsonLine){
+            if (jsonLine) {
                 json.push(jsonLine);
             }
         });
         return json;
     }
+
     private toJson() {
 
         return {
             description: this.description,
             subject_id: this.subject.id ? this.subject.id : this.subject_id,
-            title : this.title,
-            class : this.class,
-            annotation : this.annotation,
+            title: this.title,
+            class: this.class,
+            annotation: this.annotation,
             owner_id: this.owner ? this.owner.id : this.owner_id,
-            type_id : this.type.id ? this.type.id : this.type_id,
-            progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id)
-
+            type_id: this.type.id ? this.type.id : this.type_id,
+            progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id),
+            progression_folder_id: this.folder.id
         };
     }
+
     isValidForm = () => {
         let validSessionOrDueDate = false;
         return this
@@ -126,65 +134,192 @@ export class ProgressionSession implements  Selectable{
     }
 
     static formatSqlDataToModel(data: any) {
-
-
         return {
             id: data.id,
             title: data.title,
             class: data.class,
             description: data.description,
             owner_id: data.owner_id,
-            subject_id : data.subject_id,
-            type_id : data.type_id,
-            progression_homeworks: data.homeworks != "[null]" ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
+            subject_id: data.subject_id,
+            type_id: data.type_id,
+            progression_homeworks: data.homeworks && data.homeworks[0] !== null ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
             created: data.created
         };
     }
+}
+
+export class ProgressionFolder implements Selectable {
+    selected: boolean = false;
+    id: number = null;
+    parent_id = null;
+    title: string = "";
+    progressionSessions: ProgressionSession[] = [];
+    deepStep: number = 0;
+    ownerId: null;
+
+    parent: ProgressionFolder = null;
+    childFolders: ProgressionFolder[] = [];
+
+    static formatSqlDataToModel(data: any, owner_id) {
+        return {
+            id: data.id,
+            parent_id: data.parent_id,
+            title: data.title,
+            progressionSessions: data.progressions && data.progressions !== "[null]" ? ProgressionSessions.formatSqlDataToModel(data.progressions, owner_id) : [],
+            modified: data.modified,
+            created: data.created,
+            ownerId: owner_id
+        };
+    }
+
+    toSendFormat() {
+        return {
+            owner_id: this.ownerId,
+            title: this.title,
+            parent_id: this.parent_id
+        };
+    }
+
+    async save() {
+        if (this.id) {
+            return await this.update();
+        }
+        return await this.create();
+    }
+
+    async update() {
+        let response = await http.put('diary/progression/folder/update/' + this.id, this.toSendFormat());
+        return ToastUtils.setToastMessage(response, 'progression.folder.updated', 'progression.folder.updated.error');
+    }
+
+    async create() {
+        let response = await http.post('diary/progression/folder/create', this.toSendFormat());
+        return ToastUtils.setToastMessage(response, 'progression.folder.created', 'progression.folder.created.error');
+    }
+}
 
 
+export class ProgressionFolders extends Selection<ProgressionFolder> {
+    owner_id;
 
+    constructor(owner_id) {
+        super([]);
+        this.owner_id = owner_id;
+    }
 
+    async sync() {
+        let {data} = await http.get('/diary/progressions/' + this.owner_id);
+        this.all = Mix.castArrayAs(ProgressionFolder, ProgressionFolders.formatSqlDataToModel(data, this.owner_id));
+        let nullFoldersLength = this.all.findIndex((x) => x.id === null && x.parent_id === null);
+        if (nullFoldersLength === -1) {
+            this.all.push(new ProgressionFolder());
+        }
+        this.all.forEach((f) => {
+            f.parent = this.all.find((x) => x.id === f.parent_id);
+        })
+    }
 
-    async delete() {
+    static organizeTree(folders: ProgressionFolder[], currentFolders: ProgressionFolder[] = null, currentDeepStep: number = 0) {
+        if (!currentFolders) {
+            currentFolders = folders.filter((x) => x.id === null && x.parent_id === null);
+            ProgressionFolders.organizeTree(folders, currentFolders);
+            return currentFolders;
+        } else {
+            currentFolders.map((x) => {
+                x.deepStep = currentDeepStep;
+                x.childFolders = folders.filter((y) => (y.parent_id === x.id) && !(y.id === null && y.parent_id === null));
+                if (x.childFolders.length != 0) {
+                    ProgressionFolders.organizeTree(folders, x.childFolders, currentDeepStep + 1);
+                }
+            });
+        }
+    }
+
+    static isParentFolder(folder: ProgressionFolder, folderEnd: ProgressionFolder) {
+        if (folder.id === folderEnd.id) return true;
+        let childFolders = folder.childFolders;
+        if (childFolders.length > 0) {
+            let res = false;
+            for (let i = 0; i < childFolders.length; i++) {
+                res = ProgressionFolders.isParentFolder(childFolders[i], folderEnd);
+                if (res) break;
+            }
+            return res;
+        }
+        return false
+    }
+
+    static idsToRemove(folder: ProgressionFolder, deepRemove: boolean = false, folderIds: number[] = [], sessionIds: number[] = []) {
+        if (deepRemove) {
+            folder.progressionSessions.forEach((s) => {
+                sessionIds.push(s.id);
+            });
+            folderIds.push(folder.id);
+            folder.childFolders.forEach((f) => this.idsToRemove(f, deepRemove, folderIds, sessionIds))
+        } else {
+            folderIds.push(folder.id);
+        }
+    }
+
+    private static formatSqlDataToModel(data: any, owner_id) {
+        let dataModel = [];
+        data.forEach(i => dataModel.push(ProgressionFolder.formatSqlDataToModel(i, owner_id)));
+        return dataModel;
+    }
+
+    static async delete(folderIds: number[], owner_id) {
+        let params = {
+            data: {
+                owner_id: owner_id,
+                folder_ids: folderIds
+            }
+        };
+
         try {
-            let response = await http.delete(`/diary/progression/${this.id}`);
-            return DateUtils.setToastMessage(response, 'progression.session.delete','progression.session.delete.error');
-
-        }catch (e){
+            let response = await http.delete(`/diary/progression/folders`, params);
+            return ToastUtils.setToastMessage(response, 'progression.session.delete', 'progression.session.delete.error');
+        } catch (e) {
             console.error(e);
         }
     }
 
-
 }
 
-
-export class ProgressionSessions extends Selection<ProgressionSession>{
-    owner_id;
-    constructor (owner_id) {
+export class ProgressionSessions extends Selection<ProgressionSession> {
+    constructor() {
         super([]);
-        this.owner_id = owner_id;
-
     }
 
-    async sync(){
-        let {data} = await http.get('/diary/progressions/' + this.owner_id);
-        this.all = Mix.castArrayAs(ProgressionSession, ProgressionSessions.formatSqlDataToModel(data));
-        this.all.forEach(i => {
-            i.init();
-            i.setOwnerId(this.owner_id);
-        });
-    }
-
-    private static formatSqlDataToModel(data: any) {
+    static formatSqlDataToModel(data: any, owner_id) {
         let dataModel = [];
-        data.forEach(i => dataModel.push(ProgressionSession.formatSqlDataToModel(i)));
+        let json = JSON.parse(data.toString());
+        json.forEach(i => dataModel.push(Mix.castAs(ProgressionSession, ProgressionSession.formatSqlDataToModel(i))));
+        dataModel.forEach(i => {
+            i.init();
+            i.setOwnerId(owner_id)
+        });
         return dataModel;
     }
+
+    static async delete(sessionIds: number[], owner_id) {
+        let params = {
+            data: {
+                owner_id: owner_id,
+                session_ids: sessionIds
+            }
+        };
+
+        try {
+            let response = await http.delete(`/diary/progressions`, params);
+            return ToastUtils.setToastMessage(response, 'progression.session.delete', 'progression.session.delete.error');
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }
 
-export class ProgressionHomework{
+export class ProgressionHomework {
     id: string;
     description: string = '';
     plainTextDescription: string = '';
@@ -196,8 +331,8 @@ export class ProgressionHomework{
     subject: Subject;
     subject_id;
     p_session: ProgressionSession;
-    estimatedTime: number=0;
-    isNewField: boolean=false;
+    estimatedTime: number = 0;
+    isNewField: boolean = false;
     opened: boolean;
     owner;
 
@@ -205,8 +340,8 @@ export class ProgressionHomework{
     attachedToSession: boolean = true;
 
 
-    initType(){
-        if(this.type_label && this.type_id){
+    initType() {
+        if (this.type_label && this.type_id) {
             this.type = new HomeworkType();
             this.type.id = this.type_id;
             this.type.label = this.type_label;
@@ -214,9 +349,9 @@ export class ProgressionHomework{
     }
 
     toJson(ownerId) {
-        if(this.description.length)
+        if (this.description.length)
             return {
-                id: this.id || null ,
+                id: this.id || null,
                 description: this.description,
                 subject_id: this.subject ? this.subject.id : this.subject_id,
                 type_id: this.type ? this.type.id : this.type_id,
@@ -238,38 +373,35 @@ export class ProgressionHomework{
     };
 
     static formatSqlDataToModel(data) {
-        let result={
+        return {
             id: data.id,
-            type_id : data.type_id,
-            subject_id:data.subject_id,
-            type_label : data.type_label,
+            type_id: data.type_id,
+            subject_id: data.subject_id,
+            type_label: data.type_label,
             description: data.description,
             estimatedTime: data.estimatedtime,
             modified: data.modified,
             created: data.created
         };
-
-        return result;
     }
 
     async delete() {
         try {
             let response = await http.delete(`/diary/progression/homework/${this.id}`);
-            return DateUtils.setToastMessage(response, 'homework.deleted','homework.deleted.error');
+            return ToastUtils.setToastMessage(response, 'homework.deleted', 'homework.deleted.error');
 
-        }catch (e){
+        } catch (e) {
             console.error(e);
         }
     }
 }
-export class ProgressionHomeworks{
+
+export class ProgressionHomeworks {
     all: ProgressionHomework[];
 
-    static formatSqlDataToModel(data: any){
+    static formatSqlDataToModel(data: any) {
         let dataModel = [];
-
-        let json = JSON.parse(data.toString());
-        json.forEach(i => dataModel.push(Mix.castAs(ProgressionHomework,ProgressionHomework.formatSqlDataToModel(i))));
+        data.forEach(i => dataModel.push(Mix.castAs(ProgressionHomework, ProgressionHomework.formatSqlDataToModel(i))));
         dataModel.forEach(i => i.initType());
         return dataModel;
     }

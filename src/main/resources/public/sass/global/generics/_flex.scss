@@ -58,6 +58,11 @@
   width: 100%;
   background-color: $white;
 
+  input[type=checkbox] + span::before {
+    border: 2px solid $diary-darkgreen;
+    border-radius: 4px;
+  }
+
   .flex-row {
     .flex-col {
       justify-content: center;
@@ -88,5 +93,36 @@
         cursor: pointer;
       }
     }
+  }
+}
+
+.flex-card {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid rgba($diary-grey, 0.7);
+  width: 20%;
+  min-height: 100px;
+  background-color: $diary-white;
+  box-sizing: border-box;
+  border-radius: 7px;
+  //overflow: hidden;
+
+  .flex-content {
+    display: flex;
+    color: $diary-darkgreen;
+    font-size: 35px;
+    height: 75%;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .flex-title {
+    display: flex;
+    width: 100%;
+    height: 25%;
+    justify-content: center;
+    background: $diary-grey;
+    color: #fff;
+    transition: all 250ms ease;
   }
 }

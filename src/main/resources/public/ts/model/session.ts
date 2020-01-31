@@ -1,7 +1,7 @@
 import {_, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Course, Structure, Subject, Teacher, DateUtils} from './index';
+import {Course, Structure, Subject, Teacher, DateUtils, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {FORMAT} from '../utils/const/dateFormat';
 import {Visa} from './visa';
@@ -188,30 +188,30 @@ export class Session {
     async save(placeholder?) {
         if (this.id) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat(placeholder));
-            return DateUtils.setToastMessage(response, 'session.updated', 'session.updated.error');
+            return ToastUtils.setToastMessage(response, 'session.updated', 'session.updated.error');
 
         } else {
             let response = await http.post('/diary/session', this.toSendFormat(placeholder));
             this.id = response.data.id;
 
-            return DateUtils.setToastMessage(response, 'session.created', 'session.created.error');
+            return ToastUtils.setToastMessage(response, 'session.created', 'session.created.error');
 
         }
     }
 
     async delete() {
         let response = await http.delete('/diary/session/' + this.id);
-        return DateUtils.setToastMessage(response, 'session.deleted', 'session.deleted.error');
+        return ToastUtils.setToastMessage(response, 'session.deleted', 'session.deleted.error');
     }
 
     async publish() {
         let response = await http.post('/diary/session/publish/' + this.id);
-        return DateUtils.setToastMessage(response, 'session.published', 'session.published.error');
+        return ToastUtils.setToastMessage(response, 'session.published', 'session.published.error');
     }
 
     async unpublish() {
         let response = await http.post('/diary/session/unpublish/' + this.id);
-        return DateUtils.setToastMessage(response, 'session.unpublished', 'session.unpublished.error');
+        return ToastUtils.setToastMessage(response, 'session.unpublished', 'session.unpublished.error');
     }
 
     async sync() {
@@ -453,19 +453,19 @@ export class SessionType {
 
     async create() {
         let response = await http.post(`/diary/session-type`, this.toJson());
-        return DateUtils.setToastMessage(response, 'cdt.session.type.create', 'cdt.session.type.create.error')
+        return ToastUtils.setToastMessage(response, 'cdt.session.type.create', 'cdt.session.type.create.error')
     }
 
     async update() {
         let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
-        return DateUtils.setToastMessage(response, 'cdt.session.type.update', 'cdt.session.type.update.error')
+        return ToastUtils.setToastMessage(response, 'cdt.session.type.update', 'cdt.session.type.update.error')
     }
 
     async delete() {
         let {data} = await http.delete(`/diary/session-type/${this.id}/${this.structure_id}`);
         if (data.id != undefined) {
             let response = await http.put(`/diary/session-type/${this.id}`, this.toJson());
-            return DateUtils.setToastMessage(response, 'cdt.session.type.deleted', 'cdt.session.type.delete.error')
+            return ToastUtils.setToastMessage(response, 'cdt.session.type.deleted', 'cdt.session.type.delete.error')
         } else {
             notify.error('cdt.session.type.delete.impossible')
         }

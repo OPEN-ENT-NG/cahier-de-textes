@@ -1,100 +1,202 @@
-<div id="crumbs">
-    <ul class="remove-padding">
-        <a href="#" ng-click="goTo('/view')">
-            <i18n><span><li>diary.title</li></span></i18n>
-        </a>&nbsp;>&nbsp;
-            <i18n><span><li>progression.title</li></span></i18n>
-    </ul>
-</div>
-
-<div>
-    <button class="right-magnet calendar-button" ng-click="newProgressionForm()">
-        <i18n>session.create</i18n>
-    </button>
-</div>
-<div class="row" ng-controller="manageProgessionCtrl">
-
-    <div class="cell three twelve-mobile">
-        <article class="sidebar" ng-class="{opened : searchbar.progression}">
-            <h5 class="large">
-                <i18n>progression</i18n>
-            </h5>
-            <span  class="filter__input--icon">
-               <input ng-change="filterProgression(search)"  type="text" ng-model="search" placeholder="Rechercher">
-            </span>
-        </article>
+<div class="manage-progression">
+    <div id="crumbs">
+        <h1>
+            <i18n>progressions</i18n>
+        </h1>
     </div>
-
-    <div class="nine cell twelve-mobile">
-
-        <div class="row margin-bottom-md">
-            <table class="twelve">
-                <thead>
-                <tr>
-                    <th >
-
-                    </th>
-                    <th class="four text-left" ng-click="changeSortType('title')">
-                        <i18n>title</i18n>
-                    </th>
-                    <th class="two text-center" ng-click="changeSortType('class')">
-                        <i18n>progression.type</i18n>
-                    </th>
-
-
-                    <th class="two text-center" ng-click="changeSortType('class')">
-                           <i18n>progression.level</i18n>
-                    </th>
-
-                    <th class="two text-left" ng-click="changeSortType('subject.label')">
-                        <i18n>subject</i18n>
-                    </th>
-                    <th class="two text-center" ng-click="changeSortType('progression_homeworks.length')">
-                         <i18n>homeworks.attached</i18n>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="progression_session in progressionsToDisplay.all |  orderBy: sort.progression : sort.reverse  ">
-                    <td class="text-left">
-                        <label class="checkbox">
-                            <input type="checkbox" ng-model="progression_session.selected" ng-change="safeApply()">
-                            <span></span>
-                        </label>
-                    </td>
-
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="four text-left">
-                        [[progression_session.title]]
-                    </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
-                        [[progression_session.type.label]]
-                    </td>
-
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
-                        [[progression_session.class]]
-                    </td>
-
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-left">
-                        [[progression_session.subject.label]]
-                    </td>
-                    <td ng-click="$parent.openProgressionSession(progression_session)" class="two text-center">
-                        [[progression_session.progression_homeworks.length]]
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <section class="toggle-buttons" ng-class="{ hide: progressionsToDisplay.selected.length === 0 }">
-            <div class="toggle">
-                <div class="row">
-                    <button ng-click="deleteProgressions(progressionsToDisplay.selected)">
-                        <i18n>delete</i18n>
+    <div>
+        <div class="cell twelve progression-content">
+            <div class="three side-bar-progression">
+                <input ng-change="filterProgression(search)"
+                       class="progression-search cell twelve"
+                       type="text"
+                       ng-model="search"
+                       placeholder="Rechercher">
+                <div class="flex-row margin-bottom-lg progression-tree"
+                     static-include="/diary/public/template/progression/progression-tree.html">
+                </div>
+                <div class="flex-row create-progression-button">
+                    <button workflow="diary.manageSession" class="calendar-button"
+                            data-ng-disabled="(!isFolder(selectedItem) || selectedItem.deepStep >= 5)"
+                            data-ng-click="openedCreateFolder = (isFolder(selectedItem) && selectedItem.deepStep < 5)">
+                        <i18n>progression.folder.create</i18n>
                     </button>
                 </div>
             </div>
-        </section>
+            <div class="cell one"></div>
+            <div class="eight progression-table cell">
+                <div class="create-progression-button">
+                    <button class="right-magnet calendar-button" data-ng-disabled="!isFolder(selectedItem)"
+                            ng-click="showProgressionSessionForm()">
+                        <i18n>session.create</i18n>
+                    </button>
+                </div>
+                <div class="folders-view"
+                     ng-show="isFolder(selectedItem) && (selectedItem.childFolders.length > 0)">
+                    <h3 class="folder-title"><i class="icon diary-folder"></i> [[selectedItem.title]]</h3>
+                    <div class="flex-row">
+                        <div class="flex-card" ng-repeat="folder in selectedItem.childFolders"
+                             data-ng-click="selectSubItem(folder)"
+                             ng-class="{'sub-item-selected': isSelectedSubItem(folder)}"
+                             lvl-draggable
+                             lvl-drop-target on-drop="dropped(dragEl, dropEl)"
+                        >
+                            <div class="flex-content"><i class="icon diary-folder"></i></div>
+                            <div class="flex-title">[[folder.title]]</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-table progression-table">
+                    <div class="flex-row flex-head row__9" role="rowgroup">
+                        <div class="flex-col col__1 empty-take-space text-center" role="cell">
+                            <label class="checkbox">
+                                <input type="checkbox"
+                                       ng-model="$parent.allSessionsSelect"
+                                       ng-change="selectOrUnselectAllSessions()">
+                                <span></span>
+                            </label>
+                        </div>
+                        <div class="flex-col col__2 text-center" role="cell">
+                            <i18n>title</i18n>
+                        </div>
+                        <div class="flex-col col__2 text-center" role="cell">
+                            <i18n>progression.type</i18n>
+                        </div>
+                        <div class="flex-col col__1 text-center" role="cell">
+                            <i18n>progression.level</i18n>
+                        </div>
+                        <div class="flex-col col__2 text-center" role="cell">
+                            <i18n>subject</i18n>
+                        </div>
+                        <div class="flex-col col__1 text-center" role="cell">
+                            <i18n>homeworks.attached</i18n>
+                        </div>
+                    </div>
+                    <div ng-repeat="(key, session) in displayedTable()"
+                         class="flex-body"
+                         role="rowgroup">
+                        <div class="flex-content">
+                            <div class="flex-row row__9 progression-item-draggable"
+                                 ng-click="openUpdateItem(session);$event.stopPropagation();" lvl-draggable="true">
+                                <div class="flex-col col__1 empty-take-space" role="cell">
+                                    <label class="checkbox" ng-click="$event.stopPropagation();">
+                                        <input type="checkbox" ng-model="session.tableSelected"
+                                               ng-change="updateOptionToaster()">
+                                        <span></span>
+                                    </label>
+                                </div>
+                                <div class="flex-col title col__2" role="cell">
+                                    [[session.title]]
+                                </div>
+                                <div class="flex-col col__2" role="cell">
+                                    [[session.type.label]]
+                                </div>
+                                <div class="flex-col col__1" role="cell">
+                                    [[session.class]]
+                                </div>
+                                <div class="flex-col col__2" role="cell">
+                                    [[session.subject.label]]
+                                </div>
+                                <div class="flex-col col__1"
+                                     ng-class="{'work_length': session.progression_homeworks.length > 0, 'work_empty': session.progression_homeworks.length === 0}"
+                                     role="cell">
+                                    <div ng-if="session.progression_homeworks.length > 0">
+                                        <div ng-include="'/diary/public/img/inbox.svg'" class="large ng-scope"></div>
+                                        <span>[[session.progression_homeworks.length]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <section class="toggle-buttons" ng-class="{ 'hide': !showOptionToaster() }">
+                <div class="toggle">
+                    <div class="row">
+                        <button ng-show="selectedSubItems.length === 1 && getProgressionSessionsChecked().length === 0"
+                                ng-click="openUpdateItem(selectedSubItems[0])">
+                            <i18n>progression.folder.update</i18n>
+                        </button>
+                        <button ng-click="openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
+                            <i18n>delete</i18n>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <lightbox show="openedCreateFolder"
+                      class="create-visa"
+                      on-close="closeFolderForm()">
+                <h3>
+                    <i18n>progression.title</i18n>
+                </h3>
+                <form>
+                    <div class="cell twelve">
+                        <label for="title">
+                            <i18n>progression.create.folder.name</i18n>
+                        </label>
+                        <input type="text"
+                               ng-model="progressionFolderForm.title"
+                               id="title"/>
+                    </div>
+                    <div class="cell twelve">
+                        <label for="parentId">
+                            <i18n>progression.create.parent.folder.name</i18n>
+                        </label>
+                        <select id="parentId"
+                                data-ng-change="changeTest(folder, progressionFolderForm)"
+                                ng-options="folder.id as folder.title for folder in filterCycleFolders()"
+                                ng-model="progressionFolderForm.parent_id">
+                            <option ng-if="false" value="" label=""></option>
+                        </select>
+                    </div>
+                    <div class="cell twelve">
+                        <button class="right-magnet" ng-class="{'loading': folder_loading}"
+                                ng-click="submitProgressionFolderForm()">
+                            <span>
+                                <i18n ng-show="!progressionFolderForm.id">progression.folder.validate</i18n>
+                                <i18n ng-show="progressionFolderForm.id">progression.folder.update</i18n>
+                            </span>
+                            <span class="loader"></span>
+                        </button>
+                    </div>
+                </form>
+            </lightbox>
+            <lightbox show="openedToasterProgressions"
+                      on-close="openedToasterProgressions = false">
+                <form>
+                    <div class="flex-row">
+                        <i18n ng-show="selectedSubItems.length > 0">progression.info.delete</i18n>
+                        <i18n ng-show="selectedSubItems.length === 0">progression.session.to.delete</i18n>
+                    </div>
+                    <div class="flex-row row__2" v-show="selectedSubItems.length > 0">
+                        <div class="flex-col col__1 justified-button">
+                            <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                                    ng-click="deleteItems(false)">
+                                <i18n>progression.shallow.choice</i18n>
+                                <span class="loader"></span>
+                            </button>
+                        </div>
+                        <div class="flex-col col__1 justified-button">
+                            <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                                    ng-click="deleteItems(true)">
+                                <i18n>progression.deep.choice</i18n>
+                                <span class="loader"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-row row__1" v-show="selectedSubItems.length === 0">
+                        <div class="flex-col col__1 justified-button">
+                            <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                                    ng-click="deleteItems(false)">
+                                <i18n>progression.deep.choice</i18n>
+                                <span class="loader"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </lightbox>
+        </div>
     </div>
-
 </div>
