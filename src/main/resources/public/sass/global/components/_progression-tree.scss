@@ -160,6 +160,10 @@
     color: $white;
     fill: $white;
     text-align: center !important;
+    .work_full {
+      text-align: center;
+      align-items: center;
+    }
   }
 
   .work_empty {

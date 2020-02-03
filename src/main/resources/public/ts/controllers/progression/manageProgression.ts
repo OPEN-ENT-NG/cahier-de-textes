@@ -186,19 +186,19 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             return $scope.selectedItem ? $scope.selectedItem.progressionSessions : [];
         };
 
-        $scope.getProgressionSessions = () => {
+        $scope.getProgressionSessions = (): ProgressionSession[] => {
             let progressionSessions = $scope.progressionFolders ? $scope.progressionFolders.all.map((f) => f.progressionSessions) : [];
             return [].concat.apply([], progressionSessions);
         };
 
-        $scope.getProgressionSessionsChecked = () => {
+        $scope.getProgressionSessionsChecked = (): ProgressionSession[] => {
             return $scope.getProgressionSessions().filter((s) => s.tableSelected === true);
         };
 
         $scope.selectOrUnselectAllSessions = function () {
-            if($scope.progressionFolders) {
+            if ($scope.progressionFolders) {
                 let progressionSessions = $scope.selectedItem.progressionSessions;
-                progressionSessions.forEach((s) => s.tableSelected =  $scope.allSessionsSelect);
+                progressionSessions.forEach((s) => s.tableSelected = $scope.allSessionsSelect);
 
                 $scope.updateOptionToaster();
                 $scope.safeApply();
@@ -276,6 +276,51 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                 $scope.safeApply();
             }
             $scope.folder_loading = false;
+        };
+
+        $scope.dropped = async (dragEl, dropEl) => {
+            if (dragEl == dropEl)
+                return;
+            let dragItem = $('#' + dragEl);
+            let dropItem = $('#' + dropEl);
+            let dropId = dropItem.data().itemId;
+            let dragId = dragItem.data().itemId;
+
+            let folder = $scope.progressionFolders.all.find((f) => f.id === dropId);
+
+            if ((!dropItem.hasClass("folder") && !dropItem.hasClass("sub-folder")) || !folder) return;
+            if (dragItem.hasClass("session-item")) {
+                let sessionsChecked= $scope.getProgressionSessionsChecked();
+
+                if (sessionsChecked.map((s) => s.id).includes(dragId)) {
+                    sessionsChecked.forEach((s) => {
+                        s.folder = folder;
+                        s.save();
+                    });
+                } else {
+                    let sessions = $scope.getProgressionSessions();
+                    let session = sessions.find((s) => s.id === dragId);
+                    if (!session) return;
+                    session.folder = folder;
+                    await session.save();
+
+                }
+            } else if (dragItem.hasClass("sub-folder")) {
+                if ($scope.selectedSubItems.map((f) => f.id).includes(dragId)) {
+                    $scope.selectedSubItems.forEach((f) => {
+                        if (ProgressionFolders.isParentFolder(f, folder)) return;
+                        f.parent_id = folder.id;
+                        f.save();
+                    });
+                } else {
+                    let moveFolder = $scope.progressionFolders.all.find((f) => f.id === dragId);
+                    if (!moveFolder || ProgressionFolders.isParentFolder(moveFolder, folder)) return;
+                    moveFolder.parent_id = folder.id;
+                    await moveFolder.save();
+                }
+            }
+            await initData();
+            $scope.safeApply();
         };
 
         $scope.progressionSessionForm.eventer.on(`get:end`, () => {

@@ -4,8 +4,9 @@
              ng-click="addFolderSelected(folder)"
              ng-class="['include-folders_' + folder.deepStep, {'first-item': folder.id === null && folder.parent_id === null,
              'opened': selectedFolderIds.indexOf(folder.id) !== -1}]"
-             lvl-draggable
-             lvl-drop-target on-drop="dropped(dragEl, dropEl)"
+             data-item-id="[[folder.id]]"
+             lvl-drop-target
+             on-drop="dropped(dragEl, dropEl)"
         >
             <span>
                 <i class="icon"

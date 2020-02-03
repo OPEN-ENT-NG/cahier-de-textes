@@ -204,7 +204,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
                 .add(progression.getString("annotation"))
                 .add(progression.getString("owner_id"))
                 .add(progression.getString("class"))
-                .add(progression.getString("progression_folder_id"))
+                .add(progression.getInteger("progression_folder_id"))
                 .add(progressionId);
 
 

@@ -35,11 +35,13 @@
                      ng-show="isFolder(selectedItem) && (selectedItem.childFolders.length > 0)">
                     <h3 class="folder-title"><i class="icon diary-folder"></i> [[selectedItem.title]]</h3>
                     <div class="flex-row">
-                        <div class="flex-card" ng-repeat="folder in selectedItem.childFolders"
-                             data-ng-click="selectSubItem(folder)"
+                        <div class="flex-card sub-folder" ng-repeat="folder in selectedItem.childFolders"
+                             data-ng-mouseup="selectSubItem(folder)"
                              ng-class="{'sub-item-selected': isSelectedSubItem(folder)}"
+                             data-item-id="[[folder.id]]"
                              lvl-draggable
-                             lvl-drop-target on-drop="dropped(dragEl, dropEl)"
+                             lvl-drop-target
+                             on-drop="dropped(dragEl, dropEl)"
                         >
                             <div class="flex-content"><i class="icon diary-folder"></i></div>
                             <div class="flex-title">[[folder.title]]</div>
@@ -76,8 +78,11 @@
                          class="flex-body"
                          role="rowgroup">
                         <div class="flex-content">
-                            <div class="flex-row row__9 progression-item-draggable"
-                                 ng-click="openUpdateItem(session);$event.stopPropagation();" lvl-draggable="true">
+                            <div class="flex-row row__9 session-item"
+                                 ng-click="openUpdateItem(session);$event.stopPropagation();"
+                                 lvl-draggable="true"
+                                 data-item-id="[[session.id]]"
+                            >
                                 <div class="flex-col col__1 empty-take-space" role="cell">
                                     <label class="checkbox" ng-click="$event.stopPropagation();">
                                         <input type="checkbox" ng-model="session.tableSelected"
@@ -100,7 +105,7 @@
                                 <div class="flex-col col__1"
                                      ng-class="{'work_length': session.progression_homeworks.length > 0, 'work_empty': session.progression_homeworks.length === 0}"
                                      role="cell">
-                                    <div ng-if="session.progression_homeworks.length > 0">
+                                    <div ng-if="session.progression_homeworks.length > 0" class="flex-row work_full">
                                         <div ng-include="'/diary/public/img/inbox.svg'" class="large ng-scope"></div>
                                         <span>[[session.progression_homeworks.length]]</span>
                                     </div>

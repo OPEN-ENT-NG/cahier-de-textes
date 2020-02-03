@@ -136,7 +136,7 @@ public class ProgressionController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "progression_session", new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject progression) {
-                progressionService.updateProgressionFolder(progression, folderId, DefaultResponseHandler.defaultResponseHandler(request));
+                progressionService.updateProgressions(progression, folderId, DefaultResponseHandler.defaultResponseHandler(request));
             }
 
         }));
