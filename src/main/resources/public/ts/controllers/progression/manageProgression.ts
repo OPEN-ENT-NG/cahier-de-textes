@@ -373,10 +373,9 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                 $scope.openedCreateFolder = false;
                 let data = result.data;
                 let resultId = null;
-                if (data) {
+                if(data) {
                     resultId = data.id ? data.id : result.data[0]["id"];
                 }
-
                 if (resultId) {
                     $scope.closeModal();
                     let folder = $scope.progressionFolders.all.find((f) => {
