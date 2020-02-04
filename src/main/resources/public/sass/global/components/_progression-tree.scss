@@ -7,6 +7,22 @@
     font-weight: bold;
     font-size: 26px;
   }
+
+  .white-space {
+    width: 3%;
+  }
+
+  h3 {
+    padding: 0;
+    &.folder-title {
+      color: $diary-black;
+
+      .icon {
+        color: $diary-grey;
+      }
+    }
+  }
+
 }
 
 .item-no-wrap {
@@ -128,14 +144,6 @@
   }
 }
 
-.folder-title {
-  color: $diary-black;
-
-  .icon {
-    color: $diary-grey;
-  }
-}
-
 .folders-view {
   border-bottom: 1px solid $diary-grey;
   padding-bottom: 10px;
@@ -164,8 +172,7 @@
 }
 
 .progression-table {
-  margin-top: 25px;
-
+  width: 70%;
   .work_length {
     background-color: $diary-darkorange;
     font-size: 25px;

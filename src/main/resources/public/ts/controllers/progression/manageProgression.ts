@@ -9,7 +9,7 @@ import {
 import {HomeworkTypes, SessionTypes, Subjects} from "../../model";
 
 export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
-    ['$scope', '$routeParams', '$location', async function ($scope, $routeParams, $location) {
+    ['$scope', '$routeParams', '$location', '$timeout', async function ($scope, $routeParams, $location, $timeout) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         function modeIsReadOnly() {
@@ -102,6 +102,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
             await $scope.homeworkTypes.sync();
             $scope.safeApply();
+            $scope.fixEditor();
         }
 
         $scope.initProgressions = async () => {
@@ -142,6 +143,12 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                         $scope.progressionSessionForm.setType(type);
                     }
                 });
+            }
+        };
+
+        $scope.setTypeSession = () => {
+            if (!$scope.progressionSessionForm.type) {
+                $scope.progressionSessionForm.setType($scope.sessionTypes.all[0]);
             }
         };
 
@@ -352,6 +359,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.showProgressionSessionForm = () => {
             $scope.goTo('/progression/create');
             $scope.safeApply();
+            $scope.fixEditor();
         };
 
         $scope.validProgressionsSessionForm = async () => {
@@ -582,6 +590,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.progressionSessionForm = new ProgressionSession();
             $scope.progressionSessionForm.folder_id = null;
             $scope.setSubjectSession();
+            $scope.setTypeSession();
             $scope.progressionSessionForm.setOwnerId($scope.progressionFolders.owner_id);
         };
 
