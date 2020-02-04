@@ -150,7 +150,7 @@
 
   .flex-card {
     margin-left: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     cursor: pointer;
 
     &:hover {
@@ -173,6 +173,11 @@
 
 .progression-table {
   width: 70%;
+
+  .flex-table {
+    margin-top: 15px;
+  }
+
   .work_length {
     background-color: $diary-darkorange;
     font-size: 25px;

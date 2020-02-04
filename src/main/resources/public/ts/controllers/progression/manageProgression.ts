@@ -55,7 +55,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.selectIconFolder = (folder: ProgressionFolder) => {
             if (($scope.isFilterSearch() && $scope.currentUrlIsManage)
                 || (!$scope.isFilterSearch() && folder.childFolders.length === 0)
-                || ($scope.isFilterSearch() && folder.childFolders.length === 0 && folder.progressionSessions.length === 0)) {
+                || ($scope.isFilterSearch() && folder.progressionSessions.length === 0)) {
                 return 'diary-folder';
             } else {
                 return $scope.selectedFolderIds.indexOf(folder.id) !== -1 ? 'arrow-down' : 'arrow-right';
@@ -99,6 +99,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
 
             $scope.setSubjectSession();
+            $scope.setTypeSession();
 
             await $scope.homeworkTypes.sync();
             $scope.safeApply();
@@ -147,7 +148,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.setTypeSession = () => {
-            if (!$scope.progressionSessionForm.type) {
+            if (!$scope.progressionSessionForm.type.id) {
                 $scope.progressionSessionForm.setType($scope.sessionTypes.all[0]);
             }
         };
@@ -357,18 +358,25 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.showProgressionSessionForm = () => {
+            $scope.progressionSessionForm.folder_id = $scope.selectedItem.id;
             $scope.goTo('/progression/create');
             $scope.safeApply();
             $scope.fixEditor();
         };
 
         $scope.validProgressionsSessionForm = async () => {
+            console.log("ok");
             let result = await $scope.toastHttpCall(await $scope.progressionSessionForm.save());
             if (result.succeed) {
                 $scope.goTo('/progressions/view');
                 await initData();
                 $scope.openedCreateFolder = false;
-                let resultId = result.data ? result.data[0]["id"] : null;
+                let data = result.data;
+                let resultId = null;
+                if (data) {
+                    resultId = data.id ? data.id : result.data[0]["id"];
+                }
+
                 if (resultId) {
                     $scope.closeModal();
                     let folder = $scope.progressionFolders.all.find((f) => {
