@@ -86,6 +86,7 @@ export class Course {
         url += `?teacherId=${model.me.type === USER_TYPES.personnel ? teacherId : model.me.userId}`;
 
         let {data} = await http.get(url);
+        data = data.filter((d) => d.teacherIds);
         let courses = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
         let course = courses.find(c => c._id === this._id);
         Mix.extend(this, course);
@@ -136,7 +137,8 @@ export class Courses {
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);
         let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let {data} = await http.get(uri);
+        let { data } = await http.get(uri);
+        data = data.filter((d) => d.teacherIds);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
