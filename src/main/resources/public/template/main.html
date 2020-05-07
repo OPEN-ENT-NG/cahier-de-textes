@@ -1,5 +1,5 @@
-<div class="row">
-    <div class="cell four twelve-mobile">
+<div class="flex-row row__12">
+    <div class="flex-col col__3">
         <app-title class="zero-mobile">
             <div class="title-area">
                 <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
@@ -10,10 +10,10 @@
         </app-title>
     </div>
     <!-- Filter Zone (Teacher and Class) -->
-    <div workflow="diary.diarySearch" class="eight cell twelve-mobile">
+    <div workflow="diary.diarySearch" class="flex-col col__9">
         <!-- Teacher search bar -->
-        <div class="cell six">
-            <div class="cell eleven search-input">
+        <div class="flex-col col__6">
+            <div class="search-input">
                 <async-autocomplete data-ng-disabled="false"
                                     data-ng-model="autocomplete.teacher"
                                     data-ng-change="selectTeacher"
@@ -33,8 +33,9 @@
                 </ul>
             </div>
         </div>
-        <div class="cell six">
-            <div class="cell eleven search-input">
+        <div class="flex-col col__1"></div>
+        <div class="flex-col col__6">
+            <div class="search-input">
                 <async-autocomplete data-ng-disabled="false"
                                     data-ng-model="autocomplete.class"
                                     data-ng-change="selectClass"
@@ -56,12 +57,13 @@
         </div>
     </div>
     <!-- Manage session and homework -->
-    <div class="cell eight twelve-mobile">
-        <button workflow="diary.manageHomework" class="padding-md margin-left-md calendar-button pull-right"
+    <div class="flex-col col__9 title-buttons">
+        <div class="flex-col col__9"></div>
+        <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
                 ng-click="goTo('/homework/create/')">
             <i18n>homework.create</i18n>
         </button>
-        <button workflow="diary.manageSession" class="padding-md calendar-button pull-right"
+        <button workflow="diary.manageSession" class="padding-md calendar-button title-button"
                 ng-click="goTo('/session/create/')">
             <i18n>session.create</i18n>
         </button>
