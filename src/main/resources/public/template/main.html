@@ -73,9 +73,11 @@
 
 <div class="row">
     <div class="cell three twelve-mobile sidebar-content"
-         static-include="/diary/public/template/main/sidebar.html"></div>
+         static-include="/diary/public/template/main/sidebar.html">
+    </div>
 
-    <div class="cell nine twelve-mobile main-content" ng-if="!display.listView"
+    <div class="cell twelve-mobile main-content" ng-if="!display.listView"
+         ng-class="(isAChildOrAParent || isTeacher) ? 'nine' : 'twelve'"
          static-include="/diary/public/template/main/calendar-view.html">
     </div>
 </div>
