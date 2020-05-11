@@ -1,18 +1,24 @@
 <div class="diary-container diary-show-calendar"
-     ng-class="{'diary-show-homeworks': display.homeworks && calendar.increment !== 'month', 'calendar-day-mode': calendar.increment === 'day'}">
+     ng-class="{'diary-show-homeworks': display.homeworks && calendar.increment !== 'month',
+     'calendar-day-mode': calendar.increment === 'day'}">
     <!-- Loader calendrier -->
     <div id="loader-calendar" ng-show="isRefreshingCalendar" class="overlay-loader-calendar">
         <div class="loader"></div>
     </div>
+
     <div class="row" ng-class="{'hide-session':!display.sessions}">
+        <!-- Calendar homework -->
         <div class="homeworks-row" ng-show="calendar.increment != 'month'">
             <div class="timeslot ng-binding ng-scope">
                 <i18n>Homeworks</i18n>
             </div>
             <calendar-daily-events for="calendar" b-show-calendar="display.bShowCalendar"
-                                   b-show-homeworks-minified="display.bShowHomeworksMinified" ng-model="dailyHomeworks">
+                                   b-show-homeworks-minified="display.bShowHomeworksMinified"
+                                   ng-model="dailyHomeworks">
             </calendar-daily-events>
         </div>
+
+        <!-- Calendar view -->
         <div id="calendar-view" class="twelve calendar-container">
             <calendar
                     enable-display-modes="true"
@@ -21,8 +27,7 @@
                     items="calendarItems"
                     slots="timeSlot.list"
                     item-tooltip-template="main/course-tooltip"
-                    show-next-previous-button="true"
-            >
+                    show-next-previous-button="true">
             </calendar>
         </div>
     </div>
