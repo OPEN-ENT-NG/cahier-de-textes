@@ -78,8 +78,8 @@ section.main {
   margin-left: 63px;
 }
 
-section.main {
-  margin-left: 63px;
+.remove-margin-left {
+  margin-left: -63px;
 }
 
 .schedule .days .day .timeslots .timeslot {

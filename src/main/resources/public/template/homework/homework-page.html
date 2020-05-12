@@ -1,4 +1,4 @@
-<div ng-controller="manageHomeworkCtrl">
+<div ng-controller="manageHomeworkCtrl" ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
     <div id="crumbs">
         <ul class="remove-padding"><a ng-click="$parent.syncPedagogicItems(); back();">
             <i18n><span><li>diary.title</li></span></i18n>
