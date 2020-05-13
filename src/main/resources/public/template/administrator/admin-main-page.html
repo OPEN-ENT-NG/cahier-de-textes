@@ -1,12 +1,20 @@
 <div class="global-administrator-page" ng-controller="globalAdminCtrl">
-    <div class="row">
-        <h1 workflow="diary.adminAccess" class="three cell">
-            <i18n>sessions.admin.main.title</i18n>
-        </h1>
-        <div class="nine cell twelve-mobile">
+    <div class="flex-row row__12">
+        <div class="flex-col col__3">
+            <app-title class="zero-mobile">
+                <div ng-class="isCounselorUser() ?  'title-area-complete' : 'title-area-simple'">
+                    <img ng-if="isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+                    <h1 class="application-title">
+                        <i18n>diary.title</i18n>
+                    </h1>
+                </div>
+            </app-title>
+        </div>
+        <!-- Filter Zone (Teacher and Class) -->
+        <div workflow="diary.diarySearch" class="flex-col col__9">
             <!-- Teacher search bar -->
-            <div class="cell six" workflow="diary.diarySearch">
-                <div class="cell eleven search-input">
+            <div class="flex-col col__6">
+                <div class="search-input">
                     <async-autocomplete data-ng-disabled="false"
                                         data-ng-model="autocomplete.teacher"
                                         data-ng-change="selectTeacher"
@@ -16,18 +24,10 @@
                                         search="autocomplete.teacher">
                     </async-autocomplete>
                 </div>
-                <!-- Teacher selected via filter -->
-                <div class="cell twelve" v-show="autocomplete.teacher && autocomplete.teacher != '' ">
-                    <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="teacher in autocomplete.teachersSelected track by teacher.id" class="twelve">
-                            [[teacher.displayName]] <i class="close"
-                                                       data-ng-click="removeTeacher(teacher)"></i>
-                        </li>
-                    </ul>
-                </div>
             </div>
-            <div class="cell six">
-                <div class="cell eleven search-input">
+            <div class="flex-col col__1"></div>
+            <div class="flex-col col__6">
+                <div class="search-input">
                     <async-autocomplete data-ng-disabled="false"
                                         data-ng-model="autocomplete.class"
                                         data-ng-change="selectClass"
@@ -37,6 +37,25 @@
                                         search="autocomplete.class">
                     </async-autocomplete>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex-row row__12 list-search">
+        <div class="flex-col col__3 list-search"></div>
+        <div class="flex-col col__9 list-search">
+            <div class="flex-col col__6 list-search">
+                <!-- Teacher selected via filter -->
+                <div class="cell twelve" ng-show="autocomplete.teacher && autocomplete.teacher != '' ">
+                    <ul class="cell twelve search-input-ul">
+                        <li ng-repeat="teacher in autocomplete.teachersSelected track by teacher.id" class="twelve">
+                            [[teacher.displayName]] <i class="close"
+                                                       data-ng-click="removeTeacher(teacher)"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex-col col__1 list-search"></div>
+            <div class="flex-col col__6 list-search">
                 <!-- Class selected via filter -->
                 <div class="cell twelve">
                     <ul class="cell twelve search-input-ul">
@@ -56,7 +75,7 @@
         </div>
 
         <section class="toggle-buttons" ng-class="{ hide: showOptionToaster != true }">
-            <div class="toggle">
+            <div class="toggle">.
                 <div class="row">
                     <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
                         <i18n>visa.manage.viser</i18n>

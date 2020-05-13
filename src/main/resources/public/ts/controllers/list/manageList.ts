@@ -25,7 +25,7 @@ export let manageListCtrl = ng.controller('manageListController',
         };
         $scope.goToViewList = () =>{
             $window.location.reload();
-        }
+        };
 
         $scope.displayDay = (pedagogicDay) =>{
             pedagogicDay.displayed = !pedagogicDay.displayed;
@@ -91,7 +91,7 @@ export let manageListCtrl = ng.controller('manageListController',
                 }
             })
             return containsOnlyCourseBool;
-        }
+        };
         //check the display mod and if display session check the homeworks an the sessions which have homeworks
         $scope.displaySession = (displaySession,pedagogicItem) =>{
             if (displaySession)
@@ -126,7 +126,7 @@ export let manageListCtrl = ng.controller('manageListController',
                     })
                 });
             return hasOneDayToDisplay
-        }
+        };
 
         $scope.hasHomeworksToDisplay = (display, pedagogicDay) => {
             let hasHomeworkToDisplay = false;

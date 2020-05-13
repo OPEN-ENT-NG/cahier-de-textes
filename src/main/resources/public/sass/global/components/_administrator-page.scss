@@ -1,9 +1,31 @@
 .global-administrator-page {
-
   h1 {
-    color: $black;
-    font-size: 28px;
+    flex-shrink: 0;
     font-weight: bold;
+    margin-bottom: 0;
+    line-height: 0;
+    color: $black;
+  }
+  .title-area-simple {
+    display: flex;
+  }
+
+  .title-area-complete {
+    display: flex;
+    height: 60px;
+    align-items: center;
+
+    img {
+      max-height: 60px;
+      margin-right: 10px;
+    }
+
+    h1 {
+      font-size: 36px;
+      a {
+        color: $black;
+      }
+    }
   }
 
   i.published {
@@ -24,7 +46,7 @@
     }
   }
 
-  .shadowed  {
+  .shadowed {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
   }
 
@@ -113,9 +135,10 @@
   .create-visa {
     textarea:focus {
       outline: none !important;
-      border:1px solid $diary-darkgreen;
+      border: 1px solid $diary-darkgreen;
       box-shadow: 0 0 10px $diary-darkgreen;
     }
+
     button {
       background-color: $diary-darkgreen;
     }
@@ -130,8 +153,10 @@
 
       .twelve.cell {
         display: flex;
+
         .modal-include {
           align-items: stretch;
+
           .back, .next {
             z-index: 1;
             display: inline-flex;
@@ -141,10 +166,12 @@
             width: 10%;
             justify-content: center;
             top: 50vh;
+
             i {
               color: $diary-grey;
               cursor: pointer;
               font-size: 45px;
+
               &:hover {
                 color: $session-grey;
               }
@@ -152,18 +179,22 @@
               &.disabled {
                 cursor: default;
                 color: rgba($diary-grey, 0.3);
+
                 &:hover {
                   color: rgba($diary-grey, 0.3);
                 }
               }
             }
           }
+
           .back {
             left: 0;
           }
+
           .next {
             right: 0;
           }
+
           .session-content {
             display: inline-flex;
             width: 80%;

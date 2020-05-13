@@ -1,18 +1,15 @@
 <div ng-controller="manageHomeworkCtrl" ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
-    <div id="crumbs">
-        <ul class="remove-padding"><a ng-click="$parent.syncPedagogicItems(); back();">
-            <i18n><span><li>diary.title</li></span></i18n>
-        </a>&nbsp;>&nbsp;<i18n><span><li>homework</li></span></i18n>
-        </ul>
-    </div>
     <div ng-if="!isReadOnly">
-        <div class="row">
-            <div class="six cell twelve-mobile">
-                <h1>
-                    <i18n><span>homework.manage.create</span></i18n>
-                </h1>
-            </div>
-            <div class="six cell zero-mobile text-right zero-mobile">
+        <div class="flex-row row__12">
+            <app-title class="flex-col col__3 zero-mobile">
+                <div class="title-area-simple">
+                    <h1>
+                        <i18n><span>homework.manage.create</span></i18n>
+                    </h1>
+                </div>
+            </app-title>
+            <div class="flex-col col__6"></div>
+            <div class="flex-col col__3 title-buttons">
                 <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
                     <i18n>utils.cancel</i18n>
                 </button>
@@ -33,7 +30,8 @@
             <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
                 <i18n>utils.cancel</i18n>
             </button>
-            <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button" ng-click="saveHomework()" workflow="diary.manageHomework">
+            <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button"
+                    ng-click="saveHomework()" workflow="diary.manageHomework">
                 <i18n>utils.save</i18n>
             </button>
         </div>
@@ -41,6 +39,8 @@
     <div ng-if="isReadOnly">
         <div class="row margin-bottom-lg"
              static-include="/diary/public/template/homework/homework-view.html"></div>
-        <button class="float-none cancel" ng-click="$parent.syncPedagogicItems();back()"><i18n>back</i18n></button>
+        <button class="float-none cancel" ng-click="$parent.syncPedagogicItems();back()">
+            <i18n>back</i18n>
+        </button>
     </div>
 </div>

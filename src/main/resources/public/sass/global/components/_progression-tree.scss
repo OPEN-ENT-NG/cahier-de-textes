@@ -115,6 +115,7 @@
   height: max-content;
   max-height: 65vh;
   overflow: auto;
+  margin-top: 10px;
 
   input {
     width: 90%;
@@ -134,13 +135,20 @@
   display: flex;
 }
 
+.create-folder-button {
+  justify-content: center !important;
+  align-items: center !important;
+}
+
 .create-progression-button {
-  justify-content: center;
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
 
   button[disabled=disabled] {
     cursor: default;
     background-color: rgba($diary-darkgreen, 0.3);
     color: $diary-white;
+    margin-bottom: 0;
   }
 }
 

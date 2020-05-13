@@ -259,6 +259,7 @@ export let main = ng.controller('MainController',
             }
 
             await initProgressions();
+
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
             $scope.isRefreshingCalendar = false;
@@ -397,8 +398,12 @@ export let main = ng.controller('MainController',
 
         }
 
+        $scope.isCounselorUser = () => {
+            return model.me.hasWorkflow(WORKFLOW_RIGHTS.viescoSettingHomeworkAndSessionTypeManage);
+        };
+
         function containsHomeworks(c: any) {
-            let isDisplayedByDefault = false
+            let isDisplayedByDefault = false;
             c.pedagogicItems.map(pi => {
                 if (pi.pedagogicType === $scope.TYPE_HOMEWORK)
                     if ($scope.isChild) {
@@ -492,7 +497,6 @@ export let main = ng.controller('MainController',
                     break;
             }
             $scope.syncPedagogicItems();
-            console.log("SIX sync");
         });
 
 
@@ -544,6 +548,10 @@ export let main = ng.controller('MainController',
             return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
         };
 
+// $scope.hasBothViewMode = () => {
+//     return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
+// };
+
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/update/' + sessionId);
@@ -576,6 +584,7 @@ export let main = ng.controller('MainController',
             sessionToPublish.id = item.id;
             $scope.toastHttpCall(await sessionToPublish.publish())
             $scope.syncPedagogicItems();
+
             $scope.safeApply();
         };
 
@@ -693,11 +702,13 @@ export let main = ng.controller('MainController',
             $scope.session = session;
 
             $scope.goTo('/session/create');
+
+
         };
 
-        /**
-         * Handle a progression dropped on a session
-         */
+        /*
+               Handle a progression dropped on a session
+                */
         $scope.updateSession = async (idSession, idProgression) => {
             let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
@@ -732,6 +743,7 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply();
             $scope.goTo('/session/update/' + idSession);
+
 
         };
 

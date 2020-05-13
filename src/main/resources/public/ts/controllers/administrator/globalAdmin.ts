@@ -1,4 +1,4 @@
-import {_, angular, idiom as lang, model, moment, ng} from 'entcore';
+import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
@@ -24,7 +24,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.userType = model.me.type;
-        $scope.showSession = false
+        $scope.showSession = false;
 
         $scope.allSessionsSelect = false;
         $scope.showOptionToaster = false;
@@ -150,7 +150,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
             AutocompleteUtils.init($scope.structure);
             $scope.sessions.structure = $scope.structure;
-
             if ($scope.userType == "ENSEIGNANT") {
                 AutocompleteUtils.setTeachersSelected([_.find($scope.structure.teachers.all, {id: model.me.userId})]);
             }

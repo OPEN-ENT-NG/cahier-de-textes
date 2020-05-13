@@ -1,76 +1,86 @@
-<div ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
-    <div class="flex-row row__12">
-        <div class="flex-col col__3">
-            <app-title class="zero-mobile">
-                <div class="title-area">
-                    <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
-                    <h1 class="application-title">
-                        <i18n>diary.title</i18n>
-                    </h1>
-                </div>
-            </app-title>
-        </div>
-        <!-- Filter Zone (Teacher and Class) -->
-        <div workflow="diary.diarySearch" class="flex-col col__9">
-            <!-- Teacher search bar -->
-            <div class="flex-col col__6">
-                <div class="search-input">
-                    <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="autocomplete.teacher"
-                                        data-ng-change="selectTeacher"
-                                        data-options="autocomplete.teacherOptions"
-                                        on-search="filterTeacherOptions"
-                                        data-placeholder="diary.search.teacher"
-                                        search="autocomplete.teacher">
-                    </async-autocomplete>
-                </div>
-                <!-- Teacher selected via filter -->
-                <div class="cell twelve" ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
-                    <ul class="cell twelve search-input-ul">
-                        <li>
-                            [[autocomplete.teachersSelected[0].displayName]] <i class="close"
-                                                           data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
-                        </li>
-                    </ul>
-                </div>
+<div class="flex-row row__12 title-size"
+     ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
+    <div class="flex-col col__3">
+        <app-title class="zero-mobile">
+            <div ng-class="isCounselorUser() ?  'title-area-simple' : 'title-area-complete'">
+                <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+                <h1 class="application-title">
+                    <i18n>diary.title</i18n>
+                </h1>
             </div>
-            <div class="flex-col col__1"></div>
-            <div class="flex-col col__6">
-                <div class="search-input">
-                    <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="autocomplete.class"
-                                        data-ng-change="selectClass"
-                                        data-options="autocomplete.classOptions"
-                                        on-search="filterClassOptions"
-                                        data-placeholder="diary.search.group"
-                                        search="autocomplete.class">
-                    </async-autocomplete>
-                </div>
-                <!-- Class selected via filter -->
-                <div class="cell twelve" ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
-                    <ul class="cell twelve search-input-ul">
-                        <li>
-                            [[autocomplete.classesSelected[0].displayName]] <i class="close"
-                                                            data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <!-- Manage session and homework -->
-        <div class="flex-col col__9 title-buttons">
-            <div class="flex-col col__9"></div>
-            <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
-                    ng-click="goTo('/homework/create/')">
-                <i18n>homework.create</i18n>
-            </button>
-            <button workflow="diary.manageSession" class="padding-md calendar-button title-button"
-                    ng-click="goTo('/session/create/')">
-                <i18n>session.create</i18n>
-            </button>
-        </div>
-        <div class="clear"></div>
+        </app-title>
     </div>
+    <!-- Filter Zone (Teacher and Class) -->
+    <div workflow="diary.diarySearch" class="flex-col col__9">
+        <!-- Teacher search bar -->
+        <div class="flex-col col__6 flex-column">
+            <div class="search-input">
+                <async-autocomplete data-ng-disabled="false"
+                                    data-ng-model="autocomplete.teacher"
+                                    data-ng-change="selectTeacher"
+                                    data-options="autocomplete.teacherOptions"
+                                    on-search="filterTeacherOptions"
+                                    data-placeholder="diary.search.teacher"
+                                    search="autocomplete.teacher">
+                </async-autocomplete>
+            </div>
+        </div>
+        <div class="flex-col col__1"></div>
+        <div class="flex-col col__6 flex-column">
+            <div class="search-input">
+                <async-autocomplete data-ng-disabled="false"
+                                    data-ng-model="autocomplete.class"
+                                    data-ng-change="selectClass"
+                                    data-options="autocomplete.classOptions"
+                                    on-search="filterClassOptions"
+                                    data-placeholder="diary.search.group"
+                                    search="autocomplete.class">
+                </async-autocomplete>
+            </div>
+        </div>
+    </div>
+    <!-- Manage session and homework -->
+    <div class="flex-col col__9 title-buttons">
+        <div class="flex-col col__8"></div>
+        <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
+                ng-click="goTo('/homework/create/')">
+            <i18n>homework.create</i18n>
+        </button>
+        <button workflow="diary.manageSession" class="padding-md calendar-button title-button"
+                ng-click="goTo('/session/create/')">
+            <i18n>session.create</i18n>
+        </button>
+    </div>
+    <div class="clear"></div>
+</div>
+<div workflow="diary.diarySearch" class="flex-row row__12 list-search">
+    <div class="flex-col col__3 list-search"></div>
+    <div class="flex-col col__9 list-search">
+        <div class="flex-col col__6 list-search">
+            <!-- Teacher selected via filter -->
+            <div class="cell twelve"
+                 ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
+                <ul class="cell twelve search-input-ul">
+                    <li>
+                        [[autocomplete.teachersSelected[0].displayName]] <i class="close"
+                                                                            data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="flex-col col__1 list-search"></div>
+        <!-- Class selected via filter -->
+        <div class="cell twelve"
+             ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
+            <ul class="cell twelve search-input-ul">
+                <li>
+                    [[autocomplete.classesSelected[0].displayName]] <i class="close"
+                                                                       data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
     <div class="row">
         <div class="cell three twelve-mobile sidebar-content"

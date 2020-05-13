@@ -1,30 +1,23 @@
 <div ng-controller="manageSessionCtrl">
-    <div id="crumbs">
-        <ul class="remove-padding"><a ng-click="$parent.syncPedagogicItems(); back();">
-            <i18n><span><li>diary.title</li></span></i18n>
-        </a>&nbsp;>&nbsp;<i18n><span><li>session</li></span></i18n>
-        </ul>
-    </div>
-    <div class="row" ng-if="!isReadOnly">
-        <div class="six cell twelve-mobile">
-            <h1>
-                <i18n><span>session.manage.create</span></i18n>
-            </h1>
-        </div>
-
-        <div class="six cell zero-mobile text-right zero-mobile">
+    <div class="flex-row row__12" ng-if="!isReadOnly">
+        <app-title class="flex-col col__3 zero-mobile">
+            <div class="title-area-simple">
+                <h1>
+                    <i18n><span>session.manage.create</span></i18n>
+                </h1>
+            </div>
+        </app-title>
+        <div class="flex-col col__6"></div>
+        <div class="flex-col col__3 title-buttons">
             <button class="float-none display-inline-block cancel" type="button" ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
-
             <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession"
                     ng-click="saveSession()">
                 <i18n>utils.save</i18n>
             </button>
-
         </div>
     </div>
-
 
     <div ng-if="!isReadOnly">
         <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
