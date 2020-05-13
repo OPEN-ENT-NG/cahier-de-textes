@@ -114,15 +114,18 @@ export class Courses {
      * Synchronize courses.
      * @param structure structure
      * @param teacher teacher. Can be null. If null, group need to be provide.
-     * @param group group. Can be null. If null, teacher needs to be provide.
+     * @param audience
+     * @param startMoment
+     * @param endMoment
      * @returns {Promise<void>} Returns a promise.
      */
-    async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null, startMoment: any, endMoment: any): Promise<void> {
+    async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null,
+               startMoment: any, endMoment: any): Promise<void> {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
         if (model.me.type !== USER_TYPES.student) {
-            if (teacher) filter += `teacherId=${model.me.type === USER_TYPES.personnel && teacher ? teacher.id : model.me.userId}?`;
+            if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}?`;
             if (audience) filter += `group=${audience.name}?`;
         } else if (model.me.classes && model.me.classes.length) {
             if (window.audiences && window.audiences.all.length > 0)

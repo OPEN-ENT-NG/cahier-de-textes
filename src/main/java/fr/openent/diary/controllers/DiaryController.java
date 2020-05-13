@@ -71,7 +71,4 @@ public class DiaryController extends BaseController {
 
     @SecuredAction(value = WorkflowUtils.ACCESS_CHILD_DATA, type = ActionType.WORKFLOW)
     public void workflow4(final HttpServerRequest request) { }
-
-    @SecuredAction(value = WorkflowUtils.ACCESS_EXTERNAL_DATA, type = ActionType.WORKFLOW)
-    public void workflow5(final HttpServerRequest request) { }
 }

@@ -29,7 +29,7 @@ const diaryBehaviours = {
             listView: "fr.openent.diary.controllers.DiaryController|workflow2",
             accessOwnData: "fr.openent.diary.controllers.DiaryController|workflow3",
             accessChildData: "fr.openent.diary.controllers.DiaryController|workflow4",
-            accessExternalData: "fr.openent.diary.controllers.SearchController|workflow5",
+            accessExternalData: 'fr.openent.diary.controllers.FakeRight|accessExternalData',
             diarySearch: "fr.openent.diary.controllers.SearchController|searchUsers"
         },
     },

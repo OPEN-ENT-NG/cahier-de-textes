@@ -36,6 +36,9 @@ public class Diary extends BaseServer {
         addController(new InspectorController(new InspectorServiceImpl()));
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
         addController(new SearchController(eb));
-	}
+
+        // add right controller
+        addController(new FakeRight());
+    }
 
 }
