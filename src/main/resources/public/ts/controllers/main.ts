@@ -226,7 +226,6 @@ export let main = ng.controller('MainController',
             /* personal workflow case */
             if ((model.me.hasWorkflow(WORKFLOW_RIGHTS.diarySearch) && model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData))
                 && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id))) {
-                console.log("going as a personal ?");
                 let teacherId = teacherSelected && teacherSelected.id ? teacherSelected.id : null;
                 let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                 await Promise.all([
@@ -243,7 +242,6 @@ export let main = ng.controller('MainController',
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                 /* teacher workflow case */
-                console.log("going as a teacher ?");
                 let teacherId = (teacherSelected && teacherSelected.id) ? teacherSelected.id : model.me.userId;
                 let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                 const promises: Promise<void>[] = [];
@@ -768,7 +766,6 @@ export let main = ng.controller('MainController',
             //insert data and refresh calendar
             await course.sync(date, date);
             let session = new Session($scope.structure, course, progressionDragged);
-            console.log(session);
             session.setFromCourse(course);
             session.opened = true;
             $scope.session = session;

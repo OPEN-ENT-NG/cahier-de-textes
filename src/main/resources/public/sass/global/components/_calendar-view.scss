@@ -132,13 +132,17 @@
 
   .next-timeslots, .previous-timeslots {
     margin-bottom: 0;
+    background: $diary-darkgreen;
 
+    &:hover {
+      background: $diary-darkengreen;
+    }
 
     &:disabled {
-      background: #e6e6e6;
+      background: $diary-light-grey;
 
       &:hover {
-        background: #e6e6e6;
+        background: $diary-light-grey;
       }
 
       &::before {
