@@ -1,85 +1,88 @@
-<div class="flex-row row__12">
-    <div class="flex-col col__3">
-        <app-title class="zero-mobile">
-            <div ng-class="isCounselorUser() ?  'title-area-simple' : 'title-area-complete'">
-                <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
-                <h1 class="application-title">
-                    <i18n>diary.title</i18n>
-                </h1>
+<div ng-class="{'remove-margin-left': isAChildOrAParent}">
+    <div class="flex-row" ng-class="isCounselorUser() ? 'row__12' : 'row__14'">
+        <div class="flex-col" ng-class="isCounselorUser() ? 'col__3' : 'col__4'">
+            <app-title class="zero-mobile">
+                <div ng-class="isCounselorUser() ?  'title-area-simple' : 'title-area-complete'">
+                    <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+                    <h1 class="application-title">
+                        <i18n>diary.title</i18n>
+                    </h1>
+                </div>
+            </app-title>
+        </div>
+        <!-- Filter Zone (Teacher and Class) -->
+        <div workflow="diary.diarySearch" class="flex-col" ng-class="isCounselorUser() ? 'col__9' : 'col__6' "
+             style="justify-content: space-between">
+            <!-- Teacher search bar -->
+            <div class="flex-col col__6 flex-column">
+                <div class="search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="autocomplete.teacher"
+                                        data-ng-change="selectTeacher"
+                                        data-options="autocomplete.teacherOptions"
+                                        on-search="filterTeacherOptions"
+                                        data-placeholder="diary.search.teacher"
+                                        search="autocomplete.teacher">
+                    </async-autocomplete>
+                </div>
             </div>
-        </app-title>
-    </div>
-    <!-- Filter Zone (Teacher and Class) -->
-    <div workflow="diary.diarySearch" class="flex-col" ng-class="isCounselorUser() ? 'col__9' : 'col__6' ">
-        <!-- Teacher search bar -->
-        <div class="flex-col col__6 flex-column">
-            <div class="search-input">
-                <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="autocomplete.teacher"
-                                    data-ng-change="selectTeacher"
-                                    data-options="autocomplete.teacherOptions"
-                                    on-search="filterTeacherOptions"
-                                    data-placeholder="diary.search.teacher"
-                                    search="autocomplete.teacher">
-                </async-autocomplete>
+            <div class="flex-col col__1"></div>
+            <div class="flex-col col__6 flex-column">
+                <div class="search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="autocomplete.class"
+                                        data-ng-change="selectClass"
+                                        data-options="autocomplete.classOptions"
+                                        on-search="filterClassOptions"
+                                        data-placeholder="diary.search.group"
+                                        search="autocomplete.class">
+                    </async-autocomplete>
+                </div>
             </div>
         </div>
-        <div class="flex-col col__1"></div>
-        <div class="flex-col col__6 flex-column">
-            <div class="search-input">
-                <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="autocomplete.class"
-                                    data-ng-change="selectClass"
-                                    data-options="autocomplete.classOptions"
-                                    on-search="filterClassOptions"
-                                    data-placeholder="diary.search.group"
-                                    search="autocomplete.class">
-                </async-autocomplete>
-            </div>
+        <div ng-if="!isCounselorUser()" class="flex-col col__1"></div>
+        <!-- Manage session and homework -->
+        <div workflow="diary.manageHomework" class="flex-col col__3 title-buttons">
+            <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
+                    ng-click="goTo('/homework/create/')">
+                <i18n>homework.create</i18n>
+            </button>
+            <button workflow="diary.manageSession" class="padding-md margin-left-md calendar-button title-button"
+                    ng-click="goTo('/session/create/')">
+                <i18n>session.create</i18n>
+            </button>
         </div>
+        <div class="clear"></div>
     </div>
-    <div ng-if="!isCounselorUser()" class="flex-col col__1"></div>
-    <!-- Manage session and homework -->
-    <div workflow="diary.manageHomework" class="flex-col col__2 title-buttons">
-        <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
-                ng-click="goTo('/homework/create/')">
-            <i18n>homework.create</i18n>
-        </button>
-        <button workflow="diary.manageSession" class="padding-md calendar-button title-button"
-                ng-click="goTo('/session/create/')">
-            <i18n>session.create</i18n>
-        </button>
-    </div>
-    <div class="clear"></div>
-</div>
-<div workflow="diary.diarySearch" class="flex-row row__12 list-search">
-    <div class="flex-col col__3 list-search"></div>
-    <div class="flex-col col__9 list-search">
-        <div class="flex-col col__6 list-search">
-            <!-- Teacher selected via filter -->
+
+    <div workflow="diary.diarySearch" class="flex-row row__12 list-search">
+        <div class="flex-col col__3 list-search"></div>
+        <div class="flex-col col__9 list-search">
+            <div class="flex-col col__6 list-search">
+                <!-- Teacher selected via filter -->
+                <div class="cell twelve"
+                     ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
+                    <ul class="cell twelve search-input-ul">
+                        <li>
+                            [[autocomplete.teachersSelected[0].displayName]] <i class="close"
+                                                                                data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex-col col__1 list-search"></div>
+            <!-- Class selected via filter -->
             <div class="cell twelve"
-                 ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
+                 ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
                 <ul class="cell twelve search-input-ul">
                     <li>
-                        [[autocomplete.teachersSelected[0].displayName]] <i class="close"
-                                                                            data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
+                        [[autocomplete.classesSelected[0].displayName]] <i class="close"
+                                                                           data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
                     </li>
                 </ul>
             </div>
         </div>
-        <div class="flex-col col__1 list-search"></div>
-        <!-- Class selected via filter -->
-        <div class="cell twelve"
-             ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
-            <ul class="cell twelve search-input-ul">
-                <li>
-                    [[autocomplete.classesSelected[0].displayName]] <i class="close"
-                                                                       data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
-                </li>
-            </ul>
-        </div>
     </div>
-</div>
 
     <div class="row">
         <div class="cell three twelve-mobile sidebar-content"
