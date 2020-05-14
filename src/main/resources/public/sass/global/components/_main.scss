@@ -162,6 +162,7 @@ h1 {
   button {
     &:hover {
       color: $diary-darkgreen;
+      background: $white;
     }
 
     &:disabled {
