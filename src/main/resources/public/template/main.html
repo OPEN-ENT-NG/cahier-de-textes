@@ -73,7 +73,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="flex-col col__1 list-search"></div>
+            <div class="flex-col list-search" ng-class="isCounselorUser() ? 'col__8' : 'col__1'"></div>
             <!-- Class selected via filter -->
             <div class="cell twelve"
                  ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
