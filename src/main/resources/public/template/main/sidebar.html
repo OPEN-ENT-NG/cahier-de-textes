@@ -1,26 +1,27 @@
 <article class="sidebar remove-padding" workflow="diary.listView">
 
-    <!-- Titre/En-tête Mode d'affichage -->
-    <div class="row title-sidebar padding-left-md padding-right-md">
-        <h5 class="large cell twelve" workflow="diary.listView">
-            <i18n>sidebar.display_mode</i18n>
-            <!-- Legend -->
-            <i class="large help one cell right-magnet" ng-if="!display.listView"
-               tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
-        </h5>
-    </div>
-    <!-- Bloc Mode d'affichage -->
-    <section id="display-section" class="cell twelve padding-left-md padding-bottom-sm padding-top-sm">
-        <div workflow="diary.accessChildData">
-            <select ng-model="params.child"
-                    class="twelve"
-                    ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                    ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                <option value="" disabled>[[translate('student.choose')]]</option>
-            </select>
+    <!-- Display mode -->
+    <div>
+        <div class="row title-sidebar padding-left-md padding-right-md">
+            <h5 class="large cell twelve" workflow="diary.listView">
+                <i18n>sidebar.display_mode</i18n>
+                <!-- Legend -->
+                <i class="large help one cell right-magnet" ng-if="!display.listView"
+                   tooltip="[[translate('help')]]" ng-click="setLegendLightboxVisible(true)"></i>
+            </h5>
         </div>
+        <!-- Bloc Mode d'affichage -->
+        <section id="display-section" class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+            <div workflow="diary.accessChildData">
+                <select ng-model="params.child"
+                        class="twelve"
+                        ng-change="params.group = null;params.user = null;syncPedagogicItems()"
+                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                    <option value="" disabled>[[translate('student.choose')]]</option>
+                </select>
+            </div>
 
-        <label workflow="diary.listView" class="cell twelve margin-bottom-md">
+            <label workflow="diary.listView" class="cell twelve margin-bottom-md">
                 <span class="six diary-choice-view">
                     <div ng-include="'/diary/public/img/calendaire.svg'"
                          class="margin-sm cursorPointer"
@@ -28,7 +29,7 @@
                          ng-click="changeViewCalendar()"></div>
                     <i18n>calendar</i18n>
                 </span>
-            <span class="six diary-choice-view">
+                <span class="six diary-choice-view">
                     <div ng-include="'/diary/public/img/liste.svg'"
                          class="margin-sm cursorPointer"
                          ng-class="display.listView ? 'selected' : 'opacity-icon'"
@@ -36,33 +37,35 @@
                          ng-model="display.listView"></div>
                     <i18n>list</i18n>
                 </span>
-        </label>
-    </section>
-
-    <!-- Titre/En-tête Progression -->
-    <div ng-if="typeUser ==='ENSEIGNANT'" class="row title-sidebar padding-left-md padding-right-md">
-        <h5 class="large cell twelve">
-            <i18n>progressions</i18n>
-            <div ng-include="'/diary/public/img/' + (showProgression ? 'plus.svg' : 'moins.svg')"
-                 class="large one cell right-magnet close-bloc cursorPointer"
-                 ng-click="changeShowProgression()"></div>
-        </h5>
+            </label>
+        </section>
     </div>
-    <!-- Bloc Progression -->
-    <section class="progression-container cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView"
-             ng-controller="manageProgessionCtrl">
-        <div class="row">
-            <input ng-change="filterProgression(search)"
-                   class="progression-search cell twelve"
-                   type="text"
-                   ng-model="search"
-                   placeholder="Rechercher">
-            <div class="row margin-bottom-lg progression-tree"
-                 static-include="/diary/public/template/progression/progression-tree.html">
-            </div>
+
+
+    <!-- Progression -->
+    <div>
+        <div ng-if="typeUser ==='ENSEIGNANT'" class="row title-sidebar padding-left-md padding-right-md">
+            <h5 class="large cell twelve">
+                <i18n>progressions</i18n>
+            </h5>
         </div>
-    </section>
+        <!-- Bloc Progression -->
+        <section class="progression-container cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView"
+                 ng-controller="manageProgessionCtrl">
+            <div class="row">
+                <input ng-change="filterProgression(search)"
+                       class="progression-search cell twelve"
+                       type="text"
+                       ng-model="search"
+                       placeholder="Rechercher">
+                <div class="row margin-bottom-lg progression-tree"
+                     static-include="/diary/public/template/progression/progression-tree.html">
+                </div>
+            </div>
+        </section>
+    </div>
 </article>
+
 <lightbox show="legendLightboxIsVisible" on-close="setLegendLightboxVisible(false);">
     <container template="infoBulleTemplate"></container>
 </lightbox>
