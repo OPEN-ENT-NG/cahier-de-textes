@@ -1,4 +1,5 @@
 <div ng-class="{'remove-margin-left': isAChildOrAParent}">
+    <!-- header -->
     <div class="flex-row" ng-class="isCounselorUser() ? 'row__12' : 'row__14'">
         <div class="flex-col" ng-class="isCounselorUser() ? 'col__3' : 'col__4'">
             <app-title class="zero-mobile">
@@ -41,7 +42,8 @@
             </div>
         </div>
         <div ng-if="!isCounselorUser()" class="flex-col col__1"></div>
-        <!-- Manage session and homework -->
+
+        <!-- Manage session and homework (buttons) -->
         <div workflow="diary.manageHomework" class="flex-col col__3 title-buttons">
             <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
                     ng-click="goTo('/homework/create/')">
@@ -55,6 +57,7 @@
         <div class="clear"></div>
     </div>
 
+    <!-- list of search -->
     <div workflow="diary.diarySearch" class="flex-row row__12 list-search">
         <div class="flex-col col__3 list-search"></div>
         <div class="flex-col col__9 list-search">
@@ -84,7 +87,8 @@
         </div>
     </div>
 
-    <div class="row">
+    <!-- area calendar -->
+    <div class="row" id="calendar-area">
         <div class="cell three twelve-mobile sidebar-content"
              static-include="/diary/public/template/main/sidebar.html">
         </div>
