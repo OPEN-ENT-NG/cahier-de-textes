@@ -389,26 +389,25 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.showSession = true;
         };
 
-        $scope.getTimeSlotIdsByDate = () => {
-            return $scope.timeSlotsByDate.map((x) => (x instanceof Homework ? 'h' : 's') + x.id)
+        $scope.sessionsHomeworksByClass = () => {
+            return $scope.timeSlotsByDate.filter(time => time.audience.name === $scope.openedTimeSlot.audience.name)
         };
 
         $scope.getTimeSlotIndex = () => {
-            if ($scope.openedTimeSlot) return $scope.getTimeSlotIdsByDate()
+            if ($scope.openedTimeSlot) return $scope.sessionsHomeworksByClass()
                 .indexOf(($scope.openedTimeSlot instanceof Homework ? 'h' : 's') + $scope.openedTimeSlot.id);
         };
 
-
         $scope.canNavigate = (goingRight: Boolean) => {
             return $scope.openedTimeSlot
-                && $scope.getTimeSlotIdsByDate()[$scope.getTimeSlotIndex() + (goingRight ? 1 : -1)];
+                && $scope.sessionsHomeworksByClass()[$scope.sessionsHomeworksByClass().indexOf($scope.openedTimeSlot)
+                + (goingRight ? 1 : -1)];
         };
-
 
         $scope.timeSlotNavigate = (goingRight: Boolean) => {
             if ($scope.canNavigate(goingRight)) {
-                const index = $scope.getTimeSlotIndex() + (goingRight ? 1 : -1);
-                $scope.openedTimeSlot = $scope.timeSlotsByDate[index];
+                const index = $scope.sessionsHomeworksByClass().indexOf($scope.openedTimeSlot) + (goingRight ? 1 : -1);
+                $scope.openedTimeSlot = $scope.sessionsHomeworksByClass()[index];
             }
         };
 
