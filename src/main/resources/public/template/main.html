@@ -1,5 +1,4 @@
-<div class="flex-row row__12 title-size"
-     ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
+<div class="flex-row row__12">
     <div class="flex-col col__3">
         <app-title class="zero-mobile">
             <div ng-class="isCounselorUser() ?  'title-area-simple' : 'title-area-complete'">
@@ -11,7 +10,7 @@
         </app-title>
     </div>
     <!-- Filter Zone (Teacher and Class) -->
-    <div workflow="diary.diarySearch" class="flex-col col__9">
+    <div workflow="diary.diarySearch" class="flex-col" ng-class="isCounselorUser() ? 'col__9' : 'col__6' ">
         <!-- Teacher search bar -->
         <div class="flex-col col__6 flex-column">
             <div class="search-input">
@@ -39,8 +38,9 @@
             </div>
         </div>
     </div>
+    <div ng-if="!isCounselorUser()" class="flex-col col__1"></div>
     <!-- Manage session and homework -->
-    <div workflow="diary.manageHomework" class="flex-col col__9 title-buttons">
+    <div workflow="diary.manageHomework" class="flex-col col__2 title-buttons">
         <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
                 ng-click="goTo('/homework/create/')">
             <i18n>homework.create</i18n>

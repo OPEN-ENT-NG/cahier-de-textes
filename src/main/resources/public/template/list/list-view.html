@@ -1,12 +1,16 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView"
      ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
-    <div class="title-area">
-        <img ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
-        <h1 ng-if="!isAChildOrAParent">
-            <a href="#" ng-click="changeViewCalendar()">
-                <i18n>diary.title</i18n>
-            </a>
-        </h1>
+    <div class="flex-row row__12">
+        <div class="flex-col col__3">
+            <app-title class="zero-mobile">
+                <div ng-class="isCounselorUser() ? 'title-area-simple' : 'title-area-complete'">
+                    <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+                    <h1 class="application-title">
+                        <i18n>diary.title</i18n>
+                    </h1>
+                </div>
+            </app-title>
+        </div>
     </div>
     <div class="cell three twelve-mobile sidebar-content"
          static-include="/diary/public/template/main/sidebar.html"></div>
