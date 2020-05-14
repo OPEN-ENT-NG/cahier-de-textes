@@ -1,0 +1,12 @@
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &-result-search {
+    position: absolute;
+    top: 42px;
+    z-index: 1;
+  }
+}
+
