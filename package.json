@@ -4,7 +4,7 @@
   "description": "Diary tool for ENT Core.",
   "main": "gulpfile.js",
   "dependencies": {
-    "entcore": "^3.9.0-dev.44-calendar",
+    "entcore": "3.9.0-dev.44-calendar",
     "awesome-typescript-loader": "3.2.1",
     "axios": "0.16.2",
     "core-js": "2.4.1",
