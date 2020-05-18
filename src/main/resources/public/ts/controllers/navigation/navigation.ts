@@ -61,16 +61,22 @@ export let navigationController = ng.controller("navigationController",
 
         $scope.hoverIn = function(menuItem) {
             $scope.menu.hovered = menuItem;
-            document.getElementById('calendar-area').style.zIndex = "0";
+            let elementCalendar = document.getElementById('calendar-area');
+            if (elementCalendar) {
+                elementCalendar.style.zIndex = "0";
+            }
             window.clearTimeout($scope.menu.timeout);
         };
 
         $scope.hoverOut = function() {
             $scope.menu.timeout = setTimeout(() => {
                 $scope.menu.hovered = '';
-                document.getElementById('calendar-area').style.zIndex = "";
+                let elementCalendar = document.getElementById('calendar-area');
+                if (elementCalendar) {
+                    elementCalendar.style.zIndex = "";
+                }
                 $scope.safeApply();
-            }, 250);
+            });
         };
 
         $scope.getCurrentState = function() {

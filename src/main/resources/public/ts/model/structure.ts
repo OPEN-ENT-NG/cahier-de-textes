@@ -3,6 +3,7 @@ import {Audiences, Courses, Homeworks, Sessions, Students, Subjects, Teachers} f
 import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
+import {AutocompleteUtils} from "../utils/autocompleteUtils";
 
 declare let window: any;
 
@@ -46,19 +47,20 @@ export class Structure {
     /**
      * Synchronize structure information. Audiences and Subjects need to be synchronized to start courses
      * synchronization.
-     * @returns {Promise<T>|Promise}
+     * @returns {Promise<any>|Promise}
      */
     async sync() {
-        await this.subjects.sync(this.id);
-        await this.types.sync();
-        await this.audiences.sync(this.id);
+        const promises: Promise<void>[] = [];
+        promises.push(this.subjects.sync(this.id));
+        promises.push(this.types.sync());
+        promises.push(this.audiences.sync(this.id));
         window.audiences = this.audiences;
         if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
-            await this.students.sync();
+            promises.push(this.students.sync());
         }
-        await this.teachers.sync(this);
-        await this.personnels.sync(this);
-
+        promises.push(this.teachers.sync(this));
+        promises.push(this.personnels.sync(this));
+        await Promise.all(promises);
     }
 }
 
@@ -85,5 +87,16 @@ export class Structures {
      */
     first(): Structure {
         return this.all[0];
+    }
+
+
+    /**
+     * Returns current structure we are using with window.structure
+     * @returns {Structure} structure
+     */
+    getCurrentStructure(): Structure {
+        if (window.structure) {
+            return this.all.find((structure: Structure) => structure.id === window.structure.id);
+        }
     }
 }

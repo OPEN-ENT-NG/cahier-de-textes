@@ -4,7 +4,6 @@ import {
     Homework,
     PEDAGOGIC_TYPES,
     Session,
-    Structure,
     Structures,
     Toast,
     Workload
@@ -12,14 +11,14 @@ import {
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocompleteUtils';
 import {ProgressionFolders} from "../model/Progression";
-import {SearchService, StructureService} from "../services";
+import {SearchService, StructureService, StructureSlot} from "../services";
 
 declare let window: any;
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', 'StructureService', 'SearchService', '$timeout', '$compile',
+    ['$scope', 'route', '$location', 'StructureService', 'SearchService', '$timeout',
         async function ($scope, route, $location, StructureService: StructureService,
-                        SearchService: SearchService, $timeout, $compile) {
+                        SearchService: SearchService, $timeout) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
         $scope.notifications = [];
@@ -33,6 +32,7 @@ export let main = ng.controller('MainController',
             sessionList: false,
             homeworksFilter: true,
         };
+        $scope.timeSlot = {slots : []};
         $scope.isAChildOrAParent = DateUtils.isAChildOrAParent(model.me.type);
         $scope.isChild = DateUtils.isChild(model.me.type);
         $scope.isRelative = DateUtils.isRelative(model.me.type);
@@ -55,23 +55,10 @@ export let main = ng.controller('MainController',
                 template.open('infoBulleTemplate', 'main/toolTip-legendeTemplate');
             }
         };
+
         $scope.transformDateToFrenchDate = (date: Date) => {
             return moment(date).format("dddd D MMMM YYYY");
         };
-        $scope.syncStructure = async (structure: Structure) => {
-            await structure.audiences.sync(structure.id);
-            /* Load time slot for calendar, with StructureService(Presence) */
-            if (structure && structure.id) {
-                await structure.sync();
-                $scope.timeSlot = {
-                    list: null
-                };
-                const structure_slots = await StructureService.getSlotProfile(structure.id);
-                if (Object.keys(structure_slots).length > 0) $scope.timeSlot.list = structure_slots.slots;
-            }
-            $scope.structure = structure;
-        };
-
 
         function init() {
             $scope.search = "";
@@ -98,11 +85,12 @@ export let main = ng.controller('MainController',
                 $scope.display.done = false;
             }
 
-            if ($scope.structure.students.all.length < 2) {
+            if ($scope.structure && $scope.structure.students.all.length < 2) {
                 $scope.params.child = $scope.structure.students.all[0];
             }
             AutocompleteUtils.init($scope.structure);
         }
+
         async function placingLoader(exit: number = 0) {
             if (exit < 20) {
                 await $timeout(function () {
@@ -139,11 +127,7 @@ export let main = ng.controller('MainController',
             $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
             $scope.goTo('/list');
             $scope.display.listView = true;
-            if (!DateUtils.isAChildOrAParent(model.me.type)) {
-                $scope.display.sessionList = true;
-            } else {
-                $scope.display.sessionList = false;
-            }
+            $scope.display.sessionList = !DateUtils.isAChildOrAParent(model.me.type);
             if ($scope.display.listView) {
                 $scope.display.sessions = true;
                 $scope.display.homeworks = true;
@@ -157,29 +141,39 @@ export let main = ng.controller('MainController',
         async function initializeStructure() {
             $scope.structures = new Structures();
             await $scope.structures.sync();
-            $scope.structure = $scope.structures.first();
-            await $scope.syncStructure($scope.structure);
-            $scope.structureInitialized = true;
+            $scope.structure = $scope.structures.getCurrentStructure();
+            if ($scope.structure) {
+                $scope.structure.sync();
+                $scope.structureInitialized = true;
+            }
+            $scope.safeApply();
         }
 
-        async function initializeData(structure?: Structure) {
+        const initTimeSlots = async () => {
+            const structure_slots: StructureSlot = await StructureService.getSlotProfile(window.structure.id);
+            if (Object.keys(structure_slots).length > 0) {
+                $scope.timeSlot.slots = structure_slots.slots;
+            }
+            else $scope.timeSlot.slots = null;
+        };
+
+        async function initializeData() {
             $scope.isRefreshingCalendar = true;
-            structure ? await $scope.syncStructure(structure) : await initializeStructure();
+            await initializeStructure();
             if (!$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);
             $scope.pageInitialized = true;
             model.calendar.setDate(moment());
-            await $scope.safeApply();
-
+            $scope.safeApply();
         }
 
         $scope.filterTeacherOptions = async (value) => {
             await AutocompleteUtils.filterTeacherOptions(value);
-            await $scope.safeApply();
+            $scope.safeApply();
         };
 
         $scope.filterClassOptions = async (value) => {
             await AutocompleteUtils.filterClassOptions(value);
-            await $scope.safeApply();
+            $scope.safeApply();
         };
 
         $scope.selectTeacher = async (model, item) =>  {
@@ -260,10 +254,9 @@ export let main = ng.controller('MainController',
 
             // On lie les homeworks à leur session
             $scope.loadPedagogicItems();
-            $scope.isRefreshingCalendar = false;
             delete ($scope.session);
-
             $scope.safeApply();
+            $scope.isRefreshingCalendar = false;
         };
 
         async function initProgressions() {
@@ -310,7 +303,7 @@ export let main = ng.controller('MainController',
         $scope.loadCalendarItems = () => {
             $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
             $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
-
+            $scope.slots = $scope.timeSlot.slots;
             $scope.isRefreshingCalendar = false;
         };
 
@@ -455,9 +448,7 @@ export let main = ng.controller('MainController',
                         c.displayed = true;
                     }
                 })
-
             }
-
         };
 
         $scope.setProgress = (homework: Homework) => {
@@ -469,34 +460,6 @@ export let main = ng.controller('MainController',
             pedagogicDay.selected = true;
             $scope.selectedPedagogicDay = pedagogicDay;
         };
-
-        model.calendar.on('date-change', function () {
-            $scope.calendar = model.calendar;
-
-            if (!$scope.pageInitialized) return;
-
-            let calendarMode = $scope.calendar.increment;
-            let momentFirstDay = moment($scope.calendar.firstDay);
-            switch (calendarMode) {
-                case 'month':
-                    $scope.filters.startDate = momentFirstDay.clone().startOf('month');
-                    $scope.filters.endDate = momentFirstDay.clone().endOf('month');
-                    break;
-                case 'week':
-                    $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
-                    if ($scope.display.listview)
-                        $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
-                    else
-                        $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
-                    break;
-                case 'day':
-                    $scope.filters.startDate = momentFirstDay.clone().startOf('day');
-                    $scope.filters.endDate = momentFirstDay.clone().endOf('day');
-                    break;
-            }
-            $scope.syncPedagogicItems();
-        });
-
 
         /**
          * Toast the response
@@ -520,21 +483,15 @@ export let main = ng.controller('MainController',
             dateFromCalendar: null
         };
 
-        $scope.safeApply = (): Promise<any> => {
-            return new Promise((resolve, reject) => {
-                let phase = $scope.$root.$$phase;
-                if (phase === '$apply' || phase === '$digest') {
-                    if (resolve && (typeof (resolve) === 'function')) {
-                        resolve();
-                    }
-                } else {
-                    if (resolve && (typeof (resolve) === 'function')) {
-                        $scope.$apply(resolve);
-                    } else {
-                        $scope.$apply()();
-                    }
+        $scope.safeApply = (fn?) => {
+            const phase = $scope.$root.$$phase;
+            if (phase == '$apply' || phase == '$digest') {
+                if (fn && (typeof (fn) === 'function')) {
+                    fn();
                 }
-            });
+            } else {
+                $scope.$apply(fn);
+            }
         };
 
         $scope.goTo = (state: string) => {
@@ -545,10 +502,6 @@ export let main = ng.controller('MainController',
         $scope.hasAtLeastOneCreateRight = () => {
             return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
         };
-
-// $scope.hasBothViewMode = () => {
-//     return model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView) && model.me.hasWorkflow(WORKFLOW_RIGHTS.listView);
-// };
 
         $scope.openSession = (sessionId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
@@ -704,9 +657,9 @@ export let main = ng.controller('MainController',
 
         };
 
-        /*
-               Handle a progression dropped on a session
-                */
+        /**
+         * Handle a progression dropped on a session
+         */
         $scope.updateSession = async (idSession, idProgression) => {
             let progressionDragged, sessionDroped;
             $scope.progressions.all.map(progression => {
@@ -715,7 +668,6 @@ export let main = ng.controller('MainController',
                 }
                 //TODO Edit
             });
-            // progressionDragged.toSession(idSession);
 
             $scope.calendarItems.map(async session => {
                 if (session.id == idSession) {
@@ -745,8 +697,8 @@ export let main = ng.controller('MainController',
 
         };
 
-        /*
-        Handle a progression dropped on a course
+        /**
+         * Handle a progression dropped on a course
          */
         $scope.createSessionFromProgression = async (idProgression, idCourse, date) => {
             let progressionDragged;
@@ -830,22 +782,42 @@ export let main = ng.controller('MainController',
             }
         });
 
-        async function switchStructure() {
-            if ($scope.structures) {
-                if ($scope.structures.all.length === 0) await initializeData();
-                else {
-                    const {id} = window.structure;
-                    for (let i = 0; i < $scope.structures.all.length; i++) {
-                        if (id === $scope.structures.all[i].id) {
-                            await initializeData($scope.structures.all[i]);
-                            break;
-                        }
-                    }
-                }
-                AutocompleteUtils.init($scope.structure);
-                $scope.safeApply();
-            }
-        }
+        const load = async () => {
+            await initializeData();
+            AutocompleteUtils.init($scope.structure);
+        };
 
-        $scope.$watch(() => window.structure, await switchStructure);
+        model.calendar.on('date-change',  () => {
+            $scope.calendar = model.calendar;
+
+            if (!$scope.pageInitialized) return;
+
+            let calendarMode = $scope.calendar.increment;
+            let momentFirstDay = moment($scope.calendar.firstDay);
+            switch (calendarMode) {
+                case 'month':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('month');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('month');
+                    break;
+                case 'week':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('isoWeek');
+                    if ($scope.display.listview)
+                        $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
+                    else
+                        $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
+                    break;
+                case 'day':
+                    $scope.filters.startDate = momentFirstDay.clone().startOf('day');
+                    $scope.filters.endDate = momentFirstDay.clone().endOf('day');
+                    break;
+            }
+            $scope.syncPedagogicItems();
+        });
+
+        $scope.$watch(() => window.structure,  () => {
+            if (window.structure) {
+                load();
+                initTimeSlots();
+            }
+        });
     }]);

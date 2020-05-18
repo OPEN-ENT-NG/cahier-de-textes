@@ -6,7 +6,7 @@
         <div class="loader"></div>
     </div>
 
-    <div class="row" ng-class="{'hide-session':!display.sessions}">
+    <div class="row" ng-class="{'hide-session':!display.sessions}" ng-show="!isRefreshingCalendar">
         <!-- Calendar homework -->
         <div class="homeworks-row" ng-show="calendar.increment != 'month'">
             <div class="timeslot ng-binding ng-scope">
@@ -20,15 +20,14 @@
 
         <!-- Calendar view -->
         <div id="calendar-view" class="twelve calendar-container">
-            <calendar
-                    enable-display-modes="true"
-                    display-template="main/calendar-week-item"
-                    display-month-template="main/calendar-month-item"
-                    items="calendarItems"
-                    slots="timeSlot.list"
-                    item-tooltip-template="main/course-tooltip"
-                    show-next-previous-button="true">
-            </calendar>
+            <calendar enable-display-modes="true"
+                      readonly="false"
+                      display-template="main/calendar-week-item"
+                      display-month-template="main/calendar-month-item"
+                      items="calendarItems"
+                      slots="timeSlot.slots"
+                      item-tooltip-template="main/course-tooltip"
+                      show-next-previous-button="true"/>
         </div>
     </div>
 </div>

@@ -11,13 +11,18 @@
 </head>
 
 <body ng-controller="MainController" class="cdt">
-    <toasts notifications="notifications"></toasts>
+	<portal>
+		<!-- toaster -->
+		<toasts notifications="notifications"></toasts>
+
+		<!-- navigation menu -->
 		<div ng-controller="navigationController"
 			 ng-if="!isAChildOrAParent"
 			 class="side-navbar"
 			 static-include="/diary/public/template/navigation/side-navbar.html">
 		</div>
-	<portal>
+
+		<!-- main templates -->
 		<container template="main"></container>
 	</portal>
 </body>
