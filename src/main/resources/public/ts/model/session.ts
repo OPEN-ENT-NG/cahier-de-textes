@@ -295,15 +295,17 @@ export class Session {
     }
 
     duplicateHomeworks(sessionDrag) {
-        sessionDrag.homeworks.map(h => {
-            delete h.id;
-            delete h.session;
-            h.dueDate = this.date;
-            h.audience = this.audience;
-            h.subject = this.subject;
-            h.teacher = this.teacher;
-            this.homeworks.push(h);
-        })
+        if(sessionDrag.homeworks) {
+            sessionDrag.homeworks.map(h => {
+                delete h.id;
+                delete h.session;
+                h.dueDate = this.date;
+                h.audience = this.audience;
+                h.subject = this.subject;
+                h.teacher = this.teacher;
+                this.homeworks.push(h);
+            })
+        }
     }
 
     isSameSession(session: Session) {

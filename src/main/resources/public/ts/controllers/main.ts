@@ -1,4 +1,4 @@
-import {_, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
+import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {
     Course, Courses,
     Homework,
@@ -575,13 +575,21 @@ export let main = ng.controller('MainController',
             let progression = $('#' + dragEl);
             const typeCourse = "TYPE_COURSE";
             const typeSession = "TYPE_SESSION";
-            let id_progressionOrSession = progression.data().sessionId;
-            let sessionOrCourse = $('#' + dropEl);
+
+            // set progression or session id
+            let progressionOrSession = angular.element(progression[0]).scope();
+            let id_progressionOrSession = progressionOrSession.item ? progressionOrSession.item.id : progressionOrSession.session.id;
+
+            let $sessionOrCourse = $('#' + dropEl);
             let typeCourseSession = "";
-            let idCourseSession = sessionOrCourse[0].children[0].textContent;
-            if ($(sessionOrCourse).hasClass(typeSession)) {
+
+            // set course or session id
+            let courseOrSession = angular.element($sessionOrCourse[0]).scope();
+            let idCourseSession = courseOrSession.item._id ? courseOrSession.item._id : courseOrSession.item.id;
+
+            if ($($sessionOrCourse).hasClass(typeSession)) {
                 typeCourseSession = typeSession;
-            } else if ($(sessionOrCourse).hasClass(typeCourse)) {
+            } else if ($($sessionOrCourse).hasClass(typeCourse)) {
                 typeCourseSession = typeCourse;
             }
 
@@ -589,15 +597,17 @@ export let main = ng.controller('MainController',
                 if (typeCourseSession == typeSession) {
                     $scope.updateSession(idCourseSession, id_progressionOrSession);
                 } else if (typeCourseSession == typeCourse) {
-                    let date = sessionOrCourse[0].children[1].textContent;
+                    let course = angular.element($sessionOrCourse[0]).scope();
+                    let date = course.item.data.startDisplayDate;
                     $scope.createSessionFromProgression(id_progressionOrSession, idCourseSession, date);
                 }
             } else if ($(progression[0]).hasClass(typeSession)) {
                 if (typeCourseSession == typeSession) {
                     $scope.sessionToSession(id_progressionOrSession, idCourseSession)
                 } else if (typeCourseSession == typeCourse) {
-                    let date = sessionOrCourse[0].children[1].textContent;
-                    $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date)
+                    let course = angular.element($sessionOrCourse[0]).scope();
+                    let date = course.item.data.startDisplayDate;
+                    $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
                 }
 
             }
@@ -662,12 +672,15 @@ export let main = ng.controller('MainController',
          */
         $scope.updateSession = async (idSession, idProgression) => {
             let progressionDragged, sessionDroped;
-            $scope.progressions.all.map(progression => {
-                if (progression.id == idProgression) {
-                    progressionDragged = progression;
-                }
-                //TODO Edit
+            $scope.progressionFolders.all.forEach(p => {
+                p.progressionSessions.forEach(ps => {
+                    if (ps.id == idProgression) {
+                        progressionDragged = ps;
+                    }
+                })
             });
+
+            // progressionDragged.toSession(idSession);
 
             $scope.calendarItems.map(async session => {
                 if (session.id == idSession) {
