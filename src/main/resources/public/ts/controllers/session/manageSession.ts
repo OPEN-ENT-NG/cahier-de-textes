@@ -3,11 +3,12 @@ import {Course, Homework, Session, SessionTypes, Subject, Subjects, Toast} from 
 import {SubjectService} from "../../services";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
-    ['$scope', '$routeParams', '$location', '$attrs', '$filter', 'SubjectService', async function ($scope, $routeParams, $location, $attrs, $filter, SubjectService: SubjectService) {
+    ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter', 'SubjectService',
+        async function ($scope, $rootScope, $routeParams, $location, $attrs, $filter, SubjectService: SubjectService) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.isReadOnly = modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
-        $scope.session = $scope.session ? $scope.session : new Session($scope.structure);
+        $scope.session = $rootScope.session ? $rootScope.session : new Session($scope.structure);
         //$scope.session.opened = false;
         $scope.subjects = new Subjects();
         $scope.sessionTypes = new SessionTypes($scope.structure.id);
@@ -110,7 +111,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
                 await saveSessionHomeworks();
             }
-            await $scope.syncPedagogicItems();
             $scope.safeApply();
             window.history.back();
         };

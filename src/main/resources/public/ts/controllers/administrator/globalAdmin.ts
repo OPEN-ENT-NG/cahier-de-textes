@@ -5,6 +5,7 @@ import * as html2canvas from 'html2canvas';
 import {Sessions, Teacher, DateUtils, Visa, Visas, Homework} from "../../model";
 import * as ts from "typescript/lib/tsserverlibrary";
 import Session = ts.server.Session;
+import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
 
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
@@ -150,9 +151,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
             AutocompleteUtils.init($scope.structure);
             $scope.sessions.structure = $scope.structure;
-            if ($scope.userType == "ENSEIGNANT") {
-                AutocompleteUtils.setTeachersSelected([_.find($scope.structure.teachers.all, {id: model.me.userId})]);
-            }
             await $scope.filterList();
         };
 
@@ -433,8 +431,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             }
         };
 
+        $scope.init();
 
-        $scope.$watch(() => $scope.structure, async () => {
+        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
             $scope.init();
         });
     }]);

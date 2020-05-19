@@ -1,32 +1,55 @@
-div .loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid $diary-blue-light;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 2s linear infinite;
-  display: inline-block;
-}
+$loader-animation-duration: 1.8s;
 
-button {
-  &.loading {
-    .loader {
-      margin-left: 10px;
-      border: 3px solid $white;
-      border-top: 3px solid transparent;
-      border-radius: 50%;
-      width: 10px;
+.loader-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .loader {
+    margin: 50px;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 10px;
+    background: $diary-darkgreen;
+    border-radius: 5px;
+    animation: load $loader-animation-duration ease-in-out infinite;
+
+    &:before, &:after {
+      position: absolute;
+      display: block;
+      content: "";
+      animation: load $loader-animation-duration ease-in-out infinite;
       height: 10px;
-      animation: spin 2s linear infinite;
+      border-radius: 5px;
+    }
 
-      position: relative;
-      top: 1px;
-      float: right;
+    &:before {
+      top: -20px;
+      left: 10px;
+      width: 40px;
+      background: $diary-red;
+    }
+
+    &:after {
+      bottom: -20px;
+      width: 35px;
+      background: $diary-purple;
     }
   }
-  &:not(.loading){
-    .loader {
-      display: none;
-    }
+}
+
+@keyframes load {
+  0% {
+    transform: translateX(40px);
+  }
+
+  50% {
+    transform: translateX(-30px);
+  }
+  100% {
+    transform: translateX(40px);
   }
 }

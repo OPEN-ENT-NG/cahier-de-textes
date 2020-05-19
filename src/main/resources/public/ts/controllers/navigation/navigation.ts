@@ -1,4 +1,5 @@
 import {model, ng} from 'entcore';
+import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
 
 declare let window: any;
 
@@ -8,7 +9,7 @@ interface Structure {
 }
 
 export let navigationController = ng.controller("navigationController",
-    ['$scope', async function ($scope) {
+    ['$rootScope', '$scope', '$timeout', async function ($rootScope, $scope, $timeout) {
         $scope.public = false;
         $scope.userType = model.me.type;
 
@@ -85,5 +86,11 @@ export let navigationController = ng.controller("navigationController",
         };
 
         await init();
+
+        $scope.$watch(() => window.structure,async () => {
+            await $scope.initializeStructure();
+            $rootScope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE);
+            $scope.safeApply();
+        });
     }]
 );

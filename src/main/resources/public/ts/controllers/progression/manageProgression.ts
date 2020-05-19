@@ -8,6 +8,8 @@ import {
 } from "../../model/Progression";
 import {HomeworkTypes, SessionTypes, Subjects} from "../../model";
 
+declare let window: any;
+
 export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
     ['$scope', '$routeParams', '$location', '$timeout', async function ($scope, $routeParams, $location, $timeout) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
@@ -63,10 +65,10 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         async function initData() {
-            $scope.sessionTypes = new SessionTypes($scope.structure.id);
+            $scope.sessionTypes = new SessionTypes(window.structure.id);
             $scope.subjects = new Subjects();
             await $scope.sessionTypes.sync();
-            await $scope.subjects.sync($scope.structure.id, model.me.userId);
+            await $scope.subjects.sync(window.structure.id, model.me.userId);
             await $scope.initProgressions();
             await $scope.initForms();
 
@@ -96,7 +98,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.progressionSessionForm.owner = {id: model.me.userId};
 
             $scope.isReadOnly = modeIsReadOnly();
-            $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
+            $scope.homeworkTypes = new HomeworkTypes(window.structure.id);
 
             $scope.setSubjectSession();
             $scope.setTypeSession();
