@@ -336,7 +336,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         $scope.toastHttpCall(homeworkSaveResponse);
                     }
                 }
-                await $scope.syncPedagogicItems();
                 $scope.safeApply();
                 if(!$scope.isInsideSessionForm) window.history.back();
 
