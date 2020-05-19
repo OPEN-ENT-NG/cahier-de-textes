@@ -22,19 +22,23 @@
             </div>
 
             <label workflow="diary.listView" class="cell twelve margin-bottom-md">
-                <span class="six diary-choice-view">
+
+                <!-- switch calendar mode -->
+                <span class="six diary-choice-view" data-ng-click="changeViewCalendar()">
                     <div ng-include="'/diary/public/img/calendaire.svg'"
                          class="margin-sm cursorPointer"
-                         ng-class="display.listView ? 'opacity-icon' : 'selected'"
-                         ng-click="changeViewCalendar()"></div>
+                         ng-class="display.listView ? 'opacity-icon' : 'selected'">
+                    </div>
                     <i18n>calendar</i18n>
                 </span>
-                <span class="six diary-choice-view">
+
+                <!-- switch list mode -->
+                <span class="six diary-choice-view" data-ng-click="changeViewList()">
                     <div ng-include="'/diary/public/img/liste.svg'"
                          class="margin-sm cursorPointer"
                          ng-class="display.listView ? 'selected' : 'opacity-icon'"
-                         ng-click="changeViewList()"
-                         ng-model="display.listView"></div>
+                         data-ng-model="display.listView">
+                    </div>
                     <i18n>list</i18n>
                 </span>
             </label>
