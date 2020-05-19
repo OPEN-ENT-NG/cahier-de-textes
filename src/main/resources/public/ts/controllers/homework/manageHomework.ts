@@ -338,7 +338,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
                 $scope.safeApply();
                 if(!$scope.isInsideSessionForm) window.history.back();
-
             }
         };
 

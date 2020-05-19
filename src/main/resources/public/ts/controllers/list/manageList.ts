@@ -16,6 +16,11 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.homeworks.syncHomeworks();
         }
 
+        $scope.filters = {
+            startDate: moment().startOf('isoWeek').toDate(),
+            endDate: moment().endOf('isoWeek').toDate()
+        };
+
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
