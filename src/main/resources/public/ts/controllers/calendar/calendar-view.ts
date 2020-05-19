@@ -654,11 +654,13 @@ export let calendarController = ng.controller('CalendarController',
             $scope.$on('$destroy', () => model.calendar.callbacks['date-change'] = []);
 
             $scope.$on('$includeContentLoaded', async () => {
-                if ($scope.timeSlot.slots === null) {
-                    $scope.isRefreshingCalendar = true;
-                    await initTimeSlots();
-                    $scope.isRefreshingCalendar = false;
-                    $scope.safeApply();
+                if (window.structure) {
+                    if ($scope.timeSlot.slots === null) {
+                        $scope.isRefreshingCalendar = true;
+                        await initTimeSlots();
+                        $scope.isRefreshingCalendar = false;
+                        $scope.safeApply();
+                    }
                 }
             });
 
