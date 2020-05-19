@@ -639,7 +639,7 @@ export let calendarController = ng.controller('CalendarController',
                         if ($scope.display.listview)
                             $scope.filters.endDate = momentFirstDay.clone().endOf('isoWeek');
                         else
-                            $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
+                            $scope.filters.endDate = moment($scope.filters.startDate).add('1', 'weeks');
                         break;
                     case 'day':
                         $scope.filters.startDate = momentFirstDay.clone().startOf('day');
