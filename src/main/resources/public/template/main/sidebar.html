@@ -47,14 +47,14 @@
 
 
     <!-- Progression -->
-    <div>
+    <div ng-show="!display.listView">
         <div ng-if="typeUser ==='ENSEIGNANT'" class="row title-sidebar padding-left-md padding-right-md">
             <h5 class="large cell twelve">
                 <i18n>progressions</i18n>
             </h5>
         </div>
         <!-- Bloc Progression -->
-        <section class="progression-container cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'" ng-show="!display.listView"
+        <section class="progression-container cell twelve padding-md" ng-if="typeUser ==='ENSEIGNANT'"
                  ng-controller="manageProgessionCtrl">
             <div class="row">
                 <input ng-change="filterProgression(search)"

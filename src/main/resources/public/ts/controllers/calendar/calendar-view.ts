@@ -107,12 +107,8 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.syncPedagogicItems = async (firstRun?: boolean) => {
                 $scope.isRefreshingCalendar = true;
-                if (!firstRun && !$scope.pageInitialized) {
-                    // Prevent from executing twice from the front
-                    return;
-                }
                 if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
-                    // Dates incorrectes
+                    // incorrect dates
                     return;
                 }
                 $scope.isRefreshingCalendar = true;
@@ -162,8 +158,9 @@ export let calendarController = ng.controller('CalendarController',
                     await initProgressions();
                 }
 
-                // On lie les homeworks à leur session
+                // link homeworks to their session
                 $scope.loadPedagogicItems();
+                $scope.loadCalendarItems();
                 delete ($rootScope.session);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
@@ -206,150 +203,12 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
                 $scope.loadCalendarItems();
-                $scope.loadPedagogicDays();
             };
 
             $scope.loadCalendarItems = () => {
                 $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
                 $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
                 $scope.isRefreshingCalendar = false;
-            };
-
-            $scope.loadPedagogicDays = () => {
-                $scope.pedagogicItems.sort(function (a, b) {
-                    return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
-                });
-
-                let group_to_values = $scope.pedagogicItems.reduce(function (obj, item) {
-                    let date = item.startMoment.format('YYYY-MM-DD');
-                    obj[date] = obj[date] || [];
-                    obj[date].push(item);
-                    return obj;
-                }, {});
-
-                $scope.getNbHomework = (pedagogicDay) => {
-                    let nbHomework = 0;
-                    pedagogicDay.pedagogicItems.map(p => {
-                        if (p.pedagogicType === $scope.TYPE_HOMEWORK) {
-                            if ($scope.display.todo && !p.isDone) {
-                                nbHomework++;
-                            }
-                            if ($scope.display.done && p.isDone) {
-                                nbHomework++;
-                            }
-                        }
-                    });
-                    return nbHomework;
-                };
-
-                $scope.pedagogicDays = Object.keys(group_to_values).map(function (key: string) {
-                    let pedagogicItems = group_to_values[key];
-                    let nbHomework = 0;
-                    let publishedHomeworkByAudience = {};
-                    pedagogicItems.forEach(i => {
-                        if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
-                            nbHomework++;
-                        }
-                    });
-
-
-                    let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
-                        if (p.audience)
-                            return p.audience.id
-                    });
-                    let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
-                    let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
-
-
-                    let nbSession = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_SESSION).length;
-                    let nbCourse = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_COURSE).length;
-                    let nbCourseAndSession = nbSession + nbCourse;
-
-                    let fullDayNameStr = moment(key).format('dddd LL');
-                    fullDayNameStr = `${fullDayNameStr[0].toUpperCase()}${fullDayNameStr.slice(1)}`;
-                    return {
-                        descriptionMaxSize: 140,
-                        date: moment(key),
-                        pedagogicItems: pedagogicItems,
-                        shortDate: moment(key).format('DD/MM'),
-                        fullDayName: fullDayNameStr,
-                        dayName: moment(key).format('dddd'),
-                        shortDayName: moment(key).format('dd'),
-                        nbHomework: nbHomework,
-                        nbPublishHomework: publishedHomeworkByAudience,
-                        nbSession: nbSession,
-                        nbCourse: nbCourse,
-                        nbCourseAndSession: nbCourseAndSession,
-                        homeworksAreForOneAudienceOnly: homeworksAreForOneAudienceOnly,
-                        audience: audienceIds,
-                        color: Workload.getWorkloadColor(nbHomework)
-                    };
-                });
-                $scope.initDisplay();
-            };
-
-            function containsSession(c: any) {
-                return c.nbSession != 0;
-            }
-
-            $scope.isCounselorUser = () => {
-                return model.me.hasWorkflow(WORKFLOW_RIGHTS.viescoSettingHomeworkAndSessionTypeManage);
-            };
-
-            function containsHomeworks(c: any) {
-                let isDisplayedByDefault = false;
-                c.pedagogicItems.map(pi => {
-                    if (pi.pedagogicType === $scope.TYPE_HOMEWORK)
-                        if ($scope.isChild) {
-                            if (!pi.isDone) {
-                                isDisplayedByDefault = true;
-
-                            }
-                        } else {
-                            isDisplayedByDefault = true;
-                        }
-                });
-                return c.nbHomework != 0 && isDisplayedByDefault;
-            }
-
-            $scope.initDisplay = () => {
-                let nbSessionDisplayed = 0;
-                let nbHomeworkDisplayed = 0;
-                let indexMinChildHomework = $scope.pedagogicDays.length;
-                let indexMaxChildHomework = -1;
-
-                //hiding all the days
-                $scope.pedagogicDays.map(c => {
-                    c.displayed = false;
-                });
-
-                //display session
-                $scope.pedagogicDays.map((c, index) => {
-                    if (c.shortDate === "17/04")
-
-                        containsSession(c);
-                    if (containsSession(c) && nbSessionDisplayed < 3) {
-                        c.displayed = true;
-                        nbSessionDisplayed++;
-                    }
-                    if (containsHomeworks(c) && nbHomeworkDisplayed < 3) {
-                        if ($scope.isChild) {
-                            (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework;
-                            (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework;
-                        } else {
-                            c.displayed = true;
-
-                        }
-                        nbHomeworkDisplayed++;
-                    }
-                });
-                if ($scope.isChild) {
-                    $scope.pedagogicDays.map((c, index) => {
-                        if (index => indexMinChildHomework && index <= indexMaxChildHomework) {
-                            c.displayed = true;
-                        }
-                    })
-                }
             };
 
             $scope.setProgress = (homework: Homework) => {
