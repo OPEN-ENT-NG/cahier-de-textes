@@ -21,6 +21,10 @@ export let calendarController = ng.controller('CalendarController',
             $scope.timeSlot = {
                 slots: null
             };
+            
+            $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+            $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
+            $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
 
             $scope.filters = {
                 startDate: moment().startOf('isoWeek').toDate(),
