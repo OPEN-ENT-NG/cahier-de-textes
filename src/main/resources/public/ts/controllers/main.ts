@@ -55,6 +55,11 @@ export let main = ng.controller('MainController',
             if ($scope.structure) {
                 await $scope.structure.sync();
                 $scope.structureInitialized = true;
+            } else {
+                // if cannot find own structure because he is based on window.structure.id then we take first
+                $scope.structure = $scope.structures.first();
+                await $scope.structure.sync();
+                $scope.structureInitialized = true;
             }
             if (elementCalendar) {
                 $scope.isRefreshingCalendar = false;

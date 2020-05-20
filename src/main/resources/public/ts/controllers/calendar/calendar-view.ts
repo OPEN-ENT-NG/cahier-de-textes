@@ -105,7 +105,7 @@ export let calendarController = ng.controller('CalendarController',
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.syncPedagogicItems = async (firstRun?: boolean) => {
+            $scope.syncPedagogicItems = async () => {
                 $scope.isRefreshingCalendar = true;
                 if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                     // incorrect dates
@@ -197,7 +197,6 @@ export let calendarController = ng.controller('CalendarController',
                         }
                     })
                 }
-
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
                 let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
@@ -477,14 +476,9 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
-            model.calendar.on('date-change', () => {
+            const initCalendar = () => {
                 $scope.calendar = model.calendar;
                 $scope.isRefreshingCalendar = true;
-
-                if (!$scope.pageInitialized) {
-                    $scope.isRefreshingCalendar = false;
-                    return;
-                }
 
                 let calendarMode = $scope.calendar.increment;
                 let momentFirstDay = moment($scope.calendar.firstDay);
@@ -504,6 +498,13 @@ export let calendarController = ng.controller('CalendarController',
                         $scope.filters.startDate = momentFirstDay.clone().startOf('day');
                         $scope.filters.endDate = momentFirstDay.clone().endOf('day');
                         break;
+                }
+            };
+
+            model.calendar.on('date-change', async () => {
+                initCalendar();
+                if (!$scope.structure) {
+                    await $scope.initializeStructure();
                 }
                 $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;
