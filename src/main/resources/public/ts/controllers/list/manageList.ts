@@ -26,13 +26,10 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.syncPedagogicItems = async () => {
-            $scope.isRefreshingCalendar = true;
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // incorrect dates
                 return;
             }
-            $scope.isRefreshingCalendar = true;
-            $scope.safeApply();
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
@@ -369,5 +366,8 @@ export let manageListCtrl = ng.controller('manageListController',
                 })
             }
             return hasHomeworkToDisplay;
-        }
-    }]);
+        };
+
+        $scope.syncPedagogicItems();
+    }]
+);
