@@ -1,5 +1,5 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Toast, Workload} from '../../model';
+import {Course, Homework, PEDAGOGIC_TYPES, Session, Toast} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
@@ -18,9 +18,6 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
 
-            $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
-            $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
-            $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
             $scope.timeSlot = {
                 slots: null
             };
@@ -160,7 +157,6 @@ export let calendarController = ng.controller('CalendarController',
 
                 // link homeworks to their session
                 $scope.loadPedagogicItems();
-                $scope.loadCalendarItems();
                 delete ($rootScope.session);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();

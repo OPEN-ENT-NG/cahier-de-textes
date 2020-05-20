@@ -1,8 +1,7 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Course, Homework, Homeworks, Toast, PEDAGOGIC_TYPES, Session, Sessions, Structure, Structures,
-    Workload
+    Homework, PEDAGOGIC_TYPES, Session, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
 
@@ -11,6 +10,10 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.display.listView = true;
+
+        $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
+        $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
+        $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
 
         $scope.indexItemsDisplayed = [];
         if ($scope.homeworks) {
