@@ -1,4 +1,5 @@
-<div ng-controller="manageListController" class="row" workflow="diary.listView" ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
+<div ng-controller="manageListController" class="row" workflow="diary.listView"
+     ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
     <!-- title -->
     <div class="flex-row row__12">
         <div class="flex-col col__3">
@@ -63,8 +64,11 @@
                             <!-- content inside arrow if displayed -->
                             <div ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
                                 <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
+                                    <!-- content list pedagogic item case session list is view -->
                                     <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList"
                                          static-include="/diary/public/template/list/list-pedagogic-item.html"></div>
+
+                                    <!-- content list pedagogic homeworkOnly case session list is not view -->
                                     <div ng-if="displaySession(display.sessionList,pedagogicItem) && !display.sessionList"
                                          static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"></div>
                                 </div>

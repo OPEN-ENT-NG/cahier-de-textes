@@ -1,7 +1,7 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Workload
+    Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
 
@@ -9,7 +9,15 @@ export let manageListCtrl = ng.controller('manageListController',
     ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $rootScope) {
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
-        $scope.display.listView = true;
+
+        $scope.display = {
+            sessionList: !DateUtils.isAChildOrAParent(model.me.type),
+            listView: true,
+            sessions: true,
+            homeworks: true,
+            todo: true,
+            done: true
+        };
 
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
@@ -231,6 +239,20 @@ export let manageListCtrl = ng.controller('manageListController',
             }
         };
 
+        $scope.setHomeworkProgress = (homework) => {
+            if (homework.isDone)
+                $scope.notifications.push(new Toast('homework.done.notification', 'info'));
+            else
+                $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
+
+            $scope.setProgress(homework);
+            $scope.safeApply();
+        };
+
+        $scope.setProgress = (homework: Homework) => {
+            homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
+        };
+
         $scope.openHomework = (homeworkId: number) => {
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
@@ -263,7 +285,6 @@ export let manageListCtrl = ng.controller('manageListController',
             return isInFilter;
         };
 
-
         $scope.isClickableByStudentOrParent = (pedagogicItem) => {
             if (DateUtils.isAChildOrAParent(model.me.type)){
                 if(pedagogicItem.isPublished){
@@ -295,10 +316,6 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.changeViewCalendar = function () {
             $scope.goTo('/view');
             $scope.display.listView = false;
-            if ($scope.display.listView) {
-                $scope.display.sessions = true;
-                $scope.display.homeworks = true ;
-            }
         };
 
         $scope.containsOnlyCourses = (pedagogicDay) => {
@@ -308,9 +325,10 @@ export let manageListCtrl = ng.controller('manageListController',
                     containsOnlyCourseBool = false ;
 
                 }
-            })
+            });
             return containsOnlyCourseBool;
         };
+
         //check the display mod and if display session check the homeworks an the sessions which have homeworks
         $scope.displaySession = (displaySession,pedagogicItem) => {
             if (displaySession)

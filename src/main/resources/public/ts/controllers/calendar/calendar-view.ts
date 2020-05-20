@@ -1,5 +1,5 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Toast} from '../../model';
+import {Course, Homework, PEDAGOGIC_TYPES, Session, Toast, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
@@ -11,6 +11,14 @@ declare let window: any;
 export let calendarController = ng.controller('CalendarController',
     ['$scope', '$rootScope', 'route', '$location', 'StructureService',
         async function ($scope, $rootScope, route, $location, StructureService: StructureService) {
+            $scope.display = {
+                homeworks: true,
+                sessions: true,
+                listView: false,
+                progression: false,
+                sessionList: false,
+                homeworksFilter: true,
+            };
             const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
             $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
             $scope.legendLightboxIsVisible = false;
@@ -18,13 +26,12 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
 
-            $scope.timeSlot = {
-                slots: null
-            };
-            
             $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
             $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
             $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
+            $scope.timeSlot = {
+                slots: null
+            };
 
             $scope.filters = {
                 startDate: moment().startOf('isoWeek').toDate(),
@@ -106,10 +113,14 @@ export let calendarController = ng.controller('CalendarController',
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.syncPedagogicItems = async () => {
+            $scope.syncPedagogicItems = async (firstRun?: boolean) => {
                 $scope.isRefreshingCalendar = true;
+                if (!firstRun && !$scope.pageInitialized) {
+                    // Prevent from executing twice from the front
+                    return;
+                }
                 if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
-                    // incorrect dates
+                    // Dates incorrectes
                     return;
                 }
                 $scope.isRefreshingCalendar = true;
@@ -159,7 +170,7 @@ export let calendarController = ng.controller('CalendarController',
                     await initProgressions();
                 }
 
-                // link homeworks to their session
+                // On lie les homeworks à leur session
                 $scope.loadPedagogicItems();
                 delete ($rootScope.session);
                 $scope.isRefreshingCalendar = false;
@@ -197,11 +208,13 @@ export let calendarController = ng.controller('CalendarController',
                         }
                     })
                 }
+
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
                 let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
                 $scope.loadCalendarItems();
+                $scope.loadPedagogicDays();
             };
 
             $scope.loadCalendarItems = () => {
@@ -210,8 +223,141 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.isRefreshingCalendar = false;
             };
 
-            $scope.setProgress = (homework: Homework) => {
-                homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
+            $scope.loadPedagogicDays = () => {
+                $scope.pedagogicItems.sort(function (a, b) {
+                    return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                });
+
+                let group_to_values = $scope.pedagogicItems.reduce(function (obj, item) {
+                    let date = item.startMoment.format('YYYY-MM-DD');
+                    obj[date] = obj[date] || [];
+                    obj[date].push(item);
+                    return obj;
+                }, {});
+
+                $scope.getNbHomework = (pedagogicDay) => {
+                    let nbHomework = 0;
+                    pedagogicDay.pedagogicItems.map(p => {
+                        if (p.pedagogicType === $scope.TYPE_HOMEWORK) {
+                            if ($scope.display.todo && !p.isDone) {
+                                nbHomework++;
+                            }
+                            if ($scope.display.done && p.isDone) {
+                                nbHomework++;
+                            }
+                        }
+                    });
+                    return nbHomework;
+                };
+
+                $scope.pedagogicDays = Object.keys(group_to_values).map(function (key: string) {
+                    let pedagogicItems = group_to_values[key];
+                    let nbHomework = 0;
+                    let publishedHomeworkByAudience = {};
+                    pedagogicItems.forEach(i => {
+                        if (i.pedagogicType === $scope.TYPE_HOMEWORK) {
+                            nbHomework++;
+                        }
+                    });
+
+
+                    let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
+                        if (p.audience)
+                            return p.audience.id
+                    });
+                    let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
+                    let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
+
+
+                    let nbSession = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_SESSION).length;
+                    let nbCourse = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_COURSE).length;
+                    let nbCourseAndSession = nbSession + nbCourse;
+
+                    let fullDayNameStr = moment(key).format('dddd LL');
+                    fullDayNameStr = `${fullDayNameStr[0].toUpperCase()}${fullDayNameStr.slice(1)}`;
+                    return {
+                        descriptionMaxSize: 140,
+                        date: moment(key),
+                        pedagogicItems: pedagogicItems,
+                        shortDate: moment(key).format('DD/MM'),
+                        fullDayName: fullDayNameStr,
+                        dayName: moment(key).format('dddd'),
+                        shortDayName: moment(key).format('dd'),
+                        nbHomework: nbHomework,
+                        nbPublishHomework: publishedHomeworkByAudience,
+                        nbSession: nbSession,
+                        nbCourse: nbCourse,
+                        nbCourseAndSession: nbCourseAndSession,
+                        homeworksAreForOneAudienceOnly: homeworksAreForOneAudienceOnly,
+                        audience: audienceIds,
+                        color: Workload.getWorkloadColor(nbHomework)
+                    };
+                });
+                $scope.initDisplay();
+            };
+
+            function containsSession(c: any) {
+                return c.nbSession != 0;
+            }
+
+            $scope.isCounselorUser = () => {
+                return model.me.hasWorkflow(WORKFLOW_RIGHTS.viescoSettingHomeworkAndSessionTypeManage);
+            };
+
+            function containsHomeworks(c: any) {
+                let isDisplayedByDefault = false;
+                c.pedagogicItems.map(pi => {
+                    if (pi.pedagogicType === $scope.TYPE_HOMEWORK)
+                        if ($scope.isChild) {
+                            if (!pi.isDone) {
+                                isDisplayedByDefault = true;
+
+                            }
+                        } else {
+                            isDisplayedByDefault = true;
+                        }
+                });
+                return c.nbHomework != 0 && isDisplayedByDefault;
+            }
+
+            $scope.initDisplay = () => {
+                let nbSessionDisplayed = 0;
+                let nbHomeworkDisplayed = 0;
+                let indexMinChildHomework = $scope.pedagogicDays.length;
+                let indexMaxChildHomework = -1;
+
+                //hiding all the days
+                $scope.pedagogicDays.map(c => {
+                    c.displayed = false;
+                });
+
+                //display session
+                $scope.pedagogicDays.map((c, index) => {
+                    if (c.shortDate === "17/04")
+
+                        containsSession(c);
+                    if (containsSession(c) && nbSessionDisplayed < 3) {
+                        c.displayed = true;
+                        nbSessionDisplayed++;
+                    }
+                    if (containsHomeworks(c) && nbHomeworkDisplayed < 3) {
+                        if ($scope.isChild) {
+                            (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework;
+                            (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework;
+                        } else {
+                            c.displayed = true;
+
+                        }
+                        nbHomeworkDisplayed++;
+                    }
+                });
+                if ($scope.isChild) {
+                    $scope.pedagogicDays.map((c, index) => {
+                        if (index => indexMinChildHomework && index <= indexMaxChildHomework) {
+                            c.displayed = true;
+                        }
+                    })
+                }
             };
 
             $scope.selectPedagogicDay = (pedagogicDay) => {
@@ -237,16 +383,6 @@ export let calendarController = ng.controller('CalendarController',
                 if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                     $scope.goTo('/session/create/' + calendar_course._id + '/' + DateUtils.getFormattedDate(calendar_course.startMoment));
                 }
-                $scope.safeApply();
-            };
-
-            $scope.setHomeworkProgress = (homework) => {
-                if (homework.isDone)
-                    $scope.notifications.push(new Toast('homework.done.notification', 'info'));
-                else
-                    $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
-
-                $scope.setProgress(homework);
                 $scope.safeApply();
             };
 
@@ -476,9 +612,14 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
-            const initCalendar = () => {
+            model.calendar.on('date-change', () => {
                 $scope.calendar = model.calendar;
                 $scope.isRefreshingCalendar = true;
+
+                if (!$scope.pageInitialized) {
+                    $scope.isRefreshingCalendar = false;
+                    return;
+                }
 
                 let calendarMode = $scope.calendar.increment;
                 let momentFirstDay = moment($scope.calendar.firstDay);
@@ -498,13 +639,6 @@ export let calendarController = ng.controller('CalendarController',
                         $scope.filters.startDate = momentFirstDay.clone().startOf('day');
                         $scope.filters.endDate = momentFirstDay.clone().endOf('day');
                         break;
-                }
-            };
-
-            model.calendar.on('date-change', async () => {
-                initCalendar();
-                if (!$scope.structure) {
-                    await $scope.initializeStructure();
                 }
                 $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;

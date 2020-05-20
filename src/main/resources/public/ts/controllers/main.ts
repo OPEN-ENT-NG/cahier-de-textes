@@ -15,12 +15,7 @@ export let main = ng.controller('MainController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.notifications = [];
         $scope.display = {
-            homeworks: true,
-            sessions: true,
-            listView: false,
-            progression: false,
-            sessionList: false,
-            homeworksFilter: true,
+            listView: false
         };
         $scope.params = {
             user: null,
