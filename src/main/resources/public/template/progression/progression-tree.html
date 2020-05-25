@@ -6,8 +6,7 @@
              'opened': selectedFolderIds.indexOf(folder.id) !== -1}]"
              data-item-id="[[folder.id]]"
              lvl-drop-target
-             on-drop="dropped(dragEl, dropEl)"
-        >
+             on-drop="dropped(dragEl, dropEl)">
             <span>
                 <i data-ng-click="addFolderSelected(folder);$event.stopPropagation();"
                    class="icon"
@@ -30,9 +29,15 @@
                       ng-class="{'col__6': session.class && session.class != '', 'col__10': !session.class || session.class === ''}"><span
                         class="item-no-wrap">[[session.title]]</span></span>
                 <span class="flex-col col__4"
-                      ng-if="session.class && session.class != ''"><span class="item-no-wrap">([[session.class]])</span></span>
-                <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
-                                                        class="large ng-scope"></div></span>
+                      ng-if="session.class && session.class != ''">
+                    <span class="item-no-wrap">([[session.class]])</span>
+                </span>
+
+                <!-- display icon homeworks if have at least one -->
+                <span class="flex-col col__2 work" ng-show="session.progression_homeworks.length !== 0">
+                    <div ng-include="'/diary/public/img/inbox.svg'" class="large ng-scope"></div>
+                </span>
+
             </div>
         </div>
         <div ng-init="subProgressionsItems = folder.childFolders"
@@ -71,8 +76,11 @@
                     <span class="flex-col col__4"
                           ng-if="session.class && session.class != ''"><span
                             class="item-no-wrap">([[session.class]])</span></span>
-                    <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
-                                                            class="large ng-scope"></div></span>
+
+                    <!-- display icon homeworks if have at least one -->
+                    <span class="flex-col col__2 work" ng-show="session.progression_homeworks.length !== 0">
+                        <div ng-include="'/diary/public/img/inbox.svg'" class="large ng-scope"></div>
+                    </span>
                 </div>
             </div>
         </div>
@@ -90,9 +98,13 @@
                     class="item-no-wrap">[[session.title]]</span></span>
             <span class="flex-col col__4"
                   ng-if="session.class && session.class != ''"><span
-                    class="item-no-wrap">([[session.class]])</span></span>
-            <span class="flex-col col__2 work"><div ng-include="'/diary/public/img/inbox.svg'"
-                                                    class="large ng-scope"></div></span>
+                    class="item-no-wrap">([[session.class]])</span>
+            </span>
+
+            <!-- display icon homeworks if have at least one -->
+            <span class="flex-col col__2 work" ng-show="session.progression_homeworks.length !== 0">
+                <div ng-include="'/diary/public/img/inbox.svg'" class="large ng-scope"></div>
+            </span>
         </div>
     </div>
 </div>
