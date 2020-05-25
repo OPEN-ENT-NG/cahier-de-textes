@@ -40,10 +40,6 @@ export let main = ng.controller('MainController',
         };
 
         $scope.initializeStructure = async () => {
-            let elementCalendar = document.getElementById('calendar-area');
-            if (elementCalendar) {
-                $scope.isRefreshingCalendar = true;
-            }
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.getCurrentStructure();
@@ -55,9 +51,6 @@ export let main = ng.controller('MainController',
                 $scope.structure = $scope.structures.first();
                 await $scope.structure.sync();
                 $scope.structureInitialized = true;
-            }
-            if (elementCalendar) {
-                $scope.isRefreshingCalendar = false;
             }
             $scope.safeApply();
         };
@@ -126,7 +119,6 @@ export let main = ng.controller('MainController',
             }
             if (!$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);
             $scope.pageInitialized = true;
-            model.calendar.setDate(moment());
             $scope.safeApply();
         };
 

@@ -8,7 +8,7 @@ export class Audience {
     type: string;
     type_group: number;
 
-    constructor ( name: string, groupName: string, id?, type?) {
+    constructor (name: string, id?, type?) {
         this.name = name;
         if(id)
             this.id = id;

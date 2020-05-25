@@ -1,5 +1,5 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Toast, Workload} from '../../model';
+import {Course, Homework, PEDAGOGIC_TYPES, Session, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
@@ -23,7 +23,7 @@ export let calendarController = ng.controller('CalendarController',
             $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
             $scope.legendLightboxIsVisible = false;
             $scope.autocomplete = AutocompleteUtils;
-
+            $scope.isTimeSlotsInitialized = false;
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
 
             $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
@@ -37,6 +37,8 @@ export let calendarController = ng.controller('CalendarController',
                 startDate: moment().startOf('isoWeek').toDate(),
                 endDate: moment().endOf('isoWeek').toDate()
             };
+
+            model.calendar.setDate(moment());
 
             $scope.setLegendLightboxVisible = (state: boolean) => {
                 $scope.legendLightboxIsVisible = state;
@@ -69,14 +71,22 @@ export let calendarController = ng.controller('CalendarController',
                 }
             };
 
+            const setTimeSlots = async () => {
+                await initTimeSlots();
+                $scope.safeApply();
+            };
+
             $scope.createHomeworksLoop = function (pedagogicItem) {
                 $scope.homeworks = !pedagogicItem.homeworks ? [pedagogicItem] : pedagogicItem.homeworks;
             };
 
             const initTimeSlots = async () => {
-                const structure_slots: StructureSlot = await StructureService.getSlotProfile(window.structure.id);
+                const structure_slots: StructureSlot = await StructureService.getSlotProfile(
+                    window.structure ? window.structure.id : $scope.structure.id
+                );
                 if (Object.keys(structure_slots).length > 0) {
                     $scope.timeSlot.slots = structure_slots.slots;
+                    model.calendar.setTimeslots($scope.timeSlot.slots);
                 }
                 else $scope.timeSlot.slots = null;
             };
@@ -114,17 +124,6 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             $scope.syncPedagogicItems = async (firstRun?: boolean) => {
-                $scope.isRefreshingCalendar = true;
-                if (!firstRun && !$scope.pageInitialized) {
-                    // Prevent from executing twice from the front
-                    return;
-                }
-                if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
-                    // Dates incorrectes
-                    return;
-                }
-                $scope.isRefreshingCalendar = true;
-                $scope.safeApply();
                 $scope.structure.homeworks.all = [];
                 $scope.structure.sessions.all = [];
                 $scope.structure.courses.all = [];
@@ -173,7 +172,6 @@ export let calendarController = ng.controller('CalendarController',
                 // On lie les homeworks à leur session
                 $scope.loadPedagogicItems();
                 delete ($rootScope.session);
-                $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
             };
 
@@ -184,7 +182,6 @@ export let calendarController = ng.controller('CalendarController',
                     if (x.id === null && x.parent_id === null) x.title = lang.translate("progression.my.folders");
                     return x;
                 });
-
                 $scope.progressionFolders.all.filter((x) => x.id);
             }
 
@@ -220,7 +217,6 @@ export let calendarController = ng.controller('CalendarController',
             $scope.loadCalendarItems = () => {
                 $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
                 $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
-                $scope.isRefreshingCalendar = false;
             };
 
             $scope.loadPedagogicDays = () => {
@@ -390,7 +386,7 @@ export let calendarController = ng.controller('CalendarController',
                 event.stopPropagation();
                 let sessionToPublish = new Session($scope.structure);
                 sessionToPublish.id = item.id;
-                $scope.toastHttpCall(await sessionToPublish.publish())
+                $scope.toastHttpCall(await sessionToPublish.publish());
                 $scope.syncPedagogicItems();
 
                 $scope.safeApply();
@@ -558,8 +554,6 @@ export let calendarController = ng.controller('CalendarController',
 
                 $scope.safeApply();
                 $scope.goTo('/session/update/' + idSession);
-
-
             };
 
             /**
@@ -605,22 +599,15 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.isRefreshingCalendar = true;
                 await Promise.all([
                     $scope.initializeData(),
-                    initTimeSlots()
+                    setTimeSlots()
                 ]);
                 AutocompleteUtils.init($scope.structure);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
             };
 
-            model.calendar.on('date-change', () => {
+            const initCalendar = () => {
                 $scope.calendar = model.calendar;
-                $scope.isRefreshingCalendar = true;
-
-                if (!$scope.pageInitialized) {
-                    $scope.isRefreshingCalendar = false;
-                    return;
-                }
-
                 let calendarMode = $scope.calendar.increment;
                 let momentFirstDay = moment($scope.calendar.firstDay);
                 switch (calendarMode) {
@@ -640,6 +627,12 @@ export let calendarController = ng.controller('CalendarController',
                         $scope.filters.endDate = momentFirstDay.clone().endOf('day');
                         break;
                 }
+            };
+
+            model.calendar.on('date-change', () => {
+                $scope.isRefreshingCalendar = true;
+                initCalendar();
+                setTimeSlots();
                 $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
@@ -647,18 +640,7 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.$on('$destroy', () => model.calendar.callbacks['date-change'] = []);
 
-            $scope.$on('$includeContentLoaded', async () => {
-                if (window.structure) {
-                    if ($scope.timeSlot.slots === null) {
-                        $scope.isRefreshingCalendar = true;
-                        await initTimeSlots();
-                        $scope.isRefreshingCalendar = false;
-                        $scope.safeApply();
-                    }
-                }
-            });
-
-            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, async () => {
+            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
                 load();
             });
         }]);
