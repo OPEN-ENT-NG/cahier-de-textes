@@ -49,7 +49,7 @@ export class Course {
         if (data && data.groups) {
             audienceNameArray = audienceNameArray.concat(data.groups);
         }
-        audiences.all = structure.audiences.all.filter(t => audienceNameArray.includes(t.name))
+        audiences.all = structure.audiences.all.filter(t => audienceNameArray.includes(t.name));
         return {
             _id: data._id,
             audiences: audiences,
@@ -124,12 +124,13 @@ export class Courses {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
+
         if (model.me.type !== USER_TYPES.student) {
-            if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}?`;
-            if (audience) filter += `group=${audience.name}?`;
+            if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`;
+            if (audience) filter += `&group=${audience.name ? audience.name : audience.groupName}`;
         } else if (model.me.classes && model.me.classes.length) {
             if (window.audiences && window.audiences.all.length > 0)
-                window.audiences.all.forEach((audience: Audience) => filter += `&group=${audience.name}`);
+                window.audiences.all.forEach((audience: Audience) => `&group=${audience.name ? audience.name : audience.groupName}`);
         }
 
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);
