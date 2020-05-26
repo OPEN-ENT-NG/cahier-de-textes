@@ -5,18 +5,19 @@ import {DateUtils} from '../../utils/dateUtils';
 import indexOf = require('core-js/fn/array/index-of');
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
-    ['$scope', '$routeParams', '$location', '$attrs', async function ($scope, $routeParams, $location, $attrs) {
+    ['$scope', '$rootScope', '$routeParams', '$location', '$attrs',
+        async function ($scope, $rootScope, $routeParams, $location, $attrs) {
         $scope.isReadOnly = $scope.isReadOnly || modeIsReadOnly();
         $scope.isInsideDiary = $attrs.insideDiary;
         $scope.display = {
             sessionSelect : false
-        }
+        };
 
         function modeIsReadOnly() {
             let currentPath = $location.path();
             return currentPath.includes('view');
         }
-        $scope.homework ?  $scope.homework = $scope.homework : $scope.homework = new Homework($scope.structure) ;
+        $scope.homework = $rootScope.homework ? $rootScope.homework : new Homework($scope.structure);
         if($scope.structure.audiences.all.length === 1){
             $scope.homework.audience = $scope.structure.audiences.all[0];
         }

@@ -5,6 +5,7 @@ import {AutocompleteUtils} from '../../utils/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
 import {StructureService, StructureSlot} from "../../services";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
+import {PEDAGOGIC_SLOT_PROFILE} from "../../enum/pedagogic-slot-profile";
 
 declare let window: any;
 
@@ -29,6 +30,9 @@ export let calendarController = ng.controller('CalendarController',
             $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
             $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
             $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
+
+            const pedagogicSlotProfile: typeof PEDAGOGIC_SLOT_PROFILE = PEDAGOGIC_SLOT_PROFILE;
+
             $scope.timeSlot = {
                 slots: null
             };
@@ -172,6 +176,7 @@ export let calendarController = ng.controller('CalendarController',
                 // On lie les homeworks à leur session
                 $scope.loadPedagogicItems();
                 delete ($rootScope.session);
+                delete ($rootScope.homework);
                 $scope.safeApply();
             };
 
@@ -458,7 +463,12 @@ export let calendarController = ng.controller('CalendarController',
                     } else if (typeCourseSession == typeCourse) {
                         let course = angular.element($sessionOrCourse[0]).scope();
                         let date = course.item.data.startDisplayDate;
-                        $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
+                        if (progressionOrSession.item.color === pedagogicSlotProfile.HOMEWORK) {
+                            // case we drag homework to empty session in order to create homework
+                            $scope.homeworkToEmptySession(id_progressionOrSession, idCourseSession, date);
+                        } else {
+                            $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
+                        }
                     }
 
                 }
@@ -481,6 +491,20 @@ export let calendarController = ng.controller('CalendarController',
                 });
                 $rootScope.session.getSessionInfo(sessionDrag);
                 $scope.goTo('/session/update/' + $rootScope.session.id);
+            };
+
+            /**
+             * Handle a homework pedagogic type drop on course to create homework
+             */
+            $scope.homeworkToEmptySession = async (idSessionDrag, idSessionDrop) => {
+                let sessionDrag, sessionDrop;
+                $scope.calendarItems.map(async session => {
+                    if (session.id == idSessionDrag) {
+                        sessionDrag = session;
+                    }
+                });
+                $rootScope.homework = sessionDrag.homeworks[0];
+                $scope.goTo('/homework/create/');
             };
 
             /**
