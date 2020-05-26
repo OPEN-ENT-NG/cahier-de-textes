@@ -85,9 +85,14 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
                 hideHomeworks = isNotHidden;
             }
 
+            const $weeks = $('.week');
             if (hideHomeworks) {
+                // hide
+                hideShowHomework($weeks);
                 hwDayDetail.removeClass('show');
             } else {
+                // show
+                displayShowHomework($weeks);
                 hwDayDetail.addClass('show');
             }
 
@@ -96,6 +101,18 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
                     dailyEvent.selected = false;
                 });
             }
+        };
+
+        const displayShowHomework = ($weeks: JQuery) => {
+            $weeks.each((i: number, e: Element) => {
+                $(e).css({'z-index':'0'})
+            });
+        };
+
+        const hideShowHomework = ($weeks: JQuery) => {
+            $weeks.each((i: number, e: Element) => {
+                $(e).css({'z-index':'unset'})
+            });
         };
 
         /**
