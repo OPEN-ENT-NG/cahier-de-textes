@@ -12,6 +12,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
         (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
+        const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
+
         $scope.vised = true;
         $scope.notVised = true;
         $scope.archived = false;
@@ -45,12 +47,20 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 .toString()
         };
 
+        const getTeacherId = (): string => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
+                return model.me.userId;
+            } else {
+                return null;
+            }
+        };
+
         $scope.filterList = async () => {
             $scope.selectOrUnselectAllSessions(false);
             $scope.homeworks = [];
             const teachersSelected = AutocompleteUtils.getTeachersSelected();
             const classesSelected = AutocompleteUtils.getClassesSelected();
-            let teachers = teachersSelected.length ? getIds(teachersSelected) : null;
+            let teachers = teachersSelected.length ? getIds(teachersSelected) : getTeacherId();
             let audiences = classesSelected.length ? getIds(classesSelected) : null;
             await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate,
                 $scope.filters.endDate,
