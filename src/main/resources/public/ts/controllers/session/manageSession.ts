@@ -345,8 +345,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     }
                 }
             });
-            const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
-            if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];
+
+            // if $scope.session has subject filled
+            if ($scope.session.subject) {
+                const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
+                if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];
+            }
         }
 
         $scope.back = () => {
