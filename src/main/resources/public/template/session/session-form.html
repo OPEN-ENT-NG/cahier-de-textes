@@ -128,7 +128,7 @@
                     <i18n>utils.description</i18n>
                 </span>
             </div>
-            <editor ng-model="session.description"></editor>
+            <editor editor-resize ng-model="session.description"></editor>
         </div>
 
         <div ng-if="session.homeworks.length < 1" class="padding-md margin-bottom-md">
@@ -309,7 +309,7 @@
                                 </label>
                             </div>
 
-                            <editor class="session-form-editor twelve" ng-model="homework.description"></editor>
+                            <editor editor-resize class="session-form-editor twelve" ng-model="homework.description"></editor>
                         </div>
                     </div>
                 </div>

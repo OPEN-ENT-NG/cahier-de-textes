@@ -105,7 +105,11 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
             await $scope.homeworkTypes.sync();
             $scope.safeApply();
-            $scope.fixEditor();
+
+            let elementCalendar = document.getElementById('calendar-area');
+            if (!elementCalendar) {
+                $scope.fixEditor();
+            }
         }
 
         $scope.initProgressions = async () => {
