@@ -276,7 +276,7 @@
   "progression.create.folder.name": "Nom du dossier",
   "progression.create.parent.folder.name": "Nom du dossier parent",
   "progression.my.folders": "Mes Dossiers",
-  "validate": "valider",
+  "validate": "Valider",
   "Status": "Statut",
   "diary.error.date.is.not.valid": "L'heure de fin doit être supérieure de 15 minutes à l'heure de début"
 }

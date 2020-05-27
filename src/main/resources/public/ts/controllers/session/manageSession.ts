@@ -155,9 +155,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         }
                     }
                 }
-                h.dueDate = h.session.date;
-                h.dueDate.setHours(h.session.startTime.getHours());
-                h.dueDate.setMinutes(h.session.startTime.getMinutes());
+                if(h.session) {
+                    h.dueDate = h.session.date;
+                    h.dueDate.setHours(h.session.startTime.getHours());
+                    h.dueDate.setMinutes(h.session.startTime.getMinutes());
+                }
                 if (!h.isDeleted && h.isValidForm() && (h.attachedToDate || h.session.id)) {
                     let {succeed} = await h.save();
                     if (!succeed) {
