@@ -1,4 +1,5 @@
 import {Behaviours, model, moment, ng} from 'entcore';
+declare let window: any;
 
 export let calendarDailyEventsController = ng.controller('CalendarDailyEventsController',
     ['$scope', 'route', '$location', '$timeout', async function ($scope, route, $location, $timeout) {
@@ -329,6 +330,12 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
 
         $scope.$watchCollection('ngModel', function (newVal) {
             setDaysContent();
+        });
+
+        $scope.$watch(() => window.entcore.calendar.startOfDay, async (newVal, oldVal) => {
+            if (newVal !== oldVal) {
+                setDaysContent();
+            }
         });
 
         $scope.$watch(() => $scope.calendar.timeSlots.all[0].beginning,  (newVal, oldVal) => {
