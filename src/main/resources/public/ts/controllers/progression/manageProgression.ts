@@ -515,6 +515,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
         $scope.back = () => {
             $scope.closeModal();
+            $scope.cancelProgressionHomework();
             window.history.back();
         };
 
