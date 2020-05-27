@@ -465,7 +465,7 @@ export let calendarController = ng.controller('CalendarController',
                         let date = course.item.data.startDisplayDate;
                         if (progressionOrSession.item.color === pedagogicSlotProfile.HOMEWORK) {
                             // case we drag homework to empty session in order to create homework
-                            $scope.homeworkToEmptySession(id_progressionOrSession, idCourseSession, date);
+                            $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item.audiences);
                         } else {
                             $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
                         }
@@ -496,14 +496,28 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a homework pedagogic type drop on course to create homework
              */
-            $scope.homeworkToEmptySession = async (idSessionDrag, idSessionDrop) => {
+            $scope.homeworkToEmptySession = async (idSessionDrag, audienceDrop) => {
                 let sessionDrag, sessionDrop;
                 $scope.calendarItems.map(async session => {
                     if (session.id == idSessionDrag) {
                         sessionDrag = session;
                     }
                 });
-                $rootScope.homework = sessionDrag.homeworks[0];
+                
+                if (sessionDrag.homeworks.length === 0) {
+                    let sessionHomework = new Session($scope.structure);
+                    sessionHomework.id = sessionDrag.id;
+                    await sessionHomework.sync();
+                    if (audienceDrop.all.length !== 0) {
+                        sessionHomework.homeworks[0].audience = audienceDrop.all[0];
+                    }
+                    $rootScope.homework = sessionHomework.homeworks[0];
+                } else {
+                    if (audienceDrop.all.length !== 0) {
+                        sessionDrag.homeworks[0].audience = audienceDrop.all[0];
+                    }
+                    $rootScope.homework = sessionDrag.homeworks[0];
+                }
                 $scope.goTo('/homework/create/');
             };
 
