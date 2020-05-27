@@ -32,10 +32,16 @@
   }
 
   .subject {
+    font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     display: inline-block !important;
+  }
+
+  .text-item {
+    font-size: 11px;
+    color: rgba(0, 0, 0, .87);
   }
 
   .flex-row {
@@ -310,6 +316,7 @@
 
 .diary-container .schedule-item {
   margin-top: 40px;
+  border: 1px solid rgba(96, 96, 96, 0.15);
 }
 
 .diary-container [resizable] {
