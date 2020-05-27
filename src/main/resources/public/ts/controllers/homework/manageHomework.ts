@@ -368,8 +368,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             } else {
 
                 $scope.homework.id = $routeParams.id ? $routeParams.id : undefined;
-                if($scope.homework.id){
-                    await $scope.homework.sync();
+                if($scope.homework.id) {
+                    if (!$scope.homework.description) {
+                        await $scope.homework.sync();
+                    }
                     if ($scope.homework.session) {
                         $scope.attachToSession();
                     } else {
@@ -389,13 +391,14 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             await $scope.syncWorkloadDay();
             $scope.safeApply();
             $scope.fixEditor();
-        };
+        }
 
         $scope.back = ()=>{
             $scope.homework.isDone = !$scope.homework.isDone;
             // $scope.setProgress($scope.homework);
             window.history.back();
         };
+
         if(!$scope.homework.isInit)
             await initData();
     }]

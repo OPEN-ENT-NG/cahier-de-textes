@@ -518,7 +518,7 @@ export let calendarController = ng.controller('CalendarController',
                     }
                     $rootScope.homework = sessionDrag.homeworks[0];
                 }
-                $scope.goTo('/homework/create/');
+                $scope.goTo('/homework/update/' + $rootScope.homework.id);
             };
 
             /**
