@@ -420,7 +420,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.goToEditTimeslot = () => {
-            $scope.goTo(($scope.openedTimeSlot instanceof Homework ? '/homework' : '/session') + '/update/' + $scope.openedTimeSlot.type.id)
+            $scope.goTo(($scope.openedTimeSlot instanceof Homework ? '/homework' : '/session') + '/update/' + $scope.openedTimeSlot.id)
         };
 
 
