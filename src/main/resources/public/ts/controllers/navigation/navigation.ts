@@ -1,5 +1,6 @@
-import {model, ng} from 'entcore';
+import {Me, model, ng} from 'entcore';
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
+import {PreferencesUtils} from "../../utils/preference/preferences";
 
 declare let window: any;
 
@@ -34,13 +35,16 @@ export let navigationController = ng.controller("navigationController",
             };
 
             $scope.structures = initStructures();
+            let preferenceStructure = await Me.preference(PreferencesUtils.PREFERENCE_KEYS.CDT_STRUCTURE);
+            let preferenceStructureId = preferenceStructure ? preferenceStructure['id'] : null;
+            let structure = $scope.structures.length > 1 && preferenceStructureId ? $scope.structures.find((s) => s.id === preferenceStructureId) : $scope.structures[0];
             $scope.menu = {
-                structure: $scope.structures[0],
+                structure: structure,
                 hovered: '',
                 active: '',
                 timeout: null
             };
-            await $scope.setStructure($scope.structures[0]);
+            await $scope.setStructure(structure);
             $scope.safeApply();
         }
 
@@ -57,6 +61,7 @@ export let navigationController = ng.controller("navigationController",
             window.structure = structure;
             $scope.menu.structure = structure;
             $scope.menu.active = structure.id;
+            await PreferencesUtils.updateStructure(structure);
             $scope.safeApply();
         };
 
