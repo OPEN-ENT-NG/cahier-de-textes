@@ -228,6 +228,7 @@
   "sessions.admin.merge": "Fusionner",
   "sessions.admin.share": "Partager",
   "sessions.admin.Visa.sateOk": "Visés",
+  "sessions.admin.visa.sate.on": "Visé le ",
   "sessions.admin.Visa.sateKo": "Non Visés",
   "sessions.admin.icon.dwlPdf": "Visa(s) créé(s)",
   "sessions.admin.icon.see": "Visualiser",
