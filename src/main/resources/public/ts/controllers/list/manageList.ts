@@ -30,8 +30,8 @@ export let manageListCtrl = ng.controller('manageListController',
         }
 
         $scope.filters = {
-            startDate: moment().startOf('isoWeek').toDate(),
-            endDate: moment().endOf('isoWeek').toDate()
+            startDate: moment().toDate(),
+            endDate: moment().add('2', 'weeks').toDate()
         };
 
         $scope.syncPedagogicItems = async () => {
