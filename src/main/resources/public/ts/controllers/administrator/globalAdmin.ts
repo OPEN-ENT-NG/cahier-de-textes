@@ -435,6 +435,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             if (succeed) {
                 await $scope.filterList();
                 $scope.selectOrUnselectAllSessions(false);
+                $scope.visaForm.comment = "";
                 $scope.closeVisaCreateBox();
                 $scope.safeApply();
             }
