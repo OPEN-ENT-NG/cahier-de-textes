@@ -134,7 +134,7 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.progressionFolders.all = [];
                 const teacherSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
                     AutocompleteUtils.getTeachersSelected()[0] : [];
-                const classSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
+                const classSelected = AutocompleteUtils.getClassesSelected() != undefined ?
                     AutocompleteUtils.getClassesSelected()[0] : [];
                 /* personal workflow case */
                 if ((model.me.hasWorkflow(WORKFLOW_RIGHTS.diarySearch) && model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData))
@@ -618,15 +618,17 @@ export let calendarController = ng.controller('CalendarController',
                 session.setFromCourse(course);
                 session.opened = true;
                 $rootScope.session = session;
+                console.log(progressionDragged.progression_homeworks);
                 progressionDragged.progression_homeworks.map(
                     ph => {
                         let homework = new Homework($scope.structure);
                         homework.estimatedTime = ph.estimatedTime;
                         homework.description = ph.description;
-                        homework.subject = ph.subject;
+                        homework.subject = session.subject;
                         homework.type = ph.type;
+                        homework.audience = $.extend(true, Object.create(Object.getPrototypeOf(session.audience)), session.audience);
+                        homework.sessions.push(session);
                         session.homeworks.push(homework);
-
                     }
                 );
                 $scope.safeApply();

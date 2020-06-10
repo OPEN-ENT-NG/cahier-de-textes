@@ -24,6 +24,7 @@ export class Homework {
     subject: Subject;
     audience: any;
     session: Session;
+    sessions: Session[] = [];
     workload: number;
     startMoment: any;
     endMoment: any;

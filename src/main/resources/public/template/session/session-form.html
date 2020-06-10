@@ -15,7 +15,8 @@
                     ng-options=
                             "subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'"
             >
-                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
+                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]
+                </option>
             </select>
         </div>
     </div>
@@ -128,213 +129,253 @@
                     <i18n>utils.description</i18n>
                 </span>
             </div>
-            <editor editor-resize ng-model="session.description"></editor>
+            <editor ng-model="session.description"></editor>
         </div>
 
-        <div ng-if="session.homeworks.length < 1" class="padding-md margin-bottom-md">
-            <button ng-show="!validate"
-                    class="float-none display-inline-block margin-top-md"
-                    ng-click="addHomework()">
-                <i18n>homework.manage.create</i18n>
-            </button>
-        </div>
 
-        <div ng-if="session.homeworks.length" class="margin-bottom-md">
-            <h2 ng-if="session.homeworks.length && hasOneHomeworkInList()">
+        <div class="margin-bottom-md">
+            <h2 ng-if="homeworks.length">
                 <i18n>Homeworks</i18n>
             </h2>
-            <div class="responsive-table row" ng-show="session.homeworks.length && hasOneHomeworkInList()">
-                <table class="twelve">
-                    <thead>
-                    <tr>
-                        <td class="two text-left padding-left-md">
-                            <i18n>deadline</i18n>
-                        </td>
-                        <td class="one text-left">
-                            <i18n>homework.manage.type</i18n>
-                        </td>
-                        <td class="eight text-left">
-                            <i18n>settings.exclusion.description</i18n>
-                        </td>
-                        <td class="one">&nbsp;</td>
-                    </tr>
-                    </thead>
 
-                    <tbody>
-                    <tr ng-repeat="homework in session.homeworks track by $index" ng-if="!homework.isDeleted"
-                        inside-session-form="true"
-                        ng-controller="manageHomeworkCtrl">
-                        <!-- Deadline static data -->
-                        <td ng-if="!homework.opened" class="three vertical-align-top text-left">
-                            <p ng-if="homework.attachedToDate" class="margin-bottom-md twelve">
-                                [[homework.dateDisplayed]]</p>
-                            <p ng-if="homework.attachedToSession && !homework.session.firstText"
-                               class="margin-bottom-md twelve">
-                                <i18n>homework.attachedToSession</i18n>
-                                [[homework.session.startDisplayDate]]
-                                [[homework.session.startDisplayTime]] [[homework.session.endDisplayTime]]
-                                [[homework.session.subject.label]]
-                            </p>
+            <div class="custom-flex-table responsive-table row" ng-show="homeworks.length">
+                <!-- Homeworks Display -->
+                <div class="custom-flex-row twelve bot-border custom-flex-head"> <!-- HEADER -->
+                    <div class="custom-flex-col four right-border">
+                        <div class="custom-flex-row twelve">
+                            <div class="custom-flex-col padding-cell justified-content-center flex-text-left two">
+                                <i18n>utils.group</i18n>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center flex-text-left five">
+                                <i18n>deadline</i18n>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center flex-text-left five">
+                                <i18n>subject</i18n>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">
+                        <i18n>homework.manage.type</i18n>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center flex-text-left six">
+                        <i18n>settings.exclusion.description</i18n>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">&nbsp;</div>
+                </div>
 
-                            <p ng-if="homework.attachedToSession && homework.session.firstText"
-                               class="margin-bottom-md twelve">
-                                <i18n>todo.for.this.session</i18n>
-                            </p>
-                        </td>
+                <div ng-repeat="homework in homeworks track by $index"
+                     class="custom-flex-row twelve bot-border">
+                    <div class="custom-flex-col four right-border">
+                        <div ng-if="homework.attachedToSession && homework.sessions.length" ng-repeat="session in homework.sessions track by $index" class="custom-flex-row twelve">
+                            <div class="custom-flex-col padding-cell justified-content-center two">
+                                <p>[[session.audience.name]]</p>
+                            </div>
 
-                        <!-- Type static data -->
-                        <td ng-if="!homework.opened" class="two vertical-align-top text-left ">
-                            <p class="twelve">[[homework.type.label]]</p>
-                        </td>
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p ng-if="!session.firstText" class="margin-bottom-md">
+                                    <i18n>homework.attachedToSession</i18n>
+                                    [[session.startDisplayDate]]
+                                    [[session.startDisplayTime]] [[session.endDisplayTime]]
+                                </p>
+                                <p ng-if="session.firstText" class="margin-bottom-md">
+                                    <i18n>todo.for.this.session</i18n>
+                                </p>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p>[[session.subject.label]]</p>
+                            </div>
+                        </div>
+                        <div ng-if="!homework.attachedToSession || !homework.sessions.length" class="custom-flex-row twelve">
+                            <div class="custom-flex-col padding-cell justified-content-center two">
+                                <p>[[homework.audience.name]]</p>
+                            </div>
 
-                        <!-- Description -->
-                        <td ng-if="!homework.opened" class="five vertical-align-top full-td-width text-left">
-                            <p class="twelve" bind-html="[[homework.description]]"></p>
-                        </td>
-                        <!-- Button part -->
-                        <td ng-if="!homework.opened">
-                            <i ng-show="!homework.opened && !hidePencil" ng-click="$parent.openHomework(homework)">&#xe858;</i>
-                            <i ng-show="!homework.opened" class="trash right-magnet"
-                               ng-click="deleteHomework($index);$parent.cancelValidateOnDelete(homework,$index);"></i>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p ng-if="!isHomeworkInSession(homework, session)" class="margin-bottom-md">
+                                    <i18n>homework.attachedToSession</i18n>
+                                    <span ng-if="homework.due_date">[[homework.due_date]]</span>
+                                    <span ng-if="!homework.due_date">[[homework.dueDate]]</span>
+                                </p>
+                                <p ng-if="isHomeworkInSession(homework, session)" class="margin-bottom-md">
+                                    <i18n>todo.for.this.session</i18n>
+                                </p>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p>[[homework.subject.label]]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center one">
+                        <p>[[homework.type.label]]</p>
+                    </div>
+                    <div class="custom-flex-col padding-cell six">
+                        <p bind-html="[[homework.description]]"></p>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center flex-text-right one">
+                        <i ng-show="!hidePencil"
+                           ng-click="manageHomework(homework)">&#xe858;</i>
+                        <i class="trash right-magnet"
+                           ng-click="deleteHomework(homework, $index)"></i>
+                    </div>
+                </div>
             </div>
 
+            <!-- Homework Form -->
             <div class="row">
+                <div ng-if="form.homework" class="padding-md">
+                    <!-- Deadline -->
+                    <div class="float-left three vertical-align-top text-left">
+                        <div ng-if="!isUpdateHomework()" class="ten flex twelve-mobile">
+                            <label>
+                                <i18n>deadline</i18n>
+                                :
+                            </label>
 
-                <div ng-repeat="homework in session.homeworks track by $index" ng-show="!homework.isDeleted"
-                     inside-session-form="true"
-                     ng-controller="manageHomeworkCtrl">
-
-
-                    <div ng-if="homework.opened" class="padding-md">
-                        <!-- Deadline -->
-                        <div ng-if="homework.opened" class="float-left three vertical-align-top text-left">
-                            <div class="ten flex twelve-mobile">
+                            <div class="six flex margin-auto space-around margin-bottom-md">
                                 <label>
-                                    <i18n>deadline</i18n>
-                                    :
+                                    <input type="radio"
+                                           ng-click="attachHomework(true); syncWorkloadDay();"
+                                           ng-checked="form.homework.attachedToSession"
+                                           value="true">
+                                    <span class="no-style ng-scope"><i18n>session</i18n></span>
+                                </label><br>
+                                <label>
+                                    <input type="radio"
+                                           ng-click="attachHomework(false); syncWorkloadDay();"
+                                           ng-checked="!form.homework.attachedToSession"
+                                           value="false">
+                                    <span class="no-style ng-scope"><i18n>date</i18n></span>
                                 </label>
+                            </div>
+                        </div>
+                        <div ng-if="!isUpdateHomework()" class="flex-row row__12">
+                            <date-picker class="date-picker-sm" ng-show="!form.homework.attachedToSession"
+                                         ng-model="form.homework.dueDate" ng-change="syncWorkloadDay()"></date-picker>
 
-                                <div class="six flex margin-auto space-around margin-bottom-md">
-                                    <label>
-                                        <input type="radio"
-                                               ng-click="attachToSession(); syncWorkloadDay();"
-                                               ng-checked="homework.attachedToSession"
-                                               value="true">
-                                        <span class="no-style ng-scope"><i18n>session</i18n></span>
-                                    </label><br>
-                                    <label>
-                                        <input type="radio"
-                                               ng-click="attachToDate(); syncWorkloadDay();"
-                                               ng-checked="homework.attachedToDate"
-                                               value="false">
-                                        <span class="no-style ng-scope"><i18n>date</i18n></span>
-                                    </label>
+                            <div ng-show="form.homework.attachedToSession" class="twelve">
+                                <div class="flex-col col__10 autocomplete-audiences">
+                                    <div class="search-input">
+                                        <async-autocomplete data-ng-disabled="false"
+                                                            data-ng-model="autocomplete.class"
+                                                            data-ng-change="selectAudience"
+                                                            data-options="autocomplete.classOptions"
+                                                            data-on-search="filterAudiences"
+                                                            data-placeholder="printer.audience"
+                                                            data-search="autocomplete.class">
+                                        </async-autocomplete>
+                                    </div>
+                                    <div class="autocomplete-selected"
+                                         ng-show="autocomplete.classesSelected.length > 0">
+                                        <div ng-repeat="audience in autocomplete.classesSelected track by audience.id"
+                                             class="search-input-ul flex-col col__3">
+                                            <span>[[audience.name]]</span>&nbsp;
+                                            <i class="close" ng-click="removeAudience(audience)"></i>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <date-picker class="date-picker-sm" ng-if="homework.attachedToDate"
-                                             ng-model="homework.dueDate" ng-change="syncWorkloadDay()"></date-picker>
-                                <select class="ten"
-                                        ng-if="!homework.attachedToDate"
-                                        ng-model="homework.session"
-                                        ng-click="syncWorkloadDay()"
-                                        ng-options="session as (session.firstText || session.startDisplayDate + ' ' + session.startDisplayTime
-                + '-' + session.endDisplayTime + ' - ' + session.subject.label ) for session in sessionsToAttachTo">
-                                </select>
-
-                                <!-- Type -->
-                                <select class="ten" ng-if="homework.opened"
+                                <select class="flex-col col__10"
                                         required
-                                        ng-model="homework.type"
-                                        ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
+                                        data-ng-change="syncSessionsAndCourses()"
+                                        data-ng-model="form.homework.subject_id"
+                                        ng-options="subject.id as subject.label for subject in getTeacherSubjects()">
                                 </select>
+                                <multi-combo title="[[sessionTitle()]]"
+                                             search-placeholder="sessionChoose"
+                                             id="group-list-teacher"
+                                             class="flex-col col__10"
+                                             combo-model="sessionsToAttachTo"
+                                             filtered-model="form.homework.sessions"
+                                             search-on="string"
+                                             order-by="firstText && audience.id"
+                                >
+                                </multi-combo>
                             </div>
+                        </div>
 
-                            <!--Estimated Time-->
-                            <div class="margin10v">
+                        <!-- Type -->
+                        <select class="ten"
+                                required
+                                ng-model="form.homework.type"
+                                ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
+                        </select>
+
+                        <!--Estimated Time-->
+                        <div class="margin10v">
                                 <span class="ten">
                                     <label>
                                         <i18n>homework.workload</i18n>
                                         <input class="two margin-right-sm margin-left-sm"
-                                               ng-model="homework.estimatedTime" min="0" type="number">
+                                               ng-model="form.homework.estimatedTime" min="0" type="number">
                                         <i18n>minutes</i18n>
                                     </label>
                                 </span>
-                            </div>
+                        </div>
 
-                            <!-- Workload -->
-                            <div ng-if="sessionsToAttachTo ||  homework.attachedToDate">
-                                <span class="ten" ng-repeat="workload in homework.workloadDay.all">
+                        <!-- Workload -->
+                        <div ng-if="sessionsToAttachTo ||  form.homework.attachedToDate">
+                                <span class="ten" ng-repeat="workload in form.homework.workloadDay.all">
                                     <label ng-class="workload.color">
                                         [[workload.count]]
                                     </label>
                                     <label>[[workload.title]]</label>
                                 </span>
-                            </div>
-
-                            <!-- switch publish -->
-                            <div class="flex twelve-mobile">
-                                <label class="vertical-spacing margin-right-md">
-                                    <i18n>utils.publish</i18n>
-                                    :
-                                </label>
-
-                                <switch class="vertical-spacing"
-                                        ng-change="homework.publishedChanged = !homework.publishedChanged"
-                                        ng-model="homework.isPublished">
-                                    <label class="switch"> </label>
-                                </switch>
-                            </div>
-
-                            <div ng-if="homework.publishDate && homework.isPublished" class="flex twelve-mobile">
-                                <label class="vertical-spacing margin-right-md">
-                                    <i18n>homework.published.date.teacher</i18n>
-                                    [[homework.publishDate]]
-                                </label>
-                            </div>
                         </div>
 
-                        <!-- Description-->
-                        <div ng-if="homework.opened"
-                             class="nine float-none display-inline-block vertical-align-top text-left">
-                            <div class="twelve-mobile">
-                                <label>
-                                    <i18n>utils.description</i18n>
-                                    :
-                                </label>
-                            </div>
+                        <!-- switch publish -->
+                        <div class="flex twelve-mobile">
+                            <label class="vertical-spacing margin-right-md">
+                                <i18n>utils.publish</i18n>
+                                :
+                            </label>
 
-                            <editor editor-resize class="session-form-editor twelve" ng-model="homework.description"></editor>
+                            <switch class="vertical-spacing"
+                                    ng-change="form.homework.publishedChanged = !form.homework.publishedChanged"
+                                    ng-model="form.homework.isPublished">
+                                <label class="switch"> </label>
+                            </switch>
+                        </div>
+
+                        <div ng-if="form.homework.publishDate && form.homework.isPublished" class="flex twelve-mobile">
+                            <label class="vertical-spacing margin-right-md">
+                                <i18n>homework.published.date.teacher</i18n>
+                                [[form.homework.publishDate]]
+                            </label>
                         </div>
                     </div>
+
+                    <!-- Description-->
+                    <div ng-if="form.homework"
+                         class="nine float-none display-inline-block vertical-align-top text-left">
+                        <div class="twelve-mobile">
+                            <label>
+                                <i18n>utils.description</i18n>
+                                :
+                            </label>
+                        </div>
+
+                        <editor class="session-form-editor twelve" ng-model="form.homework.description"></editor>
+                    </div>
                 </div>
-
-                <button ng-show="!validate"
-                        class="float-none display-inline-block margin-top-md"
-                        ng-click="addHomework();">
-                    <i18n>homework.manage.create</i18n>
-                </button>
-                <button ng-show="validate"
-                        class="float-none display-inline-block margin-top-md"
-                        ng-disabled="!areValidHomeworks()"
-                        ng-click="closeHomework()">
-                    <i18n>validate</i18n>
-                </button>
-                <button type="button"
-                        class="cancel float-none display-inline-block"
-                        ng-show="formIsOpened"
-                        ng-click="cancelHomework()">
-                    <i18n>utils.cancel</i18n>
-                </button>
-
             </div>
+            <button ng-show="validate"
+                    class="float-none display-inline-block margin-top-md"
+                    ng-disabled="!areValidHomeworks()"
+                    ng-click="closeHomework()">
+                <i18n>validate</i18n>
+            </button>
+            <button type="button"
+                    class="cancel float-none display-inline-block"
+                    ng-show="formIsOpened"
+                    ng-click="cancelHomework()">
+                <i18n>utils.cancel</i18n>
+            </button>
         </div>
-
+        <div ng-if="!sessionDisplay.homeworks[0].opened" class="padding-md margin-bottom-md">
+            <button ng-show="!validate"
+                    class="float-none display-inline-block margin-top-md"
+                    ng-click="manageHomework()">
+                <i18n>homework.manage.create</i18n>
+            </button>
+        </div>
     </div>
-</div>
 </div>

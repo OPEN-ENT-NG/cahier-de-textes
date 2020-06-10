@@ -398,3 +398,70 @@ ul.search-input-ul {
 }
 
 
+.multi-combo-root-button {
+  color: $diary-black;
+}
+
+#group-list-teacher {
+  > button {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  .multi-combo-root-panel {
+    text-align: left;
+  }
+}
+
+.autocomplete-audiences {
+  flex-direction: column;
+}
+
+.autocomplete-selected {
+  width: 100%;
+  display: flex;
+}
+
+.custom-flex-table {
+  .custom-flex-row {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .custom-flex-col {
+    display: flex;
+    flex-flow: column nowrap;
+  }
+
+  .custom-flex-head {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+    color: rgba($diary-grey, 0.7);
+  }
+
+  .padding-cell {
+    padding: 10px;
+  }
+
+  .centered {
+    justify-content: center;
+    text-align: center;
+  }
+  .text-centered {
+    text-align: center;
+  }
+
+  .bot-border {
+    border-bottom: 1px solid #ddd;
+  }
+  .right-border {
+    border-right: 1px solid #ddd;
+  }
+
+  .flex-text-left {
+    text-align: start;
+  }
+  .flex-text-right {
+    text-align: end;
+  }
+  .justified-content-center {
+    justify-content: center;
+  }
+}

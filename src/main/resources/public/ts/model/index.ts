@@ -11,6 +11,7 @@ export * from './Personnel';
 export * from './visa';
 export * from './Toast';
 export * from './User';
+export * from './SessionHomework';
 
 export * from '../utils/dateUtils';
 export * from '../utils/toastUtils';

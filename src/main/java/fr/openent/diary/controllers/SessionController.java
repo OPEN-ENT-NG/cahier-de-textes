@@ -48,15 +48,17 @@ public class SessionController extends ControllerHelper {
     @ResourceFilter(AccessOwnData.class)
     public void getOwnSessions(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
+
             String startDate = request.getParam("startDate");
             String endDate = request.getParam("endDate");
             String structureId = request.getParam("structureId");
-            String audienceId = request.getParam("audienceId");
+            List<String> audienceIds = request.params().getAll("audienceId");
             String subjectId = request.getParam("subjectId");
 
-            sessionService.getOwnSessions(structureId, startDate, endDate, audienceId, subjectId, user, DefaultResponseHandler.arrayResponseHandler(request));
+            sessionService.getOwnSessions(structureId, startDate, endDate, audienceIds, subjectId, user, DefaultResponseHandler.arrayResponseHandler(request));
         });
     }
+
 
     @Get("/sessions/external/:startDate/:endDate")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
@@ -97,7 +99,7 @@ public class SessionController extends ControllerHelper {
         List<String> listTeacherId = request.getParam("teachersId") != null ? Arrays.asList(request.getParam("teachersId").split("\\s*,\\s*")) : null;
         List<String> listAudienceId = request.getParam("audienceId") != null ? Arrays.asList(request.getParam("audienceId").split("\\s*,\\s*")) : null;
         String StructureId = request.getParam("structureId") != null ? request.getParam("structureId") : null;
-        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listTeacherId, published, notPublished, vised, notVised, true,
+        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listTeacherId, null, published, notPublished, vised, notVised, true,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 

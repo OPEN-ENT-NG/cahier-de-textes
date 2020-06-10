@@ -14,6 +14,7 @@ export class Session {
     id: string;
     subject: Subject;
     type: SessionType;
+    type_id?: number;
     structure: Structure;
     teacher: Teacher;
     audience: any;
@@ -355,15 +356,16 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncOwnSessions(structure: any, startMoment: any, endMoment: any, audienceId?: string, subjectId?: string): Promise<void> {
+    async syncOwnSessions(strutcture: any, startMoment: any, endMoment: any, audienceIds?: string[], subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/sessions/own/${startDate}/${endDate}/${this.structure.id}`;
 
-        if (audienceId) {
-            url += `&audienceId=${audienceId}`;
+        if(audienceIds) {
+            audienceIds.forEach(id => url += `&audienceId=${id}`);
         }
+
         if (subjectId) {
             url += `&subjectId=${subjectId}`;
         }

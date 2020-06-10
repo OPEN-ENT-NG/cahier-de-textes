@@ -236,6 +236,8 @@
   "sessions.admin.main.title": "Cahiers de texte",
   "sessions.admin.button.goTo": "Rechercher des cahiers de textes",
   "sessions.admin.button.goTo2": "Mes cahiers de textes",
+  "sessions.choose": "Choisissez des séances",
+  "sessions.selected": "sessions sélectionnées",
   "visa.manage.title": "Visas du cahier de textes",
   "delete.progressions": "Suppression de(s) progression(s)",
   "visa.manage.choosePdf": "Visa du",

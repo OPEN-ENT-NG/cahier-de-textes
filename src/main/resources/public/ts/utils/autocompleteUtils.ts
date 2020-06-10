@@ -52,9 +52,9 @@ export class AutocompleteUtils {
 
 
     static resetSearchFields() {
-        this.teacher = null;
+        this.teacher = "";
         this.teacherOptions = [];
-        this.class = null;
+        this.class = "";
         this.classOptions = [];
     }
 
@@ -76,6 +76,20 @@ export class AutocompleteUtils {
             throw err;
         }
     }
+
+    static filterClassOptionsFromList(value, allClasses) {
+        let audiencesId = this.classesSelected.map(a => a.id);
+        this.classOptions = allClasses
+            .filter(audience =>
+                audience.name.toLowerCase().includes(value.toLowerCase())
+                && !audiencesId.includes(audience.id)
+            )
+            .map((audience) => {
+                audience.toString = () => audience.name.trim();
+                return audience;
+            });
+    }
+
 
     static selectTeacher(model, item) {
         this.teachersSelected.push(item);
