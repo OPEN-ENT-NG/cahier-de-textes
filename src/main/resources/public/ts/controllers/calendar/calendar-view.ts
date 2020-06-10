@@ -622,6 +622,7 @@ export let calendarController = ng.controller('CalendarController',
                 session.setFromCourse(course);
                 session.opened = true;
                 $rootScope.session = session;
+                console.log(progressionDragged.progression_homeworks);
                 progressionDragged.progression_homeworks.map(
                     ph => {
                         let homework = new Homework($scope.structure);
