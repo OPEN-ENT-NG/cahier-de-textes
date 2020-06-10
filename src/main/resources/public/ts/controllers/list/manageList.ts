@@ -1,7 +1,7 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
+    Homework, PEDAGOGIC_TYPES, Session, Structure, Toast, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
@@ -12,9 +12,8 @@ export let manageListCtrl = ng.controller('manageListController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.display = {
-            sessionList: !DateUtils.isAChildOrAParent(model.me.type),
+            sessionList: false,
             listView: true,
-            sessions: true,
             homeworks: true,
             todo: true,
             done: true
@@ -328,14 +327,6 @@ export let manageListCtrl = ng.controller('manageListController',
                 }
             });
             return containsOnlyCourseBool;
-        };
-
-        //check the display mod and if display session check the homeworks an the sessions which have homeworks
-        $scope.displaySession = (displaySession,pedagogicItem) => {
-            if (displaySession)
-                return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_SESSION;
-            else
-                return pedagogicItem.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK || (pedagogicItem.homeworks && pedagogicItem.homeworks.length && pedagogicItem.homeworks.length > 0);
         };
 
         $scope.hasPedagogicDayToDisplay = (pedagogicDays, display) => {

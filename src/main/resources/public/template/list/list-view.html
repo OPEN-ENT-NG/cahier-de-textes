@@ -35,10 +35,11 @@
 
             <!-- list pedagogic day -->
             <div class="list-view">
-                <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display)" class="timeline-story vertical-spacing row">
+                <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display) && (display.sessionList || display.homeworks)"
+                     class="timeline-story vertical-spacing row">
                     <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
                          class="twelve cell event-row timeline-story">
-                        <div ng-if="!containsOnlyCourses(pedagogicDay) && hasHomeworksToDisplay(display, pedagogicDay)">
+                        <div ng-if="!containsOnlyCourses(pedagogicDay)">
 
                             <!-- arrow toggle open or down -->
                             <i ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet"
@@ -68,11 +69,11 @@
                             <div ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
                                 <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
                                     <!-- content list pedagogic item case session list is view -->
-                                    <div ng-if="displaySession(display.sessionList,pedagogicItem) && display.sessionList"
+                                    <div ng-if="display.sessionList"
                                          static-include="/diary/public/template/list/list-pedagogic-item.html"></div>
 
                                     <!-- content list pedagogic homeworkOnly case session list is not view -->
-                                    <div ng-if="displaySession(display.sessionList,pedagogicItem) && !display.sessionList"
+                                    <div ng-if="display.homeworks"
                                          static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"></div>
                                 </div>
                             </div>
@@ -81,10 +82,21 @@
                 </div>
 
                 <!--  empty state -->
-                <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays,display)">
-                    <span ng-show="!display.sessionList"><i18n>diary.empty.viewlist.homework</i18n></span>
-                    <span ng-show="display.sessionList"><i18n>diary.empty.viewlist.session</i18n></span>
+                <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays, display)">
+                    <div class="row">
+                        <div class="nine empty-content">
+                            <div class="eight description">
+                                <span class="orange-bar bar"></span>
+                                    <i18n ng-show="!display.sessionList && display.homeworks">diary.empty.viewlist.homework</i18n>
+                                    <i18n ng-show="display.sessionList && !display.homeworks">diary.empty.viewlist.session</i18n>
+                                    <i18n ng-show="(!display.sessionList && !display.homeworks) || (display.sessionList && display.homeworks)">diary.empty.on.period</i18n>
+                                <span class="green-bar bar"></span>
+                            </div>
+                            <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
 </div>
