@@ -1,29 +1,37 @@
-<div class="homework-type ten cell">
+<div class="sniplet cdt ten cell">
     <toasts notifications="data.notifications"></toasts>
-    <article class="row">
 
+    <article class="row">
         <h3 class="row">
             [[lang.translate('cdt.session.type.title')]]
         </h3>
 
-        <div class="cell twelve-mobile twelve">
+        <!-- content -->
+        <div class="homework-type margin-top-lg padding-left-sm">
+            <!-- form -->
+            <div>
+                <input type="text"
+                       class="input-libelle"
+                       placeholder="[[lang.translate('cdt.session.type.placeholder')]]"
+                       ng-model="data.input"
+                       ng-maxlength="50"
+                       maxlength="50"
+                       minlength="1"/>
+
+                <!-- button save info -->
+                <button class="margin-left-lg right-button" data-ng-click="onClick(sessionTypeInput)">
+                    <span ng-if="data.updateMode">[[lang.translate('item.modify')]]</span>
+                    <span ng-if="!data.updateMode">[[lang.translate('evaluations.add')]]</span>
+                </button>
+
+                <!-- button cancel update mode -->
+                <button class="right-button" ng-if="data.updateMode" data-ng-click="cancelUpdateSessionTypeInput()">
+                    [[lang.translate('viescolaire.utils.cancel')]]
+                </button>
+            </div>
+
+            <!-- list of session type  -->
             <ul class="settings-list">
-                <li class="twelve skill-list-proposition">
-                    <input type="text"
-                           class="input-libelle"
-                           placeholder="[[lang.translate('cdt.session.type.placeholder')]]"
-                           ng-model="data.input"
-                           ng-maxlength="50"
-                           maxlength="50"
-                           minlength="1"/>
-                    <button class="right-button" data-ng-click="onClick(sessionTypeInput)">
-                        <span ng-if="data.updateMode">[[lang.translate('item.modify')]]</span>
-                        <span ng-if="!data.updateMode">[[lang.translate('evaluations.add')]]</span>
-                    </button>
-                    <button class="right-button" ng-if="data.updateMode" data-ng-click="cancelUpdateSessionTypeInput()">
-                       [[lang.translate('viescolaire.utils.cancel')]]
-                    </button>
-                </li>
                 <li ng-repeat="sessionType in sessionTypes.all track by $index"
                     class="twelve twelve-mobile skills-list-proposition">
                     <span class="three cell twelve-mobile">[[sessionType.label]]</span>
@@ -31,6 +39,7 @@
                     <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteSessionType(sessionType);"></i>
                 </li>
             </ul>
+
         </div>
 
     </article>

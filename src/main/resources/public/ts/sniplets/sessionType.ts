@@ -1,5 +1,6 @@
 import {SessionType, SessionTypes, Toast} from "../model";
-import {homeworkType} from "./homeworkType";
+
+declare let window: any;
 
 export const sessionType = {
     title: 'Session type',
@@ -8,6 +9,7 @@ export const sessionType = {
     controller: {
         init: async function () {
             sessionType.that = this;
+            this.setHandler();
             this.structure_id = this.source.idStructure;
             this.session_type = new SessionType(this.structure_id);
             this.sessionTypes = new SessionTypes(this.structure_id);
@@ -21,7 +23,18 @@ export const sessionType = {
             };
 
             await this.sessionTypes.sync();
+            this.isLast();
             this.safeApply();
+        },
+
+        setHandler: function () {
+            this.$watch(() => window.model.vieScolaire.structure, async () => {
+                this.structure_id = window.model.vieScolaire.structure.id;
+                this.sessionTypes = new SessionTypes(this.structure_id);
+                await this.sessionTypes.sync();
+                this.isLast();
+                this.safeApply();
+            });
         },
 
         safeApply: function (): Promise<any> {
@@ -42,12 +55,7 @@ export const sessionType = {
         },
 
         isLast: function () {
-            if(this.sessionTypes.all.length <= 1) {
-                sessionType.that.data.hideTrash = true;
-            }
-            else {
-                sessionType.that.data.hideTrash = false;
-            }
+            sessionType.that.data.hideTrash = this.sessionTypes.all.length <= 1;
         },
 
         toastHttpCall: (response) => {

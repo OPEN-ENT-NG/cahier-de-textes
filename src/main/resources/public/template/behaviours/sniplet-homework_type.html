@@ -1,4 +1,4 @@
-<div class="homework-type ten cell">
+<div class="sniplet cdt ten cell">
     <toasts notifications="data.notifications"></toasts>
     <article class="row">
 
@@ -6,34 +6,55 @@
             [[lang.translate('cdt.setting.homework.type')]]
         </h3>
 
-        <div class="cell twelve-mobile twelve">
-                <ul class="settings-list">
-                    <li class="twelve skill-list-proposition">
-                        <input type="text"
-                               class="input-libelle"
-                               placeholder="Créer un type de travail"
-                               ng-model="homework_type.label"
-                               ng-maxlength="50"
-                               maxlength="50"/>
-                        <button class="right-button"
-                                ng-if="!updateType"
-                                ng-click="createHomeworkType(homework_type)">
-                            [[lang.translate('evaluations.add')]]
-                        </button>
-                        <button class="right-button"
-                                ng-if="updateType"
-                                ng-click="updateHomeworkType(homeworkType);">
-                            [[lang.translate('item.modify')]]
-                        </button>
-                    </li>
-                    <li ng-repeat="homeworkType in homeworkTypes.all"
-                        class="twelve twelve-mobile skills-list-proposition">
-                        <span class="three cell twelve-mobile">[[homeworkType.label]]</span>
-                        <i class="pencil icon-grey" data-ng-click="prepareUpdate(homeworkType);"></i>
-                        <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
-                    </li>
-                </ul>
+        <!-- content -->
+        <div class="homework-type margin-top-lg padding-left-sm">
+            <!-- form -->
+            <div>
+                <input type="text"
+                       class="input-libelle"
+                       placeholder="Créer un type de travail"
+                       ng-model="data.input"
+                       ng-maxlength="50"
+                       maxlength="50"/>
+
+                <!-- button save info -->
+<!--                <button class="margin-left-lg right-button" ng-if="!updateType" ng-click="createHomeworkType(homework_type)">-->
+<!--                    [[lang.translate('evaluations.add')]]-->
+<!--                </button>-->
+
+<!--                &lt;!&ndash; button cancel update mode &ndash;&gt;-->
+<!--                <button class="margin-left-lg right-button" ng-if="updateType" ng-click="updateHomeworkType(homeworkType);">-->
+<!--                    [[lang.translate('item.modify')]]-->
+<!--                </button>-->
+
+                <!-- button save info -->
+                <button class="margin-left-lg right-button" data-ng-click="onClick(homeworkTypeInput)">
+                    <span ng-if="data.updateMode">[[lang.translate('item.modify')]]</span>
+                    <span ng-if="!data.updateMode">[[lang.translate('evaluations.add')]]</span>
+                </button>
+
+                <!-- button cancel update mode -->
+                <button class="right-button" ng-if="data.updateMode" data-ng-click="cancelUpdateHomeworkTypeInput()">
+                    [[lang.translate('viescolaire.utils.cancel')]]
+                </button>
+            </div>
+
+            <!-- list of homework type  -->
+            <ul class="settings-list">
+                <li ng-repeat="homeworkType in homeworkTypes.all"
+                    class="twelve twelve-mobile skills-list-proposition">
+                    <span class="three cell twelve-mobile">[[homeworkType.label]]</span>
+                    <i class="pencil icon-grey" data-ng-click="prepareUpdate(homeworkType);"></i>
+                    <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteHomeworkType(homeworkType);"></i>
+                </li>
+            </ul>
         </div>
+
+
+        <div class="cell twelve-mobile twelve">
+
+        </div>
+
 
     </article>
 </div>

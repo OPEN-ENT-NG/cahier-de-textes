@@ -21,7 +21,7 @@
 
   ul.settings-list {
     list-style-type: none;
-    padding-left: 10px;
+    padding-left: 0;
   }
 
   .skills-list-proposition:hover dots-menu {
@@ -40,10 +40,10 @@
   }
 
   .pencil:hover {
-    color: $orange;
+    color: $diary-darkengreen;
   }
 
   .trash:hover {
-    color: $orange;
+    color: $diary-darkengreen;
   }
 }

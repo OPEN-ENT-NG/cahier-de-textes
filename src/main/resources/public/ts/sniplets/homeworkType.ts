@@ -1,6 +1,7 @@
 import {HomeworkType, Toast} from "../model";
 import {HomeworkTypes} from "../model";
 
+declare let window: any;
 
 export const homeworkType = {
     title: 'Homework type',
@@ -9,11 +10,16 @@ export const homeworkType = {
     controller: {
         init: async function () {
             homeworkType.that = this;
+            this.setHandler();
             this.structure_id = this.source.idStructure;
             this.homework_type = new HomeworkType(this.structure_id);
             this.homeworkTypes = new HomeworkTypes(this.structure_id);
+            this.homeworkTypeInput = this.homework_type;
 
             this.data = {
+                input: "",
+                updateMode: false,
+                updateId: null,
                 notifications: [],
                 hideTrash: false,
             };
@@ -21,6 +27,16 @@ export const homeworkType = {
             await this.homeworkTypes.sync();
             this.isLast();
             this.safeApply();
+        },
+
+        setHandler: function () {
+            this.$watch(() => window.model.vieScolaire.structure, async () => {
+                this.structure_id = window.model.vieScolaire.structure.id;
+                this.homeworkTypes = new HomeworkTypes(this.structure_id);
+                await this.homeworkTypes.sync();
+                this.isLast();
+                this.safeApply();
+            });
         },
 
         safeApply: function (): Promise<any> {
@@ -41,12 +57,7 @@ export const homeworkType = {
         },
 
         isLast: function () {
-            if(this.homeworkTypes.all.length <= 1) {
-                homeworkType.that.data.hideTrash = true;
-            }
-            else {
-                homeworkType.that.data.hideTrash = false;
-            }
+            homeworkType.that.data.hideTrash = this.homeworkTypes.all.length <= 1;
         },
 
         toastHttpCall: (response) => {
@@ -58,24 +69,46 @@ export const homeworkType = {
             return response;
         },
 
-        createHomeworkType: async function () {
-            this.updateType = false;
-            this.toastHttpCall(await this.homework_type.create());
+        onClick: async function(homeworkTypeInput: HomeworkType) {
+            if (homeworkType.that.data.input.length > 1) {
+                if (homeworkType.that.data.updateMode) {
+                    homeworkType.that.updateHomeworkType();
+                } else {
+                    homeworkType.that.createHomeworkType(homeworkTypeInput);
+                }
+            }
+        },
+
+        createHomeworkType: async function (event: HomeworkType) {
+            event.label = homeworkType.that.data.input;
+            this.toastHttpCall(await event.create());
+            homeworkType.that.data.input = "";
             await this.homeworkTypes.sync();
-            this.homework_type.label = null;
-            homeworkType.that.homework_type.label = null;
             this.safeApply(homeworkType.that);
             this.isLast();
         },
 
         updateHomeworkType: async function () {
-            this.updateType = true;
-            this.toastHttpCall(await this.homework_type.update());
+            this.homeworkTypeInput.label = homeworkType.that.data.input;
+            this.homeworkTypeInput.id = homeworkType.that.data.updateId;
+            this.toastHttpCall(await this.homeworkTypeInput.update());
+            homeworkType.that.data.updateMode = false;
+            homeworkType.that.data.input = "";
             await this.homeworkTypes.sync();
-            homeworkType.that.updateType = false;
-            this.homework_type.label = null;
-            homeworkType.that.homework_type.label = null;
             this.safeApply(homeworkType.that);
+        },
+
+        prepareUpdate: async function (homework_type: HomeworkType) {
+            this.homeworkTypeInput = homework_type;
+            homeworkType.that.data.updateId = homework_type.id;
+            homeworkType.that.data.updateMode = true;
+            homeworkType.that.data.input = homework_type.label;
+        },
+
+        cancelUpdateHomeworkTypeInput: async function () {
+            this.homeworkTypeInput = this.sessionType;
+            homeworkType.that.data.updateMode = false;
+            homeworkType.that.data.input = "";
         },
 
         deleteHomeworkType: async function (homework_type: HomeworkType) {
@@ -84,11 +117,5 @@ export const homeworkType = {
             this.safeApply(homeworkType.that);
             this.isLast();
         },
-
-        prepareUpdate: async function (homework_type: HomeworkType) {
-            homeworkType.that.updateType = true;
-            homeworkType.that.homework_type = homework_type;
-            this.safeApply(homeworkType.that);
-        }
     }
 };
