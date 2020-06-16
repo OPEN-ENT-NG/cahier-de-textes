@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonObject;
 
 public interface InitService {
 
+    void retrieveInitializationStatus(String structure_id, final Handler<Either<String, JsonObject>> handler);
 
-    void init( final  Handler<Either<String, JsonObject>>  handler);
+    void init(String structure_id, final Handler<Either<String, JsonObject>> handler);
 }

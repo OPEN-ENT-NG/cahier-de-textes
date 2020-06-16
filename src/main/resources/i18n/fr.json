@@ -214,6 +214,7 @@
   "homeworks.attached": "Travail à faire",
   "homework.manage.delete": "Le travail à faire a été supprimé",
   "homework.create": "Créer un travail",
+  "homework.type.empty.state": "Veuillez lancer l'initialisation",
   "homework.manage.error.noId": "Erreur, pas d'identifiant pour le travail à faire",
   "sidebar.display_mode": "Mode d'affichage",
   "sessions.admin.nbsessions": "Nb séances",

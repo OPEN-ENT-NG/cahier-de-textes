@@ -1,4 +1,5 @@
 import {SessionType, SessionTypes, Toast} from "../model";
+import {structureService} from "../services";
 
 declare let window: any;
 
@@ -12,7 +13,6 @@ export const sessionType = {
             this.setHandler();
             this.structure_id = this.source.idStructure;
             this.session_type = new SessionType(this.structure_id);
-            this.sessionTypes = new SessionTypes(this.structure_id);
             this.sessionTypeInput = this.session_type;
 
             this.data = {
@@ -21,20 +21,19 @@ export const sessionType = {
                 updateId: null,
                 notifications: [],
             };
+        },
 
+        load: async function(): Promise<void> {
+            this.structure_id = window.model.vieScolaire.structure.id;
+            this.isStructureInitialized = await structureService.fetchInitializationStatus(this.structure_id);
+            this.sessionTypes = new SessionTypes(this.structure_id);
             await this.sessionTypes.sync();
             this.isLast();
             this.safeApply();
         },
 
         setHandler: function () {
-            this.$watch(() => window.model.vieScolaire.structure, async () => {
-                this.structure_id = window.model.vieScolaire.structure.id;
-                this.sessionTypes = new SessionTypes(this.structure_id);
-                await this.sessionTypes.sync();
-                this.isLast();
-                this.safeApply();
-            });
+            this.$watch(() => window.model.vieScolaire.structure, async () => this.load());
         },
 
         safeApply: function (): Promise<any> {

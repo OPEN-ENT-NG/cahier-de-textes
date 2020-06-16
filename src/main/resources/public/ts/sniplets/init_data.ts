@@ -1,7 +1,9 @@
 import {Toast, ToastUtils} from "../model";
 import {homeworkType} from "./homeworkType";
 import http from "axios";
+import {structureService} from "../services";
 
+declare let window: any;
 
 export const initData = {
     title: 'Init data',
@@ -41,9 +43,10 @@ export const initData = {
         },
 
         initData: async function () {
-            let response = await http.get(`diary/init`);
+            let structure_id = window.model.vieScolaire.structure.id;
+            let response = await structureService.initStructure(structure_id);
             this.toastHttpCall(ToastUtils.setToastMessage(response,'cdt.data.init.success', 'cdt.data.init.error'));
             this.safeApply();
         }
     }
-}
+};

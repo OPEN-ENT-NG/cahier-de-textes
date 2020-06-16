@@ -1,5 +1,6 @@
 import {HomeworkType, Toast} from "../model";
 import {HomeworkTypes} from "../model";
+import {structureService} from "../services";
 
 declare let window: any;
 
@@ -13,7 +14,6 @@ export const homeworkType = {
             this.setHandler();
             this.structure_id = this.source.idStructure;
             this.homework_type = new HomeworkType(this.structure_id);
-            this.homeworkTypes = new HomeworkTypes(this.structure_id);
             this.homeworkTypeInput = this.homework_type;
 
             this.data = {
@@ -21,22 +21,23 @@ export const homeworkType = {
                 updateMode: false,
                 updateId: null,
                 notifications: [],
-                hideTrash: false,
+                hideTrash: false
             };
 
+            this.safeApply();
+        },
+
+        load: async function(): Promise<void> {
+            this.isStructureInitialized = await structureService.fetchInitializationStatus(window.model.vieScolaire.structure.id);
+            this.structure_id = window.model.vieScolaire.structure.id;
+            this.homeworkTypes = new HomeworkTypes(this.structure_id);
             await this.homeworkTypes.sync();
             this.isLast();
             this.safeApply();
         },
 
         setHandler: function () {
-            this.$watch(() => window.model.vieScolaire.structure, async () => {
-                this.structure_id = window.model.vieScolaire.structure.id;
-                this.homeworkTypes = new HomeworkTypes(this.structure_id);
-                await this.homeworkTypes.sync();
-                this.isLast();
-                this.safeApply();
-            });
+            this.$watch(() => window.model.vieScolaire.structure, async () => this.load());
         },
 
         safeApply: function (): Promise<any> {

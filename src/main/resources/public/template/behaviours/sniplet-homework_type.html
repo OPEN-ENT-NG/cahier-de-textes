@@ -1,7 +1,8 @@
 <div class="sniplet cdt ten cell">
     <toasts notifications="data.notifications"></toasts>
-    <article class="row">
 
+    <!-- structure is initialized -->
+    <article ng-if="isStructureInitialized" class="row">
         <h3 class="row">
             [[lang.translate('cdt.setting.homework.type')]]
         </h3>
@@ -16,17 +17,6 @@
                        ng-model="data.input"
                        ng-maxlength="50"
                        maxlength="50"/>
-
-                <!-- button save info -->
-<!--                <button class="margin-left-lg right-button" ng-if="!updateType" ng-click="createHomeworkType(homework_type)">-->
-<!--                    [[lang.translate('evaluations.add')]]-->
-<!--                </button>-->
-
-<!--                &lt;!&ndash; button cancel update mode &ndash;&gt;-->
-<!--                <button class="margin-left-lg right-button" ng-if="updateType" ng-click="updateHomeworkType(homeworkType);">-->
-<!--                    [[lang.translate('item.modify')]]-->
-<!--                </button>-->
-
                 <!-- button save info -->
                 <button class="margin-left-lg right-button" data-ng-click="onClick(homeworkTypeInput)">
                     <span ng-if="data.updateMode">[[lang.translate('item.modify')]]</span>
@@ -49,12 +39,10 @@
                 </li>
             </ul>
         </div>
+    </article>
 
-
-        <div class="cell twelve-mobile twelve">
-
-        </div>
-
-
+    <!-- empty state -->
+    <article ng-if="!isStructureInitialized">
+        <h3>[[lang.translate('homework.type.empty.state')]]</h3>
     </article>
 </div>

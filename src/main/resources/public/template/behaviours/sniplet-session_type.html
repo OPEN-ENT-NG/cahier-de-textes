@@ -1,7 +1,8 @@
 <div class="sniplet cdt ten cell">
     <toasts notifications="data.notifications"></toasts>
 
-    <article class="row">
+    <!-- structure is initialized -->
+    <article ng-if="isStructureInitialized" class="row">
         <h3 class="row">
             [[lang.translate('cdt.session.type.title')]]
         </h3>
@@ -39,8 +40,11 @@
                     <i ng-show="!data.hideTrash" class="trash icon-grey" data-ng-click="deleteSessionType(sessionType);"></i>
                 </li>
             </ul>
-
         </div>
+    </article>
 
+    <!-- empty state -->
+    <article ng-if="!isStructureInitialized">
+        <h3>[[lang.translate('homework.type.empty.state')]]</h3>
     </article>
 </div>
