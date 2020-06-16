@@ -3,8 +3,16 @@
     <div class="main-header" ng-class="{'padding-bottom-lg': !isCounselorUser()}">
         <!-- Title -->
         <h1 class="cell title-area-complete padding-right-xlg">
+            <!-- module image -->
             <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+
+            <!-- module title name -->
             <i18n>diary.title</i18n>
+
+            <!-- name structure -->
+            <span ng-if="!isCounselorUser()" class="structure-title main">
+                [[structure.name]]
+            </span>
         </h1>
 
         <!-- teacher search bar -->

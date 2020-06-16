@@ -10,3 +10,20 @@
   }
 }
 
+.structure-title {
+  position: absolute;
+  min-width: 300px;
+  font-size: 18px;
+  font-weight: normal;
+  // main.html design
+  &.main {
+    top: 40px;
+    left: 70px;
+  }
+  //admin-main.html design
+  &.admin-main {
+    bottom: 0;
+    left: -11px;
+  }
+}
+

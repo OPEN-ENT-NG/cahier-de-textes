@@ -5,8 +5,15 @@
                 <div ng-class="isCounselorUser() ?  'title-area-complete' : 'title-area-simple'">
                     <img ng-if="isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
                     <h1 class="application-title">
+                        <!-- module title name -->
                         <i18n>diary.title</i18n>
+
+                        <!-- name structure -->
+                        <span ng-if="isCounselorUser()" class="structure-title admin-main">
+                            [[structure.name]]
+                        </span>
                     </h1>
+
                 </div>
             </app-title>
         </div>
