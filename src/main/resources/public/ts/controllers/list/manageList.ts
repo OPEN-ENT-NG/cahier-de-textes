@@ -1,10 +1,12 @@
-import {_, Behaviours, model, moment, ng} from 'entcore';
+import {_, Behaviours, Me, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
     Homework, PEDAGOGIC_TYPES, Session, Structure, Toast, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
+
+declare let window: any;
 
 export let manageListCtrl = ng.controller('manageListController',
     ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $rootScope) {
@@ -32,6 +34,16 @@ export let manageListCtrl = ng.controller('manageListController',
             startDate: moment().toDate(),
             endDate: moment().add('2', 'weeks').toDate()
         };
+
+        $scope.structures = initStructures();
+        let preferenceStructure = await Me.preference(PreferencesUtils.PREFERENCE_KEYS.CDT_STRUCTURE);
+        let preferenceStructureId = preferenceStructure ? preferenceStructure['id'] : null;
+        let structure = $scope.structures.length > 1 && preferenceStructureId ? $scope.structures.find((s) => s.id === preferenceStructureId) : $scope.structures[0];
+        $scope.menu = {
+            structure: structure
+        };
+        // await $scope.setStructure(structure);
+        $scope.safeApply();
 
         $scope.syncPedagogicItems = async () => {
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
@@ -71,6 +83,23 @@ export let manageListCtrl = ng.controller('manageListController',
             // link homeworks to their session
             $scope.loadPedagogicItems();
             delete ($rootScope.session);
+            $scope.safeApply();
+        };
+
+        function initStructures(): Structure[] {
+            const {structures, structureNames} = model.me;
+            const values = [];
+            for (let i = 0; i < structures.length; i++) {
+                values.push({id: structures[i], name: structureNames[i]});
+            }
+            return values;
+        };
+
+        $scope.setStructure = async function(structure: Structure) {
+            window.structure = structure;
+            $scope.menu.structure = structure;
+            $scope.menu.active = structure.id;
+            await PreferencesUtils.updateStructure(structure);
             $scope.safeApply();
         };
 

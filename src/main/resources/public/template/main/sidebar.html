@@ -1,7 +1,7 @@
 <article class="sidebar remove-padding" workflow="diary.listView">
     <div>
         <!-- SELECT STRUCTURE -->
-        <div ng-if="structures.all.length > 1">
+        <div ng-if="structures.length > 1">
             <div class="row title-sidebar padding-left-md padding-right-md">
                 <h5 class="large cell twelve" workflow="diary.listView">
                     <i18n>utils.structure.fr</i18n>
@@ -14,7 +14,7 @@
                             id="structure-list"
                             class="twelve"
                             ng-change="setStructure(structure)"
-                            ng-options="structure as structure.name for structure in structures.all">
+                            ng-options="structure as structure.name for structure in structures">
                         <option value="" disabled selected>[[translate('utils.structure.choose.one')]]</option>
                     </select>
                 </div>
