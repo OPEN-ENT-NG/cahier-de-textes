@@ -1,14 +1,14 @@
 <div class="sniplet cdt ten cell">
     <toasts notifications="data.notifications"></toasts>
 
-    <!-- structure is initialized -->
-    <article ng-if="isStructureInitialized" class="row">
+    <!-- content -->
+    <article class="row">
         <h3 class="row">
             [[lang.translate('cdt.session.type.title')]]
         </h3>
 
-        <!-- content -->
-        <div class="homework-type margin-top-lg padding-left-sm">
+        <!-- structure is initialized -->
+        <div ng-if="isStructureInitialized" class="homework-type margin-top-lg padding-left-sm">
             <!-- form -->
             <div>
                 <input type="text"
@@ -41,10 +41,13 @@
                 </li>
             </ul>
         </div>
-    </article>
 
-    <!-- empty state -->
-    <article ng-if="!isStructureInitialized">
-        <h3>[[lang.translate('homework.type.empty.state')]]</h3>
+        <!-- empty state -->
+        <div class="homework-type" ng-if="!isStructureInitialized">
+            <div class="empty-state">
+                <span>[[lang.translate('homework.session.type.empty.state')]]</span>
+                <img data-ng-src="/diary/public/img/computer-book-orange.svg" class="two" alt="">
+            </div>
+        </div>
     </article>
 </div>

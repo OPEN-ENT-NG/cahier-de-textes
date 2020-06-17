@@ -19,6 +19,13 @@
     }
   }
 
+  .empty-state {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   ul.settings-list {
     list-style-type: none;
     padding-left: 0;
