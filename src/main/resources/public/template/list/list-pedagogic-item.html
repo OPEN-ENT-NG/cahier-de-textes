@@ -1,10 +1,10 @@
 <!-- Session and Course -->
 <article ng-if="pedagogicItem.pedagogicType === TYPE_SESSION" class="pedagogic-item-article">
     <!-- Sessions -->
-    <div class="row  list-view-item">
+    <div class="row list-view-item">
         <div  ng-click="pedagogicItem.opened = !pedagogicItem.opened" class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
-            <span ng-class=" pedagogicItem.description?'hasDescription':''"
+            <span ng-class="pedagogicItem.description?'hasDescription':''"
                   >
                 <span>
                     <b>[[pedagogicItem.subject.label]] &nbsp;</b>
@@ -20,11 +20,12 @@
                 </span>
             </span>
 
-                <!--<i ng-if="pedagogicItem.description"-->
-                <!--ng-class="pedagogicItem.opened ? 'up-open' : 'down-open'"></i>&nbsp;&nbsp;-->
-
-            <i ng-if="isClickableByStudentOrParent(pedagogicItem)" class="right-magnet" ng-click="openSession(pedagogicItem.id)" tooltip="[[translate('session.consult')]]">&#xe8aa;</i>
-            <i ng-if="pedagogicItem.pedagogicType == 3" class="right-magnet" ng-click="openSessionFromCourse(pedagogicItem)" tooltip="[[translate('session.consult')]]">&#xe8aa;</i>
+            <i ng-if="isClickableByStudentOrParent(pedagogicItem)" class="right-open i-icon-right" ng-click="openSession(pedagogicItem.id)" tooltip="[[translate('session.consult')]]">
+                <i18n class="see-right">see.detail</i18n>
+            </i>
+            <i ng-if="pedagogicItem.pedagogicType == 3" class="right-open i-icon-right" ng-click="openSessionFromCourse(pedagogicItem)" tooltip="[[translate('session.consult')]]">
+                <i18n class="see-right">see.detail</i18n>
+            </i>
             <br/>
 
             <div class="row inline-block horizontal-spacing medium-importance margin-top-md">
@@ -36,7 +37,6 @@
                    -   <i18n>utils.room</i18n> : [[pedagogicItem.room]]
                 </span>
             </div>
-
 
             <!-- Description -->
             <div ng-if="pedagogicItem.opened && pedagogicItem.description"

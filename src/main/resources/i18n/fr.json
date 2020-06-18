@@ -285,5 +285,6 @@
   "progression.my.folders": "Mes Dossiers",
   "validate": "Valider",
   "Status": "Statut",
-  "diary.error.date.is.not.valid": "L'heure de fin doit être supérieure de 15 minutes à l'heure de début"
+  "diary.error.date.is.not.valid": "L'heure de fin doit être supérieure de 15 minutes à l'heure de début",
+  "see.detail":  "Voir"
 }

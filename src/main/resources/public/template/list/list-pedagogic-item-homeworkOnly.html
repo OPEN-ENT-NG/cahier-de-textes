@@ -1,6 +1,6 @@
 <!-- HOMEWORKS ONLY-->
 <article  ng-if="pedagogicItem.pedagogicType === TYPE_HOMEWORK && filterHomeworkState(pedagogicItem)" class="pedagogic-item-article">
-    <div  class="row  list-view-item">
+    <div  class="row list-view-item">
 
         <div  class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
@@ -21,7 +21,7 @@
 
                     <!--devoir -->
                     <div class="cell horizontal-spacing twelve-mobile">
-                        <span ><i>&#xe80d;</i></span>
+                        <span><i>&#xe80d;</i></span>
                         <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
                               ng-click="pedagogicItem.opened = !pedagogicItem.opened">
                             [[pedagogicItem.type.label]]&nbsp;
@@ -65,8 +65,8 @@
         </div>
 
         <!-- HOMEWORK DONE -->
-
-        <i ng-click="openHomework(pedagogicItem.id)" tooltip="[[translate('homework.consult')]]">&#xe8aa;</i>
-
+        <i ng-click="openHomework(pedagogicItem.id)" class="right-open" tooltip="[[translate('homework.consult')]]">
+            <i18n class="see-right">see.detail</i18n>
+        </i>
     </div>
 </article>

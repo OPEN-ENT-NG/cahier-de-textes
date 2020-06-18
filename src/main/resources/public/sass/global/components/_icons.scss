@@ -54,11 +54,17 @@ i {
   &.arrow-right::before {
     content: "\e823";
   }
+
   &.arrow-left::before {
     content: "\e87b";
   }
+
   &.arrow-down::before {
     content: "\e841";
+  }
+
+  &.right-open::before {
+    content: "\e823";
   }
 
 }

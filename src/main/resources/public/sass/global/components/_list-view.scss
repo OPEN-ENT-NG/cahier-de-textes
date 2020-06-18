@@ -192,6 +192,17 @@
   .hoursInView {
     color: #666666;
   }
+
+  .see-right {
+    text-decoration: underline;
+    position: absolute;
+    right: 18px;
+  }
+
+  .i-icon-right {
+    position: absolute;
+    right: 10px;
+  }
  /* @media screen and (min-width: $tablette) {
     .timeline-story {
       .date-label {
