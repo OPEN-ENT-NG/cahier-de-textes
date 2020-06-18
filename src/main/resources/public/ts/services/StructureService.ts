@@ -1,5 +1,6 @@
-import {ng} from 'entcore'
+import {model, ng} from 'entcore'
 import http, {AxiosResponse} from 'axios';
+import {Structure} from "../model";
 
 export interface StructureSlot {
     _id: string;
@@ -17,7 +18,11 @@ export interface TimeSlot {
 
 export interface StructureService {
     initStructure(structure_id: string): Promise<AxiosResponse>;
+
     getSlotProfile(structureId: string): Promise<StructureSlot>;
+
+    getUserStructure(): Array<Structure>;
+
     fetchInitializationStatus(structure_id: string): Promise<boolean>;
 }
 
@@ -48,7 +53,17 @@ export const structureService: StructureService = {
         } catch (err) {
             throw err;
         }
+    },
+
+    getUserStructure: (): Array<Structure> => {
+        const {structures, structureNames} = model.me;
+        const values = [];
+        for (let i = 0; i < structures.length; i++) {
+            values.push({id: structures[i], name: structureNames[i]});
+        }
+        return values;
     }
+
 };
 
 export const StructureService = ng.service('StructureService', (): StructureService => structureService);

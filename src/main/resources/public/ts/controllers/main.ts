@@ -1,4 +1,4 @@
-import {Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
+import {Behaviours, idiom as lang, Me, model, moment, ng, template} from 'entcore';
 import {
     Courses,
     Structures,
@@ -6,12 +6,14 @@ import {
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocompleteUtils';
+import {PreferencesUtils} from "../utils/preference/preferences";
+import {StructureService} from "../services";
 
 declare let window: any;
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout',
-        async function ($scope, route, $location, $timeout) {
+    ['$scope', 'route', '$location', '$timeout', 'StructureService',
+        async function ($scope, route, $location, $timeout, structureService: StructureService) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.notifications = [];
         $scope.display = {
@@ -39,7 +41,16 @@ export let main = ng.controller('MainController',
             }
         };
 
-        $scope.initializeStructure = async () => {
+        $scope.initializeStructure = async (): Promise<void> => {
+            // case navigation does not exist
+            if ($scope.isAChildOrAParent) {
+                let structures = structureService.getUserStructure();
+                let preferenceStructure = await Me.preference(PreferencesUtils.PREFERENCE_KEYS.CDT_STRUCTURE);
+                let preferenceStructureId = preferenceStructure ? preferenceStructure['id'] : null;
+                window.structure = preferenceStructureId ?
+                    structures.find((s) => s.id === preferenceStructureId) : structures[0];
+            }
+
             $scope.structures = new Structures();
             await $scope.structures.sync();
             $scope.structure = $scope.structures.getCurrentStructure();

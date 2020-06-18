@@ -3,7 +3,6 @@ import {Audiences, Courses, Homeworks, Sessions, Students, Subjects, Teachers} f
 import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
-import {AutocompleteUtils} from "../utils/autocompleteUtils";
 
 declare let window: any;
 
