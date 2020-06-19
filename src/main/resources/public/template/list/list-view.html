@@ -8,6 +8,10 @@
                     <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
                     <h1 class="application-title">
                         <i18n>diary.title</i18n>
+                        <!-- name structure -->
+                        <span ng-if="!isCounselorUser()" class="structure-title manage-list">
+                            [[structure.name]]
+                        </span>
                     </h1>
                 </div>
             </app-title>

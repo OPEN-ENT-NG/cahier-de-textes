@@ -12,18 +12,27 @@
 
 .structure-title {
   position: absolute;
-  min-width: 300px;
   font-size: 18px;
   font-weight: normal;
+  width: max-content;
+
   // main.html design
   &.main {
     top: 40px;
     left: 70px;
   }
-  //admin-main.html design
+
+  // list-view.html design
+  &.manage-list {
+    bottom: -10px;
+    left: 70px;
+    font-size: 16px;
+  }
+
+  // admin-main.html design
   &.admin-main {
     bottom: 0;
-    left: -11px;
+    left: 70px;
   }
 }
 
