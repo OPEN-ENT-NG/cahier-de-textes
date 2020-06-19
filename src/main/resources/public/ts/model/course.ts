@@ -126,7 +126,7 @@ export class Courses {
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
 
-        if (model.me.type !== USER_TYPES.student || model.me.type !== USER_TYPES.relative) {
+        if (model.me.type !== USER_TYPES.student && model.me.type !== USER_TYPES.relative) {
             if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`;
             if (audience) filter += `&group=${audience.name ? audience.name : audience.groupName}`;
         } else if (model.me.classes && model.me.classes.length) {
