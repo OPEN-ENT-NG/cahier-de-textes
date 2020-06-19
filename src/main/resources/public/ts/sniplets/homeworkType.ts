@@ -15,6 +15,7 @@ export const homeworkType = {
             this.structure_id = this.source.idStructure;
             this.homework_type = new HomeworkType(this.structure_id);
             this.homeworkTypeInput = this.homework_type;
+            this.loading = null;
 
             this.data = {
                 input: "",
@@ -28,11 +29,13 @@ export const homeworkType = {
         },
 
         load: async function(): Promise<void> {
+            this.loading = true;
             this.isStructureInitialized = await structureService.fetchInitializationStatus(window.model.vieScolaire.structure.id);
             this.structure_id = window.model.vieScolaire.structure.id;
             this.homeworkTypes = new HomeworkTypes(this.structure_id);
             await this.homeworkTypes.sync();
             this.isLast();
+            this.loading = false;
             this.safeApply();
         },
 

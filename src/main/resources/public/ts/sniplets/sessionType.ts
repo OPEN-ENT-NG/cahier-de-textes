@@ -14,6 +14,7 @@ export const sessionType = {
             this.structure_id = this.source.idStructure;
             this.session_type = new SessionType(this.structure_id);
             this.sessionTypeInput = this.session_type;
+            this.loading = null;
 
             this.data = {
                 input: "",
@@ -24,11 +25,13 @@ export const sessionType = {
         },
 
         load: async function(): Promise<void> {
+            this.loading = true;
             this.structure_id = window.model.vieScolaire.structure.id;
             this.isStructureInitialized = await structureService.fetchInitializationStatus(this.structure_id);
             this.sessionTypes = new SessionTypes(this.structure_id);
             await this.sessionTypes.sync();
             this.isLast();
+            this.loading = false;
             this.safeApply();
         },
 
