@@ -1,4 +1,4 @@
-import {model, ng} from 'entcore'
+import {model, moment, ng} from 'entcore'
 import http, {AxiosResponse} from 'axios';
 import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from "../model";
 
@@ -15,16 +15,16 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                             type_id: s.type.id ? s.type.id : s.type_id,
                             structure_id: s.structure.id,
                             audience_id: s.audience.id,
-                            title: s.title ? s.title : '',
+                            title: "Séance du " + moment(s.date).format("DD/MM/YYYY"),
                             room: s.room,
                             color: s.color,
-                            description: s.description,
+                            description: "",
                             annotation: s.annotation,
                             is_published: s.isPublished ? s.isPublished : null,
                             course_id: s.courseId ? s.courseId : null,
-                            date: s.date,
-                            start_time: s.startTime,
-                            end_time: s.endTime,
+                            date: DateUtils.getFormattedDate(s.date),
+                            start_time: DateUtils.getFormattedTime(s.startTime),
+                            end_time: DateUtils.getFormattedTime(s.endTime),
                             due_date: DateUtils.getFormattedDate(s.date),
                         }
                     });

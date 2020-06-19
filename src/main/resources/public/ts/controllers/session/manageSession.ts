@@ -111,12 +111,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             $scope.deleteSession = async () => {
                 $scope.toastHttpCall(await $scope.session.delete());
-                window.history.back();
+                $scope.back();
             };
 
             $scope.unpublishSession = async () => {
                 $scope.toastHttpCall(await $scope.session.unpublish());
-                window.history.back();
+                $scope.back();
             };
 
             $scope.saveSession = async () => {
@@ -150,7 +150,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     await saveSessionHomeworks();
                 }
                 $scope.safeApply();
-                // window.history.back();
             };
 
             const createSessionsHomework = async () => {
@@ -188,7 +187,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     await createSessionsHomework(),
                     await updateSessionsHomework()
                 ]).then((values) => {
-                    if (values.indexOf(false) === -1) window.history.back();
+                    if (values.indexOf(false) === -1) $scope.back();
                 });
 
 
@@ -332,19 +331,20 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         moment($scope.session.date).add(15, 'day'))
                 ]).then(function () {
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessionGetter.all.filter(s => !$scope.sessionIsInTable(s, $scope.form.homework.sessions)));
-
-                    let filteredCourses = $scope.courses.all.filter(c =>
-                        c.audiences.all.find(a => (a.id === $scope.form.homework.audience.id) && c.subject)
-                            ? c.subject.id === $scope.form.homework.subject.id
-                            : false);
+                    let filteredCourses = $scope.courses.all.filter(c => {
+                            return c.audiences.all.find(a => ($scope.autocomplete.classesSelected.map(cl => cl.id).includes(a.id) && c.subject))
+                                ? c.subject.id === $scope.form.homework.subject.id
+                                : false;
+                        }
+                    );
 
                     // We only keep the courses without a session attached to.
-
                     let courses = filteredCourses.filter(c => !($scope.sessionGetter.all.find(s =>
-                        s.courseId == c._id && DateUtils.getFormattedDate(s.startMoment) ===
-                        DateUtils.getFormattedDate(c.startMoment))) && (moment(c.endCourse).isAfter(moment(c.endDate)) || moment(c.endCourse).isSame(c.endDate))
-                    );
+                    {
+                        return c.date ? $scope.isSameSession(c, s) : false;
+                    })));
                     let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
+
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
 
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => !$scope.isSameSession(s, $scope.session));
@@ -354,7 +354,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     }
 
                     $scope.sessionsToAttachTo.sort(function (a, b) {
-                        return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                        return a.audience.id === b.audience.id && new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                     });
 
                     $scope.sessionsToAttachTo.forEach(session => {

@@ -45,6 +45,7 @@ export class Session {
     is_empty: boolean = true;
 
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
+    string: string = "";
 
     constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
