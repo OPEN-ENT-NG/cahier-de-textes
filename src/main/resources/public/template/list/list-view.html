@@ -1,21 +1,20 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView"
      ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
     <!-- title -->
-    <div class="flex-row row__12">
-        <div class="flex-col col__3">
-            <app-title class="zero-mobile">
-                <div ng-class="isCounselorUser() ? 'title-area-simple' : 'title-area-complete'">
-                    <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
-                    <h1 class="application-title">
-                        <i18n>diary.title</i18n>
-                        <!-- name structure -->
-                        <span ng-if="!isCounselorUser()" class="structure-title manage-list">
-                            [[structure.name]]
-                        </span>
-                    </h1>
-                </div>
-            </app-title>
-        </div>
+    <div class="flex-row row__12 padding-bottom-lg">
+        <!-- Title -->
+        <h1 class="cell title-area-complete padding-right-xlg">
+            <!-- module image -->
+            <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+
+            <!-- module title name -->
+            <i18n>diary.title</i18n>
+
+            <!-- name structure -->
+            <span ng-if="!isCounselorUser()" class="structure-title main">
+                [[structure.name]]
+            </span>
+        </h1>
     </div>
 
     <!-- content -->
