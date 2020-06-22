@@ -19,8 +19,8 @@
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item._id]]</span>
     <span ng-show="false">[[item.startDisplayDate]]</span>
-    <div><i class="icon cahier-textes2"></i> [[item.subject.label]]</div>
-    <em class="metadata">
+    <div class="text-item"><i class="icon cahier-textes2"></i> [[item.subject.label]]</div>
+    <em class="text-item metadata">
         <span ng-repeat="audience in item.audiences">[[audience.name]]</span>
     </em>
 </div>

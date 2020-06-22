@@ -223,11 +223,14 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
                 $scope.safeApply();
                 $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
+                $scope.calendarItems.sort(function (a, b) {
+                    return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                });
             };
 
             $scope.loadPedagogicDays = () => {
                 $scope.pedagogicItems.sort(function (a, b) {
-                    return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
                 });
 
                 let group_to_values = $scope.pedagogicItems.reduce(function (obj, item) {

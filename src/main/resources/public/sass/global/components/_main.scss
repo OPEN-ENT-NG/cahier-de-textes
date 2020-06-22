@@ -90,6 +90,10 @@ section.main {
   width: 100%
 }
 
+.schedule .schedule-month {
+  padding-top: 0;
+}
+
 tr th label input[type=checkbox]:checked + span::before {
   border-color: $white;
 }
@@ -179,8 +183,11 @@ h1 {
 }
 
 .main-content {
-  #calendar-view {
+  .margin-container {
     margin-top: -40px;
+  }
+  .schedule-month {
+    padding-top: 0;
   }
 }
 

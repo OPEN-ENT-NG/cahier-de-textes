@@ -20,7 +20,7 @@
         </div>
 
         <!-- Calendar view -->
-        <div id="calendar-view" class="twelve calendar-container">
+        <div id="calendar-view" class="twelve calendar-container" ng-class="{'margin-container': calendar.increment !== 'month'}">
             <calendar enable-display-modes="true"
                       readonly="false"
                       display-template="main/calendar-week-item"
