@@ -681,5 +681,6 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
                 load();
+                $scope.syncPedagogicItems();
             });
         }]);

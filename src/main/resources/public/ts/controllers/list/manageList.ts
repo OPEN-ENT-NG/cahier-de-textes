@@ -4,6 +4,7 @@ import {
     Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
+import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
 
 export let manageListCtrl = ng.controller('manageListController',
     ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $rootScope) {
@@ -387,5 +388,9 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.syncPedagogicItems();
+
+        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
+            $scope.syncPedagogicItems();
+        });
     }]
 );
