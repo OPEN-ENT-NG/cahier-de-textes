@@ -8,6 +8,7 @@ import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocompleteUtils';
 import {PreferencesUtils} from "../utils/preference/preferences";
 import {StructureService} from "../services";
+import {MobileUtils} from "../utils/mobile";
 
 declare let window: any;
 
@@ -158,6 +159,10 @@ export let main = ng.controller('MainController',
         };
 
         $scope.translate = (key: string) => lang.translate(key);
+        
+        $scope.isMobile = (): boolean => {
+            return MobileUtils.isMobile();
+        }
 
         route({
             main: async () => {

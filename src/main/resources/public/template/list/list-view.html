@@ -1,21 +1,23 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView"
-     ng-class="isAChildOrAParent ? 'remove-margin-left' : ''">
+     ng-class="isAChildOrAParent ? (!isMobile() ? 'remove-margin-left' : '') : ''">
     <!-- title -->
-    <div class="flex-row row__12 padding-bottom-lg">
-        <!-- Title -->
-        <h1 class="cell title-area-complete padding-right-xlg">
-            <!-- module image -->
-            <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+    <app-title class="flex-row row__12 padding-bottom-lg">
+        <div class="title-area-simple">
+            <!-- Title -->
+            <h1 class="cell title-area-complete padding-right-xlg">
+                <!-- module image -->
+                <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
 
-            <!-- module title name -->
-            <i18n>diary.title</i18n>
+                <!-- module title name -->
+                <i18n>diary.title</i18n>
 
-            <!-- name structure -->
-            <span ng-if="!isCounselorUser()" class="structure-title main">
+                <!-- name structure -->
+                <span ng-if="!isCounselorUser()" class="structure-title main">
                 [[structure.name]]
             </span>
-        </h1>
-    </div>
+            </h1>
+        </div>
+    </app-title>
 
     <!-- content -->
     <div class="cell three twelve-mobile sidebar-content"
@@ -23,7 +25,7 @@
 
         <div class="cell nine twelve-mobile sidebar-content">
             <!-- date filter -->
-            <article class="twelve row " ng-if="display.listView">
+            <article class="twelve row list-view-date-picker" ng-if="display.listView">
                 <i18n>period.from</i18n>
                 <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
                              class="no-margin date-picker-sm">

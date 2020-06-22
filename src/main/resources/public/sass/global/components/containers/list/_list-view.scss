@@ -203,11 +203,10 @@
     position: absolute;
     right: 10px;
   }
- /* @media screen and (min-width: $tablette) {
-    .timeline-story {
-      .date-label {
-        display: block;
-      }
-    }
-  }*/
+}
+
+.list-view-date-picker {
+  @include mobile {
+    padding: 8px;
+  }
 }

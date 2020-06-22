@@ -41,3 +41,15 @@ $session-grey: #7E7E7E;
     transform: rotate(360deg);
   }
 }
+
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin mobileMini {
+  @media (max-width: 350px) {
+    @content;
+  }
+}
