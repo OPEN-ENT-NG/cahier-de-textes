@@ -221,6 +221,7 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.loadCalendarItems = () => {
                 $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
+                $scope.safeApply();
                 $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
             };
 
@@ -640,6 +641,7 @@ export let calendarController = ng.controller('CalendarController',
                     $scope.initializeData(),
                     setTimeSlots()
                 ]);
+                $scope.syncPedagogicItems();
                 AutocompleteUtils.init($scope.structure);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
@@ -681,6 +683,5 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
                 load();
-                $scope.syncPedagogicItems();
             });
         }]);
