@@ -644,7 +644,7 @@ export let calendarController = ng.controller('CalendarController',
                     $scope.initializeData(),
                     setTimeSlots()
                 ]);
-                $scope.syncPedagogicItems();
+                await $scope.syncPedagogicItems();
                 AutocompleteUtils.init($scope.structure);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
@@ -673,11 +673,11 @@ export let calendarController = ng.controller('CalendarController',
                 }
             };
 
-            model.calendar.on('date-change', () => {
+            model.calendar.on('date-change', async () => {
                 $scope.isRefreshingCalendar = true;
                 initCalendar();
-                setTimeSlots();
-                $scope.syncPedagogicItems();
+                await setTimeSlots();
+                await $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
             });
