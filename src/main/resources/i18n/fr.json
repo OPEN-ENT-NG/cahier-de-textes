@@ -7,6 +7,7 @@
   "diary.empty.on.period": "Le cahier de texte est vide sur cette période",
   "diary.empty.homework": "Aucun travail à faire",
   "diary.search.teacher": "Rechercher un enseignant",
+  "diary.filter.none": "Oups... il semblerait qu'aucun filtre ne soit sélectionné",
   "diary.search.group": "Rechercher une classe",
   "diary.notAvailable": "Il n'y a pas de cahier de texte disponible pour le moment",
   "notify.saved": "La donnée a été sauvegardée",

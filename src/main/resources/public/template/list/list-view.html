@@ -37,8 +37,9 @@
             <div class="list-view">
                 <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display) && (display.sessionList || display.homeworks)"
                      class="timeline-story vertical-spacing row">
-                    <div ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
+                    <div ng-if="!containsOnlyCourses(pedagogicDay)" ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
                          class="twelve cell event-row timeline-story">
+
                         <div ng-if="!containsOnlyCourses(pedagogicDay)">
 
                             <!-- arrow toggle open or down -->
@@ -81,8 +82,8 @@
                     </div>
                 </div>
 
-                <!--  empty state -->
-                <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays, display)">
+                <!--  empty state no pedagogicDay with at least one pedagogicitem != Course -->
+                <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays, display) && (display.sessionList || display.homeworks)">
                     <div class="row">
                         <div class="nine empty-content">
                             <div class="eight description">
@@ -90,6 +91,20 @@
                                     <i18n ng-show="!display.sessionList && display.homeworks">diary.empty.viewlist.homework</i18n>
                                     <i18n ng-show="display.sessionList && !display.homeworks">diary.empty.viewlist.session</i18n>
                                     <i18n ng-show="(!display.sessionList && !display.homeworks) || (display.sessionList && display.homeworks)">diary.empty.on.period</i18n>
+                                <span class="green-bar bar"></span>
+                            </div>
+                            <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
+                        </div>
+                    </div>
+                </div>
+
+                <!--  empty state none filter is selected -->
+                <div ng-show="!display.sessionList && !display.homeworks">
+                    <div class="row">
+                        <div class="nine empty-content">
+                            <div class="eight description">
+                                <span class="orange-bar bar"></span>
+                                <i18n>diary.filter.none</i18n>
                                 <span class="green-bar bar"></span>
                             </div>
                             <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
