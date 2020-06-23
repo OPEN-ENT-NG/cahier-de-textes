@@ -2,7 +2,7 @@
 
     <div>
         <!-- SELECT STRUCTURE -->
-        <select-structure structure="structure"></select-structure>
+        <select-structure ng-if="$parent.isAChildOrAParent" structure="structure"></select-structure>
 
         <!-- Display mode -->
             <div class="row title-sidebar padding-left-md padding-right-md">
@@ -47,33 +47,35 @@
                 </label>
             </section>
 
-            <div class="row title-sidebar padding-left-md padding-right-md" ng-if="display.listView">
+            <div class="row title-sidebar padding-left-md padding-right-md"
+                 ng-if="display.listView && $parent.isAChildOrAParent">
                 <h5 class="large cell twelve" workflow="diary.listView">
                     <i18n>filters</i18n>
                 </h5>
             </div>
-            <section class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
-                    <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
-                        <!-- homework -->
-                        <div class="six diary-choice-view" ng-click="display.homeworks = !display.homeworks">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="display.homeworks"/>
-                                <span><i18n>Homeworks</i18n></span>
-                            </label>
-                        </div>
+            <section ng-if="$parent.isAChildOrAParent"
+                     class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+                <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
+                    <!-- homework -->
+                    <div class="six diary-choice-view" ng-click="display.homeworks = !display.homeworks">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="display.homeworks"/>
+                            <span><i18n>Homeworks</i18n></span>
+                        </label>
+                    </div>
 
-                        <!-- session -->
-                        <div class="six diary-choice-view" ng-click="display.sessionList = !display.sessionList">
-                            <label class="checkbox">
-                                <input type="checkbox" ng-model="display.sessionList"/>
-                                <span><i18n>sessions</i18n></span>
-                            </label>
-                        </div>
-                    </label>
+                    <!-- session -->
+                    <div class="six diary-choice-view" ng-click="display.sessionList = !display.sessionList">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="display.sessionList"/>
+                            <span><i18n>sessions</i18n></span>
+                        </label>
+                    </div>
+                </label>
+
+                <!-- SELECT SUBJECT -->
+                <filter-subject subjects="structure.subjects.all" ng-if="display.listView"></filter-subject>
             </section>
-
-        <!-- SELECT SUBJECT -->
-        <filter-subject subjects="structure.subjects.all" ng-if="display.listView"></filter-subject>
     </div>
 
     <!-- Progression -->
