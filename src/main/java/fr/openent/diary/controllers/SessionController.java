@@ -80,8 +80,9 @@ public class SessionController extends ControllerHelper {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String childId = request.getParam("childId");
+        List<String> listSubjectId = request.getParam("subjectId") != null ? Arrays.asList(request.getParam("subjectId").split("\\s*,\\s*")) : null;
 
-        sessionService.getChildSessions(structureId, startDate, endDate, childId, DefaultResponseHandler.arrayResponseHandler(request));
+        sessionService.getChildSessions(structureId, startDate, endDate, childId, listSubjectId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
 

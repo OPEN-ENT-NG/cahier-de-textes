@@ -30,7 +30,7 @@ export const SelectStructure = ng.directive('selectStructure', () => {
                 </h5>
             </div>
             <!-- Select structure -->
-            <section class="cell twelve padding-lg display-background">
+            <section class="cell twelve padding-top-md padding-left-md padding-right-md padding-bottom-sm display-background">
                 <div>
                     <select data-ng-model="vm.structureDisplay"
                             class="twelve"
@@ -59,7 +59,7 @@ export const SelectStructure = ng.directive('selectStructure', () => {
                 window.structure = vm.structureDisplay;
                 await PreferencesUtils.updateStructure(window.structure);
                 await $scope.$parent.initializeStructure();
-                $scope.$parent.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE);
+                $scope.$emit(UPDATE_STRUCTURE_EVENTS.UPDATE);
             };
         }
     };

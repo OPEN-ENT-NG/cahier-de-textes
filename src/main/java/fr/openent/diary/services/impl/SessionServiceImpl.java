@@ -61,7 +61,7 @@ public class SessionServiceImpl implements SessionService {
         List<String> listSubjectId = subjectId != null ? Arrays.asList(subjectId) : null;
 
         if (user.getType().equals("Student")) {
-            this.getChildSessions(structureId, startDate, endDate, user.getUserId(), handler);
+            this.getChildSessions(structureId, startDate, endDate, user.getUserId(), listSubjectId, handler);
         } else if (user.getType().equals("Teacher")) {
             this.getSessions(structureId, startDate, endDate, user.getUserId(), audienceIds, Arrays.asList(user.getUserId()), listSubjectId,false, false, false, false, false, handler);
         }
@@ -76,7 +76,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void getChildSessions(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler) {
+    public void getChildSessions(String structureId, String startDate, String endDate, String childId, List<String> listSubjectId, Handler<Either<String, JsonArray>> handler) {
         // Get child audiences
         diaryService.getAudienceFromChild(childId, response -> {
             if (response.isRight()) {
@@ -85,7 +85,7 @@ public class SessionServiceImpl implements SessionService {
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getSessions(structureId, startDate, endDate, null, listAudienceId, null, null, true, false, false, false, false, handler);
+                this.getSessions(structureId, startDate, endDate, null, listAudienceId, null, listSubjectId, true, false, false, false, false, handler);
             }
         });
     }

@@ -4,7 +4,7 @@ import {
     Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
 } from '../../model';
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
-import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
+import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from "../../enum/events";
 
 export let manageListCtrl = ng.controller('manageListController',
     ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $rootScope) {
@@ -33,7 +33,7 @@ export let manageListCtrl = ng.controller('manageListController',
             endDate: moment().add('2', 'weeks').toDate()
         };
 
-        $scope.syncPedagogicItems = async () => {
+        $scope.syncPedagogicItems = async (subject) => {
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // incorrect dates
                 return;
@@ -41,30 +41,21 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.structure.homeworks.all = [];
             $scope.structure.sessions.all = [];
             $scope.structure.courses.all = [];
-            const teacherSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
-                AutocompleteUtils.getTeachersSelected()[0] : [];
-            const classSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
-                AutocompleteUtils.getClassesSelected()[0] : [];
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
-                /* student/parents workflow case */
+                /* parents workflow case */
+                let subjectId = subject && subject.id ? subject.id : null;
                 await Promise.all([
-                    $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                    $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                    $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                    $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
+                    $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
+                    $scope.structure.courses.sync($scope.structure, null, null, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
-                /* teacher workflow case */
-                let teacherId = (teacherSelected && teacherSelected.id) ? teacherSelected.id : model.me.userId;
-                let audienceId = classSelected && classSelected.id ? classSelected.id : null;
+                let subjectId = subject && subject.id ? subject.id : null;
                 const promises: Promise<void>[] = [];
-                if (teacherId != model.me.userId) {
-                    promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
-                    promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
-                } else {
-                    promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate));
-                    promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate));
-                }
-                promises.push($scope.structure.courses.sync($scope.structure, teacherId, classSelected, $scope.filters.startDate, $scope.filters.endDate));
+                /* student/teacher workflow case */
+                promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId));
+                promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, null, subjectId));
+                promises.push($scope.structure.courses.sync($scope.structure, model.me.userId, null, $scope.filters.startDate, $scope.filters.endDate));
                 await Promise.all(promises)
             }
 
@@ -139,14 +130,12 @@ export let manageListCtrl = ng.controller('manageListController',
                     }
                 });
 
-
                 let audienceIds = pedagogicItems.filter(p => p.pedagogicType === $scope.TYPE_HOMEWORK).map(p => {
                     if (p.audience)
                         return p.audience.id
                 });
                 let uniqueAudienceIdsArray = Array.from(new Set(audienceIds));
                 let homeworksAreForOneAudienceOnly = uniqueAudienceIdsArray.length === 1;
-
 
                 let nbSession = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_SESSION).length;
                 let nbCourse = pedagogicItems.filter(i => i.pedagogicType === $scope.TYPE_COURSE).length;
@@ -382,6 +371,13 @@ export let manageListCtrl = ng.controller('manageListController',
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
             $scope.syncPedagogicItems();
+        });
+
+        $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE,  (event, data) => {
+            if (data != null) {
+                $scope.syncPedagogicItems(data);
+            }
+            else $scope.syncPedagogicItems();
         });
     }]
 );

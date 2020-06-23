@@ -10,11 +10,11 @@ public interface HomeworkService {
 
     void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
-    void getOwnHomeworks(String structureId,String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler);
+    void getOwnHomeworks(String structureId,String startDate, String endDate, UserInfos user, String subjectId, Handler<Either<String, JsonArray>> handler);
 
-    void getExternalHomeworks( String startDate, String endDate, String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler);
+    void getExternalHomeworks( String startDate, String endDate, String teacherId, String audienceId, String subjectId, Handler<Either<String, JsonArray>> handler);
 
-    void getChildHomeworks(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler);
+    void getChildHomeworks(String structureId, String startDate, String endDate, String childId, String subjectId, Handler<Either<String, JsonArray>> handler);
 
     void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler);
 

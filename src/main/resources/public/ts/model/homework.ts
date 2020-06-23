@@ -229,12 +229,16 @@ export class Homeworks {
         return dataModel;
     }
 
-    async syncOwnHomeworks(structure: any,startMoment: any, endMoment: any): Promise<void> {
+    async syncOwnHomeworks(structure: any,startMoment: any, endMoment: any, subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
 
         let url = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}`;
 
+        if (subjectId) {
+            url += `&subjectId=${subjectId}`;
+        }
+        url = url.replace('&', '?');
         await this.syncHomeworks(url);
     }
 
@@ -251,11 +255,14 @@ export class Homeworks {
         await this.syncHomeworks(url);
     }
 
-    async syncChildHomeworks(startMoment: any, endMoment: any, childId?: string): Promise<void> {
+    async syncChildHomeworks(startMoment: any, endMoment: any, childId?: string, subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
 
-        let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}/${this.structure.id}`;
+        let filter = subjectId ? '?' : '';
+        if (subjectId) filter += `subjectId=${subjectId}&`;
+
+        let url = `/diary/homeworks/child/${startDate}/${endDate}/${childId}/${this.structure.id}${filter.slice(0,-1)}`;
 
         await this.syncHomeworks(url);
     }

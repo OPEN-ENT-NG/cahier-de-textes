@@ -87,24 +87,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     @Override
-    public void getOwnHomeworks(String structureId, String startDate, String endDate, UserInfos user, Handler<Either<String, JsonArray>> handler) {
+    public void getOwnHomeworks(String structureId, String startDate, String endDate, UserInfos user, String subjectId, Handler<Either<String, JsonArray>> handler) {
         if (user.getType().equals("Student")) {
-            this.getChildHomeworks(structureId, startDate, endDate, user.getUserId(), handler);
+            this.getChildHomeworks(structureId, startDate, endDate, user.getUserId(), subjectId, handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, false, handler);
+            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, null, false, handler);
         }
     }
 
     @Override
-    public void getExternalHomeworks(String startDate, String endDate, String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler) {
+    public void getExternalHomeworks(String startDate, String endDate, String teacherId, String audienceId, String subjectId, Handler<Either<String, JsonArray>> handler) {
         List<String> listAudienceId = audienceId != null && !audienceId.equals("") ? Arrays.asList(audienceId) : null;
         List<String> listTeacherId = teacherId != null && !teacherId.equals("") ? Arrays.asList(teacherId) : null;
 
-        this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, true, handler);
+        this.getHomeworks("", startDate, endDate, null, listTeacherId, listAudienceId, subjectId, true, handler);
     }
 
     @Override
-    public void getChildHomeworks(String structureId, String startDate, String endDate, String childId, Handler<Either<String, JsonArray>> handler) {
+    public void getChildHomeworks(String structureId, String startDate, String endDate, String childId, String subjectId, Handler<Either<String, JsonArray>> handler) {
         // Get child audiences
         diaryService.getAudienceFromChild(childId, response -> {
             if(response.isRight()){
@@ -113,7 +113,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 for (int i = 0; i < result.size(); i++) {
                     listAudienceId.add(result.getJsonObject(i).getString("audienceId"));
                 }
-                this.getStudentHomeworks(structureId, childId, startDate, endDate, null, listAudienceId, null, true,  handler);
+                this.getStudentHomeworks(structureId, childId, startDate, endDate, null, listAudienceId, null, subjectId, true,  handler);
             }
         });
     }
@@ -130,11 +130,11 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param handler
      */
     private void getHomeworks(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                              boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
+                              String subjectId, boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
         JsonArray values = new JsonArray();
         String query;
 
-        query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values) +
+        query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values) +
                 this.getSelectHomeworkQuery();
 
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
@@ -162,8 +162,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     }
 
     private String getWhereContentGetHomeworkQuery(String structureID, String startDate, String endDate, String ownerId,
-                                                          List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished,
-                                                          JsonArray values, String query) {
+                                                   List<String> listAudienceId, List<String> listTeacherId,
+                                                   String subjectId, boolean onlyPublished, JsonArray values,
+                                                   String query) {
         if (startDate != null && endDate != null) {
             query += " AND (h.due_date >= to_date(?,'YYYY-MM-DD')";
             query += " AND h.due_date <= to_date(?,'YYYY-MM-DD')";
@@ -172,23 +173,28 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             values.add(endDate);
         }
 
-        if(structureID != ("")){
+        if(structureID != ("")) {
             query += " AND h.structure_id = ?";
             values.add(structureID);
         }
 
-        if (listAudienceId != null) {
+        if (listAudienceId != null && !listAudienceId.isEmpty()) {
             query += " AND h.audience_id IN " + (Sql.listPrepared(listAudienceId.toArray()));
             for (String audienceId : listAudienceId) {
                 values.add(audienceId);
             }
         }
 
-        if (listTeacherId != null) {
+        if (listTeacherId != null && !listTeacherId.isEmpty()) {
             query += " AND h.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
             for (String teacherId : listTeacherId) {
                 values.add(teacherId);
             }
+        }
+
+        if (subjectId != null && !subjectId.isEmpty()) {
+            query += " AND h.subject_id = ?";
+            values.add(subjectId);
         }
 
         if (onlyPublished) {
@@ -205,14 +211,14 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
 
     private String getCTEHomeworkQuery(String structureID, String startDate, String endDate, String ownerId,
-                                              List<String> listAudienceId, List<String> listTeacherId, boolean onlyPublished,
-                                              JsonArray values) {
+                                       List<String> listAudienceId, List<String> listTeacherId, String subjectId,
+                                       boolean onlyPublished, JsonArray values) {
         String query = " WITH homework_filter AS (" +
                         " SELECT h.*, to_json(homework_type) as type " +
                         " FROM " + Diary.DIARY_SCHEMA + ".homework h" +
                         " INNER JOIN diary.homework_type ON h.type_id = homework_type.id";
 
-        query = getWhereContentGetHomeworkQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values, query);
+        query = getWhereContentGetHomeworkQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values, query);
         query += " ) ";
 
         return query.replaceFirst("AND", "WHERE");
@@ -247,12 +253,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param handler
      */
     private void getStudentHomeworks(String structureId, String studentId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                              boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
+                              String subjectId, boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
 
         JsonArray values = new JsonArray();
 
         String query;
-        query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, onlyPublished, values)
+        query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values)
                 + this.getSelectHomeworkStudentQuery(studentId);
 
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {

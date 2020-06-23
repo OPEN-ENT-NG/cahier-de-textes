@@ -388,10 +388,15 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncChildSessions(startMoment: any, endMoment: any, childId?: string): Promise<void> {
+    async syncChildSessions(startMoment: any, endMoment: any, childId?: string, subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let url = `/diary/sessions/child/${startDate}/${endDate}/${childId}`;
+
+        if (subjectId) {
+            url += `&subjectId=${subjectId}`;
+        }
+        url = url.replace('&', '?');
 
         await this.syncSessions(url);
     }
