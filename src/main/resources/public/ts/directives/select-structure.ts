@@ -23,11 +23,21 @@ export const SelectStructure = ng.directive('selectStructure', () => {
         },
         template: `
         <!-- SELECT STRUCTURE -->
-        <div ng-if="vm.structures.length > 1">
+        <div ng-if="vm.structures.length > 1" data-ng-click="$parent.collapseMobile('structure')">
             <div class="row title-sidebar padding-left-md padding-right-md">
                 <h5 class="large cell twelve" workflow="diary.listView">
                     <i18n>utils.structure.fr</i18n>
+                    
+                      <i ng-show="$parent.isMobile()"
+                       ng-class="$parent.$parent.display.listViewArea.structure ? 'up-open' : 'down-open'"
+                       class="right-magnet">
+                    </i>
                 </h5>
+                
+                 <i ng-show="isMobile()"
+                   ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
+                   class="right-magnet">
+                </i>
             </div>
             <!-- Select structure -->
             <section class="cell twelve padding-top-md padding-left-md padding-right-md padding-bottom-sm display-background">
@@ -44,7 +54,7 @@ export const SelectStructure = ng.directive('selectStructure', () => {
         controllerAs: 'vm',
         bindToController: true,
         replace: false,
-        controller: async function () {
+        controller: async function ($scope) {
             const vm: IViewModel = <IViewModel>this;
             vm.structures = structureService.getUserStructure();
             vm.structureDisplay = {

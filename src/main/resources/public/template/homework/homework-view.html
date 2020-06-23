@@ -3,33 +3,34 @@
         <b>[[homework.subject.label]] &nbsp; [[homework.audience.name]] &nbsp; [[homework.teacher.toString()]]</b>
     </div>
 
-    <article class="row padding-md" ng-click="homework.opened = !homework.opened">
-        <h2 class="eight cell remove-margin">
-            <span>[[homework.type.label]]</span>
-            <span ng-if="!homework.isInsideDiary">
-                <span ng-if="homework.attachedToDate"> - <i18n>homework.for.date</i18n> [[getDisplayDate(homework.dueDate)]]</span>
-                <span ng-if="homework.attachedToParentSession"> - <i18n>for.this.session</i18n></span>
-                <span ng-if="homework.attachedToSession && homework.session">
-                    - <i18n>todo.for.session</i18n>
-                    [[homework.session.subject.label]] [[homework.session.startDisplayDate]]
-                    ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
+    <article class="homework-view-content row padding-md" ng-click="homework.opened = !homework.opened">
+
+        <!--  title description -->
+        <h2 class="homework-view-content-title cell remove-margin">
+            <span>
+                <span>[[homework.type.label]]</span>
+                <span ng-if="!homework.isInsideDiary">
+                    <span ng-if="homework.attachedToDate"> - <i18n>homework.for.date</i18n> [[getDisplayDate(homework.dueDate)]]</span>
+                    <span ng-if="homework.attachedToParentSession"> - <i18n>for.this.session</i18n></span>
+                    <span ng-if="homework.attachedToSession && homework.session">
+                        - <i18n>todo.for.session</i18n>
+                        [[homework.session.subject.label]] [[homework.session.startDisplayDate]]
+                        ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
+                    </span>
+                </span>
+                <span ng-show="homework.publishDate !== 'Invalid date'">
+                     -<i18n>homework.manage.give</i18n> [[homework.publishDate]]
                 </span>
             </span>
-            <span ng-show="homework.publishDate !== 'Invalid date'">
-                 -
-            <i18n>homework.manage.give</i18n> [[homework.publishDate]]
-                </span>
-        </h2>
-        <h2 class="right-magnet">
-            <i  ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
+            <span class="homework-view-content-title-icon right-magnet">
+                <i ng-if="!homework.isInsideDiary" ng-class="homework.opened ? 'up-open' : 'down-open'"></i>
+            </span>
         </h2>
 
-        <div  workflow="diary.setProgressHomework" class="three cell twelve-mobile margin-top-sm" ng-click="$event.stopPropagation();">
-            <div class="cell horizontal-spacing twelve-mobile">
-                <switch class="" ng-model="homework.isDone" ng-change="setHomeworkProgress(homework)">
-                    <label class="switch"> </label>
-                </switch>
-            </div>
+        <!--  tick done/undone -->
+        <div workflow="diary.setProgressHomework"
+             class="homework-view-content-tick three cell twelve-mobile margin-top-sm"
+             data-ng-click="$event.stopPropagation();">
             <label class="cell twelve-mobile">
                 <div ng-show="homework.isDone" class="twelve">
                     <i18n style="color:green;">done</i18n>
@@ -38,9 +39,15 @@
                     <i18n style="color:red;">todo</i18n>
                 </div>
             </label>
+
+            <div class="cell horizontal-spacing twelve-mobile">
+                <switch class="" ng-model="homework.isDone" ng-change="setHomeworkProgress(homework)">
+                    <label class="switch"> </label>
+                </switch>
+            </div>
         </div>
 
-        <div class="twelve cell ">
+        <div class="twelve cell homework-view-content-estimated">
             <h4>
                 <div ng-show="homework.estimatedTime !== 0">
 
@@ -56,9 +63,12 @@
         <div class="row" ng-show="homework.opened || homework.isInsideDiary">
 
             <!-- Description-->
-            <div class="read-only-description" bind-html="homework.description"></div>
+            <div bind-html="homework.description"></div>
         </div>
     </article>
 
+    <button data-ng-click="$parent.back()">
+        <i18n>back</i18n>
+    </button>
 </div>
 

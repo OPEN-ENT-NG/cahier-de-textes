@@ -41,6 +41,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
         };
 
+        $scope.getDisplayDate = (date: any) => {
+            return DateUtils.getDisplayDate(date);
+        };
+
         $scope.openHomework = (homework: Homework) => {
             if($scope.isInsideSessionForm){
                 $scope.$parent.openHomework(homework);
@@ -394,8 +398,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
         }
 
         $scope.back = ()=>{
-            $scope.homework.isDone = !$scope.homework.isDone;
-            // $scope.setProgress($scope.homework);
             window.history.back();
         };
 

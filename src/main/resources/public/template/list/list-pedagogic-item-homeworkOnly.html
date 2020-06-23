@@ -1,10 +1,12 @@
 <!-- HOMEWORKS ONLY-->
-<article  ng-if="pedagogicItem.pedagogicType === TYPE_HOMEWORK && filterHomeworkState(pedagogicItem)" class="pedagogic-item-article">
-    <div  class="row list-view-item">
+<article ng-if="pedagogicItem.pedagogicType === TYPE_HOMEWORK && filterHomeworkState(pedagogicItem)"
+         class="pedagogic-item-article">
 
-        <div  class="twelve cell first-content">
+    <div class="row list-view-item">
+        <div class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
-            <span ng-class=" pedagogicItem.description?'hasDescription':''"
+            <span class="pedagogic-item-article-title"
+                  ng-class="pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
                 <span>
                     <b>[[pedagogicItem.subject.label]] &nbsp;</b>
@@ -16,11 +18,13 @@
                     [[pedagogicItem.teacher.toString()]]
                 </span>
             </span>
-            <div>
-                <div class="row inline-block medium-importance margin-top-md">
+
+            <!-- content -->
+            <div class="pedagogic-item-article-content">
+                <div class="pedagogic-item-article-content-body row inline-block medium-importance margin-top-md">
 
                     <!--devoir -->
-                    <div class="cell horizontal-spacing twelve-mobile">
+                    <div ng-class="!$parent.isMobile() ? 'horizontal-spacing' : ''" class="cell twelve-mobile">
                         <span><i>&#xe80d;</i></span>
                         <span class="three" ng-class=" pedagogicItem.description?'hasDescription':''"
                               ng-click="pedagogicItem.opened = !pedagogicItem.opened">
@@ -34,13 +38,11 @@
                         </span>
                     </div>
 
-                    <div class="horizontal-spacing twelve-mobile" ng-if="isAChildOrAParent">
-                        <div workflow="diary.setProgressHomework" class="cell horizontal-spacing twelve-mobile" ng-if="isChild">
-                            <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
-                                <label class="switch"> </label>
-                            </switch>
-                        </div>
-                        <label class="cell twelve-mobile">
+                    <!-- is child or parent homework done/undone -->
+                    <div ng-class="!$parent.isMobile() ? 'horizontal-spacing' : ''"
+                         class="pedagogic-item-article-content-body-homeworkState twelve-mobile" ng-if="isAChildOrAParent">
+
+                        <label ng-class="!$parent.isMobile() ? 'twelve-mobile' : ''" class="cell">
                             <div ng-show="pedagogicItem.isDone" class="twelve">
                                 <i18n style="color:green;">done</i18n>
                             </div>
@@ -48,6 +50,14 @@
                                 <i18n style="color:red;">todo</i18n>
                             </div>
                         </label>
+
+                        <div workflow="diary.setProgressHomework"
+                             ng-class="!$parent.isMobile() ? 'twelve-mobile' : ''"
+                             class="cell horizontal-spacing" ng-if="isChild">
+                            <switch class="" ng-model="pedagogicItem.isDone" ng-change="setHomeworkProgress(pedagogicItem)">
+                                <label class="switch"> </label>
+                            </switch>
+                        </div>
                     </div>
                 </div>
             </div>

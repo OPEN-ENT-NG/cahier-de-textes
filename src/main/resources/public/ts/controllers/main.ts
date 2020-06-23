@@ -18,7 +18,12 @@ export let main = ng.controller('MainController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.notifications = [];
         $scope.display = {
-            listView: false
+            listView: false,
+            // sidebar component html workflow
+            listViewArea : {
+                filter: true,
+                structure: true
+            }
         };
         $scope.params = {
             user: null,
@@ -162,7 +167,22 @@ export let main = ng.controller('MainController',
         
         $scope.isMobile = (): boolean => {
             return MobileUtils.isMobile();
-        }
+        };
+
+        $scope.collapseMobile = (areaType: string): void => {
+            if ($scope.isMobile()) {
+                switch (areaType) {
+                    case 'filter': {
+                        $scope.display.listViewArea.filter = !$scope.display.listViewArea.filter;
+                        break;
+                    }
+                    case 'structure': {
+                        $scope.display.listViewArea.structure = !$scope.display.listViewArea.structure;
+                        break;
+                    }
+                }
+            }
+        };
 
         route({
             main: async () => {

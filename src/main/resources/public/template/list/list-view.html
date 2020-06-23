@@ -1,5 +1,5 @@
 <div ng-controller="manageListController" class="row" workflow="diary.listView"
-     ng-class="isAChildOrAParent ? (!isMobile() ? 'remove-margin-left' : '') : ''">
+     ng-class="isAChildOrAParent ? (!$parent.isMobile() ? 'remove-margin-left' : '') : ''">
     <!-- title -->
     <app-title class="flex-row row__12 padding-bottom-lg">
         <div class="title-area-simple">
@@ -19,101 +19,101 @@
         </div>
     </app-title>
 
+    <!-- content sidebar -->
+    <div class="cell three twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></div>
+
     <!-- content -->
-    <div class="cell three twelve-mobile sidebar-content"
-         static-include="/diary/public/template/main/sidebar.html"></div>
+    <div ng-class="$parent.isMobile() ? 'sidebar-content' : ''" class="cell nine twelve-mobile sidebar-article">
+        <!-- date filter -->
+        <article class="twelve row list-view-date-picker" ng-if="display.listView">
+            <i18n>period.from</i18n>
+            <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
+                         class="no-margin date-picker-sm">
+            </date-picker>
+            <i18n>to</i18n>
+            <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
+                         class="no-margin date-picker-sm"></date-picker>
+        </article>
 
-        <div class="cell nine twelve-mobile sidebar-content">
-            <!-- date filter -->
-            <article class="twelve row list-view-date-picker" ng-if="display.listView">
-                <i18n>period.from</i18n>
-                <date-picker ng-model="filters.startDate" ng-change="syncPedagogicItems();"
-                             class="no-margin date-picker-sm">
-                </date-picker>
-                <i18n>to</i18n>
-                <date-picker ng-model="filters.endDate" ng-change="syncPedagogicItems();"
-                             class="no-margin date-picker-sm"></date-picker>
-            </article>
+        <!-- list pedagogic day -->
+        <div class="list-view">
+            <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display) && (display.sessionList || display.homeworks)"
+                 class="timeline-story vertical-spacing row">
+                <div ng-if="!containsOnlyCourses(pedagogicDay)" ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
+                     class="twelve cell event-row timeline-story">
 
-            <!-- list pedagogic day -->
-            <div class="list-view">
-                <div ng-show="hasPedagogicDayToDisplay(pedagogicDays,display) && (display.sessionList || display.homeworks)"
-                     class="timeline-story vertical-spacing row">
-                    <div ng-if="!containsOnlyCourses(pedagogicDay)" ng-repeat="pedagogicDay in pedagogicDays | pedagogicDayFilter: display.sessionList:!display.sessionList"
-                         class="twelve cell event-row timeline-story">
+                    <div ng-if="!containsOnlyCourses(pedagogicDay)">
 
-                        <div ng-if="!containsOnlyCourses(pedagogicDay)">
+                        <!-- arrow toggle open or down -->
+                        <i ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet"
+                           data-ng-click="displayDay(pedagogicDay)">
+                        </i>
 
-                            <!-- arrow toggle open or down -->
-                            <i ng-class="pedagogicDay.displayed ? 'up-open' : 'down-open'" class="left-magnet"
-                               data-ng-click="displayDay(pedagogicDay)">
-                            </i>
+                        <!-- title-->
+                        <div class="cell date-field text-right">
+                            <span class="label">
+                                [[pedagogicDay.fullDayName]]
+                            </span>
+                        </div>
 
-                            <!-- title-->
-                            <div class="cell date-field text-right">
-                                <span class="label">
-                                    [[pedagogicDay.fullDayName]]
+                        <!-- round -->
+                        <div class="event cell">
+                            <div>
+                                <span class="round"
+                                      ng-class="{'[[pedagogicDay.color]]': true}">
+                                    <span class="white-text">
+                                        [[getNbHomework(pedagogicDay)]]
+                                    </span>
                                 </span>
                             </div>
+                        </div>
 
-                            <!-- round -->
-                            <div class="event cell">
-                                <div>
-                                    <span class="round"
-                                          ng-class="{'[[pedagogicDay.color]]': true}">
-                                        <span class="white-text">
-                                            [[getNbHomework(pedagogicDay)]]
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
+                        <!-- content inside arrow if displayed -->
+                        <div ng-show="pedagogicDay.displayed" class="cell ten twelve-mobile">
+                            <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
+                                <!-- content list pedagogic item case session list is view -->
+                                <div ng-if="display.sessionList"
+                                     static-include="/diary/public/template/list/list-pedagogic-item.html"></div>
 
-                            <!-- content inside arrow if displayed -->
-                            <div ng-show="pedagogicDay.displayed" class="cell ten eleven-mobile">
-                                <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
-                                    <!-- content list pedagogic item case session list is view -->
-                                    <div ng-if="display.sessionList"
-                                         static-include="/diary/public/template/list/list-pedagogic-item.html"></div>
-
-                                    <!-- content list pedagogic homeworkOnly case session list is not view -->
-                                    <div ng-if="display.homeworks"
-                                         static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"></div>
-                                </div>
+                                <!-- content list pedagogic homeworkOnly case session list is not view -->
+                                <div ng-if="display.homeworks"
+                                     static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!--  empty state no pedagogicDay with at least one pedagogicitem != Course -->
-                <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays, display) && (display.sessionList || display.homeworks)">
-                    <div class="row">
-                        <div class="nine empty-content">
-                            <div class="eight description">
-                                <span class="orange-bar bar"></span>
-                                    <i18n ng-show="!display.sessionList && display.homeworks">diary.empty.viewlist.homework</i18n>
-                                    <i18n ng-show="display.sessionList && !display.homeworks">diary.empty.viewlist.session</i18n>
-                                    <i18n ng-show="(!display.sessionList && !display.homeworks) || (display.sessionList && display.homeworks)">diary.empty.on.period</i18n>
-                                <span class="green-bar bar"></span>
-                            </div>
-                            <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
-                        </div>
-                    </div>
-                </div>
-
-                <!--  empty state none filter is selected -->
-                <div ng-show="!display.sessionList && !display.homeworks">
-                    <div class="row">
-                        <div class="nine empty-content">
-                            <div class="eight description">
-                                <span class="orange-bar bar"></span>
-                                <i18n>diary.filter.none</i18n>
-                                <span class="green-bar bar"></span>
-                            </div>
-                            <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
-                        </div>
-                    </div>
-                </div>
-
             </div>
+
+            <!--  empty state no pedagogicDay with at least one pedagogicitem != Course -->
+            <div ng-show="!hasPedagogicDayToDisplay(pedagogicDays, display) && (display.sessionList || display.homeworks)">
+                <div class="row">
+                    <div ng-class="!$parent.isMobile() ? 'nine' : ''" class="empty-content">
+                        <div ng-class="!$parent.isMobile() ? 'eight' : ''" class="description">
+                            <span class="orange-bar bar"></span>
+                                <i18n ng-show="!display.sessionList && display.homeworks">diary.empty.viewlist.homework</i18n>
+                                <i18n ng-show="display.sessionList && !display.homeworks">diary.empty.viewlist.session</i18n>
+                                <i18n ng-show="(!display.sessionList && !display.homeworks) || (display.sessionList && display.homeworks)">diary.empty.on.period</i18n>
+                            <span class="green-bar bar"></span>
+                        </div>
+                        <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
+                    </div>
+                </div>
+            </div>
+
+            <!--  empty state none filter is selected -->
+            <div ng-show="!display.sessionList && !display.homeworks">
+                <div class="row">
+                    <div ng-class="!$parent.isMobile() ? 'nine' : ''" class="empty-content">
+                        <div ng-class="!$parent.isMobile() ? 'eight' : ''" class="description">
+                            <span class="orange-bar bar"></span>
+                            <i18n>diary.filter.none</i18n>
+                            <span class="green-bar bar"></span>
+                        </div>
+                        <img data-ng-src="/diary/public/img/skate-green.svg" class="four" src="/presences/public/img/skate-green.svg">
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
 </div>

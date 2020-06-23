@@ -4,6 +4,7 @@
     border: 1px solid $black;
     border-radius: 10px;
     background: $white;
+
     &.selected {
       background: gray;
       fill: gray;
@@ -33,11 +34,11 @@
 
   i.session::before {
     content: "\e86f";
-    font-family:"generic-icons";
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    background-image:none;
-    color : $white;
+    font-family: "generic-icons";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: none;
+    color: $white;
   }
 
   i.cahier-textes2::before {
@@ -87,11 +88,14 @@
     .isDone {
       color: #46bfaf !important;
     }
+
     .title-lesson {
       text-transform: lowercase;
+
       &:first-letter {
         text-transform: uppercase;
       }
+
       &::first-letter {
         text-transform: uppercase;
       }
@@ -104,6 +108,7 @@
     .date-field {
       top: 0;
       line-height: 20px;
+
       .label {
         text-align: right;
         text-transform: uppercase;
@@ -127,13 +132,16 @@
       margin-top: 0;
       border: solid 3px #F9F9F9;
       text-align: center;
-      &.green-text{
+
+      &.green-text {
         background: $diary-darkgreen;
       }
-      &.yellow-text{
+
+      &.yellow-text {
         background: #ffd900;
       }
-      &.red-text{
+
+      &.red-text {
         background: #ff2011;
       }
     }
@@ -156,17 +164,25 @@
       position: relative;
       top: 0;
     }
+
     .event-row {
       margin-top: 9px;
     }
+
     .event-row .date-field {
       height: 54px;
       width: 12.666%;
     }
+
     .event-row .event {
       height: 54px;
       width: 2% !important;
       margin-right: 1%;
+      @include mobile {
+        width: 3% !important;
+        margin-right: 3%;
+        height: 1px;
+      }
     }
   }
 
@@ -208,5 +224,34 @@
 .list-view-date-picker {
   @include mobile {
     padding: 8px;
+  }
+}
+
+.pedagogic-item-article {
+  @include mobile {
+    margin: 16px;
+    padding: 12px;
+  }
+
+  &-title {
+    @include mobile {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  &-content {
+    &-body {
+      @include mobile {
+        display: flex;
+        flex-direction: column;
+      }
+
+      &-homeworkState {
+        @include mobile {
+          display: flex;
+        }
+      }
+    }
   }
 }

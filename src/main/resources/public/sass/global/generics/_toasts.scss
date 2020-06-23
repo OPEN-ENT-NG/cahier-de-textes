@@ -6,6 +6,13 @@
   z-index: 1000;
   box-sizing: border-box;
 
+  @include mobile {
+    width: 100%;
+    right: 0;
+    top: 70px;
+    padding: 8px;
+  }
+
   .toast-content {
     //@include material-card();
     margin-bottom: 10px;
