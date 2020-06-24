@@ -91,8 +91,7 @@ export let calendarController = ng.controller('CalendarController',
                 if (Object.keys(structure_slots).length > 0) {
                     $scope.timeSlot.slots = structure_slots.slots;
                     model.calendar.setTimeslots($scope.timeSlot.slots);
-                }
-                else $scope.timeSlot.slots = null;
+                } else $scope.timeSlot.slots = null;
             };
 
             $scope.filterTeacherOptions = async (value) => {
@@ -105,24 +104,24 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
-            $scope.selectTeacher = async (model, item) =>  {
+            $scope.selectTeacher = async (model, item) => {
                 AutocompleteUtils.setTeachersSelected([item]);
                 AutocompleteUtils.resetSearchFields();
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.selectClass = async (model, item) =>  {
+            $scope.selectClass = async (model, item) => {
                 AutocompleteUtils.setClassesSelected([item]);
                 AutocompleteUtils.resetSearchFields();
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.removeTeacher = async (value) =>  {
+            $scope.removeTeacher = async (value) => {
                 AutocompleteUtils.removeTeacherSelected(value);
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.removeClass = async (value) =>  {
+            $scope.removeClass = async (value) => {
                 AutocompleteUtils.removeClassSelected(value);
                 await $scope.syncPedagogicItems();
             };
@@ -215,17 +214,18 @@ export let calendarController = ng.controller('CalendarController',
                 let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
-                $scope.loadCalendarItems();
                 $scope.loadPedagogicDays();
+                $scope.loadCalendarItems();
             };
 
             $scope.loadCalendarItems = () => {
                 $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
+                $scope.calendarItems = $scope.pedagogicItems
+                    .filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK)
+                    .sort(function (a, b) {
+                        return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                    });
                 $scope.safeApply();
-                $scope.calendarItems = $scope.pedagogicItems.filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK);
-                $scope.calendarItems.sort(function (a, b) {
-                    return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
-                });
             };
 
             $scope.loadPedagogicDays = () => {
@@ -507,7 +507,7 @@ export let calendarController = ng.controller('CalendarController',
                         sessionDrag = session;
                     }
                 });
-                
+
                 if (sessionDrag.homeworks.length === 0) {
                     let sessionHomework = new Session($scope.structure);
                     sessionHomework.id = sessionDrag.id;
@@ -604,7 +604,7 @@ export let calendarController = ng.controller('CalendarController',
             $scope.createSessionFromProgression = async (idProgression, idCourse, date) => {
                 let progressionDragged;
                 let progressionSessions = $scope.progressionFolders.all.map((f) => f.progressionSessions);
-                progressionSessions = [].concat.apply([],progressionSessions);
+                progressionSessions = [].concat.apply([], progressionSessions);
                 progressionDragged = progressionSessions.find((s) => s.id == idProgression);
                 let course = new Course($scope.structure, idCourse);
 
@@ -644,7 +644,7 @@ export let calendarController = ng.controller('CalendarController',
                     $scope.initializeData(),
                     setTimeSlots()
                 ]);
-                await $scope.syncPedagogicItems();
+                $scope.syncPedagogicItems();
                 AutocompleteUtils.init($scope.structure);
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
@@ -677,14 +677,14 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.isRefreshingCalendar = true;
                 initCalendar();
                 await setTimeSlots();
-                await $scope.syncPedagogicItems();
+                $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
             });
 
             $scope.$on('$destroy', () => model.calendar.callbacks['date-change'] = []);
 
-            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
+            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
                 load();
             });
         }]);
