@@ -14,9 +14,9 @@ export let manageListCtrl = ng.controller('manageListController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.display = {
-            sessionList: false,
+            sessionList: (window.item && ('display' in window.item)) ? window.item.display.sessionList : false,
             listView: true,
-            homeworks: true,
+            homeworks: (window.item && ('display' in window.item)) ? window.item.display.homeworks : true,
             todo: true,
             done: true
         };
@@ -31,9 +31,9 @@ export let manageListCtrl = ng.controller('manageListController',
         }
 
         $scope.filters = {
-            startDate: (window.item && ('startDate' in window.item)) ? window.item.startDate : moment().toDate(),
-            endDate: (window.item && ('endDate' in window.item)) ? window.item.endDate : moment().add('2', 'weeks').toDate(),
-            subject: (window.item && ('subject' in window.item)) ? window.item.subject : null
+            startDate: (window.item && ('filters' in window.item)) ? window.item.filters.startDate : moment().toDate(),
+            endDate: (window.item && ('filters' in window.item)) ? window.item.filters.endDate : moment().add('2', 'weeks').toDate(),
+            subject: (window.item && ('filters' in window.item)) ? window.item.filters.subject : null
         };
 
         $scope.syncPedagogicItems = async (subject) => {
@@ -46,14 +46,14 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.structure.courses.all = [];
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                 /* parents workflow case */
-                let subjectId = subject && subject.id ? subject.id : null;
+                let subjectId = subject && subject.id ? subject.id : $scope.filters.subject ? $scope.filters.subject.id : null;
                 await Promise.all([
                     $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
                     $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
                     $scope.structure.courses.sync($scope.structure, null, null, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
-                let subjectId = subject && subject.id ? subject.id : null;
+                let subjectId = subject && subject.id ? subject.id : $scope.filters.subject ? $scope.filters.subject.id : null;
                 const promises: Promise<void>[] = [];
                 /* student/teacher workflow case */
                 promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId));
@@ -246,7 +246,10 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.openHomework = (homeworkId: number) => {
-            window.item = $scope.filters;
+            window.item = {
+                filters: $scope.filters,
+                display: $scope.display
+            };
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
             } else {
@@ -291,7 +294,10 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.openSession = (sessionId: number) => {
-            window.item = $scope.filters;
+            window.item = {
+                filters: $scope.filters,
+                display: $scope.display
+            };
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/update/' + sessionId);
             } else {
