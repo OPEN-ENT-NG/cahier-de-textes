@@ -120,20 +120,27 @@
                                 </div>
                                 <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">&nbsp;</div>
                             </div>
-                                <!-- Description -->
-                                <div ng-show="!progressionHomework.opened"
-                                     class="custom-flex-col padding-cell nine">
-                                    <p bind-html=[[progressionHomework.description]]></p>
-                                </div>
-                                <!-- Button part -->
-                                <div ng-show="!progressionHomework.opened"
-                                     class="custom-flex-col padding-cell justified-content-center flex-text-right one">
-                                    <i ng-show="!progressionHomework.opened && !hidePencil"
-                                       ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
-                                    <i ng-show="!progressionHomework.opened" class="trash right-magnet"
-                                       ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
-                                </div>
-                        </div>
+                            <!-- Label -->
+                            <div ng-repeat="progressionHomework in progressionSessionForm.progression_homeworks track by $index"
+                                 class="custom-flex-row twelve bot-border">
+                                    <div ng-show="!progressionHomework.opened"
+                                         class="custom-flex-col padding-cell justified-content-center two">
+                                        <p>[[progressionHomework.type.label]]</p>
+                                    </div>
+                                    <!-- Description -->
+                                    <div ng-show="!progressionHomework.opened"
+                                         class="custom-flex-col padding-cell nine">
+                                        <p bind-html=[[progressionHomework.description]]></p>
+                                    </div>
+                                    <!-- Button part -->
+                                    <div ng-show="!progressionHomework.opened"
+                                         class="custom-flex-col padding-cell justified-content-center flex-text-right one">
+                                        <i ng-show="!progressionHomework.opened && !hidePencil"
+                                           ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
+                                        <i ng-show="!progressionHomework.opened" class="trash right-magnet"
+                                           ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
+                                    </div>
+                            </div>
 
                     </div>
 
