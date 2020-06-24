@@ -23,24 +23,21 @@ export const SelectStructure = ng.directive('selectStructure', () => {
         },
         template: `
         <!-- SELECT STRUCTURE -->
-        <div ng-if="vm.structures.length > 1" data-ng-click="$parent.collapseMobile('structure')">
+        <div ng-if="vm.structures.length > 1" data-ng-click="$parent.$parent.collapseMobile('structure')">
             <div class="row title-sidebar padding-left-md padding-right-md">
                 <h5 class="large cell twelve" workflow="diary.listView">
                     <i18n>utils.structure.fr</i18n>
                     
-                      <i ng-show="$parent.isMobile()"
-                       ng-class="$parent.$parent.display.listViewArea.structure ? 'up-open' : 'down-open'"
-                       class="right-magnet">
+                     <i ng-show="$parent.$parent.isMobile()"
+                        ng-class="$parent.$root.display.listViewArea.structure ? 'up-open' : 'down-open'"
+                        class="right-magnet">
                     </i>
                 </h5>
-                
-                 <i ng-show="isMobile()"
-                   ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
-                   class="right-magnet">
-                </i>
             </div>
             <!-- Select structure -->
-            <section class="cell twelve padding-top-md padding-left-md padding-right-md padding-bottom-sm display-background">
+            <section 
+            ng-if="$parent.$root.display.listViewArea.structure"
+            class="cell twelve padding-top-md padding-left-md padding-right-md padding-bottom-sm display-background">
                 <div>
                     <select data-ng-model="vm.structureDisplay"
                             class="twelve"

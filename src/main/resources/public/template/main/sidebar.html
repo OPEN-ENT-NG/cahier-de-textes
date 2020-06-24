@@ -49,12 +49,18 @@
         </section>
 
             <div class="row title-sidebar padding-left-md padding-right-md"
+                 data-ng-click="collapseMobile('filter')"
                  ng-if="display.listView && $parent.isAChildOrAParent">
                 <h5 class="large cell twelve" workflow="diary.listView">
                     <i18n>filters</i18n>
+
+                    <i ng-show="isMobile()"
+                       ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
+                       class="right-magnet">
+                    </i>
                 </h5>
             </div>
-            <section ng-if="$parent.isAChildOrAParent"
+            <section ng-if="$parent.isAChildOrAParent && $parent.$parent.display.listViewArea.filter"
                      class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
                 <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
                     <!-- homework -->

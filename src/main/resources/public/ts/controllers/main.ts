@@ -13,8 +13,8 @@ import {MobileUtils} from "../utils/mobile";
 declare let window: any;
 
 export let main = ng.controller('MainController',
-    ['$scope', 'route', '$location', '$timeout', 'StructureService',
-        async function ($scope, route, $location, $timeout, structureService: StructureService) {
+    ['$scope', '$rootScope', 'route', '$location', '$timeout', 'StructureService',
+        async function ($scope, $rootScope, route, $location, $timeout, structureService: StructureService) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
         $scope.notifications = [];
         $scope.display = {
@@ -25,6 +25,9 @@ export let main = ng.controller('MainController',
                 structure: true
             }
         };
+
+        $rootScope.display = $scope.display;
+
         $scope.params = {
             user: null,
             group: null,
@@ -164,7 +167,7 @@ export let main = ng.controller('MainController',
         };
 
         $scope.translate = (key: string) => lang.translate(key);
-        
+
         $scope.isMobile = (): boolean => {
             return MobileUtils.isMobile();
         };
