@@ -12,7 +12,7 @@
                 <i18n>diary.title</i18n>
 
                 <!-- name structure -->
-                <span ng-if="!isCounselorUser()" class="structure-title main">
+                <span ng-if="!isCounselorUser()" class="structure-title side">
                 [[structure.name]]
             </span>
             </h1>
@@ -23,7 +23,7 @@
     <div class="cell three twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></div>
 
     <!-- content -->
-    <div ng-class="$parent.isMobile() ? 'sidebar-content' : ''" class="cell nine twelve-mobile sidebar-article">
+    <div class="cell nine twelve-mobile sidebar-article">
         <!-- date filter -->
         <article class="twelve row list-view-date-picker" ng-if="display.listView">
             <i18n>period.from</i18n>

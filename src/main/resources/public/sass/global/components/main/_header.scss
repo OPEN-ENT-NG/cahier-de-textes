@@ -16,6 +16,12 @@
   font-weight: normal;
   width: max-content;
 
+  // structure name aside title
+  &.side {
+    position: initial;
+    margin-left: 24px;
+  }
+
   // main.html design
   &.main {
     top: 40px;

@@ -15,7 +15,7 @@
         </div>
 
         <!-- Bloc Mode d'affichage -->
-        <section ng-if="!isMobile()" id="display-section" 
+        <section ng-if="!isMobile()" id="display-section"
                  class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
             <label workflow="diary.listView" class="cell twelve">
 
@@ -41,11 +41,10 @@
         </section>
 
         <!-- children content as parent -->
-        <div class="row" workflow="diary.accessChildData">
+        <div class="row" ng-if="$parent.isRelative">
             <div class="row title-sidebar padding-left-md padding-right-md"
-                 data-ng-click="collapseMobile('children')"
-                 ng-if="display.listView && $parent.isRelative">
-                <h5 class="large cell twelve" workflow="diary.listView">
+                 data-ng-click="collapseMobile('children')">
+                <h5 class="large cell twelve">
                     <i18n>children</i18n>
 
                     <i ng-show="isMobile()"
@@ -78,7 +77,7 @@
             </h5>
         </div>
         <section ng-if="$parent.isAChildOrAParent && $parent.$parent.display.listViewArea.filter"
-                 class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+                 class="cell twelve padding-left-md margin-bottom-lg padding-bottom-sm padding-top-sm display-background">
             <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
                 <!-- homework -->
                 <div class="six diary-choice-view" ng-click="display.homeworks = !display.homeworks">
