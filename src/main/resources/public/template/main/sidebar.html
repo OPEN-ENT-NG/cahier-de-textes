@@ -15,17 +15,9 @@
         </div>
 
         <!-- Bloc Mode d'affichage -->
-        <section ng-if="!isMobile()" id="display-section" class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
-            <div workflow="diary.accessChildData">
-                <select ng-model="params.child"
-                        class="twelve"
-                        ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
-                    <option value="" disabled>[[translate('student.choose')]]</option>
-                </select>
-            </div>
-
-            <label workflow="diary.listView" class="cell twelve margin-bottom-md">
+        <section ng-if="!isMobile()" id="display-section" 
+                 class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+            <label workflow="diary.listView" class="cell twelve">
 
                 <!-- switch calendar mode -->
                 <span class="six diary-choice-view" data-ng-click="changeViewCalendar()">
@@ -48,44 +40,69 @@
             </label>
         </section>
 
+        <!-- children content as parent -->
+        <div class="row" workflow="diary.accessChildData">
             <div class="row title-sidebar padding-left-md padding-right-md"
-                 data-ng-click="collapseMobile('filter')"
-                 ng-if="display.listView && $parent.isAChildOrAParent">
+                 data-ng-click="collapseMobile('children')"
+                 ng-if="display.listView && $parent.isRelative">
                 <h5 class="large cell twelve" workflow="diary.listView">
-                    <i18n>filters</i18n>
+                    <i18n>children</i18n>
 
                     <i ng-show="isMobile()"
-                       ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
+                       ng-class="$parent.$parent.display.listViewArea.children ? 'up-open' : 'down-open'"
                        class="right-magnet">
                     </i>
                 </h5>
             </div>
-            <section ng-if="$parent.isAChildOrAParent && $parent.$parent.display.listViewArea.filter"
-                     class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
-                <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
-                    <!-- homework -->
-                    <div class="six diary-choice-view" ng-click="display.homeworks = !display.homeworks">
-                        <label class="checkbox">
-                            <input type="checkbox" ng-model="display.homeworks"/>
-                            <span><i18n>Homeworks</i18n></span>
-                        </label>
-                    </div>
+            <div ng-if="$parent.$parent.display.listViewArea.children" class="padding-md">
+                <select data-ng-model="params.child"
+                        class="twelve"
+                        data-ng-change="params.group = null;params.user = null;syncPedagogicItems()"
+                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                    <option value="" disabled>[[translate('student.choose')]]</option>
+                </select>
+            </div>
+        </div>
 
-                    <!-- session -->
-                    <div class="six diary-choice-view" ng-click="display.sessionList = !display.sessionList">
-                        <label class="checkbox">
-                            <input type="checkbox" ng-model="display.sessionList"/>
-                            <span><i18n>sessions</i18n></span>
-                        </label>
-                    </div>
-                </label>
+        <!-- Filter -->
+        <div class="row title-sidebar padding-left-md padding-right-md"
+             data-ng-click="collapseMobile('filter')"
+             ng-if="display.listView && $parent.isAChildOrAParent">
+            <h5 class="large cell twelve" workflow="diary.listView">
+                <i18n>filters</i18n>
 
-                <!-- SELECT SUBJECT -->
-                <filter-subject
-                        subjects="structure.subjects.all"
-                        current-subject="filters.subject" ng-if="display.listView">
-                </filter-subject>
-            </section>
+                <i ng-show="isMobile()"
+                   ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
+                   class="right-magnet">
+                </i>
+            </h5>
+        </div>
+        <section ng-if="$parent.isAChildOrAParent && $parent.$parent.display.listViewArea.filter"
+                 class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+            <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
+                <!-- homework -->
+                <div class="six diary-choice-view" ng-click="display.homeworks = !display.homeworks">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.homeworks"/>
+                        <span><i18n>Homeworks</i18n></span>
+                    </label>
+                </div>
+
+                <!-- session -->
+                <div class="six diary-choice-view" ng-click="display.sessionList = !display.sessionList">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="display.sessionList"/>
+                        <span><i18n>sessions</i18n></span>
+                    </label>
+                </div>
+            </label>
+
+            <!-- SELECT SUBJECT -->
+            <filter-subject
+                    subjects="structure.subjects.all"
+                    current-subject="filters.subject" ng-if="display.listView">
+            </filter-subject>
+        </section>
     </div>
 
     <!-- Progression -->

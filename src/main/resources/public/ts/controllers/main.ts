@@ -21,8 +21,9 @@ export let main = ng.controller('MainController',
             listView: false,
             // sidebar component html workflow
             listViewArea : {
-                filter: true,
-                structure: true
+                filter: !MobileUtils.isMobile(),
+                structure: !MobileUtils.isMobile(),
+                children: !MobileUtils.isMobile()
             }
         };
 
@@ -181,6 +182,10 @@ export let main = ng.controller('MainController',
                     }
                     case 'structure': {
                         $scope.display.listViewArea.structure = !$scope.display.listViewArea.structure;
+                        break;
+                    }
+                    case 'children': {
+                        $scope.display.listViewArea.children = !$scope.display.listViewArea.children;
                         break;
                     }
                 }
