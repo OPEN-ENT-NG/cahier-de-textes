@@ -2,10 +2,10 @@
 <article ng-if="pedagogicItem.pedagogicType === TYPE_SESSION" class="pedagogic-item-article">
     <!-- Sessions -->
     <div class="row list-view-item">
-        <div  ng-click="pedagogicItem.opened = !pedagogicItem.opened" class="twelve cell first-content">
+        <div data-ng-click="pedagogicItem.opened = !pedagogicItem.opened" class="twelve cell first-content">
             <!-- Subject, Audience and Teacher-->
-            <span ng-class="pedagogicItem.description?'hasDescription':''"
-                  >
+            <span class="pedagogic-item-article-title"
+                  ng-class="pedagogicItem.description?'hasDescription':''">
                 <span>
                     <b>[[pedagogicItem.subject.label]] &nbsp;</b>
                 </span>
@@ -14,21 +14,29 @@
                 </span>
                 <span>
                     [[pedagogicItem.teacher.toString()]]
-                </span> &nbsp;
+                </span>
                 <span class="hoursInView" ng-if="pedagogicItem.startDisplayTime && pedagogicItem.startDisplayTime">
                     [[pedagogicItem.startDisplayTime]] - [[pedagogicItem.endDisplayTime]]
                 </span>
+
+                <!-- icon to click -->
+                <i ng-if="isClickableByStudentOrParent(pedagogicItem)"
+                   class="right-open i-icon-right"
+                   data-ng-click="openSession(pedagogicItem.id)"
+                   tooltip="[[translate('session.consult')]]">
+                    <i18n class="see-right">see.detail</i18n>
+                </i>
+                <i ng-if="pedagogicItem.pedagogicType == 3"
+                   class="right-open i-icon-right"
+                   data-ng-click="openSessionFromCourse(pedagogicItem)"
+                   tooltip="[[translate('session.consult')]]">
+                    <i18n class="see-right">see.detail</i18n>
+                </i>
             </span>
 
-            <i ng-if="isClickableByStudentOrParent(pedagogicItem)" class="right-open i-icon-right" ng-click="openSession(pedagogicItem.id)" tooltip="[[translate('session.consult')]]">
-                <i18n class="see-right">see.detail</i18n>
-            </i>
-            <i ng-if="pedagogicItem.pedagogicType == 3" class="right-open i-icon-right" ng-click="openSessionFromCourse(pedagogicItem)" tooltip="[[translate('session.consult')]]">
-                <i18n class="see-right">see.detail</i18n>
-            </i>
-            <br/>
-
-            <div class="row inline-block horizontal-spacing medium-importance margin-top-md">
+            <!-- Description -->
+            <div ng-class="!$parent.isMobile() ? 'horizontal-spacing' : ''"
+                 class="row inline-block medium-importance margin-top-md">
                 <i>&#xe86f;</i>
                 <span class="small" ng-if="pedagogicItem.title">
                      [[pedagogicItem.title]]
@@ -38,10 +46,10 @@
                 </span>
             </div>
 
-            <!-- Description -->
+            <!-- Description Body -->
             <div ng-if="pedagogicItem.opened && pedagogicItem.description"
                  class="row"
-                 ng-click="pedagogicItem.opened = !pedagogicItem.opened">
+                 data-ng-click="pedagogicItem.opened = !pedagogicItem.opened">
 
                 <div ng-if="pedagogicItem.opened"
                      class="read-only-description"

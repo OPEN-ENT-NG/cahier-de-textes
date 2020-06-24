@@ -207,6 +207,10 @@
 
   .hoursInView {
     color: #666666;
+    padding-left: 5px;
+    @include mobile {
+      padding-left: 0;
+    }
   }
 
   .see-right {
