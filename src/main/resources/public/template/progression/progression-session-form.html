@@ -1,5 +1,5 @@
 <div class="manage-progression">
-    <div class="flex-row row__12">
+    <div class="flex-row-cdt row__12">
         <app-title class="flex-col col__3 zero-mobile">
             <div class="title-area-simple">
                 <h1>
@@ -102,47 +102,39 @@
                 </div>
 
                 <div ng-if="progressionSessionForm.progression_homeworks.length" class="margin-bottom-md">
-                    <h2>
+                    <h2 class="cdt-title-not-clickable">
                         <i18n>Homeworks</i18n>
                     </h2>
 
-                    <div class="responsive-table row" ng-if="progressionSessionForm.progression_homeworks.length &&
-                    (( progressionSessionForm.progression_homeworks.length == 1 && !progressionSessionForm.progression_homeworks[0].opened) ||  progressionSessionForm.progression_homeworks.length > 1)">
-                        <table class="twelve">
-                            <thead>
-                            <tr>
-                                <td class="one text-left padding-left-md">
+                    <div class="custom-flex-table responsive-table row"
+                         ng-if="progressionSessionForm.progression_homeworks.length &&
+                                ((progressionSessionForm.progression_homeworks.length == 1 &&
+                                !progressionSessionForm.progression_homeworks[0].opened) || progressionSessionForm.progression_homeworks.length > 1)">
+                            <!-- HEADER -->
+                            <div class="custom-flex-row twelve bot-border custom-flex-head">
+                                <div class="custom-flex-col padding-cell justified-content-center flex-text-left two">
                                     <i18n>homework.manage.type</i18n>
-                                </td>
-
-                                <td class="eight text-left">
+                                </div>
+                                <div class="custom-flex-col padding-cell justified-content-center flex-text-left nine">
                                     <i18n>settings.exclusion.description</i18n>
-                                </td>
-
-                                <td class="one">&nbsp;</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="progressionHomework in progressionSessionForm.progression_homeworks track by $index">
-                                <!-- Type static data -->
-                                <td ng-show="!progressionHomework.opened" class="two vertical-align-top text-left ">
-                                    <p class="twelve">[[progressionHomework.type.label]]</p>
-                                </td>
+                                </div>
+                                <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">&nbsp;</div>
+                            </div>
                                 <!-- Description -->
-                                <td ng-show="!progressionHomework.opened"
-                                    class="five vertical-align-top full-td-width text-left">
-                                    <p class="twelve" bind-html=[[progressionHomework.description]]></p>
-                                </td>
+                                <div ng-show="!progressionHomework.opened"
+                                     class="custom-flex-col padding-cell nine">
+                                    <p bind-html=[[progressionHomework.description]]></p>
+                                </div>
                                 <!-- Button part -->
-                                <td ng-show="!progressionHomework.opened">
+                                <div ng-show="!progressionHomework.opened"
+                                     class="custom-flex-col padding-cell justified-content-center flex-text-right one">
                                     <i ng-show="!progressionHomework.opened && !hidePencil"
                                        ng-click="openProgressionHomework(progressionHomework)">&#xe858;</i>
                                     <i ng-show="!progressionHomework.opened" class="trash right-magnet"
                                        ng-click="deleteProgressionHomework(progressionHomework,$index)"></i>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                </div>
+                        </div>
+
                     </div>
 
                     <div class="row">

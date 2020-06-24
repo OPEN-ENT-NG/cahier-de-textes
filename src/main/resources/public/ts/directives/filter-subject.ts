@@ -19,7 +19,7 @@ export const FilterSubject = ng.directive('filterSubject', () => {
             subjects: '='
         },
         template: `
-        <section class="cell twelve padding-top-sm padding-left-md padding-right-md padding-bottom-sm display-background">
+        <section class="cell twelve padding-top-sm padding-right-md padding-bottom-sm display-background">
                 <div>
                     <select ng-model="vm.subjectDisplay"
                             id="subject-list"

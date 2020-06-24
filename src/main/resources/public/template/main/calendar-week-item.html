@@ -1,17 +1,17 @@
 <div ng-if="item.pedagogicType == TYPE_SESSION" data-ng-click="openSession(item.id)"
-     class="flex-row row__6 schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
+     class="flex-row-cdt row__6 schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
      lvl-draggable
      lvl-drop-target on-drop="dropped(dragEl, dropEl)">
 
     <!-- course item info -->
-    <div class="margin-left-sm flex-col flex-row" ng-class="item.homeworks.length > 0 && !item.is_empty ? 'col__4': 'col__5' ">
-        <div class="flex-row row__6" ng-if="item.exceptionnal">
+    <div class="margin-left-sm flex-col flex-row-cdt" ng-class="item.homeworks.length > 0 && !item.is_empty ? 'col__4': 'col__5' ">
+        <div class="flex-row-cdt row__6" ng-if="item.exceptionnal">
             <div class="flex-col col__4">[[item.exceptionnal]]</div>
         </div>
-        <div class="flex-row row__6" ng-if="!item.exceptionnal">
+        <div class="flex-row-cdt row__6" ng-if="!item.exceptionnal">
             <div class="flex-col subject">[[item.subject.label]]</div>
         </div>
-        <div class="flex-row row__6 subject">
+        <div class="flex-row-cdt row__6 subject">
             <div class="flex-col col__2">[[item.audience.name]]</div>
         </div>
     </div>

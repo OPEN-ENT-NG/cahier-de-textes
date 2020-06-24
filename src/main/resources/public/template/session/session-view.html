@@ -3,7 +3,7 @@
         <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.toString()]] </b>
     </div>
     <div class="row card padding-md" ng-click="session.opened = !session.opened">
-        <h2 class="remove-margin">
+        <h2 class="cdt-title-not-clickable ">
             [[session.title]]
             <i class="right-magnet" ng-if="!session.isInsideDiary" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>

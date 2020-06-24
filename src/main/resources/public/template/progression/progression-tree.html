@@ -19,7 +19,7 @@
         <div ng-if="!currentUrlIsManage"
              class="session-box"
              ng-repeat="session in folder.progressionSessions">
-            <div class="session progression-item-draggable flex-row row__13"
+            <div class="session progression-item-draggable flex-row-cdt row__13"
                  data-session-id="[[session.id]]"
                  lvl-draggable="true">
                 <span ng-show="false">[[session.id]]</span>
@@ -64,7 +64,7 @@
             <div ng-if="!currentUrlIsManage"
                  class="session-box"
                  ng-repeat="session in folder.progressionSessions">
-                <div class="session progression-item-draggable flex-row row__13"
+                <div class="session progression-item-draggable flex-row-cdt row__13"
                      data-session-id="[[session.id]]"
                      lvl-draggable="true">
                     <span ng-show="false">[[session.id]]</span>
@@ -88,7 +88,7 @@
     <div ng-if="!currentUrlIsManage"
          class="session-box"
          ng-repeat="session in searchSessions">
-        <div class="session progression-item-draggable flex-row row__13"
+        <div class="session progression-item-draggable flex-row-cdt row__13"
              lvl-draggable="true">
             <span ng-show="false">[[session.id]]</span>
             <span ng-show="false">[[session.progression_homeworks.length]]</span>

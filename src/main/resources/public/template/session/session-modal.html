@@ -3,9 +3,9 @@
 <div class="back">
     <i class="icon arrow-left" ng-click="timeSlotNavigate(false)" ng-class="canNavigate(false) ? '' : 'disabled'"></i>
 </div>
-<div class="flex-row row__10 session-content">
-    <div class="flex-row flex-col main-content">
-        <div class="flex-row row__10 head">
+<div class="flex-row-cdt row__10 session-content">
+    <div class="flex-row-cdt flex-col main-content">
+        <div class="flex-row-cdt row__10 head">
             <div class="flex-col col__3">
                 <i class="text-xl one margin-sm icon diary-calendar"></i>&nbsp;[[getFormattedTimeSlotDate(openedTimeSlot)]]
             </div>
@@ -27,10 +27,10 @@
                 </button>
             </div>
         </div>
-        <div class="flex-row row__1 title">
+        <div class="flex-row-cdt row__1 title">
             <div class="flex-col">[[openedTimeSlot.title]]</div>
         </div>
-        <div class="flex-row row__1 description">
+        <div class="flex-row-cdt row__1 description">
             <div class="flex-col" bind-html="openedTimeSlot.description"></div>
         </div>
     </div>

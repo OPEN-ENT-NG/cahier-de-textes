@@ -30,10 +30,10 @@ switch {
     }
 
     input[type=checkbox]:checked + .tick {
-      background: $primary-light;
+      background: $diary-green;
       &:before {
         left: 20px;
-        background: $primary-dark;
+        background: $diary-darkengreen;
       }
     }
 

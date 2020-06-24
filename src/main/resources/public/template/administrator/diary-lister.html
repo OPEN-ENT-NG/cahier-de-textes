@@ -1,6 +1,6 @@
 <div class="cell twelve">
     <div class="flex-table">
-        <div class="flex-row  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'" role="rowgroup">
+        <div class="flex-row-cdt  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'" role="rowgroup">
             <div class="flex-col col__1 empty-take-space text-center" role="cell">
                 <label class="checkbox">
                     <input type="checkbox"
@@ -36,7 +36,7 @@
              class="flex-body"
              role="rowgroup">
             <div class="flex-content">
-                <div class="flex-row" ng-click="openDetails = openDetails != key ? key : null"
+                <div class="flex-row-cdt" ng-click="openDetails = openDetails != key ? key : null"
                      ng-class="{'shadowed': openDetails == key, 'row__15': userType !== 'ENSEIGNANT', 'row__13': userType === 'ENSEIGNANT'}">
                     <div class="flex-col col__1 empty-take-space" role="cell">
                         <label class="checkbox">
@@ -68,7 +68,7 @@
             </div>
             <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
-                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row row__15"
+                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row-cdt row__15"
                          ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup"
                          ng-click="openTimeSlotModal(timeSlot)">
                         <div class="flex-col col__1 time-slot-type" role="cell">
@@ -99,7 +99,7 @@
             </div>
         </div>
         <div ng-show="sessionsSize() <= 0"
-             class="flex-row row__5"
+             class="flex-row-cdt row__5"
              role="rowgroup">
             <div class="flex-col col__2">
                 <img class="img-none" ng-src="/diary/public/img/nothing.png" alt=""/>

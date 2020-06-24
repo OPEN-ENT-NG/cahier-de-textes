@@ -23,7 +23,7 @@
 
     <fieldset class="row cursorDefault card remove-margin padding-md border-widht-fieldset"
               ng-disabled="isSelectSubjectAndAudienceSession && !(session.courseId && session.audience)">
-        <h2 class="remove-margin">
+        <h2 class="cdt-title-not-clickable">
             <i18n>session</i18n>
             <span class="margin-left-md" ng-show="session.opened">
                 <span style="color: green;" ng-if="session.isPublished">(<i18n>published.f</i18n>)</span>
@@ -134,7 +134,7 @@
 
 
         <div class="margin-bottom-md">
-            <h2 ng-if="homeworks.length">
+            <h2 class="cdt-title-not-clickable" ng-if="homeworks.length">
                 <i18n>Homeworks</i18n>
             </h2>
 
@@ -248,7 +248,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div ng-if="!isUpdateHomework()" class="flex-row row__12">
+                        <div ng-if="!isUpdateHomework()" class="flex-row-cdt row__12">
                             <date-picker class="date-picker-sm" ng-show="!form.homework.attachedToSession"
                                          ng-model="form.homework.dueDate" ng-change="syncWorkloadDay()"></date-picker>
 
