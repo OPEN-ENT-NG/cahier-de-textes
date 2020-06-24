@@ -104,7 +104,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 await $scope.sessions.syncOwnSessions($scope.structure,
                     ($scope.session)? moment($scope.session.date) : moment(),
                     ($scope.session)? moment($scope.session.date).add(15, 'day'):   moment().add(15, 'day'),
-                    $scope.homework.audience.id,$scope.homework.subject.id),
+                    [$scope.homework.audience.id],$scope.homework.subject.id),
 
                 await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group,
                     ($scope.session)? moment($scope.session.date) : moment(),

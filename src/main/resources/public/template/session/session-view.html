@@ -1,18 +1,23 @@
 <div class="session-view">
+    <!-- title -->
     <div class="row margin-bottom-md" ng-if="!session.isInsideDiary">
         <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.toString()]] </b>
     </div>
-    <div class="row card padding-md" ng-click="session.opened = !session.opened">
-        <h2 class="cdt-title-not-clickable ">
+
+    <!-- description title -->
+    <div class="session-view-description row card padding-md" ng-click="session.opened = !session.opened">
+        <h2 class="session-view-description-title cdt-title-not-clickable ">
             [[session.title]]
             <i class="right-magnet" ng-if="!session.isInsideDiary" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
         </h2>
     </div>
+
+    <!-- description body -->
     <div class="row card padding-md margin-bottom-md" ng-show="session.opened || session.isInsideDiary">
         <div class="row">
             <span class="gray">[[session.type.label]] &nbsp; [[session.startDisplayDate]] &nbsp; [[session.startDisplayTime]] - [[session.endDisplayTime]]</span>
         </div>
         <!-- Description-->
-        <div class="read-only-description" bind-html="session.description"></div>
+        <div bind-html="session.description"></div>
     </div>
 </div>

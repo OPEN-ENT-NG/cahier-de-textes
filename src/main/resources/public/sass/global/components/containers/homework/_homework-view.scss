@@ -33,3 +33,9 @@
     }
   }
 }
+
+.homework-view-button {
+  @include mobile {
+    margin: 8px;
+  }
+}
