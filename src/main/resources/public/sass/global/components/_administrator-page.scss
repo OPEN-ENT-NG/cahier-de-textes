@@ -1,4 +1,7 @@
 .global-administrator-page {
+  &-header {
+    position: relative;
+  }
   h1 {
     flex-shrink: 0;
     font-weight: bold;
