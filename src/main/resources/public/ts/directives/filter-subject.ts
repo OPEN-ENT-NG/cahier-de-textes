@@ -4,7 +4,8 @@ import {UPDATE_SUBJECT_EVENTS} from "../enum/events";
 
 interface IViewModel {
     subject: Subject;
-    subjectDisplay: { name: string, id: string };
+    currentSubject: Subject;
+    subjectDisplay: Subject;
     subjects: Array<Subject>;
 
     selectSubjectText: string;
@@ -16,26 +17,27 @@ export const FilterSubject = ng.directive('filterSubject', () => {
         restrict: 'E',
         transclude: true,
         scope: {
-            subjects: '='
+            subjects: '=',
+            currentSubject: '='
         },
         template: `
-        <section class="cell twelve padding-top-sm padding-right-md padding-bottom-sm display-background">
+        <section class="cell twelve padding-top-sm padding-left-md padding-right-md padding-bottom-sm display-background">
                 <div>
-                    <select ng-model="vm.subjectDisplay"
+                    <select data-ng-model="vm.subjectDisplay"
                             id="subject-list"
                             class="twelve"
-                            ng-change="vm.selectSubject()"
+                            data-ng-change="vm.selectSubject()"
                             ng-options="subject as subject.label for subject in vm.subjects | orderBy:'label'"">
                         <option value="" disabled selected>[[vm.selectSubjectText]]</option>
                        
                     </select>
                 </div>
                 
-                <div class="cell twelve"
-                 ng-show="vm.subjectDisplay && vm.subjectDisplay.label !== ''">
-                <div class="cell twelve search-input-ul">
-                        [[vm.subjectDisplay.label]]
-                        <i class="close" data-ng-click="removeSubject()"></i>
+                <div class="cell twelve" ng-show="vm.subjectDisplay && vm.subjectDisplay.label !== ''">
+                    <div class="cell twelve search-input-ul">
+                            [[vm.subjectDisplay.label]]
+                            <i class="close" data-ng-click="removeSubject()"></i>
+                    </div>
                 </div>
             </div>
         </section>
@@ -45,7 +47,11 @@ export const FilterSubject = ng.directive('filterSubject', () => {
         replace: false,
         controller: async function () {
             const vm: IViewModel = <IViewModel>this;
-            vm.subjectDisplay = null;
+            if (vm.currentSubject != null) {
+                vm.subjectDisplay = vm.currentSubject
+            } else {
+                vm.subjectDisplay = null;
+            }
             vm.selectSubjectText = lang.translate('subject.discipline');
         },
         link: function ($scope, $element: HTMLDivElement) {
@@ -57,7 +63,7 @@ export const FilterSubject = ng.directive('filterSubject', () => {
 
             $scope.removeSubject = async () => {
                 vm.subjectDisplay = null;
-                $scope.$emit(UPDATE_SUBJECT_EVENTS.UPDATE, null);
+                $scope.$emit(UPDATE_SUBJECT_EVENTS.UPDATE, vm.subjectDisplay);
             };
         }
     };

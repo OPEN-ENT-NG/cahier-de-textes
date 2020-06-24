@@ -81,7 +81,10 @@
                 </label>
 
                 <!-- SELECT SUBJECT -->
-                <filter-subject subjects="structure.subjects.all" ng-if="display.listView"></filter-subject>
+                <filter-subject
+                        subjects="structure.subjects.all"
+                        current-subject="filters.subject" ng-if="display.listView">
+                </filter-subject>
             </section>
     </div>
 

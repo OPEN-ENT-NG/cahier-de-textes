@@ -3,8 +3,10 @@ import {DateUtils} from '../../utils/dateUtils';
 import {
     Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
 } from '../../model';
-import {AutocompleteUtils} from "../../utils/autocompleteUtils";
 import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from "../../enum/events";
+import {IAngularEvent} from "angular";
+
+declare let window: any;
 
 export let manageListCtrl = ng.controller('manageListController',
     ['$scope','$window', '$route', '$location', '$timeout', '$compile', async function ($scope,$window, $rootScope) {
@@ -29,8 +31,9 @@ export let manageListCtrl = ng.controller('manageListController',
         }
 
         $scope.filters = {
-            startDate: moment().toDate(),
-            endDate: moment().add('2', 'weeks').toDate()
+            startDate: (window.item && ('startDate' in window.item)) ? window.item.startDate : moment().toDate(),
+            endDate: (window.item && ('endDate' in window.item)) ? window.item.endDate : moment().add('2', 'weeks').toDate(),
+            subject: (window.item && ('subject' in window.item)) ? window.item.subject : null
         };
 
         $scope.syncPedagogicItems = async (subject) => {
@@ -243,6 +246,7 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.openHomework = (homeworkId: number) => {
+            window.item = $scope.filters;
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
                 $scope.goTo('/homework/update/' + homeworkId  );
             } else {
@@ -287,6 +291,7 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.openSession = (sessionId: number) => {
+            window.item = $scope.filters;
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
                 $scope.goTo('/session/update/' + sessionId);
             } else {
@@ -373,9 +378,10 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.syncPedagogicItems();
         });
 
-        $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE,  (event, data) => {
+        $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE,  (event: IAngularEvent, data) => {
+            $scope.filters.subject = data;
             if (data != null) {
-                $scope.syncPedagogicItems(data);
+                $scope.syncPedagogicItems($scope.filters.subject);
             }
             else $scope.syncPedagogicItems();
         });
