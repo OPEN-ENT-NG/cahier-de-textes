@@ -25,7 +25,7 @@ export const FilterSubject = ng.directive('filterSubject', () => {
                             id="subject-list"
                             class="twelve"
                             ng-change="vm.selectSubject()"
-                            ng-options="subject as subject.label for subject in vm.subjects">
+                            ng-options="subject as subject.label for subject in vm.subjects | orderBy:'label'"">
                         <option value="" disabled selected>[[vm.selectSubjectText]]</option>
                        
                     </select>
