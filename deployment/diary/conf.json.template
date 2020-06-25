@@ -1,5 +1,5 @@
     {
-      "name": "fr.openent~diary~3.1-SNAPSHOT",
+      "name": "fr.openent~diary~3.2",
       "config": {
         "main" : "fr.openent.diary.Diary",
         "port" : 8054,
