@@ -27,7 +27,7 @@
         <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-view.html"></div>
         <div class="session-read-only card padding-md margin-bottom-lg"
              ng-if="session.homeworks.length > 0">
-            <h2 class="session-read-only-title"><i18n>Homeworks</i18n></h2>
+            <h2 class="cdt-title-not-clickable"><i18n>Homeworks</i18n></h2>
             <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
                  ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-view.html"></div>
         </div>
