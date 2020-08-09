@@ -37,8 +37,11 @@
 
   // admin-main.html design
   &.admin-main {
-    bottom: 0;
+    top: 50px;
     left: 70px;
+    line-height: 20px;
+    width: 250px;
+    text-align: initial;
   }
 }
 
