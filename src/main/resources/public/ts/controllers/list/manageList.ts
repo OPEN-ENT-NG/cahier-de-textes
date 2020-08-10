@@ -168,8 +168,6 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.initDisplay = () => {
-            let nbSessionDisplayed = 0;
-            let nbHomeworkDisplayed = 0;
             let indexMinChildHomework = $scope.pedagogicDays.length;
             let indexMaxChildHomework = -1;
 
@@ -204,14 +202,10 @@ export let manageListCtrl = ng.controller('manageListController',
 
             //display session
             $scope.pedagogicDays.map((c, index) => {
-                if (c.shortDate === "17/04")
-
-                    containsSession(c);
-                if (containsSession(c) && nbSessionDisplayed < 3) {
+                if (containsSession(c)) {
                     c.displayed = true;
-                    nbSessionDisplayed++;
                 }
-                if (containsHomeworks(c) && nbHomeworkDisplayed < 3) {
+                if (containsHomeworks(c)) {
                     if ($scope.isChild) {
                         (indexMinChildHomework > index) ? indexMinChildHomework = index : indexMinChildHomework;
                         (indexMaxChildHomework < index) ? indexMaxChildHomework = index : indexMaxChildHomework;
@@ -219,7 +213,6 @@ export let manageListCtrl = ng.controller('manageListController',
                         c.displayed = true;
 
                     }
-                    nbHomeworkDisplayed++;
                 }
             });
             if ($scope.isChild) {
