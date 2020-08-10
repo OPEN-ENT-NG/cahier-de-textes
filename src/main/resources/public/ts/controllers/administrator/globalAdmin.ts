@@ -397,7 +397,11 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.sessionsHomeworksByClass = () => {
-            return $scope.timeSlotsByDate.filter(time => time.audience.name === $scope.openedTimeSlot.audience.name)
+            return $scope.timeSlotsByDate.filter(
+                time =>
+                    time.audience.name === $scope.openedTimeSlot.audience.name &&
+                    time.teacher.id === $scope.openedTimeSlot.teacher.id
+            );
         };
 
         $scope.getTimeSlotIndex = () => {
