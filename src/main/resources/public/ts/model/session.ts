@@ -286,7 +286,7 @@ export class Session {
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
         this.subject = new Subject();
-        this.subject.id = sessionDrag.subject.id;
+        this.subject.id = sessionDrag.subject ? sessionDrag.subject.id : null;
 
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();

@@ -469,7 +469,7 @@ export let calendarController = ng.controller('CalendarController',
                         let date = course.item.data.startDisplayDate;
                         if (progressionOrSession.item.color === pedagogicSlotProfile.HOMEWORK) {
                             // case we drag homework to empty session in order to create homework
-                            $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item.audiences);
+                            $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item);
                         } else {
                             $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
                         }
@@ -500,29 +500,32 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a homework pedagogic type drop on course to create homework
              */
-            $scope.homeworkToEmptySession = async (idSessionDrag, audienceDrop) => {
-                let sessionDrag, sessionDrop;
+            $scope.homeworkToEmptySession = async (idSessionDrag, sessionDrop) => {
+                let sessionDrag: any = [];
                 $scope.calendarItems.map(async session => {
                     if (session.id == idSessionDrag) {
                         sessionDrag = session;
                     }
                 });
-
                 if (sessionDrag.homeworks.length === 0) {
                     let sessionHomework = new Session($scope.structure);
                     sessionHomework.id = sessionDrag.id;
                     await sessionHomework.sync();
-                    if (audienceDrop.all.length !== 0) {
-                        sessionHomework.homeworks[0].audience = audienceDrop.all[0];
-                    }
-                    $rootScope.homework = sessionHomework.homeworks[0];
+                    prepareHomeworkRedirect(sessionDrop, sessionHomework);
                 } else {
-                    if (audienceDrop.all.length !== 0) {
-                        sessionDrag.homeworks[0].audience = audienceDrop.all[0];
-                    }
-                    $rootScope.homework = sessionDrag.homeworks[0];
+                    prepareHomeworkRedirect(sessionDrop, sessionDrag);
                 }
-                $scope.goTo('/homework/update/' + $rootScope.homework.id);
+                $scope.goTo('/homework/create');
+            };
+
+            const prepareHomeworkRedirect = (sessionDrop, sessionHomework) => {
+                if (sessionDrop.audiences.all.length !== 0) {
+                    sessionHomework.homeworks[0].audience = sessionDrop.audiences.all[0];
+                    sessionHomework.homeworks[0].dueDate = sessionDrop.startMoment;
+                    sessionHomework.homeworks[0].session = sessionDrop;
+                    sessionHomework.homeworks[0].id = "";
+                }
+                $rootScope.homework = sessionHomework.homeworks[0];
             };
 
             /**
@@ -551,6 +554,12 @@ export let calendarController = ng.controller('CalendarController',
                 await course.sync(date, date);
                 let session = new Session($scope.structure, course);
                 session.setFromCourseAndSession(course, sessionDrag);
+                // if I have homeworks, append this session to my sessions array 
+                if (session.homeworks.length !== 0) {
+                    session.homeworks.forEach(homework => {
+                        homework.sessions.push(session)
+                    });
+                }
                 session.opened = true;
                 $rootScope.session = session;
 

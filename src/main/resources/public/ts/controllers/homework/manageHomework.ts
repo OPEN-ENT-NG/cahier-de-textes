@@ -210,23 +210,18 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             if($scope.session){
                 $scope.homework.dueDate = moment($scope.session.startDate);
             }
-            //
+
             if($scope.homework.session){
                 $scope.homework.dueDate = moment($scope.homework.session.startDate);
             }
 
-
-            //If no session then push the current one
-
-            //
+            // If no session in homework then push the current one
             if($scope.sessionsToAttachTo) {
-
                 if ($scope.sessionsToAttachTo.length == 1 && ($scope.homework.opened || !$scope.homework.session)) {
                     $scope.homework.session = $scope.sessionsToAttachTo[0];
-
                 }
                 else if ($scope.sessionsToAttachTo.length > 1 && ($scope.homework.opened || !$scope.homework.session
-                        || $scope.homework.session&& $scope.homework.session.id && $scope.homework.session.id !== $scope.session.id && $scope.homework.opened  )) {
+                    || $scope.homework.session&& $scope.homework.session.id && $scope.homework.session.id !== $scope.session.id && $scope.homework.opened  )) {
                     $scope.homework.session = $scope.sessionsToAttachTo[1];
                 }
                 else if ($scope.homework.opened && !$scope.sessionsToAttachTo.length) {
@@ -236,9 +231,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
 
                 }
             }
-
             $scope.safeApply();
-
         };
 
         $scope.attachToDate = () => {
@@ -382,9 +375,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         $scope.attachToDate();
                     }
                 } else {
-                    if($scope.sessionsToAttachTo)
-                        $scope.homework.session = $scope.sessionsToAttachTo[0];
-                    $scope.attachToDate();
+                    if($scope.sessionsToAttachTo) {
+                        // if homework session has one session we try to match with sessionsToAttachTo
+                        let session = $scope.sessionsToAttachTo.find(
+                            session => session.startDisplayDate === $scope.homework.session.startDisplayDate
+                        );
+                        if (session) {
+                            $scope.homework.session = session;
+                        } else {
+                            $scope.homework.session = $scope.sessionsToAttachTo[0];
+                        }
+                    } else {
+                        $scope.attachToDate();
+                    }
                 }
             }
 

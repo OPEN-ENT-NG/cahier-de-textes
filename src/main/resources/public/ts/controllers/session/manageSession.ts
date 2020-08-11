@@ -13,6 +13,7 @@ import {
 } from '../../model';
 import {SubjectService} from "../../services";
 import {AutocompleteUtils} from "../../utils/autocompleteUtils";
+import {AxiosResponse} from "axios";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter',
@@ -110,8 +111,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
             $scope.deleteSession = async () => {
-                $scope.toastHttpCall(await $scope.session.delete());
-                $scope.back();
+                $scope.session.delete().then(() => {
+                    if ($scope.session.homeworks.length !== 0) {
+                        $scope.session.homeworks.forEach((homework: Homework) => {
+                            if (homework.session_id === $scope.session.id) {
+                                homework.delete();
+                            }
+                        });
+                    }
+                    toasts.confirm('session.deleted');
+                    $scope.back();
+                });
             };
 
             $scope.unpublishSession = async () => {
@@ -127,7 +137,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                 // Sauvegarde de la session
                 $scope.session.is_empty = false;
-                let sessionSaveResponse = $scope.toastHttpCall(await $scope.session.save($scope.placeholder));
+                let sessionSaveResponse = await $scope.session.save($scope.placeholder);
                 if (sessionSaveResponse.succeed) {
                     if (!$scope.session.id && sessionSaveResponse.data.id) {
                         $scope.session.id = sessionSaveResponse.data.id;
@@ -182,15 +192,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 return true;
             };
 
-            async function saveSessionHomeworks() {
+            const saveSessionHomeworks = async (): Promise<void> =>{
                 Promise.all([
                     await createSessionsHomework(),
                     await updateSessionsHomework()
-                ]).then((values) => {
-                    if (values.indexOf(false) === -1) $scope.back();
+                ]).then((values: boolean[]) => {
+                    if (values.indexOf(false) === -1) {
+                        toasts.confirm('session.created');
+                        $scope.back();
+                    }
                 });
-
-
             }
 
             // region Gestion des homework
