@@ -305,7 +305,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             }
             else {
                 // Creating session from course before saving the homework
+                // first condition checks if homework is not attachedToDate (will obviously be attached to session)
+                // we set our dueDate with the session we attached to
                 if(!$scope.homework.attachedToDate && !$scope.homework.session.id && $scope.homework.session.courseId){
+                    $scope.homework.dueDate = $scope.homework.session.date;
                     if (!$scope.homework.session.type.id) {
                         $scope.homework.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                     }
