@@ -1,6 +1,6 @@
 <div class="cell twelve">
     <div class="flex-table">
-        <div class="flex-row-cdt  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__15' : 'row__13'" role="rowgroup">
+        <div class="flex-row-cdt  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__13' : 'row__11'" role="rowgroup">
             <div class="flex-col col__1 empty-take-space text-center" role="cell">
                 <label class="checkbox">
                     <input type="checkbox"
@@ -25,9 +25,6 @@
                 <i18n>sessions.admin.numberSessions</i18n>
             </div>
             <div class="flex-col col__2 text-center" role="cell">
-                <i18n>sessions.admin.merged</i18n>
-            </div>
-            <div class="flex-col col__2 text-center" role="cell">
                 <i18n>sessions.admin.state</i18n>
             </div>
         </div>
@@ -37,7 +34,7 @@
              role="rowgroup">
             <div class="flex-content">
                 <div class="flex-row-cdt" ng-click="openDetails = openDetails != key ? key : null"
-                     ng-class="{'shadowed': openDetails == key, 'row__15': userType !== 'ENSEIGNANT', 'row__13': userType === 'ENSEIGNANT'}">
+                     ng-class="{'shadowed': openDetails == key, 'row__13': userType !== 'ENSEIGNANT', 'row__11': userType === 'ENSEIGNANT'}">
                     <div class="flex-col col__1 empty-take-space" role="cell">
                         <label class="checkbox">
                             <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
@@ -60,15 +57,13 @@
                         [[sessionsGroup.length]]
                     </div>
                     <div class="flex-col col__2" role="cell">
-                    </div>
-                    <div class="flex-col col__2" role="cell">
                         <span>[[getLastCreatedVisa(sessionsGroup)]]</span>
                     </div>
                 </div>
             </div>
             <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
-                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row-cdt row__15"
+                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row-cdt row__13"
                          ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup"
                          ng-click="openTimeSlotModal(timeSlot)">
                         <div class="flex-col col__1 time-slot-type" role="cell">
