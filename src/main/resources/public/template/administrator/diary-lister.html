@@ -63,7 +63,7 @@
             </div>
             <div class="flex-collapse" ng-class="{'open-details': openDetails == key}">
                 <div class="flex-content">
-                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row-cdt row__13"
+                    <div ng-repeat="timeSlot in sessionsGroup" class="flex-row-cdt row__15"
                          ng-class="isHomeworkInstance(timeSlot) ? 'homework-slot' : 'session-slot'" role="rowgroup"
                          ng-click="openTimeSlotModal(timeSlot)">
                         <div class="flex-col col__1 time-slot-type" role="cell">
@@ -85,9 +85,9 @@
                             <i class="text-xl two margin-sm icon diary-up"
                                ng-class="timeSlot.isPublished ? 'published' : 'unpublished'"></i>
                             <span class="ten">
-                                    <i18n ng-if="timeSlot.isPublished">published</i18n>
-                                    <i18n ng-if="!timeSlot.isPublished">notpublished.s</i18n>
-                                </span>
+                                <i18n ng-if="timeSlot.isPublished">published</i18n>
+                                <i18n ng-if="!timeSlot.isPublished">notpublished.s</i18n>
+                            </span>
                         </div>
                     </div>
                 </div>
