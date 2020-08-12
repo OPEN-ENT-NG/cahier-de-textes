@@ -45,7 +45,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             reverse: false
         };
 
-        $scope.refresh = () => {
+        $scope.refresh = (): void => {
             if ($routeParams.progressionId) {
                 $scope.progressionSessionForm.id = parseInt($routeParams.progressionId);
                 $scope.progressionSessionForm.get();
@@ -64,13 +64,15 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             }
         };
 
-        async function initData() {
+        const initData = async (): Promise<void> => {
             $scope.sessionTypes = new SessionTypes(window.structure.id);
             $scope.subjects = new Subjects();
-            await $scope.sessionTypes.sync();
-            await $scope.subjects.sync(window.structure.id, model.me.userId);
-            await $scope.initProgressions();
-            await $scope.initForms();
+            await Promise.all([
+                $scope.sessionTypes.sync(),
+                $scope.subjects.sync(window.structure.id, model.me.userId),
+                $scope.initProgressions()
+            ]);
+            $scope.initForms();
 
             $scope.progressionFolders.forEach((folder) => {
                 folder.progressionSessions.map(psession => {
@@ -112,12 +114,12 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             }
         }
 
-        $scope.initProgressions = async () => {
+        $scope.initProgressions = async (): Promise<void> => {
             $scope.selectedItem = null;
 
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
             await $scope.progressionFolders.sync();
-            $scope.progressionFolders.all.map((x) => {
+            $scope.progressionFolders.all.map((x: ProgressionFolder) => {
                 if (x.id === null && x.parent_id === null) {
                     x.title = lang.translate("progression.my.folders");
                     x.selected = true;
@@ -310,17 +312,24 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.dropped = async (dragEl, dropEl) => {
+        $scope.dropped = async (dragEl: string, dropEl: string) => {
             if (dragEl == dropEl)
                 return;
-            let dragItem = $('#' + dragEl);
-            let dropItem = $('#' + dropEl);
-            let dropId = dropItem.data().itemId;
-            let dragId = dragItem.data().itemId;
+            let dragItem: JQuery = $('#' + dragEl);
+            let dropItem: JQuery  = $('#' + dropEl);
+            let dropId: any = dropItem.data().itemId;
+            let dragId: any = dragItem.data().itemId;
 
-            let folder = $scope.progressionFolders.all.find((f) => f.id === dropId);
+            // We check if it is the origin folder to make sure our dropId value will be Nullable instead of being ""
+            if (dropItem.hasClass("folder") && (dropId === null || dropId === "")) {
+                dropId = null;
+            }
+
+            let folder: ProgressionFolder = $scope.progressionFolders.all.find((f: ProgressionFolder) => f.id === dropId);
 
             if ((!dropItem.hasClass("folder") && !dropItem.hasClass("sub-folder")) || !folder) return;
+
+            /* case we dropped session item */
             if (dragItem.hasClass("session-item")) {
                 let sessionsChecked = $scope.getProgressionSessionsChecked();
 
@@ -330,14 +339,15 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                         s.save();
                     });
                 } else {
-                    let sessions = $scope.getProgressionSessions();
-                    let session = sessions.find((s) => s.id === dragId);
+                    let sessions: Array<ProgressionSession> = $scope.getProgressionSessions();
+                    let session: ProgressionSession = sessions.find((s: ProgressionSession) => s.id === dragId);
                     if (!session) return;
                     session.folder = folder;
+                    session.folder_id = session.folder.id;
                     await session.save();
-
                 }
             } else if (dragItem.hasClass("sub-folder")) {
+                /* case we dropped sub folder */
                 if ($scope.selectedSubItems.map((f) => f.id).includes(dragId)) {
                     $scope.selectedSubItems.forEach((f) => {
                         if (ProgressionFolders.isParentFolder(f, folder)) return;
@@ -371,7 +381,6 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.validProgressionsSessionForm = async () => {
-            console.log("ok");
             let result = await $scope.toastHttpCall(await $scope.progressionSessionForm.save());
             if (result.succeed) {
                 $scope.goTo('/progressions/view');
@@ -599,7 +608,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.initForms = () => {
+        $scope.initForms = (): void => {
             $scope.progressionFolderForm = new ProgressionFolder();
             $scope.progressionSessionForm = new ProgressionSession();
             $scope.progressionSessionForm.folder_id = null;

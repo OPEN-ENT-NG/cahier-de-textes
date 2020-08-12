@@ -26,6 +26,7 @@ export class ProgressionSession implements Selectable {
     eventer: Eventer;
     type: SessionType;
     folder_id: number;
+    folder?: ProgressionFolder;
 
     progression_homeworks: ProgressionHomework[] = [];
 
