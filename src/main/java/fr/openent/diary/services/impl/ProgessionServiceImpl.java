@@ -16,7 +16,6 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.user.UserInfos;
 
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -161,7 +160,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
 
         try {
-            JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
+            JsonArray statements = new JsonArray();
             statements.add(getProgressionSessionUpdateStatement(progression, progressionId));
 
             if (progression.containsKey("progression_homeworks")) {
@@ -195,7 +194,7 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     private JsonObject getProgressionSessionUpdateStatement(JsonObject progression, String progressionId) {
         JsonArray params;
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".progression_session " +
-                "SET subject_id = ?,type_id =? ,title = ? , description = ? , annotation = ?, owner_id = ?, class = ?, " +
+                "SET subject_id = ?, type_id = ?, modified = NOW(), title = ? , description = ? , annotation = ?, owner_id = ?, class = ?, " +
                 "progression_folder_id = ? Where progression_session.id = ?  ";
         params = new JsonArray().add(progression.getString("subject_id"))
                 .add(progression.getInteger("type_id"))

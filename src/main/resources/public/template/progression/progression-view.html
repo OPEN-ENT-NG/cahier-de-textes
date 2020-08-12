@@ -80,15 +80,14 @@
                         <i18n>homeworks.attached</i18n>
                     </div>
                 </div>
-                <div ng-repeat="(key, session) in displayedTable()"
+                <div data-ng-repeat="session in displayedTable() | orderBy:'-modified'"
                      class="flex-body"
                      role="rowgroup">
                     <div class="flex-content">
                         <div class="flex-row-cdt row__9 session-item"
                              ng-click="openUpdateItem(session);$event.stopPropagation();"
                              lvl-draggable="true"
-                             data-item-id="[[session.id]]"
-                        >
+                             data-item-id="[[session.id]]">
                             <div class="flex-col col__1 empty-take-space" role="cell">
                                 <label class="checkbox" ng-click="$event.stopPropagation();">
                                     <input type="checkbox" ng-model="session.tableSelected"

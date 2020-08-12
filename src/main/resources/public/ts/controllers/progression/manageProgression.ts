@@ -201,7 +201,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             return $scope.searchSessions.length > 0 || $scope.searchFolders.length > 0 || ($scope.search && $scope.search != '');
         };
 
-        $scope.displayedTable = () => {
+        $scope.displayedTable = (): Array<ProgressionSession> => {
             if ($scope.isFilterSearch()) {
                 return $scope.selectedItem ? $scope.selectedItem.progressionSessions : $scope.searchSessions;
             }
