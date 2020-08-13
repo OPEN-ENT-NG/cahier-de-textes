@@ -22,8 +22,11 @@
             </span>
             </div>
             <div class="flex-col col__2 edit-button">
-                <button class="right-magnet calendar-button edit-button" ng-click="goToEditTimeslot()">
-                    MODIFIER
+                <button workflow="diary.manageSession"
+                        ng-show="isOwnSession()"
+                        class="right-magnet calendar-button edit-button"
+                        ng-click="goToEditTimeslot()">
+                    <i18n>utils.modify</i18n>
                 </button>
             </div>
         </div>

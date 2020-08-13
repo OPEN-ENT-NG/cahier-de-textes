@@ -445,6 +445,10 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             }
         };
 
+        $scope.isOwnSession = (): boolean => {
+            return $scope.openedTimeSlot.session.teacher.id === model.me.userId;
+        };
+
         $scope.init();
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
