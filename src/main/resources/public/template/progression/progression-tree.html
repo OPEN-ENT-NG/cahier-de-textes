@@ -16,7 +16,7 @@
         </div>
     </div>
     <div ng-show="(selectedFolderIds.indexOf(folder.id) !== -1 || folder.childFolders.length === 0)">
-        <div ng-if="!currentUrlIsManage"
+        <div ng-if="!currentUrlIsManage && selectedFolderIds.includes(session.folder_id)"
              class="session-box"
              ng-repeat="session in folder.progressionSessions">
             <div class="session progression-item-draggable flex-row-cdt row__13"

@@ -55,11 +55,16 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.selectIconFolder = (folder: ProgressionFolder) => {
-            if (($scope.isFilterSearch() && $scope.currentUrlIsManage)
-                || (!$scope.isFilterSearch() && folder.childFolders.length === 0)
-                || ($scope.isFilterSearch() && folder.progressionSessions.length === 0)) {
-                return 'diary-folder';
+            if ($scope.currentUrlIsManage) {
+                if (($scope.isFilterSearch() && $scope.currentUrlIsManage)
+                    || (!$scope.isFilterSearch() && folder.childFolders.length === 0)
+                    || ($scope.isFilterSearch() && folder.progressionSessions.length === 0)) {
+                    return 'diary-folder';
+                } else {
+                    return $scope.selectedFolderIds.indexOf(folder.id) !== -1 ? 'arrow-down' : 'arrow-right';
+                }
             } else {
+                /* case we are in dashboard */
                 return $scope.selectedFolderIds.indexOf(folder.id) !== -1 ? 'arrow-down' : 'arrow-right';
             }
         };
@@ -85,7 +90,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
                         if (psession.type_id == type.id) {
                             psession.setType(type);
                         }
-                    })
+                    });
                 });
             });
             if ($routeParams.progressionId) {
@@ -119,13 +124,16 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
             await $scope.progressionFolders.sync();
-            $scope.progressionFolders.all.map((x: ProgressionFolder) => {
-                if (x.id === null && x.parent_id === null) {
-                    x.title = lang.translate("progression.my.folders");
-                    x.selected = true;
-                    $scope.selectedItem = x;
+            $scope.progressionFolders.all.forEach((progression: ProgressionFolder) => {
+                progression.progressionSessions.forEach((psession: ProgressionSession) => {
+                        psession.folder_id = progression.id;
+                });
+                if (progression.id === null && progression.parent_id === null) {
+                    progression.title = lang.translate("progression.my.folders");
+                    progression.selected = true;
+                    $scope.selectedItem = progression;
                 }
-                return x;
+                return progression;
             });
 
             $scope.progressionFoldersToDisplay = Object.assign(Object.create(Object.getPrototypeOf($scope.progressionFolders)), $scope.progressionFolders);
