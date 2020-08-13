@@ -187,6 +187,11 @@ h1 {
       }
     }
   }
+
+  /* use display to cancel 'hide' class */
+  &.display {
+    max-height: 150px;
+  }
 }
 
 .main-content {

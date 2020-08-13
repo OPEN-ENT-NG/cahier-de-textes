@@ -108,44 +108,50 @@
 </div>
 </div>
 
-<lightbox show="visaPdfDownloadBox" on-close="closeVisaPdfDownloadBox()">
-    <h3>
-        <i18n>visa.manage.title</i18n>
-    </h3>
-    <div ng-repeat="visa_pdf in visas_pdfChoice | orderBy: 'moment':true">
-        <p ng-click="visa_pdf.downloadPdf()">
-            <i>&#xe857;</i>&nbsp;
-            <i18n>visa.manage.choosePdf</i18n>&nbsp;
-            [[visa_pdf.displayDwlName]]
-        </p>
-    </div>
+<!-- visa history -->
+<lightbox show="visaPdfDownloadBox" class="lightbox" on-close="closeVisaPdfDownloadBox()">
+    <section class="head">
+        <h3>
+            <i18n>visa.manage.title</i18n>
+        </h3>
+    </section>
+
+    <section class="body">
+        <div ng-repeat="visa_pdf in visas_pdfChoice | orderBy: 'moment':true">
+            <p ng-click="visa_pdf.downloadPdf()">
+                <i>&#xe857;</i>&nbsp;
+                <i18n>visa.manage.choosePdf</i18n>&nbsp;
+                [[visa_pdf.displayDwlName]]
+            </p>
+        </div>
+    </section>
 </lightbox>
 
-<lightbox workflow="diary.manageVisa"
-          show="visaCreateBox"
-          class="create-visa"
-          on-close="closeVisaCreateBox()">
-    <form>
-        <div class="cell twelve">
-            <label for="comment">
+<!-- manage visa form lightbox as personal user -->
+<lightbox workflow="diary.manageVisa" show="visaCreateBox" class="lightbox create-visa" on-close="closeVisaCreateBox()">
+    <section class="body">
+        <form>
+            <div class="cell twelve">
+                <label for="comment">
 
-                <i18n>sessions.admin.comment</i18n>
-            </label>
-            <textarea class="resize-vertical min-height-textarea" i18n-placeholder="visa.create.commentLabel"
-                      ng-model="visaForm.comment"
-                      id="comment"></textarea>
-        </div>
-        <div class="cell twelve">
-            <button class="right-magnet" ng-class="{'loading': visaForm.loading}"
-                    ng-click="submitVisaForm()">
-                <i18n>visa.vise.diary</i18n>
-                <span class="loader"></span>
-            </button>
-        </div>
-    </form>
+                    <i18n>sessions.admin.comment</i18n>
+                </label>
+                <textarea class="resize-vertical min-height-textarea" i18n-placeholder="visa.create.commentLabel"
+                          ng-model="visaForm.comment"
+                          id="comment"></textarea>
+            </div>
+            <div class="cell twelve">
+                <button class="right-magnet" ng-class="{'loading': visaForm.loading}"
+                        ng-click="submitVisaForm()">
+                    <i18n>visa.vise.diary</i18n>
+                    <span class="loader"></span>
+                </button>
+            </div>
+        </form>
+    </section>
 </lightbox>
 
-
+<!--  session detail when clicked on one session -->
 <lightbox show="showSession" class="session-modal">
     <div class="row margin-bottom-lg modal-include"
          static-include="/diary/public/template/session/session-modal.html">

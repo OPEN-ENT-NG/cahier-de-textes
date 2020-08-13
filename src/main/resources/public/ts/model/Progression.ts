@@ -219,13 +219,13 @@ export class ProgressionFolders extends Selection<ProgressionFolder> {
 
     static organizeTree(folders: ProgressionFolder[], currentFolders: ProgressionFolder[] = null, currentDeepStep: number = 0) {
         if (!currentFolders) {
-            currentFolders = folders.filter((x) => x.id === null && x.parent_id === null);
+            currentFolders = folders.filter((x: ProgressionFolder) => x.id === null && x.parent_id === null);
             ProgressionFolders.organizeTree(folders, currentFolders);
             return currentFolders;
         } else {
             currentFolders.map((x) => {
                 x.deepStep = currentDeepStep;
-                x.childFolders = folders.filter((y) => (y.parent_id === x.id) && !(y.id === null && y.parent_id === null));
+                x.childFolders = folders.filter((y: ProgressionFolder) => (y.parent_id === x.id) && !(y.id === null && y.parent_id === null));
                 if (x.childFolders.length != 0) {
                     ProgressionFolders.organizeTree(folders, x.childFolders, currentDeepStep + 1);
                 }

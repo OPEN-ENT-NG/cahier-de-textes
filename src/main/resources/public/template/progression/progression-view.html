@@ -1,3 +1,4 @@
+<!-- header -->
 <div id="crumbs" class="flex-row-cdt row__12">
     <app-title class="flex-col col__4 zero-mobile">
         <div class="title-area-simple">
@@ -9,13 +10,18 @@
     <div class="flex-col col__6"></div>
     <div class="create-progression-button flex-col col__2">
         <button class="right-magnet calendar-button" data-ng-disabled="!isFolder(selectedItem)"
+                style="margin: 0;"
                 ng-click="showProgressionSessionForm()">
             <i18n>session.create</i18n>
         </button>
     </div>
 </div>
+
+<!-- progression view -->
 <div class="manage-progression">
     <div class="cell twelve progression-content">
+
+        <!-- sidebar folder tree -->
         <div class="three side-bar-progression">
             <input ng-change="filterProgression(search)"
                    class="progression-search remove-box-shadow cell twelve"
@@ -33,10 +39,19 @@
                 </button>
             </div>
         </div>
+
+        <!-- space -->
         <div class="cell white-space"></div>
+
+        <!-- table -->
         <div class="eight progression-table cell">
-            <h3 class="folder-title" ng-show="selectedItem && isFolder(selectedItem)"><i
-                    class="icon diary-folder"></i> [[selectedItem.title]]</h3>
+
+            <!-- my folder -->
+            <h3 class="folder-title" ng-show="selectedItem && isFolder(selectedItem)">
+                <i class="icon diary-folder"></i> [[selectedItem.title]]
+            </h3>
+
+            <!-- folders bloc -->
             <div class="folders-view"
                  ng-show="isFolder(selectedItem) && (selectedItem.childFolders.length > 0)">
                 <div class="flex-row-cdt">
@@ -55,12 +70,13 @@
                 </div>
             </div>
             <div class="flex-table">
+
+                <!-- header title -->
                 <div class="flex-row-cdt flex-head row__9" role="rowgroup">
                     <div class="flex-col col__1 empty-take-space text-center" role="cell">
                         <label class="checkbox">
-                            <input type="checkbox"
-                                   ng-model="$parent.allSessionsSelect"
-                                   ng-change="selectOrUnselectAllSessions()">
+                            <input type="checkbox" data-ng-model="allSessionsSelect.isAllChecked"
+                                   data-ng-change="selectOrUnselectAllSessions()">
                             <span></span>
                         </label>
                     </div>
@@ -80,6 +96,8 @@
                         <i18n>homeworks.attached</i18n>
                     </div>
                 </div>
+
+                <!-- content data session -->
                 <div data-ng-repeat="session in displayedTable() | orderBy:'-modified'"
                      class="flex-body"
                      role="rowgroup">
@@ -121,91 +139,43 @@
             </div>
         </div>
 
-        <section class="toggle-buttons" ng-class="{ 'hide': !showOptionToaster() }">
+        <!-- Snackbar option while toggling (card displaying below) -->
+        <section class="toggle-buttons hide" data-ng-class="{ 'display': showOptionToaster() }">
             <div class="toggle">
                 <div class="row">
-                    <button ng-show="selectedSubItems.length === 1 && getProgressionSessionsChecked().length === 0"
-                            ng-click="openUpdateItem(selectedSubItems[0])">
+                    <!-- update progression folder -->
+                    <button data-ng-show="selectedSubItems.length === 1 && getProgressionSessionsChecked().length === 0"
+                            data-ng-click="openUpdateItem(selectedSubItems[0])">
                         <i18n>progression.folder.update</i18n>
                     </button>
-                    <button ng-click="$parent.openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
+
+                    <!-- delete progression folder or progression session -->
+                    <button data-ng-click="$parent.openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
                         <i18n>delete</i18n>
+                    </button>
+
+                    <!-- Move progression session to folder -->
+                    <button data-ng-show="getProgressionSessionsChecked().length !== 0 && selectedSubItems.length === 0"
+                            data-ng-click="onMoveFormProgression()">
+                        <i18n>move</i18n>
                     </button>
                 </div>
             </div>
         </section>
 
-        <lightbox show="$parent.openedCreateFolder"
-                  class="create-visa"
-                  on-close="closeModal()">
-            <h3>
-                <i18n>progression.title</i18n>
-            </h3>
-            <form>
-                <div class="cell twelve">
-                    <label for="title">
-                        <i18n>progression.create.folder.name</i18n>
-                    </label>
-                    <input type="text"
-                           ng-model="progressionFolderForm.title"
-                           id="title"/>
-                </div>
-                <div class="cell twelve">
-                    <label for="parentId">
-                        <i18n>progression.create.parent.folder.name</i18n>
-                    </label>
-                    <select id="parentId"
-                            ng-options="folder.id as folder.title for folder in filterCycleFolders()"
-                            ng-model="progressionFolderForm.parent_id">
-                        <option ng-if="false" value="" label=""></option>
-                    </select>
-                </div>
-                <div class="cell twelve">
-                    <button class="right-magnet" ng-class="{'loading': folder_loading}"
-                            ng-click="submitProgressionFolderForm()">
-                            <span>
-                                <i18n ng-show="!progressionFolderForm.id">progression.folder.validate</i18n>
-                                <i18n ng-show="progressionFolderForm.id">progression.folder.update</i18n>
-                            </span>
-                        <span class="loader"></span>
-                    </button>
-                </div>
-            </form>
+        <!-- progression create/edit progression folder options -->
+        <lightbox show="$parent.openedCreateFolder" class="create-visa" on-close="closeModal()">
+            <div ng-include="'/diary/public/template/progression/lightboxes/progression-form-lightbox.html'"></div>
         </lightbox>
-        <lightbox show="$parent.openedToasterProgressions"
-                  on-close="closeModal()">
-            <form>
-                <div class="flex-row-cdt">
-                    <i18n ng-show="selectedSubItems.length > 0">progression.info.delete</i18n>
-                    <i18n ng-show="selectedSubItems.length === 0">progression.session.to.delete</i18n>
-                </div>
-                <div class="flex-row-cdt row__2" ng-show="selectedSubItems.length > 0">
-                    <div class="flex-col col__1 justified-button">
-                        <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
-                                ng-click="deleteItems(false)">
-                            <i18n>progression.shallow.choice</i18n>
-                            <span class="loader"></span>
-                        </button>
-                    </div>
-                    <div class="flex-col col__1 justified-button">
-                        <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
-                                ng-click="deleteItems(true)">
-                            <i18n>progression.deep.choice</i18n>
-                            <span class="loader"></span>
-                        </button>
-                    </div>
-                </div>
-                <div class="flex-row-cdt row__1"
-                     ng-show="selectedSubItems.length <= 0 && getProgressionSessionsChecked().length > 0">
-                    <div class="flex-col col__2 justified-button">
-                        <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
-                                ng-click="deleteSessions()">
-                            <i18n>progression.session.delete.confirm</i18n>
-                            <span class="loader"></span>
-                        </button>
-                    </div>
-                </div>
-            </form>
+
+        <!-- progression delete options -->
+        <lightbox show="$parent.openedToasterProgressions" on-close="closeModal()">
+            <div ng-include="'/diary/public/template/progression/lightboxes/progression-delete-lightbox.html'"></div>
+        </lightbox>
+
+        <!-- progression session move folder options -->
+        <lightbox show="openedMoveProgression.isOpened" on-close="closeModal()">
+            <div ng-include="'/diary/public/template/progression/lightboxes/progression-move-lightbox.html'"></div>
         </lightbox>
     </div>
 </div>

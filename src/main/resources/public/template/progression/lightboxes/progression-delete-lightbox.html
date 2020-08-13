@@ -1,0 +1,38 @@
+<section class="body">
+    <form>
+        <!-- title -->
+        <div class="flex-row-cdt">
+            <i18n ng-show="selectedSubItems.length > 0">progression.info.delete</i18n>
+            <i18n ng-show="selectedSubItems.length === 0">progression.session.to.delete</i18n>
+        </div>
+        <!-- progression folder deletion case -->
+        <div class="flex-row-cdt row__2" ng-show="selectedSubItems.length > 0">
+            <div class="flex-col col__1 justified-button">
+                <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                        ng-click="deleteItems(false)">
+                    <i18n>progression.shallow.choice</i18n>
+                    <span class="loader"></span>
+                </button>
+            </div>
+            <div class="flex-col col__1 justified-button">
+                <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                        ng-click="deleteItems(true)">
+                    <i18n>progression.deep.choice</i18n>
+                    <span class="loader"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- progression session deletion case -->
+        <div class="flex-row-cdt row__1"
+             ng-show="selectedSubItems.length <= 0 && getProgressionSessionsChecked().length > 0">
+            <div class="flex-col col__2 justified-button">
+                <button class="right-magnet calendar-button" ng-class="{'loading': delete_loading}"
+                        ng-click="deleteSessions()">
+                    <i18n>progression.session.delete.confirm</i18n>
+                    <span class="loader"></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</section>

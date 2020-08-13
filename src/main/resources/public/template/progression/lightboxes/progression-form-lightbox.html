@@ -1,0 +1,43 @@
+<!-- title create/edit progression folder -->
+<section class="head">
+    <h3>
+        <i18n>progression.title</i18n>
+    </h3>
+</section>
+
+<section class="body">
+    <!-- form -->
+    <form>
+        <!-- form name of progression folder -->
+        <div class="cell twelve">
+            <label for="title">
+                <i18n>progression.create.folder.name</i18n>
+            </label>
+            <input type="text" ng-model="progressionFolderForm.title" id="title"/>
+        </div>
+
+        <!-- progression folder's parent we want to position -->
+        <div class="cell twelve">
+            <label for="parentId">
+                <i18n>progression.create.parent.folder.name</i18n>
+            </label>
+            <select id="parentId"
+                    ng-options="folder.id as folder.title for folder in filterCycleFolders()"
+                    ng-model="progressionFolderForm.parent_id">
+                <option ng-if="false" value="" label=""></option>
+            </select>
+        </div>
+
+        <!-- save (either creation or edit) submit -->
+        <div class="cell twelve">
+            <button class="right-magnet" ng-class="{'loading': folder_loading}"
+                    ng-click="submitProgressionFolderForm()">
+                            <span>
+                                <i18n ng-show="!progressionFolderForm.id">progression.folder.validate</i18n>
+                                <i18n ng-show="progressionFolderForm.id">progression.folder.update</i18n>
+                            </span>
+                <span class="loader"></span>
+            </button>
+        </div>
+    </form>
+</section>

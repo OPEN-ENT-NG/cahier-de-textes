@@ -1,0 +1,58 @@
+<!-- title -->
+<section class="head">
+    <h3>
+        <i18n>move.selected</i18n>
+    </h3>
+</section>
+
+<section class="body">
+    <!-- form -->
+    <form>
+        <div class="padding-top-md cell twelve">
+            <i18n>move.selected</i18n>
+        </div>
+
+        <!-- list/table -->
+        <div class="padding-top-md cell twelve">
+            <div data-ng-repeat="session in openedMoveProgression.checkedProgressionSessions">
+                <!-- checkbox -->
+                <label class="checkbox padding-right-xlg" data-ng-click="$event.stopPropagation();">
+                    <input type="checkbox" data-ng-model="session.tableSelected">
+                    <span></span>
+                </label>
+
+                <!-- title -->
+                <span>[[session.title]]</span>
+            </div>
+        </div>
+
+        <div class="padding-top-md cell twelve">
+            <i18n>in</i18n>
+        </div>
+
+        <!-- progression folder's parent we want to position -->
+        <div class="padding-top-md cell twelve">
+            <select id="parentId"
+                    ng-options="folder.id as folder.title for folder in filterCycleFolders()"
+                    ng-model="progressionFolderForm.parent_id">
+                <option ng-if="false" value="" label=""></option>
+            </select>
+        </div>
+
+        <!-- submit -->
+        <div class="cell twelve">
+            <!-- submit -->
+            <button class="right-magnet " ng-class="{'loading': folder_loading}" ng-click="moveProgressionSessions()"
+                    data-ng-disabled="!hasProgressionSessionChecked(openedMoveProgression.checkedProgressionSessions)">
+                <span><i18n>move</i18n></span>
+                <span class="loader"></span>
+            </button>
+
+            <!-- cancel -->
+            <button class="right-magnet cancel" ng-class="{'loading': folder_loading}" ng-click="closeModal()">
+                <span><i18n>cancel</i18n></span>
+                <span class="loader"></span>
+            </button>
+        </div>
+    </form>
+</section>
