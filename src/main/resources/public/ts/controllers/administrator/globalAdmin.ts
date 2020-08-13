@@ -446,7 +446,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.isOwnSession = (): boolean => {
-            return $scope.openedTimeSlot && ($scope.openedTimeSlot.session.teacher.id === model.me.userId);
+            return $scope.openedTimeSlot && ($scope.openedTimeSlot.teacher.id === model.me.userId);
         };
 
         $scope.init();
