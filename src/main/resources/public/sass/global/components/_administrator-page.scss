@@ -148,6 +148,11 @@
 
 
   .session-modal {
+
+    .close-lightbox {
+      color: $diary-dark-grey;
+    }
+
     .content {
       width: 97%;
       min-height: 91%;

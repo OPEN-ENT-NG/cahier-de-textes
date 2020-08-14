@@ -1,5 +1,6 @@
 <div class="cell twelve">
     <div class="flex-table">
+        <!-- HEADER TYPE TABLE -->
         <div class="flex-row-cdt  flex-head" ng-class="userType !== 'ENSEIGNANT' ? 'row__13' : 'row__11'" role="rowgroup">
             <div class="flex-col col__1 empty-take-space text-center" role="cell">
                 <label class="checkbox">
@@ -28,16 +29,18 @@
                 <i18n>sessions.admin.state</i18n>
             </div>
         </div>
-        <div ng-show="sessionsSize() > 0"
-             ng-repeat="(key, sessionsGroup) in sessions_GroupBy_AudienceSubject"
+
+        <!-- CONTENT DATA TABLE -->
+        <div ng-show="sessionsSize() > 0" ng-repeat="(key, sessionsGroup) in sessions_GroupBy_AudienceSubject"
              class="flex-body"
              role="rowgroup">
             <div class="flex-content">
-                <div class="flex-row-cdt" ng-click="openDetails = openDetails != key ? key : null"
+                <div class="flex-row-cdt" ng-click="openDetails = openDetails != key ? key : null;"
                      ng-class="{'shadowed': openDetails == key, 'row__13': userType !== 'ENSEIGNANT', 'row__11': userType === 'ENSEIGNANT'}">
                     <div class="flex-col col__1 empty-take-space" role="cell">
-                        <label class="checkbox">
-                            <input type="checkbox" ng-model="selectedSessions[key]" ng-change="updateOptionToaster()">
+                        <label class="checkbox" data-ng-click="$event.stopPropagation()">
+                            <input type="checkbox" data-ng-model="selectedSessions[key]"
+                                   data-ng-change="updateOptionToaster()">
                             <span></span>
                         </label>
                     </div>
@@ -93,9 +96,9 @@
                 </div>
             </div>
         </div>
-        <div ng-show="sessionsSize() <= 0"
-             class="flex-row-cdt row__5"
-             role="rowgroup">
+
+        <!-- Empty state -->
+        <div ng-show="sessionsSize() <= 0" class="flex-row-cdt row__5" role="rowgroup">
             <div class="flex-col col__2">
                 <img class="img-none" ng-src="/diary/public/img/nothing.png" alt=""/>
             </div>
@@ -104,8 +107,6 @@
             </div>
         </div>
     </div>
-
-</div>
 </div>
 
 <!-- visa history -->

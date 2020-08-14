@@ -1,5 +1,5 @@
 <div class="global-administrator-page" ng-controller="globalAdminCtrl">
-    <!-- header -->
+    <!-- HEADER SECTION -->
     <div class="flex-row-cdt global-administrator-page-header row__12">
         <div class="flex-col col__3">
             <app-title class="zero-mobile">
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-
+    <!-- Result teacher/classes from async autocomplete -->
     <div class="flex-row-cdt row__12 list-search">
         <div class="flex-col col__3 list-search"></div>
         <div class="flex-col col__9 list-search">
@@ -78,35 +78,44 @@
             </div>
         </div>
     </div>
+
+    <!-- CONTENT -->
     <div workflow="diary.adminAccess">
+        <!-- HEADER CONTENT -->
         <div static-include="/diary/public/template/administrator/admin-sidebar.html"></div>
+        <!-- TABLE CONTENT -->
         <div class="visa-diary"
              static-include="/diary/public/template/administrator/diary-lister.html">
         </div>
 
-        <section class="toggle-buttons" ng-class="{ hide: showOptionToaster != true }">
+
+        <!-- SNACKBAR/TOAST -->
+        <section class="toggle-buttons hide" data-ng-class="{ 'display': showOptionToaster }">
             <div class="toggle">
                 <div class="row">
+
+                    <!-- to visa -->
                     <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
                         <i18n>visa.manage.viser</i18n>
                     </button>
+
+                    <!-- download pdf file -->
                     <button ng-class="{'loading': printPdf.loading}"
                             ng-click="printPdf()">
                         <span class="loader"></span>
                         <i18n>visa.manage.diaryToPrintPDF</i18n>
                     </button>
+
+                    <!-- download pdf file ? -->
                     <button workflow="diary.manageVisa"
                             ng-show="sessionsSelected().length === 1 && getVisas(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]]).length > 0"
-                            ng-click="wantDownloadPdf(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]])"
-                    >
+                            ng-click="wantDownloadPdf(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]])">
                         <i18n>sessions.admin.icon.dwlPdf</i18n>
                     </button>
-                    <button disabled ng-if="userType == 'ENSEIGNANT'">
-                        <i18n>sessions.admin.merge</i18n>
-                    </button>
-                    <button disabled ng-if="userType == 'ENSEIGNANT'">
-                        <i18n>sessions.admin.share</i18n>
-                    </button>
+
+<!--                    <button disabled ng-if="userType == 'ENSEIGNANT'">-->
+<!--                        <i18n>sessions.admin.share</i18n>-->
+<!--                    </button>-->
                 </div>
             </div>
         </section>
