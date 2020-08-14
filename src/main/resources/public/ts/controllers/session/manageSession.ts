@@ -1,19 +1,15 @@
 import {idiom as lang, model, moment, ng, template, toasts} from 'entcore';
 import {
     Course, Courses,
-    DateUtils,
     Homework,
     HomeworkTypes, ISessionHomeworkBody, ISessionHomeworkService,
     Session, Sessions,
     SessionTypes,
-    Subject,
-    Subjects,
     Toast,
     WorkloadDay
 } from '../../model';
 import {SubjectService} from "../../services";
-import {AutocompleteUtils} from "../../utils/autocompleteUtils";
-import {AxiosResponse} from "axios";
+import {AutocompleteUtils} from "../../utils/autocomplete/autocompleteUtils";
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter',
@@ -289,7 +285,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         $scope.form.homework.subject = $scope.session.subject;
                         $scope.form.homework.subject_id = $scope.session.subject ? $scope.session.subject.id : null;
                     }
-                    $scope.autocomplete.init();
+                    $scope.autocomplete.init($scope.structure);
                     if ($scope.session.audience && !$scope.form.homework.sessions.length) $scope.autocomplete.classesSelected.push($scope.session.audience);
                     if ($scope.form.homework.sessions.length) {
                         let audienceSelectedIds = $scope.form.homework.sessions.map(s => s.audience.id);
@@ -378,8 +374,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 });
             };
 
-            $scope.filterAudiences = (value) => {
-                $scope.autocomplete.filterClassOptionsFromList(value, $scope.audiences);
+            $scope.filterClassOptions = async (value: string): Promise<void> => {
+                await $scope.autocomplete.filterClassOptions(value);
                 $scope.safeApply();
             };
 
@@ -387,6 +383,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.autocomplete.selectClass(model, item);
                 await $scope.syncSessionsAndCourses();
                 $scope.autocomplete.resetSearchFields();
+                $scope.safeApply();
             };
 
             $scope.removeAudience = async (audience) => {
@@ -480,7 +477,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             }
 
             $scope.back = () => {
-                $scope.autocomplete.init();
+                $scope.autocomplete.init($scope.structure);
                 window.history.back();
             };
 

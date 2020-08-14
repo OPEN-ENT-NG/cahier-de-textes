@@ -5,7 +5,7 @@ import {
     Toast
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
-import {AutocompleteUtils} from '../utils/autocompleteUtils';
+import {AutocompleteUtils} from '../utils/autocomplete/autocompleteUtils';
 import {PreferencesUtils} from "../utils/preference/preferences";
 import {StructureService} from "../services";
 import {MobileUtils} from "../utils/mobile";

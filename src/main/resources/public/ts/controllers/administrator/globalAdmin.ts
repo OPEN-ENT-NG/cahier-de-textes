@@ -1,6 +1,6 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
-import {AutocompleteUtils} from '../../utils/autocompleteUtils';
+import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
 import {Sessions, Teacher, DateUtils, Visa, Visas, Homework} from "../../model";
 import * as ts from "typescript/lib/tsserverlibrary";

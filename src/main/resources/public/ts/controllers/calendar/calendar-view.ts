@@ -1,7 +1,7 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {Course, Homework, PEDAGOGIC_TYPES, Session, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
-import {AutocompleteUtils} from '../../utils/autocompleteUtils';
+import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
 import {StructureService, StructureSlot} from "../../services";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
@@ -94,12 +94,12 @@ export let calendarController = ng.controller('CalendarController',
                 } else $scope.timeSlot.slots = null;
             };
 
-            $scope.filterTeacherOptions = async (value) => {
+            $scope.filterTeacherOptions = async (value: string): Promise<void> => {
                 await AutocompleteUtils.filterTeacherOptions(value);
                 $scope.safeApply();
             };
 
-            $scope.filterClassOptions = async (value) => {
+            $scope.filterClassOptions = async (value: string): Promise<void> => {
                 await AutocompleteUtils.filterClassOptions(value);
                 $scope.safeApply();
             };

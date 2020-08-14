@@ -25,13 +25,13 @@ import static org.entcore.common.http.response.DefaultResponseHandler.arrayRespo
 
 public class SearchController extends ControllerHelper {
 
-    private EventBus eb;
-    private SearchService searchService;
+    private final EventBus eb;
+    private final SearchService searchService;
 
     public SearchController(EventBus eb) {
         super();
         this.eb = eb;
-        this.searchService = new DefaultSearchService();
+        this.searchService = new DefaultSearchService(eb);
     }
 
     @Get("/search/users")
@@ -68,17 +68,12 @@ public class SearchController extends ControllerHelper {
         if (request.params().contains("q") && !"".equals(request.params().get("q").trim())
                 && request.params().contains("field")
                 && request.params().contains("structureId")) {
+
             String query = request.getParam("q");
             List<String> fields = request.params().getAll("field");
             String structure_id = request.getParam("structureId");
 
-            JsonObject action = new JsonObject()
-                    .put("action", "groupe.search")
-                    .put("q", query)
-                    .put("fields", new JsonArray(fields))
-                    .put("structureId", structure_id);
-
-            callCDTEventBus(action, request);
+            searchService.searchGroups(query, fields, structure_id, arrayResponseHandler(request));
         } else {
             badRequest(request);
         }
@@ -99,7 +94,7 @@ public class SearchController extends ControllerHelper {
         eb.send("viescolaire", action, handlerToAsyncHandler(event -> {
             JsonObject body = event.body();
             if (!"ok".equals(body.getString("status"))) {
-                log.error("[CDT@SearchController] Failed to search for user");
+                log.error("[CDT@SearchController::callCDTEventBus] An error has occured while using viescolaire eb");
                 renderError(request);
                 return;
             }
