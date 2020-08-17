@@ -470,6 +470,12 @@ label.checkbox {
 .autocomplete-selected {
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
+
+  .search-input-ul {
+    padding: 4px;
+  }
+
 }
 
 .custom-flex-table {
