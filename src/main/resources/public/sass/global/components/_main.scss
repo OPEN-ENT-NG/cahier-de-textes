@@ -270,6 +270,22 @@ i.cahier-textes2::before {
   background-color: rgba(255, 133, 0, 0.3803921569);
 }
 
+.diary-date-picker {
+  height: 30px;
+  line-height: 25px;
+  padding: 0 0 2px 0;
+
+  input {
+    border-bottom: none;
+    box-shadow: none;
+
+    &:focus {
+      border-bottom: none;
+      box-shadow: none;
+    }
+  }
+}
+
 .date-picker-sm {
   width: 80px;
 }
