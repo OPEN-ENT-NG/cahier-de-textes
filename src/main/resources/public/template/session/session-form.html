@@ -165,8 +165,9 @@
 
                 <div ng-repeat="homework in homeworks track by $index"
                      class="custom-flex-row twelve bot-border">
-                    <div class="custom-flex-col four right-border">
-                        <div ng-if="homework.attachedToSession && homework.sessions.length" ng-repeat="session in homework.sessions track by $index" class="custom-flex-row twelve">
+                    <div class="custom-flex-col four right-border"
+                         ng-if="homework.attachedToSession && homework.sessions.length">
+                        <div ng-repeat="session in homework.sessions track by $index" class="custom-flex-row twelve">
                             <div class="custom-flex-col padding-cell justified-content-center two">
                                 <p>[[session.audience.name]]</p>
                             </div>
@@ -185,16 +186,19 @@
                                 <p>[[session.subject.label]]</p>
                             </div>
                         </div>
-                        <div ng-if="!homework.attachedToSession || !homework.sessions.length" class="custom-flex-row twelve">
+                    </div>
+                    <div class="custom-flex-col four right-border"
+                         ng-if="!homework.attachedToSession || !homework.sessions.length">
+                        <div class="custom-flex-row twelve">
                             <div class="custom-flex-col padding-cell justified-content-center two">
-                                <p>[[homework.audience.name]]</p>
+                                <div class="custom-flex-row twelve" ng-repeat="audience in homework.audiences track by $index">
+                                    <p>[[audience.name]]</p>
+                                </div>
                             </div>
-
                             <div class="custom-flex-col padding-cell justified-content-center five">
                                 <p ng-if="!isHomeworkInSession(homework, session)" class="margin-bottom-md">
-                                    <i18n>homework.attachedToSession</i18n>
-                                    <span ng-if="homework.due_date">[[homework.due_date]]</span>
-                                    <span ng-if="!homework.due_date">[[homework.dueDate]]</span>
+                                    <i18n>homework.for.date</i18n>
+                                    <span>[[homework.dateDisplayed]]</span>
                                 </p>
                                 <p ng-if="isHomeworkInSession(homework, session)" class="margin-bottom-md">
                                     <i18n>todo.for.this.session</i18n>
@@ -204,6 +208,7 @@
                                 <p>[[homework.subject.label]]</p>
                             </div>
                         </div>
+
                     </div>
                     <div class="custom-flex-col padding-cell justified-content-center one">
                         <p>[[homework.type.label]]</p>
@@ -252,27 +257,28 @@
                             <date-picker class="date-picker-sm" ng-show="!form.homework.attachedToSession"
                                          ng-model="form.homework.dueDate" ng-change="syncWorkloadDay()"></date-picker>
 
-                            <div ng-show="form.homework.attachedToSession" class="twelve">
-                                <div class="flex-col col__10 autocomplete-audiences">
-                                    <div class="search-input">
-                                        <async-autocomplete data-ng-disabled="false"
-                                                            data-ng-model="autocomplete.class"
-                                                            data-ng-change="selectAudience"
-                                                            data-options="autocomplete.classOptions"
-                                                            data-on-search="filterClassOptions"
-                                                            data-placeholder="printer.audience"
-                                                            data-search="autocomplete.class">
-                                        </async-autocomplete>
-                                    </div>
-                                    <div class="autocomplete-selected"
-                                         ng-show="autocomplete.classesSelected.length > 0">
-                                        <div ng-repeat="audience in autocomplete.classesSelected track by audience.id"
-                                             class="search-input-ul">
-                                            <span>[[audience.name]]</span>&nbsp;
-                                            <i class="close" ng-click="removeAudience(audience)"></i>
-                                        </div>
+                            <div class="flex-col col__10 autocomplete-audiences">
+                                <div class="search-input">
+                                    <async-autocomplete data-ng-disabled="false"
+                                                        data-ng-model="autocomplete.class"
+                                                        data-ng-change="selectAudience"
+                                                        data-options="autocomplete.classOptions"
+                                                        data-on-search="filterClassOptions"
+                                                        data-placeholder="printer.audience"
+                                                        data-search="autocomplete.class">
+                                    </async-autocomplete>
+                                </div>
+                                <div class="autocomplete-selected"
+                                     ng-show="autocomplete.classesSelected.length > 0">
+                                    <div ng-repeat="audience in autocomplete.classesSelected track by audience.id"
+                                         class="search-input-ul">
+                                        <span>[[audience.name]]</span>&nbsp;
+                                        <i class="close" ng-click="removeAudience(audience)"></i>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div ng-show="form.homework.attachedToSession" class="twelve">
                                 <select class="flex-col col__10"
                                         required
                                         data-ng-change="syncSessionsAndCourses()"

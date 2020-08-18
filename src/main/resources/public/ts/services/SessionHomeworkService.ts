@@ -30,6 +30,7 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                     });
                 } else {
                     res['due_date'] = DateUtils.getFormattedDate(h.dueDate);
+                    res['audience_ids'] = h.audiences.map(a => a.id);
                 }
                 return res;
             });

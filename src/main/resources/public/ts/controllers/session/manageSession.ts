@@ -147,7 +147,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                             s.id = $scope.session.id;
                         }
 
-                        // todo check this solution with our Product Owner (Sarah) => case type_id is undefined by default
                         if (!s.type_id) {
                             s.type_id = $scope.session.type_id ? $scope.session.type_id : $scope.session.type.id;
                         }
@@ -381,6 +380,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             $scope.selectAudience = async (model, item) => {
                 $scope.autocomplete.selectClass(model, item);
+                $scope.form.homework.audiences = $scope.autocomplete.getClassesSelected();
                 await $scope.syncSessionsAndCourses();
                 $scope.autocomplete.resetSearchFields();
                 $scope.safeApply();

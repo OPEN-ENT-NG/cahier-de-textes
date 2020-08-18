@@ -53,10 +53,14 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                     }
                 }
             } else {
-                // insert one ONLY homework having session_id NULL and and its subject_id + audience_id + due_date
-                Future<JsonObject> homeworkFuture = Future.future();
-                homeworkFutures.add(homeworkFuture);
-                this.createHomework(homework, user, homeworkFuture);
+                // insert homework having session_id NULL  and its subject_id + due_date for each audience_ids
+                JsonArray audience_ids = homework.getJsonArray("audience_ids");
+                for (int j = 0; j < audience_ids.size(); j++) {
+                    Future<JsonObject> homeworkFuture = Future.future();
+                    homeworkFutures.add(homeworkFuture);
+                    homework.put("audience_id", audience_ids.getString(j));
+                    this.createHomework(homework, user, homeworkFuture);
+                }
             }
         }
 

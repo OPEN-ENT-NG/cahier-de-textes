@@ -23,6 +23,7 @@ export class Homework {
     teacher: Teacher;
     subject: Subject;
     audience: any;
+    audiences: any[];
     session: Session;
     sessions: Session[] = [];
     workload: number;
