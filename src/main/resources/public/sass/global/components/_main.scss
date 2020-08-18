@@ -273,7 +273,7 @@ i.cahier-textes2::before {
 .diary-date-picker {
   height: 30px;
   line-height: 25px;
-  padding: 0 0 2px 0;
+  padding: 0!important;
 
   input {
     border-bottom: none;
