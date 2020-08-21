@@ -53,7 +53,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         const modeIsReadOnly = (): boolean => {
             let currentPath = $location.path();
             return currentPath.includes('view');
-        }
+        };
 
         $scope.selectIconFolder = (folder: ProgressionFolder) => {
             if ($scope.currentUrlIsManage) {
@@ -118,7 +118,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             if (!elementCalendar) {
                 $scope.fixEditor();
             }
-        }
+        };
 
         $scope.initProgressions = async (): Promise<void> => {
             $scope.progressionFolders = new ProgressionFolders(model.me.userId);
@@ -500,7 +500,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.openProgressionSession = async (progressionSession: ProgressionSession) => {
+        $scope.openProgressionSession = (progressionSession: ProgressionSession): void => {
             $scope.progressionSessionForm = progressionSession;
             $scope.safeApply();
             $scope.goTo('/progression/' + progressionSession.id);
@@ -512,7 +512,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             window.history.back();
         };
 
-        $scope.openUpdateItem = async (item) => {
+        $scope.openUpdateItem = (item): void => {
             if (item instanceof ProgressionSession) {
                 $scope.progressionSessionForm = item;
                 $scope.showProgressionSessionForm();

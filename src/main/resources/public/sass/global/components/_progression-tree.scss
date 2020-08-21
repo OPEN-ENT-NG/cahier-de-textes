@@ -31,6 +31,10 @@
   overflow: hidden;
 }
 
+.justified-content-end {
+  justify-content: flex-end !important;
+}
+
 .progression-tree {
   text-align: start !important;
   justify-content: flex-start;
@@ -39,6 +43,15 @@
 
   .folder-content {
     width: 100%;
+
+    .opened {
+      color: $diary-darkgreen;
+
+      &:hover {
+        color: rgba($diary-darkgreen, 0.7);
+      }
+    }
+
   }
 
   .folder, .session {
@@ -46,7 +59,6 @@
   }
 
   .selected-item {
-    background-color: $diary-green;
     color: $diary-darkgreen;
 
     &:hover {
@@ -55,19 +67,10 @@
   }
 
   .folder {
-    color: rgba($diary-darkgreen, 0.7);
+    color: $diary-darkgreen;
 
     &:hover {
-      color: $diary-darkgreen;
-    }
-
-    &.opened {
-      color: $diary-darkengreen;
-      font-weight: bold;
-
-      &:hover {
-        color: $diary-darkgreen;
-      }
+      color: rgba($diary-darkgreen, 0.7);
     }
   }
 
@@ -82,9 +85,13 @@
     padding-left: calc(var(--deep-step) * 20px);
   }
 
+  .first-item {
+    font-weight: bold;
+  }
+
   .session-box {
-    box-shadow: 0px 5px 5px $diary-grey;
-    margin-bottom: 5px;
+    box-shadow: 0px 2px 4px $diary-light-grey;
+    margin-bottom: 7px;
     margin-top: 5px;
     border-radius: 5px;
     overflow: hidden;
@@ -96,6 +103,22 @@
 
     .work {
       background-color: $diary-darkorange;
+      color: $diary-white;
+      fill: $diary-white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .no-work {
+      background-color: $diary-light-grey;
+      color: $diary-white;
+      fill: $diary-white;
+      display: flex;
+      justify-content: center;
+    }
+
+    .no-work {
+      background-color: $diary-light-grey;
       color: $white;
       fill: $white;
       display: flex;
