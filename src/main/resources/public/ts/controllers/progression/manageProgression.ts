@@ -406,11 +406,11 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         };
 
         $scope.areValidHomeworks = () => {
-            var back = true;
+            let back = true;
             if (!$scope.progressionSessionForm.progression_homeworks || $scope.progressionSessionForm.progression_homeworks.length == 0)
                 return back;
             $scope.progressionSessionForm.progression_homeworks.forEach((item) => {
-                back = back && item.isValidForm();
+                return back && item.isValidForm();
             });
             return back;
         };

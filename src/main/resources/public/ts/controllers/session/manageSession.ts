@@ -201,13 +201,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             // region Gestion des homework
             $scope.areValidHomeworks = () => {
-                var back = true;
-                //todo manage isDeleted.
+                let back = true;
                 if (!$scope.homeworks || $scope.homeworks.length == 0)
                     return back;
                 $scope.session.homeworks.forEach((item) => {
                     if (!item.isDeleted)
-                        back = back && item.isValidForm();
+                        return back && item.isValidForm();
                 });
                 return back;
             };
