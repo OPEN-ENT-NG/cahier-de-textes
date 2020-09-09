@@ -351,16 +351,18 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
 
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
-
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => !$scope.isSameSession(s, $scope.session));
                     $scope.sessionsToAttachTo.push($scope.session);
-                    if (!$scope.isUpdateHomework() && (!$scope.form.homework.sessions || !$scope.form.homework.sessions.length)) {
-                        $scope.form.homework.sessions.push($scope.session);
-                    }
 
                     $scope.sessionsToAttachTo.sort(function (a, b) {
-                        return a.audience.id === b.audience.id && new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
+                        return a.audience.id === b.audience.id && new Date(a.date).getTime() - new Date(b.date).getTime();
                     });
+
+                    if (!$scope.isUpdateHomework() && (!$scope.form.homework.sessions || !$scope.form.homework.sessions.length)) {
+                        let sessionByCurrentAudienceId = $scope.sessionsToAttachTo.filter(session => session.audience.id === $scope.session.audience.id);
+                        if (sessionByCurrentAudienceId.length === 1) $scope.form.homework.sessions.push(sessionByCurrentAudienceId[0]);
+                        else $scope.form.homework.sessions.push(sessionByCurrentAudienceId[1]);
+                    }
 
                     $scope.sessionsToAttachTo.forEach(session => {
                         if (!$scope.isSameSession(session, $scope.session)) {
