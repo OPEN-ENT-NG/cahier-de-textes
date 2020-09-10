@@ -130,7 +130,8 @@ export class Courses {
             if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`;
             if (audience) filter += `&group=${audience.name ? audience.name : audience.groupName}`;
         } else if (model.me.classes && model.me.classes.length) {
-            if (window.audiences && window.audiences.all.length > 0) {
+            if (audience) filter += `&group=${audience.name ? audience.name : audience.groupName}`;
+            else if (window.audiences && window.audiences.all.length > 0) {
                 window.audiences.all.forEach((audience: Audience) =>
                     filter += `&group=${audience.name ? audience.name : audience.groupName}`);
             }

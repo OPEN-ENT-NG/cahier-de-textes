@@ -150,7 +150,7 @@ export let calendarController = ng.controller('CalendarController',
                     await Promise.all([
                         $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                         $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                        $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate)
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher workflow case */
@@ -213,7 +213,6 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
                 let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
-
                 $scope.loadPedagogicDays();
                 $scope.loadCalendarItems();
             };
