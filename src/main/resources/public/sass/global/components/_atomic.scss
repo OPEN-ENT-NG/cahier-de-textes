@@ -267,11 +267,15 @@
   width: 100%
 }
 
-.border-widht-fieldset{
+.border-width-fieldset {
   border: aliceblue;
 }
 
 .cdt-title-not-clickable {
   color: $diary-black;
   margin: 0px;
+}
+
+.text-align-inherit {
+  text-align: initial !important;
 }
