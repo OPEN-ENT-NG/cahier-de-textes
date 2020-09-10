@@ -357,7 +357,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.sessionsToAttachTo.forEach((session) => {
                         if (distinctSessions.filter((distinctSession) => distinctSession.audience.id === session.audience.id
                             && distinctSession.startDisplayDate === session.startDisplayDate
-                            && distinctSession.startDisplayTime === session.startDisplayTime)) {
+                            && distinctSession.startDisplayTime === session.startDisplayTime).length === 0) {
                             distinctSessions.push(session);
                         }
                     });
