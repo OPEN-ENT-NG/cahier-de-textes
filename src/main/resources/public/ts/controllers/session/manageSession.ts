@@ -187,7 +187,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 return true;
             };
 
-            const saveSessionHomeworks = async (): Promise<void> =>{
+            const saveSessionHomeworks = async (): Promise<void> => {
                 Promise.all([
                     await createSessionsHomework(),
                     await updateSessionsHomework()
@@ -344,8 +344,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     );
 
                     // We only keep the courses without a session attached to.
-                    let courses = filteredCourses.filter(c => !($scope.sessionGetter.all.find(s =>
-                    {
+                    let courses = filteredCourses.filter(c => !($scope.sessionGetter.all.find(s => {
                         return c.date ? $scope.isSameSession(c, s) : false;
                     })));
                     let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
@@ -353,6 +352,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => !$scope.isSameSession(s, $scope.session));
                     $scope.sessionsToAttachTo.push($scope.session);
+
+                    let distinctSessions = [];
+                    $scope.sessionsToAttachTo.forEach((session) => {
+                        if (distinctSessions.filter((distinctSession) => distinctSession.audience.id === session.audience.id
+                            && distinctSession.startDisplayDate === session.startDisplayDate
+                            && distinctSession.startDisplayTime === session.startDisplayTime)) {
+                            distinctSessions.push(session);
+                        }
+                    });
+                    $scope.sessionsToAttachTo = distinctSessions;
 
                     $scope.sessionsToAttachTo.sort(function (a, b) {
                         return a.audience.id === b.audience.id && new Date(a.date).getTime() - new Date(b.date).getTime();
