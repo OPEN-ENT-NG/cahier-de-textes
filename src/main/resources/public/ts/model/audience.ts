@@ -1,4 +1,4 @@
-import {Mix} from 'entcore-toolkit';
+import { Mix } from 'entcore-toolkit';
 import http from 'axios';
 
 export class Audience {

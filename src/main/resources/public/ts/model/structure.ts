@@ -56,14 +56,16 @@ export class Structure {
         promises.push(this.subjects.sync(this.id));
         promises.push(this.types.sync());
         promises.push(this.audiences.sync(this.id));
-        window.audiences = this.audiences;
-        if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
-            promises.push(this.students.sync());
-        }
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
         await Promise.all(promises).then(async (values) => {
-            await this.groups.sync(this.audiences.getIds());
+            const promises: Promise<void>[] = [];
+            window.audiences = this.audiences;
+            promises.push(this.groups.sync(this.audiences.getIds()));
+            if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
+                promises.push(this.students.sync());
+            }
+            await Promise.all(promises);
         });
     }
 }

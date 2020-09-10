@@ -1,7 +1,7 @@
 import {model, moment} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils, Student} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Group} from "./group";
 
@@ -119,10 +119,11 @@ export class Courses {
      * @param audience
      * @param startMoment
      * @param endMoment
+     * @param child
      * @returns {Promise<void>} Returns a promise.
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null,
-               startMoment: any, endMoment: any): Promise<void> {
+               startMoment: any, endMoment: any, child?: Student): Promise<void> {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
@@ -140,6 +141,7 @@ export class Courses {
                 window.audiences.all.forEach((audience: Audience) =>
                     filter += `&group=${audience.name ? audience.name : audience.groupName}`);
             }
+            if (child) filter += `&student=${child.id}`;
         }
 
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);

@@ -150,7 +150,7 @@ export let calendarController = ng.controller('CalendarController',
                     await Promise.all([
                         $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                         $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate)
+                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate, $scope.params.child)
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher workflow case */
