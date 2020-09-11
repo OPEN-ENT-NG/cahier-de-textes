@@ -1,4 +1,4 @@
-import { Mix } from 'entcore-toolkit';
+import {Mix} from 'entcore-toolkit';
 import http from 'axios';
 
 export class Audience {
@@ -8,19 +8,17 @@ export class Audience {
     type: string;
     type_group: number;
 
-    constructor (name: string, id?, type?) {
+    constructor(name: string, id?, type?) {
         this.name = name;
-        if(id)
+        if (id)
             this.id = id;
-        else
-
-        if(type) {
+        else if (type) {
             this.type = type;
             this.type_group = type;
-            }
         }
+    }
 
-    toString (): string {
+    toString(): string {
         return this.name;
     }
 }
@@ -28,7 +26,7 @@ export class Audience {
 export class Audiences {
     all: Audience[];
 
-    constructor () {
+    constructor() {
         this.all = [];
     }
 
@@ -37,17 +35,17 @@ export class Audiences {
      * @param structureId structure id
      * @returns {Promise<void>}
      */
-    async sync (structureId: string) {
+    async sync(structureId: string) {
         try {
             let audiences = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true');
             this.all = Mix.castArrayAs(Audience, audiences.data);
-            this.all.sort((g,gg)=> {
-                if(g.type_group < gg.type_group)
+            this.all.sort((g, gg) => {
+                if (g.type_group < gg.type_group)
                     return -1;
-                else if(g.type_group > gg.type_group)
+                else if (g.type_group > gg.type_group)
                     return 1;
                 else if (g.type_group === gg.type_group)
-                    if(g.name < gg.name)
+                    if (g.name < gg.name)
                         return -1;
                     else {
                         return 1;
@@ -57,6 +55,10 @@ export class Audiences {
         } catch (e) {
             throw e;
         }
+    }
+
+    getIds(): String[] {
+        return this.all.map(audience => audience.id);
     }
 }
 

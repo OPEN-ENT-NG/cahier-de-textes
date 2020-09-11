@@ -213,6 +213,7 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
                 let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
+
                 $scope.loadPedagogicDays();
                 $scope.loadCalendarItems();
             };

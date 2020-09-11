@@ -3,6 +3,7 @@ import {Audiences, Courses, Homeworks, Sessions, Students, Subjects, Teachers} f
 import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
+import {Groups} from "./group";
 
 declare let window: any;
 
@@ -16,6 +17,7 @@ export class Structure {
     audiences: Audiences;
     teachers: Teachers;
     students: Students;
+    groups: Groups;
     personnels: Personnels;
     eventer: Eventer = new Eventer();
     types: SessionTypes;
@@ -41,6 +43,7 @@ export class Structure {
         this.teachers = new Teachers();
         this.personnels = new Personnels();
         this.students = new Students(this);
+        this.groups = new Groups();
     }
 
     /**
@@ -59,7 +62,9 @@ export class Structure {
         }
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
-        await Promise.all(promises);
+        await Promise.all(promises).then(async (values) => {
+            await this.groups.sync(this.audiences.getIds());
+        });
     }
 }
 
