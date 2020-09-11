@@ -67,7 +67,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
             $scope.isSameSession = (s1, s2) => {
-                return s1.date.getTime() === s2.date.getTime() && s1.audience.id === s2.audience.id;
+                return s1.audience.id === s2.audience.id
+                && s1.startDisplayDate === s2.startDisplayDate
+                && s1.startDisplayTime === s2.startDisplayTime;
             };
 
             $scope.isHomeworkInSession = (h, s) => {
@@ -355,9 +357,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                     let distinctSessions = [];
                     $scope.sessionsToAttachTo.forEach((session) => {
-                        if (distinctSessions.filter((distinctSession) => distinctSession.audience.id === session.audience.id
-                            && distinctSession.startDisplayDate === session.startDisplayDate
-                            && distinctSession.startDisplayTime === session.startDisplayTime).length === 0) {
+                        if (distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0) {
                             distinctSessions.push(session);
                         }
                     });
@@ -377,6 +377,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         if (!$scope.isSameSession(session, $scope.session)) {
                             session.toString = () => $scope.sessionString(session);
                             session.string = session.toString();
+                        } else {
+                            $scope.session.toString = () => {
+                                return $scope.session.firstText ? $scope.session.firstText : lang.translate("todo.for.this.session")
+                            };
+                            $scope.session.string = $scope.session.toString();
+                            $scope.session.firstText = lang.translate("session.manage.linkhomework");
                         }
                     });
                     $scope.safeApply();
