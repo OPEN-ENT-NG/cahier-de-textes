@@ -127,15 +127,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.back();
             };
 
-            $scope.saveSession = async () => {
+            $scope.saveSession = async (): Promise<void> => {
                 if (!$scope.isValidForm) {
                     $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                     return;
                 }
-
+                if($scope.form.homework) {
+                    $scope.closeHomework();
+                }
                 // Sauvegarde de la session
                 $scope.session.is_empty = false;
-                let sessionSaveResponse = await $scope.session.save($scope.placeholder);
+                let sessionSaveResponse: any = await $scope.session.save($scope.placeholder);
                 if (sessionSaveResponse.succeed) {
                     if (!$scope.session.id && sessionSaveResponse.data.id) {
                         $scope.session.id = sessionSaveResponse.data.id;
