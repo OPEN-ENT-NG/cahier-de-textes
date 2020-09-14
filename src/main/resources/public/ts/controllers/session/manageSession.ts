@@ -68,8 +68,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             $scope.isSameSession = (s1, s2) => {
                 return s1.audience.id === s2.audience.id
-                && s1.startDisplayDate === s2.startDisplayDate
-                && s1.startDisplayTime === s2.startDisplayTime;
+                && s1.startTime.getTime() === s2.startTime.getTime();
             };
 
             $scope.isHomeworkInSession = (h, s) => {
@@ -356,7 +355,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => !$scope.isSameSession(s, $scope.session));
                     $scope.sessionsToAttachTo.push($scope.session);
-
                     let distinctSessions = [];
                     $scope.sessionsToAttachTo.forEach((session) => {
                         if (distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0) {
@@ -366,7 +364,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.sessionsToAttachTo = distinctSessions;
 
                     $scope.sessionsToAttachTo.sort(function (a, b) {
-                        return a.audience.id === b.audience.id && new Date(a.date).getTime() - new Date(b.date).getTime();
+                        return a.audience.id === b.audience.id && a.startTime.getTime() - b.startTime.getTime();
                     });
 
                     if (!$scope.isUpdateHomework() && (!$scope.form.homework.sessions || !$scope.form.homework.sessions.length)) {
