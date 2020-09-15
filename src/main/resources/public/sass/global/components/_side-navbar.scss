@@ -114,6 +114,12 @@
     transition: all 0.5s cubic-bezier(.25, .8, .25, 1);
     left: -500%;
 
+    &-structure {
+      overflow: auto;
+      margin: 0 -10px 0 0;
+      max-height: 600px;
+    }
+
     &.hovered {
       left: 100%;
     }

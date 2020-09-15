@@ -52,14 +52,18 @@
          data-ng-mouseover="hoverIn('STRUCTURES')"
          data-ng-mouseleave="hoverOut()"
          ng-if="structures.length > 1">
+
         <h2>
             <i18n>utils.structure</i18n>
         </h2>
-        <div ng-repeat="structure in structures" class="item"
-             ng-class="{active: menu.structure.id === structure.id}"
-             data-ng-click="setStructure(structure)">
-            <i class="icon">&nbsp;</i>
-            <span>[[structure.name]]</span>
+
+        <div class="sub-items-structure">
+            <div ng-repeat="structure in structures" class="item"
+                 ng-class="{active: menu.structure.id === structure.id}"
+                 data-ng-click="setStructure(structure)">
+                <i class="icon">&nbsp;</i>
+                <span>[[structure.name]]</span>
+            </div>
         </div>
     </div>
 </div>
