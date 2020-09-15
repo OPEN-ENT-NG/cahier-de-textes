@@ -260,7 +260,6 @@ export class Session {
 
         session.homeworks.map(homework => {
             homework.due_date = this.date;
-            delete homework.id;
             delete homework.session;
             homework.subject = session.subject;
             homework.teacher = session.teacher;
