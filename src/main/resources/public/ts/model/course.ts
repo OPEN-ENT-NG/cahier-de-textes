@@ -3,7 +3,7 @@ import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils, Student} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {Group} from "./group";
+import {Group, Groups} from "./group";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -119,11 +119,11 @@ export class Courses {
      * @param audience
      * @param startMoment
      * @param endMoment
-     * @param child
+     * @param groups
      * @returns {Promise<void>} Returns a promise.
      */
     async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null,
-               startMoment: any, endMoment: any, child?: Student): Promise<void> {
+               startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
@@ -134,14 +134,15 @@ export class Courses {
         } else if (model.me.classes && model.me.classes.length) {
             if (audience) {
                 filter += `&group=${audience.name ? audience.name : audience.groupName}`;
-                let group: Group = structure.groups.all.find((group: Group) => group.id_classe === audience.id);
-                if(group) group.name_groups.forEach((name: String) => filter += `&group=${name}`);
+                if (groups) {
+                    let group: Group = groups.all.find((group: Group) => group.id_classe === audience.id);
+                    if(group) group.name_groups.forEach((name: String) => filter += `&group=${name}`);
+                }
             }
             else if (window.audiences && window.audiences.all.length > 0) {
                 window.audiences.all.forEach((audience: Audience) =>
                     filter += `&group=${audience.name ? audience.name : audience.groupName}`);
             }
-            if (child) filter += `&student=${child.id}`;
         }
 
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);

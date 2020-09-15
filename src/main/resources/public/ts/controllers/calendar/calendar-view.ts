@@ -6,6 +6,7 @@ import {ProgressionFolders} from "../../model/Progression";
 import {StructureService, StructureSlot} from "../../services";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../enum/pedagogic-slot-profile";
+import {Groups} from "../../model/group";
 
 declare let window: any;
 
@@ -147,10 +148,12 @@ export let calendarController = ng.controller('CalendarController',
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                     /* student/parents workflow case */
+                    let groups: Groups = new Groups();
+                    await groups.sync([$scope.params.child.audience.id], $scope.params.child.id);
                     await Promise.all([
                         $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                         $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate, $scope.params.child)
+                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate, groups)
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher workflow case */

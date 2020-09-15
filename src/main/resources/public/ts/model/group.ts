@@ -35,12 +35,12 @@ export class Groups {
         this.all = arr ? arr : [];
     }
 
-    async sync(audience_ids: String[]): Promise<void> {
-        let classes: String = '';
-        audience_ids.forEach(id => {
-            classes += `${classes.length === 0 ? '?' : '&'}classes=${id}`
-        });
-        let {data} = await http.get(`/viescolaire/group/from/class${classes}`);
+    async sync(audience_ids: String[], student_id?: String): Promise<void> {
+        let params: String = '';
+        audience_ids.forEach(id => params += `${params.length === 0 ? '?' : '&'}classes=${id}`);
+        if(student_id) params+=`${params.length === 0 ? '?' : '&'}student=${student_id}`;
+
+        let {data} = await http.get(`/viescolaire/group/from/class${params}`);
         this.all = data;
     }
 
