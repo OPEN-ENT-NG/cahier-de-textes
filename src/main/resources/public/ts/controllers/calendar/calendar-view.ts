@@ -593,10 +593,12 @@ export let calendarController = ng.controller('CalendarController',
                 progressionDragged.progression_homeworks.map(
                     ph => {
                         let homework = new Homework($scope.structure);
-                        homework.id = ph.id ? ph.id : null;
+                        homework.progression_homework_id = ph.id ? ph.id : null;
                         homework.estimatedTime = ph.estimatedTime;
                         homework.description = ph.description;
-                        homework.subject = ph.subject;
+                        homework.audience = sessionDroped.audience;
+                        homework.sessions.push(sessionDroped);
+                        homework.subject = $scope.structure.subjects.all.find(subject => subject.id === ph.subject_id);
                         homework.type = ph.type;
                         sessionDroped.homeworks.push(homework);
 
@@ -638,7 +640,7 @@ export let calendarController = ng.controller('CalendarController',
                 progressionDragged.progression_homeworks.map(
                     ph => {
                         let homework = new Homework($scope.structure);
-                        homework.id = ph.id ? ph.id : null;
+                        homework.progression_homework_id = ph.id ? ph.id : null;
                         homework.estimatedTime = ph.estimatedTime;
                         homework.description = ph.description;
                         homework.subject = session.subject;

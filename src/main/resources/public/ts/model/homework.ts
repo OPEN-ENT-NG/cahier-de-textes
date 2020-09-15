@@ -9,6 +9,7 @@ import {USER_TYPES} from '../utils/const/user-types';
 
 export class Homework {
     id: string;
+    progression_homework_id?: string;
     description: string = '';
     plainTextDescription: string = '';
     dueDate: Date = moment().toDate();

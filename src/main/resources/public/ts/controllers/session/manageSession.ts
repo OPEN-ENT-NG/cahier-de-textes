@@ -49,7 +49,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
             $scope.isUpdateHomework = () => {
-                return $scope.form.homework && $scope.form.homework.id;
+                return $scope.form.homework && ($scope.form.homework.id || $scope.form.progression_homework_id);
             };
 
             $scope.closeFormHomework = () => {
@@ -236,14 +236,22 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 let homework = $.extend(true, Object.create(Object.getPrototypeOf($scope.form.homework)), $scope.form.homework);
                 homework.alreadyValidate = true;
                 homework.formatDateToDisplay();
-                if (!homework.idTemp && !homework.id) {
+                if (!homework.idTemp && (!homework.id && !homework.progression_homework_id)) {
                     do {
                         homework.idTemp = Math.floor((Math.random() * (99999 - 10000 + 1)) + 10000);
                     } while ($scope.homeworks.includes((h) => h.idTemp === homework.idTemp));
 
                     $scope.homeworks.push(homework);
                 } else {
-                    let index = $scope.homeworks.findIndex(h => homework.idTemp ? h.idTemp === homework.idTemp : h.id === homework.id);
+                    let index = $scope.homeworks.findIndex(h => {
+                        if (homework.idTemp) {
+                            return h.idTemp === homework.idTemp;
+                        } else if (h.progression_homework_id) {
+                            return h.progression_homework_id === homework.progression_homework_id;
+                        } else {
+                            return h.id === homework.id;
+                        }
+                    });
                     $scope.homeworks.splice(index, 1, homework);
                 }
                 $scope.closeFormHomework();
