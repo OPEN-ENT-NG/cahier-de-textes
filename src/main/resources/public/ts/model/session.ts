@@ -249,11 +249,9 @@ export class Session {
 
     }
 
-    //  duplicateHomework(session){
-    //     this.homeworks.map(async homework =>  {
-    //          homework.duplicate(session.id,session.date);
-    //     });
-    // }
+    getStartMoment(): any {
+        return this.startMoment ? this.startMoment : moment(this.startTime)
+    }
 
     getSessionInfo(session: Session) {
 

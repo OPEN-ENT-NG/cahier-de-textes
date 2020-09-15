@@ -68,7 +68,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             $scope.isSameSession = (s1, s2) => {
                 return s1.audience.id === s2.audience.id
-                && s1.startTime.getTime() === s2.startTime.getTime();
+                    && s1.getStartMoment().isSame(s2.getStartMoment());
             };
 
             $scope.isHomeworkInSession = (h, s) => {
@@ -131,7 +131,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
                     return;
                 }
-                if($scope.form.homework) {
+                if ($scope.form.homework) {
                     $scope.closeHomework();
                 }
                 // Sauvegarde de la session
@@ -357,14 +357,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.sessionsToAttachTo.push($scope.session);
                     let distinctSessions = [];
                     $scope.sessionsToAttachTo.forEach((session) => {
-                        if (distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0) {
+                        if (
+                            distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0
+                            && !session.getStartMoment().isBefore($scope.session.getStartMoment())
+                        ) {
                             distinctSessions.push(session);
                         }
                     });
                     $scope.sessionsToAttachTo = distinctSessions;
 
                     $scope.sessionsToAttachTo.sort(function (a, b) {
-                        return a.audience.id === b.audience.id && a.startTime.getTime() - b.startTime.getTime();
+                        return a.audience.id === b.audience.id && a.getStartMoment().unix() - b.getStartMoment().unix();
                     });
 
                     if (!$scope.isUpdateHomework() && (!$scope.form.homework.sessions || !$scope.form.homework.sessions.length)) {
