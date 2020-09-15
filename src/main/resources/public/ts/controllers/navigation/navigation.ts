@@ -71,6 +71,11 @@ export let navigationController = ng.controller("navigationController",
             if (elementCalendar) {
                 elementCalendar.style.zIndex = "0";
             }
+
+            let editorDirective = document.querySelector('editor');
+            if (editorDirective) {
+                (<HTMLElement>editorDirective).style.zIndex = "0";
+            }
             window.clearTimeout($scope.menu.timeout);
         };
 

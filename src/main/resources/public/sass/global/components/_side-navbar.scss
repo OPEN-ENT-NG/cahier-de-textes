@@ -130,10 +130,41 @@
       line-height: 15px;
     }
 
+    .sub-item {
+      padding: 7px 0;
+
+      .icon {
+        display: contents!important;
+      }
+
+      &:hover, &.active {
+        color: $diary-darkgreen !important;
+
+        i::after {
+          background-color: $diary-darkgreen;
+          left: -10px;
+        }
+      }
+
+      &:hover {
+        i {
+          color: $diary-darkgreen;
+        }
+      }
+
+
+      i {
+        font-size: 22px;
+        width: 40px;
+        display: inline-block;
+        text-align: center;
+      }
+    }
+
     .item {
       span {
         font-size: 16px;
-        padding: 5px;
+        padding: 5px 0;
         line-height: 25px;
       }
     }

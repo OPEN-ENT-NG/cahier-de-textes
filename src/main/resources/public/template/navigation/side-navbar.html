@@ -58,10 +58,10 @@
         </h2>
 
         <div class="sub-items-structure">
-            <div ng-repeat="structure in structures" class="item"
+            <div ng-repeat="structure in structures" class="sub-item item"
                  ng-class="{active: menu.structure.id === structure.id}"
                  data-ng-click="setStructure(structure)">
-                <i class="icon">&nbsp;</i>
+                <i class="icon"></i>
                 <span>[[structure.name]]</span>
             </div>
         </div>
