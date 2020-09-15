@@ -49,7 +49,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
             $scope.isUpdateHomework = () => {
-                return $scope.form.homework && ($scope.form.homework.id || $scope.form.progression_homework_id);
+                return $scope.form.homework && ($scope.form.homework.id || $scope.form.progression_homework_id || $scope.form.editedId);
             };
 
             $scope.closeFormHomework = () => {
@@ -236,7 +236,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 let homework = $.extend(true, Object.create(Object.getPrototypeOf($scope.form.homework)), $scope.form.homework);
                 homework.alreadyValidate = true;
                 homework.formatDateToDisplay();
-                if (!homework.idTemp && (!homework.id && !homework.progression_homework_id)) {
+                if (!homework.idTemp && (!homework.id && !homework.progression_homework_id && !homework.editedId)) {
                     do {
                         homework.idTemp = Math.floor((Math.random() * (99999 - 10000 + 1)) + 10000);
                     } while ($scope.homeworks.includes((h) => h.idTemp === homework.idTemp));
@@ -248,6 +248,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                             return h.idTemp === homework.idTemp;
                         } else if (h.progression_homework_id) {
                             return h.progression_homework_id === homework.progression_homework_id;
+                        } else if (h.editedId) { // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
+                            return h.editedId === homework.editedId;
                         } else {
                             return h.id === homework.id;
                         }

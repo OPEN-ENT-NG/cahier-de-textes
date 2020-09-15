@@ -260,6 +260,8 @@ export class Session {
 
         session.homeworks.map(homework => {
             homework.due_date = this.date;
+            homework.editedId = homework.id; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
+            delete homework.id;
             delete homework.session;
             homework.subject = session.subject;
             homework.teacher = session.teacher;
@@ -270,7 +272,7 @@ export class Session {
         this.type = session.type;
         this.teacher = session.teacher;
         this.color = session.color;
-        this.audience = session.audience;
+        // this.audience = session.audience;
         this.opened = true;
         this.room = session.room;
         this.description = session.description;
@@ -296,6 +298,7 @@ export class Session {
     duplicateHomeworks(sessionDrag) {
         if(sessionDrag.homeworks) {
             sessionDrag.homeworks.map(h => {
+                h.editedId = h.id; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
                 delete h.id;
                 delete h.session;
                 h.dueDate = this.date;

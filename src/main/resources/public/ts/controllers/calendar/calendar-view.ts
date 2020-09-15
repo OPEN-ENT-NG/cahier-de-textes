@@ -497,6 +497,9 @@ export let calendarController = ng.controller('CalendarController',
                     }
                 });
                 $rootScope.session.getSessionInfo(sessionDrag);
+                $rootScope.session.homeworks.forEach(homework => {
+                    homework.sessions.push($rootScope.session);
+                });
                 $scope.goTo('/session/update/' + $rootScope.session.id);
             };
 

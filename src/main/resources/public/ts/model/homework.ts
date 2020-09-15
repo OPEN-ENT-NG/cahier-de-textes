@@ -1,7 +1,7 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Structure, Teacher, Toast, DateUtils, ToastUtils} from './index';
+import {Structure, Teacher, DateUtils, ToastUtils} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
@@ -9,6 +9,7 @@ import {USER_TYPES} from '../utils/const/user-types';
 
 export class Homework {
     id: string;
+    editedId?: string; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT since we want a POST)
     progression_homework_id?: string;
     description: string = '';
     plainTextDescription: string = '';
