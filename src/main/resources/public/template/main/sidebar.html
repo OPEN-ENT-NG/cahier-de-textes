@@ -76,7 +76,7 @@
                 </i>
             </h5>
         </div>
-        <section ng-if="$parent.isAChildOrAParent && $parent.$parent.display.listViewArea.filter"
+        <section ng-if="($parent.isAChildOrAParent || $parent.isTeacher) && $parent.$parent.display.listViewArea.filter"
                  class="cell twelve padding-left-md margin-bottom-lg padding-bottom-sm padding-top-sm display-background">
             <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
                 <!-- homework -->
