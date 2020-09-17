@@ -300,7 +300,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     if ($scope.session.audience && !$scope.form.homework.sessions.length) $scope.autocomplete.classesSelected.push($scope.session.audience);
                     if ($scope.form.homework.sessions.length) {
                         let audienceSelectedIds = $scope.form.homework.sessions.map(s => s.audience.id);
-                        $scope.autocomplete.classesSelected = $scope.audiences.filter(a => audienceSelectedIds.indexOf(a.id) !== -1);
+                        $scope.autocomplete.classesSelected = $scope.structure.audiences.all.filter(a => audienceSelectedIds.indexOf(a.id) !== -1);
                     }
                     if ($scope.form.homework.attachedToSession) {
                         await $scope.syncSessionsAndCourses();
