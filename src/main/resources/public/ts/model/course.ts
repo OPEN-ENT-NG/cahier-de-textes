@@ -1,7 +1,7 @@
 import {model, moment} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils, Student} from './index';
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Group, Groups} from "./group";
 
@@ -16,6 +16,7 @@ export class Course {
     structure: Structure;
     teachers: Teachers;
     subject: Subject;
+    subject_id?: string;
     exceptionnal ?: string;
 
     dayOfWeek: any;
@@ -62,6 +63,7 @@ export class Course {
             startDate: data.startDate,
             teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
             subject: structure.subjects.all.find(t => t.id === data.subjectId),
+            subject_id: data.subjectId,
             color: data.color ? data.color : colors[Math.floor(Math.random() * colors.length)],
         };
     }
@@ -112,31 +114,20 @@ export class Courses {
         return dataModel;
     }
 
-    /**
-     * Synchronize courses.
-     * @param structure structure
-     * @param teacher teacher. Can be null. If null, group need to be provide.
-     * @param audience
-     * @param startMoment
-     * @param endMoment
-     * @param groups
-     * @returns {Promise<void>} Returns a promise.
-     */
-    async sync(structure: Structure, teacher: Teacher | null, audience: Audience | null,
-               startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
+    async syncWithParams(structure: Structure, teachers: (Teacher | string)[] | null, audiences: Audience[] | null,
+                         startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
         let firstDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
         let filter = '';
-
         if (model.me.type !== USER_TYPES.student && model.me.type !== USER_TYPES.relative) {
-            if (teacher) filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`;
-            if (audience) filter += `&group=${audience.name ? audience.name : audience.groupName}`;
+            if (teachers) teachers.forEach((teacher: Teacher | string) => filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`) ;
+            if (audiences) audiences.forEach((audience: Audience) => filter += `&group=${audience.name ? audience.name : audience.groupName}`);
         } else if (model.me.classes && model.me.classes.length) {
-            if (audience) {
-                filter += `&group=${audience.name ? audience.name : audience.groupName}`;
+            if (audiences) {
+                audiences.forEach((audience: Audience) => filter += `&group=${audience.name ? audience.name : audience.groupName}`);
                 if (groups) {
-                    let group: Group = groups.all.find((group: Group) => group.id_classe === audience.id);
-                    if(group) group.name_groups.forEach((name: String) => filter += `&group=${name}`);
+                    let selectedGroups: Group[] = groups.all.filter((group: Group) => audiences.map(audience => audience.id).indexOf(group.id_classe) != -1);
+                    if(selectedGroups) selectedGroups.forEach((group: Group) => group.name_groups.forEach((name: String) => filter += `&group=${name}`));
                 }
             }
             else if (window.audiences && window.audiences.all.length > 0) {
@@ -150,9 +141,24 @@ export class Courses {
 
         let { data } = await http.get(uri);
         data = data.filter((d) => d.teacherIds);
-        this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, this.structure));
+        this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, structure ? structure : this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
         });
+    }
+
+    /**
+     * Synchronize courses.
+     * @param structure structure
+     * @param teacher teacher. Can be null. If null, group need to be provide.
+     * @param audience
+     * @param startMoment
+     * @param endMoment
+     * @param groups
+     * @returns {Promise<void>} Returns a promise.
+     */
+    async sync(structure: Structure, teacher: Teacher | string| null, audience: Audience | null,
+               startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
+        this.syncWithParams(structure, teacher ? [teacher] : null, audience ? [audience] : null, startMoment, endMoment, groups ? groups : null)
     }
 }

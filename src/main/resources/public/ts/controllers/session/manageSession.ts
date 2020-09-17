@@ -10,6 +10,7 @@ import {
 } from '../../model';
 import {SubjectService} from "../../services";
 import {AutocompleteUtils} from "../../utils/autocomplete/autocompleteUtils";
+import {Moment} from 'moment';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter',
@@ -337,34 +338,46 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.syncSessionsAndCourses = async () => {
                 if (!$scope.form.homework.audience || !$scope.form.homework.subject || $scope.isReadOnly) return;
                 $scope.sessionsToAttachTo = [];
+                let startDate: Moment = moment($scope.session.date);
+                let endDate: Moment = moment($scope.session.date).add(15, 'day');
+                let classesSelectedIds: string[] = $scope.autocomplete.classesSelected.map(a => a.id);
+
+                // We only keep courses selected that correspond to the new subject and audiences selected
+                $scope.form.homework.sessions = $scope.form.homework.sessions.filter(session =>
+                    $scope.form.homework.subject_id === session.subject.id
+                        && classesSelectedIds.indexOf(session.audience.id) != -1
+                );
                 $scope.sessionsToAttachTo = [...$scope.sessionsToAttachTo, ...$scope.form.homework.sessions];
+
                 Promise.all([
-                    await $scope.sessionGetter.syncOwnSessions($scope.structure,
-                        moment($scope.session.date),
-                        moment($scope.session.date).add(15, 'day'),
-                        $scope.autocomplete.classesSelected.map(a => a.id), $scope.form.homework.subject.id),
-
-                    await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group,
-                        moment($scope.session.date),
-                        moment($scope.session.date).add(15, 'day'))
+                    await $scope.sessionGetter.syncOwnSessions($scope.structure, startDate, endDate, classesSelectedIds, $scope.form.homework.subject_id),
+                    await $scope.courses.syncWithParams($scope.structure, [model.me.userId], $scope.autocomplete.classesSelected, startDate, endDate)
                 ]).then(function () {
-                    $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessionGetter.all.filter(s => !$scope.sessionIsInTable(s, $scope.form.homework.sessions)));
-                    let filteredCourses = $scope.courses.all.filter(c => {
-                            return c.audiences.all.find(a => ($scope.autocomplete.classesSelected.map(cl => cl.id).includes(a.id) && c.subject))
-                                ? c.subject.id === $scope.form.homework.subject.id
-                                : false;
-                        }
-                    );
+                    // We set subjects on courses and sessions (in case that subject courses are not set)
+                    $scope.courses.all.forEach((course) => {
+                        if (course.subject_id) course.subject = $scope.subjects.all.find(subject => subject.id === course.subject_id)
+                    });
+                    $scope.sessionGetter.all.forEach((session) => {
+                        if (session.subject_id) session.subject = $scope.subjects.all.find(subject => subject.id === session.subject_id)
+                    });
 
-                    // We only keep the courses without a session attached to.
+                    // We add in sessions selector sessions already selected
+                    $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessionGetter.all.filter(s => !$scope.sessionIsInTable(s, $scope.form.homework.sessions)));
+
+                    // We only keep the courses that correspond to the new subject selected and that have not sessions corresponding,
+
+                    let filteredCourses = $scope.courses.all.filter(c => c.subject.id === $scope.form.homework.subject_id);
                     let courses = filteredCourses.filter(c => !($scope.sessionGetter.all.find(s => {
                         return c.date ? $scope.isSameSession(c, s) : false;
                     })));
-                    let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
 
+                    // Then we transform courses as sessions (to manipulate them the same way).
+                    let sessionFromCourses: Session[] = courses.map(c => new Session($scope.structure, c));
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.filter(s => !$scope.isSameSession(s, $scope.session));
                     $scope.sessionsToAttachTo.push($scope.session);
+
+                    // We remove double sessions
                     let distinctSessions = [];
                     $scope.sessionsToAttachTo.forEach((session) => {
                         if (
@@ -376,16 +389,27 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     });
                     $scope.sessionsToAttachTo = distinctSessions;
 
+                    // We sort sessions in selector by audience id and then by startDate
                     $scope.sessionsToAttachTo.sort(function (a, b) {
                         return a.audience.id === b.audience.id && a.getStartMoment().unix() - b.getStartMoment().unix();
                     });
 
                     if (!$scope.isUpdateHomework() && (!$scope.form.homework.sessions || !$scope.form.homework.sessions.length)) {
-                        let sessionByCurrentAudienceId = $scope.sessionsToAttachTo.filter(session => session.audience.id === $scope.session.audience.id);
-                        if (sessionByCurrentAudienceId.length === 1) $scope.form.homework.sessions.push(sessionByCurrentAudienceId[0]);
-                        else $scope.form.homework.sessions.push(sessionByCurrentAudienceId[1]);
+                        // We default select next session of each audiences corresponding to the new subject selected
+                        let sessionsByAudienceId: Map<String, Session[]> = new Map<String, Session[]>();
+                        $scope.sessionsToAttachTo.forEach(session =>
+                            sessionsByAudienceId.has(session.audience.id) ?
+                                sessionsByAudienceId.get(session.audience.id).push(session)
+                                : sessionsByAudienceId.set(session.audience.id, [session])
+                        );
+
+                        sessionsByAudienceId.forEach((sessions, audienceId) => {
+                            if (audienceId != $scope.session.audience.id) $scope.form.homework.sessions.push(sessions[0]);
+                            else if(sessions[1]) $scope.form.homework.sessions.push(sessions[1]);
+                        });
                     }
 
+                    // we set parameters / methods that display the session in the selector.
                     $scope.sessionsToAttachTo.forEach(session => {
                         if (!$scope.isSameSession(session, $scope.session)) {
                             session.toString = () => $scope.sessionString(session);

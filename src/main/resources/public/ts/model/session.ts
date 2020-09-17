@@ -13,6 +13,7 @@ const colors = ['#7E7E7E', '#00ab6f', '#ff9700'];
 export class Session {
     id: string;
     subject: Subject;
+    subject_id?: string;
     type: SessionType;
     type_id?: number;
     structure: Structure;
@@ -43,7 +44,6 @@ export class Session {
     is_periodic: boolean = false;
     locked: boolean = true;
     is_empty: boolean = true;
-
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     string: string = "";
 
@@ -65,7 +65,7 @@ export class Session {
             teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
             subject: structure.subjects.all.find(t => t.id === data.subject_id),
             type: structure.types.all.find(t => t.id === data.type_id),
-
+            subject_id: data.subject_id,
             id: data.id,
             title: data.title,
             room: data.room,
@@ -357,7 +357,7 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncOwnSessions(strutcture: any, startMoment: any, endMoment: any, audienceIds?: string[], subjectId?: string): Promise<void> {
+    async syncOwnSessions(structure: any, startMoment: any, endMoment: any, audienceIds?: string[], subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
 
