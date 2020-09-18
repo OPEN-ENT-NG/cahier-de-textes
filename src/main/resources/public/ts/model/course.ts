@@ -159,6 +159,6 @@ export class Courses {
      */
     async sync(structure: Structure, teacher: Teacher | string| null, audience: Audience | null,
                startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
-        this.syncWithParams(structure, teacher ? [teacher] : null, audience ? [audience] : null, startMoment, endMoment, groups ? groups : null)
+        await this.syncWithParams(structure, teacher ? [teacher] : null, audience ? [audience] : null, startMoment, endMoment, groups ? groups : null)
     }
 }
