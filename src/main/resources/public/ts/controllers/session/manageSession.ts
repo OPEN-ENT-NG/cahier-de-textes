@@ -104,9 +104,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     && $scope.validDate();
             };
 
-            $scope.publishSession = async () => {
-                await $scope.saveSession(true);
-            };
 
             $scope.deleteSession = async () => {
                 $scope.session.delete().then(() => {
@@ -122,10 +119,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 });
             };
 
-            $scope.unpublishSession = async () => {
-                $scope.toastHttpCall(await $scope.session.unpublish());
-                $scope.back();
-            };
 
             $scope.saveSession = async (): Promise<void> => {
                 if (!$scope.isValidForm) {
@@ -270,6 +263,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     newHomework.isNewField = true;
                 }
                 newHomework.audiences = [$scope.session.audience];
+                newHomework.isPublished = $scope.session.isPublished ? $scope.session.isPublished : false;
                 $scope.validate = true;
                 $scope.hidePencil = true;
                 $scope.formIsOpened = true;
@@ -455,6 +449,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.localRemoveHomework = (i) => {
                 $scope.homeworks.splice(i, 1);
                 $scope.safeApply();
+            };
+
+
+            $scope.updatePublishAllHomeworks = (): void => {
+                for (let homework of $scope.homeworks) {
+                    homework.isPublished = $scope.session.isPublished;
+                    if ($scope.form.homework) {
+                        $scope.form.homework.isPublished = $scope.session.isPublished;
+                    }
+                }
             };
 
             async function initData() {

@@ -273,16 +273,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             return $scope.homework.isValidForm();
         };
 
-        $scope.publishHomework = async () => {
-            $scope.saveHomework(true);
-        };
-
-        $scope.unpublishHomework = async () => {
-            let { succeed } = $scope.toastHttpCall(await $scope.homework.unpublish());
-            if (succeed && !$scope.isInsideSessionForm) {
-                window.history.back();
-            }
-        };
 
         $scope.deleteHomework = async (index: any) => {
             if($scope.isInsideSessionForm && !$scope.homework.id){

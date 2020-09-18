@@ -110,7 +110,7 @@
                 <div class="twelve margin-bottom-md">
                     <i18n>utils.publish</i18n>
                 </div>
-                <switch class="vertical-spacing" ng-model="session.isPublished">
+                <switch class="vertical-spacing" ng-model="session.isPublished" ng-change="updatePublishAllHomeworks()">
                     <label class="switch"> </label>
                 </switch>
             </label>

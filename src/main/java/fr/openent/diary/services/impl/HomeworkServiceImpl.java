@@ -363,7 +363,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void publishHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = true && publish_date = NOW() WHERE id = " + homeworkId;
+        String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework SET is_published = true, publish_date = NOW() WHERE id = " + homeworkId;
         Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 

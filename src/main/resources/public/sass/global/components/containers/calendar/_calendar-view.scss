@@ -39,6 +39,15 @@
     display: inline-block !important;
   }
 
+  .audience {
+    font-size: 11px;
+  }
+
+  .publish-icon {
+    flex-grow: 2;
+    margin-right: 10px;
+  }
+
   .text-item {
     font-size: 11px;
     color: rgba(0, 0, 0, .87);

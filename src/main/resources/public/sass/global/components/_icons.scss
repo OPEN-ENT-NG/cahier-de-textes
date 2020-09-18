@@ -67,4 +67,13 @@ i {
     content: "\e823";
   }
 
+  &.visible:before {
+    font-family: 'material-icons';
+    content: "\F208";
+  }
+  &.invisible:before {
+    font-family: 'material-icons';
+    content: "\F6D0";
+  }
+
 }

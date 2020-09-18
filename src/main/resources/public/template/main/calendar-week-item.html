@@ -13,21 +13,46 @@
         <div class="flex-row-cdt row__6" ng-if="!item.exceptionnal">
             <div class="flex-col subject">[[item.subject.label]]</div>
         </div>
-        <div class="flex-row-cdt row__6 subject">
-            <div class="flex-col col__2">[[item.audience.name]]</div>
+        <div class="flex-row-cdt row__6 audience">
+            <div class="flex-col col__4">[[item.audience.name]]</div>
+            <i class="flex-col col__1 justified-content-end publish-icon invisible"
+               ng-click="publishSession(item,$event)"
+               ng-if="!item.isPublished"
+               tooltip="utils.publish"></i>
         </div>
     </div>
 
     <!-- homework side -->
     <div class="flex-col col__1 homework-item" ng-if="item.homeworks.length > 0 && !item.is_empty">
         <span class="text-center">
-            <i class="icon-homework homework"></i>
+
+            <!--If unpublished and published homeworks-->
+            <div ng-if="getCountUnpublishedHomeworks(item.homeworks) > 0 && getCountPublishedHomeworks(item.homeworks) > 0">
+                <span>[[getCountPublishedHomeworks(item.homeworks)]] </span>
+                <i class="margin-left-sm homework"></i>
             <br>
-            <span>[[item.homeworks.length]] </span>
-            <i class="margin-left-sm"
-               ng-click="publishSession(item,$event)"
-               ng-if="!item.isPublished"
-               tooltip="utils.publish">&#xe904;</i>
+                <span>[[getCountUnpublishedHomeworks(item.homeworks)]] </span>
+                <i class="margin-left-sm invisible"
+               ng-click="publishHomework(item,$event)"
+               tooltip="utils.publish"></i>
+            </div>
+
+            <!--If only unpublished homeworks-->
+            <div ng-if="getCountUnpublishedHomeworks(item.homeworks) > 0 && getCountPublishedHomeworks(item.homeworks) === 0">
+                <i class="invisible icon-homework"
+                   ng-click="publishHomework(item,$event)"
+                   tooltip="utils.publish"></i>
+                <br>
+                <span>[[getCountUnpublishedHomeworks(item.homeworks)]] </span>
+            </div>
+
+            <!--If only published homeworks-->
+            <div ng-if="getCountPublishedHomeworks(item.homeworks) > 0 && getCountUnpublishedHomeworks(item.homeworks) === 0">
+                <i class="icon-homework homework"></i>
+                <br>
+                <span>[[getCountPublishedHomeworks(item.homeworks)]] </span>
+            </div>
+
         </span>
     </div>
     <span ng-show="false">[[item.id]]</span>

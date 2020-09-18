@@ -397,14 +397,39 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
+
+            $scope.getCountPublishedHomeworks = (homeworks: Homework[]): number => {
+                return homeworks.filter(homework => homework.isPublished === true).length;
+            };
+
+            $scope.getCountUnpublishedHomeworks = (homeworks: Homework[]): number => {
+                return homeworks.filter(homework => homework.isPublished === false).length;
+            };
+
+            $scope.publishHomework = async (item, event) => {
+                event.stopPropagation();
+                if (item.homeworks) {
+                    for (let homework of item.homeworks) {
+                        let homeworkToPublish = new Homework($scope.structure);
+                        homeworkToPublish.id = homework.id;
+                        $scope.toastHttpCall(await homeworkToPublish.publish());
+                    }
+                    $scope.syncPedagogicItems();
+                    $scope.safeApply();
+                }
+            };
+
             $scope.publishSession = async (item, event) => {
                 event.stopPropagation();
                 let sessionToPublish = new Session($scope.structure);
                 sessionToPublish.id = item.id;
                 $scope.toastHttpCall(await sessionToPublish.publish());
-                $scope.syncPedagogicItems();
-
-                $scope.safeApply();
+                if (item.homeworks) {
+                    $scope.publishHomework(item,event);
+                } else {
+                    $scope.syncPedagogicItems();
+                    $scope.safeApply();
+                }
             };
 
             $scope.openHomework = (homeworkId: number) => {

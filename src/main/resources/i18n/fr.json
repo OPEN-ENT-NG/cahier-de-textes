@@ -174,6 +174,7 @@
   "session.manage.unpublished": "Publication enlevée, séance passée en brouillon",
   "session.manage.update": "Modifier une séance",
   "session.not.published": "Séance non publiée",
+  "session.or.homework.not.published": "Travail à faire ou séance non publié(e)",
   "session.official": "Séance issue de l'Emploi du temps",
   "session.official.empty": "Séance issue de l'Emploi du temps vide avec devoir(s)",
   "session.official.update": "Séance issue de l'Emploi du temps remplie",
