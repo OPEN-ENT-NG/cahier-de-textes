@@ -534,6 +534,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 window.history.back();
             };
 
+            $scope.$watch('$destroy', () => $scope.autocomplete.init($scope.structure));
+
             await initData();
         }]
 );
