@@ -344,7 +344,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                 // We only keep courses selected that correspond to the new subject and audiences selected
                 $scope.form.homework.sessions = $scope.form.homework.sessions.filter(session =>
-                    $scope.form.homework.subject_id === session.subject.id
+                    session.subject && $scope.form.homework.subject_id === session.subject.id
                         && classesSelectedIds.indexOf(session.audience.id) != -1
                 );
                 $scope.sessionsToAttachTo = [...$scope.sessionsToAttachTo, ...$scope.form.homework.sessions];
@@ -366,7 +366,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                     // We only keep the courses that correspond to the new subject selected and that have not sessions corresponding,
 
-                    let filteredCourses = $scope.courses.all.filter(c => c.subject.id === $scope.form.homework.subject_id);
+                    let filteredCourses = $scope.courses.all.filter(c => c.subject && c.subject.id === $scope.form.homework.subject_id);
                     let courses = filteredCourses.filter(c => !($scope.sessionGetter.all.find(s => {
                         return c.date ? $scope.isSameSession(c, s) : false;
                     })));
@@ -381,7 +381,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     let distinctSessions = [];
                     $scope.sessionsToAttachTo.forEach((session) => {
                         if (
-                            distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0
+                            session.subject && distinctSessions.filter((distinctSession) => $scope.isSameSession(distinctSession, session)).length === 0
                             && !session.getStartMoment().isBefore($scope.session.getStartMoment())
                         ) {
                             distinctSessions.push(session);
