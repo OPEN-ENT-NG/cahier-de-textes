@@ -61,8 +61,8 @@ export class Structure {
         await Promise.all(promises).then(async (values) => {
             const promises: Promise<void>[] = [];
             window.audiences = this.audiences;
-            promises.push(this.groups.sync(this.audiences.getIds()));
             if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
+                promises.push(this.groups.sync(this.audiences.getIds()));
                 promises.push(this.students.sync());
             }
             await Promise.all(promises);
