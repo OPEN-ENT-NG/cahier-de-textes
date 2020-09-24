@@ -269,6 +269,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     newHomework.session = $scope.session;
                     newHomework.isNewField = true;
                 }
+                newHomework.audiences = [$scope.session.audience];
                 $scope.validate = true;
                 $scope.hidePencil = true;
                 $scope.formIsOpened = true;
@@ -283,6 +284,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.attachHomework = (toSession: boolean = null) => {
                 if (!$scope.isUpdateHomework()) {
                     if (toSession !== null) {
+                        $scope.form.homework.audiences = $scope.autocomplete.getClassesSelected();
                         $scope.form.homework.attachedToSession = toSession;
                     } else if (!$scope.form.homework.idTemp) {
                         $scope.form.homework.attachedToSession = true;
@@ -480,7 +482,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.session.opened = true;
                 }
                 $scope.homeworks = $scope.homeworks.concat($scope.session.homeworks);
-
 
                 // if new session, we set the default sessionType
                 if (!$scope.session.id && !$scope.session.type) {

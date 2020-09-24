@@ -191,8 +191,8 @@
                          ng-if="!homework.attachedToSession || !homework.sessions.length">
                         <div class="custom-flex-row twelve">
                             <div class="custom-flex-col padding-cell justified-content-center two">
-                                <div class="custom-flex-row twelve">
-                                    <p>[[homework.audience.name]]</p>
+                                <div class="custom-flex-row twelve" ng-repeat="audience in homework.audiences track by $index">
+                                    <p>[[audience.name]]</p>
                                 </div>
                             </div>
                             <div class="custom-flex-col padding-cell justified-content-center five">
