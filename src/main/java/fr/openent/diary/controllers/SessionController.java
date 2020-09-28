@@ -100,7 +100,8 @@ public class SessionController extends ControllerHelper {
         List<String> listTeacherId = request.getParam("teachersId") != null ? Arrays.asList(request.getParam("teachersId").split("\\s*,\\s*")) : null;
         List<String> listAudienceId = request.getParam("audienceId") != null ? Arrays.asList(request.getParam("audienceId").split("\\s*,\\s*")) : null;
         String StructureId = request.getParam("structureId") != null ? request.getParam("structureId") : null;
-        sessionService.getSessions(StructureId, startDate, endDate, null, listAudienceId, listTeacherId, null, published, notPublished, vised, notVised, true,
+        sessionService.getSessionsAndHomeworksWithVisas(StructureId, startDate, endDate, null, listAudienceId,
+                listTeacherId, null, published, notPublished, vised, notVised,
                 DefaultResponseHandler.arrayResponseHandler(request));
     }
 

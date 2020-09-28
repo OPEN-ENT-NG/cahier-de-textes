@@ -2,7 +2,7 @@ import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore'
 import * as jsPDF from 'jspdf';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
-import {Sessions, Teacher, DateUtils, Visa, Visas, Homework} from "../../model";
+import {Sessions, Teacher, DateUtils, Visa, Visas, Homework, Homeworks} from "../../model";
 import * as ts from "typescript/lib/tsserverlibrary";
 import Session = ts.server.Session;
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
@@ -37,7 +37,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
         $scope.openedTimeSlot = null;
-        $scope.homeworks = [];
+        $scope.homeworks = new Homeworks($scope.structure);
         $scope.timeSlotsByDate = [];
 
         let getIds = (collection) => {
@@ -57,7 +57,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         $scope.filterList = async () => {
             $scope.selectOrUnselectAllSessions(false);
-            $scope.homeworks = [];
+            $scope.homeworks.all = [];
             const teachersSelected = AutocompleteUtils.getTeachersSelected();
             const classesSelected = AutocompleteUtils.getClassesSelected();
             let teachers = teachersSelected.length ? getIds(teachersSelected) : getTeacherId();
@@ -72,15 +72,16 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
                 $scope.archived,
                 $scope.sharedWithMe,
                 $scope.published,
-                $scope.notPublished);
+                $scope.notPublished,
+                $scope.homeworks);
             $scope.sessions.all.forEach(s => {
                 s.isInsideDiary = true;
                 s.homeworks.forEach(h => {
                     h.isInsideDiary = true;
-                    if ($scope.homeworks.map(sh => sh.id).indexOf(h.id) === -1) $scope.homeworks.push(h);
+                    if ($scope.homeworks.all.map(sh => sh.id).indexOf(h.id) === -1) $scope.homeworks.all.push(h);
                 });
             });
-            const sessions = [...$scope.homeworks, ...$scope.sessions.all];
+            const sessions = [...$scope.homeworks.all, ...$scope.sessions.all];
             $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject(sessions);
             $scope.timeSlotsByDate = getTimeSlotsByDate();
 
@@ -213,7 +214,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
          */
         $scope.getVisas = (sessionsGroup) => {
             return _.chain(sessionsGroup)
-                    .filter(x => !(x instanceof Homework))
+                    .filter(x => !(x instanceof Homework && x.session_id))
                     .pluck('visas')
                     .flatten()
                     .uniq(function (visa) {

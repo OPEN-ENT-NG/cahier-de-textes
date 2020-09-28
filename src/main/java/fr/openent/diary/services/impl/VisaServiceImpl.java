@@ -90,6 +90,7 @@ public class VisaServiceImpl implements VisaService {
         query.append("VALUES ");
 
         JsonArray sessionIds = visa.getJsonArray("sessionIds");
+        JsonArray homeworkIds = visa.getJsonArray("homeworkIds");
         query.append("(?, ?, ?, ?, ?, ?, ?, ?);");
         String comment = visa.getString("comment");
         values.add(comment == null || comment.isEmpty() ? "" : comment);
@@ -101,17 +102,29 @@ public class VisaServiceImpl implements VisaService {
         values.add(visa.getString("created"));
         values.add(visa.getString("modified"));
 
-        for (int j = 0; j < sessionIds.size(); j++) {
-            Integer sessionId = sessionIds.getInteger(j);
-            query.append("INSERT INTO diary.session_visa ( session_id, visa_id) ");
-            query.append("VALUES ");
-            query.append("(?, (SELECT currval(pg_get_serial_sequence('diary.visa', 'id'))));");
-            values.add(sessionId);
-        }
+        query.append(createRelationnalVisaQuery(sessionIds,
+                Diary.DIARY_SCHEMA + ".session_visa",
+                "session_id", values));
+
+        query.append(createRelationnalVisaQuery(homeworkIds,
+                Diary.DIARY_SCHEMA + ".homework_visa",
+                "homework_id", values));
 
         return new JsonObject().put("statement", query.toString())
                 .put("values", values).put("action", "prepared");
 
+    }
+
+    private StringBuilder createRelationnalVisaQuery(JsonArray ids, String tableUsed, String tableIdName, JsonArray values) {
+        StringBuilder query = new StringBuilder();
+        for (int j = 0; j < ids.size(); j++) {
+            Integer tableId = ids.getInteger(j);
+            query.append("INSERT INTO ").append(tableUsed).append(" (").append(tableIdName).append(", visa_id) ");
+            query.append("VALUES ");
+            query.append("(?, (SELECT currval(pg_get_serial_sequence('diary.visa', 'id'))));");
+            values.add(tableId);
+        }
+        return query;
     }
 
     private void generatePDF(final HttpServerRequest request, UserInfos user, final JsonObject arrayVisaSessions, final Handler<Buffer> handler) {

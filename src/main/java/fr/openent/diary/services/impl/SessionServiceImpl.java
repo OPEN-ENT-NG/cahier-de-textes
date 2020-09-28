@@ -1,10 +1,14 @@
 package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.SessionService;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
@@ -17,6 +21,7 @@ import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class SessionServiceImpl implements SessionService {
@@ -25,6 +30,10 @@ public class SessionServiceImpl implements SessionService {
     private static final String ACTION = "action";
     private static final String PREPARED = "prepared";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
+    private static final String SESSION = "session";
+    private static final String HOMEWORK = "homework";
+    private static final List<String> TABLE_NAMES = Arrays.asList(SESSION, HOMEWORK);
+
 
     private DiaryService diaryService = new DiaryServiceImpl();
 
@@ -63,7 +72,7 @@ public class SessionServiceImpl implements SessionService {
         if (user.getType().equals("Student")) {
             this.getChildSessions(structureId, startDate, endDate, user.getUserId(), listSubjectId, handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getSessions(structureId, startDate, endDate, user.getUserId(), audienceIds, Arrays.asList(user.getUserId()), listSubjectId,false, false, false, false, false, handler);
+            this.getSessions(structureId, startDate, endDate, user.getUserId(), audienceIds, Arrays.asList(user.getUserId()), listSubjectId, false, false, false, false, false, handler);
         }
     }
 
@@ -137,8 +146,9 @@ public class SessionServiceImpl implements SessionService {
         return query.replaceFirst("AND", "WHERE");
     }
 
-    public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
-                                         List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, JsonArray values) {
+    public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId,
+                                         List<String> listAudienceId, List<String> listTeacherId, List<String> listSubjectId,
+                                         boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, JsonArray values) {
         String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) as homeworks" +
                 ((agregVisas) ? " ,array_to_json(array_agg(distinct visa)) as visas" : " ") +
                 " FROM diary.session s " +
@@ -146,61 +156,83 @@ public class SessionServiceImpl implements SessionService {
                         " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
                 " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)";
 
+        return query + filterItemByVisa(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId,
+                published, notPublished, vised, notVised, agregVisas, values, SESSION);
+    }
+
+    private String filterItemByVisa(String structureID, String startDate, String endDate, String ownerId,
+                                    List<String> listAudienceId, List<String> listTeacherId, List<String> listSubjectId,
+                                    boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, JsonArray values, String table_used) {
+        table_used = isInTableNames(table_used);
+        String agregUsed = table_used.equals(HOMEWORK) ? "h." : "s.";
+
+        String query = table_used.equals(HOMEWORK) ? " AND " + agregUsed + "session_id IS NULL " : "";
         if (published && !notPublished) {
-            query += " AND s.is_published = true ";
+            query += " AND " + agregUsed + "is_published = true ";
         }
 
         if (notPublished && !published) {
-            query += " AND s.is_published = false ";
+            query += " AND " + agregUsed + "is_published = false ";
         }
 
-        query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, values, query);
+        query = getWhereContentGetSessionQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, values, query, table_used);
 
         if (agregVisas && vised && !notVised) {
             query += " AND visa IS NOT NULL";
         }
         if (agregVisas && notVised && !vised) {
             query += " AND visa IS NULL";
-        }
-        query += " GROUP BY s.id " + " ORDER BY s.date ASC ";
+        }//
+        query += " GROUP BY " + agregUsed + "id " + (table_used.equals(HOMEWORK) ? ", type.id" : "");
+        query += " ORDER BY " + agregUsed + (table_used.equals(HOMEWORK) ? "due_date" : "date") + " ASC ";
         return query.replaceFirst("AND", "WHERE");
     }
 
     private String getWhereContentGetSessionQuery(String structureID, String startDate, String endDate, String ownerId,
-                                                  List<String> listAudienceId, List<String> listTeacherId, List<String> listSubjectId, JsonArray values, String query) {
+                                                  List<String> listAudienceId, List<String> listTeacherId,
+                                                  List<String> listSubjectId, JsonArray values, String query, String table_used) {
+        table_used = isInTableNames(table_used);
+        String agregUsed = table_used.equals(HOMEWORK) ? "h." : "s.";
+        String dateParameter = (table_used.equals(HOMEWORK) ? "due_date" : "date");
+
         if (startDate != null && endDate != null) {
-            query += " AND s.date >= to_date(?,'YYYY-MM-DD')";
-            query += " AND s.date <= to_date(?,'YYYY-MM-DD')";
+            query += " AND " + agregUsed + dateParameter + " >= to_date(?,'YYYY-MM-DD')";
+            query += " AND " + agregUsed + dateParameter + " <= to_date(?,'YYYY-MM-DD')";
             values.add(startDate);
             values.add(endDate);
         }
         if (listAudienceId != null && !listAudienceId.isEmpty()) {
-            query += " AND s.audience_id IN " + (Sql.listPrepared(listAudienceId.toArray()));
+            query += " AND " + agregUsed + "audience_id IN " + (Sql.listPrepared(listAudienceId.toArray()));
             for (String audienceId : listAudienceId) {
                 values.add(audienceId);
             }
         }
         if (listTeacherId != null && !listTeacherId.isEmpty()) {
-            query += " AND s.teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
+            query += " AND " + agregUsed + "teacher_id IN " + (Sql.listPrepared(listTeacherId.toArray()));
             for (String teacherId : listTeacherId) {
                 values.add(teacherId);
             }
         }
         if (listSubjectId != null && !listSubjectId.isEmpty()) {
-            query += " AND s.subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
+            query += " AND " + agregUsed + "subject_id IN " + (Sql.listPrepared(listSubjectId.toArray()));
             for (String subjectId : listSubjectId) {
                 values.add(subjectId);
             }
         }
         if (ownerId != null) {
-            query += " AND s.owner_id = ?";
+            query += " AND " + agregUsed + "owner_id = ?";
             values.add(ownerId);
         }
         if (structureID != null) {
-            query += " AND s.structure_id = ?";
+            query += " AND " + agregUsed + "structure_id = ?";
             values.add(structureID);
         }
         return query;
+    }
+
+    private String isInTableNames(String tableName) {
+        if (!TABLE_NAMES.contains(tableName)) return SESSION;
+        return tableName;
     }
 
     /**
@@ -227,6 +259,7 @@ public class SessionServiceImpl implements SessionService {
         String query;
         query = this.getWithSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, published, values)
                 + this.getSelectSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, published, notPublished, vised, notVised, agregVisas, values);
+
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
@@ -239,6 +272,84 @@ public class SessionServiceImpl implements SessionService {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
         }));
+    }
+
+    public void getSessionsAndHomeworksWithVisas(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
+                                                 List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised,
+                                                 Handler<Either<String, JsonArray>> handler) {
+
+        Future<JsonArray> sessionsFuture = Future.future();
+        Future<JsonArray> homeworksFuture = Future.future();
+
+        getSessions(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
+                listSubjectId, published, notPublished, vised, notVised, true, sessionResult -> {
+                    if (sessionResult.isLeft()) {
+                        sessionsFuture.fail(sessionResult.left().getValue());
+                        return;
+                    }
+                    sessionsFuture.complete(sessionResult.right().getValue());
+                });
+
+        getSelectIndependantHomeworks(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
+                listSubjectId, published, notPublished, vised, notVised, true, homeworkResult -> {
+                    if (homeworkResult.failed()) {
+                        homeworksFuture.fail(homeworkResult.cause().getMessage());
+                        return;
+                    }
+                    homeworksFuture.complete(homeworkResult.result());
+                });
+
+        FutureHelper.all(Arrays.asList(sessionsFuture, homeworksFuture)).setHandler(event -> {
+            if (event.failed()) {
+                String message = "[Diary@SessionServiceImpl::getSessionsAndHomeworksWithVisas] Failed to " +
+                        "fetch used homeworks. " + event.cause().toString();
+                LOGGER.error(message);
+                handler.handle(new Either.Left<>(message));
+                return;
+            }
+            JsonArray result = sessionsFuture.result();
+            result.addAll(homeworksFuture.result());
+            handler.handle(new Either.Right<>(result));
+        });
+    }
+
+    private void getSelectIndependantHomeworks(String structureID, String startDate, String endDate, String ownerId,
+                                               List<String> listAudienceId, List<String> listTeacherId,
+                                               List<String> listSubjectId, boolean published, boolean notPublished,
+                                               boolean vised, boolean notVised, boolean agregVisas, Handler<AsyncResult<JsonArray>> handler) {
+        JsonArray values = new JsonArray();
+        String query = getSelectIndependantHomeworksQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
+                listSubjectId, published, notPublished, vised, notVised, agregVisas, values);
+
+        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
+            if (result.isLeft()) {
+                String message = "[Diary@SessionServiceImpl::getSelectIndependantHomeworks] Failed to " +
+                        "fetch used homeworks. " + result.left().getValue();
+                LOGGER.error(message);
+                handler.handle(Future.failedFuture(message));
+                return;
+            }
+            handler.handle(Future.succeededFuture(result.right().getValue()));
+        }));
+    }
+
+    private String getSelectIndependantHomeworksQuery(String structureID, String startDate, String endDate, String ownerId,
+                                                      List<String> listAudienceId, List<String> listTeacherId, List<String> listSubjectId,
+                                                      boolean published, boolean notPublished, boolean vised,
+                                                      boolean notVised, boolean agregVisas, JsonArray values) {
+        String query = "";
+        if (agregVisas) {
+            // To distinguish homerwork of sessions in the shallow table (for visas), we set a boolean "is_homework" at true.
+            query += " SELECT h.*, to_json(type) as type, true as is_homework, array_to_json(array_agg(distinct visa)) as visas" +
+                    " FROM diary.homework h " +
+                    " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id " +
+                    " LEFT JOIN diary.homework_visa AS homework_visa ON homework_visa.homework_id = h.id " +
+                    " LEFT JOIN diary.visa AS visa ON visa.id = homework_visa.visa_id ";
+
+            query += filterItemByVisa(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId,
+                    published, notPublished, vised, notVised, true, values, HOMEWORK);
+        }
+        return query;
     }
 
     private void cleanSession(JsonObject session) {

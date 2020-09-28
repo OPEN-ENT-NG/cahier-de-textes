@@ -296,7 +296,7 @@ export class Session {
     }
 
     duplicateHomeworks(sessionDrag) {
-        if(sessionDrag.homeworks) {
+        if (sessionDrag.homeworks) {
             sessionDrag.homeworks.map(h => {
                 h.editedId = h.id; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
                 delete h.id;
@@ -363,7 +363,7 @@ export class Sessions {
 
         let url = `/diary/sessions/own/${startDate}/${endDate}/${this.structure.id}`;
 
-        if(audienceIds) {
+        if (audienceIds) {
             audienceIds.forEach(id => url += `&audienceId=${id}`);
         }
 
@@ -383,7 +383,7 @@ export class Sessions {
         if (teacherId) filter += `teacherId=${teacherId}&`;
         if (audienceId) filter += `audienceId=${audienceId}&`;
 
-        let url = `/diary/sessions/external/${startDate}/${endDate}${filter.slice(0,-1)}`;
+        let url = `/diary/sessions/external/${startDate}/${endDate}${filter.slice(0, -1)}`;
 
         await this.syncSessions(url);
     }
@@ -411,7 +411,8 @@ export class Sessions {
                                archived?: boolean,
                                sharedWithMe?: boolean,
                                published?: boolean,
-                               notPublished?: boolean): Promise<void> {
+                               notPublished?: boolean,
+                               homeworks?: Homeworks): Promise<void> {
 
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
@@ -428,12 +429,25 @@ export class Sessions {
         if (notPublished) filter += `notPublished=${notPublished}&`;
 
         let url = `/diary/sessions/visa/${startDate}/${endDate}${filter.slice(0, -1)}`;
-        await this.syncSessions(url);
+
+        homeworks ? await this.syncSessionsWithHomeworks(url, homeworks) : await this.syncSessions(url);
     }
 
     async syncSessions(url: string) {
         let {data} = await http.get(url);
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
+        this.all.forEach(i => {
+            i.init(this.structure);
+        });
+    }
+
+     syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void>  => {
+        let {data} = await http.get(url);
+        homeworks.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data.filter(h => h.is_homework), this.structure));
+        homeworks.all.forEach(i => {
+            i.init();
+        });
+        this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data.filter(s => !s.is_homework), this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
         });

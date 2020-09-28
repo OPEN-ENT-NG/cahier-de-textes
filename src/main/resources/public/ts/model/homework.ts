@@ -1,7 +1,7 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Structure, Teacher, DateUtils, ToastUtils} from './index';
+import {Structure, Teacher, DateUtils, ToastUtils, Visas} from './index';
 import {Subject} from './subject';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Session} from './session';
@@ -12,6 +12,7 @@ export class Homework {
     editedId?: string; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT since we want a POST)
     progression_homework_id?: string;
     description: string = '';
+    title: string = '';
     plainTextDescription: string = '';
     dueDate: Date = moment().toDate();
     color: string;
@@ -22,6 +23,7 @@ export class Homework {
     workloadDay: WorkloadDay;
     structure: Structure;
     type: HomeworkType;
+    visas: Visas;
     teacher: Teacher;
     subject: Subject;
     audience: any;
@@ -102,7 +104,8 @@ export class Homework {
             session_id: data.session_id,
             session_date: data.session_date,
             id: data.id,
-            type: data.type ? data.type : data.type,
+            type: (data.type && typeof data.type === "string" ) ? JSON.parse(data.type) : data.type,
+            visas: data.visas && data.visas !== "[null]" ? JSON.parse(data.visas) : [],
             title: data.title,
             color: data.color,
             estimatedTime: data.estimatedtime,

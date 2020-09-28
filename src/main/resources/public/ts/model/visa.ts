@@ -7,6 +7,7 @@ export class Visa {
     id: number;
     comment: string = null;
     sessionIds: any = [];
+    homeworkIds: string[] = [];
     sessions: any = [];
     structure: Structure;
     teacher: Teacher;
@@ -33,6 +34,7 @@ export class Visa {
         return {
             comment: this.comment,
             sessionIds: this.sessionIds,
+            homeworkIds: this.homeworkIds,
             user: model.me.username,
             audience: this.sessions[0].audience.name,// n.audience.name,
             subject: subjectLabel,
@@ -84,6 +86,8 @@ export class Visa {
         FormData.forEach(vs => {
             if(!(vs instanceof Homework)) {
                 this.sessionIds.push(vs.id);
+            } else if (vs instanceof Homework && !vs.session_id) {
+                this.homeworkIds.push(vs.id);
             }
         });
         this.nb_sessions = FormData.length

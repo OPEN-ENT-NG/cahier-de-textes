@@ -32,6 +32,10 @@ public interface SessionService {
                      List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas,
                      Handler<Either<String, JsonArray>> handler);
 
+    void getSessionsAndHomeworksWithVisas(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
+                                          List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised,
+                                          Handler<Either<String, JsonArray>> handler);
+
     void getSessionTypes(String structure_id, Handler<Either<String, JsonArray>> handler);
 
     void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler);
