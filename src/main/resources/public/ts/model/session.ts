@@ -175,10 +175,10 @@ export class Session {
         this.color = colors[1];
     }
 
-    async setFromCourse(course: Course) {
+    async setFromCourse(course: Course): Promise<void> {
         this.courseId = course._id;
         this.teacher = course.teachers[0];
-        this.room = course.rooms[0];
+        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : "";
         if (!this.subject)
             this.subject = course.subject;
         this.date = this.startTime = course.startMoment.toDate();
