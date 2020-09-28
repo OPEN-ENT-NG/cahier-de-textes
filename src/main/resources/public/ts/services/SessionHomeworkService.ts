@@ -1,4 +1,4 @@
-import {model, moment, ng} from 'entcore'
+import {model, moment, ng, idiom as lang} from 'entcore'
 import http, {AxiosResponse} from 'axios';
 import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from "../model";
 
@@ -15,8 +15,8 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                             type_id: s.type.id ? s.type.id : s.type_id,
                             structure_id: s.structure.id,
                             audience_id: s.audience.id,
-                            title: "Séance du " + moment(s.date).format("DD/MM/YYYY"),
-                            room: s.room,
+                            title: lang.translate("homework.attachedToSession") + DateUtils.getDisplayDate(s.date),
+                            room: s.room ? s.room : "",
                             color: s.color,
                             description: "",
                             annotation: s.annotation,
