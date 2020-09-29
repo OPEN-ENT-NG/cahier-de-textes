@@ -1,5 +1,5 @@
 import {model, moment} from 'entcore';
-import http from 'axios';
+import http, {AxiosResponse} from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
@@ -62,7 +62,7 @@ export class Course {
             exceptionnal: data.exceptionnal,
             startDate: data.startDate,
             teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
-            subject: structure.subjects.all.find(t => t.id === data.subjectId),
+            subject: data.subject,
             subject_id: data.subjectId,
             color: data.color ? data.color : colors[Math.floor(Math.random() * colors.length)],
         };
@@ -116,9 +116,9 @@ export class Courses {
 
     async syncWithParams(structure: Structure, teachers: (Teacher | string)[] | null, audiences: Audience[] | null,
                          startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
-        let firstDate = DateUtils.getFormattedDate(startMoment);
-        let endDate = DateUtils.getFormattedDate(endMoment);
-        let filter = '';
+        let firstDate: string = DateUtils.getFormattedDate(startMoment);
+        let endDate: string = DateUtils.getFormattedDate(endMoment);
+        let filter: string = '';
         if (model.me.type !== USER_TYPES.student && model.me.type !== USER_TYPES.relative) {
             if (teachers) teachers.forEach((teacher: Teacher | string) => filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`) ;
             if (audiences) audiences.forEach((audience: Audience) => filter += `&group=${audience.name ? audience.name : audience.groupName}`);
@@ -137,13 +137,14 @@ export class Courses {
         }
 
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);
-        let uri = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
+        let uri: string = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let { data } = await http.get(uri);
+        let { data }: AxiosResponse = await http.get(uri);
         data = data.filter((d) => d.teacherIds);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, structure ? structure : this.structure));
-        this.all.forEach(i => {
+        this.all.forEach((i: Course) => {
             i.init(this.structure);
+            i.subject.label = i.subject.name;
         });
     }
 

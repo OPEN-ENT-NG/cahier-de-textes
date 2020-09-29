@@ -1,8 +1,6 @@
-import { model } from 'entcore';
 import http from 'axios';
 import { Mix } from 'entcore-toolkit';
-import {Structure, DateUtils} from './index';
-import {Session} from './session';
+import {Structure} from './index';
 
 export class Student {
     id: string;

@@ -1,12 +1,14 @@
-import {model, notify} from 'entcore';
+import {notify} from 'entcore';
 import http from 'axios';
-import {Structure} from "./structure";
 
 export class Subject {
     id: string;
     label: string;
     code: string;
     teacherId: string;
+    externalId?: string;
+    name?: string;
+    rank?: number;
 
     constructor(subjectId?: string, subjectLabel?: string, subjectCode?: string, teacherId?: string) {
         this.id = subjectId;
