@@ -397,12 +397,28 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.showSession = true;
         };
 
-        $scope.sessionsHomeworksByClass = () => {
+        $scope.sessionsHomeworksByClass = (): Array<Session | Homework> => {
             return $scope.timeSlotsByDate.filter(
-                time =>
-                    time.audience.name === $scope.openedTimeSlot.audience.name &&
-                    time.teacher.id === $scope.openedTimeSlot.teacher.id
-            );
+                (time) => {
+                    let canFilter: boolean = true;
+                    //Filter from class name if defined
+                    if (($scope.openedTimeSlot.audience && $scope.openedTimeSlot.audience.name)
+                        && (time.audience && time.audience.name)) {
+                        canFilter = canFilter && (time.audience.name === $scope.openedTimeSlot.audience.name);
+                    }
+                    //Filter from teacher id if defined
+                    if((time.teacher && time.teacher.id) &&
+                        ($scope.openedTimeSlot.teacher && $scope.openedTimeSlot.teacher.id)) {
+                        canFilter = canFilter && (time.teacher.id === $scope.openedTimeSlot.teacher.id);
+                    }
+
+                    //Filter from subject id if defined
+                    if ((time.subject && time.subject.id)
+                        && ($scope.openedTimeSlot.subject && $scope.openedTimeSlot.subject.id)) {
+                        canFilter = canFilter && (time.subject.id === $scope.openedTimeSlot.subject.id);
+                    }
+                    return canFilter;
+                });
         };
 
         $scope.getTimeSlotIndex = () => {
