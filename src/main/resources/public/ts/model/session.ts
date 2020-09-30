@@ -253,10 +253,11 @@ export class Session {
         return this.startMoment ? this.startMoment : moment(this.startTime)
     }
 
-    getSessionInfo(session: Session) {
+    getSessionInfo(session: Session): void {
 
         this.subject = new Subject();
         this.subject.id = session.subject.id;
+        this.title = session.title ? session.title : "";
 
         session.homeworks.map(homework => {
             homework.due_date = this.date;
@@ -272,11 +273,9 @@ export class Session {
         this.type = session.type;
         this.teacher = session.teacher;
         this.color = session.color;
-        // this.audience = session.audience;
         this.opened = true;
         this.room = session.room;
         this.description = session.description;
-
     }
 
     setFromCourseAndSession(course: Course, sessionDrag: Session) {
