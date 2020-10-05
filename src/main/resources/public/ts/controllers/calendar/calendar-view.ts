@@ -7,6 +7,7 @@ import {StructureService, StructureSlot} from "../../services";
 import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../enum/pedagogic-slot-profile";
 import {Groups} from "../../model/group";
+import {CALENDAR_TOOLTIP_EVENTER} from "../../utils/const/calendar-tooltip-eventer";
 
 declare let window: any;
 
@@ -42,7 +43,6 @@ export let calendarController = ng.controller('CalendarController',
                 startDate: moment().startOf('isoWeek').toDate(),
                 endDate: moment().endOf('isoWeek').toDate()
             };
-
             model.calendar.setDate(moment());
 
             $scope.setLegendLightboxVisible = (state: boolean) => {
@@ -231,6 +231,9 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
+            $scope.hoverCalendarItem = ($event, item: any): void => $scope.$broadcast(CALENDAR_TOOLTIP_EVENTER.HOVER_IN, {$event, item});
+            $scope.hoverOutCalendarItem = (): void => $scope.$broadcast(CALENDAR_TOOLTIP_EVENTER.HOVER_OUT);
+
             $scope.loadPedagogicDays = () => {
                 $scope.pedagogicItems.sort(function (a, b) {
                     return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
@@ -327,7 +330,7 @@ export let calendarController = ng.controller('CalendarController',
                 });
                 return c.nbHomework != 0 && isDisplayedByDefault;
             }
-
+            
             $scope.initDisplay = () => {
                 let nbSessionDisplayed = 0;
                 let nbHomeworkDisplayed = 0;

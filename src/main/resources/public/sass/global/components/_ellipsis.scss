@@ -20,4 +20,7 @@
   &-two {
     @include ellipsis-multiline(2);
   }
+  &-three {
+    @include ellipsis-multiline(3);
+  }
 }

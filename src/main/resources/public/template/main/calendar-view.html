@@ -20,15 +20,19 @@
         </div>
 
         <!-- Calendar view -->
-        <div id="calendar-view" class="twelve calendar-container" ng-class="{'margin-container': calendar.increment !== 'month'}">
+        <div id="calendar-view" class="twelve calendar-container"
+             ng-class="{'margin-container': calendar.increment !== 'month'}">
             <calendar enable-display-modes="true"
                       readonly="false"
                       display-template="main/calendar-week-item"
                       display-month-template="main/calendar-month-item"
                       items="calendarItems"
                       slots="timeSlot.slots"
-                      item-tooltip-template="main/course-tooltip"
-                      show-next-previous-button="true"/>
+                      show-next-previous-button="true">
+            </calendar>
+            <!-- tooltip triggered if you hover session/homework/emptySession -->
+            <!-- (see calendar-week-item.html || calendar-view.ts) for method ng-mouseenter and ng-mouseleave on hover -->
+            <calendar-tooltip></calendar-tooltip>
         </div>
     </div>
 </div>

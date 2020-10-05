@@ -1,5 +1,7 @@
 <div ng-if="item.pedagogicType == TYPE_SESSION" data-ng-click="openSession(item.id)"
      class="flex-row-cdt row__6 schedule-item-content session TYPE_SESSION" ng-style="{'background-color': item.color}"
+     data-ng-mouseenter="hoverCalendarItem($event, item)"
+     data-ng-mouseleave="hoverOutCalendarItem()"
      lvl-draggable
      lvl-drop-target on-drop="dropped(dragEl, dropEl)">
 
@@ -29,7 +31,6 @@
         </span>
     </div>
     <span ng-show="false">[[item.id]]</span>
-
 </div>
 
 <div ng-if="item.pedagogicType == TYPE_COURSE" data-ng-click="openSessionFromCourse(item)"

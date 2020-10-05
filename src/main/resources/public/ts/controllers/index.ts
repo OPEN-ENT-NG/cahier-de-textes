@@ -4,7 +4,6 @@ export * from './homework/manageHomework';
 export * from './administrator/globalAdmin';
 export * from './calendarDailyEventsController';
 export * from './list/manageList';
-export * from './calendar/manageCalendartooltip';
 export * from './calendar/calendar-view';
 export * from './progression/manageProgression';
 export * from './navigation/navigation';
