@@ -239,8 +239,8 @@ export class Session {
         this.title = progression.title;
         this.type = progression.type;
         this.courseId = course._id;
-        this.teacher = course.teachers[0];
-        this.room = course.rooms[0];
+        this.teacher = (course.teachers && course.teachers.length > 0) ? course.teachers[0] : null;
+        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : "";
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];

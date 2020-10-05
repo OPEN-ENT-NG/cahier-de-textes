@@ -14,7 +14,7 @@ export class Course {
     _id: string;
     audiences: Audiences;
     structure: Structure;
-    teachers: Teachers;
+    teachers: Teachers | any;
     subject: Subject;
     subject_id?: string;
     exceptionnal ?: string;
