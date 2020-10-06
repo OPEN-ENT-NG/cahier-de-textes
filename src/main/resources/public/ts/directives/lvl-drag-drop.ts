@@ -1,9 +1,9 @@
 import {angular, model, ng} from 'entcore';
+import {CALENDAR_TOOLTIP_EVENTER} from "../utils/const/calendar-tooltip-eventer";
 
 
 export const lvlDraggable = ng.directive('lvlDraggable', ['$rootScope', 'uuidDrag', function ($rootScope, uuid) {
     if(model.me.type ===  "ENSEIGNANT"){
-
         return {
             restrict: 'A',
             link: function (scope, el, attrs, controller) {
@@ -52,6 +52,8 @@ export const lvlDropTarget = ng.directive('lvlDropTarget', ['$rootScope', 'uuidD
                 }
 
                 el.bind("dragover", function (e) {
+                    scope.$emit(CALENDAR_TOOLTIP_EVENTER.HOVER_OUT);
+
                     if (e.preventDefault) {
                         e.preventDefault(); // Necessary. Allows us to drop.
                     }
