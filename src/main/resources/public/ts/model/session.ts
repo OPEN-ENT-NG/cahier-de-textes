@@ -285,7 +285,7 @@ export class Session {
         this.type = sessionDrag.type;
         this.subject = new Subject();
         this.subject.id = sessionDrag.subject ? sessionDrag.subject.id : null;
-
+        this.title = sessionDrag.title ? sessionDrag.title : "";
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
