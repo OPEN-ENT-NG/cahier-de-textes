@@ -335,7 +335,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if (!$scope.form.homework.audience || !$scope.form.homework.subject || $scope.isReadOnly) return;
                 $scope.sessionsToAttachTo = [];
                 let startDate: Moment = moment($scope.session.date);
-                let endDate: Moment = moment($scope.session.date).add(15, 'day');
+                let endDate: Moment = moment($scope.session.date).add(28, 'day');
                 let classesSelectedIds: string[] = $scope.autocomplete.classesSelected.map(a => a.id);
 
                 // We only keep courses selected that correspond to the new subject and audiences selected
