@@ -169,6 +169,10 @@ export let main = ng.controller('MainController',
 
             $scope.translate = (key: string) => lang.translate(key);
 
+            $scope.clearLightbox = (): void => {
+                document.getElementsByClassName("cdt")[0].classList.remove('lightbox-opened')
+            };
+
             $scope.isMobile = (): boolean => {
                 return MobileUtils.isMobile();
             };

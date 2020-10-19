@@ -1,5 +1,5 @@
 import {ng} from 'entcore';
-import { PEDAGOGIC_TYPES } from '../utils/const/pedagogicTypes';
+import { PEDAGOGIC_TYPES } from '../core/const/pedagogicTypes';
 
 export let pedagogicItemFilter = ng.filter('pedagogicItemFilter', function () {
     return function (items: any[], displaySession: boolean, displayHomework: boolean) {

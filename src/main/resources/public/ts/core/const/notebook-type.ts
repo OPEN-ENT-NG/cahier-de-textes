@@ -1,0 +1,4 @@
+export const NOTEBOOK_TYPE = {
+    HOMEWORK: 'HOMEWORK',
+    SESSION: 'SESSION'
+};

@@ -1,18 +1,31 @@
-import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore';
+import {idiom as lang, model, moment, ng} from 'entcore';
 import * as jsPDF from 'jspdf';
-import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import * as html2canvas from 'html2canvas';
-import {Sessions, Teacher, DateUtils, Visa, Visas, Homework, Homeworks} from "../../model";
-import * as ts from "typescript/lib/tsserverlibrary";
-import Session = ts.server.Session;
-import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
-
+import {DateUtils, Homeworks, IVisa, Sessions, Visa, Visas} from "../../model";
+import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
+import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
+import {INotebookService, SearchService} from "../../services";
+import {UsersSearch} from "../../utils/autocomplete/usersSearch";
+import {INotebook, INotebookRequest, Notebook} from "../../model/Notebook";
+import {FORMAT} from "../../core/const/dateFormat";
+import {NOTEBOOK_TYPE} from "../../core/const/notebook-type";
+import {IVisaService} from "../../services";
+import {IViescolaireService} from "../../services";
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
-    ['$scope', '$routeParams', '$location', function ($scope, $routeParams, $location) {
+    ['$scope', '$timeout', '$routeParams', '$location', 'SearchService', 'NotebookService', 'VisaService', 'ViescolaireService',
+        function ($scope, $timeout, $routeParams, $location, searchService: SearchService,
+                  notebookService: INotebookService, visaService: IVisaService, viescolaireService: IViescolaireService) {
         (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
-        const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
+
+        /* Init search bar */
+        $scope.usersSearch = undefined;
+        $scope.groupsSearch = undefined;
+
+        $scope.isLoading = false;
+        $scope.notebooks = undefined;
+        $scope.notebookRequest = {} as INotebookRequest;
 
         $scope.vised = true;
         $scope.notVised = true;
@@ -20,10 +33,13 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.sharedWithMe = false;
         $scope.published = true;
         $scope.notPublished = true;
-        $scope.autocomplete = AutocompleteUtils;
         $scope.filters = {
+            teacherIds: [],
+            audienceIds: [],
             startDate: moment(),
-            endDate: moment()
+            endDate: moment().endOf('day'),
+            orderVisa: false,
+            page: 0
         };
 
         $scope.userType = model.me.type;
@@ -36,437 +52,450 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.selectedSessions = {};
         $scope.visas_pdfChoice = [];
         $scope.sessions = new Sessions($scope.structure);
-        $scope.openedTimeSlot = null;
+        $scope.openedNotebook = {
+            current: null,
+            contents: null,
+            mainNotebookToVisa: null
+        };
         $scope.homeworks = new Homeworks($scope.structure);
         $scope.timeSlotsByDate = [];
-
-        let getIds = (collection) => {
-            return collection
-                .filter(x => x)
-                .map(array => array.id)
-                .toString()
-        };
-
-        const getTeacherId = (): string => {
-            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
-                return model.me.userId;
-            } else {
-                return null;
-            }
-        };
-
-        $scope.filterList = async () => {
-            $scope.selectOrUnselectAllSessions(false);
-            $scope.homeworks.all = [];
-            const teachersSelected = AutocompleteUtils.getTeachersSelected();
-            const classesSelected = AutocompleteUtils.getClassesSelected();
-            let teachers = teachersSelected.length ? getIds(teachersSelected) : getTeacherId();
-            let audiences = classesSelected.length ? getIds(classesSelected) : null;
-            await $scope.sessions.syncSessionsWithVisa($scope.filters.startDate,
-                $scope.filters.endDate,
-                $scope.structure.id,
-                teachers,
-                audiences,
-                $scope.vised,
-                $scope.notVised,
-                $scope.archived,
-                $scope.sharedWithMe,
-                $scope.published,
-                $scope.notPublished,
-                $scope.homeworks);
-            $scope.sessions.all.forEach(s => {
-                s.isInsideDiary = true;
-                s.homeworks.forEach(h => {
-                    h.isInsideDiary = true;
-                    if ($scope.homeworks.all.map(sh => sh.id).indexOf(h.id) === -1) $scope.homeworks.all.push(h);
-                });
-            });
-            const sessions = [...$scope.homeworks.all, ...$scope.sessions.all];
-            $scope.sessions_GroupBy_AudienceSubject = Sessions.groupByLevelANdSubject(sessions);
-            $scope.timeSlotsByDate = getTimeSlotsByDate();
-
-            _.each($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
-                $scope.selectedSessions[key] = false;
-                $scope.sessions_GroupBy_AudienceSubject[key] = item.sort((a, b) => {
-                    const dateA = $scope.isHomeworkInstance(a) ? a.dueDate : a.startMoment;
-                    const dateB = $scope.isHomeworkInstance(b) ? b.dueDate : b.startMoment;
-                    return moment(dateA).diff(moment(dateB));
-                });
-            });
-            $scope.allSessionsSelect = false;
-            $scope.safeApply();
-        };
-
-        $scope.sessionsSize = () => {
-            return $scope.sessions_GroupBy_AudienceSubject ? Object.keys($scope.sessions_GroupBy_AudienceSubject).length : 0;
-        };
-
-        $scope.updateDatas = async (event) => {
-            // Checking if event is triggered when selecting an element inside multiCombo
-            $scope.sessions.structure = $scope.structure;
-            if (event.target.tagName == 'BUTTON') {
-                if (event.target.innerHTML == lang.translate("utils.teachers")) {
-                    $scope.params.teachers = [];
-                }
-                if (event.target.innerHTML == lang.translate("utils.groups")) {
-                    $scope.params.audiences = [];
-                }
-            }
-            angular.forEach($scope.dataToUpdate, function (value, key) {
-                if (Object.getPrototypeOf(value).constructor.name === "Audience") {
-                    $scope.params.audiences[key] = value;
-                }
-                if (Object.getPrototypeOf(value).constructor.name === "Teacher") {
-                    $scope.params.teachers[key] = value;
-                }
-            });
-
-            await $scope.canUpdateSessionsWithVisa();
-            $scope.safeApply();
-        };
-
-        $scope.toggleVisa = async (event) => {
-            $scope.displayVisa = !$scope.displayVisa;
-            $scope.updateDatas(event);
-        };
-
-        $scope.toggleVised = () => {
-            $scope.vised = !$scope.vised;
-            if (!$scope.vised && !$scope.notVised) $scope.toggleNotVised();
-        };
-
-        $scope.toggleNotVised = () => {
-            $scope.notVised = !$scope.notVised;
-            if (!$scope.vised && !$scope.notVised) $scope.toggleVised();
-        };
-
-        $scope.togglePublished = () => {
-            $scope.published = !$scope.published;
-            if (!$scope.published && !$scope.notPublished) $scope.toggleNotPublished();
-        };
-
-        $scope.toggleNotPublished = () => {
-            $scope.notPublished = !$scope.notPublished;
-            if (!$scope.published && !$scope.notPublished) $scope.togglePublished();
-        };
-
-        $scope.clearSubjects = () => {
-            $scope.course.groups = [];
-            $scope.params.subjects = [];
-        };
-
-        $scope.init = async () => {
-            const schoolYears = await DateUtils.getSchoolYearDates($scope.structure.id);
-            $scope.filters.startDate = moment(schoolYears.start_date);
-            $scope.filters.endDate = moment();
-
-            AutocompleteUtils.init($scope.structure);
-            $scope.sessions.structure = $scope.structure;
-            await $scope.filterList();
-        };
-
-
-        /**
-         *   Actions de la vue *****
-         */
-        $scope.back = () => {
-            window.history.back();
-        };
-
-        $scope.updateOptionToaster = () => {
-            if ($scope.sessionsUnselected().length > 0) $scope.allSessionsSelect = false;
-            $scope.showOptionToaster = _.chain($scope.selectedSessions)
-                .map(item => item)
-                .contains(true)
-                .value();
-        };
-
-
-        $scope.wantDownloadPdf = (sessionsGroups) => {
-            $scope.visas_pdfChoice = $scope.getVisas(sessionsGroups);
-            let audiences = (_.chain(sessionsGroups).pluck("audience").pluck("name").uniq().value()).toString();
-            let teachers = (_.chain(sessionsGroups).pluck("teacher").pluck("displayName").uniq().value()).toString();
-            $scope.visas_pdfChoice.map(visa => {
-                visa.displayDwlName = moment(visa.created).format("DD/MM/YYYY") + " - " + audiences + " - " + teachers;
-            });
-            $scope.visas_pdfChoice = _.sortBy($scope.visas_pdfChoice, function (o) {
-                return moment(o.created).format("YYYYMMDD");
-            });
-            $scope.visaPdfDownloadBox = true;
-        };
-
-        $scope.closeVisaPdfDownloadBox = () => {
-            $scope.visas_pdfChoice = [];
-            $scope.visaPdfDownloadBox = null;
-        };
-
-        $scope.wantCreateVisa = () => {
-            $scope.visaCreateBox = true;
-        };
-
-        $scope.closeVisaCreateBox = () => {
-            $scope.visas_pdfChoice = [];
-            $scope.visaCreateBox = null;
-        };
-
-        /**
-         * Sort utils, and objects sorting to display *********
-         */
-        $scope.getVisas = (sessionsGroup) => {
-            return _.chain(sessionsGroup)
-                    .filter(x => !(x instanceof Homework && x.session_id))
-                    .pluck('visas')
-                    .flatten()
-                    .uniq(function (visa) {
-                        return visa.id;
-                    }).value()
-                || [];
-        };
-
-        $scope.getLastEditSession = (sessionsGroup) => {
-            var date = _.chain(sessionsGroup)
-                .pluck("modified")
-                .sort()
-                .last()
-                .value();
-            if (date)
-                return moment(date).format("DD/MM/YYYY");
-            else
-                return '-';
-        };
-
-        $scope.getLastCreatedVisa = (sessionsGroup) => {
-            const visas = $scope.getVisas(sessionsGroup);
-            if (visas.length == 0) return lang.translate("sessions.admin.Visa.sateKo");
-            let date = _.chain(visas)
-                .pluck("created")
-                .sort()
-                .last()
-                .value();
-            if (date)
-                return lang.translate("sessions.admin.visa.sate.on") + moment(date).format("DD/MM/YYYY");
-            else
-                return lang.translate("sessions.admin.Visa.sateKo");
-        };
-
-        $scope.getSessionTitle = (timeSlot) => {
-            if (timeSlot.title) return timeSlot.title;
-            if (timeSlot.attachedToSession) return lang.translate("homework.for.date") + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
-            return DateUtils.getFormattedTimeSlotDate(timeSlot);
-        };
-
-        $scope.getFormattedTimeSlotDate = (timeSlot) => {
-            if (timeSlot) return DateUtils.getFormattedTimeSlotDate(timeSlot);
-        };
-
-        $scope.getSessionsIds = (sessionsGroup) => {
-            return _.chain(sessionsGroup)
-                .pluck("id")
-                .value();
-        };
-
-        $scope.isHomeworkInstance = (timeSlot) => {
-            return timeSlot instanceof Homework;
-        };
-
-        $scope.selectOrUnselectAllSessions = function (isSelected = null) {
-            if (isSelected) $scope.allSessionsSelect = isSelected;
-            let targetValue = $scope.allSessionsSelect;
-            _.each($scope.selectedSessions, function (value, key, obj) {
-                obj[key] = targetValue;
-            });
-            $scope.updateOptionToaster();
-            $scope.safeApply();
-        };
-
-        $scope.sessionsSelected = () => {
-            return Object.keys($scope.selectedSessions).filter(x => $scope.selectedSessions[x] === true);
-        };
-        $scope.sessionsUnselected = () => {
-            return Object.keys($scope.selectedSessions).filter(x => $scope.selectedSessions[x] === false);
-        };
-
-        $scope.filterTeacherOptions = async (value) => {
-            await AutocompleteUtils.filterTeacherOptions(value);
-            $scope.safeApply();
-        };
-
-        $scope.filterClassOptions = async (value) => {
-            await AutocompleteUtils.filterClassOptions(value);
-            $scope.safeApply();
-        };
-
-        $scope.selectTeacher = async (model, item) => {
-            AutocompleteUtils.selectTeacher(model, item);
-            await $scope.filterList();
-            AutocompleteUtils.resetSearchFields();
-        };
-
-        $scope.selectClass = async (model, item) => {
-            AutocompleteUtils.selectClass(model, item);
-            await $scope.filterList();
-            AutocompleteUtils.resetSearchFields();
-        };
-
-        $scope.removeTeacher = async (value) => {
-            AutocompleteUtils.removeTeacherSelected(value);
-            await $scope.filterList();
-        };
-
-        $scope.removeClass = async (value) => {
-            AutocompleteUtils.removeClassSelected(value);
-            await $scope.filterList();
-        };
-
-        /**
-         * DateUtils  *********
-         */
-
-        let getSelectedSessions = () => {
-            let idsSelected =
-                _.chain($scope.selectedSessions)
-                    .map(function (val, key) {
-                        if (val == true)
-                            return key;
-                    })
-                    .reject(_.isUndefined)
-                    .value();
-
-            return _.filter($scope.sessions_GroupBy_AudienceSubject, (item, key) => {
-                return _.contains(idsSelected, key)
-            });
-        };
-
-        let getTimeSlotsByDate = () => {
-            let x = _.flatten(_.map($scope.sessions_GroupBy_AudienceSubject, (x) => x));
-
-            x = _.sortBy(x, (a) => {
-                const aStartDate = DateUtils.formatDate((a instanceof Homework ? a.dueDate : a.startMoment), 'YYYY/MM/DD');
-                const aStartTime = a instanceof Homework ? null : DateUtils.formatDate(a.startMoment, 'HH:mm');
-                return Math.round(new Date(aStartDate ? aStartDate : '' + (aStartTime ? ' ' + aStartTime : '')).getTime() / 1000);
-            });
-            return x;
-        };
-
-
-        $scope.safeApply();
-
-
-        /**
-         *  Starting Visas actions ************
-         **/
-
         $scope.visaForm = {
             comment: null
         };
 
-        let updateNbSessions = (sessionsGroups) => {
-            $scope.visaForm.nbSessions =
-                _.chain($scope.sessionsGroups)
-                    .filter(item => item.selected == true)
-                    .pluck('nbSessions')
-                    .reduce((count, num) => count + num)
-                    .value();
+        $scope.init = async (): Promise<void> => {
+            $scope.notebooks = new Notebook($scope.structure.id);
+            /* Init search bar */
+            $scope.usersSearch = new UsersSearch($scope.structure.id, searchService);
+            $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
+
+            const schoolYears = await viescolaireService.getSchoolYearDates($scope.structure.id);
+            // $scope.filters.startDate = DateUtils.formatDate(schoolYears.start_date, FORMAT.formattedDate);
+            $scope.filters.startDate = moment(schoolYears.start_date);
+
+            // AutocompleteUtils.init($scope.structure);
+            $scope.sessions.structure = $scope.structure;
+            // await $scope.filterList();
+            await getNotebooks();
         };
 
-        let createVisasData = (sessionsGroups) => {
-            let visas = new Visas($scope.structure);
-            sessionsGroups.forEach((visaSession) => {
-                if (visaSession) {
-                    let visa = new Visa($scope.structure);
-                    visa.mapFormData(visaSession, $scope.visaForm.comment);
+        const getNotebooks = async (): Promise<void> => {
+            $scope.isLoading = true;
+            prepareNotebookRequest();
+            await $scope.notebooks.build(await notebookService.getNotebooks($scope.notebookRequest));
+            $scope.isLoading = false;
+            $scope.safeApply();
+        };
+
+        const prepareNotebookRequest = (): void => {
+            $scope.notebookRequest.structure_id = $scope.notebooks.structure_id;
+            $scope.notebookRequest.start_at = DateUtils.formatDate($scope.filters.startDate, FORMAT.formattedDateTime);
+            $scope.notebookRequest.end_at = DateUtils.formatDate($scope.filters.endDate, FORMAT.formattedDateTime);
+            $scope.notebookRequest.visa =  $scope.fetchVisaParameter();
+            $scope.notebookRequest.orderVisa = $scope.filters.orderVisa;
+            $scope.notebookRequest.published = fetchPublishParameter();
+            $scope.notebookRequest.teacher_ids = ($scope.isTeacher && $scope.filters.teacherIds.length === 0)
+                ? [model.me.userId] : $scope.filters.teacherIds;
+            $scope.notebookRequest.audience_ids = $scope.filters.audienceIds;
+            $scope.notebookRequest.page = $scope.filters.page;
+        };
+
+        $scope.fetchVisaParameter = (): Boolean => {
+            if ($scope.vised && $scope.notVised) {
+                return null;
+            }
+            return $scope.vised && !$scope.notVised;
+        };
+
+        const fetchPublishParameter = (): Boolean => {
+            if ($scope.published && $scope.notPublished) {
+                return null;
+            }
+            return $scope.published && !$scope.notPublished;
+        };
+
+        $scope.updateFilter = async (): Promise<void> => {
+            $scope.filters.page = 0;
+            $scope.showOptionToaster = false;
+
+            /* get our search bar info */
+            $scope.filters.teacherIds = $scope.usersSearch.getSelectedUsers().map(user => user["id"]);
+            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
+
+            await getNotebooks();
+        };
+
+        $scope.openMainNotebook = async (notebook: INotebook): Promise<void> => {
+            notebook.isClicked = !notebook.isClicked;
+            if (notebook.isClicked) {
+                if (notebook.notebookSessionsContents.length === 0) {
+                    notebook.notebookSessionsContents = await notebookService
+                        .getNotebooksSessionsContent(getNotebookRequest(notebook));
+                    $scope.safeApply();
+                }
+            }
+        };
+
+        const getNotebookRequest = (notebook: INotebook): INotebookRequest => {
+            return {
+                teacher_id: notebook.teacher.id,
+                subject_id: notebook.subject.id,
+                audience_id: notebook.audience.id,
+                structure_id: $scope.notebooks.structure_id,
+                start_at: $scope.notebookRequest.start_at,
+                end_at: $scope.notebookRequest.end_at,
+                visa:  $scope.fetchVisaParameter(),
+                published: fetchPublishParameter()
+            };
+        }
+
+        $scope.changePagination = async (): Promise<void> => {
+            $scope.filters.page = $scope.notebooks.notebookResponse.page;
+            await getNotebooks();
+        };
+
+        // filter visa
+        $scope.toggleVised = (): void => {
+            $scope.vised = !$scope.vised;
+            if (!$scope.vised && !$scope.notVised) {
+                $scope.toggleNotVised();
+            } else {
+                $scope.updateFilter();
+            }
+        };
+
+        // filter not visa
+        $scope.toggleNotVised = (): void => {
+            $scope.notVised = !$scope.notVised;
+            if (!$scope.vised && !$scope.notVised) {
+                $scope.toggleVised();
+            } else {
+                $scope.updateFilter();
+            }
+        };
+
+        // filter published
+        $scope.togglePublished = (): void => {
+            $scope.published = !$scope.published;
+            if (!$scope.published && !$scope.notPublished) {
+                $scope.toggleNotPublished();
+            } else {
+                $scope.updateFilter();
+            }
+        };
+
+        // filter not published
+        $scope.toggleNotPublished = (): void => {
+            $scope.notPublished = !$scope.notPublished;
+            if (!$scope.published && !$scope.notPublished) {
+                $scope.togglePublished();
+            } else {
+                $scope.updateFilter();
+            }
+        };
+
+        // filter sort visa (date arrow)
+        $scope.toggleSortVisa = (): void => {
+            // can only trigger if visa is null (default) or is visa
+            if ($scope.fetchVisaParameter() === null || $scope.fetchVisaParameter() === true) {
+                $scope.filters.orderVisa = !$scope.filters.orderVisa;
+                $scope.updateFilter();
+            }
+        };
+
+        $scope.formatDayDate = (date: string): string => DateUtils.formatDate(date, FORMAT.displayDate);
+
+        $scope.updateOptionToaster = (): void => {
+            $scope.showOptionToaster = $scope.notebooks.notebookResponse.all.some((notebook: INotebook) => notebook.isSelected);
+            $scope.notebooks.notebookResponse.all
+                .filter((notebook: INotebook) => notebook.isSelected)
+                .forEach(async (notebook: INotebook) => {
+                    if (notebook.notebookSessionsContents.length === 0) {
+                        notebook.notebookSessionsContents = await notebookService.getNotebooksSessionsContent(getNotebookRequest(notebook));
+                        $scope.safeApply();
+                    }
+            })
+        };
+
+        $scope.getSessionTitle = (notebook: INotebook): string => {
+            if (notebook.type === NOTEBOOK_TYPE.SESSION) {
+                return notebook.title;
+            } else {
+                return lang.translate("homework.for.date") + ' ' + DateUtils.formatDate(notebook.date, FORMAT.displayDate);
+            }
+        };
+
+        $scope.getFormattedTimeNotebook = (notebookSession: INotebook): string => {
+            if (notebookSession) {
+                if (notebookSession.type === NOTEBOOK_TYPE.HOMEWORK) {
+                    return lang.translate('homework.for.date') + ' ' + DateUtils.formatDate(notebookSession.date, FORMAT.displayDate);
+                } else {
+                    return DateUtils.formatDate(notebookSession.date, FORMAT.displayDate) + ' '
+                        + lang.translate('from2') + ' '
+                        + DateUtils.getTimeFormat(notebookSession.start_time) + ' '
+                        + lang.translate('to2') + ' '
+                        + DateUtils.getTimeFormat(notebookSession.end_time);
+                }
+            } else {
+                return "";
+            }
+        };
+
+        $scope.isHomeworkType = (notebookSession: INotebook): boolean => {
+            return notebookSession.type === NOTEBOOK_TYPE.HOMEWORK;
+        };
+
+        $scope.selectOrUnselectAllSessions = (): void => {
+            if ($scope.allSessionsSelect) {
+                $scope.notebooks.notebookResponse.all.forEach((notebook: INotebook) => notebook.isSelected = true);
+            } else {
+                $scope.notebooks.notebookResponse.all.forEach((notebook: INotebook) => notebook.isSelected = false);
+            }
+            $scope.updateOptionToaster();
+            $scope.safeApply();
+        };
+
+        $scope.getSelectedNotebooks = (): Array<INotebook> => {
+            if (Object.keys($scope.notebooks.notebookResponse).length === 0) {
+                return [];
+            }
+            return $scope.notebooks.notebookResponse.all.filter((notebook: INotebook) => notebook.isSelected);
+        };
+
+        let getSelectedMainNotebooks = (): Array<INotebook> => {
+            let notebooks: Array<INotebook> = [];
+            if ($scope.notebooks && $scope.notebooks.notebookResponse && $scope.notebooks.notebookResponse.all) {
+                return $scope.notebooks.notebookResponse.all.filter((notebook: INotebook) => notebook.isSelected);
+            }
+            return notebooks;
+        };
+
+        /* ----------------------------
+         modal/navigation
+        ---------------------------- */
+
+        $scope.openContentNotebook = async (notebook: INotebook, mainNotebook: INotebook): Promise<void> => {
+            $scope.openedNotebook = {
+                current: notebook,
+                contents: mainNotebook.notebookSessionsContents,
+                mainNotebookToVisa: mainNotebook
+            };
+            $scope.showSession = true;
+        };
+
+        $scope.closeShowSession = (): void => {
+            $scope.openedNotebook = {
+                current: null,
+                contents: null,
+                mainNotebookToVisa: null
+            };
+            $scope.showSession = false;
+        };
+
+        $scope.canNavigate = (goingRight: Boolean): boolean => {
+            return $scope.openedNotebook.current
+                && $scope.openedNotebook.contents[$scope.openedNotebook.contents.indexOf($scope.openedNotebook.current)
+                + (goingRight ? 1 : -1)];
+        };
+
+        $scope.notebookModalNavigate = (goingRight: Boolean): void => {
+            if ($scope.canNavigate(goingRight)) {
+                const index = $scope.openedNotebook.contents.indexOf($scope.openedNotebook.current) + (goingRight ? 1 : -1);
+                $scope.openedNotebook.current = $scope.openedNotebook.contents[index];
+            }
+        };
+
+        $scope.isLastNotebookContent = (): boolean => {
+            if ($scope.openedNotebook.current && $scope.openedNotebook.contents) {
+                const index: number = $scope.openedNotebook.contents.indexOf($scope.openedNotebook.current);
+                return ($scope.openedNotebook.contents.length - 1) === index;
+            }
+        };
+
+        $scope.isOwnNotebook = (notebook: INotebook): boolean => {
+            if (notebook) {
+                return notebook.teacher.id === model.me.userId;
+            }
+        };
+
+        $scope.redirectNotebookSessionHomework = (notebook: INotebook): void => {
+            $scope.goTo((notebook.type === NOTEBOOK_TYPE.HOMEWORK ? '/homework' : '/session') + '/update/' + notebook.id);
+        };
+
+        /* ----------------------------
+             Visa part
+        ---------------------------- */
+
+        $scope.consultVisasFromNotebook = async (): Promise<void> => {
+            let mainSelectedNotebooks: Array<INotebook> = $scope.getSelectedNotebooks();
+            let sessionIds: Array<number> = [];
+            let homeworkIds: Array<number> = [];
+
+            mainSelectedNotebooks.forEach((mainNotebook: INotebook) => {
+                mainNotebook.notebookSessionsContents.forEach((content: INotebook) => {
+                    if (content.type === NOTEBOOK_TYPE.SESSION) {
+                        sessionIds.push(content.id);
+                    }
+                    if (content.type === NOTEBOOK_TYPE.HOMEWORK) {
+                        homeworkIds.push(content.id);
+                    }
+                })
+            });
+
+            let fetchedVisas: Array<IVisa> = await visaService.getVisas($scope.structure.id, sessionIds, homeworkIds);
+
+            let visas: Array<Visa> = [];
+            fetchedVisas.forEach((fetchedVisa: IVisa) => {
+                let visa: Visa = new Visa($scope.structure);
+                visa.buildVisaData(fetchedVisa, getTeacherInfoForVisa(fetchedVisa.created, mainSelectedNotebooks[0]));
+                visas.push(visa);
+            });
+
+            $scope.visas_pdfChoice = visas;
+            $scope.visaPdfDownloadBox = true;
+            $scope.safeApply();
+        };
+
+        const getTeacherInfoForVisa = (created_at: string, notebookContent: INotebook): string => {
+            return DateUtils.formatDate(created_at, FORMAT.displayDate) +
+                " - " + notebookContent.audience.name + " - " + notebookContent.teacher.displayName;
+        };
+
+        $scope.getVisasFromSelectedNotebooks = (): Array<Visa> => {
+            let visas: Array<Visa> = [];
+            $scope.getSelectedNotebooks().forEach((mainNotebook: INotebook) => {
+                mainNotebook.notebookSessionsContents.forEach((notebookContent: INotebook) => {
+                    // check if has visa + prevent duplicate data
+                    if (notebookContent.visas.id !== null && (!visas.some((visa: Visa) => visa.id === notebookContent.visas.id))) {
+                        let visa: Visa = new Visa($scope.structure);
+                        visas.push(visa);
+                    }
+                });
+            });
+            return visas;
+        };
+
+        $scope.closeVisaPdfDownloadBox = (): void => {
+            $scope.visas_pdfChoice = [];
+            $scope.visaPdfDownloadBox = null;
+        };
+
+        $scope.wantCreateVisa = (): void => {
+            $scope.visaCreateBox = true;
+        };
+
+        $scope.closeVisaCreateBox = (): void => {
+            $scope.visas_pdfChoice = [];
+            $scope.visaCreateBox = null;
+        };
+
+        $scope.getVisasInfo = (visaDate: string): string => {
+            if (visaDate) {
+                return lang.translate("sessions.admin.visa.sate.on") + DateUtils.formatDate(visaDate, FORMAT.displayDate);
+            } else {
+                return lang.translate("sessions.admin.Visa.sateKo");
+            }
+        };
+
+        $scope.printPdf = async (): Promise<void> => {
+            $scope.printPdf.loading = true;
+            let mainNotebooks: Array<INotebook> = getSelectedMainNotebooks();
+            let visas: Visas = createVisasData(mainNotebooks);
+            visas.getPDF(() => {
+                $scope.printPdf.loading = false;
+                $scope.allSessionsSelect = false;
+                $scope.selectOrUnselectAllSessions();
+            });
+        };
+
+        const createVisasData = (mainNotebooks: Array<INotebook>): Visas => {
+            let visas: Visas = new Visas($scope.structure);
+            mainNotebooks.forEach((mainNotebook: INotebook) => {
+                if (mainNotebook) {
+                    let visa: Visa = new Visa($scope.structure);
+                    visa.mapFormData(mainNotebook.notebookSessionsContents, $scope.visaForm.comment);
                     visas.all.push(visa);
                 }
             });
             return visas;
         };
 
-
-        $scope.printPdf = async () => {
-            $scope.printPdf.loading = true;
-            let sessionsGroups = getSelectedSessions();
-            let visas = createVisasData(sessionsGroups);
-            visas.getPDF(() => {
-                $scope.printPdf.loading = false;
-                $scope.selectOrUnselectAllSessions(false);
-            });
-        };
-
-        $scope.openTimeSlotModal = async (timeSlot: Session | Homework) => {
-            $scope.openedTimeSlot = timeSlot;
-            $scope.showSession = true;
-        };
-
-        $scope.sessionsHomeworksByClass = (): Array<Session | Homework> => {
-            return $scope.timeSlotsByDate.filter(
-                (time) => {
-                    let canFilter: boolean = true;
-                    //Filter from class name if defined
-                    if (($scope.openedTimeSlot.audience && $scope.openedTimeSlot.audience.name)
-                        && (time.audience && time.audience.name)) {
-                        canFilter = canFilter && (time.audience.name === $scope.openedTimeSlot.audience.name);
-                    }
-                    //Filter from teacher id if defined
-                    if((time.teacher && time.teacher.id) &&
-                        ($scope.openedTimeSlot.teacher && $scope.openedTimeSlot.teacher.id)) {
-                        canFilter = canFilter && (time.teacher.id === $scope.openedTimeSlot.teacher.id);
-                    }
-
-                    //Filter from subject id if defined
-                    if ((time.subject && time.subject.id)
-                        && ($scope.openedTimeSlot.subject && $scope.openedTimeSlot.subject.id)) {
-                        canFilter = canFilter && (time.subject.id === $scope.openedTimeSlot.subject.id);
-                    }
-                    return canFilter;
-                });
-        };
-
-        $scope.getTimeSlotIndex = () => {
-            if ($scope.openedTimeSlot) return $scope.sessionsHomeworksByClass()
-                .indexOf(($scope.openedTimeSlot instanceof Homework ? 'h' : 's') + $scope.openedTimeSlot.id);
-        };
-
-        $scope.canNavigate = (goingRight: Boolean) => {
-            return $scope.openedTimeSlot
-                && $scope.sessionsHomeworksByClass()[$scope.sessionsHomeworksByClass().indexOf($scope.openedTimeSlot)
-                + (goingRight ? 1 : -1)];
-        };
-
-        $scope.timeSlotNavigate = (goingRight: Boolean) => {
-            if ($scope.canNavigate(goingRight)) {
-                const index = $scope.sessionsHomeworksByClass().indexOf($scope.openedTimeSlot) + (goingRight ? 1 : -1);
-                $scope.openedTimeSlot = $scope.sessionsHomeworksByClass()[index];
-            }
-        };
-
-        $scope.goToEditTimeslot = () => {
-            $scope.goTo(($scope.openedTimeSlot instanceof Homework ? '/homework' : '/session') + '/update/' + $scope.openedTimeSlot.id)
-        };
-
-
-        $scope.submitVisaForm = async () => {
+        $scope.submitVisaForm = async (): Promise<void> => {
             $scope.visaForm.loading = true;
-            $scope.safeApply();
+            let mainNotebooks: Array<INotebook> = $scope.openedNotebook.mainNotebookToVisa != null
+                ? [$scope.openedNotebook.mainNotebookToVisa] : getSelectedMainNotebooks();
+            $scope.visaForm.nbSessions = 0;
 
-            let sessionsGroups = getSelectedSessions();
-            updateNbSessions(sessionsGroups);
-            let visas = createVisasData(sessionsGroups);
+            mainNotebooks.forEach((notebooks: INotebook) => {
+                $scope.visaForm.nbSessions += notebooks.sessions;
+            });
+
+            let visas: Visas = createVisasData(mainNotebooks);
             let {succeed} = await visas.save();
 
             if (succeed) {
-                await $scope.filterList();
+                $scope.updateFilter();
                 $scope.selectOrUnselectAllSessions(false);
                 $scope.visaForm.comment = "";
                 $scope.closeVisaCreateBox();
+                // method to remove potential lightbox-opened
+                $scope.clearLightbox();
+                // related to method clearLightbox()
+                // using $timeout in order to remove potential multiple lightbox css + their z-index
+                $timeout((): void => $scope.closeShowSession());
                 $scope.safeApply();
             }
         };
 
-        $scope.isOwnSession = (): boolean => {
-            return $scope.openedTimeSlot && ($scope.openedTimeSlot.teacher.id === model.me.userId);
+        /* ----------------------------
+            Autocomplete search
+        ---------------------------- */
+
+        /* Search bar users section */
+        $scope.searchUser = async (userForm: string): Promise<void> => {
+            await $scope.usersSearch.searchUsers(userForm);
+            $scope.safeApply();
+        };
+
+        $scope.selectUser = (valueInput, userItem): void => {
+            $scope.usersSearch.selectUsers(valueInput, userItem);
+            $scope.usersSearch.user = "";
+            $scope.updateFilter();
+        };
+
+        $scope.removeSelectedUsers = (userItem): void => {
+            $scope.usersSearch.removeSelectedUsers(userItem);
+            $scope.updateFilter();
+        };
+
+        /* Search bar groups section */
+        $scope.searchGroup = async (groupForm: string): Promise<void> => {
+            await $scope.groupsSearch.searchGroups(groupForm);
+            $scope.safeApply();
+        };
+
+        $scope.selectGroup = (valueInput, groupForm): void => {
+            $scope.groupsSearch.selectGroups(valueInput, groupForm);
+            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
+            $scope.groupsSearch.group = "";
+            $scope.updateFilter();
+        };
+
+        $scope.removeSelectedGroups = (groupForm): void => {
+            $scope.groupsSearch.removeSelectedGroups(groupForm);
+            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
+            $scope.updateFilter();
         };
 
         $scope.init();
+
+        $scope.back = () => {
+            window.history.back();
+        };
+
+        /* events handler */
+        $scope.$watch(() => $scope.filters.startDate, async () => $scope.updateFilter());
+        $scope.$watch(() => $scope.filters.endDate, async () => $scope.updateFilter());
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
             $scope.init();

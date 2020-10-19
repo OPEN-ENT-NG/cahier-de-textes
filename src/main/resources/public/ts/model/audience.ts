@@ -1,6 +1,13 @@
 import { Mix } from 'entcore-toolkit';
 import http from 'axios';
 
+export interface IAudience {
+    id?: string;
+    externalId?: string;
+    name?: string;
+    labels?: Array<string>;
+}
+
 export class Audience {
     name: string;
     groupName?: string;

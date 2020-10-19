@@ -16,6 +16,7 @@ public final class DateUtils {
     public final static String FRENCH_DATE_FORMAT ="dd-MM-yyyy";
     public final static String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
     public final static String DATE_FORMAT_SQL = "yyyy-MM-dd HH:mm:ss";
+    public final static String DAY_MONTH_YEAR_HOUR_TIME = "dd/MM/yyyy HH:mm:ss";
 
 
     private DateUtils()  {}

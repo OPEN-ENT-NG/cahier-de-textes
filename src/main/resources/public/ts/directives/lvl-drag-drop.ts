@@ -1,6 +1,5 @@
 import {angular, model, ng} from 'entcore';
-import {CALENDAR_TOOLTIP_EVENTER} from "../utils/const/calendar-tooltip-eventer";
-
+import {CALENDAR_TOOLTIP_EVENTER} from "../core/const/calendar-tooltip-eventer";
 
 export const lvlDraggable = ng.directive('lvlDraggable', ['$rootScope', 'uuidDrag', function ($rootScope, uuid) {
     if(model.me.type ===  "ENSEIGNANT"){

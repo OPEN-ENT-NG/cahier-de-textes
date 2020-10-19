@@ -1,5 +1,5 @@
 import {angular, idiom as lang, moment} from 'entcore';
-import {FORMAT} from './const/dateFormat';
+import {FORMAT} from '../core/const/dateFormat';
 import http from "axios";
 import {Homework} from "../model";
 

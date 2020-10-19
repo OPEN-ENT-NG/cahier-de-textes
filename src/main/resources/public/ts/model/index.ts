@@ -12,10 +12,11 @@ export * from './visa';
 export * from './Toast';
 export * from './User';
 export * from './SessionHomework';
+export * from './Viescolaire';
 
 export * from '../utils/dateUtils';
 export * from '../utils/toastUtils';
-export * from '../utils/const/user-types';
-export * from '../utils/const/daysOfWeek';
-export * from '../utils/const/comboLabels';
-export * from '../utils/const/pedagogicTypes';
+export * from '../core/const/user-types';
+export * from '../core/const/daysOfWeek';
+export * from '../core/const/comboLabels';
+export * from '../core/const/pedagogicTypes';

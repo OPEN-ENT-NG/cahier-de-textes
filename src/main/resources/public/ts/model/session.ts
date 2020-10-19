@@ -2,8 +2,8 @@ import {_, moment, notify} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, DateUtils, ToastUtils} from './index';
-import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
-import {FORMAT} from '../utils/const/dateFormat';
+import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
+import {FORMAT} from '../core/const/dateFormat';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
 import {ProgressionSession} from "./Progression";
@@ -453,6 +453,14 @@ export class Sessions {
     }
 
 
+}
+
+export interface ISessionType {
+    id?: number;
+    structure_id?: string;
+    label?: string;
+    rank?: number;
+    type?: string;
 }
 
 export class SessionType {

@@ -3,7 +3,7 @@ import {DateUtils} from '../../utils/dateUtils';
 import {
     Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
 } from '../../model';
-import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from "../../enum/events";
+import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from "../../core/enum/events";
 import {IAngularEvent} from "angular";
 
 declare let window: any;

@@ -1,16 +1,14 @@
 import {angular, idiom as lang, moment} from 'entcore';
-import {FORMAT} from './const/dateFormat';
+import {FORMAT} from '../core/const/dateFormat';
 import http from "axios";
 import {Homework} from "../model";
 
 export class DateUtils {
 
-    static htmlToXhtml(html) {
-        var doc = new DOMParser().parseFromString(html, 'text/html');
-        var xhtml = new XMLSerializer().serializeToString(doc);
-        return xhtml;
-    }
-
+    /**
+     * ⚠ Date Utils
+     *
+     */
     static getFormattedDate(date) {
         return moment(date).format(FORMAT.formattedDate);
     }
@@ -43,16 +41,19 @@ export class DateUtils {
         return moment(date).format(FORMAT.displayDateTime);
     }
 
-    static getFormattedTimeSlotDate(timeSlot) {
-        if (timeSlot instanceof Homework) {
-            return lang.translate('homework.for.date') + ' ' + DateUtils.formatDate(timeSlot.dueDate, 'DD/MM/YYYY');
-        }
-        return DateUtils.formatDate(timeSlot.startMoment, 'DD/MM/YYYY') + ' '
-            + lang.translate('from2') + ' '
-            + DateUtils.formatDate(timeSlot.startMoment, 'HH:mm') + ' '
-            + lang.translate('to2') + ' '
-            + DateUtils.formatDate(timeSlot.endMoment, 'HH:mm');
-    };
+    /**
+     * ⚠ This method format your TIME but your DATE will have your date.now() ⚠
+     * @param time  time value as a string (e.g) "09:00"
+     */
+    static getTimeFormat(time: string): string {
+       return moment().set('HOUR', time.split(":")[0]).set('MINUTE', time.split(":")[1]).format(FORMAT.displayTime);
+    }
+
+    static htmlToXhtml(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var xhtml = new XMLSerializer().serializeToString(doc);
+        return xhtml;
+    }
 
     static safeApply(that) {
         return new Promise((resolve, reject) => {
@@ -118,10 +119,5 @@ export class DateUtils {
         }
 
         return decodeURI(filename);
-    }
-
-    static async getSchoolYearDates(structureId) {
-        let {data} = await http.get(`viescolaire/settings/periode/schoolyear?structureId=` + structureId);
-        return data;
     }
 }

@@ -3,9 +3,9 @@ import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Structure, Teacher, DateUtils, ToastUtils, Visas} from './index';
 import {Subject} from './subject';
-import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
+import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {Session} from './session';
-import {USER_TYPES} from '../utils/const/user-types';
+import {USER_TYPES} from '../core/const/user-types';
 
 export class Homework {
     id: string;
@@ -280,6 +280,14 @@ export class Homeworks {
             i.init();
         });
     }
+}
+
+export interface IHomeworkType {
+    id?: number;
+    structure_id?: string;
+    label?: string;
+    rank?: number;
+    type?: string;
 }
 
 export class HomeworkType {

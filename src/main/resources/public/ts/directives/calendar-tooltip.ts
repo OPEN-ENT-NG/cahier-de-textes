@@ -1,5 +1,5 @@
 import {ng} from 'entcore';
-import {CALENDAR_TOOLTIP_EVENTER} from "../utils/const/calendar-tooltip-eventer";
+import {CALENDAR_TOOLTIP_EVENTER} from "../core/const/calendar-tooltip-eventer";
 import {IAngularEvent} from "angular";
 
 interface IViewModel {

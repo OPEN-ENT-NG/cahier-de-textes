@@ -4,10 +4,10 @@ import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
 import {StructureService, StructureSlot} from "../../services";
-import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
-import {PEDAGOGIC_SLOT_PROFILE} from "../../enum/pedagogic-slot-profile";
 import {Groups} from "../../model/group";
-import {CALENDAR_TOOLTIP_EVENTER} from "../../utils/const/calendar-tooltip-eventer";
+import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
+import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
+import {CALENDAR_TOOLTIP_EVENTER} from "../../core/const/calendar-tooltip-eventer";
 
 declare let window: any;
 

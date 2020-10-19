@@ -24,25 +24,27 @@
             <div class="flex-col col__6">
                 <div class="search-input">
                     <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="autocomplete.teacher"
-                                        data-ng-change="selectTeacher"
-                                        data-options="autocomplete.teacherOptions"
-                                        on-search="filterTeacherOptions"
+                                        data-ng-model="usersSearch.user"
+                                        data-ng-change="selectUser"
+                                        data-on-search="searchUser"
+                                        data-options="usersSearch.users"
                                         data-placeholder="diary.search.teacher"
-                                        search="autocomplete.teacher">
+                                        data-search="usersSearch.user">
                     </async-autocomplete>
                 </div>
             </div>
             <div class="flex-col col__1"></div>
+
+            <!-- audience search bar -->
             <div class="flex-col col__6">
                 <div class="search-input">
                     <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="autocomplete.class"
-                                        data-ng-change="selectClass"
-                                        data-options="autocomplete.classOptions"
-                                        on-search="filterClassOptions"
+                                        data-ng-model="groupsSearch.group"
+                                        data-ng-change="selectGroup"
+                                        data-on-search="searchGroup"
+                                        data-options="groupsSearch.groups"
                                         data-placeholder="diary.search.group"
-                                        search="autocomplete.class">
+                                        data-search="groupsSearch.group">
                     </async-autocomplete>
                 </div>
             </div>
@@ -55,11 +57,10 @@
         <div class="flex-col col__9 list-search">
             <div class="flex-col col__6 list-search">
                 <!-- Teacher selected via filter -->
-                <div class="cell twelve">
+                <div class="cell twelve administrator-page-list">
                     <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="teacher in autocomplete.teachersSelected track by teacher.id" class="twelve">
-                            [[teacher.displayName]] <i class="close"
-                                                       data-ng-click="removeTeacher(teacher)"></i>
+                        <li ng-repeat="user in usersSearch.selectedUsers track by user.id" class="administrator-page-list-item">
+                            [[user.displayName]] <i class="close" data-ng-click="removeSelectedUsers(teacher)"></i>
                         </li>
                     </ul>
                 </div>
@@ -67,11 +68,10 @@
             <div class="flex-col col__1 list-search"></div>
             <div class="flex-col col__6 list-search">
                 <!-- Class selected via filter -->
-                <div class="cell twelve">
+                <div class="cell twelve administrator-page-list">
                     <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="class in autocomplete.classesSelected track by class.id" class="twelve">
-                            [[class.displayName]] <i class="close"
-                                                     data-ng-click="removeClass(class)"></i>
+                        <li ng-repeat="group in groupsSearch.selectedGroups" class="administrator-page-list-item">
+                            [[group.toString()]] <i class="close" data-ng-click="removeSelectedGroups(class)"></i>
                         </li>
                     </ul>
                 </div>
@@ -83,8 +83,13 @@
     <div workflow="diary.adminAccess">
         <!-- HEADER CONTENT -->
         <div static-include="/diary/public/template/administrator/admin-sidebar.html"></div>
+
+        <!-- Loader calendrier -->
+        <loader data-ng-show="isLoading" min-height="'250px'"/>
+
         <!-- TABLE CONTENT -->
         <div class="visa-diary"
+             data-ng-show="!isLoading"
              static-include="/diary/public/template/administrator/diary-lister.html">
         </div>
 
@@ -106,10 +111,11 @@
                         <i18n>visa.manage.diaryToPrintPDF</i18n>
                     </button>
 
-                    <!-- download pdf file ? -->
+                    <!-- consult visas file -->
                     <button workflow="diary.manageVisa"
-                            ng-show="sessionsSelected().length === 1 && getVisas(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]]).length > 0"
-                            ng-click="wantDownloadPdf(sessions_GroupBy_AudienceSubject[sessionsSelected()[0]])">
+                            ng-show="getSelectedNotebooks().length !== 0 && getSelectedNotebooks().length === 1
+                            && getVisasFromSelectedNotebooks().length !== 0"
+                            ng-click="consultVisasFromNotebook()">
                         <i18n>sessions.admin.icon.dwlPdf</i18n>
                     </button>
 

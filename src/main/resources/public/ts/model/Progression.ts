@@ -2,7 +2,7 @@
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
 import {Subject, ToastUtils} from './index';
-import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
+import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {HomeworkType} from './homework';
 import {SessionType} from "./session";
 

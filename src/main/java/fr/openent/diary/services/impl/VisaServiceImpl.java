@@ -21,16 +21,33 @@ import org.entcore.common.user.UserInfos;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class VisaServiceImpl implements VisaService {
 
     private static final Logger log = LoggerFactory.getLogger(VisaServiceImpl.class);
-    private ExportPDFService exportPDFService;
+    private final ExportPDFService exportPDFService;
     private int indexAsync = 0;
 
     public VisaServiceImpl(Storage storage, EventBus eb, Vertx vertx, JsonObject config) {
         this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
+    }
 
+    @Override
+    public void getVisasFromSessionsAndHomework(String structure_id, List<String> sessionsIds, List<String> homeworkIds,
+                                                Handler<Either<String, JsonArray>> handler) {
+        String query = "WITH visa_ids AS (SELECT visa_id FROM diary.session_visa WHERE " +
+                " session_id IN " + (!sessionsIds.isEmpty() ? Sql.listPrepared(sessionsIds) : "(null) ") +
+                " UNION SELECT visa_id FROM diary.homework_visa WHERE " +
+                " homework_id IN " + (!homeworkIds.isEmpty() ? Sql.listPrepared(homeworkIds) : "(null) ") +
+                " ) SELECT * FROM diary.visa WHERE structure_id = ? AND id IN (SELECT visa_id FROM visa_ids) ORDER BY created DESC";
+
+        JsonArray params = new JsonArray()
+                .addAll(new JsonArray(sessionsIds))
+                .addAll(new JsonArray(homeworkIds))
+                .add(structure_id);
+
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
     }
 
     @Override

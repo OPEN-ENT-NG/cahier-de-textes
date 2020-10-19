@@ -2,7 +2,7 @@ import {Me, ng} from 'entcore';
 import {Structure} from "../model";
 import {structureService} from "../services";
 import {PreferencesUtils} from "../utils/preference/preferences";
-import {UPDATE_STRUCTURE_EVENTS} from "../enum/events";
+import {UPDATE_STRUCTURE_EVENTS} from "../core/enum/events";
 
 declare let window: any;
 

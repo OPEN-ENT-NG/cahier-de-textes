@@ -31,7 +31,7 @@ export const structureService: StructureService = {
         return http.get(`/diary/init/structures/${structure_id}`);
     },
 
-    getSlotProfile: async (structureId: string) => {
+    getSlotProfile: async (structureId: string): Promise<StructureSlot> => {
         try {
             const {data} = await http.get(`/viescolaire/structures/${structureId}/time-slot`);
             return data;

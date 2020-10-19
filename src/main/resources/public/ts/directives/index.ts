@@ -8,4 +8,5 @@ export * from './loader';
 export * from './editor-resize';
 export * from './select-structure';
 export * from './filter-subject';
+export * from './pagination';
 export * from './calendar-tooltip';

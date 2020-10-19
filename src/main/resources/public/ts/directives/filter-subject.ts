@@ -1,6 +1,6 @@
 import {idiom as lang, ng} from 'entcore';
 import {Subject} from "../model";
-import {UPDATE_SUBJECT_EVENTS} from "../enum/events";
+import {UPDATE_SUBJECT_EVENTS} from "../core/enum/events";
 
 interface IViewModel {
     subject: Subject;

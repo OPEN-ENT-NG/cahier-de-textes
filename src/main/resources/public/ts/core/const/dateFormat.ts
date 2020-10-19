@@ -5,4 +5,5 @@ export const FORMAT = {
     displayDate: 'DD/MM/YYYY',
     displayTime: 'HH:mm',
     displayDateTime: 'DD/MM/YYYY HH:mm',
+    'YEAR/MONTH/DAY': 'YYYY/MM/DD'
 };

@@ -1,5 +1,5 @@
 import {Me, model, ng} from 'entcore';
-import {UPDATE_STRUCTURE_EVENTS} from "../../enum/events";
+import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
 import {PreferencesUtils} from "../../utils/preference/preferences";
 
 declare let window: any;

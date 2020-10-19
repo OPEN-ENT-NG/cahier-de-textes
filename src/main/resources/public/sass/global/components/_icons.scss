@@ -59,6 +59,10 @@ i {
     content: "\e87b";
   }
 
+  &.arrow-up::before {
+    content: "\e840";
+  }
+
   &.arrow-down::before {
     content: "\e841";
   }

@@ -1,9 +1,9 @@
 import {model, moment} from 'entcore';
 import http, {AxiosResponse} from 'axios';
 import {Mix} from 'entcore-toolkit';
-import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
-import {PEDAGOGIC_TYPES} from '../utils/const/pedagogicTypes';
 import {Group, Groups} from "./group";
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils, Student} from './index';
+import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 

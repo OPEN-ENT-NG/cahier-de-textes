@@ -15,6 +15,8 @@ public class Diary extends BaseServer {
     public final static String VIESCO_SCHEMA = "viesco";
     public final static String SEARCH = "diary.search";
 
+    public static int PAGE_SIZE = 20;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -29,6 +31,10 @@ public class Diary extends BaseServer {
         final VisaServiceImpl visaService = new VisaServiceImpl(storage, eb, vertx, config);
 
         addController(new DiaryController(diaryService));
+
+        /* diary controller named as Notebook */
+        addController(new NotebookController(eb));
+
         addController(new InitController(new DefautlInitService("diary",eb)));
         addController(new VisaController(visaService, storage));
         addController(new SessionController(new SessionServiceImpl()));

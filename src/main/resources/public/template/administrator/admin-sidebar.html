@@ -1,15 +1,16 @@
 <!-- Access External Data -->
 <div class="display-inline-block margin-top-md">
+    <!-- Date filter -->
     <div class="flex-row-cdt" style="align-items: center;">
         <div class="flex-col">
             <i18n>from</i18n>
             &#58;&nbsp;
         </div>
+        <!-- start date -->
         <div class="flex-col flex-col margin-right-md card diary-date-picker">
             <i class="text-xl margin-sm icon diary-calendar svg-green"></i>
             <date-picker
                     ng-model="filters.startDate"
-                    ng-change="filterList();"
                     class="date-picker-sm remove-margin">
             </date-picker>
         </div>
@@ -17,16 +18,18 @@
             <i18n>to</i18n>
             &#58;&nbsp;
         </div>
+        <!-- end date -->
         <div class="flex-col flex-col margin-right-md card diary-date-picker">
             <i class="text-xl margin-sm icon diary-calendar svg-green"></i>
             <date-picker
                     ng-model="filters.endDate"
-                    ng-change="filterList();"
                     class="date-picker-sm remove-margin">
             </date-picker>
         </div>
     </div>
-    <div class="flex-row-cdt" ng-click="filterList()">
+
+    <!-- filter area -->
+    <div class="flex-row-cdt margin-bottom-md">
         <div class="flex-col margin-right-md">
             <div class="button-checkbox" ng-class="vised ? 'active' : 'unactive'" ng-click="toggleVised()">
                 <i18n>sessions.admin.Visa.sateOk</i18n>
@@ -43,8 +46,7 @@
             </div>
         </div>
         <div class="flex-col margin-right-md">
-            <div class="button-checkbox" ng-class="notPublished ? 'active' : 'unactive'"
-                 ng-click="toggleNotPublished()">
+            <div class="button-checkbox" ng-class="notPublished ? 'active' : 'unactive'" ng-click="toggleNotPublished()">
                 <i18n>notpublished.p</i18n>
             </div>
         </div>
