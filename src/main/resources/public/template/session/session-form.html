@@ -11,7 +11,7 @@
             </select>
             <select required ng-model="session.subject"
                     ng-change="disableFieldSetSubjectAndAudienceSession(session.audience,session.subject)"
-                    ng-disabled="session.courseId && session.subject"
+                    ng-disabled="session.courseId && session.subject.id"
                     ng-options=
                             "subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'"
             >

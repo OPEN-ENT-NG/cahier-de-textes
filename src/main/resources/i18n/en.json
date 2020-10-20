@@ -186,6 +186,7 @@
   "session.unpublished.error": "Error while unpublishing session",
   "session.updated": "Session modified",
   "session.updated.error": "Error while editing session",
+  "session.exceptional.subject": "Exceptional subject",
   "sessions": "Sessions",
   "sessions.admin.Visa.sateKo": "Not tagged",
   "sessions.admin.Visa.sateOk": "Tagged",

@@ -187,6 +187,7 @@
   "session.unpublished.error": "Erreur lors de la dépublication de la séance",
   "session.updated": "Séance modifiée",
   "session.updated.error": "Erreur lors de la modification de la séance",
+  "session.exceptional.subject": "Matière personnalisée",
   "sessions": "Séances",
   "sessions.admin.Visa.sateKo": "Non Visés",
   "sessions.admin.Visa.sateOk": "Visés",

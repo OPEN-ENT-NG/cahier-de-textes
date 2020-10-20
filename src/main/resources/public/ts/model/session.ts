@@ -4,6 +4,7 @@ import {Mix} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, DateUtils, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {FORMAT} from '../core/const/dateFormat';
+import {EXCEPTIONAL} from '../core/const/exceptional-subject';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
 import {ProgressionSession} from "./Progression";
@@ -179,8 +180,13 @@ export class Session {
         this.courseId = course._id;
         this.teacher = course.teachers[0];
         this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : "";
-        if (!this.subject)
+        if (!this.subject) {
             this.subject = course.subject;
+        }
+        if (course.exceptionnal) {
+            this.subject.id = EXCEPTIONAL.subjectId;
+            this.subject.label = EXCEPTIONAL.subjectCode;
+        }
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
@@ -440,7 +446,7 @@ export class Sessions {
         });
     }
 
-     syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void>  => {
+    syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void>  => {
         let {data} = await http.get(url);
         homeworks.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data.filter(h => h.is_homework), this.structure));
         homeworks.all.forEach(i => {
