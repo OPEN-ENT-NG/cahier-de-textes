@@ -3,6 +3,7 @@ package fr.openent.diary.models;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Audience implements Cloneable {
@@ -17,7 +18,7 @@ public class Audience implements Cloneable {
         this.id = audience.getString("id", "");
         this.externalId = audience.getString("externalId", "");
         this.name = audience.getString("name", "");
-        this.labels = audience.getJsonArray("labels", new JsonArray()).getList();
+        this.labels = audience.getJsonArray("labels") != null ? audience.getJsonArray("labels", new JsonArray()).getList() : new ArrayList<>();
     }
 
     public Audience(String audienceId) {

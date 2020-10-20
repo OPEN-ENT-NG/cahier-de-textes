@@ -36,6 +36,10 @@ buildGradle () {
   docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle shadowJar install publishToMavenLocal
 }
 
+test () {
+  docker-compose run --rm -u "$USER_UID:$GROUP_GID" gradle gradle test
+}
+
 publish () {
   if [ -e "?/.gradle" ] && [ ! -e "?/.gradle/gradle.properties" ]
   then
@@ -64,6 +68,9 @@ do
       ;;
     publish)
       publish
+      ;;
+    test)
+      test
       ;;
     *)
       echo "Invalid argument : $param"
