@@ -1,5 +1,5 @@
 import { Mix } from 'entcore-toolkit';
-import http from 'axios';
+import http, {AxiosResponse} from 'axios';
 
 export interface IAudience {
     id?: string;
@@ -42,11 +42,11 @@ export class Audiences {
      * @param structureId structure id
      * @returns {Promise<void>}
      */
-    async sync(structureId: string) {
+    async sync(structureId: string): Promise<void> {
         try {
-            let audiences = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true');
+            let audiences: AxiosResponse = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true&isTeacherEdt=true');
             this.all = Mix.castArrayAs(Audience, audiences.data);
-            this.all.sort((g, gg) => {
+            this.all.sort((g: Audience, gg: Audience) => {
                 if (g.type_group < gg.type_group)
                     return -1;
                 else if (g.type_group > gg.type_group)
@@ -57,7 +57,6 @@ export class Audiences {
                     else {
                         return 1;
                     }
-
             });
         } catch (e) {
             throw e;
