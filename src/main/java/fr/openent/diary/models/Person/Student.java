@@ -12,7 +12,7 @@ public class Student extends Person {
         this.id = student.getString("id", null);
         this.displayName = student.getString("displayName", null);
         this.classId = student.getString("classId", null);
-        this.className = student.getString("classeName", null);
+        this.className = student.getString("className", null);
         this.firstName = student.getString("firstName", null);
         this.lastName = student.getString("lastName", null);
     }
