@@ -3,6 +3,10 @@
   "version": "2.2.0",
   "description": "Diary tool for ENT Core.",
   "main": "gulpfile.js",
+  "scripts": {
+    "coverage": "./node_modules/.bin/jest --config jest.config.js --coverage",
+    "test": "npm run coverage"
+  },
   "dependencies": {
     "entcore": "3.9.0-dev.44-calendar",
     "awesome-typescript-loader": "3.2.1",
@@ -31,7 +35,12 @@
     "@types/jquery": "^2.0.34",
     "@types/jest": "^22.2.0",
     "@types/core-js": "0.9.42",
-    "@types/angular": "^1.6.55"
+    "@types/angular": "^1.6.55",
+    "jest": "^24.7.1",
+    "jest-environment-node": "^23.0.0",
+    "moment": "^2.21.0",
+    "ts-jest": "^22.4.2",
+    "underscore": "^1.8.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
