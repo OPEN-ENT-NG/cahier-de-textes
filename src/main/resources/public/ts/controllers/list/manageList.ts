@@ -32,7 +32,7 @@ export let manageListCtrl = ng.controller('manageListController',
 
         $scope.filters = {
             startDate: (window.item && ('filters' in window.item)) ? window.item.filters.startDate : moment().toDate(),
-            endDate: (window.item && ('filters' in window.item)) ? window.item.filters.endDate : moment().add('2', 'weeks').toDate(),
+            endDate: (window.item && ('filters' in window.item)) ? window.item.filters.endDate : moment().add(28, 'day').toDate(),
             subject: (window.item && ('filters' in window.item)) ? window.item.filters.subject : null
         };
 

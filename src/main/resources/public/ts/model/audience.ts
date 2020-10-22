@@ -40,11 +40,14 @@ export class Audiences {
     /**
      * Synchronize groups belongs to the parameter structure
      * @param structureId structure id
+     * @param canFetchAllClasses boolean
      * @returns {Promise<void>}
      */
-    async sync(structureId: string): Promise<void> {
+    async sync(structureId: string, canFetchAllClasses: boolean): Promise<void> {
         try {
-            let audiences: AxiosResponse = await http.get('/viescolaire/classes?idEtablissement=' + structureId + '&isEdt=true&isTeacherEdt=true');
+            let structureParam: string = `?idEtablissement=${structureId}`;
+            let optionalEdtParams: string = `&isEdt=true${canFetchAllClasses ? '&isTeacherEdt=true' : ''}`;
+            let audiences: AxiosResponse = await http.get(`/viescolaire/classes${structureParam}${optionalEdtParams}`);
             this.all = Mix.castArrayAs(Audience, audiences.data);
             this.all.sort((g: Audience, gg: Audience) => {
                 if (g.type_group < gg.type_group)

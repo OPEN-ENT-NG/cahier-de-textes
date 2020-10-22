@@ -55,10 +55,10 @@ export class Structure {
         const promises: Promise<void>[] = [];
         promises.push(this.subjects.sync(this.id));
         promises.push(this.types.sync());
-        promises.push(this.audiences.sync(this.id));
+        promises.push(this.audiences.sync(this.id, !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)));
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
-        await Promise.all(promises).then(async (values) => {
+        await Promise.all(promises).then(async () => {
             const promises: Promise<void>[] = [];
             window.audiences = this.audiences;
             if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
