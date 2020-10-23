@@ -82,7 +82,7 @@ do
       publish
       ;;
     test)
-      testAngular && testJava
+      testAngular ; testJava
       ;;
     testAngular)
     testAngular
