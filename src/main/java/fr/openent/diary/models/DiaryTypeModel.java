@@ -13,6 +13,7 @@ public class DiaryTypeModel implements Cloneable {
         super();
         this.id = typeId;
     }
+
     public DiaryTypeModel(JsonObject diaryType) {
         super();
         this.id = diaryType.getLong("id", null);
