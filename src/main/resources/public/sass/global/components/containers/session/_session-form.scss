@@ -1,0 +1,33 @@
+.session-form {
+
+  &-card {
+    margin: 10px;
+    padding: 6px;
+    font-size: 19px;
+    border-radius: 5px;
+  }
+
+  &-header {
+    display: flex;
+
+    &-search {
+      display: flex;
+      flex: auto;
+      margin-right: 50px;
+
+      .async-autocomplete {
+        flex: 60%;
+      }
+
+      .search-input-ul {
+        flex: auto;
+        margin-left: 10px;
+      }
+    }
+
+    &-select {
+      flex: auto;
+    }
+  }
+
+}
