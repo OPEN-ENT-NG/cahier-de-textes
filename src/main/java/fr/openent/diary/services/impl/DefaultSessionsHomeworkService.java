@@ -103,6 +103,7 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
         // need info (session_id...audience_id...etc...)
         return homeworkSession.getJsonObject("homework")
                 .put("session_id", homeworkSession.getLong("id"))
+                .put("from_session_id",  homeworkSession.getJsonObject("homework").getLong("from_session_id"))
                 .put("due_date",    homeworkSession.getString("due_date"))
                 .put("audience_id", homeworkSession.getString("audience_id", null))
                 .put("subject_id", homeworkSession.getString("subject_id", null));

@@ -279,9 +279,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
-                "color, description, is_published, session_id, due_date, type_id, owner_id " +
+                "color, description, is_published, from_session_id, session_id, due_date, type_id, owner_id " +
                 ", created, modified" + ((homework.getBoolean("is_published") == true)? " , publish_date) " : ")" )+
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), ?, ?, NOW()," +
                 " NOW()"+((homework.getBoolean("is_published") == true)? " , NOW()) " : ")" )+" RETURNING id";
 
@@ -296,6 +296,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
             values.add(homework.getBoolean("is_published"));
         } else {
             values.add(false);
+        }
+
+        if (homework.getInteger("from_session_id") != null) {
+            values.add(homework.getInteger("from_session_id"));
+        } else {
+            values.addNull();
         }
 
         if (homework.getInteger("session_id") != null) {

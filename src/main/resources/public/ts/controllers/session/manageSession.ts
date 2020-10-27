@@ -13,6 +13,7 @@ import {SearchService, SubjectService} from '../../services';
 import {Moment} from 'moment';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from '../../utils/autocomplete/groupsSearch';
+import {AxiosResponse} from 'axios';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter',
@@ -33,6 +34,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 homework: null
             };
             $scope.homeworks = [];
+            $scope.from_homeworks = [];
 
             $scope.session.teacher = {id: model.me.userId};
 
@@ -132,6 +134,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
 
+            /**
+             * Save the session with its attached homeworks.
+             * Also update future sessions linked to defined homeworks.
+             */
             $scope.saveSession = async (): Promise<void> => {
                 if (!$scope.isValidForm) {
                     $scope.notifications.push(new Toast('utils.unvalidForm', 'error'));
@@ -151,27 +157,35 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         return;
                     }
 
-                    $scope.homeworks.forEach(h => h.sessions.forEach(s => {
-                        if ($scope.isSameSession(s, $scope.session)) {
-                            s.id = $scope.session.id;
-                        }
+                    $scope.homeworks.forEach((h: Homework) => {
 
-                        if (!s.type_id) {
-                            s.type_id = $scope.session.type_id ? $scope.session.type_id : $scope.session.type.id;
-                        }
-                    }));
+                        h.from_session_id = $scope.session.id;
+
+                        h.sessions.forEach((s: Session) => {
+
+                            if ($scope.isSameSession(s, $scope.session)) {
+                                s.id = $scope.session.id;
+                            }
+
+                            if (!s.type_id) {
+                                s.type_id = $scope.session.type_id ? $scope.session.type_id : $scope.session.type.id;
+                            }
+                        });
+                    });
 
                     await saveSessionHomeworks();
                 }
                 $scope.safeApply();
             };
 
-            const createSessionsHomework = async () => {
-                // using $scope.homeworks
+            /**
+             * Create defined homeworks.
+             */
+            const createSessionsHomework = async (): Promise<boolean> => {
                 let sessionsHomework: ISessionHomeworkBody = {homeworks: $scope.homeworks.filter(h => !h.id)};
                 if (sessionsHomework.homeworks.length) {
-                    let response = await sessionHomeworkService.create(sessionsHomework);
-                    if (response.status == 200 || response.status == 201) {
+                    let response: AxiosResponse = await sessionHomeworkService.create(sessionsHomework);
+                    if (response.status === 200 || response.status === 201) {
                         return true;
                     } else {
                         toasts.warning(response.data.toString());
@@ -181,12 +195,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 return true;
             };
 
-            const updateSessionsHomework = async () => {
-                // using $scope.homeworks
+
+            /**
+             * Update session homeworks.
+             */
+            const updateSessionsHomework = async (): Promise<boolean> => {
                 let sessionsHomework: ISessionHomeworkBody = {homeworks: $scope.homeworks.filter(h => h.id)};
                 if (sessionsHomework.homeworks.length) {
-                    let response = await sessionHomeworkService.update(sessionsHomework);
-                    if (response.status == 200 || response.status == 201) {
+                    let response: AxiosResponse = await sessionHomeworkService.update(sessionsHomework);
+                    if (response.status === 200 || response.status === 201) {
                         return true;
                     } else {
                         toasts.warning(response.data.toString());
@@ -206,22 +223,35 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         $scope.back();
                     }
                 });
-            }
+            };
 
             // region Gestion des homework
-            $scope.areValidHomeworks = () => {
-                let back = true;
-                if (!$scope.homeworks || $scope.homeworks.length == 0)
+            $scope.areValidHomeworks = (): boolean => {
+                let back: boolean = true;
+                if (!$scope.homeworks || $scope.homeworks.length === 0) {
                     return back;
+                }
                 $scope.session.homeworks.forEach((item) => {
-                    if (!item.isDeleted)
+                    if (!item.isDeleted) {
                         return back && item.isValidForm();
+                    }
                 });
                 return back;
             };
 
-            $scope.deleteHomework = async (homework: Homework, i) => {
-                $scope.localRemoveHomework(i);
+
+            /**
+             * Delete homework from view and from back.
+             * @param homework homework to delete
+             * @param index index of the homework in the view table.
+             */
+            $scope.deleteHomework = async (homework: Homework, index: number): Promise<void> => {
+                if ($scope.session.id === homework.session_id) {
+                    $scope.localRemoveHomework(index);
+                }
+                else {
+                    $scope.localRemoveFromHomework(index);
+                }
                 if (homework.id) {
                     $scope.toastHttpCall(await homework.delete());
                 }
@@ -235,11 +265,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             };
 
 
-            $scope.closeHomework = () => {
+            /**
+             * Save and close the homework form.
+             */
+            $scope.closeHomework = (): void => {
                 $scope.validate = false;
                 $scope.hidePencil = false;
                 $scope.formIsOpened = false;
-                let homework = $.extend(true, Object.create(Object.getPrototypeOf($scope.form.homework)), $scope.form.homework);
+                let homework: Homework = $.extend(true, Object.create(Object.getPrototypeOf($scope.form.homework)), $scope.form.homework);
                 homework.alreadyValidate = true;
                 homework.formatDateToDisplay();
                 if (!homework.idTemp && (!homework.id && !homework.progression_homework_id && !homework.editedId)) {
@@ -249,7 +282,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                     $scope.homeworks.push(homework);
                 } else {
-                    let index = $scope.homeworks.findIndex(h => {
+                    let index: number = $scope.homeworks.findIndex(h => {
                         if (homework.idTemp) {
                             return h.idTemp === homework.idTemp;
                         } else if (h.progression_homework_id) {
@@ -260,7 +293,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                             return h.id === homework.id;
                         }
                     });
-                    $scope.homeworks.splice(index, 1, homework);
+
+                    if ($scope.session.id === homework.session_id) {
+                        $scope.homeworks.splice(index, 1, homework);
+                    } else {
+                        $scope.from_homeworks.splice(index, 1, homework);
+                    }
+
                 }
                 $scope.closeFormHomework();
                 $scope.safeApply();
@@ -440,8 +479,21 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     + ' - ' + session.endDisplayTime;
             };
 
-            $scope.localRemoveHomework = (i) => {
-                $scope.homeworks.splice(i, 1);
+            /**
+             * Remove the selected homework (attached to current session) from the view.
+             * @param index index of the homework in the displayed table.
+             */
+            $scope.localRemoveHomework = (index: number): void => {
+                $scope.homeworks.splice(index, 1);
+                $scope.safeApply();
+            };
+
+            /**
+             * Remove the selected homework (created from session) from the view.
+             * @param index index of the homework in the displayed table.
+             */
+            $scope.localRemoveFromHomework = (index: number): void => {
+                $scope.from_homeworks.splice(index, 1);
                 $scope.safeApply();
             };
 
@@ -517,7 +569,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             /* -------------------------- */
 
-            async function initData() {
+            /**
+             * Initialize form data.
+             */
+            async function initData(): Promise<void> {
                 await Promise.all([
                     $scope.sessionTypes.sync(),
                     $scope.homeworkTypes.sync()]);
@@ -533,14 +588,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         let course = new Course($scope.structure, $routeParams.courseId);
                         await course.sync($routeParams.date, $routeParams.date);
                         await $scope.session.setFromCourse(course);
-                        if ($scope.session.subject && $scope.session.audience)
+                        if ($scope.session.subject && $scope.session.audience) {
                             $scope.session.opened = true;
+                        }
                     }
 
                 } else {
                     $scope.session.opened = true;
                 }
                 $scope.homeworks = $scope.homeworks.concat($scope.session.homeworks);
+                $scope.from_homeworks = $scope.from_homeworks.concat($scope.session.from_homeworks);
+                $scope.from_homeworks.forEach((homework: Homework) => homework.formatDateToDisplay());
 
                 // if new session, we set the default sessionType
                 if (!$scope.session.id && !$scope.session.type) {
@@ -550,16 +608,16 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.audiences = $scope.structure.audiences.all.filter(audience => model.me.classes.includes(audience.id));
                 // useful for this session as an option is session selector (homework form).
                 $scope.session.toString = () => {
-                    return $scope.session.firstText ? $scope.session.firstText : lang.translate("todo.for.this.session")
+                    return $scope.session.firstText ? $scope.session.firstText : lang.translate('todo.for.this.session');
                 };
                 $scope.session.string = $scope.session.toString();
-                $scope.session.firstText = lang.translate("session.manage.linkhomework");
+                $scope.session.firstText = lang.translate('session.manage.linkhomework');
 
 
-                $scope.placeholder = "Séance du " + moment($scope.session.date).format("DD/MM/YYYY");
+                $scope.placeholder = lang.translate('homework.attachedToSession') + moment($scope.session.date).format(FORMAT.displayDate);
                 await initSubjects();
                 $scope.safeApply();
-                $scope.fixEditor();
+                await $scope.fixEditor();
             }
 
             async function initSubjects() {

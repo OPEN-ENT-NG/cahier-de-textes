@@ -25,11 +25,12 @@ export class Session {
     date: Date = moment().toDate();
     startTime: any = (moment().set({'hour': '08', 'minute': '00'})).seconds(0).millisecond(0).toDate();
     endTime: any = (moment().set({'hour': '10', 'minute': '00'})).seconds(0).millisecond(0).toDate();
-    description: string = "";
-    plainTextDescription: string = "";
-    annotation: string = "";
+    description: string = '';
+    plainTextDescription: string = '';
+    annotation: string = '';
     homeworks: Homework[] = [];
-    room: string = "";
+    from_homeworks: Homework[] = [];
+    room: string = '';
     courseId: string = null;
     isPublished: boolean = true;
     visas: Visa[] = [];
@@ -46,7 +47,7 @@ export class Session {
     locked: boolean = true;
     is_empty: boolean = true;
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
-    string: string = "";
+    string: string = '';
 
     constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
@@ -78,7 +79,8 @@ export class Session {
             description: data.description,
             annotation: data.annotation,
             homeworks: data.homeworks ? Homeworks.formatSqlDataToModel(data.homeworks, structure) : [],
-            visas: data.visas && data.visas !== "[null]" ? JSON.parse(data.visas) : [],
+            from_homeworks: data.from_homeworks ? Homeworks.formatSqlDataToModel(data.from_homeworks, structure) : [],
+            visas: data.visas && data.visas !== '[null]' ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id : null,
             modified: data.modified,
             created: data.created,
@@ -136,10 +138,17 @@ export class Session {
         }
         if (this.homeworks) {
             this.homeworks = Mix.castArrayAs(Homework, this.homeworks);
-            this.homeworks.forEach(h => {
+            this.homeworks.forEach((h: Homework) => {
                 h.structure = this.structure;
                 h.session = this;
                 h.session_date = DateUtils.getFormattedDate(this.date);
+                h.init();
+            });
+        }
+        if (this.from_homeworks) {
+            this.from_homeworks = Mix.castArrayAs(Homework, this.from_homeworks);
+            this.from_homeworks.forEach((h: Homework) => {
+                h.structure = this.structure;
                 h.init();
             });
         }

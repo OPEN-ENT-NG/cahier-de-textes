@@ -1,6 +1,6 @@
-import {model, moment, ng, idiom as lang} from 'entcore'
+import {model, ng, idiom as lang} from 'entcore';
 import http, {AxiosResponse} from 'axios';
-import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from "../model";
+import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from '../model';
 
 export const sessionHomeworkService: ISessionHomeworkService = {
     create: async (sessionHomework: ISessionHomeworkBody): Promise<AxiosResponse> => {
@@ -15,10 +15,10 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                             type_id: s.type.id ? s.type.id : s.type_id,
                             structure_id: s.structure.id,
                             audience_id: s.audience.id,
-                            title: lang.translate("homework.attachedToSession") + DateUtils.getDisplayDate(s.date),
-                            room: s.room ? s.room : "",
+                            title: lang.translate('homework.attachedToSession') + DateUtils.getDisplayDate(s.date),
+                            room: s.room ? s.room : '',
                             color: s.color,
-                            description: "",
+                            description: '',
                             annotation: s.annotation,
                             is_published: s.isPublished ? s.isPublished : null,
                             course_id: s.courseId ? s.courseId : null,
@@ -26,7 +26,7 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                             start_time: DateUtils.getFormattedTime(s.startTime),
                             end_time: DateUtils.getFormattedTime(s.endTime),
                             due_date: DateUtils.getFormattedDate(s.date),
-                        }
+                        };
                     });
                 } else {
                     res['due_date'] = DateUtils.getFormattedDate(h.dueDate);
@@ -52,6 +52,7 @@ const basicFormatHomework = (h: Homework) => {
         id: h.id ? h.id : null,
         subject_id: h.subject.id,
         audience_id: h.audience.id,
+        from_session_id: h.from_session_id,
         teacher_id: model.me.userId,
         structure_id: h.structure.id,
         estimatedTime: h.estimatedTime ? h.estimatedTime : 0,

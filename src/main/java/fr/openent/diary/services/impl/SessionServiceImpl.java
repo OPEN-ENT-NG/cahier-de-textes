@@ -42,8 +42,8 @@ public class SessionServiceImpl implements SessionService {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT s.*, to_json(type_session) as type, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
         query.append(",(SELECT 1 FROM diary.session_visa");
-        query.append(" INNER JOIN diary.session on session.id = session_visa.session_id");
-        query.append(" WHERE session.id = ").append(sessionId).append("LIMIT 1) AS one_visa");
+        query.append(" INNER JOIN "+ Diary.DIARY_SCHEMA + ".session on session.id = session_visa.session_id");
+        query.append(" WHERE session.id = ").append(sessionId).append(" LIMIT 1) AS one_visa");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
         query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id");
         query.append(" LEFT JOIN (");
@@ -57,10 +57,36 @@ public class SessionServiceImpl implements SessionService {
             if (result.isRight()) {
                 JsonObject session = result.right().getValue();
                 cleanSession(session);
-
-                handler.handle(new Either.Right<>(session));
+                getFromSessionHomeworks(session.getLong("id"), session, handler);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+        }));
+    }
+
+    /**
+     * Get homeworks created from the session but belonging to another session
+     * and include result in the session object
+     * @param fromSessionId session id
+     * @param session the session JsonObject
+     * @param handler handler
+     */
+    private void getFromSessionHomeworks(Long fromSessionId, JsonObject session, Handler<Either<String, JsonObject>> handler) {
+        String query = " SELECT homework.*, to_json(homework_type) as type" +
+                " FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id" +
+                " WHERE from_session_id = " + fromSessionId +
+                " AND session_id != " + fromSessionId;
+        Sql.getInstance().raw(query, SqlResult.validResultHandler(fromSessionHomeworks -> {
+
+            if(fromSessionHomeworks.isRight()) {
+                JsonArray homeworks = fromSessionHomeworks.right().getValue();
+                session.put("from_homeworks", homeworks);
+                handler.handle(new Either.Right<>(session));
+            } else {
+                LOGGER.error("[Diary@SessionServiceImpl::getFromSessionHomeworks] " +
+                        "An error occurred when fetching child homeworks", fromSessionHomeworks.left().getValue());
+                handler.handle(new Either.Left<>(fromSessionHomeworks.left().getValue()));
             }
         }));
     }

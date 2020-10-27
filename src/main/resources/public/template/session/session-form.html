@@ -162,12 +162,13 @@
         </div>
 
 
+        <!--DISPLAY ATTACHED HOMEWORKS AND CHILD HOMEWORKS-->
         <div class="margin-bottom-md">
-            <h2 class="cdt-title-not-clickable" ng-if="homeworks.length">
+            <h2 class="cdt-title-not-clickable" ng-if="homeworks.length || from_homeworks.length">
                 <i18n>Homeworks</i18n>
             </h2>
 
-            <div class="custom-flex-table responsive-table row" ng-show="homeworks.length">
+            <div class="custom-flex-table responsive-table row" ng-show="homeworks.length || from_homeworks.length">
                 <!-- Homeworks Display -->
                 <div class="custom-flex-row twelve bot-border custom-flex-head"> <!-- HEADER -->
                     <div class="custom-flex-col four right-border">
@@ -192,6 +193,7 @@
                     <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">&nbsp;</div>
                 </div>
 
+                <!--CURRENT SESSION HOMEWORKS-->
                 <div ng-repeat="homework in homeworks track by $index"
                      class="custom-flex-row twelve bot-border">
                     <div class="custom-flex-col four right-border"
@@ -220,9 +222,8 @@
                          ng-if="!homework.attachedToSession || !homework.sessions.length">
                         <div class="custom-flex-row twelve">
                             <div class="custom-flex-col padding-cell justified-content-center two">
-                                <div class="custom-flex-row twelve"
-                                     ng-repeat="audience in homework.audiences track by $index">
-                                    <p>[[audience.name]]</p>
+                                <div class="custom-flex-row twelve">
+                                    <p>[[homework.audience.name]]</p>
                                 </div>
                             </div>
                             <div class="custom-flex-col padding-cell justified-content-center five">
@@ -253,7 +254,43 @@
                            ng-click="deleteHomework(homework, $index)"></i>
                     </div>
                 </div>
+
+                <!--CURRENT SESSION CHILD HOMEWORKS-->
+                <div ng-repeat="homework in from_homeworks track by $index"
+                     class="custom-flex-row twelve bot-border">
+                    <div class="custom-flex-col four right-border">
+                        <div class="custom-flex-row twelve">
+                            <div class="custom-flex-col padding-cell justified-content-center two">
+                                <div class="custom-flex-row twelve">
+                                    <p>[[homework.audience.name]]</p>
+                                </div>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p class="margin-bottom-md">
+                                    <i18n>homework.for.date</i18n>
+                                    <span>[[homework.dateDisplayed]]</span>
+                                </p>
+                            </div>
+                            <div class="custom-flex-col padding-cell justified-content-center five">
+                                <p>[[homework.subject.label]]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center one">
+                        <p>[[homework.type.label]]</p>
+                    </div>
+                    <div class="custom-flex-col padding-cell six">
+                        <p bind-html="[[homework.description]]"></p>
+                    </div>
+                    <div class="custom-flex-col padding-cell justified-content-center flex-text-right one">
+                        <i ng-show="!hidePencil"
+                           ng-click="manageHomework(homework)">&#xe858;</i>
+                        <i class="trash right-magnet"
+                           ng-click="deleteHomework(homework, $index)"></i>
+                    </div>
+                </div>
             </div>
+        </div>
 
             <!-- Homework Form -->
             <div class="row">

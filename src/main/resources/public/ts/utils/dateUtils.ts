@@ -7,15 +7,15 @@ export class DateUtils {
      * ⚠ Date Utils
      *
      */
-    static getFormattedDate(date) {
+    static getFormattedDate(date): string {
         return moment(date).format(FORMAT.formattedDate);
     }
 
-    static getFormattedTime(date) {
+    static getFormattedTime(date): string {
         return moment(date).format(FORMAT.formattedTime);
     }
 
-    static getFormattedDateTime(date, time?) {
+    static getFormattedDateTime(date, time?): string {
         if (!!time) {
             return moment(DateUtils.getFormattedDate(date) + ' ' + DateUtils.getFormattedTime(time)).format(FORMAT.formattedDateTime);
         } else {
@@ -23,19 +23,19 @@ export class DateUtils {
         }
     }
 
-    static formatDate(date, format) {
+    static formatDate(date, format: string): string {
         return moment(date).format(format);
     }
 
-    static getDisplayDate(date) {
+    static getDisplayDate(date): string {
         return moment(date).format(FORMAT.displayDate);
     }
 
-    static getDisplayTime(date) {
+    static getDisplayTime(date): string {
         return moment(date).format(FORMAT.displayTime);
     }
 
-    static getDisplayDateTime(date) {
+    static getDisplayDateTime(date): string {
         return moment(date).format(FORMAT.displayDateTime);
     }
 
