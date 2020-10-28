@@ -62,6 +62,7 @@ dependencies {
   testCompile "org.entcore:tests:$entCoreVersion"
   testCompile "junit:junit:$junitVersion"
   testCompile "org.mockito:mockito-core:$mockitoVersion"
+  testCompile "org.powermock:powermock-core:$powerMockVersion"
   testCompile 'io.gatling.highcharts:gatling-charts-highcharts:2.2.2'
 }
 
