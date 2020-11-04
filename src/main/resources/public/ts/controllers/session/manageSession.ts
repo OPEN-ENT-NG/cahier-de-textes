@@ -44,7 +44,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.validate = false;
             $scope.hidePencil = false;
             $scope.oldHomework = new Homework($scope.structure);
-            $scope.formIsOpened = false;
+            $scope.formIsOpened = false; // homework form open state
+            $scope.sessionFormIsOpened = false; // session form open state
 
             $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
             $scope.groupsHomeworkSearch = new GroupsSearch($scope.structure.id, searchService);
@@ -596,6 +597,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 } else {
                     $scope.session.opened = true;
                 }
+                $scope.sessionFormIsOpened = true;
                 $scope.homeworks = $scope.homeworks.concat($scope.session.homeworks);
                 $scope.from_homeworks = $scope.from_homeworks.concat($scope.session.from_homeworks);
                 $scope.from_homeworks.forEach((homework: Homework) => homework.formatDateToDisplay());

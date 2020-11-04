@@ -3,7 +3,7 @@
         <div class="seven cell twelve-mobile">
 
             <!-- IF ADD SESSION-->
-            <div ng-if="!session.courseId" class="session-form-header">
+            <div ng-if="!session.courseId && sessionFormIsOpened" class="session-form-header">
 
                 <!--SEARCH CLASS/GROUP-->
                 <div class="session-form-header-search">
@@ -35,7 +35,7 @@
             </div>
 
             <!--IF EDIT SESSION-->
-            <div ng-if="session.courseId" class="margin-bottom-md margin-top-lg">
+            <div ng-if="session.courseId && sessionFormIsOpened" class="margin-bottom-md margin-top-lg">
 
                 <!--CLASS/GROUP NAME CARD-->
                 <span class="card session-form-card">
