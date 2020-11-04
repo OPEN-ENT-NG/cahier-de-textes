@@ -534,10 +534,10 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a homework pedagogic type drop on course to create homework
              */
-            $scope.homeworkToEmptySession = async (idSessionDrag, sessionDrop) => {
+            $scope.homeworkToEmptySession = async (idSessionDrag: number, sessionDrop: any) => {
                 let sessionDrag: any = [];
-                $scope.calendarItems.map(async session => {
-                    if (session.id == idSessionDrag) {
+                $scope.calendarItems.map(async (session: any) => {
+                    if (session.id === idSessionDrag) {
                         sessionDrag = session;
                     }
                 });
@@ -552,12 +552,13 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.goTo('/homework/create');
             };
 
-            const prepareHomeworkRedirect = (sessionDrop, sessionHomework) => {
+            const prepareHomeworkRedirect = (sessionDrop: any, sessionHomework: Session) => {
                 if (sessionDrop.audiences.all.length !== 0) {
                     sessionHomework.homeworks[0].audience = sessionDrop.audiences.all[0];
                     sessionHomework.homeworks[0].dueDate = sessionDrop.startMoment;
                     sessionHomework.homeworks[0].session = sessionDrop;
-                    sessionHomework.homeworks[0].id = "";
+                    sessionHomework.homeworks[0].subject = sessionDrop.subject;
+                    sessionHomework.homeworks[0].id = '';
                 }
                 $rootScope.homework = sessionHomework.homeworks[0];
             };
