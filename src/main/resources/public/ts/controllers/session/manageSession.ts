@@ -474,7 +474,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              * @param session A session.
              */
             $scope.sessionString = (session: Session): string => {
-                return session.audience.name + ' - ' + session.subject.label + ' - '
+                return session.audience.name + ' - ' +
+                    (session.subject.name ? session.subject.name : lang.translate('session.exceptional.subject')) + ' - '
                     + moment.weekdays(true)[moment(session.startDisplayDate, FORMAT.displayDate).weekday()] + ' '
                     + session.startDisplayDate + ' ' + session.startDisplayTime
                     + ' - ' + session.endDisplayTime;
