@@ -261,7 +261,7 @@ export let manageListCtrl = ng.controller('manageListController',
 
         $scope.filterHomeworkState = (homework) => {
             let isInFilter = false;
-            if($scope.display.homeworksFilter){
+            if($scope.display.homeworks){
                 if($scope.display.todo){
                     isInFilter =  isInFilter || !homework.isDone;
                 }
@@ -322,26 +322,25 @@ export let manageListCtrl = ng.controller('manageListController',
             return containsOnlyCourseBool;
         };
 
-        $scope.hasPedagogicDayToDisplay = (pedagogicDays, display) => {
-            let hasOneDayToDisplay=false;
-            if(pedagogicDays)
-                pedagogicDays.map(p =>{
-                    p.pedagogicItems.map( pd => {
-                        if(display.sessionList && pd instanceof Session){
+        $scope.hasPedagogicDayToDisplay = (pedagogicDays, display): boolean => {
+            let hasOneDayToDisplay: boolean = false;
+            if (pedagogicDays)
+                pedagogicDays.forEach(p => {
+                    p.pedagogicItems.forEach(pd => {
+                        if (display.sessionList && pd.pedagogicType === $scope.TYPE_SESSION) {
                             hasOneDayToDisplay = true;
                         }
-                        if(!display.sessionList && pd instanceof Homework){
-
+                        if(display.homeworks && pd.pedagogicType === $scope.TYPE_HOMEWORK) {
                             if(DateUtils.isAChildOrAParent(model.me.type) ){
-                                if( display.todo || display.done) {
-                                    if(display.todo && !pd.isDone)
+                                if (display.todo || display.done) {
+                                    if (display.todo && !pd.isDone)
                                         hasOneDayToDisplay = true;
-                                    if(display.done && pd.isDone)
+                                    if (display.done && pd.isDone)
                                         hasOneDayToDisplay = true;
                                 }
                                 else
                                     hasOneDayToDisplay = false;
-                            }else{
+                            } else {
                                 hasOneDayToDisplay = true;
                             }
                         }

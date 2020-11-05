@@ -52,10 +52,15 @@ export class Structure {
      * @returns {Promise<any>|Promise}
      */
     async sync() {
+        // boolean that check for audiences.sync() these workflow are not allowed to fetch all classes
+        let hasTeacherStudentWorkflow: boolean =
+            !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData) &&
+            !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessOwnData);
+
         const promises: Promise<void>[] = [];
         promises.push(this.subjects.sync(this.id));
         promises.push(this.types.sync());
-        promises.push(this.audiences.sync(this.id, !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)));
+        promises.push(this.audiences.sync(this.id, hasTeacherStudentWorkflow));
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
         await Promise.all(promises).then(async () => {

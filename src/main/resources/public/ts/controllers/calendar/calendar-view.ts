@@ -19,8 +19,7 @@ export let calendarController = ng.controller('CalendarController',
                 sessions: true,
                 listView: false,
                 progression: false,
-                sessionList: false,
-                homeworksFilter: true,
+                sessionList: false
             };
             const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
             $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;
