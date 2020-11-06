@@ -1,5 +1,5 @@
 import {Behaviours, model} from 'entcore';
-import {Audiences, Courses, Homeworks, Sessions, Students, Subjects, Teachers} from './index';
+import {Audiences, Courses, DateUtils, Homeworks, Sessions, Students, Subjects, Teachers} from './index';
 import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
@@ -51,10 +51,12 @@ export class Structure {
      * @returns {Promise<any>|Promise}
      */
     async sync() {
-        // boolean that check for audiences.sync() these workflow are not allowed to fetch all classes
-        let hasTeacherStudentWorkflow: boolean =
-            !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData) &&
-            !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessOwnData);
+        let hasTeacherStudentWorkflow: boolean = true;
+
+        // boolean that check if relative or children we do not fetch all classes
+        if (DateUtils.isAChildOrAParent(model.me.type)) {
+            hasTeacherStudentWorkflow = false;
+        }
 
         const promises: Promise<void>[] = [];
         promises.push(this.types.sync());

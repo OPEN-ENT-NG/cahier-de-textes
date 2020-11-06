@@ -1,7 +1,7 @@
 <div class="session-view">
     <!-- title -->
     <div class="row margin-bottom-md" ng-if="!session.isInsideDiary">
-        <b>[[session.subject.label]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.toString()]] </b>
+        <b>[[session.subject.label ? session.subject.label : session.subject.name]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.displayName]] </b>
     </div>
 
     <!-- description title -->
