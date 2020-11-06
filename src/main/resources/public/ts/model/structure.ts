@@ -34,7 +34,6 @@ export class Structure {
         if (typeof name === 'string') {
             this.name = name;
         }
-        this.subjects = new Subjects();
         this.types = new SessionTypes(this.id);
         this.audiences = new Audiences();
         this.courses = new Courses(this);
@@ -58,7 +57,6 @@ export class Structure {
             !model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessOwnData);
 
         const promises: Promise<void>[] = [];
-        promises.push(this.subjects.sync(this.id));
         promises.push(this.types.sync());
         promises.push(this.audiences.sync(this.id, hasTeacherStudentWorkflow));
         promises.push(this.teachers.sync(this));

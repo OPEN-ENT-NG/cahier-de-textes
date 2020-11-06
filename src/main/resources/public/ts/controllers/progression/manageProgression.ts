@@ -20,6 +20,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.subjects = null;
         $scope.sessionTypes = null;
         $scope.progressionSessionForm = new ProgressionSession();
+        $scope.subjects = new Subjects();
         $scope.progressionFolders = null;
         $scope.progressionFoldersToDisplay = null;
         $scope.subProgressionsItems = [];
@@ -72,7 +73,6 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
 
         const initData = async (): Promise<void> => {
             $scope.sessionTypes = new SessionTypes(window.structure.id);
-            $scope.subjects = new Subjects();
             await Promise.all([
                 $scope.sessionTypes.sync(),
                 $scope.subjects.sync(window.structure.id, model.me.userId),

@@ -21,6 +21,13 @@ public class Audience implements Cloneable {
         this.labels = audience.getJsonArray("labels") != null ? audience.getJsonArray("labels", new JsonArray()).getList() : new ArrayList<>();
     }
 
+    public Audience() {
+        this.id = "";
+        this.externalId = "";
+        this.name = "";
+        this.labels = new ArrayList<>();
+    }
+
     public Audience(String audienceId) {
         this.id = audienceId;
     }

@@ -16,6 +16,13 @@ public class Subject implements Cloneable {
         this.rank = null;
     }
 
+    public Subject() {
+        this.id = null;
+        this.externalId = null;
+        this.name = null;
+        this.rank = null;
+    }
+
     public Subject(JsonObject subject) {
         this.id = subject.getString("id");
         this.externalId = subject.getString("externalId");

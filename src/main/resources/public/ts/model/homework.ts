@@ -100,16 +100,11 @@ export class Homework {
         this.subject = homework.subject;
     }
 
-    static formatSqlDataToModel(data: any, structure: Structure): any {
-
-        let subject = new Subject();
-        subject.id = data.subject_id;
-        subject.label = data.subject_label;
-
+    static formatSqlDataToModel(data: any): any {
         return {
-            audience: structure.audiences.all.find(t => t.id === data.audience_id),
-            teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
-            subject: structure.subjects.all.find(t => t.id === data.subject_id),
+            audience: data.audience,
+            teacher: data.teacher,
+            subject: data.subject,
             session_id: data.session_id,
             from_session_id: data.from_session_id,
             session_date: data.session_date,
@@ -173,7 +168,7 @@ export class Homework {
     async sync(): Promise<void> {
         if (model.me.type === USER_TYPES.teacher || model.me.type === USER_TYPES.personnel) {
             let {data}: AxiosResponse = await http.get('/diary/homework/' + this.id);
-            Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+            Mix.extend(this, Homework.formatSqlDataToModel(data));
         } else {
             let studentId: string;
 
@@ -183,7 +178,7 @@ export class Homework {
                 studentId = 'stop';
             }
             let {data}: AxiosResponse = await http.get('/diary/homework/' + this.id + '/' + studentId);
-            Mix.extend(this, Homework.formatSqlDataToModel(data, this.structure));
+            Mix.extend(this, Homework.formatSqlDataToModel(data));
         }
 
         this.init();
@@ -237,9 +232,9 @@ export class Homeworks {
         this.origin = [];
     }
 
-    static formatSqlDataToModel(data: any, structure: Structure): any[] {
+    static formatSqlDataToModel(data: any): any[] {
         let dataModel: any[] = [];
-        data.forEach(i => dataModel.push(Homework.formatSqlDataToModel(i, structure)));
+        data.forEach(i => dataModel.push(Homework.formatSqlDataToModel(i)));
         return dataModel;
     }
 
@@ -283,7 +278,7 @@ export class Homeworks {
 
     async syncHomeworks(url: string): Promise<void> {
         let {data}: AxiosResponse = await http.get(url);
-        this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data, this.structure));
+        this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data));
         this.all.forEach(i => {
             i.init();
         });

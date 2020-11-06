@@ -1,11 +1,16 @@
 package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
-import fr.openent.diary.services.DiaryService;
-import fr.openent.diary.services.HomeworkService;
+import fr.openent.diary.models.Audience;
+import fr.openent.diary.models.Person.User;
+import fr.openent.diary.models.Subject;
+import fr.openent.diary.services.*;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -19,6 +24,8 @@ import org.entcore.common.user.UserInfos;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HomeworkServiceImpl extends SqlCrudService implements HomeworkService {
     private static final String STATEMENT = "statement" ;
@@ -27,10 +34,16 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private static final String PREPARED = "prepared" ;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgessionServiceImpl.class);
 
-    private DiaryService diaryService = new DiaryServiceImpl();
+    private final DiaryService diaryService = new DiaryServiceImpl();
+    private final SubjectService subjectService;
+    private final GroupService groupService;
+    private final UserService userService;
 
-    public HomeworkServiceImpl(String table) {
+    public HomeworkServiceImpl(String table, EventBus eb) {
         super(table);
+        this.subjectService = new DefaultSubjectService(eb);
+        this.groupService = new DefaultGroupService(eb);
+        this.userService = new DefaultUserService();
     }
 
 
@@ -91,7 +104,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         if (user.getType().equals("Student")) {
             this.getChildHomeworks(structureId, startDate, endDate, user.getUserId(), subjectId, handler);
         } else if (user.getType().equals("Teacher")) {
-            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, null, false, handler);
+            this.getHomeworks(structureId, startDate, endDate, user.getUserId(),null, null, subjectId, false, handler);
         }
     }
 
@@ -127,7 +140,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param listAudienceId return homeworks with a audience_id field inside this list
      * @param listTeacherId return homeworks with a teacher_id field inside this list
      * @param onlyPublished returns only published homeworks
-     * @param handler
+     * @param handler function handler data send array of homeworks
      */
     private void getHomeworks(String structureId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
                               String subjectId, boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
@@ -137,18 +150,66 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values) +
                 this.getSelectHomeworkQuery();
 
+        proceedHomeworks(handler, values, query);
+    }
+
+    private void proceedHomeworks(Handler<Either<String, JsonArray>> handler, JsonArray values, String query) {
         Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
                 JsonArray arrayHomework = result.right().getValue();
+
+                List<String> subjectIds = new ArrayList<>();
+                List<String> teacherIds = new ArrayList<>();
+                List<String> audienceIds = new ArrayList<>();
                 for (int i = 0; i < arrayHomework.size(); i++) {
                     cleanHomework(arrayHomework.getJsonObject(i));
+                    if (!subjectIds.contains(arrayHomework.getJsonObject(i).getString("subject_id"))) {
+                        subjectIds.add(arrayHomework.getJsonObject(i).getString("subject_id"));
+                    }
+                    if (!teacherIds.contains(arrayHomework.getJsonObject(i).getString("teacher_id"))) {
+                        teacherIds.add(arrayHomework.getJsonObject(i).getString("teacher_id"));
+                    }
+                    if (!audienceIds.contains(arrayHomework.getJsonObject(i).getString("audience_id"))) {
+                        audienceIds.add(arrayHomework.getJsonObject(i).getString("audience_id"));
+                    }
                 }
-                handler.handle(new Either.Right<>(arrayHomework));
+                Future<List<Subject>> subjectsFuture = Future.future();
+                Future<List<User>> teachersFuture = Future.future();
+                Future<List<Audience>> audiencesFuture = Future.future();
+
+                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                    if (asyncResult.failed()) {
+                        String message = "[Diary@HomeworkServiceImpl::proceedHomeworks] Failed to get homeworks. ";
+                        LOGGER.error(message + " " + asyncResult.cause());
+                        handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
+                    } else {
+                        // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
+                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
+                        Map<String, User> teacherMap = teachersFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
+                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
+
+                        for (int i = 0; i < arrayHomework.size(); i++) {
+                            JsonObject homework = arrayHomework.getJsonObject(i);
+                            homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
+                            homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
+                            homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
+                        }
+                        handler.handle(new Either.Right<>(arrayHomework));
+                    }
+                });
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
-
         }));
     }
 
@@ -250,7 +311,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
      * @param listAudienceId return homeworks with a audience_id field inside this list
      * @param listTeacherId return homeworks with a teacher_id field inside this list
      * @param onlyPublished returns only published homeworks
-     * @param handler
+     * @param handler function handler data send array of homeworks
      */
     private void getStudentHomeworks(String structureId, String studentId, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
                               String subjectId, boolean onlyPublished, Handler<Either<String, JsonArray>> handler) {
@@ -261,18 +322,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query = this.getCTEHomeworkQuery(structureId, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values)
                 + this.getSelectHomeworkStudentQuery(studentId);
 
-        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
-        // Formatting String into JsonObject
-            if (result.isRight()) {
-                JsonArray arrayHomework = result.right().getValue();
-                for (int i = 0; i < arrayHomework.size(); i++) {
-                    cleanHomework(arrayHomework.getJsonObject(i));
-                }
-                handler.handle(new Either.Right<>(arrayHomework));
-            } else {
-                handler.handle(new Either.Left<>(result.left().getValue()));
-            }
-        }));
+        proceedHomeworks(handler, values, query);
     }
 
     @Override

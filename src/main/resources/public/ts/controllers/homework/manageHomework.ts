@@ -378,6 +378,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
                 }
                 await $scope.syncWorkloadDay();
+
                 $scope.safeApply();
                 await $scope.fixEditor();
             }

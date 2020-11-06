@@ -13,6 +13,14 @@ public class User extends Person implements Cloneable {
         this.info = null;
     }
 
+    public User() {
+        this.id =  null;
+        this.firstName = null;
+        this.lastName = null;
+        this.displayName = null;
+        this.info = null;
+    }
+
     public User(JsonObject user) {
         this.id = user.getString("id", null);
         this.firstName = user.getString("firstName", null);

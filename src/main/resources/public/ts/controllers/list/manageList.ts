@@ -1,7 +1,7 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Toast, Workload
+    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload
 } from '../../model';
 import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from "../../core/enum/events";
 import {IAngularEvent} from "angular";
@@ -20,7 +20,7 @@ export let manageListCtrl = ng.controller('manageListController',
             todo: true,
             done: true
         };
-
+        $scope.subjects = new Subjects();
         $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
         $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
         $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
@@ -36,7 +36,14 @@ export let manageListCtrl = ng.controller('manageListController',
             subject: (window.item && ('filters' in window.item)) ? window.item.filters.subject : null
         };
 
-        $scope.syncPedagogicItems = async (subject) => {
+        const init = async (): Promise<void> => {
+            await Promise.all([
+                $scope.subjects.sync($scope.structure.id),
+                $scope.syncPedagogicItems()
+            ]);
+        };
+
+        $scope.syncPedagogicItems = async (subject): Promise<void> => {
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // incorrect dates
                 return;
@@ -370,10 +377,10 @@ export let manageListCtrl = ng.controller('manageListController',
             return hasHomeworkToDisplay;
         };
 
-        $scope.syncPedagogicItems();
+        init();
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
-            $scope.syncPedagogicItems();
+            init();
         });
 
         $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE,  (event: IAngularEvent, data) => {

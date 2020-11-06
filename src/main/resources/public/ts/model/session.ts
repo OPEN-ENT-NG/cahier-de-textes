@@ -63,9 +63,9 @@ export class Session {
 
     static formatSqlDataToModel(data: any, structure: Structure) {
         return {
-            audience: structure.audiences.all.find(t => t.id === data.audience_id),
-            teacher: structure.teachers.all.find(t => t.id === data.teacher_id),
-            subject: structure.subjects.all.find(t => t.id === data.subject_id),
+            audience: data.audience,
+            teacher: data.teacher,
+            subject: data.subject,
             type: structure.types.all.find(t => t.id === data.type_id),
             subject_id: data.subject_id,
             id: data.id,
@@ -78,8 +78,8 @@ export class Session {
             endTime: data.end_time,
             description: data.description,
             annotation: data.annotation,
-            homeworks: data.homeworks ? Homeworks.formatSqlDataToModel(data.homeworks, structure) : [],
-            from_homeworks: data.from_homeworks ? Homeworks.formatSqlDataToModel(data.from_homeworks, structure) : [],
+            homeworks: data.homeworks ? Homeworks.formatSqlDataToModel(data.homeworks) : [],
+            from_homeworks: data.from_homeworks ? Homeworks.formatSqlDataToModel(data.from_homeworks) : [],
             visas: data.visas && data.visas !== '[null]' ? JSON.parse(data.visas) : [],
             courseId: data.course_id ? data.course_id : null,
             modified: data.modified,
@@ -457,7 +457,7 @@ export class Sessions {
 
     syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void>  => {
         let {data} = await http.get(url);
-        homeworks.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data.filter(h => h.is_homework), this.structure));
+        homeworks.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data.filter(h => h.is_homework)));
         homeworks.all.forEach(i => {
             i.init();
         });

@@ -11,7 +11,7 @@
             <div class="flex-col col__4">[[item.exceptionnal]]</div>
         </div>
         <div class="flex-row-cdt row__6" ng-if="!item.exceptionnal">
-            <div class="flex-col subject">[[item.subject.label]]</div>
+            <div class="flex-col subject">[[item.subject.label ? item.subject.label : item.subject.name]]</div>
         </div>
         <div class="flex-row-cdt row__6 audience">
             <div class="flex-col col__4">[[item.audience.name]]</div>
@@ -68,7 +68,7 @@
             [[item.exceptionnal]]
          </div>
          <div ng-if="!item.exceptionnal" class="text-ellipsis overflow-hidden">
-             [[item.subject.label]]
+             [[item.subject.label ? item.subject.label : item.subject.name]]
          </div>
          <div class="text-ellipsis overflow-hidden">
             <span class="text-ellipsis overflow-hidden">

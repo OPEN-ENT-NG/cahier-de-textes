@@ -9,13 +9,13 @@
                   ng-class="pedagogicItem.description?'hasDescription':''"
                   ng-click="pedagogicItem.opened = !pedagogicItem.opened">
                 <span>
-                    <b>[[pedagogicItem.subject.label]] &nbsp;</b>
+                    <b>[[pedagogicItem.subject.label ? pedagogicItem.subject.label : pedagogicItem.subject.name]] &nbsp;</b>
                 </span>
                 <span>
                     <b>[[pedagogicItem.audience.name]] &nbsp;</b>
                 </span>
                 <span>
-                    [[pedagogicItem.teacher.toString()]]
+                    [[pedagogicItem.teacher.displayName]]
                 </span>
             </span>
 

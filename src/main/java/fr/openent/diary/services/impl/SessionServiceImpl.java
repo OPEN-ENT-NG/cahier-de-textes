@@ -2,14 +2,17 @@ package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
 import fr.openent.diary.helper.FutureHelper;
-import fr.openent.diary.services.DiaryService;
-import fr.openent.diary.services.SessionService;
+import fr.openent.diary.models.Audience;
+import fr.openent.diary.models.Person.User;
+import fr.openent.diary.models.Subject;
+import fr.openent.diary.services.*;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -21,8 +24,9 @@ import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SessionServiceImpl implements SessionService {
     private static final String STATEMENT = "statement";
@@ -33,9 +37,16 @@ public class SessionServiceImpl implements SessionService {
     private static final String SESSION = "session";
     private static final String HOMEWORK = "homework";
     private static final List<String> TABLE_NAMES = Arrays.asList(SESSION, HOMEWORK);
+    private final DiaryService diaryService = new DiaryServiceImpl();
+    private final SubjectService subjectService;
+    private final GroupService groupService;
+    private final UserService userService;
 
-
-    private DiaryService diaryService = new DiaryServiceImpl();
+    public SessionServiceImpl(EventBus eb) {
+        this.subjectService = new DefaultSubjectService(eb);
+        this.groupService = new DefaultGroupService(eb);
+        this.userService = new DefaultUserService();
+    }
 
     @Override
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
@@ -56,9 +67,13 @@ public class SessionServiceImpl implements SessionService {
         Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
             if (result.isRight()) {
                 JsonObject session = result.right().getValue();
-                cleanSession(session);
-                getFromSessionHomeworks(session.getLong("id"), session, handler);
+                List<String> subjectIds = new ArrayList<>();
+                List<String> teacherIds = new ArrayList<>();
+                List<String> audienceIds = new ArrayList<>();
+                cleanSession(session, subjectIds, teacherIds, audienceIds);
+                getFromSessionHomeworks(session.getLong("id"), session, subjectIds, teacherIds, audienceIds, handler);
             } else {
+                LOGGER.error("[Diary@SessionServiceImpl::getSession] An error occurred while fetching session ", result.left().getValue());
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
         }));
@@ -69,24 +84,81 @@ public class SessionServiceImpl implements SessionService {
      * and include result in the session object
      * @param fromSessionId session id
      * @param session the session JsonObject
+     * @param subjectIds subject ids
+     * @param teacherIds teacher ids
+     * @param audienceIds audiences ids
      * @param handler handler
      */
-    private void getFromSessionHomeworks(Long fromSessionId, JsonObject session, Handler<Either<String, JsonObject>> handler) {
+    private void getFromSessionHomeworks(Long fromSessionId, JsonObject session, List<String> subjectIds,
+                                         List<String> teacherIds, List<String> audienceIds,
+                                         Handler<Either<String, JsonObject>> handler) {
+
         String query = " SELECT homework.*, to_json(homework_type) as type" +
                 " FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id" +
                 " WHERE from_session_id = " + fromSessionId +
                 " AND session_id != " + fromSessionId;
-        Sql.getInstance().raw(query, SqlResult.validResultHandler(fromSessionHomeworks -> {
+        Sql.getInstance().raw(query, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
+            if (fromSessionHomeworksAsync.isRight()) {
+                JsonArray fromSessionHomeworks = fromSessionHomeworksAsync.right().getValue();
+                session.put("from_homeworks", fromSessionHomeworks);
 
-            if(fromSessionHomeworks.isRight()) {
-                JsonArray homeworks = fromSessionHomeworks.right().getValue();
-                session.put("from_homeworks", homeworks);
-                handler.handle(new Either.Right<>(session));
+                subjectIds.add(session.getString("subject_id"));
+                teacherIds.add(session.getString("teacher_id"));
+                audienceIds.add(session.getString("audience_id"));
+
+                for (int i = 0; i < fromSessionHomeworks.size(); i++) {
+                    JsonObject homework = fromSessionHomeworks.getJsonObject(i);
+                    setAudienceSubjectTeacherData(subjectIds, teacherIds, audienceIds, homework);
+                }
+                Future<List<Subject>> subjectsFuture = Future.future();
+                Future<List<User>> teachersFuture = Future.future();
+                Future<List<Audience>> audiencesFuture = Future.future();
+
+                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                    if (asyncResult.failed()) {
+                        String message = "[Diary@SessionServiceImpl::getSessions] Failed to get sessions. ";
+                        LOGGER.error(message + " " + asyncResult.cause());
+                        handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
+                    } else {
+                        // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
+                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
+                        Map<String, User> teacherMap = teachersFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
+                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
+
+                        session.put("subject", subjectMap.getOrDefault(session.getString("subject_id"), new Subject()).toJSON());
+                        session.put("teacher", teacherMap.getOrDefault(session.getString("teacher_id"), new User()).toJSON());
+                        session.put("audience", audienceMap.getOrDefault(session.getString("audience_id"), new Audience()).toJSON());
+                        
+                        for (int i = 0; i < session.getJsonArray("homeworks").size(); i++) {
+                            JsonObject homework =session.getJsonArray("homeworks").getJsonObject(i);
+                            homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
+                            homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
+                            homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
+                        }
+
+                        for (int j = 0; j < fromSessionHomeworks.size(); j++) {
+                            JsonObject homework = fromSessionHomeworks.getJsonObject(j);
+                            homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
+                            homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
+                            homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
+                        }
+                        handler.handle(new Either.Right<>(session));
+                    }
+                });
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
             } else {
                 LOGGER.error("[Diary@SessionServiceImpl::getFromSessionHomeworks] " +
-                        "An error occurred when fetching child homeworks", fromSessionHomeworks.left().getValue());
-                handler.handle(new Either.Left<>(fromSessionHomeworks.left().getValue()));
+                        "An error occurred when fetching child homeworks", fromSessionHomeworksAsync.left().getValue());
+                handler.handle(new Either.Left<>(fromSessionHomeworksAsync.left().getValue()));
             }
         }));
     }
@@ -274,7 +346,7 @@ public class SessionServiceImpl implements SessionService {
      * @param vised          returns the sessions with visa
      * @param notVised       returns the sessions without visa
      * @param agregVisas     returns the sessions with the field visas
-     * @param handler
+     * @param handler        function handler that will send array of sessions
      */
     public void getSessions(String structureID, String startDate, String endDate, String ownerId, List<String> listAudienceId, List<String> listTeacherId,
                             List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas,
@@ -290,10 +362,56 @@ public class SessionServiceImpl implements SessionService {
             // Formatting String into JsonObject
             if (result.isRight()) {
                 JsonArray arraySession = result.right().getValue();
+
+                List<String> subjectIds = new ArrayList<>();
+                List<String> teacherIds = new ArrayList<>();
+                List<String> audienceIds = new ArrayList<>();
+
                 for (int i = 0; i < arraySession.size(); i++) {
-                    cleanSession(arraySession.getJsonObject(i));
+                    cleanSession(arraySession.getJsonObject(i), subjectIds, teacherIds, audienceIds);
+                    setAudienceSubjectTeacherData(subjectIds, teacherIds, audienceIds, arraySession.getJsonObject(i));
                 }
-                handler.handle(new Either.Right<>(arraySession));
+                Future<List<Subject>> subjectsFuture = Future.future();
+                Future<List<User>> teachersFuture = Future.future();
+                Future<List<Audience>> audiencesFuture = Future.future();
+
+                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                    if (asyncResult.failed()) {
+                        String message = "[Diary@SessionServiceImpl::getSessions] Failed to get sessions. ";
+                        LOGGER.error(message + " " + asyncResult.cause());
+                        handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
+                    } else {
+                        // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
+                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
+                        Map<String, User> teacherMap = teachersFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
+                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
+
+                        for (int i = 0; i < arraySession.size(); i++) {
+                            JsonObject session = arraySession.getJsonObject(i);
+                            session.put("subject", subjectMap.getOrDefault(session.getString("subject_id"), new Subject()).toJSON());
+                            session.put("teacher", teacherMap.getOrDefault(session.getString("teacher_id"), new User()).toJSON());
+                            session.put("audience", audienceMap.getOrDefault(session.getString("audience_id"), new Audience()).toJSON());
+                            if (session.getJsonArray("homeworks").size() > 0) {
+                                for (int j = 0; j < session.getJsonArray("homeworks").size(); j++) {
+                                    JsonObject homework = session.getJsonArray("homeworks").getJsonObject(j);
+                                    homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
+                                    homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
+                                    homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
+                                }
+                            }
+                        }
+                        handler.handle(new Either.Right<>(arraySession));
+                    }
+                });
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
@@ -378,12 +496,41 @@ public class SessionServiceImpl implements SessionService {
         return query;
     }
 
-    private void cleanSession(JsonObject session) {
-        if (session.getString("type") != null)
+    private void cleanSession(JsonObject session, List<String> subjectIds, List<String> teacherIds, List<String> audienceIds) {
+        if (session.getString("type") != null) {
             session.put("type", new JsonObject(session.getString("type")));
+        }
         session.put("homeworks", new JsonArray(session.getString("homeworks")));
         if (session.getJsonArray("homeworks").contains(null)) {
             session.put("homeworks", new JsonArray());
+        }
+        if (session.getJsonArray("homeworks").size() > 0) {
+            for (int i = 0; i < session.getJsonArray("homeworks").size(); i++) {
+                JsonObject homework = session.getJsonArray("homeworks").getJsonObject(i);
+                setAudienceSubjectTeacherData(subjectIds, teacherIds, audienceIds, homework);
+            }
+        }
+    }
+
+    private void cleanSession(JsonObject session) {
+        if (session.getString("type") != null) {
+            session.put("type", new JsonObject(session.getString("type")));
+        }
+        session.put("homeworks", new JsonArray(session.getString("homeworks")));
+        if (session.getJsonArray("homeworks").contains(null)) {
+            session.put("homeworks", new JsonArray());
+        }
+    }
+
+    private void setAudienceSubjectTeacherData(List<String> subjectIds, List<String> teacherIds, List<String> audienceIds, JsonObject homework) {
+        if (!subjectIds.contains(homework.getString("subject_id"))) {
+            subjectIds.add(homework.getString("subject_id"));
+        }
+        if (!teacherIds.contains(homework.getString("teacher_id"))) {
+            teacherIds.add(homework.getString("teacher_id"));
+        }
+        if (!audienceIds.contains(homework.getString("audience_id"))) {
+            audienceIds.add(homework.getString("audience_id"));
         }
     }
 

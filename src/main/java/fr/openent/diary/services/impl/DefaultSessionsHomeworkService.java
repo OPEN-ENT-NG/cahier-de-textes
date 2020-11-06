@@ -7,6 +7,7 @@ import fr.openent.diary.services.SessionService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -22,9 +23,9 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
     private SessionService sessionService;
     private HomeworkService homeworkService;
 
-    public DefaultSessionsHomeworkService() {
-        this.sessionService = new SessionServiceImpl();
-        this.homeworkService = new HomeworkServiceImpl("diary");
+    public DefaultSessionsHomeworkService(EventBus eb) {
+        this.sessionService = new SessionServiceImpl(eb);
+        this.homeworkService = new HomeworkServiceImpl("diary", eb);
     }
 
     @Override

@@ -37,9 +37,9 @@ public class Diary extends BaseServer {
 
         addController(new InitController(new DefautlInitService("diary",eb)));
         addController(new VisaController(visaService, storage));
-        addController(new SessionController(new SessionServiceImpl()));
-        addController(new HomeworkController(new HomeworkServiceImpl("diary")));
-        addController(new SessionsHomeworkController(new DefaultSessionsHomeworkService()));
+        addController(new SessionController(new SessionServiceImpl(eb)));
+        addController(new HomeworkController(new HomeworkServiceImpl("diary", eb)));
+        addController(new SessionsHomeworkController(new DefaultSessionsHomeworkService(eb)));
         addController(new InspectorController(new InspectorServiceImpl()));
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
         addController(new SearchController(eb));

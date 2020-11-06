@@ -5,7 +5,7 @@ import {
     Homework,
     HomeworkTypes, ISessionHomeworkBody, ISessionHomeworkService,
     Session, Sessions,
-    SessionTypes, Subject,
+    SessionTypes, Subject, Subjects,
     Toast,
     WorkloadDay
 } from '../../model';
@@ -27,7 +27,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.session = $rootScope.session ? $rootScope.session : new Session($scope.structure);
             $scope.sessionGetter = new Sessions($scope.structure);
             $scope.courses = new Courses($scope.structure);
-            $scope.subjects = $.extend(true, Object.create(Object.getPrototypeOf($scope.structure.subjects)), $scope.structure.subjects);
+            $scope.subjects = new Subjects();
             $scope.homeworkTypes = new HomeworkTypes($scope.structure.id);
             $scope.sessionTypes = new SessionTypes($scope.structure.id);
             $scope.form = {
@@ -537,7 +537,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              */
             $scope.selectSearchSessionAudience = (valueInput: string, groupForm: Audience): void => {
                 $scope.groupsSearch.selectGroups(valueInput, groupForm);
-                $scope.session.audience = $scope.structure.audiences.all.find(audience => audience.id === groupForm.id);
+                $scope.session.audience = $scope.groupsSearch.getSelectedGroups()[0]; // first element we fetch before reset
+                $scope.groupsSearch.resetGroups()
                 $scope.groupsSearch.group = '';
             };
 
@@ -574,10 +575,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             /**
              * Initialize form data.
              */
-            async function initData(): Promise<void> {
+            const initData = async (): Promise<void> => {
                 await Promise.all([
                     $scope.sessionTypes.sync(),
-                    $scope.homeworkTypes.sync()]);
+                    $scope.homeworkTypes.sync(),
+                    $scope.subjects.sync($scope.structure.id)
+                ]);
 
                 if (!$scope.session.id) {
 
@@ -623,14 +626,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 await $scope.fixEditor();
             }
 
-            async function initSubjects() {
-                await SubjectService.getTeacherSubjects($scope.structure.id, model.me.userId).then((subjectsList) => {
+            const initSubjects = async (): Promise<void> => {
+                await SubjectService.getTeacherSubjects($scope.structure.id, model.me.userId).then((subjectsList: Subject[]) => {
                     subjectsList.filter(subjects => subjects).forEach((subject) => {
                         if (Object.keys($scope.subjects.mapping).indexOf(subject.id) === -1) {
                             $scope.subjects.all.push(subject);
                             $scope.subjects.mapping[subject.id] = subject.label;
                         } else if (subject.teacherId !== undefined) {
-                            const subjectIndex = $scope.subjects.all.findIndex(s => s.id === subject.id);
+                            const subjectIndex: number = $scope.subjects.all.findIndex(s => s.id === subject.id);
                             $scope.subjects.all[subjectIndex].teacherId = subject.teacherId;
                         }
                     });

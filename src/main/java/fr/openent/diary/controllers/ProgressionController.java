@@ -1,8 +1,7 @@
 package fr.openent.diary.controllers;
 
-import fr.openent.diary.security.WorkflowUtils;
-import fr.openent.diary.security.workflow.*;
-import fr.openent.diary.services.HomeworkService;
+import fr.openent.diary.security.workflow.SessionManage;
+import fr.openent.diary.security.workflow.SessionRead;
 import fr.openent.diary.services.ProgressionService;
 import fr.openent.diary.services.impl.ProgessionServiceImpl;
 import fr.wseduc.rs.Delete;
@@ -15,7 +14,6 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
@@ -23,7 +21,6 @@ import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.defaultResponseHandler;
-import static org.entcore.common.http.response.DefaultResponseHandler.arrayResponseHandler;
 
 public class ProgressionController extends ControllerHelper {
 
