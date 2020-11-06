@@ -1,6 +1,6 @@
 <div ng-if="item.pedagogicType == TYPE_HOMEWORK" ng-click="goTo('/homework/update/' + item.id)"
      class="schedule-item-content "  ng-style="{'background-color': item.color}">
-    <div><i class="icon rack2"></i> [[item.subject.label]]</div>
+    <div><i class="icon rack2"></i> [[item.subject.label ? item.subject.label : item.subject.name]]</div>
     <div>&nbsp;[[item.audience.name]]</div>
     <div>([[item.type.label]])</div>
 </div>
@@ -11,7 +11,7 @@
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item.id]]</span>
 
-    <div><i class="icon cahier-textes2"></i> [[item.subject.label]]</div>
+    <div><i class="icon cahier-textes2"></i> [[item.subject.label ? item.subject.label : item.subject.name]]</div>
     <div>&nbsp;[[item.audience.name]]</div>
 </div>
 
@@ -19,7 +19,7 @@
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
     <span ng-show="false">[[item._id]]</span>
     <span ng-show="false">[[item.startDisplayDate]]</span>
-    <div class="text-item"><i class="icon cahier-textes2"></i> [[item.subject.label]]</div>
+    <div class="text-item"><i class="icon cahier-textes2"></i> [[item.subject.label ? item.subject.label : item.subject.name]]</div>
     <em class="text-item metadata">
         <span ng-repeat="audience in item.audiences.all">&nbsp;[[audience.name]]</span>
     </em>
