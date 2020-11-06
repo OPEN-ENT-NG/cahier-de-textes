@@ -201,7 +201,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              * Update session homeworks.
              */
             const updateSessionsHomework = async (): Promise<boolean> => {
-                let sessionsHomework: ISessionHomeworkBody = {homeworks: $scope.homeworks.filter(h => h.id)};
+                let sessionsHomework: ISessionHomeworkBody = {
+                    homeworks: $scope.homeworks.filter(h => h.id).concat($scope.from_homeworks.filter(h => h.id))
+                };
                 if (sessionsHomework.homeworks.length) {
                     let response: AxiosResponse = await sessionHomeworkService.update(sessionsHomework);
                     if (response.status === 200 || response.status === 201) {
@@ -211,7 +213,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         return false;
                     }
                 }
-                return true;
             };
 
             const saveSessionHomeworks = async (): Promise<void> => {
