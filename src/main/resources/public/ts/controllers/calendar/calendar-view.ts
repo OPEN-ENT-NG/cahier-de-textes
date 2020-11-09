@@ -511,18 +511,22 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a session drop on another session
              */
-            $scope.sessionToSession = async (idSessionDrag, idSessionDrop) => {
-                let sessionDrag, sessionDrop;
-                $scope.calendarItems.map(async session => {
-                    if (session.id == idSessionDrag) {
+            $scope.sessionToSession = async (idSessionDrag: string, idSessionDrop: string): Promise<void> => {
+                let sessionDrag: Session;
+                $scope.calendarItems.map(async (session: Session) => {
+                    if (session.id === idSessionDrag) {
                         sessionDrag = session;
                     }
                 });
-                $scope.calendarItems.map(async session => {
-                    if (session.id == idSessionDrop) {
+                $scope.calendarItems.map(async (session: Session) => {
+                    if (session.id === idSessionDrop) {
                         $rootScope.session = session;
                     }
                 });
+                if (sessionDrag) {
+                    sessionDrag.subject = $rootScope.session.subject;
+                    sessionDrag.subject_id = $rootScope.session.subject_id;
+                }
                 $rootScope.session.getSessionInfo(sessionDrag);
                 $rootScope.session.homeworks.forEach(homework => {
                     homework.sessions.push($rootScope.session);
@@ -565,33 +569,32 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a session drop on course
              */
-            $scope.sessionToCourse = async (idSession, idCourse, date) => {
-                let sessionDrag;
+            $scope.sessionToCourse = async (idSession: string, idCourse: string, date: any): Promise<void> => {
+                let sessionDrag: Session;
                 let course = new Course($scope.structure, idCourse);
 
                 $scope.calendarItems.map(async session => {
-                    if (session.id == idSession) {
+                    if (session.id === idSession) {
                         sessionDrag = session;
                     }
                 });
-
-
-                // Formating date
+                
+                // Formatting date
                 date = date.split('/').join('-');
-                date = date.split("-");
-                let tempDateAnnee = date[2];
+                date = date.split('-');
+                let tempDateYear = date[2];
                 date[2] = date[0];
-                date[0] = tempDateAnnee;
-                date = date.join("-");
+                date[0] = tempDateYear;
+                date = date.join('-');
 
-                //insert data and refresh calendar
+                // insert data and refresh calendar
                 await course.sync(date, date);
                 let session = new Session($scope.structure, course);
                 session.setFromCourseAndSession(course, sessionDrag);
-                // if I have homeworks, append this session to my sessions array 
+                // if I have homework, append this session to my sessions array
                 if (session.homeworks.length !== 0) {
-                    session.homeworks.forEach(homework => {
-                        homework.sessions.push(session)
+                    session.homeworks.forEach((homework: Homework) => {
+                        homework.sessions.push(session);
                     });
                 }
                 session.opened = true;

@@ -272,9 +272,10 @@ export class Session {
 
         this.subject = new Subject();
         this.subject.id = session.subject.id;
-        this.title = session.title ? session.title : "";
+        this.subject.name = session.subject.name ? session.subject.name : session.subject.label;
+        this.title = session.title ? session.title : '';
 
-        session.homeworks.map(homework => {
+        session.homeworks.map((homework: Homework) => {
             homework.due_date = this.date;
             homework.editedId = homework.id; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
             delete homework.id;
@@ -293,14 +294,15 @@ export class Session {
         this.description = session.description;
     }
 
-    setFromCourseAndSession(course: Course, sessionDrag: Session) {
+    setFromCourseAndSession(course: Course, sessionDrag: Session): void {
         this.courseId = course._id;
         this.teacher = sessionDrag.teacher;
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
         this.subject = new Subject();
         this.subject.id = sessionDrag.subject ? sessionDrag.subject.id : null;
-        this.title = sessionDrag.title ? sessionDrag.title : "";
+        this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+        this.title = sessionDrag.title ? sessionDrag.title : '';
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
