@@ -600,7 +600,7 @@ export let calendarController = ng.controller('CalendarController',
                 session.opened = true;
                 $rootScope.session = session;
 
-                $scope.goTo('/session/create');
+                $scope.goTo('/session/create/' + session.courseId + '/' + DateUtils.getFormattedDate(session.startMoment));
             };
 
             /**
@@ -685,7 +685,8 @@ export let calendarController = ng.controller('CalendarController',
                     }
                 );
                 $scope.safeApply();
-                $scope.goTo('/session/create');
+                $scope.goTo('/session/create/' + session.courseId + '/' + DateUtils.getFormattedDate(session.startMoment));
+
             };
 
             const load = async () => {

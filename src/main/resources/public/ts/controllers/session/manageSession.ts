@@ -57,9 +57,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              * @param subject Selected subject
              */
             $scope.openSessionForm = (audience: Audience, subject: Subject): void => {
-                if (audience && subject) {
-                    $scope.session.opened = true;
-                }
+                $scope.session.opened = audience && subject;
             };
 
             $scope.isUpdateHomework = (): boolean => {
@@ -548,6 +546,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.audience = $scope.groupsSearch.getSelectedGroups()[0]; // first element we fetch before reset
                 $scope.groupsSearch.resetGroups()
                 $scope.groupsSearch.group = '';
+                $scope.openSessionForm($scope.session.audience, $scope.session.subject);
             };
 
             /**
@@ -567,6 +566,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              */
             $scope.removeSearchSessionAudience = (): void => {
                 $scope.session.audience = null;
+                $scope.openSessionForm($scope.session.audience, $scope.session.subject);
             };
 
             /**
@@ -627,7 +627,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.string = $scope.session.toString();
                 $scope.session.firstText = lang.translate('session.manage.linkhomework');
 
-                if (!$scope.session.audience) {
+                if (Object.keys($routeParams).length !== 0 && !$scope.session.audience) {
                     toasts.warning(lang.translate('session.audience.load.error'));
                 }
 
