@@ -159,6 +159,7 @@
   "select.subject": "Select subject",
   "select.type": "Select session type",
   "session": "Session",
+  "session.audience.load.error": "The group is not part of the ENT. Please contact your administration.",
   "session.consult": "View session",
   "session.create": "Create session",
   "session.created": "Session created",

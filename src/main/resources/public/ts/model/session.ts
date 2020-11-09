@@ -93,7 +93,7 @@ export class Session {
 
         return {
             id: this.id ? this.id : null,
-            subject_id: this.subject.id,
+            subject_id: this.subject.id ? this.subject.id : this.subject_id,
             type_id: this.type.id,
             structure_id: this.structure.id,
             title: this.title ? this.title : placeholder,

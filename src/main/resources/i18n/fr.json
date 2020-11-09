@@ -160,6 +160,7 @@
   "select.subject": "Sélectionner la matière",
   "select.type": "Sélectionner le type de progression",
   "session": "Séance",
+  "session.audience.load.error": "Le groupe n'existe pas dans l'ENT. Veuillez contacter votre administration.",
   "session.consult": "Consulter la séance",
   "session.create": "Créer une séance",
   "session.created": "Séance créée",

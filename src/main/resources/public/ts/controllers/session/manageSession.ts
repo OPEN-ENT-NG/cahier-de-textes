@@ -14,6 +14,7 @@ import {Moment} from 'moment';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from '../../utils/autocomplete/groupsSearch';
 import {AxiosResponse} from 'axios';
+import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', '$filter',
@@ -344,7 +345,13 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if (!$scope.isUpdateHomework()) {
                     if (!$scope.form.homework.subject_id) {
                         $scope.form.homework.subject = $scope.session.subject;
-                        $scope.form.homework.subject_id = $scope.session.subject ? $scope.session.subject.id : null;
+
+                        if ($scope.session.subject.id) {
+                            $scope.form.homework.subject_id = $scope.session.subject;
+                        } else {
+                            $scope.form.homework.subject_id = $scope.session.subject_id ? $scope.session.subject_id : null;
+                            $scope.form.subject.id = EXCEPTIONAL.subjectId;
+                        }
                     }
                     if ($scope.session.audience && !$scope.form.homework.sessions.length) $scope.groupsHomeworkSearch.selectGroup(null, $scope.session.audience);
                     if ($scope.form.homework.sessions.length) {
@@ -620,12 +627,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.string = $scope.session.toString();
                 $scope.session.firstText = lang.translate('session.manage.linkhomework');
 
+                if (!$scope.session.audience) {
+                    toasts.warning(lang.translate('session.audience.load.error'));
+                }
 
                 $scope.placeholder = lang.translate('homework.attachedToSession') + moment($scope.session.date).format(FORMAT.displayDate);
                 await initSubjects();
                 $scope.safeApply();
                 await $scope.fixEditor();
-            }
+            };
 
             const initSubjects = async (): Promise<void> => {
                 await SubjectService.getTeacherSubjects($scope.structure.id, model.me.userId).then((subjectsList: Subject[]) => {
@@ -649,10 +659,14 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                 // if $scope.session has subject filled
                 if ($scope.session.subject) {
+                    if (!$scope.session.subject.id && $scope.session.subject_id === EXCEPTIONAL.subjectId) {
+                        $scope.session.subject.id = EXCEPTIONAL.subjectId;
+                        $scope.session.subject.name = lang.translate('session.exceptional.subject');
+                    }
                     const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
                     if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];
                 }
-            }
+            };
 
             $scope.back = () => {
                 window.history.back();
