@@ -296,7 +296,7 @@
         <div class="row">
             <div ng-if="form.homework" class="padding-md">
                 <!-- Deadline -->
-                <div class="float-left four vertical-align-top text-left">
+                <div class="float-left three vertical-align-top text-left">
                     <div ng-if="!isUpdateHomework()" class="ten flex twelve-mobile">
                         <label>
                             <i18n>deadline</i18n>
@@ -326,7 +326,7 @@
 
 
                         <!--GROUPS SEARCH INPUT-->
-                        <div class="flex-col col__10 autocomplete-audiences">
+                        <div class="flex-col col__11 autocomplete-audiences">
                             <div class="search-input">
 
                                 <async-autocomplete data-ng-disabled="false"
@@ -354,7 +354,7 @@
                             <multi-combo title="[[sessionTitle()]]"
                                          search-placeholder="[[lang.translate('sessions.choose')]]"
                                          id="group-list-teacher"
-                                         class="flex-col col__11"
+                                         class="flex-col col__15 select-list-sessions"
                                          combo-model="sessionsToAttachTo"
                                          filtered-model="form.homework.sessions"
                                          search-on="string"
@@ -362,7 +362,7 @@
                             >
                             </multi-combo>
                             <!-- Type -->
-                            <select class="flex-col col__11"
+                            <select class="flex-col col__15"
                                     required
                                     ng-model="form.homework.type"
                                     ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
@@ -416,7 +416,7 @@
 
                 <!-- Description-->
                 <div ng-if="form.homework"
-                     class="eight float-none display-inline-block vertical-align-top text-left">
+                     class="nine float-none display-inline-block vertical-align-top text-left">
                     <div class="twelve-mobile">
                         <label>
                             <i18n>utils.description</i18n>
