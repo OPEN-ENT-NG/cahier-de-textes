@@ -300,7 +300,7 @@ export class Session {
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
         this.subject = new Subject();
-        this.subject.id = sessionDrag.subject ? sessionDrag.subject.id : null;
+        this.subject.id = course.subject ? course.subject.id : null;
         this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
         this.title = sessionDrag.title ? sessionDrag.title : '';
         this.date = this.startTime = course.startMoment.toDate();
