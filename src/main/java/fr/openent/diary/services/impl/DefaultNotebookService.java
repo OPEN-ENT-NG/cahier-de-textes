@@ -121,9 +121,9 @@ public class DefaultNotebookService implements NotebookService {
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
                         for (Notebook notebook: notebookList) {
-                            notebook.setSubject(subjectMap.getOrDefault(notebook.getSubject().getId(), null));
-                            notebook.setTeacher(teacherMap.getOrDefault(notebook.getTeacher().getId(), null));
-                            notebook.setAudience(audienceMap.getOrDefault(notebook.getAudience().getId(), null));
+                            notebook.setSubject(subjectMap.getOrDefault(notebook.getSubject().getId(), new Subject(notebook.getSubject().getId())));
+                            notebook.setTeacher(teacherMap.getOrDefault(notebook.getTeacher().getId(), new User(notebook.getTeacher().getId())));
+                            notebook.setAudience(audienceMap.getOrDefault(notebook.getAudience().getId(), new Audience(notebook.getAudience().getId())));
                         }
                         future.complete(NotebookHelper.toJsonArray(notebookList));
                     }
@@ -334,9 +334,9 @@ public class DefaultNotebookService implements NotebookService {
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
                         for (Notebook notebook: notebookList) {
-                            notebook.setSubject(subjectMap.getOrDefault(notebook.getSubject().getId(), null));
-                            notebook.setTeacher(teacherMap.getOrDefault(notebook.getTeacher().getId(), null));
-                            notebook.setAudience(audienceMap.getOrDefault(notebook.getAudience().getId(), null));
+                            notebook.setSubject(subjectMap.getOrDefault(notebook.getSubject().getId(), new Subject(notebook.getSubject().getId())));
+                            notebook.setTeacher(teacherMap.getOrDefault(notebook.getTeacher().getId(), new User(notebook.getTeacher().getId())));
+                            notebook.setAudience(audienceMap.getOrDefault(notebook.getAudience().getId(), new Audience(notebook.getAudience().getId())));
                         }
                         handler.handle(new Either.Right<>(NotebookHelper.toJsonArray(notebookList)));
                     }

@@ -24,10 +24,10 @@ public class Subject implements Cloneable {
     }
 
     public Subject(JsonObject subject) {
-        this.id = subject.getString("id");
-        this.externalId = subject.getString("externalId");
-        this.name = subject.getString("name");
-        this.rank = subject.getInteger("rank");
+        this.id = subject.getString("id", null);
+        this.externalId = subject.getString("externalId", null);
+        this.name = subject.getString("name", null);
+        this.rank = subject.getInteger("rank", null);
     }
 
     public JsonObject toJSON() {
