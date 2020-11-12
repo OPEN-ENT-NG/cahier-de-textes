@@ -461,7 +461,7 @@ public class DefaultNotebookService implements NotebookService {
     }
 
     private String getHomeworksSessionsSelectResultQuery() {
-        return ") SELECT * from notebooks ";
+        return ") SELECT * from notebooks ORDER BY date DESC";
     }
 
     private String getSubQueryJoin(DiaryType diaryType) {
