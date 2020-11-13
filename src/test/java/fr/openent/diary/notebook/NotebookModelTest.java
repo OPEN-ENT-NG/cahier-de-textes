@@ -1,6 +1,7 @@
 package fr.openent.diary.notebook;
 
 import fr.openent.diary.models.Notebook;
+import fr.openent.diary.models.Subject;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -62,5 +63,19 @@ public class NotebookModelTest {
                 !notebook.getWorkload().toString().isEmpty() &&
                 !notebook.getEstimatedTime().toString().isEmpty();
         ctx.assertTrue(isNotEmpty);
+    }
+
+    @Test
+    public void testNotebookSubjectFieldCanUseJSONWithNull(TestContext ctx) {
+        Notebook notebook = new Notebook(notebookJsonObject_1);
+        notebook.setSubject(new Subject());
+        notebook.getSubject().toJSON();
+
+        ctx.assertEquals(new JsonObject()
+                        .putNull("id")
+                        .putNull("externalId")
+                        .putNull("name")
+                        .putNull("rank"),
+                notebook.getSubject().toJSON());
     }
 }
