@@ -52,7 +52,7 @@ public class DefaultNotebookService implements NotebookService {
 
         getNotebooksRequest(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished,
                 page, limit, offset, listResultsFuture);
-        countRequest(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, isPublished, countResultsFuture);
+        countRequest(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished, countResultsFuture);
 
         CompositeFuture.all(listResultsFuture, countResultsFuture).setHandler(eventResult -> {
             if (eventResult.failed()) {
@@ -141,10 +141,10 @@ public class DefaultNotebookService implements NotebookService {
     }
 
     private void countRequest(String structure_id, String start_at, String end_at, List<String> teacher_id,
-                              List<String> audience_id, Boolean isVisa, Boolean isPublished, Future<Long> future) {
+                              List<String> audience_id, Boolean isVisa, String visaOrder, Boolean isPublished, Future<Long> future) {
         JsonArray params = new JsonArray();
         Sql.getInstance().prepared(queryGetter(true, structure_id, start_at, end_at, teacher_id,
-                audience_id, isVisa, null, isPublished, null, null, null, params), params, SqlResult.validUniqueResultHandler(event -> {
+                audience_id, isVisa, visaOrder, isPublished, null, null, null, params), params, SqlResult.validUniqueResultHandler(event -> {
             if (event.isLeft()) {
                 String message = "[Diary@DefaultNotebookService::countRequest] Failed to count notebooks.";
                 log.error(message + " " + event.left().getValue());
@@ -173,7 +173,7 @@ public class DefaultNotebookService implements NotebookService {
         String query = " SELECT * FROM (SELECT DISTINCT ON (notebook_id) * FROM notebooks) AS notebooks ";
 
         // order by visa
-        if (isVisa == null || isVisa) {
+        if (isVisa != null && isVisa) {
             query += "ORDER BY visa " + (visaOrder.equals("ASC") ? visaOrder + " NULLS FIRST " : visaOrder + " NULLS LAST ");
         }
 
@@ -211,7 +211,7 @@ public class DefaultNotebookService implements NotebookService {
                     "LEFT JOIN diary.visa ON (session_visa.visa_id = visa.id OR homework_visa.visa_id = visa.id)";
 
             selectQuery += getFilterSelectQueryNotebook(structure_id, isVisa, start_at, end_at, teacher_ids,
-                    audience_ids, isPublished, params);
+                    audience_ids, isPublished, params, true);
             return selectQuery + ')';
         } else {
             // Filtering with VISA case
@@ -225,7 +225,7 @@ public class DefaultNotebookService implements NotebookService {
 
             // potentially filter visa false case
             selectQuery += getFilterSelectQueryNotebook(structure_id, isVisa, start_at, end_at, teacher_ids,
-                    audience_ids, isPublished, params);
+                    audience_ids, isPublished, params, null);
 
             // filter visa true case
             if (isVisa) {
@@ -235,7 +235,7 @@ public class DefaultNotebookService implements NotebookService {
                         "' AND notebook.id = homework_visa.homework_id) " +
                         "INNER JOIN diary.visa ON (homework_visa.visa_id = visa.id) ";
                 selectQuery += getFilterSelectQueryNotebook(structure_id, isVisa, start_at, end_at, teacher_ids,
-                        audience_ids, isPublished, params);
+                        audience_ids, isPublished, params, null);
             }
 
         }
@@ -251,7 +251,7 @@ public class DefaultNotebookService implements NotebookService {
 
     private String getFilterSelectQueryNotebook(String structure_id, Boolean isVisa, String start_at,
                                                 String end_at, List<String> teacher_ids, List<String> audience_ids,
-                                                Boolean isPublished, JsonArray params) {
+                                                Boolean isPublished, JsonArray params, Boolean visaOrderParam) {
 
         // structure id
         String query = " WHERE notebook.structure_id = ? ";
@@ -294,6 +294,10 @@ public class DefaultNotebookService implements NotebookService {
             query += "AND notebook.is_published IS " + isPublished + " ";
         }
         query += "GROUP BY notebook.subject_id, notebook.teacher_id, notebook.audience_id ";
+
+        if (visaOrderParam != null && visaOrderParam) {
+            query += " ORDER BY visa DESC NULLS LAST ";
+        }
         return query;
     }
 

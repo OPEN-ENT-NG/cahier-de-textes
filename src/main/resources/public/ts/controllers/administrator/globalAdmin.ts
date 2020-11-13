@@ -487,8 +487,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.updateFilter();
         };
 
-        $scope.init();
-
         $scope.back = () => {
             window.history.back();
         };
