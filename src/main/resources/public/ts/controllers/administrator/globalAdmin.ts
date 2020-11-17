@@ -491,6 +491,11 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             window.history.back();
         };
 
+        // We use this condition to prevent $scope.init to be called twice with $scope.$on to handle multiple structure 
+        if ($scope.structures.all.length <= 1) {
+            $scope.init();
+        }
+
         /* events handler */
         $scope.$watch(() => $scope.filters.startDate, async () => $scope.updateFilter());
         $scope.$watch(() => $scope.filters.endDate, async () => $scope.updateFilter());
