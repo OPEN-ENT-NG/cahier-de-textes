@@ -7,7 +7,8 @@ import {FORMAT} from '../core/const/dateFormat';
 import {EXCEPTIONAL} from '../core/const/exceptional-subject';
 import {Visa} from './visa';
 import {Homework, Homeworks} from './homework';
-import {ProgressionSession} from "./Progression";
+import {ProgressionSession} from './Progression';
+import {Moment} from 'moment';
 
 const colors = ['#7E7E7E', '#00ab6f', '#ff9700'];
 
@@ -15,6 +16,7 @@ export class Session {
     id: string;
     subject: Subject;
     subject_id?: string;
+    exceptional_label?: string;
     type: SessionType;
     type_id?: number;
     structure: Structure;
@@ -35,8 +37,8 @@ export class Session {
     isPublished: boolean = true;
     visas: Visa[] = [];
     opened: boolean = false;
-    startMoment: any;
-    endMoment: any;
+    startMoment: Moment;
+    endMoment: Moment;
     startDisplayDate: string;
     startDisplayTime: string;
     one_visa ?: boolean;
@@ -68,6 +70,7 @@ export class Session {
             subject: data.subject,
             type: structure.types.all.find(t => t.id === data.type_id),
             subject_id: data.subject_id,
+            exceptional_label: data.exceptional_label,
             id: data.id,
             title: data.title,
             room: data.room,
@@ -89,11 +92,12 @@ export class Session {
         };
     }
 
-    toSendFormat(placeholder?) {
+    toSendFormat(placeholder?: string) {
 
         return {
             id: this.id ? this.id : null,
             subject_id: this.subject.id ? this.subject.id : this.subject_id,
+            exceptional_label: this.exceptional_label,
             type_id: this.type.id,
             structure_id: this.structure.id,
             title: this.title ? this.title : placeholder,
@@ -164,37 +168,17 @@ export class Session {
         }
     }
 
-    async mapFromCourse() {
-        if (!this.courseId)
-            return;
-        let course: any = this.structure.courses.all.find(i => i._id === this.courseId);
-        if (!course)
-            return;
-        if (course.teachers && course.teachers.all && course.teachers.all.length > 0)
-            this.teacher = course.teachers[0];
-        if (course.rooms && course.rooms.length > 0)
-            this.room = course.rooms[0];
-        if (course.subject)
-            this.subject = course.subject;
-        if (course.beginning)
-            this.date = this.startTime = course.beginning.toDate();
-        if (course.end)
-            this.endTime = course.end.toDate();
-        if (course.audiences && course.audiences.all && course.audiences.all.length > 0)
-            this.audience = course.audiences.all[0];
-        this.color = colors[1];
-    }
-
     async setFromCourse(course: Course): Promise<void> {
         this.courseId = course._id;
         this.teacher = course.teachers[0];
-        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : "";
+        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : '';
         if (!this.subject) {
             this.subject = course.subject;
         }
         if (course.exceptionnal) {
             this.subject.id = EXCEPTIONAL.subjectId;
             this.subject.label = EXCEPTIONAL.subjectCode;
+            this.exceptional_label = course.exceptionnal;
         }
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
@@ -255,7 +239,7 @@ export class Session {
         this.type = progression.type;
         this.courseId = course._id;
         this.teacher = (course.teachers && course.teachers.length > 0) ? course.teachers[0] : null;
-        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : "";
+        this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : '';
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
         this.audience = course.audiences.all[0];
@@ -264,15 +248,24 @@ export class Session {
 
     }
 
-    getStartMoment(): any {
-        return this.startMoment ? this.startMoment : moment(this.startTime)
+    getStartMoment(): Moment {
+        return this.startMoment ? this.startMoment : moment(this.startTime);
+    }
+    
+    getSubjectTitle(): string {
+        if (this.subject.id && this.subject.id !== EXCEPTIONAL.subjectId) {
+            return this.subject.name ? this.subject.name : this.subject.label;
+        }
+        else {
+            return this.exceptional_label ? this.exceptional_label : this.subject.label;
+        }
     }
 
     getSessionInfo(session: Session): void {
 
         this.subject = new Subject();
         this.subject.id = session.subject.id;
-        this.subject.name = session.subject.name ? session.subject.name : session.subject.label;
+        this.subject.name = session.getSubjectTitle();
         this.title = session.title ? session.title : '';
 
         session.homeworks.map((homework: Homework) => {

@@ -5,6 +5,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
@@ -19,4 +20,6 @@ public interface SubjectService {
     void getSubjects(JsonArray subjectsId, Handler<AsyncResult<List<Subject>>> handler);
 
     void getSubjects(JsonArray subjectsId, Future<List<Subject>> handler);
+
+    void getExceptionalLabels(String structureId, Handler<AsyncResult<JsonObject>> handler);
 }

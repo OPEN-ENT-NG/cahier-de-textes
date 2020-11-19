@@ -3,7 +3,7 @@
         <div class="seven cell twelve-mobile">
 
             <!-- IF ADD SESSION-->
-            <div ng-if="!session.courseId && sessionFormIsOpened" class="session-form-header">
+            <div ng-if="!session.courseId && !session.subject_id && sessionFormIsOpened" class="session-form-header">
 
                 <!--SEARCH CLASS/GROUP-->
                 <div class="session-form-header-search">
@@ -35,15 +35,15 @@
             </div>
 
             <!--IF EDIT SESSION-->
-            <div ng-if="session.courseId && sessionFormIsOpened" class="margin-bottom-md margin-top-lg">
+            <div ng-if="(session.courseId || session.subject_id) && sessionFormIsOpened" class="margin-bottom-md margin-top-lg">
 
                 <!--CLASS/GROUP NAME CARD-->
                 <span class="card session-form-card" ng-if="session.audience.name">
                     [[session.audience.name]]
                 </span>
                 <!--SUBJECT LABEL CARD-->
-                <span class="card session-form-card" ng-if="session.subject.label || session.subject.name">
-                [[session.subject.label ? session.subject.label : session.subject.name]]
+                <span class="card session-form-card">
+                    [[session.getSubjectTitle()]]
                 </span>
             </div>
 
@@ -193,16 +193,19 @@
                     <div class="custom-flex-col padding-cell justified-content-center flex-text-left one">&nbsp;</div>
                 </div>
 
-                <!--CURRENT SESSION HOMEWORKS-->
+                <!--CURRENT SESSION HOMEWORKS DATA FORM-->
                 <div ng-repeat="homework in homeworks track by $index"
                      class="custom-flex-row twelve bot-border">
                     <div class="custom-flex-col four right-border"
                          ng-if="homework.attachedToSession && homework.sessions.length">
                         <div ng-repeat="session in homework.sessions track by $index" class="custom-flex-row twelve">
+
+                            <!--HOMEWORK AUDIENCE-->
                             <div class="custom-flex-col padding-cell justified-content-center two">
                                 <p>[[session.audience.name]]</p>
                             </div>
 
+                            <!--HOMEWORK DATE-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
                                 <p ng-if="!session.firstText" class="margin-bottom-md">
                                     <i18n>homework.attachedToSession</i18n>
@@ -213,19 +216,25 @@
                                     <i18n>todo.for.this.session</i18n>
                                 </p>
                             </div>
+                            <!--HOMEWORK SUBJECT-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
-                                <p>[[session.subject.label]]</p>
+                                <p>[[session.getSubjectTitle()]]</p>
                             </div>
                         </div>
                     </div>
+
+                    <!--CURRENT SESSION HOMEWORKS LOADED DATA-->
                     <div class="custom-flex-col four right-border"
                          ng-if="!homework.attachedToSession || !homework.sessions.length">
                         <div class="custom-flex-row twelve">
+
+                            <!--HOMEWORK AUDIENCE-->
                             <div class="custom-flex-col padding-cell justified-content-center two">
                                 <div class="custom-flex-row twelve">
                                     <p>[[homework.audience.name]]</p>
                                 </div>
                             </div>
+                            <!--HOMEWORK DATE-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
                                 <p ng-if="!isHomeworkInSession(homework, session)" class="margin-bottom-md">
                                     <i18n>homework.for.date</i18n>
@@ -235,18 +244,23 @@
                                     <i18n>todo.for.this.session</i18n>
                                 </p>
                             </div>
+                            <!--HOMEWORK SUBJECT-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
-                                <p>[[homework.subject.label ? homework.subject.label : homework.subject.name]]</p>
+                                <p>[[homework.getSubjectTitle()]]</p>
                             </div>
                         </div>
-
                     </div>
+
+                    <!--HOMEWORK TYPE-->
                     <div class="custom-flex-col padding-cell justified-content-center one">
                         <p>[[homework.type.label]]</p>
                     </div>
+                    <!--HOMEWORK DESCRIPTION-->
                     <div class="custom-flex-col padding-cell six">
                         <p bind-html="[[homework.description]]"></p>
                     </div>
+
+                    <!--EDIT/DELETE BUTTONS-->
                     <div class="custom-flex-col padding-cell justified-content-center flex-text-right one">
                         <i ng-show="!hidePencil"
                            ng-click="manageHomework(homework)">&#xe858;</i>
@@ -260,28 +274,36 @@
                      class="custom-flex-row twelve bot-border">
                     <div class="custom-flex-col four right-border">
                         <div class="custom-flex-row twelve">
+
+                            <!--HOMEWORK AUDIENCE-->
                             <div class="custom-flex-col padding-cell justified-content-center two">
                                 <div class="custom-flex-row twelve">
                                     <p>[[homework.audience.name]]</p>
                                 </div>
                             </div>
+                            <!--HOMEWORK DATE-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
                                 <p class="margin-bottom-md">
                                     <i18n>homework.for.date</i18n>
                                     <span>[[homework.dateDisplayed]]</span>
                                 </p>
                             </div>
+                            <!--HOMEWORK SUBJECT-->
                             <div class="custom-flex-col padding-cell justified-content-center five">
-                                <p>[[homework.subject.label]]</p>
+                                <p>[[homework.getSubjectTitle()]]</p>
                             </div>
                         </div>
                     </div>
+
+                    <!--HOMEWORK TYPE-->
                     <div class="custom-flex-col padding-cell justified-content-center one">
                         <p>[[homework.type.label]]</p>
                     </div>
                     <div class="custom-flex-col padding-cell six">
                         <p bind-html="[[homework.description]]"></p>
                     </div>
+
+                    <!--EDIT/DELETE BUTTONS-->
                     <div class="custom-flex-col padding-cell justified-content-center flex-text-right one">
                         <i ng-show="!hidePencil"
                            ng-click="manageHomework(homework)">&#xe858;</i>

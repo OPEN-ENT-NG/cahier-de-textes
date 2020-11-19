@@ -107,7 +107,8 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                 .put("from_session_id",  homeworkSession.getJsonObject("homework").getLong("from_session_id"))
                 .put("due_date",    homeworkSession.getString("due_date"))
                 .put("audience_id", homeworkSession.getString("audience_id", null))
-                .put("subject_id", homeworkSession.getString("subject_id", null));
+                .put("subject_id", homeworkSession.getString("subject_id", null))
+                .put("exceptional_label", homeworkSession.getString("exceptional_label", null));
     }
 
     private void createSession(JsonObject homework, JsonObject session, UserInfos user, Future<JsonObject> future) {

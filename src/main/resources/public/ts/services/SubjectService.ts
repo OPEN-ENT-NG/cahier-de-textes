@@ -1,12 +1,13 @@
-import {ng} from 'entcore'
-import http from 'axios';
-import {Subject} from "../model";
+import {ng} from 'entcore';
+import http, {AxiosResponse} from 'axios';
+import {Subject} from '../model';
 
 export interface SubjectService {
-    getTeacherSubjects(structureId: string, teacherId: string): Promise<Subject[]>
+    getTeacherSubjects(structureId: string, teacherId: string): Promise<Subject[]>;
+    getExceptionalLabels(structureId): Promise<string[]>;
 }
 
-export const SubjectService = ng.service('SubjectService', (): SubjectService => ({
+export const subjectService: SubjectService = {
     getTeacherSubjects: async (structureId, teacherId) => {
         try {
             const {data} = await http.get(`/directory/timetable/subjects/${structureId}?teacherId=${teacherId}`);
@@ -18,5 +19,17 @@ export const SubjectService = ng.service('SubjectService', (): SubjectService =>
         } catch (e) {
             throw e;
         }
+    },
+
+    getExceptionalLabels: async (structureId): Promise<string[]> => {
+        try {
+            const {data}: AxiosResponse = await http.get(`/diary/subjects/exceptional/${structureId}`);
+            return data.values;
+        } catch (e) {
+            throw e;
+        }
     }
-}));
+};
+
+
+export const SubjectService = ng.service('SubjectService', (): SubjectService => subjectService);

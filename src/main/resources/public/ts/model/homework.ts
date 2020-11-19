@@ -28,6 +28,7 @@ export class Homework {
     visas: Visas;
     teacher: Teacher;
     subject: Subject;
+    exceptional_label?: string;
     audience: any;
     audiences: any[];
     session: Session;
@@ -64,6 +65,7 @@ export class Homework {
         return {
             subject_id: this.subject.id,
             type_id: this.type.id,
+            exceptional_label: this.exceptional_label,
             teacher_id: model.me.userId,
             structure_id: this.structure.id,
             session_id: this.session ? this.session.id : null,
@@ -98,6 +100,16 @@ export class Homework {
         this.attachedToDate = homework.attachedToDate;
         this.attachedToSession = homework.attachedToSession;
         this.subject = homework.subject;
+        this.exceptional_label = homework.exceptional_label;
+    }
+
+    getSubjectTitle(): string {
+        if (this.subject.id && !this.exceptional_label) {
+            return this.subject.name ? this.subject.name : this.subject.label;
+        }
+        else {
+            return this.exceptional_label;
+        }
     }
 
     static formatSqlDataToModel(data: any): any {
@@ -105,6 +117,7 @@ export class Homework {
             audience: data.audience,
             teacher: data.teacher,
             subject: data.subject,
+            exceptional_label: data.exceptional_label,
             session_id: data.session_id,
             from_session_id: data.from_session_id,
             session_date: data.session_date,

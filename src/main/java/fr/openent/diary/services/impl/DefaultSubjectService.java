@@ -3,6 +3,7 @@ package fr.openent.diary.services.impl;
 import fr.openent.diary.helper.SubjectHelper;
 import fr.openent.diary.models.Subject;
 import fr.openent.diary.services.SubjectService;
+import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -11,6 +12,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.mongodb.MongoDbResult;
 
 import java.util.List;
 
@@ -48,5 +50,20 @@ public class DefaultSubjectService implements SubjectService {
                 future.complete(event.result());
             }
         });
+    }
+
+    @Override
+    public void getExceptionalLabels(String structureId, Handler<AsyncResult<JsonObject>> handler) {
+        JsonObject query = new JsonObject().put("structureId", structureId);
+        MongoDb.getInstance().distinct("courses", "exceptionnal", query,
+                MongoDbResult.validActionResultHandler(either -> {
+                    if(either.isLeft()) {
+                        LOGGER.error("[Diary.DefaultSubjectService::getExceptionalLabels] Failed to retrieve exceptional" +
+                                "subjects labels");
+                        handler.handle(Future.failedFuture(either.left().getValue()));
+                    } else {
+                        handler.handle(Future.succeededFuture(either.right().getValue()));
+                    }
+                }));
     }
 }

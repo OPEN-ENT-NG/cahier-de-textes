@@ -328,14 +328,21 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     @Override
     public void createHomework(JsonObject homework, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, structure_id, teacher_id, audience_id, estimatedTime, " +
+        String query = "INSERT INTO " + Diary.DIARY_SCHEMA + ".homework (subject_id, exceptional_label, structure_id, teacher_id, audience_id, estimatedTime, " +
                 "color, description, is_published, from_session_id, session_id, due_date, type_id, owner_id " +
                 ", created, modified" + ((homework.getBoolean("is_published") == true)? " , publish_date) " : ")" )+
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), ?, ?, NOW()," +
                 " NOW()"+((homework.getBoolean("is_published") == true)? " , NOW()) " : ")" )+" RETURNING id";
 
         values.add(homework.getString("subject_id"));
+
+        if (homework.getString("exceptional_label") != null) {
+            values.add(homework.getString("exceptional_label"));
+        } else {
+            values.addNull();
+        }
+
         values.add(homework.getString("structure_id"));
         values.add(user.getUserId());
         values.add(homework.getString("audience_id"));
@@ -375,10 +382,15 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void updateHomework(long homeworkId,boolean publishedChanged, JsonObject homework, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework " +
-                "SET subject_id = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
+                "SET subject_id = ?, exceptional_label = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
                 " color = ?, description = ?, type_id = ?,  modified = NOW() " ;
 
         values.add(homework.getString("subject_id"));
+        if (homework.getString("exceptional_label") != null) {
+            values.add(homework.getString("exceptional_label"));
+        } else {
+            values.addNull();
+        }
         values.add(homework.getString("structure_id"));
         values.add(homework.getString("audience_id"));
         values.add(homework.getInteger("estimatedTime"));

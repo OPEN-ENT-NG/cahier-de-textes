@@ -67,7 +67,7 @@
 
                     <!-- subject name -->
                     <div class="text-center flex-col col__2" role="cell">
-                        [[notebook.subject.name]]
+                        [[notebook.subject.name ? notebook.subject.name : notebook.exceptional_label]]
                     </div>
 
                     <!-- teacher name (if personal user type) -->

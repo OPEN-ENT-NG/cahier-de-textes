@@ -148,6 +148,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
                 // Sauvegarde de la session
                 $scope.session.is_empty = false;
+
+                if ($scope.session.subject && $scope.session.subject.id === EXCEPTIONAL.subjectId) {
+                    $scope.session.exceptional_label = $scope.session.subject.label ?
+                        $scope.session.subject.label : $scope.session.subject.name;
+                }
+
                 let sessionSaveResponse: any = await $scope.session.save($scope.placeholder);
                 if (sessionSaveResponse.succeed) {
                     if (!$scope.session.id && sessionSaveResponse.data.id) {
@@ -160,6 +166,11 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.homeworks.forEach((h: Homework) => {
 
                         h.from_session_id = $scope.session.id;
+                        h.exceptional_label = $scope.session.exceptional_label;
+                        if ($scope.session.exceptional_label && !h.subject.id) {
+                            h.subject.id = EXCEPTIONAL.subjectId;
+                            h.subject.code = EXCEPTIONAL.subjectCode;
+                        }
 
                         h.sessions.forEach((s: Session) => {
 
@@ -349,6 +360,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         } else {
                             $scope.form.homework.subject_id = $scope.session.subject_id ? $scope.session.subject_id : null;
                             $scope.form.subject.id = EXCEPTIONAL.subjectId;
+                            $scope.form.exceptional_label = $scope.session.exceptional_label;
                         }
                     }
                     if ($scope.session.audience && !$scope.form.homework.sessions.length) $scope.groupsHomeworkSearch.selectGroup(null, $scope.session.audience);
@@ -480,8 +492,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              * @param session A session.
              */
             $scope.sessionString = (session: Session): string => {
-                return session.audience.name + ' - ' +
-                    (session.subject.name ? session.subject.name : lang.translate('session.exceptional.subject')) + ' - '
+                return session.audience.name + ' - ' + session.getSubjectTitle() + ' - '
                     + moment.weekdays(true)[moment(session.startDisplayDate, FORMAT.displayDate).weekday()] + ' '
                     + session.startDisplayDate + ' ' + session.startDisplayTime
                     + ' - ' + session.endDisplayTime;
@@ -648,7 +659,17 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                             $scope.subjects.all[subjectIndex].teacherId = subject.teacherId;
                         }
                     });
-                    $scope.groupBy = (x) => x.teacherId !== undefined ? lang.translate("subjects.teacher") : lang.translate("subjects.structure");
+
+                    $scope.groupBy = (subject: Subject): string => {
+                        if (subject.teacherId !== undefined) {
+                            return lang.translate('subjects.teacher');
+                        } else if (subject.id !== EXCEPTIONAL.subjectId) {
+                            return lang.translate('subjects.structure');
+                       } else {
+                            return lang.translate('subjects.exceptional');
+                        }
+                    };
+
                     if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
                         $scope.session.subject = $scope.subjects.all[0];
                         if ($scope.session.audience) {
@@ -661,7 +682,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 if ($scope.session.subject) {
                     if (!$scope.session.subject.id && $scope.session.subject_id === EXCEPTIONAL.subjectId) {
                         $scope.session.subject.id = EXCEPTIONAL.subjectId;
-                        $scope.session.subject.name = lang.translate('session.exceptional.subject');
+                        $scope.session.subject.name = $scope.session.getSubjectTitle();
                     }
                     const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
                     if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];

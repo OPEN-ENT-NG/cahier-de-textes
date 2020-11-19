@@ -10,7 +10,10 @@
         <div class="flex-row-cdt row__6" ng-if="item.exceptionnal">
             <div class="flex-col col__4">[[item.exceptionnal]]</div>
         </div>
-        <div class="flex-row-cdt row__6" ng-if="item.subject_id === 'exceptional'">
+        <div class="flex-row-cdt row__6" ng-if="item.subject_id === 'exceptional' && item.exceptional_label">
+            <div class="flex-col">[[item.exceptional_label]]</div>
+        </div>
+        <div class="flex-row-cdt row__6" ng-if="item.subject_id === 'exceptional' && !item.exceptional_label">
             <div class="flex-col"><i18n>session.exceptional.subject</i18n></div>
         </div>
         <div class="flex-row-cdt row__6" ng-if="item.subject_id !== 'exceptional' && !item.exceptionnal">

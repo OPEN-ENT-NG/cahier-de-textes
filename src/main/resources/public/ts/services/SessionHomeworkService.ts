@@ -1,6 +1,7 @@
 import {model, ng, idiom as lang} from 'entcore';
 import http, {AxiosResponse} from 'axios';
 import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from '../model';
+import {EXCEPTIONAL} from '../core/const/exceptional-subject';
 
 export const sessionHomeworkService: ISessionHomeworkService = {
     create: async (sessionHomework: ISessionHomeworkBody): Promise<AxiosResponse> => {
@@ -11,7 +12,8 @@ export const sessionHomeworkService: ISessionHomeworkService = {
                     res['sessions'] = h.sessions.map(s => {
                         return {
                             id: s.id ? s.id : null,
-                            subject_id: s.subject.id,
+                            subject_id: s.subject.id ? s.subject.id : EXCEPTIONAL.subjectId,
+                            exceptional_label: s.exceptional_label,
                             type_id: s.type.id ? s.type.id : s.type_id,
                             structure_id: s.structure.id,
                             audience_id: s.audience.id,
@@ -50,7 +52,8 @@ export const sessionHomeworkService: ISessionHomeworkService = {
 const basicFormatHomework = (h: Homework) => {
     return {
         id: h.id ? h.id : null,
-        subject_id: h.subject.id,
+        subject_id: h.subject.id ? h.subject.id : EXCEPTIONAL.subjectId,
+        exceptional_label: h.exceptional_label,
         audience_id: h.audience.id,
         from_session_id: h.from_session_id,
         teacher_id: model.me.userId,

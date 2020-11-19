@@ -330,22 +330,19 @@ export let calendarController = ng.controller('CalendarController',
                 return c.nbHomework != 0 && isDisplayedByDefault;
             }
             
-            $scope.initDisplay = () => {
-                let nbSessionDisplayed = 0;
-                let nbHomeworkDisplayed = 0;
-                let indexMinChildHomework = $scope.pedagogicDays.length;
-                let indexMaxChildHomework = -1;
+            $scope.initDisplay = (): void => {
+                let nbSessionDisplayed: number = 0;
+                let nbHomeworkDisplayed: number = 0;
+                let indexMinChildHomework: number = $scope.pedagogicDays.length;
+                let indexMaxChildHomework: number = -1;
 
-                //hiding all the days
+                // hiding all the days
                 $scope.pedagogicDays.map(c => {
                     c.displayed = false;
                 });
 
-                //display session
+                // display session
                 $scope.pedagogicDays.map((c, index) => {
-                    if (c.shortDate === "17/04")
-
-                        containsSession(c);
                     if (containsSession(c) && nbSessionDisplayed < 3) {
                         c.displayed = true;
                         nbSessionDisplayed++;
@@ -366,7 +363,7 @@ export let calendarController = ng.controller('CalendarController',
                         if (index => indexMinChildHomework && index <= indexMaxChildHomework) {
                             c.displayed = true;
                         }
-                    })
+                    });
                 }
             };
 

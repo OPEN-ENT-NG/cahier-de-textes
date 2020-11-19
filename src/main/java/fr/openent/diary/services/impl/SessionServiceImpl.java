@@ -537,14 +537,21 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void createSession(JsonObject session, UserInfos user, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
-        String query = "INSERT INTO diary.session (subject_id, type_id, structure_id, teacher_id, audience_id, title, " +
+        String query = "INSERT INTO diary.session (subject_id, type_id, exceptional_label, structure_id, teacher_id, audience_id, title, " +
                 "room, color, description, annotation, is_published, is_empty, course_id, owner_id, " +
                 "date, start_time, end_time, created, modified) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
 
         values.add(session.getString("subject_id"));
         values.add(session.getInteger("type_id"));
+
+        if (session.getString("exceptional_label") != null) {
+            values.add(session.getString("exceptional_label"));
+        } else {
+            values.addNull();
+        }
+
         values.add(session.getString("structure_id"));
         values.add(user.getUserId());
         values.add(session.getString("audience_id"));
@@ -583,13 +590,20 @@ public class SessionServiceImpl implements SessionService {
     public void updateSession(long sessionId, JsonObject session, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "UPDATE diary.session" +
-                " SET subject_id = ?, type_id = ?, structure_id = ?, audience_id = ?, title = ?, " +
+                " SET subject_id = ?, type_id = ?, exceptional_label = ?, structure_id = ?, audience_id = ?, title = ?, " +
                 " room = ?, color = ?, description = ?, annotation = ?, is_published = ?, is_empty = ?, course_id = ?, " +
                 " date = to_date(?,'YYYY-MM-DD'), start_time = to_timestamp(?, 'hh24:mi:ss'), end_time = to_timestamp(?, 'hh24:mi:ss'), modified = NOW()" +
                 " WHERE id = ?;";
 
         values.add(session.getString("subject_id"));
         values.add(session.getInteger("type_id"));
+
+        if (session.getString("exceptional_label") != null) {
+            values.add(session.getString("exceptional_label"));
+        } else {
+            values.addNull();
+        }
+
         values.add(session.getString("structure_id"));
         values.add(session.getString("audience_id"));
         values.add(session.getString("title"));

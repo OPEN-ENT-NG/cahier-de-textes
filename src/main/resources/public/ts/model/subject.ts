@@ -1,7 +1,7 @@
 import {notify} from 'entcore';
 import http from 'axios';
+import {subjectService} from '../services';
 import {EXCEPTIONAL} from '../core/const/exceptional-subject';
-import {idiom as lang} from 'entcore';
 
 export interface ISubject {
     id?: string;
@@ -57,7 +57,7 @@ export class Subjects {
                     this.initSubject(subject);
                 }
             });
-            this.initExceptionalSubject();
+            await this.initExceptionalSubject(structureId);
             return;
         } catch (e) {
             notify.error('app.notify.e500');
@@ -69,8 +69,13 @@ export class Subjects {
         this.mapping[subject.subjectId] = subject.subjectLabel;
     }
 
-    private initExceptionalSubject(): void {
-        this.all.push( new Subject(EXCEPTIONAL.subjectId, lang.translate('session.exceptional.subject'), EXCEPTIONAL.subjectCode));
+    private async initExceptionalSubject(structureId: string): Promise<void> {
+
+        let exceptionalLabels: string[] = await subjectService.getExceptionalLabels(structureId);
+
+        exceptionalLabels.forEach((label: string) => {
+            this.all.push(new Subject(EXCEPTIONAL.subjectId, label));
+        });
     }
 
 }

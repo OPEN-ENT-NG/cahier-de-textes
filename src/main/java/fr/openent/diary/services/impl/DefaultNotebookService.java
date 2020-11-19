@@ -245,8 +245,8 @@ public class DefaultNotebookService implements NotebookService {
     private String getSelectNotebookContentQuery(Boolean isVisa) {
         return "SELECT concat(notebook.subject_id, '$', " +
                 "notebook.teacher_id, '$', notebook.audience_id) as notebook_id, notebook.subject_id, " +
-                "notebook.teacher_id, notebook.audience_id, count(distinct notebook.id) as sessions, MAX(notebook.modified) as modified, " +
-                ((isVisa == null || isVisa) ? "MAX(visa.created)" : "null") + " as visa" + " FROM diary.notebook ";
+                "notebook.teacher_id, notebook.audience_id, notebook.exceptional_label, count(distinct notebook.id) as sessions, MAX(notebook.modified) as modified, " +
+                ((isVisa == null || isVisa) ? "MAX(visa.created)" : "null") + " as visa" + " FROM "+ Diary.DIARY_SCHEMA +".notebook ";
     }
 
     private String getFilterSelectQueryNotebook(String structure_id, Boolean isVisa, String start_at,
@@ -259,9 +259,9 @@ public class DefaultNotebookService implements NotebookService {
 
         // NO VISA filter case
         if (isVisa != null && !isVisa) {
-            query += "AND NOT EXISTS(SELECT 1 FROM diary.session_visa session_visa " +
+            query += "AND NOT EXISTS(SELECT 1 FROM "+ Diary.DIARY_SCHEMA +".session_visa session_visa " +
                     "WHERE notebook.type = '" + SESSION.toString() + "' AND session_visa.session_id = notebook.id) " +
-                    "AND NOT EXISTS(SELECT 1 FROM diary.homework_visa homework_visa " +
+                    "AND NOT EXISTS(SELECT 1 FROM "+ Diary.DIARY_SCHEMA +".homework_visa homework_visa " +
                     "WHERE notebook.type = '" + HOMEWORK.toString() + "' AND homework_visa.homework_id = notebook.id) ";
         }
 
@@ -293,7 +293,7 @@ public class DefaultNotebookService implements NotebookService {
         if (isPublished != null) {
             query += "AND notebook.is_published IS " + isPublished + " ";
         }
-        query += "GROUP BY notebook.subject_id, notebook.teacher_id, notebook.audience_id ";
+        query += "GROUP BY notebook.subject_id, notebook.teacher_id, notebook.audience_id, notebook.exceptional_label ";
 
         if (visaOrderParam != null && visaOrderParam) {
             query += " ORDER BY visa DESC NULLS LAST ";
@@ -540,7 +540,7 @@ public class DefaultNotebookService implements NotebookService {
         query += "GROUP BY notebook.id, notebook.subject_id, notebook.structure_id, notebook.teacher_id, notebook.audience_id, " +
                 "notebook.description, notebook.title, notebook.type_id, notebook.modified, notebook.is_published, notebook.date, " +
                 "notebook.start_time, notebook.end_time, notebook.type, notebook.session_id, notebook.annotation, " +
-                "notebook.workload, notebook.estimatedtime" + ((isVisa == null || isVisa) ? ", visa" : " ");
+                "notebook.workload, notebook.estimatedtime, notebook.exceptional_label" + ((isVisa == null || isVisa) ? ", visa" : " ");
         return query;
     }
 

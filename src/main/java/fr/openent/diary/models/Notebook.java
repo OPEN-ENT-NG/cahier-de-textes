@@ -8,6 +8,7 @@ public class Notebook {
     private String notebook_id;
     private Long id;
     private Subject subject;
+    private String exceptional_label;
     private User teacher;
     private Audience audience;
     private Long sessions;
@@ -31,6 +32,7 @@ public class Notebook {
         this.notebook_id = notebook.getString("notebook_id", null);
         this.id = notebook.getLong("id", null);
         this.subject = new Subject(notebook.getString("subject_id"));
+        this.exceptional_label = notebook.getString("exceptional_label", null);
         this.teacher = new User(notebook.getString("teacher_id"));
         this.audience = new Audience(notebook.getString("audience_id"));
         this.sessions = notebook.getLong("sessions", null);
@@ -56,6 +58,7 @@ public class Notebook {
                 .put("notebook_id", this.notebook_id)
                 .put("id", this.id)
                 .put("subject", this.subject.toJSON())
+                .put("exceptional_label", this.exceptional_label)
                 .put("teacher", this.teacher.toJSON())
                 .put("audience", this.audience.toJSON())
                 .put("description", this.description)
