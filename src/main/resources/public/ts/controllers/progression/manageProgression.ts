@@ -6,7 +6,8 @@ import {
     ProgressionSession,
     ProgressionSessions
 } from '../../model/Progression';
-import {HomeworkTypes, SessionTypes, Subjects} from '../../model';
+import {HomeworkTypes, SessionType, SessionTypes, Subject, Subjects} from '../../model';
+import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 
 declare let window: any;
 
@@ -75,20 +76,20 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.sessionTypes = new SessionTypes(window.structure.id);
             await Promise.all([
                 $scope.sessionTypes.sync(),
-                $scope.subjects.sync(window.structure.id, model.me.userId),
+                $scope.subjects.sync(window.structure.id),
                 $scope.initProgressions()
             ]);
             initForms();
 
-            $scope.progressionFolders.forEach((folder) => {
-                folder.progressionSessions.map(psession => {
-                    $scope.subjects.all.forEach(subject => {
-                        if (psession.subject_id == subject.id) {
+            $scope.progressionFolders.forEach((folder: ProgressionFolder) => {
+                folder.progressionSessions.map((psession: ProgressionSession) => {
+                    $scope.subjects.all.forEach((subject: Subject) => {
+                        if (psession.subject_id === subject.id) {
                             psession.setSubject(subject);
                         }
                     });
-                    $scope.sessionTypes.all.forEach(type => {
-                        if (psession.type_id == type.id) {
+                    $scope.sessionTypes.all.forEach((type: SessionType) => {
+                        if (psession.type_id === type.id) {
                             psession.setType(type);
                         }
                     });
@@ -114,7 +115,7 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             await $scope.homeworkTypes.sync();
             $scope.safeApply();
 
-            let elementCalendar = document.getElementById('calendar-area');
+            let elementCalendar: HTMLElement = document.getElementById('calendar-area');
             if (!elementCalendar) {
                 $scope.fixEditor();
             }
@@ -142,6 +143,12 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.selectedItem = $scope.progressionFolders.all
                 .find((progressionFolder: ProgressionFolder) => progressionFolder.id === currentFolder);
             $scope.selectedSubItems = [];
+        };
+
+        $scope.groupBy = (subject: Subject): string => {
+           if (subject.id === EXCEPTIONAL.subjectId) {
+                return lang.translate('subjects.exceptional');
+           }
         };
 
         $scope.setSubjectSession = () => {

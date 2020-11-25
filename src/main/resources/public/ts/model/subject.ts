@@ -50,6 +50,7 @@ export class Subjects {
         try {
             let url = `/directory/timetable/subjects/${structureId}`;
             this.all = [];
+            this.mapping = {};
             if (teacherId !== undefined) url += `?teacherId=${teacherId}`;
             let subjects = await http.get(url);
             subjects.data.forEach((subject) => {
