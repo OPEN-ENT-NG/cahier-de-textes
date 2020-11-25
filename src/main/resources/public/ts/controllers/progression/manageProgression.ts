@@ -5,16 +5,16 @@ import {
     ProgressionHomework,
     ProgressionSession,
     ProgressionSessions
-} from "../../model/Progression";
-import {HomeworkTypes, SessionTypes, Subjects} from "../../model";
+} from '../../model/Progression';
+import {HomeworkTypes, SessionTypes, Subjects} from '../../model';
 
 declare let window: any;
 
-export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
+export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
     ['$scope', '$routeParams', '$location', '$timeout', async function ($scope, $routeParams, $location, $timeout) {
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
-        $scope.currentUrlIsManage = $location.url() === "/progressions/view";
+        $scope.currentUrlIsManage = $location.url() === '/progressions/view';
 
         $scope.isListView = true;
         $scope.subjects = null;
@@ -534,8 +534,7 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
         $scope.closeModal = () => {
             $scope.openedCreateFolder = false;
             $scope.openedToasterProgressions = false;
-            $scope.$parent.openedCreateFolder = false;
-            $scope.$parent.openedToasterProgressions = false;
+
             $scope.openedMoveProgression = {
                 isOpened: false,
                 checkedProgressionSessions: []
@@ -631,19 +630,27 @@ export let manageProgressionCtrl = ng.controller("manageProgessionCtrl",
             $scope.safeApply();
         };
 
-        $scope.deleteSessions = async () => {
+        $scope.deleteSessions = async (): Promise<void> => {
             $scope.delete_loading = true;
-            let selectedId = $scope.selectedItem.id ? $scope.selectedItem.id : null;
-            let sessionIds = $scope.getProgressionSessionsChecked().map((s) => s.id);
+            let selectedId: number = $scope.selectedItem.id ? $scope.selectedItem.id : null;
+            let sessionIds: number[] = $scope.getProgressionSessionsChecked().map((s: ProgressionSession) => s.id);
             sessionIds.length > 0 ? await ProgressionSessions.delete(sessionIds, model.me.userId) : null;
             await initData();
             $scope.closeModal();
 
-            let folder = $scope.progressionFolders.all.find((f) => f.id === selectedId);
+            let folder: ProgressionFolder = $scope.progressionFolders.all.find((f: ProgressionFolder) => f.id === selectedId);
             $scope.initWithOldSelectedItem(folder);
 
             $scope.delete_loading = false;
             $scope.safeApply();
+        };
+
+        $scope.onDeleteFormProgression = (): void => {
+            $scope.openedToasterProgressions = true;
+        };
+
+        $scope.onCreateFolderFormProgression = (): void => {
+            $scope.openedCreateFolder = true;
         };
 
         /* Move progression sessions method */

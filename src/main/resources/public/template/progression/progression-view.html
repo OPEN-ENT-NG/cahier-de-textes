@@ -34,7 +34,7 @@
             <div class="flex-row-cdt create-folder-button">
                 <button workflow="diary.manageSession" class="calendar-button"
                         data-ng-disabled="(!isFolder(selectedItem) || selectedItem.deepStep >= 5)"
-                        data-ng-click="$parent.openedCreateFolder = (isFolder(selectedItem) && selectedItem.deepStep < 5)">
+                        data-ng-click="onCreateFolderFormProgression()">
                     <i18n>progression.folder.create</i18n>
                 </button>
             </div>
@@ -150,7 +150,8 @@
                     </button>
 
                     <!-- delete progression folder or progression session -->
-                    <button data-ng-click="$parent.openedToasterProgressions = (selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0)">
+                    <button data-ng-show="selectedSubItems.length > 0 || getProgressionSessionsChecked().length > 0"
+                            data-ng-click="onDeleteFormProgression()">
                         <i18n>delete</i18n>
                     </button>
 
@@ -164,12 +165,12 @@
         </section>
 
         <!-- progression create/edit progression folder options -->
-        <lightbox show="$parent.openedCreateFolder" class="create-visa" on-close="closeModal()">
+        <lightbox show="openedCreateFolder" class="create-visa" on-close="closeModal()">
             <div ng-include="'/diary/public/template/progression/lightboxes/progression-form-lightbox.html'"></div>
         </lightbox>
 
         <!-- progression delete options -->
-        <lightbox show="$parent.openedToasterProgressions" on-close="closeModal()">
+        <lightbox show="openedToasterProgressions" on-close="closeModal()">
             <div ng-include="'/diary/public/template/progression/lightboxes/progression-delete-lightbox.html'"></div>
         </lightbox>
 
