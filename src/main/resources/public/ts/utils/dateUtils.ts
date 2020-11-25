@@ -1,5 +1,6 @@
 import {angular, moment} from 'entcore';
 import {FORMAT} from '../core/const/dateFormat';
+import {Moment} from "moment";
 
 export class DateUtils {
 
@@ -7,8 +8,9 @@ export class DateUtils {
      * ⚠ Date Utils
      *
      */
-    static getFormattedDate(date): string {
-        return moment(date).format(FORMAT.formattedDate);
+    static getFormattedDate(date, parsingFormat?: string): string {
+        let momentDate: Moment = parsingFormat ? moment(date, parsingFormat) : moment(date);
+        return momentDate.format(FORMAT.formattedDate);
     }
 
     static getFormattedTime(date): string {

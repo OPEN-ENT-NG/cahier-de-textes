@@ -18,10 +18,9 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
         $scope.currentUrlIsManage = $location.url() === '/progressions/view';
 
         $scope.isListView = true;
-        $scope.subjects = null;
+        $scope.subjects = new Subjects();
         $scope.sessionTypes = null;
         $scope.progressionSessionForm = new ProgressionSession();
-        $scope.subjects = new Subjects();
         $scope.progressionFolders = null;
         $scope.progressionFoldersToDisplay = null;
         $scope.subProgressionsItems = [];
@@ -112,7 +111,11 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.setSubjectSession();
             $scope.setTypeSession();
 
-            await $scope.homeworkTypes.sync();
+            await Promise.all([
+                $scope.homeworkTypes.sync(),
+                $scope.subjects.setLinkedTeacherById(window.structure.id, model.me.userId)
+            ]);
+
             $scope.safeApply();
 
             let elementCalendar: HTMLElement = document.getElementById('calendar-area');
@@ -143,12 +146,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.selectedItem = $scope.progressionFolders.all
                 .find((progressionFolder: ProgressionFolder) => progressionFolder.id === currentFolder);
             $scope.selectedSubItems = [];
-        };
-
-        $scope.groupBy = (subject: Subject): string => {
-           if (subject.id === EXCEPTIONAL.subjectId) {
-                return lang.translate('subjects.exceptional');
-           }
         };
 
         $scope.setSubjectSession = () => {

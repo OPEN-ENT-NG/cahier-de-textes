@@ -1,4 +1,4 @@
-import {notify} from 'entcore';
+import {notify, idiom as lang} from 'entcore';
 import http from 'axios';
 import {subjectService} from '../services';
 import {EXCEPTIONAL} from '../core/const/exceptional-subject';
@@ -29,6 +29,19 @@ export class Subject {
     toString() {
         return this.label;
     }
+
+    /**
+     * Group by current teacher subjects, or not, or exceptional.
+     */
+    groupByTeacherBelonging = (): String => {
+        if (this.teacherId !== undefined) {
+            return lang.translate('subjects.teacher');
+        } else if (this.id !== EXCEPTIONAL.subjectId) {
+            return lang.translate('subjects.structure');
+        } else {
+            return lang.translate('subjects.exceptional');
+        }
+    };
 }
 
 export class Subjects {
@@ -79,4 +92,22 @@ export class Subjects {
         });
     }
 
+
+    /**
+     * Mainly used when you want to set teacherId on each subject if the current teacher logged possesses them
+     * (else let teacherId as null).
+     */
+    public setLinkedTeacherById = async (structureId: string, teacherId: string): Promise<void> => {
+        subjectService.getTeacherSubjects(structureId, teacherId).then((subjectsList: Subject[]) => {
+            subjectsList.filter(subjects => subjects).forEach((subject: Subject) => {
+                if (Object.keys(this.mapping).indexOf(subject.id) === -1) {
+                    this.all.push(subject);
+                    this.mapping[subject.id] = subject.label;
+                } else if (subject.teacherId !== undefined) {
+                    const subjectIndex: number = this.all.findIndex((s: Subject) => s.id === subject.id);
+                    this.all[subjectIndex].teacherId = subject.teacherId;
+                }
+            });
+        });
+    };
 }

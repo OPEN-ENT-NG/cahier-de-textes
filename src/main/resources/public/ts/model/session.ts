@@ -288,19 +288,19 @@ export class Session {
     }
 
     setFromCourseAndSession(course: Course, sessionDrag: Session): void {
-        this.courseId = course._id;
         this.teacher = sessionDrag.teacher;
         this.room = sessionDrag.room;
         this.type = sessionDrag.type;
-        this.subject = new Subject();
-        this.subject.id = course.subject ? course.subject.id : null;
-        this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
         this.title = sessionDrag.title ? sessionDrag.title : '';
         this.date = this.startTime = course.startMoment.toDate();
         this.endTime = course.endMoment.toDate();
-        this.audience = course.audiences.all[0];
         this.color = sessionDrag.color;
         this.description = sessionDrag.description;
+        this.courseId = course._id;
+        this.subject = new Subject();
+        this.subject.id = course.subject ? course.subject.id : null;
+        this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+        this.audience = course.audiences.all[0];
         this.duplicateHomeworks(sessionDrag);
     }
 

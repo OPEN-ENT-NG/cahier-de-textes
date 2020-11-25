@@ -1,22 +1,48 @@
 <div class="homework-form">
-    <div class="row" ng-if="!isInsideSessionForm">
-        <div class="six cell twelve-mobile">
-            <select ng-change="syncSessionsAndCourses();syncWorkloadDay();homework.session = undefined;
-                            disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
-                    ng-model="homework.audience"
-                    ng-options="audience.name for audience in structure.audiences.all track by audience.id">
-                <option ng-if="structure.audiences.all.length !== 1"  value="" disabled selected>[[translate('select.audience')]]</option>
-            </select>
-            <select ng-change="syncSessionsAndCourses();homework.session = undefined;
-                        disableFieldSetSubjectAndAudienceHomework(homework.audience,homework.subject);"
-                    ng-model="homework.subject"
-                    ng-options="subject.label for subject in subjects.all track by subject.id">
-                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
-            </select>
+    <div ng-if="!isInsideSessionForm" class="seven">
+        <div ng-if="!homework.courseId" class="session-form-header">
+            <!--SELECT SUBJECT-->
+            <div class="session-form-header-select">
+                <select required ng-model="homework.subject"
+                        ng-disabled="homework.courseId && homework.subject.id"
+                        ng-change="disableFieldSetSubjectAndAudienceHomework(homework.audience, homework.subject)"
+                        ng-options="subject.label group by subject.groupByTeacherBelonging() for subject in subjects.all | orderBy:'teacherId'">
+                    <option ng-if="subjects.all.length !== 1" value="" disabled selected>
+                        [[translate('select.subject')]]
+                    </option>
+                </select>
+            </div>
+
+            <!--SEARCH CLASS/GROUP-->
+            <div class="session-form-header-search">
+                <async-autocomplete data-ng-disabled="false"
+                                    data-ng-model="groupsSearch.group"
+                                    data-ng-change="selectSearchAudience"
+                                    data-on-search="searchAudience"
+                                    data-options="groupsSearch.groups"
+                                    data-placeholder="printer.audience"
+                                    data-search="groupsSearch.group">
+                </async-autocomplete>
+                <div class="search-input-ul" ng-show="homework.audience">
+                    <span>[[homework.audience.name]]</span>&nbsp;
+                    <i class="close" ng-click="removeSearchAudience()"></i>
+                </div>
+            </div>
+        </div>
+        <!--IF EDIT HOMEWORK-->
+        <div ng-if="homework.courseId" class="margin-bottom-md margin-top-lg">
+            <!--SUBJECT LABEL CARD-->
+            <span class="card session-form-card" ng-if="homework.subject.label || homework.subject.name">
+                [[homework.getSubjectTitle()]]
+                </span>
+            <!--CLASS/GROUP NAME CARD-->
+            <span class="card session-form-card" ng-if="homework.audience.name">
+                    [[homework.audience.name]]
+                </span>
         </div>
     </div>
     <fieldset class="row cursorDefault card remove-margin padding-md border-widht-fieldset"
-              ng-disabled="isSelectSubjectAndAudienceHomework">
+              ng-disabled="isSelectSubjectAndAudienceHomework()">
         <h2 class="cdt-title-not-clickable">
             <span ng-if="!isInsideSessionForm"><i18n>Homework</i18n></span>
 

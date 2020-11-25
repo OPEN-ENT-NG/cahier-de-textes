@@ -50,6 +50,7 @@ export class Homework {
     estimatedTime: number = 0;
     publishDate ?: any;
     publishedChanged: boolean = false;
+    courseId: string = null;
 
     static HOMEWORK_STATE_TODO: number = 1;
     static HOMEWORK_STATE_DONE: number = 2;

@@ -1,5 +1,5 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Workload} from '../../model';
+import {Course, Homework, PEDAGOGIC_TYPES, Session, Subject, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolders} from "../../model/Progression";
@@ -8,6 +8,7 @@ import {Groups} from "../../model/group";
 import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
 import {CALENDAR_TOOLTIP_EVENTER} from "../../core/const/calendar-tooltip-eventer";
+import {FORMAT} from "../../core/const/dateFormat";
 
 declare let window: any;
 
@@ -230,7 +231,10 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.safeApply();
             };
 
-            $scope.hoverCalendarItem = ($event, item: any): void => $scope.$broadcast(CALENDAR_TOOLTIP_EVENTER.HOVER_IN, {$event, item});
+            $scope.hoverCalendarItem = ($event, item: any): void => $scope.$broadcast(CALENDAR_TOOLTIP_EVENTER.HOVER_IN, {
+                $event,
+                item
+            });
             $scope.hoverOutCalendarItem = (): void => $scope.$broadcast(CALENDAR_TOOLTIP_EVENTER.HOVER_OUT);
 
             $scope.loadPedagogicDays = () => {
@@ -421,7 +425,7 @@ export let calendarController = ng.controller('CalendarController',
                 sessionToPublish.id = item.id;
                 $scope.toastHttpCall(await sessionToPublish.publish());
                 if (item.homeworks) {
-                    $scope.publishHomework(item,event);
+                    $scope.publishHomework(item, event);
                 } else {
                     $scope.syncPedagogicItems();
                     $scope.safeApply();
@@ -496,7 +500,7 @@ export let calendarController = ng.controller('CalendarController',
                         let date = course.item.data.startDisplayDate;
                         if (progressionOrSession.item.color === pedagogicSlotProfile.HOMEWORK) {
                             // case we drag homework to empty session in order to create homework
-                            $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item);
+                            $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item, idCourseSession, date);
                         } else {
                             $scope.sessionToCourse(id_progressionOrSession, idCourseSession, date);
                         }
@@ -534,7 +538,7 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a homework pedagogic type drop on course to create homework
              */
-            $scope.homeworkToEmptySession = async (idSessionDrag: number, sessionDrop: any) => {
+            $scope.homeworkToEmptySession = async (idSessionDrag: number, sessionDrop: any, idCourse: string, date: any) => {
                 let sessionDrag: any = [];
                 $scope.calendarItems.map(async (session: any) => {
                     if (session.id === idSessionDrag) {
@@ -545,22 +549,30 @@ export let calendarController = ng.controller('CalendarController',
                     let sessionHomework = new Session($scope.structure);
                     sessionHomework.id = sessionDrag.id;
                     await sessionHomework.sync();
-                    prepareHomeworkRedirect(sessionDrop, sessionHomework);
+                    await prepareHomeworkRedirect(sessionDrop, sessionHomework, idCourse, date);
                 } else {
-                    prepareHomeworkRedirect(sessionDrop, sessionDrag);
+                    await prepareHomeworkRedirect(sessionDrop, sessionDrag, idCourse, date);
                 }
                 $scope.goTo('/homework/create');
             };
 
-            const prepareHomeworkRedirect = (sessionDrop: any, sessionHomework: Session) => {
-                if (sessionDrop.audiences.all.length !== 0) {
-                    sessionHomework.homeworks[0].audience = sessionDrop.audiences.all[0];
-                    sessionHomework.homeworks[0].dueDate = sessionDrop.startMoment;
-                    sessionHomework.homeworks[0].session = sessionDrop;
-                    sessionHomework.homeworks[0].subject = sessionDrop.subject;
-                    sessionHomework.homeworks[0].id = '';
-                }
-                $rootScope.homework = sessionHomework.homeworks[0];
+            const prepareHomeworkRedirect = async (sessionDrop: any, sessionHomework: Session, idCourse: string, date: any) => {
+                let course: Course = await syncCourseFromDate(idCourse, date);
+                let homework: Homework = sessionHomework.homeworks[0];
+
+                homework.courseId = course._id;
+                homework.subject = new Subject();
+                homework.subject.id = course.subject ? course.subject.id : null;
+                homework.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+                homework.audience = course.audiences.all[0];
+                // if (sessionDrop.audiences.all.length !== 0) {
+                // homework.audience = sessionDrop.audiences.all[0];
+                homework.dueDate = sessionDrop.startMoment;
+                homework.session = sessionDrop;
+                // homework.subject = sessionDrop.subject;
+                homework.id = '';
+                // }
+                $rootScope.homework = homework;
             };
 
             /**
@@ -568,24 +580,15 @@ export let calendarController = ng.controller('CalendarController',
              */
             $scope.sessionToCourse = async (idSession: string, idCourse: string, date: any): Promise<void> => {
                 let sessionDrag: Session;
-                let course = new Course($scope.structure, idCourse);
+                let course: Course = await syncCourseFromDate(idCourse, date);
 
                 $scope.calendarItems.map(async session => {
                     if (session.id === idSession) {
                         sessionDrag = session;
                     }
                 });
-                
-                // Formatting date
-                date = date.split('/').join('-');
-                date = date.split('-');
-                let tempDateYear = date[2];
-                date[2] = date[0];
-                date[0] = tempDateYear;
-                date = date.join('-');
 
                 // insert data and refresh calendar
-                await course.sync(date, date);
                 let session = new Session($scope.structure, course);
                 session.setFromCourseAndSession(course, sessionDrag);
                 // if I have homework, append this session to my sessions array
@@ -598,6 +601,13 @@ export let calendarController = ng.controller('CalendarController',
                 $rootScope.session = session;
 
                 $scope.goTo('/session/create/' + session.courseId + '/' + DateUtils.getFormattedDate(session.startMoment));
+            };
+
+            const syncCourseFromDate = async (idCourse: string, date: any): Promise<Course> => {
+                let course = new Course($scope.structure, idCourse);
+                date = DateUtils.getFormattedDate(date, FORMAT['DAY/MONTH/YEAR']);
+                await course.sync(date, date);
+                return course;
             };
 
             /**

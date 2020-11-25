@@ -1,12 +1,14 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import {Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
+import {Audience, Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadDay} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {FORMAT} from '../../core/const/dateFormat';
+import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
+import {SearchService} from "../../services";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
-    ['$scope', '$rootScope', '$routeParams', '$location', '$attrs',
-        async function ($scope, $rootScope, $routeParams, $location, $attrs) {
+    ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', 'SearchService',
+        async function ($scope, $rootScope, $routeParams, $location, $attrs, searchService: SearchService) {
             $scope.isReadOnly = $scope.isReadOnly || modeIsReadOnly();
             $scope.isInsideDiary = $attrs.insideDiary;
             $scope.display = {
@@ -30,6 +32,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.isSelectSubjectAndAudienceHomework = true;
             $scope.validate = false;
             $scope.sessionTypes = new SessionTypes($scope.structure.id);
+            $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
 
             $scope.homework.opened ? $scope.homework.opened : $scope.homework.opened = false;
 
@@ -324,10 +327,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             async function initData() {
                 $scope.homework.isInit = true;
                 await $scope.sessionTypes.sync();
-
                 await Promise.all([
                     $scope.homeworkTypes.sync(),
-                    $scope.subjects.sync($scope.structure.id, model.me.userId)]);
+                    $scope.subjects.sync($scope.structure.id)
+                ]);
                 if (!$scope.isInsideSessionForm && $scope.subjects.all.length === 1) {
                     $scope.homework.subject = $scope.subjects.all[0];
                     if ($scope.homework.audience) {
@@ -377,11 +380,42 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 if (!$scope.homework.id && !$scope.homework.type) {
                     $scope.homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
                 }
-                await $scope.syncWorkloadDay();
 
+                await Promise.all([
+                    $scope.syncWorkloadDay(),
+                    $scope.subjects.setLinkedTeacherById($scope.structure.id, model.me.userId)
+                ]);
                 $scope.safeApply();
                 await $scope.fixEditor();
             }
+
+            /* ----------------------------
+                Autocomplete search
+            ---------------------------- */
+
+            /**
+             * Search a group for the session from user input.
+             * @param valueInput the user input.
+             */
+            $scope.searchAudience = async (valueInput: string): Promise<void> => {
+                await $scope.groupsSearch.searchGroups(valueInput);
+                $scope.safeApply();
+            };
+
+            /**
+             * Select an audience from the session audience search results.
+             * @param valueInput the user input.
+             * @param groupForm the selected audience.
+             */
+            $scope.selectSearchAudience = (valueInput: string, groupForm: Audience): void => {
+                $scope.groupsSearch.selectGroups(valueInput, groupForm);
+                $scope.homework.audience = $scope.groupsSearch.getSelectedGroups()[0]; // first element we fetch before reset
+                $scope.groupsSearch.resetGroups();
+                $scope.groupsSearch.group = '';
+                $scope.syncSessionsAndCourses();
+                $scope.homework.session = undefined;
+                $scope.disableFieldSetSubjectAndAudienceHomework($scope.homework.audience, $scope.homework.subject);
+            };
 
             $scope.back = () => {
                 window.history.back();

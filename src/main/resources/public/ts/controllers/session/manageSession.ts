@@ -642,40 +642,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 }
 
                 $scope.placeholder = lang.translate('homework.attachedToSession') + moment($scope.session.date).format(FORMAT.displayDate);
-                await initSubjects();
-                $scope.safeApply();
-                await $scope.fixEditor();
-            };
 
-            const initSubjects = async (): Promise<void> => {
-                await SubjectService.getTeacherSubjects($scope.structure.id, model.me.userId).then((subjectsList: Subject[]) => {
-                    subjectsList.filter(subjects => subjects).forEach((subject) => {
-                        if (Object.keys($scope.subjects.mapping).indexOf(subject.id) === -1) {
-                            $scope.subjects.all.push(subject);
-                            $scope.subjects.mapping[subject.id] = subject.label;
-                        } else if (subject.teacherId !== undefined) {
-                            const subjectIndex: number = $scope.subjects.all.findIndex(s => s.id === subject.id);
-                            $scope.subjects.all[subjectIndex].teacherId = subject.teacherId;
-                        }
-                    });
+                await $scope.subjects.setLinkedTeacherById($scope.structure.id, model.me.userId);
 
-                    $scope.groupBy = (subject: Subject): string => {
-                        if (subject.teacherId !== undefined) {
-                            return lang.translate('subjects.teacher');
-                        } else if (subject.id !== EXCEPTIONAL.subjectId) {
-                            return lang.translate('subjects.structure');
-                       } else {
-                            return lang.translate('subjects.exceptional');
-                        }
-                    };
-
-                    if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
-                        $scope.session.subject = $scope.subjects.all[0];
-                        if ($scope.session.audience) {
-                            $scope.session.opened = true;
-                        }
+                if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
+                    $scope.session.subject = $scope.subjects.all[0];
+                    if ($scope.session.audience) {
+                        $scope.session.opened = true;
                     }
-                });
+                }
 
                 // if $scope.session has subject filled
                 if ($scope.session.subject) {
@@ -686,6 +661,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     const sessionSubject = $scope.subjects.all.filter(x => x.id === $scope.session.subject.id);
                     if (sessionSubject.length === 1) $scope.session.subject = sessionSubject[0];
                 }
+                $scope.safeApply();
+                await $scope.fixEditor();
             };
 
             $scope.back = () => {

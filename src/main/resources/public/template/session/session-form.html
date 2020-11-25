@@ -10,7 +10,7 @@
                     <select required ng-model="session.subject"
                             ng-disabled="session.courseId && session.subject.id"
                             ng-change="openSessionForm(session.audience,session.subject)"
-                            ng-options="subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'">
+                            ng-options="subject.label group by subject.groupByTeacherBelonging() for subject in subjects.all | orderBy:'teacherId'">
                         <option ng-if="subjects.all.length !== 1" value="" disabled selected>
                             [[translate('select.subject')]]
                         </option>

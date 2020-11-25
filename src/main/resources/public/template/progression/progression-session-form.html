@@ -31,7 +31,7 @@
                             <i18n class="twelve" ng-if="!progressionSessionForm.subject">select.subject</i18n>
                             <select required ng-model="progressionSessionForm.subject" class="twelve-mobile"
                                     ng-disabled="progressionSessionForm.courseId && progressionSessionForm.subject"
-                                    ng-options="subject.label group by groupBy(subject) for subject in subjects.all track by subject.id">
+                                    ng-options="subject.label group by subject.groupByTeacherBelonging() for subject in subjects.all track by subject.id | orderBy:'teacherId'">
                                 <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
                             </select>
                         </span>
