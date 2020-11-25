@@ -5,6 +5,17 @@
             <!-- IF ADD SESSION-->
             <div ng-if="!session.courseId && !session.subject_id && sessionFormIsOpened" class="session-form-header">
 
+                <!--SELECT SUBJECT-->
+                <div class="session-form-header-select">
+                    <select required ng-model="session.subject"
+                            ng-disabled="session.courseId && session.subject.id"
+                            ng-change="openSessionForm(session.audience,session.subject)"
+                            ng-options="subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'">
+                        <option ng-if="subjects.all.length !== 1" value="" disabled selected>
+                            [[translate('select.subject')]]
+                        </option>
+                    </select>
+                </div>
                 <!--SEARCH CLASS/GROUP-->
                 <div class="session-form-header-search">
                     <async-autocomplete data-ng-disabled="false"
@@ -20,30 +31,18 @@
                         <i class="close" ng-click="removeSearchSessionAudience()"></i>
                     </div>
                 </div>
-
-                <!--SELECT SUBJECT-->
-                <div class="session-form-header-select">
-                    <select required ng-model="session.subject"
-                            ng-disabled="session.courseId && session.subject.id"
-                            ng-change="openSessionForm(session.audience,session.subject)"
-                            ng-options="subject.label group by groupBy(subject) for subject in subjects.all | orderBy:'teacherId'">
-                        <option ng-if="subjects.all.length !== 1" value="" disabled selected>
-                            [[translate('select.subject')]]
-                        </option>
-                    </select>
-                </div>
             </div>
 
             <!--IF EDIT SESSION-->
             <div ng-if="(session.courseId || session.subject_id) && sessionFormIsOpened" class="margin-bottom-md margin-top-lg">
 
-                <!--CLASS/GROUP NAME CARD-->
-                <span class="card session-form-card" ng-if="session.audience.name">
-                    [[session.audience.name]]
-                </span>
                 <!--SUBJECT LABEL CARD-->
                 <span class="card session-form-card">
                     [[session.getSubjectTitle()]]
+                </span>
+                <!--CLASS/GROUP NAME CARD-->
+                <span class="card session-form-card" ng-if="session.audience.name">
+                    [[session.audience.name]]
                 </span>
             </div>
 

@@ -150,8 +150,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.session.is_empty = false;
 
                 if ($scope.session.subject && $scope.session.subject.id === EXCEPTIONAL.subjectId) {
-                    $scope.session.exceptional_label = $scope.session.subject.label ?
-                        $scope.session.subject.label : $scope.session.subject.name;
+                    $scope.session.exceptional_label = $scope.session.getSubjectTitle();
                 }
 
                 let sessionSaveResponse: any = await $scope.session.save($scope.placeholder);

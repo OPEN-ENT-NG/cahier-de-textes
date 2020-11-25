@@ -12,11 +12,16 @@
 
     &-search {
       display: flex;
-      flex: auto;
-      margin-right: 50px;
+      flex: 2;
+      margin-top: 8px;
 
       .async-autocomplete {
-        flex: 60%;
+
+        width: 33%;
+
+        input {
+          margin-bottom: 0px;
+        }
       }
 
       .search-input-ul {
@@ -26,7 +31,8 @@
     }
 
     &-select {
-      flex: auto;
+      flex: 1;
+      margin-right: 50px;
     }
   }
 
