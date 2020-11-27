@@ -11,6 +11,7 @@ public final class WorkflowUtils {
 
     static public final String ADMIN_ACCESS = "administrator.read";
     static public final String ADMIN_VISA_MANAGE = "administrator.visa.manage";
+    static public final String ADMIN_VISA_READ = "administrator.visa.read";
 
     static public final String SESSION_READ = "session.read";
     static public final String SESSION_MANAGE = "session.manage";

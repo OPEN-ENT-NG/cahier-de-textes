@@ -21,4 +21,10 @@ public class FakeRight extends ControllerHelper {
     public void accessExternalData(HttpServerRequest request) {
         notImplemented(request);
     }
+
+    @Get("/rights/admin/visa/read")
+    @SecuredAction(WorkflowUtils.ADMIN_VISA_READ)
+    public void adminVisaRead(HttpServerRequest request) {
+        notImplemented(request);
+    }
 }

@@ -1,8 +1,8 @@
 package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.WorkflowUtils;
-import fr.openent.diary.security.workflow.AdminAccess;
 import fr.openent.diary.security.workflow.AdminVisaManage;
+import fr.openent.diary.security.workflow.AdminVisaRead;
 import fr.openent.diary.services.ExportPDFService;
 import fr.openent.diary.services.VisaService;
 import fr.openent.diary.services.impl.ExportPDFServiceImpl;
@@ -57,7 +57,7 @@ public class VisaController extends ControllerHelper {
 
     @Get("/visas")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(AdminAccess.class)
+    @ResourceFilter(AdminVisaRead.class)
     public void getVisas(final HttpServerRequest request) {
         MultiMap params = request.params();
         String structure_id = params.get("structure_id");
@@ -104,7 +104,7 @@ public class VisaController extends ControllerHelper {
 
     @Get("/visa/:id/pdf")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(AdminAccess.class)
+    @ResourceFilter(AdminVisaRead.class)
     public void getVisaPdf(final HttpServerRequest request) {
         String visaId = request.getParam("id");
         visaService.getVisaPdfDetails(visaId, visa -> {
@@ -121,7 +121,7 @@ public class VisaController extends ControllerHelper {
 
     @Post("/visas/topdf")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
-    @ResourceFilter(AdminAccess.class)
+    @ResourceFilter(AdminVisaRead.class)
     public void sessionsToPdf(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             RequestUtils.bodyToJson(request, json -> {
