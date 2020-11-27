@@ -172,9 +172,7 @@ export class Session {
         this.courseId = course._id;
         this.teacher = course.teachers[0];
         this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : '';
-        if (!this.subject) {
-            this.subject = course.subject;
-        }
+        this.subject = course.subject;
         if (course.exceptionnal) {
             this.subject.id = EXCEPTIONAL.subjectId;
             this.subject.label = EXCEPTIONAL.subjectCode;
@@ -251,12 +249,11 @@ export class Session {
     getStartMoment(): Moment {
         return this.startMoment ? this.startMoment : moment(this.startTime);
     }
-    
+
     getSubjectTitle(): string {
         if (this.subject.id && this.subject.id !== EXCEPTIONAL.subjectId) {
             return this.subject.name ? this.subject.name : this.subject.label;
-        }
-        else {
+        } else {
             return this.exceptional_label ? this.exceptional_label : this.subject.label;
         }
     }
@@ -450,7 +447,7 @@ export class Sessions {
         });
     }
 
-    syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void>  => {
+    syncSessionsWithHomeworks = async (url: string, homeworks: Homeworks): Promise<void> => {
         let {data} = await http.get(url);
         homeworks.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data.filter(h => h.is_homework)));
         homeworks.all.forEach(i => {
