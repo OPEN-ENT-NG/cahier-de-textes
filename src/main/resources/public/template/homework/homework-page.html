@@ -3,11 +3,21 @@
     <div ng-if="!isReadOnly">
         <div class="flex-row-cdt row__12">
             <app-title class="flex-col col__3 zero-mobile">
-                <div class="title-area-simple">
+
+                <!--CREATE HOMEWORK-->
+                <div ng-if="!homework.id && homeworkFormIsOpened" class="title-area-simple">
                     <h1>
                         <i18n><span>homework.manage.create</span></i18n>
                     </h1>
                 </div>
+
+                <!--UPDATE HOMEWORK-->
+                <div ng-if="homework.id && homeworkFormIsOpened" class="title-area-simple">
+                    <h1>
+                        <i18n><span>homework.manage.update</span></i18n>
+                    </h1>
+                </div>
+
             </app-title>
             <div class="flex-col col__6"></div>
             <div class="flex-col col__3 title-buttons">

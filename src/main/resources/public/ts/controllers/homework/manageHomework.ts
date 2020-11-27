@@ -35,6 +35,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
 
             $scope.homework.opened ? $scope.homework.opened : $scope.homework.opened = false;
+            $scope.homeworkFormIsOpened = false;
 
             $scope.disableFieldSetSubjectAndAudienceHomework = (audience: any, subject: any): void => {
                 $scope.isSelectSubjectAndAudienceHomework = (!audience || !subject);
@@ -324,10 +325,13 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             };
 
-            async function initData() {
+            /**
+             * Initialize form data.
+             */
+            const initData = async (): Promise<void> => {
                 $scope.homework.isInit = true;
-                await $scope.sessionTypes.sync();
                 await Promise.all([
+                    $scope.sessionTypes.sync(),
                     $scope.homeworkTypes.sync(),
                     $scope.subjects.sync($scope.structure.id)
                 ]);
@@ -385,6 +389,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.syncWorkloadDay(),
                     $scope.subjects.setLinkedTeacherById($scope.structure.id, model.me.userId)
                 ]);
+                $scope.homeworkFormIsOpened = true;
                 $scope.safeApply();
                 await $scope.fixEditor();
             }

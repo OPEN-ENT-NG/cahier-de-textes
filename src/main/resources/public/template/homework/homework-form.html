@@ -1,6 +1,6 @@
 <div class="homework-form">
     <div ng-if="!isInsideSessionForm" class="seven">
-        <div ng-if="!homework.courseId" class="session-form-header">
+        <div ng-if="!homework.id && homeworkFormIsOpened" class="session-form-header">
             <!--SELECT SUBJECT-->
             <div class="session-form-header-select">
                 <select required ng-model="homework.subject"
@@ -30,15 +30,15 @@
             </div>
         </div>
         <!--IF EDIT HOMEWORK-->
-        <div ng-if="homework.courseId" class="margin-bottom-md margin-top-lg">
+        <div ng-if="homework.id && homeworkFormIsOpened" class="margin-bottom-md margin-top-lg">
             <!--SUBJECT LABEL CARD-->
             <span class="card session-form-card" ng-if="homework.subject.label || homework.subject.name">
                 [[homework.getSubjectTitle()]]
-                </span>
+            </span>
             <!--CLASS/GROUP NAME CARD-->
             <span class="card session-form-card" ng-if="homework.audience.name">
-                    [[homework.audience.name]]
-                </span>
+                [[homework.audience.name]]
+            </span>
         </div>
     </div>
     <fieldset class="row cursorDefault card remove-margin padding-md border-widht-fieldset"

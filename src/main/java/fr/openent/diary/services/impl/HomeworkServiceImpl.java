@@ -74,21 +74,12 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler) {
-        StringBuilder query = new StringBuilder();
-        query.append(" SELECT h.*, to_json(type) as type");
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework h");
-        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id");
-        query.append(" WHERE h.id = ").append(homeworkId);
+        String query = " SELECT h.*, to_json(type) as type"
+        + " FROM " + Diary.DIARY_SCHEMA + ".homework h"
+        + " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id"
+        + " WHERE h.id = " + homeworkId;
 
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
-            if (result.isRight()) {
-                JsonObject homework = result.right().getValue();
-                cleanHomework(homework);
-                handler.handle(new Either.Right<>(homework));
-            } else {
-                handler.handle(new Either.Left<>(result.left().getValue()));
-            }
-        }));
+        proceedHomework(handler, query);
     }
 
     private void cleanHomework(JsonObject homework){
@@ -151,6 +142,67 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 this.getSelectHomeworkQuery();
 
         proceedHomeworks(handler, values, query);
+    }
+
+    private void proceedHomework(Handler<Either<String, JsonObject>> handler, String query) {
+        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(result -> {
+
+            if (result.isRight()) {
+                JsonObject homework = result.right().getValue();
+                cleanHomework(homework);
+
+                List<String> subjectIds = new ArrayList<>();
+                List<String> teacherIds = new ArrayList<>();
+                List<String> audienceIds = new ArrayList<>();
+
+                subjectIds.add(homework.getString("subject_id"));
+                teacherIds.add(homework.getString("teacher_id"));
+                audienceIds.add(homework.getString("audience_id"));
+
+
+                Future<List<Subject>> subjectsFuture = Future.future();
+                Future<List<User>> teachersFuture = Future.future();
+                Future<List<Audience>> audiencesFuture = Future.future();
+
+                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                    if (asyncResult.failed()) {
+                        String message = "[Diary@HomeworkServiceImpl::proceedHomework] Failed to get homework. ";
+                        LOGGER.error(message + " " + asyncResult.cause());
+                        handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
+                    } else {
+                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
+                        Map<String, User> teacherMap = teachersFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
+                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                                .stream()
+                                .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
+
+                        if (!homework.getString("subject_id").equals("exceptional")) {
+                            homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
+                        } else {
+                            JsonObject exceptionalSubject = new JsonObject()
+                                    .put("id", "exceptional")
+                                    .put("name", homework.getString("exceptional_label"));
+
+
+                            homework.put("subject", new Subject(exceptionalSubject).toJSON());
+                        }
+                        homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
+                        homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
+
+                        handler.handle(new Either.Right<>(homework));
+                    }
+                });
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+            } else {
+                handler.handle(new Either.Left<>(result.left().getValue()));
+            }
+        }));
     }
 
     private void proceedHomeworks(Handler<Either<String, JsonArray>> handler, JsonArray values, String query) {
