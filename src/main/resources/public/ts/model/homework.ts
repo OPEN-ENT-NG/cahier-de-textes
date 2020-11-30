@@ -98,7 +98,6 @@ export class Homework {
             this.session = homework.session;
         }
         this.attachedToDate = homework.attachedToDate;
-        this.attachedToDate = homework.attachedToDate;
         this.attachedToSession = homework.attachedToSession;
         this.subject = homework.subject;
         this.exceptional_label = homework.exceptional_label;
@@ -123,6 +122,7 @@ export class Homework {
             from_session_id: data.from_session_id,
             session_date: data.session_date,
             id: data.id,
+            session: (data.session && typeof data.session === 'string') ? JSON.parse(data.session) : data.session,
             type: (data.type && typeof data.type === 'string') ? JSON.parse(data.type) : data.type,
             visas: data.visas && data.visas !== '[null]' ? JSON.parse(data.visas) : [],
             title: data.title,

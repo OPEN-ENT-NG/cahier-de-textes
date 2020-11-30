@@ -74,9 +74,10 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler) {
-        String query = " SELECT h.*, to_json(type) as type"
+        String query = " SELECT h.*, to_json(type) as type, to_json(session) as session"
         + " FROM " + Diary.DIARY_SCHEMA + ".homework h"
         + " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id"
+        + " LEFT JOIN " + Diary.DIARY_SCHEMA + ".session AS session ON session.id = h.session_id"
         + " WHERE h.id = " + homeworkId;
 
         proceedHomework(handler, query);
@@ -85,6 +86,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private void cleanHomework(JsonObject homework){
         if(homework.getString("type") != null)
             homework.put("type", new JsonObject(homework.getString("type")));
+
+        if(homework.getString("session") != null)
+            homework.put("session", new JsonObject(homework.getString("session")));
 
         if(homework.getString("progress") != null)
             homework.put("progress", new JsonObject(homework.getString("progress")));
