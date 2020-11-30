@@ -14,7 +14,7 @@
                     <span ng-if="homework.attachedToParentSession"> - <i18n>for.this.session</i18n></span>
                     <span ng-if="homework.attachedToSession && homework.session">
                         - <i18n>todo.for.session</i18n>
-                        [[homework.session.subject.label]] [[homework.session.startDisplayDate]]
+                        [[homework.session.getSubjectTitle()]] [[homework.session.startDisplayDate]]
                         ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
                     </span>
                 </span>

@@ -123,7 +123,7 @@
                                 [[session.class]]
                             </div>
                             <div class="flex-col col__2" role="cell">
-                                [[session.subject.label]]
+                                [[session.getSubjectTitle()]]
                             </div>
                             <div class="flex-col col__1"
                                  ng-class="{'work_length': session.progression_homeworks.length > 0, 'work_empty': session.progression_homeworks.length === 0}"
