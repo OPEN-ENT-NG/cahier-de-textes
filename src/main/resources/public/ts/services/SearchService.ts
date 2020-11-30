@@ -23,6 +23,7 @@ export interface SearchService {
 export const SearchService: SearchService = {
     search: async (structureId: string, value: string): Promise<SearchItem[]> => {
         try {
+            value = value.replace("\\s", "").toLowerCase();
             const {data}: AxiosResponse = await http.get(`/diary/search?structureId=${structureId}&q=${value}`);
             data.forEach((item) => item.toString = () => item.displayName);
             return data;
@@ -32,6 +33,7 @@ export const SearchService: SearchService = {
     },
     searchUser: async (structureId: string, value: string, profile: string): Promise<User[]> => {
         try {
+            value = value.replace("\\s", "").toLowerCase();
             const {data}: AxiosResponse = await http.get(`/diary/search/users?structureId=${structureId}&profile=${profile}&q=${value}&field=firstName&field=lastName`);
             data.forEach((user) => user.toString = () => user.displayName);
             return data;
@@ -41,6 +43,7 @@ export const SearchService: SearchService = {
     },
     searchGroup: async (structureId: string, value: string): Promise<SearchItem[]> => {
         try {
+            value = value.replace("\\s", "").toLowerCase();
             const {data}: AxiosResponse = await http.get(`/diary/search/groups?structureId=${structureId}&q=${value}&field=name`);
             return data;
         } catch (err) {
