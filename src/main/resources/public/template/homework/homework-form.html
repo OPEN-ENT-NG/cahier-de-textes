@@ -75,7 +75,7 @@
                 </div>
                 <!-- Other Seance or Date -- ng-if="!homework.attachedToParentSession || !isInsideSessionForm"-->
                 <div class="row" >
-                    <div class="row margin-bottom-md" ng-show="display.sessionSelect">
+                    <div class="row margin-bottom-md" ng-show="display.sessionSelect && (isSessionFuture() || !homework.id)">
                         <label>
                             <input type="radio"
                                    ng-click="attachToSession(); syncWorkloadDay();"
@@ -96,10 +96,12 @@
                         <date-picker class="date-picker-sm margin-bottom-7"  ng-if="homework.attachedToDate"
                                      ng-model="homework.dueDate"  ng-change="syncWorkloadDay()">
                         </date-picker>
-                        <select ng-if="homework.attachedToSession" ng-model="homework.session" ng-click="syncWorkloadDay()"
-                                ng-options="session as (session.getSubjectTitle() + ' - ' + session.startDisplayDate + ' ' +
-                                session.startDisplayTime + '-' + session.endDisplayTime ) for session in sessionsToAttachTo">
+                        <select ng-if="homework.attachedToSession && (isSessionFuture() || !homework.id)" ng-model="homework.session" ng-click="syncWorkloadDay()"
+                                ng-options="session as (session.getSessionString()) for session in sessionsToAttachTo">
                         </select>
+                        <span ng-if="homework.attachedToSession && !isSessionFuture() && homework.id">
+                            <i18n>homework.attachedToSession</i18n> [[homework.dateDisplayed]]
+                        </span>
                     </div>
 
                 </div>

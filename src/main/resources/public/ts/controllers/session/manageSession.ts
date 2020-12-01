@@ -470,12 +470,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     }
 
                     // we set parameters / methods that display the session in the selector.
-                    $scope.sessionsToAttachTo.forEach(session => {
+                    $scope.sessionsToAttachTo.forEach((session: Session) => {
                         if (!$scope.isSameSession(session, $scope.session)) {
-                            session.toString = () => $scope.sessionString(session);
+                            session.toString = () => session.getSessionString();
                             session.string = session.toString();
                         } else {
-                            $scope.session.toString = () => {
+                            $scope.session.toString = (): string => {
                                 return $scope.session.firstText ? $scope.session.firstText : lang.translate('todo.for.this.session');
                             };
                             $scope.session.string = $scope.session.toString();
@@ -484,17 +484,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     });
                     $scope.safeApply();
                 });
-            };
-
-            /**
-             * Returns the session info text for the session select options in the homework form.
-             * @param session A session.
-             */
-            $scope.sessionString = (session: Session): string => {
-                return session.audience.name + ' - ' + session.getSubjectTitle() + ' - '
-                    + moment.weekdays(true)[moment(session.startDisplayDate, FORMAT.displayDate).weekday()] + ' '
-                    + session.startDisplayDate + ' ' + session.startDisplayTime
-                    + ' - ' + session.endDisplayTime;
             };
 
             /**

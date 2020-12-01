@@ -258,6 +258,16 @@ export class Session {
         }
     }
 
+    /**
+     * Returns the session info text.
+     */
+    getSessionString = (): string => {
+        return this.audience.name + ' - ' + this.getSubjectTitle() + ' - '
+            + moment.weekdays(true)[moment(this.startDisplayDate, FORMAT.displayDate).weekday()] + ' '
+            + this.startDisplayDate + ' ' + this.startDisplayTime
+            + ' - ' + this.endDisplayTime;
+    }
+
     getSessionInfo(session: Session): void {
 
         this.subject = new Subject();

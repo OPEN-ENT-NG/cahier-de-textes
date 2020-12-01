@@ -201,6 +201,7 @@ export class Homework {
 
     init(): void {
         this.type = Mix.castAs(HomeworkType, this.type);
+        this.session = Mix.castAs(Session, this.type);
         this.dueDate = moment(this.dueDate).toDate();
         if (this.session_id && this.session_date) {
             this.startMoment = moment(this.session_date);

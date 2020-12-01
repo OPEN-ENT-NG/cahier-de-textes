@@ -1,6 +1,6 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
 import {Audience, Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
-import {Homework, HomeworkTypes, WorkloadDay} from '../../model';
+import {Homework, HomeworkTypes, WorkloadDay, Course} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
@@ -112,25 +112,31 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group,
                         ($scope.session) ? moment($scope.session.date) : moment(),
                         ($scope.session) ? moment($scope.session.date).add(15, 'day') : moment().add(15, 'day'))
-                ]).then(function () {
+                ]).then(() => {
                     $scope.sessionsToAttachTo = [];
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
-                    let filteredCourses = $scope.courses.all.filter(c =>
-                        c.audiences.all.find(a => (a.id === $scope.homework.audience.id) && c.subject)
+
+                    let filteredCourses: Course[] = $scope.courses.all.filter((c: any) =>
+                        c.audiences.all.find((a: Audience) => (a.id === $scope.homework.audience.id) && c.subject)
                             ? c.subject.id === $scope.homework.subject.id
                             : false);
 
                     // We only keep the courses without a session attached to.
-
-                    let courses = filteredCourses.filter(c => !($scope.sessions.all.find(s =>
+                    let courses: Course[] = filteredCourses.filter((c: Course) => !($scope.sessions.all.find((s: Session) =>
                         s.courseId == c._id && DateUtils.getFormattedDate(s.startMoment) ===
                         DateUtils.getFormattedDate(c.startMoment))) && (moment(c.endCourse).isAfter(moment(c.endDate)) || moment(c.endCourse).isSame(c.endDate))
                     );
-                    let sessionFromCourses = courses.map(c => new Session($scope.structure, c));
+                    let sessionFromCourses: Session[] = courses.map((c: Course) => new Session($scope.structure, c));
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat(sessionFromCourses);
-                    $scope.sessionsToAttachTo.sort(function (a, b) {
+                    $scope.sessionsToAttachTo.sort((a, b) => {
                         return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                     });
+
+                    if($scope.isSessionFuture()) {
+                        $scope.homework.session = $scope.sessionsToAttachTo
+                            .find((session: Session) => session.id === $scope.homework.session_id);
+                    }
+
                     linkSession();
                     if ($scope.session || courses.length !== 0 || $scope.sessions.all.length !== 0) {
                         $scope.display.sessionSelect = true;
@@ -148,7 +154,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             };
 
 
-            function checkIsAfter(s: Session): boolean {
+            const checkIsAfter = (s: Session): boolean => {
                 if ($scope.session) {
                     let isAfter: boolean = false;
 
@@ -164,6 +170,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             }
 
+            $scope.isSessionFuture = (): boolean => {
+                return ($scope.homework.session && $scope.homework.session.date) ?
+                    moment($scope.homework.session.date).isAfter(moment()) : true;
+            }
 
             /*
             Clear previous session and linkToHomework current session
@@ -199,17 +209,21 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 return $scope.sessionsToAttachTo;
             }
 
-            $scope.attachToSession = () => {
+            $scope.attachToSession = (): void => {
 
                 $scope.homework.attachedToDate = false;
                 $scope.homework.attachedToSession = true;
-                if ($scope.session) {
+                if ($scope.session && $scope.session.startDate) {
                     $scope.homework.dueDate = moment($scope.session.startDate);
                 }
 
-                if ($scope.homework.session) {
+                if ($scope.homework.session && $scope.homework.session.startDate) {
                     $scope.homework.dueDate = moment($scope.homework.session.startDate);
+                } else if ($scope.homework.session && $scope.homework.dueDate) {
+                    $scope.homework.session.date = $scope.homework.dueDate;
                 }
+
+                $scope.homework.formatDateToDisplay();
 
                 // If no session in homework then push the current one
                 if ($scope.sessionsToAttachTo) {
@@ -228,7 +242,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.safeApply();
             };
 
-            $scope.attachToDate = () => {
+            $scope.attachToDate = (): void => {
                 $scope.homework.attachedToSession = false;
                 $scope.homework.attachedToDate = true;
                 $scope.homework.session = undefined;
