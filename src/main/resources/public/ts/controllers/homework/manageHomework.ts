@@ -45,6 +45,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 return DateUtils.getDisplayDate(date);
             };
 
+            $scope.getDisplayTime = (date: any): string => {
+                return DateUtils.getDisplayTime(date);
+            };
+
             $scope.openHomework = (homework: Homework): void => {
                 if ($scope.isInsideSessionForm) {
                     $scope.$parent.openHomework(homework);
@@ -266,6 +270,21 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     }
                 }
             };
+
+            $scope.setHomeworkProgress = (homework: Homework): void => {
+                if (homework.isDone)
+                    $scope.notifications.push(new Toast('homework.done.notification', 'info'));
+                else
+                    $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
+
+                $scope.setProgress(homework);
+                $scope.safeApply();
+            };
+
+            $scope.setProgress = (homework: Homework): void => {
+                homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
+            };
+
             $scope.$watch(() => $scope.homework.audience, async () => {
                 if ($scope.homework.audience)
                     await $scope.syncSessionsAndCourses();

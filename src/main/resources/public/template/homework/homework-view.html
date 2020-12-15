@@ -1,6 +1,6 @@
 <div class="homework-view">
     <div class="row margin-bottom-md" ng-if="!isInsideSessionForm && !session.isInsideDiary">
-        <b>[[homework.subject.label]] &nbsp; [[homework.audience.name]] &nbsp; [[homework.teacher.toString()]]</b>
+        <b>[[homework.getSubjectTitle()]] &nbsp; [[homework.audience.name]] &nbsp; [[homework.teacher.displayName]]</b>
     </div>
 
     <article class="homework-view-content row padding-md" ng-click="homework.opened = !homework.opened">
@@ -14,12 +14,12 @@
                     <span ng-if="homework.attachedToParentSession"> - <i18n>for.this.session</i18n></span>
                     <span ng-if="homework.attachedToSession && homework.session">
                         - <i18n>todo.for.session</i18n>
-                        [[homework.session.getSubjectTitle()]] [[homework.session.startDisplayDate]]
-                        ([[homework.session.startDisplayTime]]-[[homework.session.endDisplayTime]])
+                        [[homework.getSubjectTitle()]] [[getDisplayDate(homework.session.date)]]
+                        ([[getDisplayTime(homework.session.startTime)]] - [[getDisplayTime(homework.session.endTime)]])
                     </span>
                 </span>
                 <span ng-show="homework.publishDate !== 'Invalid date'">
-                     -<i18n>homework.manage.give</i18n> [[homework.publishDate]]
+                     -  <i18n>homework.manage.give</i18n> [[homework.publishDate]]
                 </span>
             </span>
             <span class="homework-view-content-title-icon right-magnet">

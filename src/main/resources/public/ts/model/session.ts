@@ -251,10 +251,13 @@ export class Session {
     }
 
     getSubjectTitle(): string {
-        if (this.subject.id && this.subject.id !== EXCEPTIONAL.subjectId) {
-            return this.subject.name ? this.subject.name : this.subject.label;
-        } else {
-            return this.exceptional_label ? this.exceptional_label : this.subject.label;
+        // if there is a suject or an excptional_label, display it
+        if (this.subject || this.exceptional_label) {
+            if (this.subject.id && this.subject.id !== EXCEPTIONAL.subjectId) {
+                return this.subject.name ? this.subject.name : this.subject.label;
+            } else {
+                return this.exceptional_label ? this.exceptional_label : this.subject.label;
+            }
         }
     }
 

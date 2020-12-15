@@ -61,15 +61,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
         query.append(" WHERE h.id = ").append(homeworkId);
 
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
-            if (result.isRight()) {
-                JsonObject homework = result.right().getValue();
-                cleanHomework(homework);
-                handler.handle(new Either.Right<>(homework));
-            } else {
-                handler.handle(new Either.Left<>(result.left().getValue()));
-            }
-        }));
+        proceedHomework(handler, query.toString());
     }
 
     @Override

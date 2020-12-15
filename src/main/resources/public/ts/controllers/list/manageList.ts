@@ -231,7 +231,7 @@ export let manageListCtrl = ng.controller('manageListController',
             }
         };
 
-        $scope.setHomeworkProgress = (homework) => {
+        $scope.setHomeworkProgress = (homework: Homework): void => {
             if (homework.isDone)
                 $scope.notifications.push(new Toast('homework.done.notification', 'info'));
             else
@@ -241,7 +241,7 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.safeApply();
         };
 
-        $scope.setProgress = (homework: Homework) => {
+        $scope.setProgress = (homework: Homework): void => {
             homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
         };
 
