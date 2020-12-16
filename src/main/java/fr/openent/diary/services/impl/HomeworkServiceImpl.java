@@ -100,7 +100,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         List<String> listAudienceId = audienceId != null && !audienceId.equals("") ? Arrays.asList(audienceId) : null;
         List<String> listTeacherId = teacherId != null && !teacherId.equals("") ? Arrays.asList(teacherId) : null;
 
-        this.getHomeworks("", startDate, endDate, null, listTeacherId, listAudienceId, subjectId, true, handler);
+        this.getHomeworks("", startDate, endDate, null, listAudienceId, listTeacherId, subjectId, true, handler);
     }
 
     @Override
