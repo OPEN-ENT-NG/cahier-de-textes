@@ -196,7 +196,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.searchSessions = [];
             $scope.searchFolders = [];
             $scope.selectedFolderIds = [];
-            $scope.selectItem(null);
             if (search && search != '') {
                 $scope.progressionFolders.all.filter((f) => {
                     $scope.searchSessions = [
