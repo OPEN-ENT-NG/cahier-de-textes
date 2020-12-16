@@ -59,10 +59,11 @@ public class DiaryServiceImpl implements DiaryService {
     public void getAudienceFromChild(String childId, Handler<Either<String, JsonArray>> handler) {
         StringBuilder query = new StringBuilder("");
         query.append("MATCH (n:User)-[:IN]->(pg:ProfileGroup)-[:DEPENDS]->(c:Class) WHERE n.id = {id} RETURN c.id as audienceId ")
-        .append("UNION ")
-        .append("MATCH (n:User)-[:IN]->(fg:FunctionalGroup) WHERE n.id = {id} RETURN DISTINCT fg.id as audienceId;");
+                .append("UNION ")
+                .append("MATCH (n:User)-[:IN]->(fg:FunctionalGroup) WHERE n.id = {id} RETURN DISTINCT fg.id as audienceId ")
+                .append("UNION ")
+                .append("MATCH (n:User)-[:IN]->(mg:ManualGroup) WHERE n.id = {id} RETURN DISTINCT mg.id as audienceId;");
         JsonObject params = new JsonObject().put("id", childId);
         neo.execute(query.toString(), params, Neo4jResult.validResultHandler(handler));
     }
-
 }
