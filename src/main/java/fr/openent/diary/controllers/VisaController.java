@@ -137,7 +137,8 @@ public class VisaController extends ControllerHelper {
                         try {
                             DateFormat dateFormat = new SimpleDateFormat(DateUtils.DAY_MONTH_YEAR_HOUR_TIME);
                             Date date = new Date();
-                            fileName = dateFormat.format(date) + "-" + sessionsGroup.getString("audience") + "-" + sessionsGroup.getString("subject") + "-" + sessionsGroup.getString("teacher");
+                            fileName = dateFormat.format(date) + "-" + sessionsGroup.getString("audience") + "-" +
+                                    sessionsGroup.getString("subject") + "-" + sessionsGroup.getString("teacher");
                         } catch (Exception e) {
                             fileName = "exportpdf";
                         }

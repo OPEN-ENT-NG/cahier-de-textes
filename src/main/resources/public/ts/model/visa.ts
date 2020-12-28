@@ -90,6 +90,7 @@ export class Visa {
                     teacher: n.teacher.displayName,
                     title: n.title,
                     type: n.diaryType.label,
+                    startDate: n.date,
                     startDisplayDate: DateUtils.formatDate(n.date, FORMAT.displayDate),
                     startDisplayTime: n.type === NOTEBOOK_TYPE.HOMEWORK ? null :
                         DateUtils.formatDate(moment(moment().format(FORMAT.formattedDate) + ' ' + n.start_time), FORMAT.displayTime),
@@ -113,6 +114,8 @@ export class Visa {
                     }),
                     hasHomeworks: homeworks.length > 0
                 };
+            }).sort((sessionA, sessionB) => {
+                return new Date(sessionB.startDate).getTime() - new Date(sessionA.startDate).getTime();
             }),
             structure_id: this.structure.id,
             teacher_id: this.teacher.id,

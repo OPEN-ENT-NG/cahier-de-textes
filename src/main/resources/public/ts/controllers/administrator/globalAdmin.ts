@@ -70,7 +70,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
             $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
 
             const schoolYears = await viescolaireService.getSchoolYearDates($scope.structure.id);
-            // $scope.filters.startDate = DateUtils.formatDate(schoolYears.start_date, FORMAT.formattedDate);
             $scope.filters.startDate = moment(schoolYears.start_date);
 
             // AutocompleteUtils.init($scope.structure);
