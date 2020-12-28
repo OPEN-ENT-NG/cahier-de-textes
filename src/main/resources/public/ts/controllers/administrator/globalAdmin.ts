@@ -24,7 +24,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         $scope.groupsSearch = undefined;
 
         $scope.isLoading = false;
-        $scope.notebooks = undefined;
+        $scope.notebooks = new Notebook($scope.structure.id);
+
         $scope.notebookRequest = {} as INotebookRequest;
 
         $scope.vised = true;
@@ -64,7 +65,8 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.init = async (): Promise<void> => {
-            $scope.notebooks = new Notebook($scope.structure.id);
+            $scope.notebooks.setStructure($scope.structure.id);
+
             /* Init search bar */
             $scope.usersSearch = new UsersSearch($scope.structure.id, searchService);
             $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
@@ -491,13 +493,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         // We use this condition to prevent $scope.init to be called twice with $scope.$on to handle multiple structure
-        if ($scope.structures.all.length <= 1) {
-            $scope.init();
-        }
-
-        /* events handler */
-        $scope.$watch(() => $scope.filters.startDate, async () => $scope.updateFilter());
-        $scope.$watch(() => $scope.filters.endDate, async () => $scope.updateFilter());
+        $scope.init();
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
             $scope.init();

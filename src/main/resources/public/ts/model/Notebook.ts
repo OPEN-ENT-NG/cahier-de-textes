@@ -64,6 +64,10 @@ export class Notebook {
         this.notebookResponse = {} as INotebookResponse;
     }
 
+    setStructure = (structure_id: string): void => {
+      this.structure_id = structure_id;
+    };
+
     async build(data: INotebookResponse): Promise<void> {
         this.notebookResponse.all = [];
         data.all.forEach((notebook: INotebook) => {

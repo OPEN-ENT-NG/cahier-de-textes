@@ -11,6 +11,7 @@
             <i class="text-xl margin-sm icon diary-calendar svg-green"></i>
             <date-picker
                     ng-model="filters.startDate"
+                    ng-change="updateFilter()"
                     class="date-picker-sm remove-margin">
             </date-picker>
         </div>
@@ -23,6 +24,7 @@
             <i class="text-xl margin-sm icon diary-calendar svg-green"></i>
             <date-picker
                     ng-model="filters.endDate"
+                    ng-change="updateFilter()"
                     class="date-picker-sm remove-margin">
             </date-picker>
         </div>
