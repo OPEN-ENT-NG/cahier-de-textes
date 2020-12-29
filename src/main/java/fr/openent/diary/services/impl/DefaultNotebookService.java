@@ -173,7 +173,7 @@ public class DefaultNotebookService implements NotebookService {
         String query = " SELECT * FROM (SELECT DISTINCT ON (notebook_id) * FROM notebooks) AS notebooks ";
 
         // order by visa
-        if (isVisa != null && isVisa) {
+        if ((isVisa != null && isVisa) || (visaOrder != null && !visaOrder.isEmpty())) {
             query += "ORDER BY visa " + (visaOrder.equals("ASC") ? visaOrder + " NULLS FIRST " : visaOrder + " NULLS LAST ");
         }
 
@@ -295,9 +295,6 @@ public class DefaultNotebookService implements NotebookService {
         }
         query += "GROUP BY notebook.subject_id, notebook.teacher_id, notebook.audience_id, notebook.exceptional_label ";
 
-        if (visaOrderParam != null && visaOrderParam) {
-            query += " ORDER BY visa DESC NULLS LAST ";
-        }
         return query;
     }
 
