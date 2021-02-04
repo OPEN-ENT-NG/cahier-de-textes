@@ -41,7 +41,7 @@ public class HomeworkServiceTest {
                 listen(8090, context.asyncAssertSuccess());
 
         /* Service(s) to test */
-        this.homeworkService = new HomeworkServiceImpl("diary", eb);
+        this.homeworkService = new HomeworkServiceImpl("diary", eb, null);
 
     }
 

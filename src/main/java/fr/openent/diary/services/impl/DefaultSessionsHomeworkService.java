@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.events.EventStore;
 import org.entcore.common.user.UserInfos;
 
 import java.util.ArrayList;
@@ -23,9 +24,9 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
     private SessionService sessionService;
     private HomeworkService homeworkService;
 
-    public DefaultSessionsHomeworkService(EventBus eb) {
-        this.sessionService = new SessionServiceImpl(eb);
-        this.homeworkService = new HomeworkServiceImpl("diary", eb);
+    public DefaultSessionsHomeworkService(EventBus eb, EventStore eventStore) {
+        this.sessionService = new SessionServiceImpl(eb, eventStore);
+        this.homeworkService = new HomeworkServiceImpl("diary", eb, eventStore);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.core.constants.EventStores;
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.services.DiaryService;
 import fr.wseduc.rs.ApiDoc;
@@ -12,6 +13,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.events.EventStore;
 import org.entcore.common.neo4j.Neo;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.http.RouteMatcher;
@@ -27,9 +29,12 @@ public class DiaryController extends BaseController {
     private Neo neo;
 
     DiaryService diaryService;
+    private final EventStore eventStore;
 
-    public DiaryController(DiaryService diaryService) {
+
+    public DiaryController(DiaryService diaryService, EventStore eventStore) {
         this.diaryService = diaryService;
+        this.eventStore = eventStore;
     }
 
     @Override
@@ -43,6 +48,7 @@ public class DiaryController extends BaseController {
     @SecuredAction(value = WorkflowUtils.VIEW, type = ActionType.WORKFLOW)
     public void view(final HttpServerRequest request) {
         renderView(request);
+        this.eventStore.createAndStoreEvent(EventStores.ACCESS, request);
     }
 
     @Get("/children/list")

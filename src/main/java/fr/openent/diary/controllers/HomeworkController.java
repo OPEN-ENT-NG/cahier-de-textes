@@ -16,11 +16,10 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
-import java.util.Date;
-
 public class HomeworkController extends ControllerHelper {
 
     private HomeworkService homeworkService;
+
 
     public HomeworkController(HomeworkService homeworkService) {
         this.homeworkService = homeworkService;

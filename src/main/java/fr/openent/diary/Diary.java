@@ -1,9 +1,11 @@
 package fr.openent.diary;
 
 import fr.openent.diary.controllers.*;
-import fr.openent.diary.services.*;
+import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.impl.*;
 import io.vertx.core.eventbus.EventBus;
+import org.entcore.common.events.EventStore;
+import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.storage.Storage;
@@ -30,16 +32,19 @@ public class Diary extends BaseServer {
         final NotifyServiceImpl notifyService = new NotifyServiceImpl(timeline,eb,getPathPrefix(config));
         final VisaServiceImpl visaService = new VisaServiceImpl(storage, eb, vertx, config);
 
-        addController(new DiaryController(diaryService));
+        EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Diary.class.getSimpleName());
+
+
+        addController(new DiaryController(diaryService, eventStore));
 
         /* diary controller named as Notebook */
         addController(new NotebookController(eb));
 
-        addController(new InitController(new DefautlInitService("diary",eb)));
+        addController(new InitController(new DefautlInitService("diary", eb)));
         addController(new VisaController(visaService, storage));
-        addController(new SessionController(new SessionServiceImpl(eb)));
-        addController(new HomeworkController(new HomeworkServiceImpl("diary", eb)));
-        addController(new SessionsHomeworkController(new DefaultSessionsHomeworkService(eb)));
+        addController(new SessionController(new SessionServiceImpl(eb, eventStore)));
+        addController(new HomeworkController(new HomeworkServiceImpl("diary", eb, eventStore)));
+        addController(new SessionsHomeworkController(new DefaultSessionsHomeworkService(eb, eventStore)));
         addController(new InspectorController(new InspectorServiceImpl()));
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
         addController(new SearchController(eb));

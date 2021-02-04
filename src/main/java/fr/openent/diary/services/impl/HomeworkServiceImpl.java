@@ -1,6 +1,7 @@
 package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.core.constants.EventStores;
 import fr.openent.diary.models.Audience;
 import fr.openent.diary.models.Person.User;
 import fr.openent.diary.models.Subject;
@@ -16,6 +17,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.events.EventStore;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -38,12 +40,14 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     private final SubjectService subjectService;
     private final GroupService groupService;
     private final UserService userService;
+    private final EventStore eventStore;
 
-    public HomeworkServiceImpl(String table, EventBus eb) {
+    public HomeworkServiceImpl(String table, EventBus eb, EventStore eventStore) {
         super(table);
         this.subjectService = new DefaultSubjectService(eb);
         this.groupService = new DefaultGroupService(eb);
         this.userService = new DefaultUserService();
+        this.eventStore = eventStore;
     }
 
 
@@ -424,6 +428,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         values.add(user.getUserId());
 
         Sql.getInstance().prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+        this.eventStore.createAndStoreEvent(EventStores.CREATE_HOMEWORK, user);
     }
 
     @Override

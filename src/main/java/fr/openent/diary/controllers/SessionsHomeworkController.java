@@ -2,8 +2,6 @@ package fr.openent.diary.controllers;
 
 import fr.openent.diary.security.workflow.HomeworkManage;
 import fr.openent.diary.services.SessionHomeworkService;
-import fr.openent.diary.services.SessionService;
-import fr.openent.diary.services.impl.ExportPDFServiceImpl;
 import fr.wseduc.rs.Post;
 import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
@@ -17,7 +15,7 @@ import org.entcore.common.user.UserUtils;
 
 public class SessionsHomeworkController extends ControllerHelper {
 
-    private SessionHomeworkService sessionHomeworkService;
+    private final SessionHomeworkService sessionHomeworkService;
 
     public SessionsHomeworkController(SessionHomeworkService sessionHomeworkService) {
         this.sessionHomeworkService = sessionHomeworkService;

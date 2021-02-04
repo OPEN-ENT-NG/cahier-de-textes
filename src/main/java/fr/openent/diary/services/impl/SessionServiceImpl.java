@@ -1,6 +1,7 @@
 package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.core.constants.EventStores;
 import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.models.Audience;
 import fr.openent.diary.models.Person.User;
@@ -18,6 +19,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.entcore.common.events.EventStore;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
@@ -41,11 +43,14 @@ public class SessionServiceImpl implements SessionService {
     private final SubjectService subjectService;
     private final GroupService groupService;
     private final UserService userService;
+    private final EventStore eventStore;
 
-    public SessionServiceImpl(EventBus eb) {
+
+    public SessionServiceImpl(EventBus eb, EventStore eventStore) {
         this.subjectService = new DefaultSubjectService(eb);
         this.groupService = new DefaultGroupService(eb);
         this.userService = new DefaultUserService();
+        this.eventStore = eventStore;
     }
 
     @Override
@@ -584,6 +589,8 @@ public class SessionServiceImpl implements SessionService {
         values.add(session.getString("end_time"));
 
         Sql.getInstance().prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+
+        this.eventStore.createAndStoreEvent(EventStores.CREATE_SESSION, user);
     }
 
     @Override
