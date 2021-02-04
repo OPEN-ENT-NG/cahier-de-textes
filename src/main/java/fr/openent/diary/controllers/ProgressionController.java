@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.core.constants.Actions;
 import fr.openent.diary.security.workflow.SessionManage;
 import fr.openent.diary.security.workflow.SessionRead;
 import fr.openent.diary.services.ProgressionService;
@@ -17,6 +18,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.Trace;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
@@ -53,6 +55,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Delete("/progressions")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.DELETE_PROGRESSION)
     @ResourceFilter(SessionManage.class)
     public void deleteProgression(final HttpServerRequest request) {
         request.bodyHandler(body -> {
@@ -63,6 +66,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Delete("/progression/folders")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.DELETE_PROGRESSION_FOLDER)
     @ResourceFilter(SessionManage.class)
     public void deleteProgressionFolders(final HttpServerRequest request) {
         request.bodyHandler(body -> {
@@ -74,6 +78,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Post("/progression/create")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.CREATE_PROGRESSION)
     @ResourceFilter(SessionManage.class)
     public void createProgression(final HttpServerRequest request) {
 
@@ -93,6 +98,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Post("/progression/folder/create")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.CREATE_PROGRESSION_FOLDER)
     @ResourceFilter(SessionManage.class)
     public void createProgressionFolder(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, json -> {
@@ -103,6 +109,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Put("/progression/folder/update/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.UPDATE_PROGRESSION_FOLDER)
     @ResourceFilter(SessionManage.class)
     public void updateProgressionFolder(final HttpServerRequest request) {
         String progressionId = request.getParam("progressionId");
@@ -115,6 +122,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Delete("/progression/homework/:progressionHomeworkId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.DELETE_PROGRESSION)
     @ResourceFilter(SessionManage.class)
     public void deleteProgressionHomework(final HttpServerRequest request) {
 
@@ -126,6 +134,7 @@ public class ProgressionController extends ControllerHelper {
 
     @Put("/progression/update/:progressionId")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.UPDATE_PROGRESSION)
     @ResourceFilter(SessionManage.class)
     public void updateProgressions(final HttpServerRequest request) {
         String folderId = request.getParam("progressionId");

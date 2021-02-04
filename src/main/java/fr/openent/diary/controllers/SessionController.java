@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.core.constants.Actions;
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.*;
 import fr.openent.diary.services.ExportPDFService;
@@ -16,6 +17,7 @@ import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.Trace;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
@@ -117,6 +119,7 @@ public class SessionController extends ControllerHelper {
 
     @Post("/session")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.CREATE_SESSION)
     @ResourceFilter(SessionManage.class)
     public void createSession(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "session", session -> {
@@ -126,6 +129,7 @@ public class SessionController extends ControllerHelper {
 
     @Put("/session/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.UPDATE_SESSION)
     @ResourceFilter(SessionManage.class)
     public void updateSession(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "session", session -> {
@@ -136,6 +140,7 @@ public class SessionController extends ControllerHelper {
 
     @Delete("/session/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.DELETE_SESSION)
     @ResourceFilter(SessionManage.class)
     public void deleteSession(final HttpServerRequest request) {
         long sessionId = Long.parseLong(request.getParam("id"));

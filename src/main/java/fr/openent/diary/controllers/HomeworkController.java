@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.core.constants.Actions;
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.*;
 import fr.openent.diary.services.HomeworkService;
@@ -13,6 +14,7 @@ import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.Trace;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
@@ -107,6 +109,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Post("/homework")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.CREATE_HOMEWORK)
     @ResourceFilter(HomeworkManage.class)
     public void createHomework(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, pathPrefix + "homework", homework -> {
@@ -116,6 +119,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Put("/homework/:id/:publicationStateChanged")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.UPDATE_HOMEWORK)
     @ResourceFilter(HomeworkManage.class)
     public void updateHomework(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "homework", homework -> {
@@ -127,6 +131,7 @@ public class HomeworkController extends ControllerHelper {
 
     @Delete("/homework/:id")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.DELETE_HOMEWORK)
     @ResourceFilter(HomeworkManage.class)
     public void deleteHomework(final HttpServerRequest request) {
         long homeworkId = Long.parseLong(request.getParam("id"));

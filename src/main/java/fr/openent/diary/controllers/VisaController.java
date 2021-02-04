@@ -1,5 +1,6 @@
 package fr.openent.diary.controllers;
 
+import fr.openent.diary.core.constants.Actions;
 import fr.openent.diary.security.WorkflowUtils;
 import fr.openent.diary.security.workflow.AdminVisaManage;
 import fr.openent.diary.security.workflow.AdminVisaRead;
@@ -22,6 +23,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.Trace;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserUtils;
@@ -69,6 +71,7 @@ public class VisaController extends ControllerHelper {
 
     @Post("/visas")
     @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @Trace(value = Actions.CREATE_VISA)
     @ResourceFilter(AdminVisaManage.class)
     public void createVisa(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> RequestUtils.bodyToJson(request, json -> {
