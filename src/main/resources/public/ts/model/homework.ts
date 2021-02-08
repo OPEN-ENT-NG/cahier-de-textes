@@ -253,16 +253,17 @@ export class Homeworks {
         return dataModel;
     }
 
-    async syncOwnHomeworks(structure: any, startMoment: any, endMoment: any, subjectId?: string): Promise<void> {
+    async syncOwnHomeworks(structure: any, startMoment: any, endMoment: any, subjectId?: string, teacherId?: string, audienceId?: string): Promise<void> {
         let startDate: string = DateUtils.getFormattedDate(startMoment);
         let endDate: string = DateUtils.getFormattedDate(endMoment);
 
-        let url: string = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}`;
+        let filter: string = subjectId || teacherId || audienceId ? '?' : '';
+        if (teacherId) filter += `teacherId=${teacherId}&`;
+        if (audienceId) filter += `audienceId=${audienceId}&`;
+        if (subjectId) filter += `subjectId=${subjectId}&`;
 
-        if (subjectId) {
-            url += `&subjectId=${subjectId}`;
-        }
-        url = url.replace('&', '?');
+        let url: string = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}${filter.slice(0, -1)}`;
+
         await this.syncHomeworks(url);
     }
 

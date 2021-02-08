@@ -10,7 +10,8 @@ public interface HomeworkService {
 
     void getHomework(long homeworkId, UserInfos user, Handler<Either<String, JsonObject>> handler);
 
-    void getOwnHomeworks(String structureId,String startDate, String endDate, UserInfos user, String subjectId, Handler<Either<String, JsonArray>> handler);
+    void getOwnHomeworks(String structureId,String startDate, String endDate, UserInfos user, String subjectId,
+                         String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler);
 
     void getExternalHomeworks( String startDate, String endDate, String teacherId, String audienceId, String subjectId, Handler<Either<String, JsonArray>> handler);
 
