@@ -1,5 +1,6 @@
 <!-- Session and Course -->
-<article ng-if="pedagogicItem.pedagogicType === TYPE_SESSION" class="pedagogic-item-article">
+<article ng-if="pedagogicItem.pedagogicType === TYPE_SESSION
+    && pedagogicItem.homeworks.length > 0 && !pedagogicItem.isEmpty" class="pedagogic-item-article">
     <!-- Sessions -->
     <div class="row list-view-item">
         <div data-ng-click="pedagogicItem.opened = !pedagogicItem.opened" class="twelve cell first-content">
