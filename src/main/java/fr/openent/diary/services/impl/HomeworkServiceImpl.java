@@ -1,6 +1,7 @@
 package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.core.constants.Actions;
 import fr.openent.diary.core.constants.EventStores;
 import fr.openent.diary.models.Audience;
 import fr.openent.diary.models.Person.User;
@@ -18,6 +19,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.events.EventStore;
+import org.entcore.common.http.filter.Trace;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -478,8 +480,51 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
     @Override
     public void deleteHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
-        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".homework WHERE id = " + homeworkId;
-        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+        String query = "SELECT s.id AS sessionId, s.is_empty AS isEmpty FROM " + Diary.DIARY_SCHEMA +
+                ".homework h " +
+                "INNER JOIN "+ Diary.DIARY_SCHEMA + ".session s ON h.session_id = s.id WHERE h.id = " + homeworkId;
+
+        sql.raw(query, SqlResult.validUniqueResultHandler(event -> {
+            if (event.isRight()) {
+                JsonArray statements = new JsonArray();
+                statements.add(getDeleteHomeworkStatement(homeworkId));
+
+                if (!event.right().getValue().isEmpty()) {
+                    final boolean isEmpty = event.right().getValue().getBoolean("isempty");
+                    if (isEmpty) {
+                        final long sessionId = event.right().getValue().getLong("sessionid");
+                        statements.add(getDeleteEmptySessionStatement(sessionId));
+                    }
+                }
+
+                sql.transaction(statements, SqlResult.validUniqueResultHandler(handler));
+
+            } else {
+                LOGGER.error("[Diary@HomeworkServiceImpl::deleteHomework] An error occurred when removing homework");
+                handler.handle(new Either.Left<>("Error while retrieving data"));
+            }
+        }));
+    }
+
+    private JsonObject getDeleteHomeworkStatement(long homeworkId) {
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".homework WHERE id = ?";
+        JsonArray params = new JsonArray()
+                .add(homeworkId);
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
+    }
+
+    @Trace(value = Actions.DELETE_SESSION)
+    private JsonObject getDeleteEmptySessionStatement(long sessionId) {
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".session WHERE id = ?";
+        JsonArray params = new JsonArray()
+                .add(sessionId);
+        return new JsonObject()
+                .put(STATEMENT, query)
+                .put(VALUES, params)
+                .put(ACTION, PREPARED);
     }
 
     @Override

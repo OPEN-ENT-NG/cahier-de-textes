@@ -160,10 +160,10 @@ export class Session {
         this.plainTextDescription = DateUtils.convertHtmlToPlainText(this.description);
 
         if (this.courseId) {
-            if (this.is_empty) {
-                this.color = colors[2];
+            if (this.is_empty && this.homeworks && this.homeworks.length > 0) {
+                this.color = colors[2]; // ORANGE
             } else {
-                this.color = colors[1];
+                this.color = colors[1]; // GREEN
             }
         }
     }
