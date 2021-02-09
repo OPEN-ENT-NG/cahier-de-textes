@@ -500,7 +500,7 @@ export let calendarController = ng.controller('CalendarController',
                     if (typeCourseSession == typeSession) {
                         $scope.sessionToSession(id_progressionOrSession, idCourseSession)
                     } else if (typeCourseSession == typeCourse) {
-                        if (progressionOrSession.item.color === pedagogicSlotProfile.HOMEWORK) {
+                        if (progressionOrSession.item.is_empty) {
                             // case we drag homework to empty session in order to create homework
                             $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item, idCourseSession, courseDate);
                         } else {
@@ -567,13 +567,10 @@ export let calendarController = ng.controller('CalendarController',
                 homework.subject.id = course.subject ? course.subject.id : null;
                 homework.subject.label = course.subject.name ? course.subject.name : course.subject.label;
                 homework.audience = course.audiences.all[0];
-                // if (sessionDrop.audiences.all.length !== 0) {
-                // homework.audience = sessionDrop.audiences.all[0];
                 homework.dueDate = sessionDrop.startMoment;
                 homework.session = sessionDrop;
-                // homework.subject = sessionDrop.subject;
                 homework.id = '';
-                // }
+                $rootScope.session = sessionDrop;
                 $rootScope.homework = homework;
             };
 

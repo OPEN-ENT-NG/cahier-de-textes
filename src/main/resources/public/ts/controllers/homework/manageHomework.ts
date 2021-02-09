@@ -106,16 +106,18 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         subject => subject.id === $scope.homework.subject.id
                     );
                 }
+                let date: any = null;
+                if($scope.session) date = $scope.session.date ? $scope.session.date : ($scope.session.startDate ? $scope.session.startDate : null);
 
                 Promise.all([
                     await $scope.sessions.syncOwnSessions($scope.structure,
-                        ($scope.session) ? moment($scope.session.date) : moment(),
-                        ($scope.session) ? moment($scope.session.date).add(15, 'day') : moment().add(15, 'day'),
+                        (date) ? moment(date) : moment(),
+                        (date) ? moment(date).add(15, 'day') : moment().add(15, 'day'),
                         [$scope.homework.audience.id], $scope.homework.subject.id),
 
                     await $scope.courses.sync($scope.structure, $scope.params.user, $scope.params.group,
-                        ($scope.session) ? moment($scope.session.date) : moment(),
-                        ($scope.session) ? moment($scope.session.date).add(15, 'day') : moment().add(15, 'day'))
+                        (date) ? moment(date) : moment(),
+                        (date) ? moment(date).add(15, 'day') : moment().add(15, 'day'))
                 ]).then(() => {
                     $scope.sessionsToAttachTo = [];
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
@@ -137,8 +139,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     });
 
                     if($scope.isSessionFuture()) {
+                        let initialSessionId: String = null;
+                        if ($scope.homework.session)
+                            initialSessionId = $scope.homework.session._id ? $scope.homework.session._id
+                                : ($scope.homework.session.id ? $scope.homework.session.id : $scope.homework.session.courseId);
                         $scope.homework.session = $scope.sessionsToAttachTo
-                            .find((session: Session) => session.id === $scope.homework.session_id);
+                            .find((session: Session) => {
+                                if (initialSessionId) return session.courseId === initialSessionId || session.id === initialSessionId;
+                                else if ($scope.homework.session_id) return session.id === $scope.homework.session_id;
+                                return false;
+                            });
                     }
 
                     linkSession();
@@ -154,7 +164,6 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     }
                     $scope.safeApply();
                 });
-                $scope.safeApply();
             };
 
 
@@ -288,13 +297,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
             $scope.$watch(() => $scope.homework.audience, async () => {
                 if ($scope.homework.audience)
                     await $scope.syncSessionsAndCourses();
-                $scope.safeApply();
             });
 
             $scope.$watch(() => $scope.homework.subject, async () => {
                 if ($scope.homework.subject)
                     await $scope.syncSessionsAndCourses();
-                $scope.safeApply();
             });
             $scope.isValidForm = () => {
                 return $scope.homework.isValidForm();
@@ -404,7 +411,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                             );
                             if (session) {
                                 $scope.homework.session = session;
-                            } else {
+                            } else if ($scope.sessionsToAttachTo.length > 0){
                                 $scope.homework.session = $scope.sessionsToAttachTo[0];
                             }
                         } else {
@@ -447,7 +454,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
              */
             $scope.selectSearchAudience = (valueInput: string, groupForm: Audience): void => {
                 $scope.groupsSearch.selectGroups(valueInput, groupForm);
-                $scope.homework.audience = $scope.groupsSearch.getSelectedGroups()[0]; // first element we fetch before reset
+                $scope.homework.audience = $scope.groupsSearch.getSelectedGroups().length > 0 ?
+                    $scope.groupsSearch.getSelectedGroups()[0] : null; // first element we fetch before reset
                 $scope.groupsSearch.resetGroups();
                 $scope.groupsSearch.group = '';
                 $scope.syncSessionsAndCourses();
