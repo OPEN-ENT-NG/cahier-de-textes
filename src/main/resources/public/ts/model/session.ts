@@ -383,7 +383,7 @@ export class Sessions {
         let url = `/diary/sessions/own/${startDate}/${endDate}/${this.structure.id}`;
 
         if (audienceIds) {
-            audienceIds.forEach(id => url += `&audienceId=${id}`);
+            audienceIds.forEach(id => url += id ? `&audienceId=${id}` : '');
         }
 
         if (subjectId) {

@@ -305,7 +305,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         }
                     });
 
-                    if ($scope.session.id === homework.session_id) {
+                    if (($scope.session.id === homework.session_id) || !homework.session_id) {
                         $scope.homeworks.splice(index, 1, homework);
                     } else if ($scope.from_homeworks) {
 

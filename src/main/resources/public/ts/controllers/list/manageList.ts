@@ -77,9 +77,17 @@ export let manageListCtrl = ng.controller('manageListController',
 
                 const promises: Promise<void>[] = [];
                 /* student/teacher workflow case */
-                promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId, teacherId, audienceId));
-                promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, [audienceId], subjectId));
+                if (audienceId && !subjectId) {
+                    promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
+                    promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
+
+                } else {
+                    promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId, teacherId ? teacherId : model.me.userId, audienceId));
+                    promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, [audienceId], subjectId));
+                }
+
                 promises.push($scope.structure.courses.sync($scope.structure, teacherId ? teacherId : model.me.userId, classSelected, $scope.filters.startDate, $scope.filters.endDate));
+
                 await Promise.all(promises);
             }
 
