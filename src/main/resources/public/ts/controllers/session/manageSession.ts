@@ -307,10 +307,15 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
                     if ($scope.session.id === homework.session_id) {
                         $scope.homeworks.splice(index, 1, homework);
-                    } else {
-                        $scope.from_homeworks.splice(index, 1, homework);
-                    }
+                    } else if ($scope.from_homeworks) {
 
+                        for (let i = 0; i < $scope.from_homeworks.length; i++) {
+                            if ($scope.from_homeworks[i].id === homework.id) {
+                                $scope.from_homeworks.splice(i, 1, homework);
+                                break;
+                            }
+                        }
+                    }
                 }
                 $scope.closeFormHomework();
                 $scope.safeApply();
