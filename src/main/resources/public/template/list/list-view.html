@@ -82,7 +82,7 @@
         <div class="list-view">
             <div ng-show="hasPedagogicDayToDisplay(pedagogicDays, display) && (display.sessionList || display.homeworks)"
                  class="timeline-story vertical-spacing row">
-                <div ng-if="!containsOnlyCourses(pedagogicDay) && getNbHomework(pedagogicDay) > 0"
+                <div ng-if="!containsOnlyCourses(pedagogicDay)"
                      ng-repeat="pedagogicDay in pedagogicDays"
                      class="twelve cell event-row timeline-story">
 
