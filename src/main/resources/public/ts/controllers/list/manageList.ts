@@ -63,7 +63,8 @@ export let manageListCtrl = ng.controller('manageListController',
             let subjectId: string = subject && subject.id ? subject.id : $scope.filters.subject ? $scope.filters.subject.id : null;
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id
-                && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id))) {
+                && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id) ||
+                    !teacherSelected || !classSelected)) {
                 /* parents workflow case */
 
                 await Promise.all([
