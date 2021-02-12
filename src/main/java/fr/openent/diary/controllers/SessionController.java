@@ -71,8 +71,9 @@ public class SessionController extends ControllerHelper {
         String endDate = request.getParam("endDate");
         String audienceId = request.getParam("audienceId");
         String teacherId = request.getParam("teacherId");
+        String subjectId = request.getParam("subjectId");
 
-        sessionService.getExternalSessions(startDate, endDate, teacherId, audienceId, DefaultResponseHandler.arrayResponseHandler(request));
+        sessionService.getExternalSessions(startDate, endDate, teacherId, audienceId, subjectId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Get("/sessions/child/:startDate/:endDate/:childId")

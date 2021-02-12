@@ -267,13 +267,14 @@ export class Homeworks {
         await this.syncHomeworks(url);
     }
 
-    async syncExternalHomeworks(startMoment: any, endMoment: any, teacherId?: string, audienceId?: string): Promise<void> {
+    async syncExternalHomeworks(startMoment: any, endMoment: any, teacherId?: string, audienceId?: string, subjectId?: string): Promise<void> {
         let startDate: string = DateUtils.getFormattedDate(startMoment);
         let endDate: string = DateUtils.getFormattedDate(endMoment);
 
         let filter: string = teacherId || audienceId ? '?' : '';
         if (teacherId) filter += `teacherId=${teacherId}&`;
         if (audienceId) filter += `audienceId=${audienceId}&`;
+        if (subjectId) filter += `subjectId=${subjectId}&`;
 
         let url: string = `/diary/homeworks/external/${startDate}/${endDate}${filter.slice(0, -1)}`;
 

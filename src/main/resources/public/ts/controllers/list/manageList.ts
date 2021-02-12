@@ -60,7 +60,8 @@ export let manageListCtrl = ng.controller('manageListController',
             const classSelected: any = AutocompleteUtils.getClassesSelected() !== undefined ?
                 AutocompleteUtils.getClassesSelected()[0] : [];
 
-            let subjectId: string = subject && subject.id ? subject.id : $scope.filters.subject ? $scope.filters.subject.id : null;
+            let subjectId: string = subject && subject.id ? subject.id :
+                $scope.filters.subject ? $scope.filters.subject.id : null;
 
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id
                 && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id) ||
@@ -78,9 +79,9 @@ export let manageListCtrl = ng.controller('manageListController',
 
                 const promises: Promise<void>[] = [];
                 /* student/teacher workflow case */
-                if (audienceId && !subjectId) {
-                    promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
-                    promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
+                if (audienceId || teacherId) {
+                    promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId, subjectId));
+                    promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId, subjectId));
 
                 } else {
                     promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId, teacherId ? teacherId : model.me.userId, audienceId));

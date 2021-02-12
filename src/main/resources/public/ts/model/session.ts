@@ -394,14 +394,14 @@ export class Sessions {
         await this.syncSessions(url);
     }
 
-    async syncExternalSessions(startMoment: any, endMoment: any, teacherId?: string, audienceId?: string): Promise<void> {
+    async syncExternalSessions(startMoment: any, endMoment: any, teacherId?: string, audienceId?: string, subjectId?: string): Promise<void> {
         let startDate = DateUtils.getFormattedDate(startMoment);
         let endDate = DateUtils.getFormattedDate(endMoment);
 
         let filter = teacherId || audienceId ? '?' : '';
         if (teacherId) filter += `teacherId=${teacherId}&`;
         if (audienceId) filter += `audienceId=${audienceId}&`;
-
+        if (subjectId) filter += `&subjectId=${subjectId}`;
         let url = `/diary/sessions/external/${startDate}/${endDate}${filter.slice(0, -1)}`;
 
         await this.syncSessions(url);

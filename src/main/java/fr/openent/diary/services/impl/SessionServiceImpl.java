@@ -180,11 +180,13 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void getExternalSessions(String startDate, String endDate, String teacherId, String audienceId, Handler<Either<String, JsonArray>> handler) {
+    public void getExternalSessions(String startDate, String endDate, String teacherId, String audienceId, String subjectId, Handler<Either<String, JsonArray>> handler) {
         List<String> listAudienceId = audienceId != null && !audienceId.equals("") ? Arrays.asList(audienceId) : null;
         List<String> listTeacherId = teacherId != null && !teacherId.equals("") ? Arrays.asList(teacherId) : null;
+        List<String> listSubjectId = subjectId != null ? Arrays.asList(subjectId) : null;
 
-        this.getSessions(null, startDate, endDate, null, listAudienceId, listTeacherId, null, true, false, false, false, false, handler);
+
+        this.getSessions(null, startDate, endDate, null, listAudienceId, listTeacherId, listSubjectId, true, false, false, false, false, handler);
     }
 
     @Override
