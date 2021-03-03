@@ -5,6 +5,7 @@ import {DateUtils} from '../../utils/dateUtils';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
 import {SearchService} from "../../services";
+import { Moment } from "moment/moment";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', 'SearchService',
@@ -106,8 +107,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         subject => subject.id === $scope.homework.subject.id
                     );
                 }
-                let date: any = null;
-                if($scope.session) date = $scope.session.date ? $scope.session.date : ($scope.session.startDate ? $scope.session.startDate : null);
+                let date: Moment = null;
+                if ($scope.session) {
+                    date = $scope.session.date ? $scope.session.date : ($scope.session.startDate ? $scope.session.startDate : null);
+                }
 
                 Promise.all([
                     await $scope.sessions.syncOwnSessions($scope.structure,
@@ -122,9 +125,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.sessionsToAttachTo = [];
                     $scope.sessionsToAttachTo = $scope.sessionsToAttachTo.concat($scope.sessions.all);
 
-                    let filteredCourses: Course[] = $scope.courses.all.filter((c: any) =>
-                        c.audiences.all.find((a: Audience) => (a.id === $scope.homework.audience.id) && c.subject)
-                            ? c.subject.id === $scope.homework.subject.id
+                    let filteredCourses: Course[] = $scope.courses.all.filter((c: Course) =>
+                        c.audiences.all.find((a: Audience) => (a.id === $scope.homework.audience.id) &&
+                            (c.subject !== undefined || c.exceptionnal !== undefined))
+                            ? (c.subject.id === $scope.homework.subject.id) || (c.exceptionnal === $scope.homework.exceptional_label)
                             : false);
 
                     // We only keep the courses without a session attached to.
@@ -188,15 +192,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     moment($scope.homework.session.date).isAfter(moment()) : true;
             }
 
-            /*
-            Clear previous session and linkToHomework current session
-             */
-            function linkSession(): void {
+            // Clear previous session and linkToHomework current session
+            const linkSession = (): Session[] => {
                 let isIndependant: boolean = true;
-                let i: number = 0;
-                while (i < $scope.sessionsToAttachTo.length) {
-                    let s = $scope.sessionsToAttachTo[i];
-                    i++
+                for (let i = 0; i < $scope.sessionsToAttachTo.length; i++) {
+                    let s: Session = $scope.sessionsToAttachTo[i];
                     if ($scope.session && (s.isSameSession($scope.session))
                         || ($scope.session && s.id && $scope.session.id && $scope.session.id === s.id)) {
                         s.firstText = lang.translate("session.manage.linkhomework")
@@ -406,14 +406,19 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     } else {
                         if ($scope.sessionsToAttachTo) {
                             // if homework session has one session we try to match with sessionsToAttachTo
-                            let session = $scope.sessionsToAttachTo.find(
-                                session => session.startDisplayDate === $scope.homework.session.startDisplayDate
-                            );
-                            if (session) {
-                                $scope.homework.session = session;
-                            } else if ($scope.sessionsToAttachTo.length > 0){
-                                $scope.homework.session = $scope.sessionsToAttachTo[0];
+                            let session: any = $scope.homework.session ? $scope.sessionsToAttachTo.find((session: Session) =>
+                                session.startDisplayDate === $scope.homework.session.startDisplayDate) : null;
+
+                            if (($scope.homework.session && !$scope.homework.session.exceptional_label) || !$scope.homework.session) {
+                                if (session) {
+                                    $scope.homework.session = session;
+                                } else if ($scope.sessionsToAttachTo.length > 0) {
+                                    $scope.homework.session = $scope.sessionsToAttachTo[0];
+                                }
+                            } else if ($scope.homework.session && $scope.homework.session.exceptional_label) {
+                                $scope.sessionsToAttachTo[0] = $scope.homework.session;
                             }
+
                         } else {
                             $scope.attachToDate();
                         }

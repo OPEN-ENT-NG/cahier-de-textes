@@ -2,13 +2,14 @@ import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from
 import {Course, Homework, PEDAGOGIC_TYPES, Session, Subject, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
-import {ProgressionFolders} from "../../model/Progression";
-import {StructureService, StructureSlot} from "../../services";
-import {Groups} from "../../model/group";
-import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
-import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
-import {CALENDAR_TOOLTIP_EVENTER} from "../../core/const/calendar-tooltip-eventer";
-import {FORMAT} from "../../core/const/dateFormat";
+import {ProgressionFolders} from '../../model/Progression';
+import {StructureService, StructureSlot} from '../../services';
+import {Groups} from '../../model/group';
+import {UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
+import {PEDAGOGIC_SLOT_PROFILE} from '../../core/enum/pedagogic-slot-profile';
+import {CALENDAR_TOOLTIP_EVENTER} from '../../core/const/calendar-tooltip-eventer';
+import {FORMAT} from '../../core/const/dateFormat';
+import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 
 declare let window: any;
 
@@ -459,26 +460,28 @@ export let calendarController = ng.controller('CalendarController',
 
 
             // handle the drop event
-            $scope.dropped = function (dragEl, dropEl) {
-                if (dragEl == dropEl)
+            $scope.dropped = (dragEl: string, dropEl: string) => {
+                if (dragEl === dropEl) {
                     return;
+                }
                 // this is your application logic, do whatever makes sense
                 let progression: JQuery = $('#' + dragEl);
-                const typeCourse: string = "TYPE_COURSE";
-                const typeSession: string = "TYPE_SESSION";
+                const typeCourse: string = 'TYPE_COURSE';
+                const typeSession: string = 'TYPE_SESSION';
 
                 // set progression or session id
                 let progressionOrSession = angular.element(progression[0]).scope();
                 let id_progressionOrSession: string = progressionOrSession.item ? progressionOrSession.item.id : progressionOrSession.session.id;
 
                 let $sessionOrCourse: JQuery = $('#' + dropEl);
-                let typeCourseSession: string = "";
+                let typeCourseSession: string = '';
 
                 // set course or session id
                 let courseOrSession = angular.element($sessionOrCourse[0]).scope();
 
-                if (!courseOrSession || !courseOrSession.item || !courseOrSession.item.data || !courseOrSession.item.data.startDisplayDate)
+                if (!courseOrSession || !courseOrSession.item || !courseOrSession.item.data || !courseOrSession.item.data.startDisplayDate) {
                     return;
+                }
 
                 let courseDate: string = courseOrSession.item.data.startDisplayDate;
 
@@ -490,16 +493,16 @@ export let calendarController = ng.controller('CalendarController',
                     typeCourseSession = typeCourse;
                 }
 
-                if (progression[0].classList.contains("progression-item-draggable")) {
-                    if (typeCourseSession == typeSession) {
+                if (progression[0].classList.contains('progression-item-draggable')) {
+                    if (typeCourseSession === typeSession) {
                         $scope.updateSession(idCourseSession, id_progressionOrSession);
-                    } else if (typeCourseSession == typeCourse) {
+                    } else if (typeCourseSession === typeCourse) {
                         $scope.createSessionFromProgression(id_progressionOrSession, idCourseSession, courseDate);
                     }
                 } else if ($(progression[0]).hasClass(typeSession)) {
-                    if (typeCourseSession == typeSession) {
-                        $scope.sessionToSession(id_progressionOrSession, idCourseSession)
-                    } else if (typeCourseSession == typeCourse) {
+                    if (typeCourseSession === typeSession) {
+                        $scope.sessionToSession(id_progressionOrSession, idCourseSession);
+                    } else if (typeCourseSession === typeCourse) {
                         if (progressionOrSession.item.is_empty) {
                             // case we drag homework to empty session in order to create homework
                             $scope.homeworkToEmptySession(id_progressionOrSession, courseOrSession.item, idCourseSession, courseDate);
@@ -564,8 +567,14 @@ export let calendarController = ng.controller('CalendarController',
 
                 homework.courseId = course._id;
                 homework.subject = new Subject();
-                homework.subject.id = course.subject ? course.subject.id : null;
-                homework.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+                if (course.exceptionnal) {
+                    homework.subject.id = EXCEPTIONAL.subjectId;
+                    homework.subject.label = EXCEPTIONAL.subjectCode;
+                    homework.exceptional_label = course.exceptionnal;
+                } else {
+                    homework.subject.id = course.subject ? course.subject.id : null;
+                    homework.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+                }
                 homework.audience = course.audiences.all[0];
                 homework.dueDate = sessionDrop.startMoment;
                 homework.session = sessionDrop;

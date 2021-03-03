@@ -48,6 +48,7 @@ export class Session {
     is_periodic: boolean = false;
     locked: boolean = true;
     is_empty: boolean = true;
+    firstText?: string = '';
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     string: string = '';
 
@@ -308,15 +309,21 @@ export class Session {
         this.description = sessionDrag.description;
         this.courseId = course._id;
         this.subject = new Subject();
-        this.subject.id = course.subject ? course.subject.id : null;
-        this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
         this.audience = course.audiences.all[0];
+        if (course.exceptionnal) {
+            this.subject.id = EXCEPTIONAL.subjectId;
+            this.subject.label = EXCEPTIONAL.subjectCode;
+            this.exceptional_label = course.exceptionnal;
+        } else {
+            this.subject.id = course.subject ? course.subject.id : null;
+            this.subject.label = course.subject.name ? course.subject.name : course.subject.label;
+        }
         this.duplicateHomeworks(sessionDrag);
     }
 
-    duplicateHomeworks(sessionDrag) {
+    duplicateHomeworks(sessionDrag: Session): void {
         if (sessionDrag.homeworks) {
-            sessionDrag.homeworks.map(h => {
+            sessionDrag.homeworks.map((h: Homework) => {
                 h.editedId = h.id; // trick for drag & drop session with homeworks that will be created (to prevent form to PUT)
                 delete h.id;
                 delete h.session;
@@ -325,16 +332,15 @@ export class Session {
                 h.subject = this.subject;
                 h.teacher = this.teacher;
                 this.homeworks.push(h);
-            })
+            });
         }
     }
 
-    isSameSession(session: Session) {
-        let currentSessionTime = moment(this.date).add(moment(this.startTime).hour(), 'hours').add(moment(this.startTime).minutes(), 'minutes');
-        let otherSessionTime = moment(session.date).add(moment(session.startTime).hour(), 'hours').add(moment(session.startTime).minutes(), 'minutes');
+    isSameSession(session: Session): boolean {
+        let currentSessionTime: Moment = moment(this.date).add(moment(this.startTime).hour(), 'hours').add(moment(this.startTime).minutes(), 'minutes');
+        let otherSessionTime: Moment = moment(session.date).add(moment(session.startTime).hour(), 'hours').add(moment(session.startTime).minutes(), 'minutes');
 
-        return (moment(otherSessionTime).isSame(moment(currentSessionTime)))
-
+        return (moment(otherSessionTime).isSame(moment(currentSessionTime)));
     }
 
 }
