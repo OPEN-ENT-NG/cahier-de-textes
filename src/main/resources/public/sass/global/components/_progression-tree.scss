@@ -227,12 +227,20 @@
     background-color: rgba($diary-grey, 0.4);
   }
 
-  .title {
-    justify-content: start !important;
-    color: $diary-darkgreen;
+  .flex-head {
+    .title {
+      justify-content: start !important;
+    }
+  }
 
-    &:hover {
-      color: $diary-darkengreen;
+  .flex-content {
+    .title {
+      justify-content: start !important;
+      color: $diary-darkgreen;
+
+      &:hover {
+        color: $diary-darkengreen;
+      }
     }
   }
 }

@@ -22,34 +22,24 @@
         <div class="twelve cell twelve-mobile">
             <div class="row card padding-md margin-bottom-lg">
                 <div class="row">
+                    <!-- Title -->
+                    <label class="three cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>title</i18n>
+                            *
+                        </div>
+                        <input maxlength="100" type="text" class="twelve twelve-mobile"
+                               ng-model="progressionSessionForm.title"/>
+                    </label>
                     <!-- Subject -->
                     <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>subject</i18n>
                         </div>
                         <span class="cell twelve-mobile">
-                            <i18n class="twelve" ng-if="!progressionSessionForm.subject">select.subject</i18n>
-                            <select required ng-model="progressionSessionForm.subject" class="twelve-mobile"
-                                    ng-disabled="progressionSessionForm.courseId && progressionSessionForm.subject"
-                                    ng-options="subject.label group by subject.groupByTeacherBelonging() for subject in subjects.all | orderBy:'teacherId'">
-                                <option ng-if="subjects.all.length !== 1" value="" disabled selected>[[translate('select.subject')]]</option>
-                            </select>
+                            <input maxlength="100" type="text" class="twelve twelve-mobile"
+                                   ng-model="progressionSessionForm.subjectLabel"/>
                         </span>
-                    </label>
-                    <!-- TYPE SESSION -->
-                    <label class="cell horizontal-spacing twelve-mobile">
-                        <div class="twelve">
-                            <i18n>homework.manage.type</i18n>
-                            *
-                        </div>
-                        <div class="cell twelve-mobile">
-                            <select required class="twelve twelve-mobile"
-                                    ng-model="progressionSessionForm.type"
-                                    ng-options="sessionType.label for sessionType in sessionTypes.all track by sessionType.id">
-                                <option value="" disabled selected>[[translate('select.type')]]</option>
-
-                            </select>
-                        </div>
                     </label>
                     <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
@@ -59,15 +49,6 @@
                                 ng-model="progressionSessionForm.folder_id">
                             <option ng-if="false" value="" label=""></option>
                         </select>
-                    </label>
-                    <!-- Title -->
-                    <label class="three cell horizontal-spacing twelve-mobile">
-                        <div class="twelve">
-                            <i18n>title</i18n>
-                            *
-                        </div>
-                        <input maxlength="100" type="text" class="twelve twelve-mobile"
-                               ng-model="progressionSessionForm.title"/>
                     </label>
                     <!-- Class/Group -->
                     <label class="two cell horizontal-spacing twelve-mobile">
@@ -112,9 +93,6 @@
                                 !progressionSessionForm.progression_homeworks[0].opened) || progressionSessionForm.progression_homeworks.length > 1)">
                             <!-- HEADER -->
                             <div class="custom-flex-row twelve bot-border custom-flex-head">
-                                <div class="custom-flex-col padding-cell justified-content-center flex-text-left two">
-                                    <i18n>homework.manage.type</i18n>
-                                </div>
                                 <div class="custom-flex-col padding-cell justified-content-center flex-text-left nine">
                                     <i18n>settings.exclusion.description</i18n>
                                 </div>
@@ -123,13 +101,9 @@
                             <!-- Label -->
                             <div ng-repeat="progressionHomework in progressionSessionForm.progression_homeworks track by $index"
                                  class="custom-flex-row twelve bot-border">
-                                    <div ng-show="!progressionHomework.opened"
-                                         class="custom-flex-col padding-cell justified-content-center two">
-                                        <p>[[progressionHomework.type.label]]</p>
-                                    </div>
                                     <!-- Description -->
                                     <div ng-show="!progressionHomework.opened"
-                                         class="custom-flex-col padding-cell nine">
+                                         class="custom-flex-col padding-cell eleven">
                                         <p bind-html=[[progressionHomework.description]]></p>
                                     </div>
                                     <!-- Button part -->
@@ -151,22 +125,6 @@
                                 <!-- Deadline -->
                                 <div ng-if="progressionHomework.opened"
                                      class="float-left three vertical-align-top text-left">
-                                    <div class="ten twelve-mobile">
-                                        <label>
-                                            <i18n>homework.manage.type</i18n>
-                                            :
-                                        </label>
-                                    </div>
-
-                                    <!-- Type -->
-                                    <div class="row">
-                                        <select class="ten"
-                                                ng-if="progressionHomework.opened"
-                                                required
-                                                ng-model="progressionHomework.type"
-                                                ng-options="homeworkTypes.label for homeworkTypes in homeworkTypes.all track by homeworkTypes.id">
-                                        </select>
-                                    </div>
                                     <!--Estimated Time-->
                                     <div>
                                           <span class="ten">

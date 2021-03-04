@@ -176,7 +176,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                             if ($scope.isSameSession(s, $scope.session)) {
                                 s.id = $scope.session.id;
                             }
-
                             if (!s.type_id) {
                                 s.type_id = $scope.session.type_id ? $scope.session.type_id : $scope.session.type.id;
                             }
@@ -619,9 +618,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.from_homeworks.forEach((homework: Homework) => homework.formatDateToDisplay());
 
                 // if new session, we set the default sessionType
+
                 if (!$scope.session.id && !$scope.session.type) {
                     $scope.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                 }
+
+                $scope.homeworks.filter((homework) => {if(!homework.type) homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0)});
 
                 $scope.audiences = $scope.structure.audiences.all.filter(audience => model.me.classes.includes(audience.id));
                 // useful for this session as an option is session selector (homework form).

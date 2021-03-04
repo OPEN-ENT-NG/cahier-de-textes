@@ -2,7 +2,7 @@ import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from
 import {Course, Homework, PEDAGOGIC_TYPES, Session, Subject, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
-import {ProgressionFolders} from '../../model/Progression';
+import {ProgressionFolder, ProgressionFolders, ProgressionHomework, ProgressionSession} from '../../model/Progression';
 import {StructureService, StructureSlot} from '../../services';
 import {Groups} from '../../model/group';
 import {UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
@@ -334,7 +334,7 @@ export let calendarController = ng.controller('CalendarController',
                 });
                 return c.nbHomework != 0 && isDisplayedByDefault;
             }
-            
+
             $scope.initDisplay = (): void => {
                 let nbSessionDisplayed: number = 0;
                 let nbHomeworkDisplayed: number = 0;
@@ -622,44 +622,35 @@ export let calendarController = ng.controller('CalendarController',
              * Handle a progression dropped on a session
              */
             $scope.updateSession = async (idSession, idProgression) => {
-                let progressionDragged, sessionDroped;
-                $scope.progressionFolders.all.forEach(p => {
-                    p.progressionSessions.forEach(ps => {
-                        if (ps.id == idProgression) {
-                            progressionDragged = ps;
+                let progressionDragged: ProgressionSession = [].concat.apply([],
+                    $scope.progressionFolders.all.map((folder: ProgressionFolder) => folder.progressionSessions)
+                )
+                    .find((session: ProgressionSession) => session.id === idProgression)
+
+                let sessionDroped = $scope.calendarItems.find((session: any) => session.id === idSession);
+                if (sessionDroped && progressionDragged) {
+                    sessionDroped.setFromProgression(progressionDragged);
+                    progressionDragged.progression_homeworks.map(
+                        (ph: ProgressionHomework) => {
+                            let homework = new Homework($scope.structure);
+                            homework.progression_homework_id = ph.id ? ph.id : null;
+                            homework.estimatedTime = ph.estimatedTime;
+                            homework.description = ph.description;
+                            homework.audience = sessionDroped.audience;
+                            homework.subject = sessionDroped.subject;
+                            homework.sessions.push(sessionDroped);
+                            sessionDroped.homeworks.push(homework);
+
                         }
-                    })
-                });
+                    );
 
-                // progressionDragged.toSession(idSession);
+                    $rootScope.session = sessionDroped;
 
-                $scope.calendarItems.map(async session => {
-                    if (session.id == idSession) {
-                        sessionDroped = session;
-                    }
-                });
-                sessionDroped.setFromProgression(progressionDragged);
-                progressionDragged.progression_homeworks.map(
-                    ph => {
-                        let homework = new Homework($scope.structure);
-                        homework.progression_homework_id = ph.id ? ph.id : null;
-                        homework.estimatedTime = ph.estimatedTime;
-                        homework.description = ph.description;
-                        homework.audience = sessionDroped.audience;
-                        homework.sessions.push(sessionDroped);
-                        homework.subject = $scope.structure.subjects.all.find(subject => subject.id === ph.subject_id);
-                        homework.type = ph.type;
-                        sessionDroped.homeworks.push(homework);
+                    $scope.syncPedagogicItems();
 
-                    }
-                );
-
-                $rootScope.session = sessionDroped;
-
-                $scope.syncPedagogicItems();
-
-                $scope.safeApply();
-                $scope.goTo('/session/update/' + idSession);
+                    $scope.safeApply();
+                    $scope.goTo('/session/update/' + idSession);
+                }
             };
 
             /**
@@ -683,7 +674,6 @@ export let calendarController = ng.controller('CalendarController',
                         homework.estimatedTime = ph.estimatedTime;
                         homework.description = ph.description;
                         homework.subject = session.subject;
-                        homework.type = ph.type;
                         homework.audience = session.audience ? $.extend(true, Object.create(Object.getPrototypeOf(session.audience)), session.audience) : null;
                         homework.sessions.push(session);
                         session.homeworks.push(homework);

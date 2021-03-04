@@ -80,16 +80,13 @@
                             <span></span>
                         </label>
                     </div>
-                    <div class="flex-col col__2 text-center" role="cell">
+                    <div class="flex-col col__3 title" role="cell">
                         <i18n>title</i18n>
-                    </div>
-                    <div class="flex-col col__2 text-center" role="cell">
-                        <i18n>progression.type</i18n>
                     </div>
                     <div class="flex-col col__1 text-center" role="cell">
                         <i18n>progression.level</i18n>
                     </div>
-                    <div class="flex-col col__2 text-center" role="cell">
+                    <div class="flex-col col__3 text-center" role="cell">
                         <i18n>subject</i18n>
                     </div>
                     <div class="flex-col col__1 text-center" role="cell">
@@ -113,17 +110,14 @@
                                     <span></span>
                                 </label>
                             </div>
-                            <div class="flex-col title col__2" role="cell">
+                            <div class="flex-col title col__3" role="cell">
                                 [[session.title]]
-                            </div>
-                            <div class="flex-col col__2" role="cell">
-                                [[session.type.label]]
                             </div>
                             <div class="flex-col col__1" role="cell">
                                 [[session.class]]
                             </div>
-                            <div class="flex-col col__2" role="cell">
-                                [[session.getSubjectTitle()]]
+                            <div class="flex-col col__3" role="cell">
+                                [[session.subjectLabel]]
                             </div>
                             <div class="flex-col col__1"
                                  ng-class="{'work_length': session.progression_homeworks.length > 0, 'work_empty': session.progression_homeworks.length === 0}"

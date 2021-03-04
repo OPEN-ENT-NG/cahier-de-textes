@@ -6,8 +6,6 @@ import {
     ProgressionSession,
     ProgressionSessions
 } from '../../model/Progression';
-import {HomeworkTypes, SessionType, SessionTypes, Subject, Subjects} from '../../model';
-import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 
 declare let window: any;
 
@@ -18,8 +16,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
         $scope.currentUrlIsManage = $location.url() === '/progressions/view';
 
         $scope.isListView = true;
-        $scope.subjects = new Subjects();
-        $scope.sessionTypes = null;
         $scope.progressionSessionForm = new ProgressionSession();
         $scope.progressionFolders = null;
         $scope.progressionFoldersToDisplay = null;
@@ -72,28 +68,9 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
         };
 
         const initData = async (): Promise<void> => {
-            $scope.sessionTypes = new SessionTypes(window.structure.id);
-            await Promise.all([
-                $scope.sessionTypes.sync(),
-                $scope.subjects.sync(window.structure.id),
-                $scope.initProgressions()
-            ]);
+            await $scope.initProgressions();
             initForms();
 
-            $scope.progressionFolders.forEach((folder: ProgressionFolder) => {
-                folder.progressionSessions.map((psession: ProgressionSession) => {
-                    $scope.subjects.all.forEach((subject: Subject) => {
-                        if (psession.subject_id === subject.id) {
-                            psession.setSubject(subject);
-                        }
-                    });
-                    $scope.sessionTypes.all.forEach((type: SessionType) => {
-                        if (psession.type_id === type.id) {
-                            psession.setType(type);
-                        }
-                    });
-                });
-            });
             if ($routeParams.progressionId) {
                 $scope.progressionSessionForm.id = parseInt($routeParams.progressionId);
                 await $scope.progressionSessionForm.get();
@@ -106,15 +83,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.progressionSessionForm.owner = {id: model.me.userId};
 
             $scope.isReadOnly = modeIsReadOnly();
-            $scope.homeworkTypes = new HomeworkTypes(window.structure.id);
-
-            $scope.setSubjectSession();
-            $scope.setTypeSession();
-
-            await Promise.all([
-                $scope.homeworkTypes.sync(),
-                $scope.subjects.setLinkedTeacherById(window.structure.id, model.me.userId)
-            ]);
 
             $scope.safeApply();
 
@@ -146,31 +114,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.selectedItem = $scope.progressionFolders.all
                 .find((progressionFolder: ProgressionFolder) => progressionFolder.id === currentFolder);
             $scope.selectedSubItems = [];
-        };
-
-        $scope.setSubjectSession = () => {
-            if ($scope.subjects.all.length === 1) {
-                $scope.progressionSessionForm.setSubject($scope.subjects.all[0]);
-            }
-
-            if ($scope.progressionSessionForm.title) {
-                $scope.subjects.all.forEach(subject => {
-                    if ($scope.progressionSessionForm.subject_id == subject.id) {
-                        $scope.progressionSessionForm.setSubject(subject);
-                    }
-                });
-                $scope.sessionTypes.all.forEach(type => {
-                    if ($scope.progressionSessionForm.type_id == type.id) {
-                        $scope.progressionSessionForm.setType(type);
-                    }
-                });
-            }
-        };
-
-        $scope.setTypeSession = () => {
-            if (!$scope.progressionSessionForm.type.id) {
-                $scope.progressionSessionForm.setType($scope.sessionTypes.all[0]);
-            }
         };
 
         $scope.getRootFolder = () => {
@@ -403,8 +346,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
 
         $scope.isValidForm = () => {
             return $scope.progressionSessionForm
-                && $scope.progressionSessionForm.subject
-                && $scope.progressionSessionForm.type.label
                 && $scope.progressionSessionForm.title;
         };
 
@@ -417,17 +358,12 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             });
             return back;
         };
-        $scope.$watch(() => $scope.progressionSessionForm.subject, () => {
-            $scope.progressionSessionForm.progression_homeworks.forEach(h => h.subject = $scope.progressionSessionForm.subject);
-            $scope.safeApply();
-        });
 
         $scope.openProgressionHomework = (progressionHomework: ProgressionHomework) => {
             $scope.oldProgressionHomework = [];
 
             $scope.oldProgressionHomework[0] = progressionHomework.description;
             $scope.oldProgressionHomework[1] = progressionHomework.estimatedTime;
-            $scope.oldProgressionHomework[2] = progressionHomework.subject;
 
             $scope.validate = true;
             $scope.hidePencil = true;
@@ -462,12 +398,10 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
                         else {
                             p.description = $scope.oldProgressionHomework[0];
                             p.estimatedTime = $scope.oldProgressionHomework[1];
-                            p.subject = $scope.oldProgressionHomework[2];
                         }
                     } else {
                         p.description = $scope.oldProgressionHomework[0];
                         p.estimatedTime = $scope.oldProgressionHomework[1];
-                        p.subject = $scope.oldProgressionHomework[2];
                     }
                 }
             });
@@ -490,9 +424,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
 
         $scope.addProgressionHomework = () => {
             let newProgressionHomework = new ProgressionHomework();
-            newProgressionHomework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0);
-
-            newProgressionHomework.subject = $scope.progressionSessionForm.subject;
 
             newProgressionHomework.isNewField = true;
             $scope.progressionSessionForm.progression_homeworks.push(newProgressionHomework);
@@ -555,8 +486,6 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
             $scope.progressionFolderForm = new ProgressionFolder();
             $scope.progressionSessionForm = new ProgressionSession();
             $scope.progressionSessionForm.folder_id = null;
-            $scope.setSubjectSession();
-            $scope.setTypeSession();
             $scope.progressionSessionForm.setOwnerId($scope.progressionFolders.owner_id);
         };
 

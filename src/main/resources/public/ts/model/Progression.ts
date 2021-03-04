@@ -1,17 +1,16 @@
 ///<reference path="session.ts"/>
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
-import {Subject, ToastUtils} from './index';
+import {ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {HomeworkType} from './homework';
-import {SessionType} from "./session";
 
 
 export class ProgressionSession implements Selectable {
     selected: boolean = false;
     tableSelected: boolean = false;
     id: number;
-    subject: Subject;
+    subjectLabel: string;
     title: string;
     description: string = "";
     plainTextDescription: string = "";
@@ -20,19 +19,15 @@ export class ProgressionSession implements Selectable {
     owner;
     class: string;
     owner_id;
-    subject_id;
-    type_id;
     homeworks;
     eventer: Eventer;
-    type: SessionType;
     folder_id: number;
     folder?: ProgressionFolder;
 
     progression_homeworks: ProgressionHomework[] = [];
 
     constructor() {
-        this.subject = new Subject();
-        this.type = new SessionType();
+        this.subjectLabel = "";
         this.eventer = new Eventer();
         this.title = "";
         this.class = "";
@@ -56,21 +51,6 @@ export class ProgressionSession implements Selectable {
         let response = await http.put(`/diary/progression/update/${this.id}`, this.toJson());
         return ToastUtils.setToastMessage(response, 'progression.session.updated', 'progression.session.update.error');
 
-    }
-
-    public setSubject(subject: Subject) {
-        this.subject = subject;
-    }
-
-    public setType(type: SessionType) {
-        this.type = type;
-    }
-
-    init() {
-        if (this.subject_id)
-            this.subject.id = this.subject_id;
-        if (this.type_id)
-            this.type.id = this.type_id;
     }
 
 
@@ -104,15 +84,13 @@ export class ProgressionSession implements Selectable {
     }
 
     private toJson() {
-
         return {
             description: this.description,
-            subject_id: this.subject.id ? this.subject.id : this.subject_id,
+            subjectLabel: this.subjectLabel,
             title: this.title,
             class: this.class,
             annotation: this.annotation,
             owner_id: this.owner ? this.owner.id : this.owner_id,
-            type_id: this.type.id ? this.type.id : this.type_id,
             progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id),
             progression_folder_id: this.folder_id
         };
@@ -122,16 +100,12 @@ export class ProgressionSession implements Selectable {
         let validSessionOrDueDate = false;
         return this
             && this.title
-            && this.subject.id
-            && this.type.id
             && this.description
             && this.description.length;
     };
 
     setOwnerId(owner_id: any) {
-
         this.owner_id = owner_id;
-
     }
 
     static formatSqlDataToModel(data: any) {
@@ -141,7 +115,7 @@ export class ProgressionSession implements Selectable {
             class: data.class,
             description: data.description,
             owner_id: data.owner_id,
-            subject_id: data.subject_id,
+            subjectLabel: data.subject_label,
             type_id: data.type_id,
             progression_homeworks: data.homeworks && data.homeworks[0] !== null ? ProgressionHomeworks.formatSqlDataToModel(data.homeworks) : [],
             modified: data.modified,
@@ -292,9 +266,8 @@ export class ProgressionSessions extends Selection<ProgressionSession> {
         let dataModel = [];
         let json = JSON.parse(data.toString());
         json.forEach(i => dataModel.push(Mix.castAs(ProgressionSession, ProgressionSession.formatSqlDataToModel(i))));
-        dataModel.forEach(i => {
-            i.init();
-            i.setOwnerId(owner_id)
+        dataModel.forEach((model: ProgressionSession) => {
+            model.setOwnerId(owner_id)
         });
         return dataModel;
     }
@@ -325,8 +298,6 @@ export class ProgressionHomework {
     type_id;
     type_label;
     alreadyValidate: boolean = false;
-    subject: Subject;
-    subject_id;
     p_session: ProgressionSession;
     estimatedTime: number = 0;
     isNewField: boolean = false;
@@ -350,7 +321,6 @@ export class ProgressionHomework {
             return {
                 id: this.id || null,
                 description: this.description,
-                subject_id: this.subject ? this.subject.id : this.subject_id,
                 type_id: this.type ? this.type.id : this.type_id,
                 estimatedTime: this.estimatedTime ? this.estimatedTime : 0,
                 owner_id: ownerId,
@@ -361,8 +331,6 @@ export class ProgressionHomework {
     isValidForm = () => {
         let validSessionOrDueDate = false;
         return this
-
-            && this.subject
             && this.estimatedTime >= 0
             && this.type
             && this.description
@@ -373,7 +341,6 @@ export class ProgressionHomework {
         return {
             id: data.id,
             type_id: data.type_id,
-            subject_id: data.subject_id,
             type_label: data.type_label,
             description: data.description,
             estimatedTime: data.estimatedtime,

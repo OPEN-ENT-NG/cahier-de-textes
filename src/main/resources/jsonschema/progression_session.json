@@ -6,7 +6,7 @@
     "title": {
       "type": "string"
     },
-    "subject_id": {
+    "subjectLabel": {
       "type": "string"
     },
     "description": {
@@ -21,16 +21,12 @@
     "owner_id":{
       "type": "string"
     },
-    "type_id":{
-      "type":"number"
-    },
     "progression_homework": {
       "type": ["array", "null" ]
     }
   },
   "required": [
     "title",
-    "subject_id",
     "description",
     "owner_id"
   ]

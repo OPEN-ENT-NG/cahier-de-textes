@@ -117,7 +117,7 @@ export class Session {
     }
 
     init(structure: Structure) {
-        this.type = Mix.castAs(SessionType, this.type);
+        this.type = this.type ? Mix.castAs(SessionType, this.type) : null;
         this.structure = structure;
         this.date = moment(this.date).toDate();
         this.startMoment = moment(DateUtils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));
@@ -225,17 +225,13 @@ export class Session {
     }
 
     setFromProgression(progression) {
-        this.subject = progression.subject;
         this.title = progression.title;
-        this.type = progression.type;
         this.description = progression.description;
 
     }
 
     setFromCourseAndProgression(progression: ProgressionSession, course: Course) {
-        this.subject = progression.subject;
         this.title = progression.title;
-        this.type = progression.type;
         this.courseId = course._id;
         this.teacher = (course.teachers && course.teachers.length > 0) ? course.teachers[0] : null;
         this.room = (course.rooms && course.rooms.length > 0) ? course.rooms[0] : '';
