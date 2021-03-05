@@ -382,15 +382,16 @@
                                          order-by="firstText && audience.id"
                             >
                             </multi-combo>
-                            <!-- Type -->
-                            <select class="flex-col col__15"
-                                    required
-                                    ng-model="form.homework.type"
-                                    ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
-                            </select>
                         </div>
                     </div>
-
+                    <!-- Type -->
+                    <div class="flex-row-cdt row__16">
+                        <select class="flex-col col__15"
+                                required
+                                ng-model="form.homework.type"
+                                ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">
+                        </select>
+                    </div>
                     <!--Estimated Time-->
                     <div class="margin10v">
                             <span class="ten">

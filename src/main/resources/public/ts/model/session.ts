@@ -117,7 +117,7 @@ export class Session {
     }
 
     init(structure: Structure) {
-        this.type = this.type ? Mix.castAs(SessionType, this.type) : null;
+        this.type = Mix.castAs(SessionType, this.type);
         this.structure = structure;
         this.date = moment(this.date).toDate();
         this.startMoment = moment(DateUtils.getFormattedDateTime(this.date, moment(this.startTime, FORMAT.formattedTime)));

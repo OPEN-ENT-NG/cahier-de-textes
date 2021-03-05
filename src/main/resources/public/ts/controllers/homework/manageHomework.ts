@@ -333,7 +333,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     // we set our dueDate with the session we attached to
                     if (!$scope.homework.attachedToDate && !$scope.homework.session.id && $scope.homework.session.courseId) {
                         $scope.homework.dueDate = $scope.homework.session.date;
-                        if (!$scope.homework.session.type.id) {
+                        if (!$scope.homework.session.type || !$scope.homework.session.type.id) {
                             $scope.homework.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                         }
                         let sessionSaveResponse = await $scope.homework.session.save();

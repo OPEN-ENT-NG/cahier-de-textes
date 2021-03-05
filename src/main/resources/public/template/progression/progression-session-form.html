@@ -41,6 +41,15 @@
                                    ng-model="progressionSessionForm.subjectLabel"/>
                         </span>
                     </label>
+                    <!-- Class/Group -->
+                    <label class="two cell horizontal-spacing twelve-mobile">
+                        <div class="twelve">
+                            <i18n>progression.level</i18n>
+                        </div>
+                        <input maxlength="50" type="text" class="twelve twelve-mobile"
+                               ng-model="progressionSessionForm.class"/>
+                    </label>
+                    <!-- Parent folder -->
                     <label class="cell horizontal-spacing twelve-mobile">
                         <div class="twelve">
                             <i18n>progression.create.parent.folder.name</i18n>
@@ -50,16 +59,6 @@
                             <option ng-if="false" value="" label=""></option>
                         </select>
                     </label>
-                    <!-- Class/Group -->
-                    <label class="two cell horizontal-spacing twelve-mobile">
-                        <div class="twelve">
-                            <i18n>progression.level</i18n>
-                        </div>
-                        <input maxlength="50" type="text" class="twelve twelve-mobile"
-                               ng-model="progressionSessionForm.class"/>
-                    </label>
-
-
                 </div>
 
                 <!-- Description-->
