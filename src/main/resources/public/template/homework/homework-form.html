@@ -1,10 +1,10 @@
 <div class="homework-form">
     <div ng-if="!isInsideSessionForm" class="seven">
-        <div ng-if="!homework.id && homeworkFormIsOpened" class="session-form-header">
+        <!--IF CREATE HOMEWORK WITH CLICK-->
+        <div ng-if="!homework.id && (!homework.courseId || !homework.subject.id) && homeworkFormIsOpened" class="session-form-header">
             <!--SELECT SUBJECT-->
             <div class="session-form-header-select">
                 <select required ng-model="homework.subject"
-                        ng-disabled="homework.courseId && homework.subject.id"
                         ng-change="disableFieldSetSubjectAndAudienceHomework(homework.audience, homework.subject)"
                         ng-options="subject.label group by subject.groupByTeacherBelonging() for subject in subjects.all | orderBy:'teacherId'">
                     <option ng-if="subjects.all.length !== 1" value="" disabled selected>
@@ -29,8 +29,8 @@
                 </div>
             </div>
         </div>
-        <!--IF EDIT HOMEWORK-->
-        <div ng-if="homework.id && homeworkFormIsOpened" class="margin-bottom-md margin-top-lg">
+        <!--IF EDIT HOMEWORK OR CREATE WITH DRAG AND DROP-->
+        <div ng-if="(homework.id || (homework.courseId && homework.subject.id)) && homeworkFormIsOpened" class="margin-bottom-md margin-top-lg">
             <!--SUBJECT LABEL CARD-->
             <span class="card session-form-card" ng-if="homework.subject.label || homework.subject.name">
                 [[homework.getSubjectTitle()]]
