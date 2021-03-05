@@ -1,5 +1,5 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import {Audience, Courses, Session, Sessions, SessionTypes, Subjects, Toast} from '../../model';
+import {Audience, Courses, Session, Sessions, SessionTypes, Subject, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadDay, Course} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {FORMAT} from '../../core/const/dateFormat';
@@ -102,11 +102,12 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.homework.opened = true;
                 }
 
-                if ($scope.subjects.all.length > 0) {
+                if (($scope.homework.subject === undefined) && ($scope.subjects.all.length > 0)) {
                     $scope.homework.subject = $scope.subjects.all.find(
-                        subject => subject.id === $scope.homework.subject.id
+                        (subject: Subject) => subject.id === $scope.homework.subject.id
                     );
                 }
+
                 let date: Moment = null;
                 if ($scope.session) {
                     date = $scope.session.date ? $scope.session.date : ($scope.session.startDate ? $scope.session.startDate : null);
