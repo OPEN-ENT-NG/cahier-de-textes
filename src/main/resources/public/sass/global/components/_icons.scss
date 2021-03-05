@@ -75,9 +75,19 @@ i {
     font-family: 'material-icons';
     content: "\F208";
   }
+
   &.invisible:before {
     font-family: 'material-icons';
     content: "\F6D0";
+  }
+
+  &.file-pdf:before {
+    content: "\e857";
+  }
+
+  &.notebook-archive:before {
+    font-family: 'material-icons';
+    content: "\F3D4";
   }
 
 }

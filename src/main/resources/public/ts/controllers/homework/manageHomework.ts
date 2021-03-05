@@ -469,6 +469,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 $scope.disableFieldSetSubjectAndAudienceHomework($scope.homework.audience, $scope.homework.subject);
             };
 
+            $scope.removeSearchAudience = (): void => {
+                $scope.groupsSearch.resetSelectedGroups();
+                $scope.homework.audience = null;
+            };
+
             $scope.back = () => {
                 window.history.back();
             };

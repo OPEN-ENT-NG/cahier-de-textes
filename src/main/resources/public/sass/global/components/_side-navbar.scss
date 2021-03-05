@@ -33,6 +33,9 @@
       justify-content: space-between;
       flex-direction: column;
 
+      &.four_items {
+        height: 50%;
+      }
       &.three_items {
         height: 40%;
       }

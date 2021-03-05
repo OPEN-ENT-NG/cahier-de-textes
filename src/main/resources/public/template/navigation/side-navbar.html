@@ -12,7 +12,11 @@
         </div>
     </div>
 
-    <div class="list-item" ng-class="userType === 'ENSEIGNANT' ? 'three_items' : 'two_items'">
+    <div class="list-item"
+        ng-class="{'four_items' : ((userType === 'ENSEIGNANT') && hasRight('readNotebookArchives')),
+                  'three_items' : (((userType !== 'ENSEIGNANT') || !hasRight('readNotebookArchives')))
+                  && !((userType === 'ENSEIGNANT') && hasRight('readNotebookArchives')),
+                   'two_items': (userType !== 'ENSEIGNANT' && !hasRight('readNotebookArchives'))}">
         <a role="menuitem" ng-href="[[userType === 'ENSEIGNANT' ? 'diary#/view' : 'diary#/administrator/global']]"
            class="item"
            ng-class="{active: (userType === 'ENSEIGNANT' ? (getCurrentState() === 'view' || getCurrentState() === '') : (getCurrentState() === 'administrator'))}"
@@ -42,6 +46,17 @@
             <div ng-include="[[icons.progression.path]]" class="icon"></div>
             <span>
                 <i18n>progressions</i18n>
+            </span>
+        </a>
+
+        <a role="menuitem" href="diary#/archives/notebooks/view" class="item"
+           ng-class="{active: getCurrentState() === 'archives'}"
+           workflow="diary.readNotebookArchives">
+            <!-- icon -->
+            <i class="text-xl margin-sm icon notebook-archive"></i>
+            <!-- text -->
+            <span>
+                <i18n>archives</i18n>
             </span>
         </a>
     </div>

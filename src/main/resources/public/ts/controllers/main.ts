@@ -2,13 +2,13 @@ import {Behaviours, idiom as lang, Me, model, moment, ng, template} from 'entcor
 import {
     Courses,
     Structures,
-    Toast
+    Toast, USER_TYPES
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocomplete/autocompleteUtils';
-import {PreferencesUtils} from "../utils/preference/preferences";
-import {StructureService} from "../services";
-import {MobileUtils} from "../utils/mobile";
+import {PreferencesUtils} from '../utils/preference/preferences';
+import {StructureService} from '../services';
+import {MobileUtils} from '../utils/mobile';
 
 declare let window: any;
 
@@ -42,7 +42,7 @@ export let main = ng.controller('MainController',
 
             $scope.safeApply = function (fn?) {
                 const phase = $scope.$root.$$phase;
-                if (phase == '$apply' || phase == '$digest') {
+                if (phase === '$apply' || phase === '$digest') {
                     if (fn && (typeof (fn) === 'function')) {
                         fn();
                     }
@@ -100,11 +100,11 @@ export let main = ng.controller('MainController',
             };
 
             $scope.transformDateToFrenchDate = (date: Date) => {
-                return moment(date).format("dddd D MMMM YYYY");
+                return moment(date).format('dddd D MMMM YYYY');
             };
 
             function init() {
-                $scope.search = "";
+                $scope.search = '';
                 $scope.typeUser = model.me.type;
                 $scope.pageInitialized = false;
                 $scope.display.listView = !model.me.hasWorkflow(WORKFLOW_RIGHTS.calendarView)
@@ -112,17 +112,17 @@ export let main = ng.controller('MainController',
                 $timeout(async function () {
                     await $scope.initializeData();
                 }, 100);
-                if (DateUtils.isRelative(model.me.type)) {
+                if (model.me.type === USER_TYPES.relative) {
                     $scope.display.todo = true;
                     $scope.display.done = true;
                 }
 
-                if (model.me.type === "ENSEIGNANT") {
+                if (model.me.type === USER_TYPES.teacher) {
                     $scope.display.todo = true;
                     $scope.display.done = true;
                 }
 
-                if (DateUtils.isChild(model.me.type)) {
+                if (model.me.type === USER_TYPES.student) {
                     $scope.display.todo = true;
                     $scope.display.done = false;
                 }
@@ -170,7 +170,7 @@ export let main = ng.controller('MainController',
             $scope.translate = (key: string) => lang.translate(key);
 
             $scope.clearLightbox = (): void => {
-                document.getElementsByClassName("cdt")[0].classList.remove('lightbox-opened')
+                document.getElementsByClassName('cdt')[0].classList.remove('lightbox-opened');
             };
 
             $scope.isMobile = (): boolean => {
@@ -196,13 +196,17 @@ export let main = ng.controller('MainController',
                 }
             };
 
+            $scope.hasRight = (right: string): boolean => {
+                return model.me.hasWorkflow(WORKFLOW_RIGHTS[right]);
+            };
+
             route({
                 main: async () => {
                     if (!$scope.structureInitialized) await $scope.initializeStructure();
                     if (DateUtils.isAChildOrAParent(model.me.type) && !$scope.pageInitialized) {
-                        $scope.goTo("/list")
-                    } else if (model.me.type === "PERSEDUCNAT") {
-                        $scope.goTo("/administrator/global");
+                        $scope.goTo('/list');
+                    } else if (model.me.type === USER_TYPES.personnel) {
+                        $scope.goTo('/administrator/global');
                     } else {
                         if (!$scope.pageInitialized) await init();
                         template.open('main', 'main');
@@ -214,6 +218,10 @@ export let main = ng.controller('MainController',
                 },
                 manageProgression: async () => {
 
+                },
+                viewNotebookArchives: async () => {
+                    if (!$scope.structureInitialized) await $scope.initializeStructure();
+                    template.open('main', 'notebook-archive/notebook-archives');
                 },
                 mainView: async () => {
                     if (!$scope.structureInitialized) await $scope.initializeStructure();

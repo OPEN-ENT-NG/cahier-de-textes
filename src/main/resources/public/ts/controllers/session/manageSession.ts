@@ -569,6 +569,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              */
             $scope.removeSearchSessionAudience = (): void => {
                 $scope.session.audience = null;
+                $scope.groupsSearch.resetSelectedGroups();
                 $scope.openSessionForm($scope.session.audience, $scope.session.subject);
             };
 

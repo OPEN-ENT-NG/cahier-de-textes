@@ -7,3 +7,4 @@ export * from './list/manageList';
 export * from './calendar/calendar-view';
 export * from './progression/manageProgression';
 export * from './navigation/navigation';
+export * from './notebook-archives.controller';

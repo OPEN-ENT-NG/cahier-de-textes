@@ -1,6 +1,6 @@
 import {angular, moment} from 'entcore';
 import {FORMAT} from '../core/const/dateFormat';
-import {Moment} from "moment";
+import {DurationInputArg1, DurationInputArg2, Moment} from 'moment';
 
 export class DateUtils {
 
@@ -23,6 +23,32 @@ export class DateUtils {
         } else {
             return moment(date).format(FORMAT.formattedDateTime);
         }
+    }
+
+    /**
+     * Add step to given date.
+     * @param date Date to update
+     * @param step Step size
+     * @param stepType Optional. Step type.
+     */
+    static add(date: any, step: DurationInputArg1, stepType: DurationInputArg2 = 'd'): Date {
+        return moment(date).add(step, stepType).toDate();
+    }
+
+    /**
+     * Set Date to first Time of day (fr format)
+     * @param date Date to set
+     */
+    static setFirstTime(date: any): Date {
+        return moment(date).set({hour: 0, minute: 0, second: 0}).toDate();
+    }
+
+    /**
+     * Set Date to end Time of day (fr format)
+     * @param date Date to set
+     */
+    static setLastTime(date: any): Date {
+        return moment(date).set({hour: 23, minute: 59, second: 59}).toDate();
     }
 
     static formatDate(date, format: string): string {

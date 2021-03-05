@@ -13,6 +13,7 @@ export * from './Toast';
 export * from './User';
 export * from './SessionHomework';
 export * from './Viescolaire';
+export * from './notebook-archive.model';
 
 export * from '../utils/dateUtils';
 export * from '../utils/toastUtils';

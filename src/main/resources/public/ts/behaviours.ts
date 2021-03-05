@@ -19,6 +19,9 @@ const diaryBehaviours = {
             publishHomework: "fr.openent.diary.controllers.HomeworkController|workflow3",
             setProgressHomework: "fr.openent.diary.controllers.HomeworkController|setProgressHomework",
 
+            readNotebookArchives: "fr.openent.diary.controllers.NotebookArchiveController|readArchives",
+            searchNotebookArchiveTeachers: "fr.openent.diary.controllers.NotebookArchiveController|searchTeachers",
+
             viescoSettingHomeworkAndSessionTypeRead: "fr.openent.diary.controllers.HomeworkController|workflow4",
             viescoSettingHomeworkAndSessionTypeManage: "fr.openent.diary.controllers.HomeworkController|workflow5",
 

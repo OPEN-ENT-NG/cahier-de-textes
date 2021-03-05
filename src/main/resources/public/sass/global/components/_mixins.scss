@@ -21,6 +21,22 @@ $session-forestgreen: #00ab6f;
 $session-orange: #ff9700;
 $session-grey: #7E7E7E;
 
+
+/* ----------------------------
+    Spacing
+---------------------------- */
+$select-size: 172px;
+$spacing-XXL: 68px;
+$spacing-XML: 60px;
+$spacing-XM: 48px;
+$spacing-XL: 42px;
+$spacing-L: 24px;
+$spacing-M: 16px;
+$spacing-S: 12px;
+$spacing-XLXS: 10px;
+$spacing-LXS: 8px;
+$spacing-XXS: 4px;
+
 @mixin keyframes($animationName){
   @-webkit-keyframes #{$animationName} {
     @content;

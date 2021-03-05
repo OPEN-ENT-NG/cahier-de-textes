@@ -1,0 +1,73 @@
+<div id="crumbs" class="flex-row-cdt row__11">
+    <app-title class="flex-col col__2 zero-mobile">
+        <div class="title-area-simple">
+            <h1>
+                <i18n>archives</i18n>
+            </h1>
+        </div>
+    </app-title>
+    <div class="flex-col col__9">
+        <div workflow="diary.diarySearch" class="flex-col"
+             ng-class="{'col__13' : hasRight('searchNotebookArchiveTeachers'),
+             'col__7' : !hasRight('searchNotebookArchiveTeachers')}">
+            <!-- Teacher search bar -->
+            <div workflow="diary.searchNotebookArchiveTeachers" class="flex-col col__6">
+                <div class="search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="vm.notebookArchiveSearch.teacher"
+                                        data-ng-change="vm.selectTeacher"
+                                        data-on-search="vm.searchTeacher"
+                                        data-options="vm.notebookArchiveSearch.teachers"
+                                        data-placeholder="diary.search.teacher"
+                                        data-search="vm.notebookArchiveSearch.teacher">
+                    </async-autocomplete>
+                </div>
+            </div>
+            <div class="flex-col col__1"></div>
+
+            <!-- Audience search bar -->
+            <div class="flex-col col__6">
+                <div class="search-input">
+                    <async-autocomplete data-ng-disabled="false"
+                                        data-ng-model="vm.notebookArchiveSearch.audience"
+                                        data-ng-change="vm.selectAudience"
+                                        data-on-search="vm.searchAudience"
+                                        data-options="vm.notebookArchiveSearch.audiences"
+                                        data-placeholder="diary.search.group"
+                                        data-search="vm.notebookArchiveSearch.audience">
+                    </async-autocomplete>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Result teacher/classes from async autocomplete -->
+    <div class="flex-row-cdt row__11 list-search">
+        <div class="flex-col col__2 list-search"></div>
+        <div class="flex-col col__9 list-search">
+            <div class="flex-col col__6 list-search">
+                <!-- Teacher selected via filter -->
+                <div class="cell twelve">
+                    <ul class="cell twelve search-input-ul">
+                        <li ng-repeat="teacher in vm.notebookArchiveSearch.selectedTeachers">
+                            [[teacher.toString()]] <i class="close"
+                                                   data-ng-click="vm.removeSelectedTeacher(teacher)"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="flex-col col__1 list-search"></div>
+            <div class="flex-col col__6 list-search">
+                <!-- Class selected via filter -->
+                <div class="cell twelve">
+                    <ul class="cell twelve search-input-ul"
+                        data-ng-show="vm.notebookArchiveSearch.selectedAudiences.length > 0">
+                        <li ng-repeat="audience in vm.notebookArchiveSearch.selectedAudiences">
+                            [[audience.toString()]] <i class="close"
+                                                    data-ng-click="vm.removeSelectedAudiences(audience)"></i>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

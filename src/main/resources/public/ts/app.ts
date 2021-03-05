@@ -16,7 +16,7 @@ for (let controller in controllers) {
     ng.controllers.push(controllers[controller]);
 }
 
-for (let module in modules){
+for (let module in modules) {
      ng.addRequiredModule(module);
 }
 
@@ -57,20 +57,23 @@ routes.define(($routeProvider) => {
         .when('/administrator/global', {
             action: 'globalAdminCtrl'
         })
-        .when('/list',{
+        .when('/list', {
             action : 'manageList'
         })
-        .when('/progression/create',{
+        .when('/progression/create', {
             action  : 'manageProgression'
         })
-        .when('/progression/:progressionId',{
+        .when('/progression/:progressionId', {
             action  : 'manageProgression'
         })
-        .when('/progression/to/session/:idProgression/:idSession',{
+        .when('/progression/to/session/:idProgression/:idSession', {
             action  : 'manageProgression'
         })
-        .when('/progressions/view',{
+        .when('/progressions/view', {
             action  : 'viewProgression'
+        })
+        .when('/archives/notebooks/view', {
+            action: 'viewNotebookArchives'
         })
         .otherwise({
             redirectTo: '/'

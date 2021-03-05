@@ -1,0 +1,138 @@
+<!-- School year select -->
+<div ng-if="vm.notebookArchiveYears.length > 0" class="display-inline-block margin-top-md">
+    <div class="flex-row-cdt" style="align-items: center;">
+        <div class="cell">
+            <i18n>notebook.archive.school.year</i18n>&nbsp;:
+            <select class="card school-year-select"
+                    data-ng-model="vm.filter.schoolYear"
+                    data-ng-change="vm.updateFilter()"
+                    ng-options="year as year for year in vm.notebookArchiveYears">
+            </select>
+        </div>
+
+    </div>
+</div>
+
+<!-- Notebook archive table -->
+<div class="cell twelve archive-list">
+    <div class="flex-table">
+        <!-- HEADER TYPE TABLE -->
+        <div class="flex-row-cdt flex-head row__15">
+
+            <div class="flex-col col__1 empty-take-space text-center" role="cell">
+                <label class="checkbox">
+                    <input type="checkbox"
+                           ng-model="vm.allArchivesSelect"
+                           ng-change="vm.selectOrUnselectAllArchives()">
+                    <span></span>
+                </label>
+            </div>
+
+            <!-- Audience -->
+            <div class="flex-col col__3 text-center" role="cell">
+                <i18n>notebook.archive.header.audience</i18n>
+            </div>
+
+            <!-- Teacher -->
+            <div class="flex-col col__3 text-center" role="cell">
+                <i18n>notebook.archive.header.teacher</i18n>
+            </div>
+
+            <!-- Subject -->
+            <div class="flex-col col__3 text-center" role="cell">
+                <i18n>notebook.archive.header.subject</i18n>
+            </div>
+
+            <!-- Archived period -->
+            <div class="flex-col col__1 text-center" role="cell">
+                <i18n>notebook.archive.header.archived.period</i18n>
+            </div>
+
+            <!-- Archived on -->
+            <div class="flex-col col__2 text-center" role="cell">
+                <i18n>notebook.archive.header.archived.on</i18n>
+            </div>
+
+            <!-- PDF link -->
+            <div class="flex-col col__2 text-center" role="cell">
+                <i18n>notebook.archive.header.pdf</i18n>
+            </div>
+
+        </div>
+
+        <!-- CONTENT DATA TABLE -->
+        <div ng-show="vm.notebookArchives.length > 0"
+             ng-repeat="archive in vm.notebookArchives"
+             class="flex-body" role="rowgroup">
+            <div class="flex-content">
+                <div class="flex-row-cdt row__15">
+                    <!-- checkbox -->
+                    <div class="flex-col col__1 empty-take-space" role="cell">
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="archive.isSelected" data-ng-change="vm.updateOptionToaster()">
+                            <span></span>
+                        </label>
+                    </div>
+
+                    <!-- Audience -->
+                    <div class="text-center flex-col col__3" role="cell">
+                        [[archive.audienceLabel]]
+                    </div>
+
+                    <!-- Teacher -->
+                    <div class="text-center flex-col col__3" role="cell">
+                        [[archive.teacherFirstName]]&nbsp;[[archive.teacherLastName | uppercase]]
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="text-center flex-col col__3" role="cell">
+                        [[archive.subjectLabel | uppercase]]
+                    </div>
+
+                    <!-- Archived period -->
+                    <div class="flex-col col__1" role="cell">
+                        [[archive.schoolYear]]
+                    </div>
+
+                    <!-- Archived on -->
+                    <div class="flex-col col__2" role="cell">
+                        [[vm.getArchivedDateString(archive)]]
+                    </div>
+
+                    <!-- PDF link -->
+                    <div class="flex-col col__2" role="cell">
+                        <i class="icon file-pdf" ng-click="vm.downloadPDF(archive.id)"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div ng-show="vm.notebookArchives.length === 0" class="flex-row-cdt row__5" role="rowgroup">
+            <div class="flex-col col__2">
+                <img class="img-none" ng-src="/diary/public/img/nothing.png" alt=""/>
+            </div>
+            <div class="flex-col col__3 empty-list">
+                <i18n>notebook.archive.notAvailable</i18n>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- pagination notebook -->
+<pagination data-page-count="vm.pageCount"
+            data-page-number="vm.filter.page"
+            data-ng-click="vm.changePagination()"
+            class="vertical-spacing pagination">
+</pagination>
+
+
+<section class="toggle-buttons hide" data-ng-class="{ 'display': (vm.getNbSelectedArchives() > 0) }">
+    <div class="toggle">
+        <div class="row">
+            <button data-ng-click="vm.downloadMultiplePDFs()">
+                <i18n>notebook.archive.download.pdf</i18n>
+            </button>
+        </div>
+    </div>
+</section>
