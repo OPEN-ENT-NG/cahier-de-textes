@@ -4,7 +4,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
 
 <head>
-    <title>Publipostage</title>
     <style type="text/css">
 
         .MathJax_Preview {
@@ -17,7 +16,7 @@
             bottom: 1.5em;
             background-color: #E6E6E6;
             border: 1px solid #959595;
-            margin: 0px;
+            margin: 0;
             padding: 2px 8px;
             z-index: 102;
             color: black;
@@ -30,11 +29,11 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 0px;
+            width: 0;
             z-index: 101;
-            border: 0px;
-            margin: 0px;
-            padding: 0px
+            border: 0;
+            margin: 0;
+            padding: 0
         }
 
         .MathJax_Error {
@@ -68,10 +67,10 @@
             -webkit-border-radius: 15px;
             -moz-border-radius: 15px;
             -khtml-border-radius: 15px;
-            box-shadow: 0px 10px 20px #808080;
-            -webkit-box-shadow: 0px 10px 20px #808080;
-            -moz-box-shadow: 0px 10px 20px #808080;
-            -khtml-box-shadow: 0px 10px 20px #808080;
+            box-shadow: 0 10px 20px #808080;
+            -webkit-box-shadow: 0 10px 20px #808080;
+            -moz-box-shadow: 0 10px 20px #808080;
+            -khtml-box-shadow: 0 10px 20px #808080;
             filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')
         }
 
@@ -95,10 +94,10 @@
             white-space: nowrap;
             float: none;
             z-index: 201;
-            box-shadow: 0px 10px 20px #808080;
-            -webkit-box-shadow: 0px 10px 20px #808080;
-            -moz-box-shadow: 0px 10px 20px #808080;
-            -khtml-box-shadow: 0px 10px 20px #808080;
+            box-shadow: 0 10px 20px #808080;
+            -webkit-box-shadow: 0 10px 20px #808080;
+            -moz-box-shadow: 0 10px 20px #808080;
+            -khtml-box-shadow: 0 10px 20px #808080;
             filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')
         }
 
@@ -149,7 +148,7 @@
 
         .MathJax_MenuRule {
             border-top: 1px solid #CCCCCC;
-            margin: 4px 1px 0px
+            margin: 4px 1px 0
         }
 
         .MathJax_MenuDisabled {
@@ -238,10 +237,10 @@
             -webkit-border-radius: .25em;
             -moz-border-radius: .25em;
             -khtml-border-radius: .25em;
-            box-shadow: 0px 0px 15px #83A;
-            -webkit-box-shadow: 0px 0px 15px #83A;
-            -moz-box-shadow: 0px 0px 15px #83A;
-            -khtml-box-shadow: 0px 0px 15px #83A;
+            box-shadow: 0 0 15px #83A;
+            -webkit-box-shadow: 0 0 15px #83A;
+            -moz-box-shadow: 0 0 15px #83A;
+            -khtml-box-shadow: 0 0 15px #83A;
             border: 1px solid #A6D ! important;
             display: inline-block;
             position: absolute
@@ -549,8 +548,7 @@
 
         @media print {
             html, body {
-                width: 210mm;
-                height: 297mm;
+                width: 178mm;
             }
         }
 
@@ -586,22 +584,26 @@
             padding: 10px;
         }
 
+        .padding-top-md {
+            padding-top: 10px;
+        }
+
         h1 {
-            color: #4bafd5;
+            color: #00AB6F;
         }
 
         h3 {
-            color: #4bafd5;
+            color: #00AB6F;
             font-size: 1.4em;
         }
 
         h4 {
-            color: #4bafd5;
+            color: #00AB6F;
 
         }
 
         h2 {
-            color: #4bafd5;
+            color: #00AB6F;
             font-size: 20px;
         }
 
@@ -621,20 +623,10 @@
             height: 100%;
         }
 
-        .visa-comment {
+        .archive-comment {
             border: 1px solid #ccc;
             padding: 15px;
             margin: 15px;
-
-        }
-
-        div.article {
-            page-break-inside: avoid;
-        }
-
-        .visa {
-            text-align: center;
-            vertical-align: middle;
         }
 
         .center {
@@ -642,16 +634,7 @@
             vertical-align: middle;
         }
 
-        .first-Page {
-            vertical-align: center;
-            width: 100%;
-            padding: 0;
-            margin: auto;
-            position: absolute;
-            top: 30%;
-        }
-
-        .visa {
+        .archive-title {
             text-align: center;
             vertical-align: middle;
         }
@@ -670,12 +653,12 @@
             display: table-cell;
             vertical-align: middle;
             padding: 10px;
-            font-family: "Roboto";
+            font-family: "Roboto", serif;
             margin: auto;
         }
 
-        .visa-first-page {
-            border-bottom: 4px double #4bafd5;
+        .archive-first-page {
+            border-bottom: 4px double #00AB6F;
         }
 
         table tr {
@@ -694,6 +677,7 @@
             background: #fff;
             border-collapse: collapse;
             page-break-inside: avoid;
+            width: 100%;
         }
 
         .warning {
@@ -711,52 +695,28 @@
         }
     </style>
     <script type="text/javascript"
-            src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML'
-            async="async"></script>
-
+            src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML'></script>
 </head>
 
 <body>
 <div class="container">
-    <div class="article visa-first-page">
-        <div class="visa">
+    <div class="article archive-first-page">
+        <!-- Notebook archive title header -->
+        <div class="archive-title">
             {{#structureName}}
             <h1>{{structureName}}</h1>
             {{/structureName}}
 
             <h2>{{audience}} &nbsp; - &nbsp;{{teacher}} &nbsp; - &nbsp; {{subject}}</h2>
-
-            {{^printPDF}}
-            {{#created}}
-            <h3>Visa du {{created}} </h3>
-            {{/created}}
-
-            {{#user}}
-            <h3>Visé par {{user}}</h3>
-            {{/user}}
-            {{/printPDF}}
-
-
         </div>
-        {{^printPDF}}
-        {{#comment}}
-        <h3>Commentaire : </h3>
-        <p class="visa-comment">
-            {{comment}}
-        </p>
-        {{/comment}}
-        {{/printPDF}}
     </div>
-
-
     <div>
+        <!-- Session -->
         {{#sessions}}
         <div class="article card">
 
             <div class="row padding-md">
-                <h2 class="remove-margin">
-                    {{type}} : {{title}}
-                </h2>
+                <h2>{{type}} : {{title}}</h2>
             </div>
             <div class="row padding-md margin-bottom-md">
                 <div class="row">
@@ -764,28 +724,26 @@
                 </div>
                 <!-- Description-->
                 {{#hasDescription}}
-                <div class="padding-md">
-                    <div class="visa-comment">
-                        {{{description}}}
-                    </div>
+                <div class="archive-comment">
+                    {{{description}}}
                 </div>
                 {{/hasDescription}}
 
-                <div class="row padding-md">
-                    <h4 class="remove-margin">
-                        {{#hasHomeworks}}
-                        Travail(s) à faire :
-                        {{/hasHomeworks}}
-                    </h4>
+                <!-- Session homeworks -->
+                <div class="row padding-top-md">
+                    <h4>{{#hasHomeworks}} Travail(s) à faire : {{/hasHomeworks}}</h4>
+
                     {{#homeworks}}
                     <div>
                         - {{type}}
                         {{#hasEstimatedTime}}
                         - Durée estimée : {{estimatedTime}} minutes
                         {{/hasEstimatedTime}}
-
                     </div>
-                    <div class="visa-comment">{{{description}}}</div>
+
+                    <div class="archive-comment">
+                        {{{description}}}
+                    </div>
                     {{/homeworks}}
                 </div>
             </div>

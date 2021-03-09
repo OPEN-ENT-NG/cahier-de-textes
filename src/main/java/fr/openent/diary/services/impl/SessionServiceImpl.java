@@ -2,6 +2,7 @@ package fr.openent.diary.services.impl;
 
 import fr.openent.diary.Diary;
 import fr.openent.diary.core.constants.EventStores;
+import fr.openent.diary.db.*;
 import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.models.Audience;
 import fr.openent.diary.models.Person.User;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class SessionServiceImpl implements SessionService {
+public class SessionServiceImpl extends DBService implements SessionService {
     private static final String STATEMENT = "statement";
     private static final String VALUES = "values";
     private static final String ACTION = "action";
@@ -55,21 +56,21 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void getSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
-        StringBuilder query = new StringBuilder();
-        query.append(" SELECT s.*, to_json(type_session) as type, array_to_json(array_agg(distinct homework_and_type)) as homeworks");
-        query.append(",(SELECT 1 FROM diary.session_visa");
-        query.append(" INNER JOIN "+ Diary.DIARY_SCHEMA + ".session on session.id = session_visa.session_id");
-        query.append(" WHERE session.id = ").append(sessionId).append(" LIMIT 1) AS one_visa");
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".session s");
-        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id");
-        query.append(" LEFT JOIN (");
-        query.append(" SELECT homework.*, to_json(homework_type) as type");
-        query.append(" FROM diary.homework homework");
-        query.append(" INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id");
-        query.append(" ) as homework_and_type ON (s.id = homework_and_type.session_id)");
-        query.append(" WHERE s.id = ").append(sessionId);
-        query.append(" GROUP BY s.id, type_session");
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(result -> {
+
+        String query = "SELECT s.*, to_json(type_session) AS type, array_to_json(array_agg(distinct homework_and_type))" +
+                " AS homeworks, (SELECT 1 FROM " + Diary.DIARY_SCHEMA + ".session_visa" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".session on session.id = session_visa.session_id" +
+                " WHERE session.id = " + sessionId + " LIMIT 1) AS one_visa" +
+                " FROM " + Diary.DIARY_SCHEMA + ".session s" +
+                " LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id" +
+                " LEFT JOIN ( SELECT homework.*, to_json(homework_type) as type FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id )" +
+                " AS homework_and_type ON (s.id = homework_and_type.session_id)" +
+                " WHERE s.id = " + sessionId +
+                " AND s.archive_school_year IS NULL" +
+                " GROUP BY s.id, type_session";
+
+        sql.raw(query, SqlResult.validUniqueResultHandler(result -> {
             if (result.isRight()) {
                 JsonObject session = result.right().getValue();
                 List<String> subjectIds = new ArrayList<>();
@@ -102,8 +103,9 @@ public class SessionServiceImpl implements SessionService {
                 " FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id" +
                 " WHERE from_session_id = " + fromSessionId +
-                " AND session_id != " + fromSessionId;
-        Sql.getInstance().raw(query, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
+                " AND session_id != " + fromSessionId +
+                " AND homework.archive_school_year IS NULL";
+        sql.raw(query, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
             if (fromSessionHomeworksAsync.isRight()) {
                 JsonArray fromSessionHomeworks = fromSessionHomeworksAsync.right().getValue();
                 session.put("from_homeworks", fromSessionHomeworks);
@@ -210,8 +212,8 @@ public class SessionServiceImpl implements SessionService {
                 " ( " +
                 " SELECT homework.*, to_json(homework_type) as type " +
                 " FROM " + Diary.DIARY_SCHEMA + ".homework" +
-                " INNER JOIN diary.homework_type ON homework.type_id = homework_type.id " +
-                " INNER JOIN diary.session s ON (homework.session_id = s.id)" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id " +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".session s ON (homework.session_id = s.id)" +
                 ((onlyPublished) ? " AND s.is_published = true " : " ");
 
         if (startDate != null && endDate != null) {
@@ -247,6 +249,8 @@ public class SessionServiceImpl implements SessionService {
             values.add(structureID);
         }
 
+        query += " AND homework.archive_school_year IS NULL";
+
         query += " ) ";
         return query.replaceFirst("AND", "WHERE");
     }
@@ -254,10 +258,10 @@ public class SessionServiceImpl implements SessionService {
     public String getSelectSessionsQuery(String structureID, String startDate, String endDate, String ownerId,
                                          List<String> listAudienceId, List<String> listTeacherId, List<String> listSubjectId,
                                          boolean published, boolean notPublished, boolean vised, boolean notVised, boolean agregVisas, JsonArray values) {
-        String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) as homeworks" +
-                ((agregVisas) ? " ,array_to_json(array_agg(distinct visa)) as visas" : " ") +
-                " FROM diary.session s " +
-                ((agregVisas) ? " LEFT JOIN diary.session_visa AS session_visa ON session_visa.session_id = s.id " +
+        String query = " SELECT s.*, " + " array_to_json(array_agg(homework_and_type)) AS homeworks" +
+                ((agregVisas) ? " ,array_to_json(array_agg(distinct visa)) AS visas" : " ") +
+                " FROM " + Diary.DIARY_SCHEMA + ".session s " +
+                ((agregVisas) ? " LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_visa AS session_visa ON session_visa.session_id = s.id " +
                         " LEFT JOIN diary.visa AS visa ON visa.id = session_visa.visa_id" : " ") +
                 " LEFT JOIN homework_and_type ON (s.id = homework_and_type.session_id)";
 
@@ -287,7 +291,9 @@ public class SessionServiceImpl implements SessionService {
         }
         if (agregVisas && notVised && !vised) {
             query += " AND visa IS NULL";
-        }//
+        }
+
+        query += " AND " + agregUsed + "archive_school_year IS NULL";
         query += " GROUP BY " + agregUsed + "id " + (table_used.equals(HOMEWORK) ? ", type.id" : "");
         query += " ORDER BY " + agregUsed + (table_used.equals(HOMEWORK) ? "due_date" : "date") + " ASC ";
         return query.replaceFirst("AND", "WHERE");
@@ -365,7 +371,7 @@ public class SessionServiceImpl implements SessionService {
         query = this.getWithSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, published, values)
                 + this.getSelectSessionsQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId, published, notPublished, vised, notVised, agregVisas, values);
 
-        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
+        sql.prepared(query, values, SqlResult.validResultHandler(result -> {
             // Formatting String into JsonObject
             if (result.isRight()) {
                 JsonArray arraySession = result.right().getValue();
@@ -472,7 +478,7 @@ public class SessionServiceImpl implements SessionService {
         String query = getSelectIndependantHomeworksQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
                 listSubjectId, published, notPublished, vised, notVised, agregVisas, values);
 
-        Sql.getInstance().prepared(query, values, SqlResult.validResultHandler(result -> {
+        sql.prepared(query, values, SqlResult.validResultHandler(result -> {
             if (result.isLeft()) {
                 String message = "[Diary@SessionServiceImpl::getSelectIndependantHomeworks] Failed to " +
                         "fetch used homeworks. " + result.left().getValue();
@@ -492,10 +498,11 @@ public class SessionServiceImpl implements SessionService {
         if (agregVisas) {
             // To distinguish homerwork of sessions in the shallow table (for visas), we set a boolean "is_homework" at true.
             query += " SELECT h.*, to_json(type) as type, true as is_homework, array_to_json(array_agg(distinct visa)) as visas" +
-                    " FROM diary.homework h " +
+                    " FROM " + Diary.DIARY_SCHEMA + ".homework h " +
                     " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id " +
-                    " LEFT JOIN diary.homework_visa AS homework_visa ON homework_visa.homework_id = h.id " +
-                    " LEFT JOIN diary.visa AS visa ON visa.id = homework_visa.visa_id ";
+                    " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_visa AS homework_visa ON homework_visa.homework_id = h.id " +
+                    " LEFT JOIN " + Diary.DIARY_SCHEMA + ".visa AS visa ON visa.id = homework_visa.visa_id " +
+                    " WHERE h.archive_school_year IS NULL ";
 
             query += filterItemByVisa(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, listSubjectId,
                     published, notPublished, vised, notVised, true, values, HOMEWORK);
@@ -590,7 +597,7 @@ public class SessionServiceImpl implements SessionService {
         values.add(session.getString("start_time"));
         values.add(session.getString("end_time"));
 
-        Sql.getInstance().prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
 
         this.eventStore.createAndStoreEvent(EventStores.CREATE_SESSION, user);
     }
@@ -634,25 +641,25 @@ public class SessionServiceImpl implements SessionService {
 
         values.add(sessionId);
 
-        Sql.getInstance().prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void deleteSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         String query = "DELETE FROM diary.session WHERE id = " + sessionId;
-        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void publishSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         String query = "UPDATE diary.session SET is_published = true WHERE id = " + sessionId;
-        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void unpublishSession(long sessionId, Handler<Either<String, JsonObject>> handler) {
         String query = "UPDATE diary.session SET is_published = false WHERE id = " + sessionId;
-        Sql.getInstance().raw(query, SqlResult.validUniqueResultHandler(handler));
+        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -663,14 +670,14 @@ public class SessionServiceImpl implements SessionService {
 
         param.add(structure_id);
 
-        Sql.getInstance().prepared(query.toString(), param, SqlResult.validResultHandler(handler));
+        sql.prepared(query.toString(), param, SqlResult.validResultHandler(handler));
     }
 
     @Override
     public void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
         String maxQuery = "SELECT MAX(rank) as max, nextval('" + Diary.DIARY_SCHEMA + ".session_type_id_seq') as id from " + Diary.DIARY_SCHEMA + ".session_type "
                 + "WHERE structure_id = '" + sessionType.getString("structure_id") + "'";
-        Sql.getInstance().raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+        sql.raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
                 if (event.isRight()) {
@@ -680,7 +687,7 @@ public class SessionServiceImpl implements SessionService {
 
                         JsonArray statements = new JsonArray();
                         statements.add(getInsertSessionTypeStatement(sessionType, rank.intValue() + 1));
-                        Sql.getInstance().transaction(statements, new Handler<Message<JsonObject>>() {
+                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
                             @Override
                             public void handle(Message<JsonObject> event) {
                                 handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
@@ -719,7 +726,7 @@ public class SessionServiceImpl implements SessionService {
         params.add(sessionType.getString("label"));
         params.add(id);
 
-        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -734,6 +741,6 @@ public class SessionServiceImpl implements SessionService {
         params.add(structure_id);
         params.add(id);
 
-        Sql.getInstance().prepared(query, params, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, params, SqlResult.validUniqueResultHandler(handler));
     }
 }

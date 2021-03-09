@@ -44,7 +44,7 @@ public class VisaController extends ControllerHelper {
 
     public VisaController(VisaServiceImpl visaService, Storage storage) {
         this.visaService = visaService;
-        this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
+        this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, storage, config);
         this.storage = storage;
     }
 
@@ -129,7 +129,7 @@ public class VisaController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, user -> {
             RequestUtils.bodyToJson(request, json -> {
                 try {
-                    this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
+                    this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, storage, config);
                     JsonObject sessionsGroup = json.getJsonObject("visas");
                     sessionsGroup.put("owner_id", "");
                     sessionsGroup.put("created", "");

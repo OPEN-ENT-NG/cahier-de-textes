@@ -1,6 +1,9 @@
 package fr.openent.diary.utils;
 
 import fr.wseduc.webutils.Either;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -17,7 +20,7 @@ public final class SqlQueryUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static StringBuilder prepareMultipleIds (List<Integer> ids) {
+    public static StringBuilder prepareMultipleIds(List<Integer> ids) {
         StringBuilder filter = new StringBuilder();
         for (int i = 0; i < ids.size(); i++) {
             if (i > 0) {
@@ -29,7 +32,7 @@ public final class SqlQueryUtils {
         return filter;
     }
 
-    public static List<Integer> getIntegerIds (List<String> params) {
+    public static List<Integer> getIntegerIds(List<String> params) {
         List<Integer> ids = new ArrayList<>();
         for (String param : params) {
             ids.add(Integer.parseInt(param));
@@ -57,5 +60,16 @@ public final class SqlQueryUtils {
             either = new Either.Left<>("");
         }
         return either;
+    }
+
+    public static void getTransactionHandler(Message<JsonObject> event, Handler<AsyncResult<Void>> handler) {
+        JsonObject message =  event.body();
+        if (message.containsKey("status") && "ok".equals(message.getString("status"))) {
+            handler.handle(Future.succeededFuture());
+            return;
+        }
+        String error = "[Diary@SqlQueryUtils::getTransactionHandler] An error occurred while launching transaction";
+        handler.handle(Future.failedFuture(error));
+        LOGGER.error(error);
     }
 }

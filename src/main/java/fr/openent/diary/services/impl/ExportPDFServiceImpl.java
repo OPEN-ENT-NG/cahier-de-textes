@@ -1,12 +1,16 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.helper.RendersHelper;
 import fr.openent.diary.services.ExportPDFService;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.data.FileResolver;
 import fr.wseduc.webutils.http.Renders;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -33,18 +37,22 @@ import static fr.wseduc.webutils.http.Renders.badRequest;
 public class ExportPDFServiceImpl implements ExportPDFService {
     private static final Logger log = LoggerFactory.getLogger(ExportPDFServiceImpl.class);
     private String pdfGeneratorURL;
-    private JsonObject config;
-    private Vertx vertx;
-    private Renders renders;
-    private Storage storage;
+    private final JsonObject config;
+    private final Vertx vertx;
+    private final EventBus eb;
+    private final Renders renders;
+    private final Storage storage;
     private String authHeader;
+    protected RendersHelper rendersHelper;
 
 
-    public ExportPDFServiceImpl(Vertx vertx, Storage storage, JsonObject config) {
+    public ExportPDFServiceImpl(EventBus eb, Vertx vertx, Storage storage, JsonObject config) {
         super();
         this.config = config;
         this.vertx = vertx;
+        this.eb = eb;
         this.renders = new Renders(this.vertx, this.config);
+        this.rendersHelper = new RendersHelper(this.vertx, this.config);
         this.storage = storage;
         try {
             this.authHeader = "Basic " + (config.getJsonObject("pdf-generator").getString("auth"));
@@ -52,21 +60,19 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         } catch (Exception e) {
             log.info("can not get pdf generator var");
         }
-
     }
 
     public void generatePDF(final HttpServerRequest request, UserInfos user, final JsonObject templateProps, final String templateName, final Handler<Buffer> handler) {
         final String templatePath = config.getJsonObject("exports").getString("template-path");
 
         String absolutePathPrefix = FileResolver.absolutePath("./");
-        //templateProps.put("pathPrefix", absolutePathPrefix);
 
         vertx.fileSystem().readFile(absolutePathPrefix + templatePath + templateName, result -> {
             if (!result.succeeded()) {
                 badRequest(request);
                 return;
             }
-            StringReader reader = new StringReader(result.result().toString("UTF-8"));
+            StringReader reader = new StringReader(result.result().toString(StandardCharsets.UTF_8));
             renders.processTemplate(request, templateProps, templateName, reader, writer -> {
                 String processedTemplate = ((StringWriter) writer).getBuffer().toString();
                 byte[] bytes;
@@ -89,6 +95,62 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                 });
             });
         });
+    }
+
+    public void generatePDF(final JsonObject templateProps, final String templateName,
+                            final Handler<AsyncResult<Buffer>> handler) {
+        final String templatePath = config.getJsonObject("exports").getString("template-path");
+        final String baseUrl = config.getString("host") +
+                config.getString("app-address") + "/public/";
+
+        final String path = FileResolver.absolutePath(templatePath + templateName);
+        vertx.fileSystem().readFile(path, result -> {
+            if (result.failed()) {
+                String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to readFile";
+                log.error(message, result.cause().getMessage());
+                handler.handle(Future.failedFuture(message));
+                return;
+            }
+            StringReader reader = new StringReader(result.result().toString(StandardCharsets.UTF_8));
+
+            rendersHelper.processTemplate(templateProps, templateName, reader, writer -> {
+
+                StringBuffer buffer = ((StringWriter) writer).getBuffer();
+                if (buffer == null) {
+                    String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to process template";
+                    log.error(message);
+                    handler.handle(Future.failedFuture(message));
+                    return;
+                }
+                JsonObject actionObject = new JsonObject();
+                byte[] bytes;
+                bytes = buffer.toString().getBytes(StandardCharsets.UTF_8);
+
+                String node = (String) vertx.sharedData().getLocalMap("server").get("node");
+                if (node == null) node = "";
+
+                actionObject
+                        .put("content", bytes)
+                        .put("baseUrl", baseUrl);
+
+                eb.send(node + "entcore.pdf.generator", actionObject, reply -> {
+                    if (reply.failed()) {
+                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate pdf.";
+                        log.error(message + " " + reply.cause().getMessage());
+                        handler.handle(Future.failedFuture(message));
+                        return;
+                    }
+                    JsonObject pdfResponse = (JsonObject) reply.result().body();
+                    if (!"ok".equals(pdfResponse.getString("status"))) {
+                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate PDF from pdf bus";
+                        handler.handle(Future.failedFuture(message));
+                        return;
+                    }
+                    handler.handle(Future.succeededFuture(Buffer.buffer(pdfResponse.getBinary("content"))));
+                });
+            });
+        });
+
     }
 
     @Override
@@ -183,7 +245,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                         log.error("fail to post node-pdf-generator" + response.statusMessage());
                         response.bodyHandler(event -> {
                             log.error("Returning body after POST CALL : " + nodePdfGeneratorUrl
-                                    + ", Returning body : " + event.toString("UTF-8"));
+                                    + ", Returning body : " + event.toString(StandardCharsets.UTF_8));
                             if (!responseIsSent.getAndSet(true)) {
                                 httpClient.close();
                             }

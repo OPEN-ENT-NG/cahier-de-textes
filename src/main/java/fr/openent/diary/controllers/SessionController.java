@@ -31,7 +31,7 @@ public class SessionController extends ControllerHelper {
 
     public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.exportPDFService = new ExportPDFServiceImpl(vertx, null, config);
+        this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, null, config);
     }
 
     @SecuredAction(value = WorkflowUtils.SESSION_READ, type = ActionType.WORKFLOW)

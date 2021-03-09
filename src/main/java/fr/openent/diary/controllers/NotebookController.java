@@ -9,10 +9,13 @@ import fr.wseduc.rs.Get;
 import fr.wseduc.webutils.http.BaseController;
 
 import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.http.response.DefaultResponseHandler;
+import org.entcore.common.storage.Storage;
 
 import java.util.List;
 
@@ -20,9 +23,9 @@ import java.util.List;
 public class NotebookController extends BaseController {
     private final NotebookService notebookService;
 
-    public NotebookController(EventBus eb) {
+    public NotebookController(EventBus eb, Vertx vertx, Storage storage, JsonObject config) {
         super();
-        this.notebookService = new DefaultNotebookService(eb);
+        this.notebookService = new DefaultNotebookService(eb, vertx, storage, config);
     }
 
     @Get("/notebooks")
@@ -44,7 +47,7 @@ public class NotebookController extends BaseController {
         Integer page = params.get("page") != null ? Integer.parseInt(params.get("page")) : null;
         String limit = params.get("limit");
         String offset = params.get("offset");
-        notebookService.getNotebooks(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished, page,
+        notebookService.get(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished, page,
                 limit, offset, DefaultResponseHandler.defaultResponseHandler(request));
     }
 

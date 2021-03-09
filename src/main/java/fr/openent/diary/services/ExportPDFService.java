@@ -1,6 +1,7 @@
 package fr.openent.diary.services;
 
 import fr.wseduc.webutils.Either;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
@@ -17,6 +18,8 @@ public interface ExportPDFService {
      * @param handler       Function handler returning data
      */
     void generatePDF(final HttpServerRequest request, UserInfos user, final JsonObject templateProps, final String templateName, final Handler<Buffer> handler);
+
+    void generatePDF(final JsonObject templateProps, final String templateName, final Handler<AsyncResult<Buffer>> handler);
 
     void getPDF(String pdfId, Handler<Buffer> handler);
 

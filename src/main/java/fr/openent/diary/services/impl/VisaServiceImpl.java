@@ -30,7 +30,7 @@ public class VisaServiceImpl implements VisaService {
     private int indexAsync = 0;
 
     public VisaServiceImpl(Storage storage, EventBus eb, Vertx vertx, JsonObject config) {
-        this.exportPDFService = new ExportPDFServiceImpl(vertx, storage, config);
+        this.exportPDFService = new ExportPDFServiceImpl(eb, vertx, storage, config);
     }
 
     @Override

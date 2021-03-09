@@ -1,6 +1,7 @@
 package fr.openent.diary.helper;
 
 import fr.wseduc.webutils.Either;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -30,6 +31,17 @@ public class FutureHelper {
         };
     }
 
+    public static Handler<Either<String, JsonArray>> handlerJsonArray(Handler<AsyncResult<JsonArray>> handler) {
+        return event -> {
+            if (event.isRight()) {
+                handler.handle(Future.succeededFuture(event.right().getValue()));
+            } else {
+                LOGGER.error(event.left().getValue());
+                handler.handle(Future.failedFuture(event.left().getValue()));
+            }
+        };
+    }
+
     public static Handler<Either<String, JsonObject>> handlerJsonObject(Future<JsonObject> future) {
         return event -> {
             if (event.isRight()) {
@@ -41,7 +53,26 @@ public class FutureHelper {
         };
     }
 
+    public static Handler<Either<String, JsonObject>> handlerJsonObject(Handler<AsyncResult<JsonObject>> handler) {
+        return event -> {
+            if (event.isRight()) {
+                handler.handle(Future.succeededFuture(event.right().getValue()));
+            } else {
+                LOGGER.error(event.left().getValue());
+                handler.handle(Future.failedFuture(event.left().getValue()));
+            }
+        };
+    }
+
     public static <T> CompositeFuture all(List<Future<T>> futures) {
         return CompositeFutureImpl.all(futures.toArray(new Future[futures.size()]));
+    }
+
+    public static <T> CompositeFuture join(List<Future<T>> futures) {
+        return CompositeFutureImpl.join(futures.toArray(new Future[futures.size()]));
+    }
+
+    public static <T> CompositeFuture any(List<Future<T>> futures) {
+        return CompositeFutureImpl.any(futures.toArray(new Future[0]));
     }
 }

@@ -54,20 +54,18 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
 
 
     public  void getHomeworkStudent(long homeworkId, String studentId, UserInfos user, Handler<Either<String, JsonObject>> handler){
-        StringBuilder query = new StringBuilder();
+        String query = "SELECT h.*, to_json(type) as type, to_json(progress_and_state) as progress" +
+                " FROM " + Diary.DIARY_SCHEMA + ".homework h" +
+                " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id" +
+                " LEFT JOIN (" +
+                "   SELECT progress.*, homework_state.label as state_label" +
+                "   FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress" +
+                "   INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id" +
+                "   WHERE  progress.user_id =  '" + studentId + "' " +
+                ") AS progress_and_state ON (h.id = progress_and_state.homework_id)" +
+                " WHERE h.id = " + homeworkId + " AND h.archive_school_year IS NULL";
 
-        query.append(" SELECT h.*, to_json(type) as type, to_json(progress_and_state) as progress");
-        query.append(" FROM " + Diary.DIARY_SCHEMA + ".homework h");
-        query.append(" LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id");
-        query.append(" LEFT JOIN (");
-        query.append("   SELECT progress.*, homework_state.label as state_label");
-        query.append("   FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress");
-        query.append("   INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id");
-        query.append("   WHERE  progress.user_id =  '").append(studentId).append("'");
-        query.append(" )  as progress_and_state ON (h.id = progress_and_state.homework_id)");
-        query.append(" WHERE h.id = ").append(homeworkId);
-
-        proceedHomework(handler, query.toString());
+        proceedHomework(handler, query);
     }
 
     @Override
@@ -76,7 +74,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         + " FROM " + Diary.DIARY_SCHEMA + ".homework h"
         + " LEFT JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id"
         + " LEFT JOIN " + Diary.DIARY_SCHEMA + ".session AS session ON session.id = h.session_id"
-        + " WHERE h.id = " + homeworkId;
+        + " WHERE h.id = " + homeworkId + " AND h.archive_school_year IS NULL";
 
         proceedHomework(handler, query);
     }
@@ -334,24 +332,25 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                        List<String> listAudienceId, List<String> listTeacherId, String subjectId,
                                        boolean onlyPublished, JsonArray values) {
         String query = " WITH homework_filter AS (" +
-                        " SELECT h.*, to_json(homework_type) as type " +
+                        " SELECT h.*, to_json(homework_type) AS type " +
                         " FROM " + Diary.DIARY_SCHEMA + ".homework h" +
-                        " INNER JOIN diary.homework_type ON h.type_id = homework_type.id";
+                        " INNER JOIN diary.homework_type ON h.type_id = homework_type.id" +
+                        " WHERE h.archive_school_year IS NULL";
 
         query = getWhereContentGetHomeworkQuery(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId, subjectId, onlyPublished, values, query);
         query += " ) ";
 
-        return query.replaceFirst("AND", "WHERE");
+        return query;
     }
 
     private String getSelectHomeworkStudentQuery(String studentId) {
        String query = " SELECT h.*, " + " to_json(progress_and_state) as progress" +
                 " FROM homework_filter h" +
-                " INNER JOIN diary.homework_type AS type ON type.id = h.type_id" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type AS type ON type.id = h.type_id" +
                 " LEFT JOIN (" +
                 " SELECT progress.*, homework_state.label as state_label" +
-                " FROM diary.homework_progress progress" +
-                " INNER JOIN diary.homework_state ON progress.state_id = homework_state.id" +
+                " FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress" +
+                " INNER JOIN" + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id" +
                 " WHERE  progress.user_id = '" + studentId + "'"
                 + " )" +
                 " AS progress_and_state ON (h.id = progress_and_state.homework_id)" +
@@ -487,7 +486,8 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void deleteHomework(long homeworkId, Handler<Either<String, JsonObject>> handler) {
         String query = "SELECT s.id AS sessionId, s.is_empty AS isEmpty FROM " + Diary.DIARY_SCHEMA +
                 ".homework h " +
-                "INNER JOIN "+ Diary.DIARY_SCHEMA + ".session s ON h.session_id = s.id WHERE h.id = " + homeworkId;
+                "INNER JOIN "+ Diary.DIARY_SCHEMA + ".session s ON h.session_id = s.id WHERE h.id = " + homeworkId +
+                " AND h.archive_school_year IS NULL AND s.archive_school_year IS NULL";
 
         sql.raw(query, SqlResult.validUniqueResultHandler(event -> {
             if (event.isRight()) {
@@ -647,7 +647,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
     public void getWorkload(String structureId, String audienceId, String dueDate, boolean isPublished, Handler<Either<String, JsonArray>> handler) {
         JsonArray params = new JsonArray();
         String query = "SELECT COUNT(*) FROM " + Diary.DIARY_SCHEMA + ".homework " +
-                "WHERE structure_id = ? AND audience_id = ? AND due_date = ? AND is_published = true";
+                "WHERE structure_id = ? AND audience_id = ? AND due_date = ? AND is_published = true AND archive_school_year IS NULL";
         params.add(structureId);
         params.add(audienceId);
         params.add(dueDate);

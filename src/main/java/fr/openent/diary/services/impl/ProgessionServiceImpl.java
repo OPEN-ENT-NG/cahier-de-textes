@@ -426,41 +426,33 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
     @Override
     public void progressionToSession(JsonObject progression, String idProgression, String idSession, Handler<Either<String, JsonObject>> handler) {
 
-        String getIdQuery = "SELECT id as id, subject_id, color, structure_id, teacher_id, date, is_published, audience_id, type_id " +
-                "from " + Diary.DIARY_SCHEMA + ".session where id = " + idSession;
-        sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-            @Override
-            public void handle(Either<String, JsonObject> event) {
-                if (event.isRight()) {
-                    try {
-                        final Number id = event.right().getValue().getInteger("id");
+        String getIdQuery = "SELECT id, subject_id, color, structure_id, teacher_id, date, " +
+                "is_published, audience_id, type_id " +
+                "FROM " + Diary.DIARY_SCHEMA + ".session s WHERE s.id = " + idSession + " AND s.archive_school_year IS NULL";
+        sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(event -> {
+            if (event.isRight()) {
+                try {
+                    final Number id = event.right().getValue().getInteger("id");
 
-                        JsonObject session = getSessionJsonObject(event);
+                    JsonObject session = getSessionJsonObject(event);
 
-                        JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
-                        JsonArray homeworks = progression.getJsonArray("progression_homeworks");
-                        statements.add(getSessionUpdateStatement(progression, id));
+                    JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
+                    JsonArray homeworks = progression.getJsonArray("progression_homeworks");
+                    statements.add(getSessionUpdateStatement(progression, id));
 
-                        for (int i = 0; i < homeworks.size(); i++) {
-                            statements.add(getHomeworksProgressionToHomeworks(homeworks.getJsonObject(i), session));
-                        }
-                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
-                            @Override
-                            public void handle(Message<JsonObject> event) {
-                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
-                            }
-                        });
-                    } catch (ClassCastException e) {
-                        LOGGER.error("An error occurred when insert progression", e);
-                        handler.handle(new Either.Left<String, JsonObject>(""));
-
+                    for (int i = 0; i < homeworks.size(); i++) {
+                        statements.add(getHomeworksProgressionToHomeworks(homeworks.getJsonObject(i), session));
                     }
+                    sql.transaction(statements, event1 -> handler.handle(SqlQueryUtils.getTransactionHandler(event1, id)));
+                } catch (ClassCastException e) {
+                    LOGGER.error("An error occurred when insert progression", e);
+                    handler.handle(new Either.Left<>(""));
 
-                } else {
-                    LOGGER.error("An error occurred when selecting id");
                 }
-            }
 
+            } else {
+                LOGGER.error("[Diary@ProgressionServiceImpl::progressionToSession] An error occurred when selecting id");
+            }
         }));
 
     }

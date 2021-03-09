@@ -4,6 +4,8 @@ import fr.openent.diary.models.Person.User;
 import io.vertx.core.json.JsonObject;
 
 public class Notebook {
+    public static final String HOMEWORK_TYPE = "HOMEWORK";
+    public static final String SESSION_TYPE =  "SESSION";
 
     private String notebook_id;
     private Long id;
@@ -31,15 +33,11 @@ public class Notebook {
     public Notebook(JsonObject notebook) {
         this.notebook_id = notebook.getString("notebook_id", null);
         this.id = notebook.getLong("id", null);
-        this.subject = new Subject(notebook.getString("subject_id"));
         this.exceptional_label = notebook.getString("exceptional_label", null);
-        this.teacher = new User(notebook.getString("teacher_id"));
-        this.audience = new Audience(notebook.getString("audience_id"));
         this.sessions = notebook.getLong("sessions", null);
         this.annotation = notebook.getString("annotation", null);
         this.description = notebook.getString("description", null);
         this.title = notebook.getString("title", null);
-        this.diaryType = new DiaryTypeModel(notebook.getLong("type_id"));
         this.workload = notebook.getLong("workload", 0L);
         this.date = notebook.getString("date", null);
         this.start_time = notebook.getString("start_time", null);
@@ -50,7 +48,24 @@ public class Notebook {
         this.session_id = notebook.getLong("session_id", null);
         this.visa = notebook.getString("visa", null);
         this.type = notebook.getString("type", null);
-        this.visas = notebook.getString("visas") != null ? new Visa(new JsonObject(notebook.getString("visas"))) : new Visa();
+
+        JsonObject oSubject = notebook.getJsonObject("subject");
+        JsonObject oTeacher = notebook.getJsonObject("teacher");
+        JsonObject oAudience = notebook.getJsonObject("audience");
+        JsonObject oDiaryType = notebook.getJsonObject("diaryType");
+
+        this.subject = oSubject != null ? new Subject(oSubject) : new Subject(notebook.getString("subject_id"));
+        if (oSubject != null && !oSubject.isEmpty() && oSubject.getString("id") != null && (oSubject.getString("id").equals("exceptional"))) {
+            this.subject.setName(this.exceptional_label);
+        }
+        this.teacher = oTeacher != null ? new User(oTeacher) : new User(notebook.getString("teacher_id"));
+        this.audience = oAudience != null ? new Audience(oAudience) : new Audience(notebook.getString("audience_id"));
+        this.diaryType = oDiaryType != null ? new DiaryTypeModel(oDiaryType) : new DiaryTypeModel(notebook.getLong("type_id"));
+
+        Object oVisas = notebook.getValue("visas");
+        if (oVisas != null) this.visas = oVisas instanceof JsonObject ? new Visa(notebook.getJsonObject("visas"))
+                    : new Visa(new JsonObject(notebook.getString("visas")));
+            else  this.visas = new Visa();
     }
 
     public JsonObject toJSON() {

@@ -1,15 +1,26 @@
 package fr.openent.diary;
 
 import fr.openent.diary.controllers.*;
+import fr.openent.diary.db.DB;
+import fr.openent.diary.eventbus.Viescolaire;
+import fr.openent.diary.repository.event.DiaryRepositoryEvents;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.impl.*;
-import io.vertx.core.eventbus.EventBus;
+import fr.openent.diary.worker.NotebookArchiveWorker;
+import fr.wseduc.mongodb.MongoDb;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.eventbus.*;
+import io.vertx.core.json.*;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
+import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.notification.TimelineHelper;
+import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
+
+import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
 
 public class Diary extends BaseServer {
@@ -34,11 +45,12 @@ public class Diary extends BaseServer {
 
         EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Diary.class.getSimpleName());
 
+        DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
 
         addController(new DiaryController(diaryService, eventStore));
 
         /* diary controller named as Notebook */
-        addController(new NotebookController(eb));
+        addController(new NotebookController(eb, vertx, storage, config));
 
         addController(new InitController(new DefautlInitService("diary", eb)));
         addController(new VisaController(visaService, storage));
@@ -49,9 +61,28 @@ public class Diary extends BaseServer {
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
         addController(new SearchController(eb));
         addController(new SubjectController(new DefaultSubjectService(eb)));
+        addController(new NotebookArchiveController(eb, vertx, storage));
 
         // add right controller
         addController(new FakeRight());
+
+        // Repository Events
+        setRepositoryEvents(new DiaryRepositoryEvents(eb));
+
+        // Event Bus
+        Viescolaire.getInstance().init(eb);
+
+        // Worker
+        vertx.deployVerticle(NotebookArchiveWorker.class, new DeploymentOptions().setConfig(config).setWorker(true));
     }
 
+    public static void launchNotebookArchiveWorker(EventBus eb, JsonObject params) {
+	    eb.send(NotebookArchiveWorker.class.getName(), params,
+                new DeliveryOptions().setSendTimeout(1000 * 1000L), handlerToAsyncHandler(eventExport -> {
+                        if(!eventExport.body().getString("status").equals("ok")) {
+                            launchNotebookArchiveWorker(eb, params);
+                        }
+                    }
+                ));
+    }
 }

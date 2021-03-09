@@ -7,16 +7,18 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-/**
- * Created by a457593 on 26/02/2016.
- */
+
 public final class DateUtils {
 
-    public final static String DATE_FORMAT ="yyyy-MM-dd";
-    public final static String FRENCH_DATE_FORMAT ="dd-MM-yyyy";
-    public final static String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
-    public final static String DATE_FORMAT_SQL = "yyyy-MM-dd HH:mm:ss";
-    public final static String DAY_MONTH_YEAR_HOUR_TIME = "dd/MM/yyyy HH:mm:ss";
+    public static final String DATE_FORMAT ="yyyy-MM-dd";
+    public static final String FRENCH_DATE_FORMAT ="dd-MM-yyyy";
+    public static final String DATE_FORMAT_REGEX = "\\d{4}-[01]\\d-[0-3]\\d";
+    public static final String DATE_FORMAT_SQL = "yyyy-MM-dd HH:mm:ss";
+    public static final String SQL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String YEAR = "yyyy";
+    public static final String DAY_MONTH_YEAR_HOUR_TIME = "dd/MM/yyyy HH:mm:ss";
+    public static final String HOUR_MINUTE_SECOND = "HH:mm:ss";
+    public static final String HOUR_MINUTE = "HH:mm";
 
 
     private DateUtils()  {}
@@ -27,6 +29,28 @@ public final class DateUtils {
     public static Date parseDate(String dateToParse) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         return dateFormat.parse(dateToParse);
+    }
+
+    public static Date parseDate(String dateToParse, String format) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+            return dateFormat.parse(dateToParse);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Fetching current date (now())
+     *
+     * @param format date format your type want to be returned
+     * @return return current date with the wished format
+     */
+    public static String getCurrentDate(String format) {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        sdf.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        return sdf.format(calendar.getTime());
     }
 
     public static Boolean isBefore(Date d1, Date d2) {
@@ -73,6 +97,11 @@ public final class DateUtils {
 
     public static String formatDate(Date dateToParse) {
         SimpleDateFormat dateFormat = getSimpleDateFormat();
+        return dateFormat.format(dateToParse);
+    }
+
+    public static String formatDate(Date dateToParse, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(dateToParse);
     }
 }
