@@ -63,7 +63,7 @@
     </div>
 
     <!-- content sidebar -->
-    <div class="cell three twelve-mobile" static-include="/diary/public/template/main/sidebar.html"></div>
+    <div class="cell three twelve-mobile" ng-include="'/diary/public/template/main/sidebar.html'"></div>
 
     <!-- content -->
     <div class="cell nine twelve-mobile sidebar-article">
@@ -112,11 +112,11 @@
                             <div ng-repeat="pedagogicItem in pedagogicDay.pedagogicItems">
                                 <!-- content list pedagogic item case session list is view -->
                                 <div ng-if="display.sessionList"
-                                     static-include="/diary/public/template/list/list-pedagogic-item.html"></div>
+                                     ng-include="'/diary/public/template/list/list-pedagogic-item.html'"></div>
 
                                 <!-- content list pedagogic homeworkOnly case session list is not view -->
                                 <div ng-if="display.homeworks"
-                                     static-include="/diary/public/template/list/list-pedagogic-item-homeworkOnly.html"></div>
+                                     ng-include="'/diary/public/template/list/list-pedagogic-item-homeworkOnly.html'"></div>
                             </div>
                         </div>
                     </div>

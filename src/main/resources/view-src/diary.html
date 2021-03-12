@@ -19,7 +19,7 @@
 		<div ng-controller="navigationController"
 			 ng-if="!isAChildOrAParent"
 			 class="side-navbar"
-			 static-include="/diary/public/template/navigation/side-navbar.html">
+             ng-include="'/diary/public/template/navigation/side-navbar.html'">
 		</div>
 
 		<!-- main templates -->

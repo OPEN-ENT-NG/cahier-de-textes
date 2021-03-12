@@ -8,7 +8,7 @@
                 }">
         <div ng-if="day.dailyHomeworks.length <= 1">
             <div ng-repeat="homework in day.dailyHomeworks">
-                <div static-include="/diary/public/template/directives/daily-homework-item.html"></div>
+                <div ng-include="'/diary/public/template/directives/daily-homework-item.html'"></div>
             </div>
         </div>
 
@@ -22,7 +22,7 @@
             ng-if="day.dailyHomeworks.length > 0"
             id="hw-detail-[[day.index]]" ng-click="toggleOpenDailyEvents(day, $event)" ng-class="{ show: day.openDailyEvents && day.dailyHomeworks.length > 1 }">
             <div ng-repeat="homework in day.dailyHomeworks">
-                <div static-include="/diary/public/template/directives/daily-homework-item.html" style="padding: 1px;"></div>
+                <div ng-include="'/diary/public/template/directives/daily-homework-item.html'" style="padding: 1px;"></div>
             </div>
         </div>
     </div>

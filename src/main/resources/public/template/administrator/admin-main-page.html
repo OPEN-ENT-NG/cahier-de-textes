@@ -82,15 +82,15 @@
     <!-- CONTENT -->
     <div workflow="diary.adminAccess">
         <!-- HEADER CONTENT -->
-        <div static-include="/diary/public/template/administrator/admin-sidebar.html"></div>
+        <div ng-include="'/diary/public/template/administrator/admin-sidebar.html'"></div>
 
         <!-- Loader calendrier -->
-        <loader data-ng-show="isLoading" min-height="'250px'"/>
+        <loader data-ng-show="isLoading" min-height="'250px'"></loader>
 
         <!-- TABLE CONTENT -->
         <div class="visa-diary"
              data-ng-show="!isLoading"
-             static-include="/diary/public/template/administrator/diary-lister.html">
+             ng-include="'/diary/public/template/administrator/diary-lister.html'">
         </div>
 
 

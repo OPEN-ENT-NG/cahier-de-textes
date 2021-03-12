@@ -17,20 +17,20 @@ export let navigationController = ng.controller('navigationController',
         async function init() {
             $scope.icons = {
                 diary: {
-                    path: '/diary/public/img/cahierdetexte.svg' ,
-                    alt: '',
+                    path: "'/diary/public/img/cahierdetexte.svg'" ,
+                    alt: "",
                 },
                 progression: {
-                    path: '/diary/public/img/progressions.svg',
-                    alt: '',
+                    path: "'/diary/public/img/progressions.svg'",
+                    alt: "",
                 },
                 dashboard: {
-                    path: '/diary/public/img/view-dashboard.svg',
-                    alt: '',
+                    path: "'/diary/public/img/view-dashboard.svg'",
+                    alt: "",
                 },
                 calendar: {
-                    path: '/diary/public/img/calendaire.svg',
-                    alt: '',
+                    path: "'/diary/public/img/calendaire.svg'",
+                    alt: "",
                 }
             };
 

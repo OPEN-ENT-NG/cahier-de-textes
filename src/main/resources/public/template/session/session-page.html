@@ -36,19 +36,19 @@
 
     <!--SESSION FORM-->
     <div ng-if="!isReadOnly">
-        <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-form.html"></div>
+        <div class="row margin-bottom-lg" ng-include="'/diary/public/template/session/session-form.html'"></div>
     </div>
 
     <!--READ ONLY VIEW-->
     <div ng-if="isReadOnly">
-        <div class="row margin-bottom-lg" static-include="/diary/public/template/session/session-view.html"></div>
+        <div class="row margin-bottom-lg" ng-include="'/diary/public/template/session/session-view.html'"></div>
         <div class="session-read-only card padding-md margin-bottom-lg"
              ng-if="session.homeworks.length > 0">
             <h2 class="cdt-title-not-clickable"><i18n>Homeworks</i18n></h2>
 
             <!--HOMEWORK LIST-->
             <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
-                 ng-controller="manageHomeworkCtrl" static-include="/diary/public/template/homework/homework-view.html">
+                 ng-controller="manageHomeworkCtrl" ng-include="'/diary/public/template/homework/homework-view.html'">
             </div>
         </div>
         <button class="homework-view-button" data-ng-click="back();"><i18n>back</i18n></button>

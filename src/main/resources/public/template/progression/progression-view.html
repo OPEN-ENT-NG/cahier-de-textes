@@ -29,7 +29,7 @@
                    ng-model="search"
                    placeholder="Rechercher">
             <div class="flex-row-cdt margin-bottom-lg progression-tree"
-                 static-include="/diary/public/template/progression/progression-tree.html">
+                 ng-include="'/diary/public/template/progression/progression-tree.html'">
             </div>
             <div class="flex-row-cdt create-folder-button">
                 <button workflow="diary.manageSession" class="calendar-button"

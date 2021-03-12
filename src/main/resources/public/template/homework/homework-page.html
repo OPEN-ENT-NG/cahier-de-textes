@@ -32,7 +32,7 @@
         </div>
 
         <div class="row margin-bottom-md"
-             static-include="/diary/public/template/homework/homework-form.html"></div>
+             ng-include="'/diary/public/template/homework/homework-form.html'"></div>
 
         <div class="row text-right">
             <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework($index)">
@@ -49,7 +49,7 @@
     </div>
     <div ng-if="isReadOnly">
         <div class="row margin-bottom-lg"
-             static-include="/diary/public/template/homework/homework-view.html">
+             ng-include="'/diary/public/template/homework/homework-view.html'">
         </div>
         <button class="homework-view-button" data-ng-click="back()">
             <i18n>back</i18n>
