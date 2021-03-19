@@ -90,10 +90,12 @@ export let calendarController = ng.controller('CalendarController',
                 const structure_slots: StructureSlot = await StructureService.getSlotProfile(
                     window.structure ? window.structure.id : $scope.structure.id
                 );
-                if (Object.keys(structure_slots).length > 0) {
+                if (structure_slots.slots.length > 0 && Object.keys(structure_slots).length > 0) {
                     $scope.timeSlot.slots = structure_slots.slots;
                     model.calendar.setTimeslots($scope.timeSlot.slots);
-                } else $scope.timeSlot.slots = null;
+                } else {
+                    $scope.timeSlot.slots = null;
+                }
             };
 
             $scope.filterTeacherOptions = async (value: string): Promise<void> => {
