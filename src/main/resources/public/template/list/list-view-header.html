@@ -1,0 +1,61 @@
+<div class="main-header" ng-class="{'padding-bottom-list': !isCounselorUser()}">
+    <!-- Title -->
+    <h1 class="cell title-area-complete padding-right-xlg">
+        <!-- module image -->
+        <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+
+        <!-- module title name -->
+        <i18n>diary.title</i18n>
+
+        <!-- name structure -->
+        <span ng-if="!isCounselorUser()" class="structure-title main ellipsis-multiline-two">
+                [[structure.name]]
+            </span>
+    </h1>
+
+    <!-- teacher search bar -->
+    <div workflow="diary.diarySearch" class="cell padding-left-xlg margin-right-lg four">
+        <div class="cell twelve search-input">
+            <async-autocomplete data-ng-disabled="false"
+                                data-ng-model="autocomplete.teacher"
+                                data-ng-change="selectTeacher"
+                                data-options="autocomplete.teacherOptions"
+                                data-on-search="filterTeacherOptions"
+                                data-placeholder="diary.search.teacher"
+                                data-search="autocomplete.teacher">
+            </async-autocomplete>
+        </div>
+        <div class="cell twelve main-header-result-search"
+             ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
+            <ul class="cell twelve search-input-ul">
+                <li>
+                    [[autocomplete.teachersSelected[0].displayName]]
+                    <i class="close" data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Classes/groups search bar -->
+    <div workflow="diary.diarySearch" class="cell padding-left-xlg four">
+        <div class="cell twelve search-input">
+            <async-autocomplete data-ng-disabled="false"
+                                data-ng-model="autocomplete.class"
+                                data-ng-change="selectClass"
+                                data-options="autocomplete.classOptions"
+                                data-on-search="filterClassOptions"
+                                data-placeholder="diary.search.group"
+                                data-search="autocomplete.class">
+            </async-autocomplete>
+        </div>
+        <div class="cell twelve main-header-result-search"
+             ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
+            <ul class="cell twelve search-input-ul">
+                <li>
+                    [[autocomplete.classesSelected[0].displayName]]
+                    <i class="close" data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

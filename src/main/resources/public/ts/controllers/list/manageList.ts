@@ -10,7 +10,7 @@ import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 declare let window: any;
 
 export let manageListCtrl = ng.controller('manageListController',
-    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', async function ($scope, $window, $rootScope) {
+    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', function ($scope, $window, $rootScope) {
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
