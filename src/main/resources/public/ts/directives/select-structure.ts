@@ -7,6 +7,9 @@ import {UPDATE_STRUCTURE_EVENTS} from "../core/enum/events";
 declare let window: any;
 
 interface IViewModel {
+    $onInit(): any;
+    $onDestroy(): any;
+
     structure: Structure;
     structureDisplay: { name: string, id: string };
     structures: Array<Structure>;
@@ -53,11 +56,13 @@ export const SelectStructure = ng.directive('selectStructure', () => {
         replace: false,
         controller: async function ($scope) {
             const vm: IViewModel = <IViewModel>this;
-            vm.structures = structureService.getUserStructure();
-            vm.structureDisplay = {
-                name: vm.structure.name,
-                id: vm.structure.id,
-            }
+            vm.$onInit = () => {
+                vm.structures = structureService.getUserStructure();
+                vm.structureDisplay = {
+                    name: vm.structure.name,
+                    id: vm.structure.id,
+                }
+            };
         },
         link: function ($scope, $element: HTMLDivElement) {
             const vm: IViewModel = $scope.vm;
