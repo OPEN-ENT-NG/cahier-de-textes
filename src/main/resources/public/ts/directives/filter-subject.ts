@@ -3,6 +3,9 @@ import {Subject} from "../model";
 import {UPDATE_SUBJECT_EVENTS} from "../core/enum/events";
 
 interface IViewModel {
+    $onInit(): any;
+    $onDestroy(): any;
+
     subject: Subject;
     currentSubject: Subject;
     subjectDisplay: Subject;
@@ -10,6 +13,7 @@ interface IViewModel {
 
     selectSubjectText: string;
     selectSubject(item);
+    removeSubject(): void;
 }
 
 export const FilterSubject = ng.directive('filterSubject', () => {
@@ -36,7 +40,7 @@ export const FilterSubject = ng.directive('filterSubject', () => {
                 <div class="cell twelve" ng-show="vm.subjectDisplay && vm.subjectDisplay.label !== ''">
                     <div class="cell twelve search-input-ul">
                             [[vm.subjectDisplay.label]]
-                            <i class="close" data-ng-click="removeSubject()"></i>
+                            <i class="close" data-ng-click="vm.removeSubject()"></i>
                     </div>
                 </div>
             </div>
@@ -45,14 +49,17 @@ export const FilterSubject = ng.directive('filterSubject', () => {
         controllerAs: 'vm',
         bindToController: true,
         replace: false,
-        controller: async function () {
+        controller: function () {
             const vm: IViewModel = <IViewModel>this;
-            if (vm.currentSubject != null) {
-                vm.subjectDisplay = vm.currentSubject
-            } else {
-                vm.subjectDisplay = null;
-            }
-            vm.selectSubjectText = lang.translate('subject.discipline');
+
+            vm.$onInit = () => {
+                if (vm.currentSubject != null) {
+                    vm.subjectDisplay = vm.currentSubject
+                } else {
+                    vm.subjectDisplay = null;
+                }
+                vm.selectSubjectText = lang.translate('subject.discipline');
+            };
         },
         link: function ($scope, $element: HTMLDivElement) {
             const vm: IViewModel = $scope.vm;
@@ -61,7 +68,7 @@ export const FilterSubject = ng.directive('filterSubject', () => {
                 $scope.$emit(UPDATE_SUBJECT_EVENTS.UPDATE, vm.subjectDisplay);
             };
 
-            $scope.removeSubject = async () => {
+           vm.removeSubject = (): void => {
                 vm.subjectDisplay = null;
                 $scope.$emit(UPDATE_SUBJECT_EVENTS.UPDATE, vm.subjectDisplay);
             };
