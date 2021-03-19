@@ -1,11 +1,14 @@
 <div class="main-nav">
+    <!-- Structures select -->
     <div class="first-item">
         <div role="menuitem" class="item"
              data-ng-click="hoverIn('STRUCTURES')"
              data-ng-mouseover="hoverIn('STRUCTURES')"
              data-ng-mouseleave="hoverOut()"
              ng-if="structures.length > 1">
+            <!-- icon -->
             <i class="text-xl margin-sm icon diary-view-carousel"></i>
+            <!-- text -->
             <span>
                 <i18n>utils.structure.choose</i18n>
             </span>
@@ -17,33 +20,42 @@
                   'three_items' : (((userType !== 'ENSEIGNANT') || !hasRight('readNotebookArchives')))
                   && !((userType === 'ENSEIGNANT') && hasRight('readNotebookArchives')),
                    'two_items': (userType !== 'ENSEIGNANT' && !hasRight('readNotebookArchives'))}">
+        <!-- Home / Dashboard  -->
         <a role="menuitem" ng-href="[[userType === 'ENSEIGNANT' ? 'diary#/view' : 'diary#/administrator/global']]"
            class="item"
            ng-class="{active: (userType === 'ENSEIGNANT' ? (getCurrentState() === 'view' || getCurrentState() === '') : (getCurrentState() === 'administrator'))}"
            ng-click="changeViewCalendar()">
-            <div ng-include="[[icons.dashboard.path]]" class="icon"></div>
+            <!-- icon -->
+            <i class="text-xl margin-sm icon dashboard"></i>
+            <!-- text -->
             <span>
                 <i18n>home</i18n>
             </span>
         </a>
 
+        <!-- Notebook / calendar View part -->
         <a role="menuitem" ng-href="[[userType === 'ENSEIGNANT' ? 'diary#/administrator/global' : 'diary#/view']]"
            class="item"
            ng-class="{active: (userType === 'ENSEIGNANT' ? (getCurrentState() === 'administrator') : (getCurrentState() === 'view' || getCurrentState() === ''))}">
-            <div ng-include="[[userType === 'ENSEIGNANT' ? icons.diary.path : icons.calendar.path]]"
-                 class="icon"></div>
+            <!-- icon -->
+            <i class="text-xl margin-sm icon" ng-class="userType === 'ENSEIGNANT' ? 'notebook' : 'nav-diary-calendar'"></i>
+            <!-- text -->
             <span ng-if="userType === 'ENSEIGNANT'">
                 <i18n>diary.title</i18n>
             </span>
+            <!-- text -->
             <span ng-if="userType !== 'ENSEIGNANT'">
                 <i18n>sessions.admin.backOnDiary</i18n>
             </span>
         </a>
 
+        <!-- Progression  -->
         <a role="menuitem" href="diary#/progressions/view" class="item"
            ng-class="{active: getCurrentState() === 'progressions'}"
            ng-if="userType === 'ENSEIGNANT'">
-            <div ng-include="[[icons.progression.path]]" class="icon"></div>
+            <!-- icon -->
+            <i class="text-xl margin-sm icon progession"></i>
+            <!-- text -->
             <span>
                 <i18n>progressions</i18n>
             </span>
@@ -62,6 +74,7 @@
     </div>
 </div>
 
+<!-- Structures list on hover -->
 <div class="sub-nav">
     <div class="sub-items" ng-class="{hovered: menu.hovered === 'STRUCTURES'}"
          data-ng-mouseover="hoverIn('STRUCTURES')"

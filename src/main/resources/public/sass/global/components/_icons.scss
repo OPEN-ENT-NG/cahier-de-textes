@@ -81,6 +81,27 @@ i {
     content: "\F6D0";
   }
 
+  &.dashboard:before {
+    font-family: 'material-icons';
+    content: "\F56E";
+  }
+
+  &.nav-diary-calendar:before {
+    font-family: 'material-icons';
+    content: "\F4EB";
+  }
+
+  &.notebook:before {
+    font-family: 'material-icons';
+    content: "\F82D";
+  }
+
+  &.progression:before {
+    font-family: 'material-icons';
+    content: "\F8B4";
+  }
+
+
   &.file-pdf:before {
     content: "\e857";
   }

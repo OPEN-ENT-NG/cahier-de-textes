@@ -15,25 +15,6 @@ export let navigationController = ng.controller('navigationController',
         $scope.userType = model.me.type;
 
         async function init() {
-            $scope.icons = {
-                diary: {
-                    path: "'/diary/public/img/cahierdetexte.svg'" ,
-                    alt: "",
-                },
-                progression: {
-                    path: "'/diary/public/img/progressions.svg'",
-                    alt: "",
-                },
-                dashboard: {
-                    path: "'/diary/public/img/view-dashboard.svg'",
-                    alt: "",
-                },
-                calendar: {
-                    path: "'/diary/public/img/calendaire.svg'",
-                    alt: "",
-                }
-            };
-
             $scope.structures = initStructures();
             let preferenceStructure: any = await Me.preference(PreferencesUtils.PREFERENCE_KEYS.CDT_STRUCTURE);
             let preferenceStructureId: string = preferenceStructure ? preferenceStructure['id'] : null;
