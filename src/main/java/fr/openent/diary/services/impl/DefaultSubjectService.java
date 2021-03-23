@@ -36,7 +36,7 @@ public class DefaultSubjectService implements SubjectService {
                 LOGGER.error(err);
                 handler.handle(Future.failedFuture(err));
             } else {
-                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(body.getJsonArray("results"))));
+                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(body.getJsonArray("results", new JsonArray()))));
             }
         });
     }
