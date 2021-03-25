@@ -48,12 +48,12 @@
                     <i18n>children</i18n>
 
                     <i ng-show="isMobile()"
-                       ng-class="$parent.$parent.display.listViewArea.children ? 'up-open' : 'down-open'"
+                       ng-class="display.listViewArea.children ? 'up-open' : 'down-open'"
                        class="right-magnet">
                     </i>
                 </h5>
             </div>
-            <div ng-if="$parent.$parent.display.listViewArea.children" class="padding-md">
+            <div ng-if="display.listViewArea.children" class="padding-md">
                 <select data-ng-model="params.child"
                         class="twelve"
                         data-ng-change="params.group = null;params.user = null;syncPedagogicItems()"
@@ -71,12 +71,12 @@
                 <i18n>filters</i18n>
 
                 <i ng-show="isMobile()"
-                   ng-class="$parent.$parent.display.listViewArea.filter ? 'up-open' : 'down-open'"
+                   ng-class="display.listViewArea.filter ? 'up-open' : 'down-open'"
                    class="right-magnet">
                 </i>
             </h5>
         </div>
-        <section ng-if="($parent.isAChildOrAParent || $parent.isTeacher) && $parent.$parent.display.listViewArea.filter"
+        <section ng-if="($parent.isAChildOrAParent || $parent.isTeacher) && display.listViewArea.filter"
                  class="cell twelve padding-left-md margin-bottom-lg padding-bottom-sm padding-top-sm display-background">
             <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="display.listView">
                 <!-- homework -->

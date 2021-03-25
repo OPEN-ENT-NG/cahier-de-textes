@@ -10,6 +10,7 @@ import {PEDAGOGIC_SLOT_PROFILE} from '../../core/enum/pedagogic-slot-profile';
 import {CALENDAR_TOOLTIP_EVENTER} from '../../core/const/calendar-tooltip-eventer';
 import {FORMAT} from '../../core/const/dateFormat';
 import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
+import {MobileUtils} from "../../utils/mobile";
 
 declare let window: any;
 
@@ -21,7 +22,12 @@ export let calendarController = ng.controller('CalendarController',
                 sessions: true,
                 listView: false,
                 progression: false,
-                sessionList: false
+                sessionList: false,
+                listViewArea: {
+                    filter: !MobileUtils.isMobile(),
+                    structure: !MobileUtils.isMobile(),
+                    children: !MobileUtils.isMobile()
+                }
             };
             const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
             $scope.calendar = ($scope.calendar) ? $scope.calendar : model.calendar;

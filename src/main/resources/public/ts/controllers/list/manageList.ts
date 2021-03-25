@@ -6,6 +6,7 @@ import {
 import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
+import {MobileUtils} from "../../utils/mobile";
 
 declare let window: any;
 
@@ -19,7 +20,31 @@ export let manageListCtrl = ng.controller('manageListController',
             listView: true,
             homeworks: (window.item && ('display' in window.item)) ? window.item.display.homeworks : true,
             todo: true,
-            done: true
+            done: true,
+            listViewArea: {
+                filter: !MobileUtils.isMobile(),
+                structure: !MobileUtils.isMobile(),
+                children: !MobileUtils.isMobile()
+            }
+        };
+
+        $scope.collapseMobile = (areaType: string): void => {
+            if ($scope.isMobile()) {
+                switch (areaType) {
+                    case 'filter': {
+                        $scope.display.listViewArea.filter = !$scope.display.listViewArea.filter;
+                        break;
+                    }
+                    case 'structure': {
+                        $scope.display.listViewArea.structure = !$scope.display.listViewArea.structure;
+                        break;
+                    }
+                    case 'children': {
+                        $scope.display.listViewArea.children = !$scope.display.listViewArea.children;
+                        break;
+                    }
+                }
+            }
         };
 
         $scope.autocomplete = AutocompleteUtils;

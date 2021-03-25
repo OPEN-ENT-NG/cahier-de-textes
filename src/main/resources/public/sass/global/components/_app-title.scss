@@ -1,6 +1,6 @@
 app-title, .title-area-complete {
   @include mobile {
-    display: block;
+    display: flex;
   }
   i18n {
     @include mobile {
