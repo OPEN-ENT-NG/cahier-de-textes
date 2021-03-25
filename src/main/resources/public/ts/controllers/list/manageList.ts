@@ -16,7 +16,7 @@ export let manageListCtrl = ng.controller('manageListController',
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
         $scope.display = {
-            sessionList: (window.item && ('display' in window.item)) ? window.item.display.sessionList : false,
+            sessionList: !DateUtils.isAChildOrAParent(model.me.type),
             listView: true,
             homeworks: (window.item && ('display' in window.item)) ? window.item.display.homeworks : true,
             todo: true,
