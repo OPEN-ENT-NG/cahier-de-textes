@@ -129,7 +129,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     let filteredCourses: Course[] = $scope.courses.all.filter((c: Course) =>
                         c.audiences.all.find((a: Audience) => (a.id === $scope.homework.audience.id) &&
                             (c.subject !== undefined || c.exceptionnal !== undefined))
-                            ? (c.subject.id === $scope.homework.subject.id) || (c.exceptionnal === $scope.homework.exceptional_label)
+                            ? (c.subject.id === $scope.homework.subject.id) || (c.exceptionnal && c.exceptionnal === $scope.homework.exceptional_label)
                             : false);
 
                     // We only keep the courses without a session attached to.
