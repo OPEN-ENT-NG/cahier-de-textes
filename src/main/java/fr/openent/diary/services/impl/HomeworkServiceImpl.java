@@ -350,7 +350,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 " LEFT JOIN (" +
                 " SELECT progress.*, homework_state.label as state_label" +
                 " FROM " + Diary.DIARY_SCHEMA + ".homework_progress progress" +
-                " INNER JOIN" + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id" +
+                " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_state ON progress.state_id = homework_state.id" +
                 " WHERE  progress.user_id = '" + studentId + "'"
                 + " )" +
                 " AS progress_and_state ON (h.id = progress_and_state.homework_id)" +
