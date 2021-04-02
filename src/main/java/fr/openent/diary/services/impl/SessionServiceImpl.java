@@ -557,8 +557,13 @@ public class SessionServiceImpl extends DBService implements SessionService {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                 "to_date(?,'YYYY-MM-DD'), to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
 
-        values.add(session.getString("subject_id"));
-        values.add(session.getInteger("type_id"));
+        values.add(session.getString("subject_id", ""));
+
+        if (session.getInteger("type_id") != null) {
+            values.add(session.getInteger("type_id"));
+        } else {
+            values.addNull();
+        }
 
         if (session.getString("exceptional_label") != null) {
             values.add(session.getString("exceptional_label"));
@@ -568,12 +573,12 @@ public class SessionServiceImpl extends DBService implements SessionService {
 
         values.add(session.getString("structure_id"));
         values.add(user.getUserId());
-        values.add(session.getString("audience_id"));
-        values.add(session.getString("title"));
-        values.add(session.getString("room"));
-        values.add(session.getString("color"));
-        values.add(session.getString("description"));
-        values.add(session.getString("annotation"));
+        values.add(session.getString("audience_id", ""));
+        values.add(session.getString("title", ""));
+        values.add(session.getString("room", ""));
+        values.add(session.getString("color", ""));
+        values.add(session.getString("description", ""));
+        values.add(session.getString("annotation", ""));
         if (session.getBoolean("is_published") != null) {
             values.add(session.getBoolean("is_published"));
         } else {
@@ -593,9 +598,9 @@ public class SessionServiceImpl extends DBService implements SessionService {
         }
 
         values.add(user.getUserId());
-        values.add(session.getString("date"));
-        values.add(session.getString("start_time"));
-        values.add(session.getString("end_time"));
+        values.add(session.getString("date", ""));
+        values.add(session.getString("start_time", ""));
+        values.add(session.getString("end_time", ""));
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
 

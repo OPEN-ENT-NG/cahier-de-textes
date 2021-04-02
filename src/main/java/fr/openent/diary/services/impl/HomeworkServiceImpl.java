@@ -185,7 +185,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
-                        if (!homework.getString("subject_id").equals("exceptional")) {
+                        if (!homework.getString("subject_id", "").equals("exceptional")) {
                             homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
                         } else {
                             JsonObject exceptionalSubject = new JsonObject()
