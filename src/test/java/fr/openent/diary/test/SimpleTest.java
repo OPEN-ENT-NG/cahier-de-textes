@@ -15,36 +15,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public class SimpleTest {
-    Vertx vertx;
-    HttpServer server;
-
-    @Before
-    public void setUp(TestContext context) {
-        vertx = Vertx.vertx();
-        // Register the context exception handler
-        vertx.exceptionHandler(context.exceptionHandler());
-
-        server = vertx.createHttpServer().requestHandler(req -> req.response().end("test")).
-                        listen(8090, context.asyncAssertSuccess());
-    }
-
-    @After
-    public void after(TestContext context) {
-        vertx.close(context.asyncAssertSuccess());
-    }
-
-    @Test
-    public void testReadI18nFile(TestContext ctx) {
-        Async async = ctx.async();
-        vertx.fileSystem().readFile("./i18n/fr.json", ar -> {
-            if (ar.failed()) {
-                ctx.fail(ar.cause());
-            } else {
-                System.out.println("File size:" + ar.result().length());
-                async.complete();
-            }
-        });
-    }
 
     @Test
     public void testAsyncSucceed(TestContext ctx) {

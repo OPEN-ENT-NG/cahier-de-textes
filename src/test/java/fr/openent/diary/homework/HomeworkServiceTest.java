@@ -31,23 +31,8 @@ public class HomeworkServiceTest {
 
     @Before
     public void setUp(TestContext context) {
-        /* Server mocked settings */
-        vertx = Vertx.vertx();
-        vertx.exceptionHandler(context.exceptionHandler());
-        eb = vertx.eventBus();
-
-
-        HttpServer server = vertx.createHttpServer().requestHandler(req -> req.response().end("test")).
-                listen(8090, context.asyncAssertSuccess());
-
         /* Service(s) to test */
         this.homeworkService = new HomeworkServiceImpl("diary", eb, null);
-
-    }
-
-    @After
-    public void after(TestContext context) {
-        vertx.close(context.asyncAssertSuccess());
     }
 
     @Test(expected = NullPointerException.class)
