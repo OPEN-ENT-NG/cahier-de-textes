@@ -13,7 +13,7 @@ import {Moment} from 'moment';
 const colors = ['#7E7E7E', '#00ab6f', '#ff9700'];
 
 export class Session {
-    id: string;
+    id: number | string;
     subject: Subject;
     subject_id?: string;
     exceptional_label?: string;

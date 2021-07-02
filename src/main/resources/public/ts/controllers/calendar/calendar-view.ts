@@ -525,7 +525,7 @@ export let calendarController = ng.controller('CalendarController',
             /**
              * Handle a session drop on another session
              */
-            $scope.sessionToSession = async (idSessionDrag: string, idSessionDrop: string): Promise<void> => {
+            $scope.sessionToSession = async (idSessionDrag: number, idSessionDrop: number): Promise<void> => {
                 let sessionDrag: Session;
                 $scope.calendarItems.map(async (session: Session) => {
                     if (session.id === idSessionDrag) {
@@ -542,7 +542,8 @@ export let calendarController = ng.controller('CalendarController',
                     sessionDrag.subject_id = $rootScope.session.subject_id;
                 }
                 $rootScope.session.getSessionInfo(sessionDrag);
-                $rootScope.session.homeworks.forEach(homework => {
+                $rootScope.session.homeworks.forEach((homework: Homework) => {
+                    homework.session_id = idSessionDrop;
                     homework.sessions.push($rootScope.session);
                 });
                 $scope.goTo('/session/update/' + $rootScope.session.id);
