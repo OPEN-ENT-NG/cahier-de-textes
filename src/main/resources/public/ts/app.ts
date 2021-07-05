@@ -1,4 +1,4 @@
-﻿import {ng, routes} from 'entcore';
+﻿import {Behaviours, model, ng, routes} from 'entcore';
 import * as directives from './directives';
 import * as controllers from './controllers';
 import * as filters from './filters';
@@ -17,7 +17,7 @@ for (let controller in controllers) {
 }
 
 for (let module in modules) {
-     ng.addRequiredModule(module);
+    ng.addRequiredModule(module);
 }
 
 for (let service in services) {
@@ -32,19 +32,25 @@ routes.define(($routeProvider) => {
         })
         .when('/view', {
             action: 'mainView'
-        })
-        .when('/session/create/:courseId/:date/', {
-            action: 'manageSession'
-        })
-        .when('/session/create', {
-            action: 'manageSession'
-        })
-        .when('/session/update/:id', {
-            action: 'manageSession'
-        })
-        .when('/session/view/:id', {
-            action: 'manageSession'
-        })
+        });
+
+    if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.manageSession)) {
+        $routeProvider
+            .when('/session/create/:courseId/:date/', {
+                action: 'manageSession'
+            })
+            .when('/session/create', {
+                action: 'manageSession',
+            })
+            .when('/session/update/:id', {
+                action: 'manageSession'
+            })
+            .when('/session/view/:id', {
+                action: 'manageSession'
+            });
+    }
+
+    $routeProvider
         .when('/homework/create', {
             action: 'manageHomework'
         })
@@ -58,19 +64,19 @@ routes.define(($routeProvider) => {
             action: 'globalAdminCtrl'
         })
         .when('/list', {
-            action : 'manageList'
+            action: 'manageList'
         })
         .when('/progression/create', {
-            action  : 'manageProgression'
+            action: 'manageProgression'
         })
         .when('/progression/:progressionId', {
-            action  : 'manageProgression'
+            action: 'manageProgression'
         })
         .when('/progression/to/session/:idProgression/:idSession', {
-            action  : 'manageProgression'
+            action: 'manageProgression'
         })
         .when('/progressions/view', {
-            action  : 'viewProgression'
+            action: 'viewProgression'
         })
         .when('/archives/notebooks/view', {
             action: 'viewNotebookArchives'
