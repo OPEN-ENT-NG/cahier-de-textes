@@ -103,7 +103,7 @@ public class SessionServiceImpl extends DBService implements SessionService {
                 " FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id" +
                 " WHERE from_session_id = " + fromSessionId +
-                " AND session_id != " + fromSessionId +
+                " AND (session_id != " + fromSessionId + " OR  session_id IS NULL)" +
                 " AND homework.archive_school_year IS NULL";
         sql.raw(query, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
             if (fromSessionHomeworksAsync.isRight()) {
