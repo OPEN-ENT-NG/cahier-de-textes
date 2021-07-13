@@ -1,5 +1,4 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
-import * as jsPDF from 'jspdf';
 import * as html2canvas from 'html2canvas';
 import {DateUtils, Homeworks, IVisa, Sessions, Visa, Visas} from "../../model";
 import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
@@ -16,7 +15,6 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$timeout', '$routeParams', '$location', 'SearchService', 'NotebookService', 'VisaService', 'ViescolaireService',
         function ($scope, $timeout, $routeParams, $location, searchService: SearchService,
                   notebookService: INotebookService, visaService: IVisaService, viescolaireService: IViescolaireService) {
-        (window as any).jsPDF = jsPDF;
         (window as any).html2canvas = html2canvas;
 
         /* Init search bar */

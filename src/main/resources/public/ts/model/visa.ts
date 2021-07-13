@@ -1,4 +1,4 @@
-import http from 'axios';
+import http, {AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Structure, Teacher, DateUtils, Homework, ToastUtils, User} from './index';
 import {idiom as lang, model, moment} from 'entcore';
 import {INotebook} from './Notebook';
@@ -179,30 +179,25 @@ export class Visas {
         if (visasList && visasList.length) {
             let promiseArray = [];
             for (let i = 0, imax = visasList.length; i < imax; i++) {
-                let config = {
-                    url: `/diary/visas/topdf`,
-                    method: 'post',
-                    data: {visas: visasList[i]},
+                let config: AxiosRequestConfig = {
                     responseType: 'arraybuffer',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/pdf'
                     }
                 };
-                promiseArray.push((http(config)));
+                promiseArray.push((http.post(`/diary/visas/topdf`, {visas: visasList[i]}, config)));
             }
-            Promise.all(promiseArray).then(reponses => {
-                for (let j = 0, jmax = reponses.length; j < jmax; j++) {
-                    (function (response) {
-                        let filename = DateUtils.getFileNameByContentDisposition(response.headers['content-disposition']);
-                        const url = window.URL.createObjectURL(new Blob([response['data']]));
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.setAttribute('download', filename); //or any other extension
-                        document.body.appendChild(link);
-                        link.click();
-                    })
-                    (reponses[j]);
+            Promise.all(promiseArray).then((reponses: AxiosResponse[]) => {
+                for (let response of reponses) {
+                    console.log(response)
+                    let filename = DateUtils.getFileNameByContentDisposition(response.headers['content-disposition']);
+                    const url = window.URL.createObjectURL(new Blob([response['data']]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', filename); //or any other extension
+                    document.body.appendChild(link);
+                    link.click();
                 }
                 callback();
             });
