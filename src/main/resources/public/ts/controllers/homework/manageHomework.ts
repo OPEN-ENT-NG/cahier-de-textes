@@ -5,7 +5,7 @@ import {DateUtils} from '../../utils/dateUtils';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
 import {SearchService} from "../../services";
-import { Moment } from "moment/moment";
+import {Moment} from "moment/moment";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', 'SearchService',
@@ -65,7 +65,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if ($scope.homework.attachedToDate) {
                         date = $scope.homework.dueDate;
                     } else if ($scope.homework.session) {
-                        date = $scope.homework.session.date;
+                        date = $scope.homework.session.startDate;
                     } else {
                         $scope.homework.workloadDay = new WorkloadDay($scope.homework.structure, $scope.homework.audience, $scope.homework.dueDate, $scope.homework.isPublished);
                         $scope.safeApply();
@@ -143,7 +143,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                     });
 
-                    if($scope.isSessionFuture()) {
+                    if ($scope.isSessionFuture()) {
                         let initialSessionId: String = null;
                         if ($scope.homework.session)
                             initialSessionId = $scope.homework.session._id ? $scope.homework.session._id
@@ -370,6 +370,8 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
              * Initialize form data.
              */
             const initData = async (): Promise<void> => {
+                if (!($scope.session instanceof Session))
+                    $scope.session = new Session($scope.structure, $scope.session);
                 $scope.homework.isInit = true;
                 await Promise.all([
                     $scope.sessionTypes.sync(),
