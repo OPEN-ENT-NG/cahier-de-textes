@@ -311,30 +311,27 @@ public class DefaultNotebookService extends DBService implements NotebookService
 
     @Override
     public Future<Void> archiveNotebooks(String structureId, String structureName, String date, String archivePeriod, List<Notebook> notebooks) {
-        Future<Void> future = Future.future();
+        Promise<Void> promise = Promise.promise();
         if (notebooks == null || notebooks.isEmpty()) {
-            future.complete();
-            return future;
+            promise.complete();
+            return promise.future();
         }
 
-        List<Future<JsonObject>> archiveTreatmentsFuture = new ArrayList<>();
+        Promise<JsonObject> init = Promise.promise();
+        Future<JsonObject> current = init.future();
         for (Notebook notebook : notebooks) {
-            Future<JsonObject> archiveTreatmentFuture = Future.future();
-            archiveTreatmentsFuture.add(archiveTreatmentFuture);
-            archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveTreatmentFuture);
+            current = current.compose(v -> archiveNotebook(structureId, structureName, date, archivePeriod, notebook));
         }
+        current
+                .onSuccess(ar -> promise.complete())
+                .onFailure(ar -> {
+                    String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive notebooks";
+                    log.error(message, ar.getMessage());
+                    promise.fail(ar.getCause().getMessage());
+                });
+        init.complete();
 
-        FutureHelper.any(archiveTreatmentsFuture).setHandler(result -> {
-            if (result.failed()) {
-                String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive notebooks";
-                log.error(message, result.cause().getMessage());
-                future.fail(message);
-                return;
-            }
-            future.complete();
-        });
-
-        return future;
+        return promise.future();
     }
 
     private void archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook, Future<JsonObject> future) {
@@ -370,6 +367,20 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         future.fail(message);
                     });
                 });
+    }
+
+    private Future<JsonObject> archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook) {
+        Future<JsonObject> archiveNotebookFuture = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
+        archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveNotebookFuture);
+        archiveNotebookFuture.setHandler(ar -> {
+            if (ar.failed()) {
+                promise.fail(ar.cause().getMessage());
+            } else {
+                promise.complete(ar.result());
+            }
+        });
+        return promise.future();
     }
 
     private Future<List<Notebook>> getNotebookHomeworksSessions(String structureId, String date,
