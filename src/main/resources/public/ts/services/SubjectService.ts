@@ -4,7 +4,10 @@ import {Subject} from '../model';
 
 export interface SubjectService {
     getTeacherSubjects(structureId: string, teacherId: string): Promise<Subject[]>;
+
     getExceptionalLabels(structureId): Promise<string[]>;
+
+    getTimetableSubjects(structureId: string): Promise<Subject[]>;
 }
 
 export const subjectService: SubjectService = {
@@ -25,6 +28,15 @@ export const subjectService: SubjectService = {
         try {
             const {data}: AxiosResponse = await http.get(`/diary/subjects/exceptional/${structureId}`);
             return data.values;
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    getTimetableSubjects: async (structureId: string): Promise<Subject[]> => {
+        try {
+            const {data}: AxiosResponse = await http.get(`/diary/timetableSubjects/${structureId}`)
+            return data.map((subject) => new Subject(subject.id, subject.name))
         } catch (e) {
             throw e;
         }

@@ -1,17 +1,19 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Audience
+    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Audience, Subject
 } from '../../model';
 import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
+import {SubjectService} from "../../services";
 
 declare let window: any;
 
 export let manageListCtrl = ng.controller('manageListController',
-    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', function ($scope, $window, $rootScope) {
+    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', 'SubjectService', function ($scope, $window, $rootScope, $location, $timeout, $compile,
+                                                                                                     SubjectService: SubjectService) {
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
@@ -66,9 +68,15 @@ export let manageListCtrl = ng.controller('manageListController',
 
         const init = async (): Promise<void> => {
             await Promise.all([
+                SubjectService.getTimetableSubjects($scope.structure.id),
                 $scope.subjects.sync($scope.structure.id),
                 $scope.syncPedagogicItems()
-            ]);
+            ]).then(res => {
+                res[0].forEach((subject: Subject) => {
+                    if (!$scope.subjects.all.find((s: Subject) => s.id == subject.id || s.label == subject.name))
+                        $scope.subjects.all.push(subject);
+                });
+            });
         };
 
         $scope.syncPedagogicItems = async (subject): Promise<void> => {
@@ -165,7 +173,7 @@ export let manageListCtrl = ng.controller('manageListController',
             }, {});
 
             $scope.getNbHomework = (pedagogicDay): number => {
-                let nbHomework : number = 0;
+                let nbHomework: number = 0;
                 pedagogicDay.pedagogicItems.map(p => {
                     if (p.pedagogicType === $scope.TYPE_HOMEWORK) {
                         if ($scope.display.todo && !p.isDone) {
@@ -285,8 +293,7 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.setHomeworkProgress = (homework: Homework): void => {
             if (homework.isDone) {
                 $scope.notifications.push(new Toast('homework.done.notification', 'info'));
-            }
-            else {
+            } else {
                 $scope.notifications.push(new Toast('homework.todo.notification', 'info'));
             }
 
@@ -304,9 +311,9 @@ export let manageListCtrl = ng.controller('manageListController',
                 display: $scope.display
             };
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
-                $scope.goTo('/homework/update/' + homeworkId  );
+                $scope.goTo('/homework/update/' + homeworkId);
             } else {
-                $scope.goTo('/homework/view/' + homeworkId );
+                $scope.goTo('/homework/view/' + homeworkId);
             }
         };
 
@@ -323,10 +330,10 @@ export let manageListCtrl = ng.controller('manageListController',
             let isInFilter: boolean = false;
             if ($scope.display.homeworks) {
                 if ($scope.display.todo) {
-                    isInFilter =  isInFilter || !homework.isDone;
+                    isInFilter = isInFilter || !homework.isDone;
                 }
                 if ($scope.display.done) {
-                    isInFilter = isInFilter ||  homework.isDone ;
+                    isInFilter = isInFilter || homework.isDone;
                 }
             } else {
                 isInFilter = true;
@@ -335,13 +342,13 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.isClickableByStudentOrParent = (pedagogicItem) => {
-            if (DateUtils.isAChildOrAParent(model.me.type)){
-                if(pedagogicItem.isPublished){
+            if (DateUtils.isAChildOrAParent(model.me.type)) {
+                if (pedagogicItem.isPublished) {
                     return pedagogicItem.pedagogicType === 2;
-                }else{
+                } else {
                     return false;
                 }
-            }else{
+            } else {
                 return pedagogicItem.pedagogicType === 2;
             }
         };
@@ -375,7 +382,7 @@ export let manageListCtrl = ng.controller('manageListController',
             let containsOnlyCourseBool: boolean = true;
             pedagogicDay.pedagogicItems.map(p => {
                 if (p.pedagogicType === PEDAGOGIC_TYPES.TYPE_SESSION || p.pedagogicType === PEDAGOGIC_TYPES.TYPE_HOMEWORK) {
-                    containsOnlyCourseBool = false ;
+                    containsOnlyCourseBool = false;
                 }
             });
             return containsOnlyCourseBool;
@@ -389,15 +396,14 @@ export let manageListCtrl = ng.controller('manageListController',
                         if (display.sessionList && pd.pedagogicType === $scope.TYPE_SESSION) {
                             hasOneDayToDisplay = true;
                         }
-                        if(display.homeworks && pd.pedagogicType === $scope.TYPE_HOMEWORK) {
-                            if(DateUtils.isAChildOrAParent(model.me.type) ){
+                        if (display.homeworks && pd.pedagogicType === $scope.TYPE_HOMEWORK) {
+                            if (DateUtils.isAChildOrAParent(model.me.type)) {
                                 if (display.todo || display.done) {
                                     if (display.todo && !pd.isDone)
                                         hasOneDayToDisplay = true;
                                     if (display.done && pd.isDone)
                                         hasOneDayToDisplay = true;
-                                }
-                                else
+                                } else
                                     hasOneDayToDisplay = false;
                             } else {
                                 hasOneDayToDisplay = true;
@@ -410,16 +416,16 @@ export let manageListCtrl = ng.controller('manageListController',
 
         $scope.hasHomeworksToDisplay = (display, pedagogicDay) => {
             let hasHomeworkToDisplay = false;
-            if(display.sessionList)
+            if (display.sessionList)
                 hasHomeworkToDisplay = hasHomeworkToDisplay || true;
-            else{
-                pedagogicDay.pedagogicItems.map(p =>{
-                    if(p instanceof Homework && (p.isDone != display.todo || p.isDone == display.done )){
-                        if(display.todo && !p.isDone){
+            else {
+                pedagogicDay.pedagogicItems.map(p => {
+                    if (p instanceof Homework && (p.isDone != display.todo || p.isDone == display.done)) {
+                        if (display.todo && !p.isDone) {
                             hasHomeworkToDisplay = hasHomeworkToDisplay || true;
 
                         }
-                        if(display.done && p.isDone){
+                        if (display.done && p.isDone) {
                             hasHomeworkToDisplay = hasHomeworkToDisplay || true;
 
                         }
@@ -463,16 +469,15 @@ export let manageListCtrl = ng.controller('manageListController',
 
         init();
 
-        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE,  () => {
+        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
             init();
         });
 
-        $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE,  (event: IAngularEvent, data) => {
+        $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE, (event: IAngularEvent, data) => {
             $scope.filters.subject = data;
             if (data != null) {
                 $scope.syncPedagogicItems($scope.filters.subject);
-            }
-            else $scope.syncPedagogicItems();
+            } else $scope.syncPedagogicItems();
         });
     }]
 );
