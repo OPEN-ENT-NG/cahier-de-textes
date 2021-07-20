@@ -1,6 +1,6 @@
-import {ng} from 'entcore';
+import {model, ng} from 'entcore';
 import {INotebookArchiveService} from '../services';
-import {DateUtils, NotebookArchive, NotebookArchiveParams, NotebookArchiveResponse} from '../model';
+import {DateUtils, NotebookArchive, NotebookArchiveParams, NotebookArchiveResponse, USER_TYPES} from '../model';
 import {GroupsSearch} from '../utils/autocomplete/groupsSearch';
 import {NotebookArchiveSearch} from "../utils/autocomplete/notebookArchiveSearch";
 
@@ -260,7 +260,8 @@ export const notebookArchivesController = ng.controller('NotebookArchivesControl
                 vm.notebookArchiveSearch = new NotebookArchiveSearch(window.structure.id, notebookArchiveService);
                 await vm.getNotebookArchiveYears();
                 vm.filter.schoolYear = vm.notebookArchiveYears.length > 0 ? vm.notebookArchiveYears[0] : null;
-                await vm.getNotebookArchives();
+                if (model.me.type === USER_TYPES.teacher) vm.selectTeacher('', `${model.me.firstName} ${model.me.lastName}`);
+                else await vm.getNotebookArchives();
             };
 
             $scope.$watch(() => window.structure, async () => {
