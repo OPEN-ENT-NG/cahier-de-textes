@@ -67,6 +67,7 @@ export let manageListCtrl = ng.controller('manageListController',
         const init = async (): Promise<void> => {
             await Promise.all([
                 $scope.subjects.sync($scope.structure.id),
+                $scope.subjects.initTimetableSubject($scope.structure.id),
                 $scope.syncPedagogicItems()
             ]);
         };

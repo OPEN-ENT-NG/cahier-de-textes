@@ -92,6 +92,14 @@ export class Subjects {
         });
     }
 
+    private async initTimetableSubject(structureId: string): Promise<void> {
+        let url = `/diary/timetableSubjects/${structureId}`;
+        (await http.get(url)).data.forEach((subject) => {
+            let exist: Subject = this.all.find((s: Subject) => s.id == subject.id || s.label == subject.name)
+            if(!exist) this.all.push(new Subject(subject.id, subject.name));
+        });
+    }
+
 
     /**
      * Mainly used when you want to set teacherId on each subject if the current teacher logged possesses them

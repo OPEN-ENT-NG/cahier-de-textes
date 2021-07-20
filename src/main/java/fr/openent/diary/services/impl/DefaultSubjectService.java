@@ -28,17 +28,7 @@ public class DefaultSubjectService implements SubjectService {
         JsonObject action = new JsonObject()
                 .put("action", "matiere.getSubjectsAndTimetableSubjects")
                 .put("idMatieres", subjectsId);
-
-        eb.send("viescolaire", action, event -> {
-            JsonObject body = (JsonObject) event.result().body();
-            if (event.failed() || "error".equals(body.getString("status"))) {
-                String err = "[Diary@DefaultSubjectService::getSubjects] Failed to retrieve subjects";
-                LOGGER.error(err);
-                handler.handle(Future.failedFuture(err));
-            } else {
-                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(body.getJsonArray("results", new JsonArray()))));
-            }
-        });
+        retrieveSubjectsEb(action, handler);
     }
 
     @Override
@@ -48,6 +38,32 @@ public class DefaultSubjectService implements SubjectService {
                 future.fail(event.cause());
             } else {
                 future.complete(event.result());
+            }
+        });
+    }
+
+    @Override
+    public void getSubjects(String subjectsId, Future<List<Subject>> future) {
+        getSubjects(subjectsId, future::handle);
+    }
+
+    public void getSubjects(String structureId, Handler<AsyncResult<List<Subject>>> handler) {
+        JsonObject action = new JsonObject()
+                .put("action", "matiere.getSubjectsAndTimetableSubjects")
+                .put("structureId", structureId);
+
+        retrieveSubjectsEb(action, handler);
+    }
+
+    private void retrieveSubjectsEb(JsonObject action, Handler<AsyncResult<List<Subject>>> handler) {
+        eb.send("viescolaire", action, event -> {
+            JsonObject body = (JsonObject) event.result().body();
+            if (event.failed() || "error".equals(body.getString("status"))) {
+                String err = "[Diary@DefaultSubjectService::getSubjects] Failed to retrieve subjects";
+                LOGGER.error(err);
+                handler.handle(Future.failedFuture(err));
+            } else {
+                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(body.getJsonArray("results", new JsonArray()))));
             }
         });
     }
