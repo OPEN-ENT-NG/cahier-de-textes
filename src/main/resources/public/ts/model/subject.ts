@@ -92,7 +92,6 @@ export class Subjects {
         });
     }
 
-
     /**
      * Mainly used when you want to set teacherId on each subject if the current teacher logged possesses them
      * (else let teacherId as null).

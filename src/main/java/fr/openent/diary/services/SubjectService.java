@@ -21,5 +21,9 @@ public interface SubjectService {
 
     void getSubjects(JsonArray subjectsId, Future<List<Subject>> handler);
 
+    void getSubjects(String subjectsId, Future<List<Subject>> future);
+
+    void getSubjects(String structureId, Handler<AsyncResult<List<Subject>>> handler);
+
     void getExceptionalLabels(String structureId, Handler<AsyncResult<JsonObject>> handler);
 }
