@@ -311,30 +311,29 @@ public class DefaultNotebookService extends DBService implements NotebookService
 
     @Override
     public Future<Void> archiveNotebooks(String structureId, String structureName, String date, String archivePeriod, List<Notebook> notebooks) {
-        Future<Void> future = Future.future();
+        log.info("[" + this.getClass().getSimpleName() + "] - archiveNotebooks for structure " + structureName);
+
+        Promise<Void> promise = Promise.promise();
         if (notebooks == null || notebooks.isEmpty()) {
-            future.complete();
-            return future;
+            promise.complete();
+            return promise.future();
         }
 
-        List<Future<JsonObject>> archiveTreatmentsFuture = new ArrayList<>();
+        Promise<JsonObject> init = Promise.promise();
+        Future<JsonObject> current = init.future();
         for (Notebook notebook : notebooks) {
-            Future<JsonObject> archiveTreatmentFuture = Future.future();
-            archiveTreatmentsFuture.add(archiveTreatmentFuture);
-            archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveTreatmentFuture);
+            current = current.compose(v -> archiveNotebook(structureId, structureName, date, archivePeriod, notebook));
         }
+        current
+                .onSuccess(ar -> promise.complete())
+                .onFailure(ar -> {
+                    String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive notebooks: " + ar.getMessage();
+                    log.error(message);
+                    promise.fail(ar.getMessage());
+                });
+        init.complete();
 
-        FutureHelper.any(archiveTreatmentsFuture).setHandler(result -> {
-            if (result.failed()) {
-                String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive notebooks";
-                log.error(message, result.cause().getMessage());
-                future.fail(message);
-                return;
-            }
-            future.complete();
-        });
-
-        return future;
+        return promise.future();
     }
 
     private void archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook, Future<JsonObject> future) {
@@ -352,10 +351,11 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         future.complete(new JsonObject().put("success", "ok"));
                         return;
                     }
-                    String message = "[Diary@DefaultNotebookService::archiveNotebook] Failed to archive notebook";
+                    String message = "[Diary@DefaultNotebookService::archiveNotebook] Failed to archive notebook: " +
+                            result.cause().getMessage();
                     log.error(message, result.cause().getMessage());
                     if (archive.getFileId() == null) {
-                        future.fail(message);
+                        future.fail(result.cause().getMessage());
                         return;
                     }
 
@@ -370,6 +370,20 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         future.fail(message);
                     });
                 });
+    }
+
+    private Future<JsonObject> archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook) {
+        Future<JsonObject> archiveNotebookFuture = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
+        archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveNotebookFuture);
+        archiveNotebookFuture.setHandler(ar -> {
+            if (ar.failed()) {
+                promise.fail(ar.cause().getMessage());
+            } else {
+                promise.complete(ar.result());
+            }
+        });
+        return promise.future();
     }
 
     private Future<List<Notebook>> getNotebookHomeworksSessions(String structureId, String date,
@@ -394,16 +408,18 @@ public class DefaultNotebookService extends DBService implements NotebookService
         NotebookPdf notebookPdf = new NotebookPdf(structureName, notebook, notebookSessions);
         exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml", buffer -> {
                     if (buffer.failed()) {
-                        String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF";
+                        String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
+                                buffer.cause().getMessage();
                         log.error(message, buffer.cause().getMessage());
-                        future.fail(message);
+                        future.fail(buffer.cause().getMessage());
                         return;
                     }
                     exportPDFService.storePDF(buffer.result(), getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
                         if (pdfResult.isLeft()) {
-                            String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf";
+                            String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
+                                    pdfResult.left().getValue();
                             log.error(message);
-                            future.fail(message);
+                            future.fail(pdfResult.left().getValue());
                             return;
                         }
                         JsonObject file = pdfResult.right().getValue();

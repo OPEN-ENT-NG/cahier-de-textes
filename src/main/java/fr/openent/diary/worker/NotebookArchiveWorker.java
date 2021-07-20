@@ -127,7 +127,9 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
                     return notebookService.archiveNotebooks(structureId, structureName, archiveDate, archivePeriod,
                             NotebookHelper.toNotebookList(toArchiveNotebooks));
                 })
-                .setHandler(resultArchive -> log.info(ANSI_CYAN + ARCHIVE_FLAG + " Archiving end and process complete" + ANSI_RESET));
+                .onSuccess(resultArchive -> log.info(ANSI_CYAN + ARCHIVE_FLAG + " Archiving end and process complete" + ANSI_RESET))
+                .onFailure(resultArchive -> log.error("[" + this.getClass().getSimpleName() + "] Archiving end and process failed: ",
+                        resultArchive.getMessage()));
     }
 
     private Calendar getCalendarArchiveDay(Integer basedYear) {

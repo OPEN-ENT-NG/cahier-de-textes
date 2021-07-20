@@ -106,9 +106,9 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         final String path = FileResolver.absolutePath(templatePath + templateName);
         vertx.fileSystem().readFile(path, result -> {
             if (result.failed()) {
-                String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to readFile";
+                String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to readFile: " + result.cause().getMessage();
                 log.error(message, result.cause().getMessage());
-                handler.handle(Future.failedFuture(message));
+                handler.handle(Future.failedFuture(result.cause().getMessage()));
                 return;
             }
             StringReader reader = new StringReader(result.result().toString(StandardCharsets.UTF_8));
@@ -142,8 +142,10 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                     }
                     JsonObject pdfResponse = (JsonObject) reply.result().body();
                     if (!"ok".equals(pdfResponse.getString("status"))) {
-                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate PDF from pdf bus";
-                        handler.handle(Future.failedFuture(message));
+                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate PDF from pdf bus: " +
+                                pdfResponse.getString("message", "");
+                        log.error(message);
+                        handler.handle(Future.failedFuture(pdfResponse.getString("message", "")));
                         return;
                     }
                     handler.handle(Future.succeededFuture(Buffer.buffer(pdfResponse.getBinary("content"))));
