@@ -327,7 +327,8 @@ public class DefaultNotebookService extends DBService implements NotebookService
         current
                 .onSuccess(ar -> promise.complete())
                 .onFailure(ar -> {
-                    String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive notebooks: " + ar.getMessage();
+                    String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to archive" +
+                            " notebooks for structure " + structureName + ": " + ar.getMessage();
                     log.error(message);
                     promise.fail(ar.getMessage());
                 });
@@ -351,8 +352,8 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         future.complete(new JsonObject().put("success", "ok"));
                         return;
                     }
-                    String message = "[Diary@DefaultNotebookService::archiveNotebook] Failed to archive notebook: " +
-                            result.cause().getMessage();
+                    String message = "[Diary@DefaultNotebookService::archiveNotebook] Failed to archive notebook " +
+                            "[subject::teacher::audience]-" + notebook.getNotebookId() + " : " + result.cause().getMessage();
                     log.error(message, result.cause().getMessage());
                     if (archive.getFileId() == null) {
                         future.fail(result.cause().getMessage());
@@ -405,6 +406,11 @@ public class DefaultNotebookService extends DBService implements NotebookService
     private Future<Void> generatePdf(String structureName, String archivePeriod, Notebook notebook,
                                      NotebookArchive archive, List<Notebook> notebookSessions) {
         Future<Void> future = Future.future();
+        // trick to remove extra xmlns, remove invalid xml character unicode and unclosed
+        // html tag (xhtml won't support single closed tag)
+        for (Notebook notebookSession : notebookSessions) {
+            cleanHTMLDescriptionContent(notebookSession);
+        }
         NotebookPdf notebookPdf = new NotebookPdf(structureName, notebook, notebookSessions);
         exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml", buffer -> {
                     if (buffer.failed()) {
@@ -428,6 +434,18 @@ public class DefaultNotebookService extends DBService implements NotebookService
                     });
                 });
         return future;
+    }
+
+    private void cleanHTMLDescriptionContent(Notebook notebookSession) {
+        notebookSession.setDescription(notebookSession.getDescription()
+                .replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "")
+                .replaceAll("\u200B", "")
+                .replaceAll("\u00A0","")
+                .replaceAll("\u000B","")
+                .replaceAll("&amp;", "&")
+                .replaceAll("&quot;", "\"")
+                .replaceAll("\\v","")
+        );
     }
 
     private String getArchiveFileName(String archivePeriod, NotebookPdf notebookPdf) {

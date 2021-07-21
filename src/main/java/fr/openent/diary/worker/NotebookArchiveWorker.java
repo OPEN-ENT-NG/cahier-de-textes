@@ -127,8 +127,10 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
                     return notebookService.archiveNotebooks(structureId, structureName, archiveDate, archivePeriod,
                             NotebookHelper.toNotebookList(toArchiveNotebooks));
                 })
-                .onSuccess(resultArchive -> log.info(ANSI_CYAN + ARCHIVE_FLAG + " Archiving end and process complete" + ANSI_RESET))
-                .onFailure(resultArchive -> log.error("[" + this.getClass().getSimpleName() + "] Archiving end and process failed: ",
+                .onSuccess(resultArchive -> log.info(ANSI_CYAN + ARCHIVE_FLAG + " Archiving end and process complete for structure " +
+                        structureName + ANSI_RESET))
+                .onFailure(resultArchive -> log.error("[" + this.getClass().getSimpleName() + "] Archiving end and process " +
+                                "failed for structure " + structureName + ": " + resultArchive.getMessage(),
                         resultArchive.getMessage()));
     }
 
