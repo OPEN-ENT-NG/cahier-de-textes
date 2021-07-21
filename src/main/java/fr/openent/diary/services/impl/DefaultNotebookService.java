@@ -412,27 +412,46 @@ public class DefaultNotebookService extends DBService implements NotebookService
             cleanHTMLDescriptionContent(notebookSession);
         }
         NotebookPdf notebookPdf = new NotebookPdf(structureName, notebook, notebookSessions);
-        exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml", buffer -> {
-                    if (buffer.failed()) {
-                        String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
-                                buffer.cause().getMessage();
-                        log.error(message, buffer.cause().getMessage());
-                        future.fail(buffer.cause().getMessage());
-                        return;
-                    }
-                    exportPDFService.storePDF(buffer.result(), getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
-                        if (pdfResult.isLeft()) {
-                            String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
-                                    pdfResult.left().getValue();
-                            log.error(message);
-                            future.fail(pdfResult.left().getValue());
-                            return;
-                        }
-                        JsonObject file = pdfResult.right().getValue();
-                        archive.setFileId(file.getString("_id"));
-                        future.complete();
-                    });
+        exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml")
+                .onSuccess(res -> exportPDFService.storePDF(res, getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
+                            if (pdfResult.isLeft()) {
+                                String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
+                                        pdfResult.left().getValue();
+                                log.error(message);
+                                future.fail(pdfResult.left().getValue());
+                                return;
+                            }
+                            JsonObject file = pdfResult.right().getValue();
+                            archive.setFileId(file.getString("_id"));
+                            future.complete();
+                        }))
+                .onFailure(err -> {
+                    String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
+                            err.getMessage();
+                    log.error(message, err.getMessage());
+                    future.fail(err.getMessage());
                 });
+//        exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml", buffer -> {
+//                    if (buffer.failed()) {
+//                        String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
+//                                buffer.cause().getMessage();
+//                        log.error(message, buffer.cause().getMessage());
+//                        future.fail(buffer.cause().getMessage());
+//                        return;
+//                    }
+//                    exportPDFService.storePDF(buffer.result(), getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
+//                        if (pdfResult.isLeft()) {
+//                            String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
+//                                    pdfResult.left().getValue();
+//                            log.error(message);
+//                            future.fail(pdfResult.left().getValue());
+//                            return;
+//                        }
+//                        JsonObject file = pdfResult.right().getValue();
+//                        archive.setFileId(file.getString("_id"));
+//                        future.complete();
+//                    });
+//                });
         return future;
     }
 

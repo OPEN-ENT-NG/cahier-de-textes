@@ -3,6 +3,7 @@ package fr.openent.diary;
 import fr.openent.diary.controllers.*;
 import fr.openent.diary.db.DB;
 import fr.openent.diary.eventbus.Viescolaire;
+import fr.openent.diary.helper.NodePdfHelper;
 import fr.openent.diary.repository.event.DiaryRepositoryEvents;
 import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.impl.*;
@@ -46,6 +47,8 @@ public class Diary extends BaseServer {
         EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Diary.class.getSimpleName());
 
         DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
+
+        NodePdfHelper.getInstance().init(vertx, config);
 
         addController(new DiaryController(diaryService, eventStore));
 

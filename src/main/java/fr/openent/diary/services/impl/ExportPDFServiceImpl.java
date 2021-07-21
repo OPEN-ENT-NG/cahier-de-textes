@@ -1,14 +1,12 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.helper.NodePdfHelper;
 import fr.openent.diary.helper.RendersHelper;
 import fr.openent.diary.services.ExportPDFService;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.data.FileResolver;
 import fr.wseduc.webutils.http.Renders;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
@@ -17,6 +15,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.pdf.PdfException;
+import org.entcore.common.pdf.PdfFactory;
+import org.entcore.common.pdf.PdfGenerator;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -44,7 +44,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
     private final Storage storage;
     private String authHeader;
     protected RendersHelper rendersHelper;
-
+    private final PdfFactory pdfFactory;
 
     public ExportPDFServiceImpl(EventBus eb, Vertx vertx, Storage storage, JsonObject config) {
         super();
@@ -54,6 +54,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
         this.renders = new Renders(this.vertx, this.config);
         this.rendersHelper = new RendersHelper(this.vertx, this.config);
         this.storage = storage;
+        pdfFactory = NodePdfHelper.getInstance().pdfFactory();
         try {
             this.authHeader = "Basic " + (config.getJsonObject("pdf-generator").getString("auth"));
             this.pdfGeneratorURL = config.getJsonObject("pdf-generator").getString("url");
@@ -152,7 +153,48 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                 });
             });
         });
+    }
 
+    public Future<Buffer> generatePDF(final JsonObject templateProps, final String templateName) {
+        Promise<Buffer> promise = Promise.promise();
+
+        final String templatePath = config.getJsonObject("exports").getString("template-path");
+
+        final String path = FileResolver.absolutePath(templatePath + templateName);
+        vertx.fileSystem().readFile(path, result -> {
+
+            if (result.failed()) {
+                String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to readFile: " + result.cause().getMessage();
+                log.error(message, result.cause().getMessage());
+                promise.fail(result.cause().getMessage());
+            } else {
+                StringReader reader = new StringReader(result.result().toString(StandardCharsets.UTF_8));
+                rendersHelper.processTemplate(templateProps, templateName, reader, writer -> {
+                    StringBuffer buffer = ((StringWriter) writer).getBuffer();
+                    if (buffer == null) {
+                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to process template";
+                        log.error(message);
+                        promise.fail(message);
+                    } else {
+                        PdfGenerator pdfGenerator = null;
+                        try {
+                            pdfGenerator = pdfFactory.getPdfGenerator();
+                            pdfGenerator.generatePdfFromTemplate("pdf_name", buffer.toString(), ar -> {
+                                if (ar.failed()) promise.fail(ar.cause());
+                                else {
+                                    promise.complete(ar.result().getContent());
+                                }
+                            });
+                        } catch (Exception e) {
+                            log.error("[Diary@ExportPDFServiceImpl:generatePDF]: " + e.getMessage());
+                            promise.fail(e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
+
+        return promise.future();
     }
 
     @Override
@@ -213,8 +255,8 @@ public class ExportPDFServiceImpl implements ExportPDFService {
     }
 
     public String createToken(UserInfos user) throws Exception {
-
-        final String token = UserUtils.createJWTToken(vertx, user, null, null);
+        String clientId =  config.getJsonObject("pdf-generator", new JsonObject()).getString("pdf-connector-id", null);
+        final String token = UserUtils.createJWTToken(vertx, user, clientId, null);
         if (isEmpty(token)) {
             throw new PdfException("invalid.token");
         }
