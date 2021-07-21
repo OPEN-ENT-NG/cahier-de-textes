@@ -1,5 +1,5 @@
 <!-- School year select -->
-<div ng-if="vm.notebookArchiveYears.length > 0" class="display-inline-block margin-top-md">
+<div ng-if="vm.notebookArchiveYears.length > 0" class="display-inline-block margin-top-md margin-bottom-md">
     <div class="flex-row-cdt" style="align-items: center;">
         <div class="cell">
             <i18n>notebook.archive.school.year</i18n>&nbsp;:
@@ -14,7 +14,8 @@
 </div>
 
 <!-- Notebook archive table -->
-<div class="cell twelve archive-list">
+<div ng-class="{'margin-top-lg': vm.notebookArchives.length === 0 && vm.notebookArchiveYears.length === 0}"
+     class="cell twelve archive-list">
     <div class="flex-table">
         <!-- HEADER TYPE TABLE -->
         <div class="flex-row-cdt flex-head row__15">

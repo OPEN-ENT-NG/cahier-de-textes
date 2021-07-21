@@ -43,8 +43,12 @@
     <!-- Result teacher/classes from async autocomplete -->
     <div class="flex-row-cdt row__11 list-search">
         <div class="flex-col col__2 list-search"></div>
-        <div class="flex-col col__9 list-search">
-            <div class="flex-col col__6 list-search">
+        <div class="flex-col list-search"
+             ng-class="{
+             'col__9' : hasRight('searchNotebookArchiveTeachers'),
+             'col__6' : !hasRight('searchNotebookArchiveTeachers')
+             }">
+            <div class="flex-col col__6 list-search" ng-if="hasRight('searchNotebookArchiveTeachers')">
                 <!-- Teacher selected via filter -->
                 <div class="cell twelve">
                     <ul class="cell twelve search-input-ul">

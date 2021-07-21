@@ -79,7 +79,8 @@ export const notebookArchivesController = ng.controller('NotebookArchivesControl
             vm.getNotebookArchives = async (): Promise<void> => {
                 let notebookArchiveParams: NotebookArchiveParams = {
                     schoolYear: vm.filter.schoolYear,
-                    teacherName: vm.filter.users,
+                    teacherName: ($scope.isTeacher && vm.filter.users.length === 0)
+                        ? [`${model.me.firstName} ${model.me.lastName}`] : vm.filter.users,
                     audienceLabel: vm.filter.audiences,
                     page: vm.filter.page
                 };
@@ -260,12 +261,14 @@ export const notebookArchivesController = ng.controller('NotebookArchivesControl
                 vm.notebookArchiveSearch = new NotebookArchiveSearch(window.structure.id, notebookArchiveService);
                 await vm.getNotebookArchiveYears();
                 vm.filter.schoolYear = vm.notebookArchiveYears.length > 0 ? vm.notebookArchiveYears[0] : null;
-                if (model.me.type === USER_TYPES.teacher) vm.selectTeacher('', `${model.me.firstName} ${model.me.lastName}`);
-                else await vm.getNotebookArchives();
+                await vm.getNotebookArchives();
             };
 
             $scope.$watch(() => window.structure, async () => {
                 if ('structure' in window) {
+                    vm.filter.users = [];
+                    vm.filter.audiences = [];
+                    vm.filter.page = 0;
                     await initData();
                 }
             });
