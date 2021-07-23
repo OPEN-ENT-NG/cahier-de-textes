@@ -21,6 +21,13 @@
             "url" : "$pdfGeneratorUrl",
             "auth" : "$pdfGeneratorAuth"
         },
+
+        "node-pdf-generator" : {
+            "pdf-connector-id": "exportpdf",
+            "auth": "${nodePdfToken}",
+            "url" : "${nodePdfUri}"
+        },
+
         "entcore.port" : 8009
       }
     }

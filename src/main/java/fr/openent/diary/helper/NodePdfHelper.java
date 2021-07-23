@@ -16,11 +16,7 @@ public class NodePdfHelper {
     }
 
     public void init(Vertx vertx, JsonObject config) {
-        this.pdfFactory = new PdfFactory(vertx, new JsonObject().put("node-pdf-generator", new JsonObject()
-                .put("url", config.getJsonObject("pdf-generator").getString("url"))
-                .put("pdf-connector-id", config.getJsonObject("pdf-generator").getString("pdf-connector-id", "exportpdf"))
-                .put("auth", config.getJsonObject("pdf-generator").getString("auth"))
-        ));
+        this.pdfFactory = new PdfFactory(vertx, new JsonObject().put("node-pdf-generator", config.getJsonObject("node-pdf-generator")));
     }
 
     public PdfFactory pdfFactory() {
