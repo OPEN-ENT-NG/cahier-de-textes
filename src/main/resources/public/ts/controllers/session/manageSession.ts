@@ -23,6 +23,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         SubjectService: SubjectService,
                         sessionHomeworkService: ISessionHomeworkService,
                         searchService: SearchService) {
+            $scope.CONST_FROM_HOMEWORKS = "FROM_HOMEWORKS";
+            $scope.CONST_HOMEWORKS = "HOMEWORKS";
+
             $scope.isReadOnly = modeIsReadOnly();
             $scope.isInsideDiary = $attrs.insideDiary;
             $scope.session = $rootScope.session ? $rootScope.session : new Session($scope.structure);
@@ -254,9 +257,10 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
              * Delete homework from view and from back.
              * @param homework homework to delete
              * @param index index of the homework in the view table.
+             * @param array_concerned indicate if we've to delete homework from "homeworks" or "from_homeworks" array
              */
-            $scope.deleteHomework = async (homework: Homework, index: number): Promise<void> => {
-                if ($scope.session.id === homework.session_id) {
+            $scope.deleteHomework = async (homework: Homework, index: number, array_concerned?: string): Promise<void> => {
+                if (($scope.session.id === homework.session_id) || (array_concerned && array_concerned == $scope.CONST_HOMEWORKS)) {
                     $scope.localRemoveHomework(index);
                 }
                 else {
