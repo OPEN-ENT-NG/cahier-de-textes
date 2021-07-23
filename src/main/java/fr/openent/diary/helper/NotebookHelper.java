@@ -48,8 +48,8 @@ public class NotebookHelper {
     public static List<NotebookPdf.SessionPdf> notebooksToSessionPdfs(List<Notebook> notebooks) {
         return notebooks
                 .stream()
-                .filter(notebook -> notebook.getType().equals(Notebook.SESSION_TYPE)
-                        || (notebook.getType().equals(Notebook.HOMEWORK_TYPE) && notebook.getSessionId() == null))
+                .filter(notebook -> notebook.getType() != null && (notebook.getType().equals(Notebook.SESSION_TYPE)
+                        || (notebook.getType().equals(Notebook.HOMEWORK_TYPE) && notebook.getSessionId() == null)))
                 .map(notebook -> new NotebookPdf.SessionPdf(notebook,
                         notebook.getType().equals(Notebook.SESSION_TYPE)
                                 ? notebooks.stream().filter(homework -> (homework.getSessionId() != null

@@ -414,44 +414,23 @@ public class DefaultNotebookService extends DBService implements NotebookService
         NotebookPdf notebookPdf = new NotebookPdf(structureName, notebook, notebookSessions);
         exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml")
                 .onSuccess(res -> exportPDFService.storePDF(res, getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
-                            if (pdfResult.isLeft()) {
-                                String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
-                                        pdfResult.left().getValue();
-                                log.error(message);
-                                future.fail(pdfResult.left().getValue());
-                                return;
-                            }
-                            JsonObject file = pdfResult.right().getValue();
-                            archive.setFileId(file.getString("_id"));
-                            future.complete();
-                        }))
+                    if (pdfResult.isLeft()) {
+                        String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
+                                pdfResult.left().getValue();
+                        log.error(message);
+                        future.fail(pdfResult.left().getValue());
+                        return;
+                    }
+                    JsonObject file = pdfResult.right().getValue();
+                    archive.setFileId(file.getString("_id"));
+                    future.complete();
+                }))
                 .onFailure(err -> {
                     String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
                             err.getMessage();
                     log.error(message, err.getMessage());
                     future.fail(err.getMessage());
                 });
-//        exportPDFService.generatePDF(notebookPdf.toJSON(), "notebook-archive.xhtml", buffer -> {
-//                    if (buffer.failed()) {
-//                        String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
-//                                buffer.cause().getMessage();
-//                        log.error(message, buffer.cause().getMessage());
-//                        future.fail(buffer.cause().getMessage());
-//                        return;
-//                    }
-//                    exportPDFService.storePDF(buffer.result(), getArchiveFileName(archivePeriod, notebookPdf), pdfResult -> {
-//                        if (pdfResult.isLeft()) {
-//                            String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
-//                                    pdfResult.left().getValue();
-//                            log.error(message);
-//                            future.fail(pdfResult.left().getValue());
-//                            return;
-//                        }
-//                        JsonObject file = pdfResult.right().getValue();
-//                        archive.setFileId(file.getString("_id"));
-//                        future.complete();
-//                    });
-//                });
         return future;
     }
 
@@ -459,11 +438,11 @@ public class DefaultNotebookService extends DBService implements NotebookService
         notebookSession.setDescription(notebookSession.getDescription()
                 .replaceAll(" xmlns=\"http://www.w3.org/1999/xhtml\"", "")
                 .replaceAll("\u200B", "")
-                .replaceAll("\u00A0","")
-                .replaceAll("\u000B","")
+                .replaceAll("\u00A0", "")
+                .replaceAll("\u000B", "")
                 .replaceAll("&amp;", "&")
                 .replaceAll("&quot;", "\"")
-                .replaceAll("\\v","")
+                .replaceAll("\\v", "")
         );
     }
 
@@ -509,12 +488,12 @@ public class DefaultNotebookService extends DBService implements NotebookService
 
     private JsonArray updateNotebooksStatements(List<Notebook> notebookSessions, String archiveSchoolYear) {
         List<Long> sessionIds = notebookSessions.stream()
-                .filter(notebookSession -> notebookSession.getType().equals(Notebook.SESSION_TYPE))
+                .filter(notebookSession -> notebookSession.getType() != null && notebookSession.getType().equals(Notebook.SESSION_TYPE))
                 .map(Notebook::getId)
                 .collect(Collectors.toList());
 
         List<Long> homeworkIds = notebookSessions.stream()
-                .filter(notebookSession -> notebookSession.getType().equals(Notebook.HOMEWORK_TYPE))
+                .filter(notebookSession -> notebookSession.getType() != null && notebookSession.getType().equals(Notebook.HOMEWORK_TYPE))
                 .map(Notebook::getId)
                 .collect(Collectors.toList());
 
@@ -628,13 +607,16 @@ public class DefaultNotebookService extends DBService implements NotebookService
                 List<Notebook> notebookList = notebookHomeworksSessionsFuture.result();
                 List<DiaryTypeModel> diaryTypeModelList = diaryTypeFuture.result();
 
-                for (Notebook notebook : notebookList) {
-                    for (DiaryTypeModel diaryType : diaryTypeModelList) {
-                        if (notebook.getType().equals(diaryType.getType()) && notebook.getDiaryType().getId().equals(diaryType.getId())) {
-                            notebook.setDiaryType(diaryType);
-                        }
-                    }
-                }
+                notebookList.stream()
+                        .filter(notebook -> notebook.getType() != null && notebook.getDiaryType() != null &&
+                                notebook.getDiaryType().getId() != null)
+                        .forEach(notebook -> diaryTypeModelList.stream()
+                                .filter(diaryType -> diaryType.getType() != null && diaryType.getId() != null &&
+                                        notebook.getType().equals(diaryType.getType()) &&
+                                        notebook.getDiaryType().getId().equals(diaryType.getId()))
+                                .findFirst()
+                                .ifPresent(notebook::setDiaryType));
+
                 handler.handle(Future.succeededFuture(notebookList));
             }
         });
