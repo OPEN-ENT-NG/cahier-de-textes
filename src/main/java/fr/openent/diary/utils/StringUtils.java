@@ -21,9 +21,13 @@ import java.util.TimeZone;
  */
 public class StringUtils {
 
+    private StringUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static ObjectMapper mapper = new ObjectMapper();
 
-    static{
+    static {
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -51,10 +55,10 @@ public class StringUtils {
         return uuid != null && uuid.matches(UUID_REGEX);
     }
 
-    public static String encodeJson(Object obj){
-        if (obj == null){
+    public static String encodeJson(Object obj) {
+        if (obj == null) {
             return "";
-        }else{
+        } else {
             try {
                 return mapper.writeValueAsString(obj);
             } catch (JsonProcessingException e) {
@@ -63,36 +67,41 @@ public class StringUtils {
         }
     }
 
-    public static String cleanHtml(String html){
-        return html.replaceAll("<br>","<br/>");
-            //.replaceAll("\\p{C}", "?");
+    public static String cleanHtml(String html) {
+        return html.replaceAll("<br>", "<br/>");
+        //.replaceAll("\\p{C}", "?");
     }
 
-    public static Map<String,String> unicodeToReplace = new HashMap<>();
+    public static Map<String, String> unicodeToReplace = new HashMap<>();
+
     static {
-        unicodeToReplace.put("\\u00e0","&agrave;");
-        unicodeToReplace.put("\\u00e2","&acirc;");
-        unicodeToReplace.put("\\u00e4","&auml;");
-        unicodeToReplace.put("\\u00e7","&ccedil;");
-        unicodeToReplace.put("\\u00e8","&egrave;");
-        unicodeToReplace.put("\\u00e9","&eacute;");
-        unicodeToReplace.put("\\u00ea","&ecirc;");
-        unicodeToReplace.put("\\u00eb","&euml;");
-        unicodeToReplace.put("\\u00ee","&icirc;");
-        unicodeToReplace.put("\\u00ef","&iuml;");
-        unicodeToReplace.put("\\u00f4","&ocirc;");
-        unicodeToReplace.put("\\u00f6","&ouml;");
-        unicodeToReplace.put("\\u00f9","&ugrave;");
-        unicodeToReplace.put("\\u00fb","&ucirc;");
-        unicodeToReplace.put("\\u00fc","&uuml;");
-        unicodeToReplace.put("\\p{C}","");
+        unicodeToReplace.put("\\u00e0", "&agrave;");
+        unicodeToReplace.put("\\u00e2", "&acirc;");
+        unicodeToReplace.put("\\u00e4", "&auml;");
+        unicodeToReplace.put("\\u00e7", "&ccedil;");
+        unicodeToReplace.put("\\u00e8", "&egrave;");
+        unicodeToReplace.put("\\u00e9", "&eacute;");
+        unicodeToReplace.put("\\u00ea", "&ecirc;");
+        unicodeToReplace.put("\\u00eb", "&euml;");
+        unicodeToReplace.put("\\u00ee", "&icirc;");
+        unicodeToReplace.put("\\u00ef", "&iuml;");
+        unicodeToReplace.put("\\u00f4", "&ocirc;");
+        unicodeToReplace.put("\\u00f6", "&ouml;");
+        unicodeToReplace.put("\\u00f9", "&ugrave;");
+        unicodeToReplace.put("\\u00fb", "&ucirc;");
+        unicodeToReplace.put("\\u00fc", "&uuml;");
+        unicodeToReplace.put("\\p{C}", "");
     }
 
     public static String unicode(String txt) {
         String result = txt;
-        for (String key : unicodeToReplace.keySet()){
-            result = result.replaceAll(key,unicodeToReplace.get(key));
+        for (String key : unicodeToReplace.keySet()) {
+            result = result.replaceAll(key, unicodeToReplace.get(key));
         }
         return result;
+    }
+
+    public static String repeat(String toRepeat, int time) {
+        return new String(new char[time]).replace("\0", toRepeat);
     }
 }

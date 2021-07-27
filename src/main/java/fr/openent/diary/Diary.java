@@ -64,6 +64,7 @@ public class Diary extends BaseServer {
         addController(new ProgressionController(new ProgessionServiceImpl("diary")));
         addController(new SearchController(eb));
         addController(new SubjectController(new DefaultSubjectService(eb)));
+        addController(new ConfigController());
         addController(new NotebookArchiveController(eb, vertx, storage));
 
         // add right controller
