@@ -27,3 +27,7 @@ error.log
 src/main/resources/public/sass/global/develop/entcore-css-lib/
 src/main/resources/public/sass/global/develop/output.scss
 src/main/resources/public/sass/global/develop/output.scss.map
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+/gradlew
+/gradlew.bat
