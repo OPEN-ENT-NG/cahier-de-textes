@@ -72,9 +72,10 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.subjects.sync($scope.structure.id),
                 $scope.syncPedagogicItems()
             ]).then(res => {
-                res[0].forEach((subject: Subject) => {
-                    if (!$scope.subjects.all.find((s: Subject) => s.id == subject.id || s.label == subject.name))
-                        $scope.subjects.all.push(subject);
+                res[0].forEach((timetableSubject: Subject) => {
+                    if (!$scope.subjects.all.find((subject: Subject) => subject.id == timetableSubject.id ||
+                        subject.label == timetableSubject.label || subject.name == timetableSubject.label))
+                        $scope.subjects.all.push(timetableSubject);
                 });
             });
         };
