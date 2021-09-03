@@ -1,0 +1,55 @@
+<!-- Button to open/close modal -->
+<button class="float-none display-inline-block margin-top-md"
+        ng-click="vm.openProgressionForm()">
+    <i18n>progression.from.session.save</i18n>
+</button>
+
+<!-- Create Progression from Session -->
+<lightbox show="vm.progressionLightboxOpened" class="lightbox create-visa" on-close="vm.closeProgressionForm()">
+    <!-- Lightbox title -->
+    <section class="head">
+        <h3>
+            <i18n>progression.from.session.save</i18n>
+        </h3>
+    </section>
+
+    <!-- Create warning/folder selector -->
+    <section class="confirm-context">
+        <div class="cell horizontal-spacing twelve margin-top-md red-text">
+            <i18n>progression.warning.from.session.save.1</i18n>
+        </div>
+        <div class="cell horizontal-spacing twelve margin-top-md red-text">
+            <i18n>progression.warning.from.session.save.2</i18n>
+        </div>
+        <div class="cell horizontal-spacing twelve-mobile margin-top-lg">
+            <div class="twelve">
+                <i18n>progression.create.parent.folder.name</i18n>
+            </div>
+            <select ng-options="folder.id as folder.title for folder in vm.progressionFolders.all"
+                    ng-model="vm.progressionSessionForm.folder_id">
+                <option ng-if="false" value="" label=""></option>
+            </select>
+        </div>
+    </section>
+
+
+    <!-- Footer/buttons -->
+    <section class="body row">
+
+        <!-- Confirm buttons -->
+        <div class="confirm-buttons">
+
+            <!--create-->
+            <button
+                    data-ng-click="vm.saveProgression()"
+                    class="right-magnet">
+                <i18n>save</i18n>
+            </button>
+
+            <button data-ng-click="vm.closeProgressionForm()"
+                    class="right-magnet cancel">
+                <i18n>utils.cancel</i18n>
+            </button>
+        </div>
+    </section>
+</lightbox>

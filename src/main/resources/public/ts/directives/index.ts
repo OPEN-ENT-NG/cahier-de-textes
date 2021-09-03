@@ -9,3 +9,4 @@ export * from './select-structure';
 export * from './filter-subject';
 export * from './pagination';
 export * from './calendar-tooltip';
+export * from './session-to-progression-form/session-to-progression-form';

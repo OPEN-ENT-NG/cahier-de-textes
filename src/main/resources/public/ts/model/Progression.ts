@@ -1,9 +1,11 @@
 ///<reference path="session.ts"/>
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
-import {ToastUtils} from './index';
+import {Homework, Homeworks, Session, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {HomeworkType} from './homework';
+import {model} from "entcore";
+import {ScheduleItem} from "./scheduleItem";
 
 
 export class ProgressionSession implements Selectable {
@@ -26,12 +28,26 @@ export class ProgressionSession implements Selectable {
 
     progression_homeworks: ProgressionHomework[] = [];
 
-    constructor() {
+    constructor(session?: Session, homeworks?: Homework[]) {
         this.subjectLabel = "";
         this.eventer = new Eventer();
         this.title = "";
         this.class = "";
         this.folder_id = null;
+
+        if (session) {
+            if (session.exceptional_label) this.subjectLabel = session.exceptional_label;
+            else if (session.subject) this.subjectLabel = session.subject.label;
+
+            if (session.title) this.title = session.title;
+            if (session.description) this.description = session.description;
+            if (session.annotation) this.annotation = session.annotation;
+        }
+
+        if (homeworks)
+            this.progression_homeworks = homeworks.map((homework: Homework) => {
+                return new ProgressionHomework(homework);
+            });
     }
 
     async save() {
@@ -83,15 +99,16 @@ export class ProgressionSession implements Selectable {
         return json;
     }
 
-    private toJson() {
+    public toJson() {
+        let ownerId: string = this.owner ? this.owner.id : (this.owner_id ? this.owner_id : model.me.userId)
         return {
             description: this.description,
             subjectLabel: this.subjectLabel,
             title: this.title,
             class: this.class,
             annotation: this.annotation,
-            owner_id: this.owner ? this.owner.id : this.owner_id,
-            progression_homeworks: this.homeworksToJson(this.owner ? this.owner.id : this.owner_id),
+            owner_id: ownerId,
+            progression_homeworks: this.homeworksToJson(ownerId),
             progression_folder_id: this.folder_id
         };
     }
@@ -307,6 +324,13 @@ export class ProgressionHomework {
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
     attachedToSession: boolean = true;
 
+    constructor(homework?: Homework) {
+        if (homework) {
+            if (homework.description) this.description = homework.description;
+            if (homework.type) this.type = homework.type;
+            if (homework.estimatedTime) this.estimatedTime = homework.estimatedTime;
+        }
+    }
 
     initType() {
         if (this.type_label && this.type_id) {
