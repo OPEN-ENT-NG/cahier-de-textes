@@ -53,6 +53,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
 
             $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
             $scope.groupsHomeworkSearch = new GroupsSearch($scope.structure.id, searchService);
+            $scope.progressionLightbox = false;
 
             /**
              * Open the create session form
@@ -262,8 +263,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.deleteHomework = async (homework: Homework, index: number, array_concerned?: string): Promise<void> => {
                 if (($scope.session.id === homework.session_id) || (array_concerned && array_concerned == $scope.CONST_HOMEWORKS)) {
                     $scope.localRemoveHomework(index);
-                }
-                else {
+                } else {
                     $scope.localRemoveFromHomework(index);
                 }
                 if (homework.id) {
@@ -421,7 +421,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 // We only keep courses selected that correspond to the new subject and audiences selected
                 $scope.form.homework.sessions = $scope.form.homework.sessions.filter(session =>
                     $scope.form.homework.subject_id === session.subject.id
-                        && classesSelectedIds.indexOf(session.audience.id) !== -1
+                    && classesSelectedIds.indexOf(session.audience.id) !== -1
                 );
                 $scope.sessionsToAttachTo = [...$scope.sessionsToAttachTo, ...$scope.form.homework.sessions];
 
@@ -449,7 +449,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     let distinctSessions: Session[] = [];
                     $scope.sessionsToAttachTo.forEach((session: Session) => {
                         if (session.subject && distinctSessions.filter(
-                            (distinctSession: Session) => $scope.isSameSession(distinctSession, session)).length === 0
+                                (distinctSession: Session) => $scope.isSameSession(distinctSession, session)).length === 0
                             && !session.getStartMoment().isBefore($scope.session.getStartMoment())) {
 
                             distinctSessions.push(session);
@@ -628,7 +628,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     $scope.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
                 }
 
-                $scope.homeworks.filter((homework) => {if(!homework.type) homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0)});
+                $scope.homeworks.filter((homework) => {
+                    if (!homework.type) homework.type = $scope.homeworkTypes.all.find(ht => ht.rank > 0)
+                });
 
                 $scope.audiences = $scope.structure.audiences.all.filter(audience => model.me.classes.includes(audience.id));
                 // useful for this session as an option is session selector (homework form).

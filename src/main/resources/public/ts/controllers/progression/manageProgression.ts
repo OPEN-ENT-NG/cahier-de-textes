@@ -1,4 +1,4 @@
-import {Behaviours, idiom as lang, model, ng, template} from 'entcore';
+import {angular, Behaviours, idiom as lang, model, ng, template, toasts} from 'entcore';
 import {
     ProgressionFolder,
     ProgressionFolders,
@@ -6,6 +6,8 @@ import {
     ProgressionSession,
     ProgressionSessions
 } from '../../model/Progression';
+import {ScheduleItem} from "../../model/scheduleItem";
+import {AxiosResponse} from "axios";
 
 declare let window: any;
 
@@ -251,12 +253,30 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
                 .filter((progressionSession: ProgressionSession) => progressionSession.tableSelected).length !== 0;
         };
 
+        $scope.saveSessionToProgression = async (folder: ProgressionFolder, dragEl: string): Promise<void> => {
+            let item: ScheduleItem = angular.element('#' + dragEl).scope() && angular.element('#' + dragEl).scope().item ?
+                angular.element('#' + dragEl).scope().item : null
+
+            if (item && item.data && folder) {
+                let progressionSession: ProgressionSession = new ProgressionSession(item.data,
+                    !!item.data.homeworks && item.data.homeworks.length > 0 ? item.data.homeworks : null);
+                progressionSession.folder_id = folder.id;
+                let response: AxiosResponse = await progressionSession.save();
+                if (response.status === 200 || response.status === 201) {
+                    toasts.confirm(lang.translate("progression.session.create"));
+                    await $scope.initProgressions();
+                    $scope.safeApply();
+                }
+                else toasts.warning(`${lang.translate("progression.session.delete.error")} ${response.data.toString()}`);
+            }
+        }
+
         /* drag & drop method */
         $scope.dropped = async (dragEl: string, dropEl: string) => {
             if (dragEl == dropEl)
                 return;
             let dragItem: JQuery = $('#' + dragEl);
-            let dropItem: JQuery  = $('#' + dropEl);
+            let dropItem: JQuery = $('#' + dropEl);
             let dropId: any = dropItem.data().itemId;
             let dragId: any = dragItem.data().itemId;
 
@@ -324,7 +344,7 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
                 $scope.openedCreateFolder = false;
                 let data = result.data;
                 let resultId = null;
-                if(data) {
+                if (data) {
                     resultId = data.id ? data.id : result.data[0]["id"];
                 }
                 if (resultId) {

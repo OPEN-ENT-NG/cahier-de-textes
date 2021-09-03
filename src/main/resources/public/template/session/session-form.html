@@ -34,7 +34,8 @@
             </div>
 
             <!--IF EDIT SESSION-->
-            <div ng-if="(session.courseId || session.subject_id) && sessionFormIsOpened" class="margin-bottom-md margin-top-lg">
+            <div ng-if="(session.courseId || session.subject_id) && sessionFormIsOpened"
+                 class="margin-bottom-md margin-top-lg">
 
                 <!--SUBJECT LABEL CARD-->
                 <span class="card session-form-card">
@@ -462,12 +463,13 @@
                 ng-click="cancelHomework()">
             <i18n>utils.cancel</i18n>
         </button>
-        <div ng-if="!sessionDisplay.homeworks[0].opened" class="padding-md margin-bottom-md">
-            <button ng-show="!validate"
+        <div ng-if="!sessionDisplay.homeworks[0].opened && !validate" class="padding-md margin-bottom-md">
+            <button
                     class="float-none display-inline-block margin-top-md"
                     ng-click="manageHomework()">
                 <i18n>homework.manage.create</i18n>
             </button>
+            <session-to-progression-form session="session" homeworks="homeworks"></session-to-progression-form>
         </div>
     </div>
 </div>
