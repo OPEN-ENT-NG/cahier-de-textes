@@ -36,6 +36,8 @@ public final class WorkflowUtils {
     public static final String ACCESS_EXTERNAL_DATA = "access.external.data";
     public static final String ACCESS_CHILD_DATA = "access.child.data";
 
+    public static final String DIARY_SEARCH = "diary.search";
+
     private WorkflowUtils() {
         throw new IllegalAccessError("Utility class");
     }

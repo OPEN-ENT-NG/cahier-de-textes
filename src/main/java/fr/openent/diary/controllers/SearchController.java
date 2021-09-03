@@ -15,6 +15,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.user.*;
 
 import java.util.List;
 
@@ -42,19 +43,29 @@ public class SearchController extends ControllerHelper {
                 && request.params().contains("field")
                 && request.params().contains("profile")
                 && request.params().contains("structureId")) {
-            String query = request.getParam("q");
-            List<String> fields = request.params().getAll("field");
-            String profile = request.getParam("profile");
-            String structure_id = request.getParam("structureId");
 
-            JsonObject action = new JsonObject()
-                    .put("action", "user.search")
-                    .put("q", query)
-                    .put("fields", new JsonArray(fields))
-                    .put("profile", profile)
-                    .put("structureId", structure_id);
 
-            callCDTEventBus(action, request);
+            UserUtils.getUserInfos(eb, request, user ->
+                    new SearchRight().authorize(request, null, user, isAuthorized -> {
+                        if (isAuthorized.equals(Boolean.TRUE)) {
+                            String query = request.getParam("q");
+                            List<String> fields = request.params().getAll("field");
+                            String profile = request.getParam("profile");
+                            String structureId = request.getParam("structureId");
+
+                            JsonObject action = new JsonObject()
+                                    .put("action", "user.search")
+                                    .put("q", query)
+                                    .put("fields", new JsonArray(fields))
+                                    .put("profile", profile)
+                                    .put("structureId", structureId);
+
+                            callCDTEventBus(action, request);
+                        } else {
+                            badRequest(request);
+                        }
+                    }));
+
         } else {
             badRequest(request);
         }
