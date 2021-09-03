@@ -31,3 +31,4 @@ src/main/resources/public/sass/global/develop/output.scss.map
 /gradle/wrapper/gradle-wrapper.properties
 /gradlew
 /gradlew.bat
+/out/
