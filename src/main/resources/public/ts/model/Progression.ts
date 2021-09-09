@@ -1,11 +1,10 @@
 ///<reference path="session.ts"/>
 import http from 'axios';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
-import {Homework, Homeworks, Session, ToastUtils} from './index';
+import {Homework, Session, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
 import {HomeworkType} from './homework';
 import {model} from "entcore";
-import {ScheduleItem} from "./scheduleItem";
 
 
 export class ProgressionSession implements Selectable {
@@ -35,19 +34,23 @@ export class ProgressionSession implements Selectable {
         this.class = "";
         this.folder_id = null;
 
-        if (session) {
-            if (session.exceptional_label) this.subjectLabel = session.exceptional_label;
-            else if (session.subject) this.subjectLabel = session.subject.label;
+        if (session) this.setFromSession(session);
+        if (homeworks) this.setFromHomeworks(homeworks)
+    }
 
-            if (session.title) this.title = session.title;
-            if (session.description) this.description = session.description;
-            if (session.annotation) this.annotation = session.annotation;
-        }
+    public setFromSession(session: Session): void {
+        if (session.exceptional_label) this.subjectLabel = session.exceptional_label;
+        else if (session.subject) this.subjectLabel = session.subject.label;
 
-        if (homeworks)
-            this.progression_homeworks = homeworks.map((homework: Homework) => {
-                return new ProgressionHomework(homework);
-            });
+        if (session.title) this.title = session.title;
+        if (session.description) this.description = session.description;
+        if (session.annotation) this.annotation = session.annotation;
+    }
+
+    public setFromHomeworks(homeworks: Homework[]): void {
+        this.progression_homeworks = homeworks.map((homework: Homework) => {
+            return new ProgressionHomework(homework);
+        });
     }
 
     async save() {

@@ -63,6 +63,8 @@ export const sessionToProgressionForm = ng.directive('sessionToProgressionForm',
             };
 
             vm.saveProgression = async (): Promise<void> => {
+                vm.progressionSessionForm.setFromSession(vm.session);
+                vm.progressionSessionForm.setFromHomeworks(vm.homeworks);
                 try {
                     await vm.progressionSessionForm.save();
                     vm.closeProgressionForm();
