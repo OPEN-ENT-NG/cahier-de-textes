@@ -11,3 +11,4 @@ export * from './pagination';
 export * from './calendar-tooltip';
 export * from './session-to-progression-form/session-to-progression-form';
 export * from './sidebar-filter/sidebar-filter';
+export * from './restricted-groups-form/restricted-groups-form';

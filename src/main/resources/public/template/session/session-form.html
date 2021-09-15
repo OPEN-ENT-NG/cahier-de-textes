@@ -363,9 +363,12 @@
                             <div class="autocomplete-selected"
                                  ng-show="groupsHomeworkSearch.selectedGroups.length > 0">
                                 <div ng-repeat="audience in groupsHomeworkSearch.selectedGroups track by audience.id"
-                                     class="search-input-ul">
-                                    <span>[[audience.name]]</span>&nbsp;
-                                    <i class="close" ng-click="removeSearchHomeworkAudience(audience)"></i>
+                                     class="search-input-ul flex-row row__16">
+                                    <div class="flex-col col__7">
+                                        <span>[[audience.name]]</span>&nbsp;
+                                        <i class="close" ng-click="removeSearchHomeworkAudience(audience)"></i>
+                                    </div>
+                                    <restricted-groups-form class="restricted flex-col col__9"></restricted-groups-form>
                                 </div>
                             </div>
                         </div>

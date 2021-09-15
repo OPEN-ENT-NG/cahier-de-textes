@@ -493,6 +493,13 @@ label.checkbox {
 
   .search-input-ul {
     padding: 4px;
+    width: 100%;
+    display: flex;
+
+    .restricted {
+      justify-content: end;
+      font-size: 14px;
+    }
   }
 
 }
