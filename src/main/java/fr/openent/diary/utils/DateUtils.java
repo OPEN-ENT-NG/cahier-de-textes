@@ -101,6 +101,7 @@ public final class DateUtils {
     }
 
     public static String formatDate(Date dateToParse, String format) {
+        if (dateToParse == null) return null;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(dateToParse);
     }
