@@ -8,6 +8,7 @@ import fr.openent.diary.models.Audience;
 import fr.openent.diary.models.Person.User;
 import fr.openent.diary.models.Subject;
 import fr.openent.diary.services.*;
+import fr.openent.diary.utils.DateUtils;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.AsyncResult;
@@ -88,12 +89,13 @@ public class SessionServiceImpl extends DBService implements SessionService {
     /**
      * Get homeworks created from the session but belonging to another session
      * and include result in the session object
+     *
      * @param fromSessionId session id
-     * @param session the session JsonObject
-     * @param subjectIds subject ids
-     * @param teacherIds teacher ids
-     * @param audienceIds audiences ids
-     * @param handler handler
+     * @param session       the session JsonObject
+     * @param subjectIds    subject ids
+     * @param teacherIds    teacher ids
+     * @param audienceIds   audiences ids
+     * @param handler       handler
      */
     private void getFromSessionHomeworks(Long fromSessionId, JsonObject session, List<String> subjectIds,
                                          List<String> teacherIds, List<String> audienceIds,
@@ -142,9 +144,9 @@ public class SessionServiceImpl extends DBService implements SessionService {
                         session.put("subject", subjectMap.getOrDefault(session.getString("subject_id"), new Subject()).toJSON());
                         session.put("teacher", teacherMap.getOrDefault(session.getString("teacher_id"), new User()).toJSON());
                         session.put("audience", audienceMap.getOrDefault(session.getString("audience_id"), new Audience()).toJSON());
-                        
+
                         for (int i = 0; i < session.getJsonArray("homeworks").size(); i++) {
-                            JsonObject homework =session.getJsonArray("homeworks").getJsonObject(i);
+                            JsonObject homework = session.getJsonArray("homeworks").getJsonObject(i);
                             homework.put("subject", subjectMap.getOrDefault(homework.getString("subject_id"), new Subject()).toJSON());
                             homework.put("teacher", teacherMap.getOrDefault(homework.getString("teacher_id"), new User()).toJSON());
                             homework.put("audience", audienceMap.getOrDefault(homework.getString("audience_id"), new Audience()).toJSON());
@@ -555,7 +557,7 @@ public class SessionServiceImpl extends DBService implements SessionService {
                 "room, color, description, annotation, is_published, is_empty, course_id, owner_id, " +
                 "date, start_time, end_time, created, modified) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                "to_date(?,'YYYY-MM-DD'), to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
+                "?, to_timestamp(?, 'hh24:mi:ss'), to_timestamp(?, 'hh24:mi:ss'), NOW(), NOW()) RETURNING id";
 
         values.add(session.getString("subject_id", ""));
 
@@ -598,9 +600,23 @@ public class SessionServiceImpl extends DBService implements SessionService {
         }
 
         values.add(user.getUserId());
-        values.add(session.getString("date", ""));
-        values.add(session.getString("start_time", ""));
-        values.add(session.getString("end_time", ""));
+
+        // We force the format date to be yyyy-MM-dd.
+        String date = !"".trim().equals(session.getString("date")) ?
+                DateUtils.formatDate(DateUtils.parseDate(session.getString("date"), DateUtils.DATE_FORMAT), DateUtils.DATE_FORMAT) :
+                null;
+        String startTime = session.getString("start_time");
+        String endTime = session.getString("end_time");
+
+        if (date == null || "".trim().equals(date) ||
+                "".trim().equals(startTime) || "".trim().equals(endTime)) {
+            handler.handle(new Either.Left<>("[Diary@SessionServiceImpl::createSession] date is not valid."));
+            return;
+        }
+
+        values.add(date);
+        values.add(startTime);
+        values.add(endTime);
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
 
