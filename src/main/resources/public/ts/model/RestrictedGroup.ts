@@ -22,7 +22,4 @@ export class RestrictedGroup {
     teacher_id: string;
     is_valid = true;
     label = '';
-
-    constructor() {
-    }
 }

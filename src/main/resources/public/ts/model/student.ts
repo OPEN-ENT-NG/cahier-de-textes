@@ -26,6 +26,7 @@ export class Student {
             displayName: data.displayName,
             structureId: data.structureId,
             classId: data.classId
+            displayName: data.displayName ? data.displayName : `${data.firstName} ${data.lastName}`
         };
     }
 

@@ -18,6 +18,8 @@ export class Audience {
     type: string;
     type_group: number;
 
+    students?: Student[];
+
     constructor(name: string, id?, type?) {
         this.name = name;
         if (id)
