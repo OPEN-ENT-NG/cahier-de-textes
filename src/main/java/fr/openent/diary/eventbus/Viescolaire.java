@@ -4,8 +4,11 @@ package fr.openent.diary.eventbus;
 import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.message.MessageResponseHandler;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -32,6 +35,27 @@ public class Viescolaire {
                 .put("action", "periode.getSchoolYearPeriod");
 
         eb.send(address, action, MessageResponseHandler.messageJsonObjectHandler(FutureHelper.handlerJsonObject(handler)));
+    }
+
+    public Future<JsonArray> getAudienceStudents(String audienceId) {
+        JsonObject action = new JsonObject()
+                .put("action", "classe.getEleveClasse")
+                .put("idClasse", audienceId);
+
+        Promise<JsonArray> promise = Promise.promise();
+
+        eb.request(address, action, event -> {
+            JsonObject body = (JsonObject) event.result().body();
+            if (event.succeeded() && "ok".equals(body.getString("status"))) {
+                promise.complete(body.getJsonArray("results"));
+            } else if (event.failed()){
+                promise.fail(event.cause().getMessage());
+            } else {
+                promise.fail(body.getString("error"));
+            }
+        });
+
+        return promise.future();
     }
 
 

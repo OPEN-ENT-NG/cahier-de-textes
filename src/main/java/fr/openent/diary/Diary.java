@@ -66,6 +66,7 @@ public class Diary extends BaseServer {
         addController(new SubjectController(new DefaultSubjectService(eb)));
         addController(new ConfigController());
         addController(new NotebookArchiveController(eb, vertx, storage));
+        addController(new AudienceController());
 
         // add right controller
         addController(new FakeRight());
