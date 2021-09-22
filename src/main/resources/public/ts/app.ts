@@ -44,18 +44,22 @@ routes.define(($routeProvider) => {
             })
             .when('/session/update/:id', {
                 action: 'manageSession'
+            });
+    }
+
+    if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.manageHomework)) {
+        $routeProvider
+            .when('/homework/create', {
+                action: 'manageHomework'
             })
-            .when('/session/view/:id', {
-                action: 'manageSession'
+            .when('/homework/update/:id', {
+                action: 'manageHomework'
             });
     }
 
     $routeProvider
-        .when('/homework/create', {
-            action: 'manageHomework'
-        })
-        .when('/homework/update/:id', {
-            action: 'manageHomework'
+        .when('/session/view/:id', {
+            action: 'manageSession'
         })
         .when('/homework/view/:id', {
             action: 'manageHomework'
