@@ -22,7 +22,7 @@ export let calendarController = ng.controller('CalendarController',
                 sessions: true,
                 listView: false,
                 progression: false,
-                sessionList: false,
+                sessionList: true,
                 listViewArea: {
                     filter: !MobileUtils.isMobile(),
                     structure: !MobileUtils.isMobile(),
@@ -76,7 +76,6 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
                 $scope.goTo('/list');
                 $scope.display.listView = true;
-                $scope.display.sessionList = !DateUtils.isAChildOrAParent(model.me.type);
                 if ($scope.display.listView) {
                     $scope.display.sessions = true;
                     $scope.display.homeworks = true;
