@@ -281,6 +281,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             };
 
+            $scope.goToMain = (): void => {
+                $scope.goTo("/main");
+            }
+
             $scope.setHomeworkProgress = (homework: Homework): void => {
                 if (homework.isDone)
                     $scope.notifications.push(new Toast('homework.done.notification', 'info'));
@@ -366,6 +370,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             };
 
+            $scope.isHomeworkOwner = (): boolean =>
+                $scope.homework &&
+                ($scope.homework.id == null ||
+                $scope.homework.teacher && $scope.homework.teacher.id === model.me.userId);
+
             /**
              * Initialize form data.
              */
@@ -426,6 +435,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                             $scope.attachToDate();
                         }
                     }
+
+                    $scope.homework.opened = $scope.isHomeworkOwner();
+                    if (!$scope.homework.opened) $scope.goToMain();
+
                 }
 
                 // if new homework, we set the default homeworkType
