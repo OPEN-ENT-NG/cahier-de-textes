@@ -1,58 +1,60 @@
 <div ng-controller="manageHomeworkCtrl"
      ng-class="isAChildOrAParent ? (!isMobile() ? 'remove-margin-left' : '') : ''">
-    <div ng-if="!isReadOnly">
-        <div class="flex-row-cdt row__12">
-            <app-title class="flex-col col__3 zero-mobile">
+    <div ng-if="isHomeworkOwner()">
+        <div ng-if="!isReadOnly">
+            <div class="flex-row-cdt row__12">
+                <app-title class="flex-col col__3 zero-mobile">
 
-                <!--CREATE HOMEWORK-->
-                <div ng-if="!homework.id && homeworkFormIsOpened" class="title-area-simple">
-                    <h1>
-                        <i18n><span>homework.manage.create</span></i18n>
-                    </h1>
+                    <!--CREATE HOMEWORK-->
+                    <div ng-if="!homework.id && homeworkFormIsOpened" class="title-area-simple">
+                        <h1>
+                            <i18n><span>homework.manage.create</span></i18n>
+                        </h1>
+                    </div>
+
+                    <!--UPDATE HOMEWORK-->
+                    <div ng-if="homework.id && homeworkFormIsOpened" class="title-area-simple">
+                        <h1>
+                            <i18n><span>homework.manage.update</span></i18n>
+                        </h1>
+                    </div>
+
+                </app-title>
+                <div class="flex-col col__6"></div>
+                <div class="flex-col col__3 title-buttons">
+                    <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
+                        <i18n>utils.cancel</i18n>
+                    </button>
+                    <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button"
+                            ng-click="saveHomework()">
+                        <i18n>utils.save</i18n>
+                    </button>
                 </div>
+            </div>
 
-                <!--UPDATE HOMEWORK-->
-                <div ng-if="homework.id && homeworkFormIsOpened" class="title-area-simple">
-                    <h1>
-                        <i18n><span>homework.manage.update</span></i18n>
-                    </h1>
-                </div>
+            <div class="row margin-bottom-md"
+                 ng-include="'/diary/public/template/homework/homework-form.html'"></div>
 
-            </app-title>
-            <div class="flex-col col__6"></div>
-            <div class="flex-col col__3 title-buttons">
+            <div class="row text-right">
+                <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework($index)">
+                    <i18n>utils.delete</i18n>
+                </button>
                 <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
                     <i18n>utils.cancel</i18n>
                 </button>
                 <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button"
-                        ng-click="saveHomework()">
+                        ng-click="saveHomework()" workflow="diary.manageHomework">
                     <i18n>utils.save</i18n>
                 </button>
             </div>
         </div>
-
-        <div class="row margin-bottom-md"
-             ng-include="'/diary/public/template/homework/homework-form.html'"></div>
-
-        <div class="row text-right">
-            <button ng-if="homework.id" class="left-magnet cancel" type="button" ng-click="deleteHomework($index)">
-                <i18n>utils.delete</i18n>
-            </button>
-            <button type="button" class="cancel float-none display-inline-block" ng-click="cancelCreation()">
-                <i18n>utils.cancel</i18n>
-            </button>
-            <button ng-disabled="!isValidForm()" class="float-none display-inline-block" type="button"
-                    ng-click="saveHomework()" workflow="diary.manageHomework">
-                <i18n>utils.save</i18n>
+        <div ng-if="isReadOnly">
+            <div class="row margin-bottom-lg"
+                 ng-include="'/diary/public/template/homework/homework-view.html'">
+            </div>
+            <button class="homework-view-button" data-ng-click="back()">
+                <i18n>back</i18n>
             </button>
         </div>
-    </div>
-    <div ng-if="isReadOnly">
-        <div class="row margin-bottom-lg"
-             ng-include="'/diary/public/template/homework/homework-view.html'">
-        </div>
-        <button class="homework-view-button" data-ng-click="back()">
-            <i18n>back</i18n>
-        </button>
     </div>
 </div>
