@@ -586,6 +586,12 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 await $scope.syncSessionsAndCourses();
             };
 
+            $scope.isSessionOwner = (): boolean =>
+                $scope.session &&
+                ($scope.session.id == null ||
+                    $scope.session.teacher && $scope.session.teacher.id === model.me.userId);
+
+
             /* -------------------------- */
 
             /**
@@ -604,7 +610,6 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                         $scope.session.id = $routeParams.id;
                         await $scope.session.sync();
                         $scope.session.opened = true;
-
                     } else if ($routeParams.courseId && $routeParams.date) {
                         let course = new Course($scope.structure, $routeParams.courseId);
                         await course.sync($routeParams.date, $routeParams.date);

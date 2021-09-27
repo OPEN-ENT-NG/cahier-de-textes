@@ -33,10 +33,11 @@ public class Diary extends BaseServer {
 
 	@Override
 	public void start() throws Exception {
-		super.start();
+        DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
+
+        super.start();
         final EventBus eb = getEventBus(vertx);
         Storage storage = new StorageFactory(vertx, config).getStorage();
-
 
         TimelineHelper timeline = new TimelineHelper(vertx, eb, config);
         final DiaryService diaryService = new DiaryServiceImpl();
@@ -46,7 +47,6 @@ public class Diary extends BaseServer {
 
         EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Diary.class.getSimpleName());
 
-        DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
 
         NodePdfHelper.getInstance().init(vertx, config);
 

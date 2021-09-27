@@ -5,7 +5,7 @@
     <div>([[item.type.label]])</div>
 </div>
 
-<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item.id)"
+<div ng-if="item.pedagogicType == TYPE_SESSION" ng-click="openSession(item)"
      class="schedule-item-content TYPE_SESSION" ng-style="{'background-color': item.color}"
      lvl-draggable
      lvl-drop-target  on-drop="dropped(dragEl, dropEl)">

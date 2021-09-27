@@ -1,4 +1,5 @@
 import {Behaviours, model, moment, ng} from 'entcore';
+import {Homework} from "../model";
 declare let window: any;
 
 export let calendarDailyEventsController = ng.controller('CalendarDailyEventsController',
@@ -354,11 +355,15 @@ export let calendarDailyEventsController = ng.controller('CalendarDailyEventsCon
             setDaysContent();
             $scope.safeApply();
         }
-        $scope.openHomework = (homeworkId: number) => {
-            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
-                $scope.goTo('/homework/update/' + homeworkId);
+
+        $scope.isHomeworkOwner = (homework: Homework): boolean =>
+            homework && homework.teacher && homework.teacher.id === model.me.userId;
+
+        $scope.openHomework = (homework: Homework) => {
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) && $scope.isHomeworkOwner(homework)) {
+                $scope.goTo('/homework/update/' + homework.id);
             } else {
-                $scope.goTo('/homework/view/' + homeworkId);
+                $scope.goTo('/homework/view/' + homework.id);
             }
         };
 

@@ -281,6 +281,10 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 }
             };
 
+            $scope.goToMain = (): void => {
+                $scope.goTo("/main");
+            }
+
             $scope.setHomeworkProgress = (homework: Homework): void => {
                 if (homework.isDone)
                     $scope.notifications.push(new Toast('homework.done.notification', 'info'));
@@ -365,6 +369,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     if (!$scope.isInsideSessionForm) window.history.back();
                 }
             };
+
+            $scope.isHomeworkOwner = (): boolean =>
+                $scope.homework &&
+                ($scope.homework.id == null ||
+                    $scope.homework.teacher && $scope.homework.teacher.id === model.me.userId);
 
             /**
              * Initialize form data.

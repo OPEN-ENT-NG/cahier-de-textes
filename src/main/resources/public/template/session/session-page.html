@@ -24,10 +24,12 @@
 
         <!--CANCEL AND SAVE BUTTONS-->
         <div class="flex-col col__3 title-buttons">
-            <button class="float-none display-inline-block cancel" type="button" ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
+            <button class="float-none display-inline-block cancel" type="button"
+                    ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
                 <i18n>utils.cancel</i18n>
             </button>
-            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession"
+            <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button"
+                    workflow="diary.manageSession"
                     ng-click="saveSession()">
                 <i18n>utils.save</i18n>
             </button>
@@ -44,27 +46,37 @@
         <div class="row margin-bottom-lg" ng-include="'/diary/public/template/session/session-view.html'"></div>
         <div class="session-read-only card padding-md margin-bottom-lg"
              ng-if="session.homeworks.length > 0">
-            <h2 class="cdt-title-not-clickable"><i18n>Homeworks</i18n></h2>
+            <h2 class="cdt-title-not-clickable">
+                <i18n>Homeworks</i18n>
+            </h2>
 
             <!--HOMEWORK LIST-->
             <div class="row" ng-repeat="homework in session.homeworks" inside-session-form="true"
-                 ng-controller="manageHomeworkCtrl" ng-include="'/diary/public/template/homework/homework-view.html'">
+                 ng-controller="manageHomeworkCtrl"
+                 ng-include="'/diary/public/template/homework/homework-view.html'">
             </div>
         </div>
-        <button class="homework-view-button" data-ng-click="back();"><i18n>back</i18n></button>
+        <button class="homework-view-button" data-ng-click="back();">
+            <i18n>back</i18n>
+        </button>
     </div>
 
     <!--DELETE/CANCEL/SAVE BUTTONS-->
-    <div class="row text-right">
-        <button ng-if="session.id" ng-disabled="session.one_visa" class="left-magnet" type="button" ng-click="deleteSession()"  workflow="diary.manageSession">
+    <div class="row text-right" ng-if="isSessionOwner(session)">
+        <button ng-if="session.id" ng-disabled="session.one_visa" class="left-magnet" type="button"
+                ng-click="deleteSession()" workflow="diary.manageSession">
             <i18n>utils.delete</i18n>
         </button>
-        <button class="float-none display-inline-block cancel" type="button" ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
+        <button class="float-none display-inline-block cancel" type="button"
+                ng-click="$parent.syncPedagogicItems(); back();" workflow="diary.manageSession">
             <i18n>utils.cancel</i18n>
         </button>
-        <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button" workflow="diary.manageSession" ng-click="saveSession()">
+        <button class="float-none display-inline-block" ng-disabled="!isValidForm()" type="button"
+                workflow="diary.manageSession" ng-click="saveSession()">
             <i18n>utils.save</i18n>
         </button>
-        <div ng-show="session.one_visa && isTeacher" class="warning"><i18n>session.submit.error.visa</i18n></div>
+        <div ng-show="session.one_visa && isTeacher" class="warning">
+            <i18n>session.submit.error.visa</i18n>
+        </div>
     </div>
 </div>
