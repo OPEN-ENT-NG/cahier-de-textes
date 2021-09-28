@@ -390,11 +390,14 @@ export let calendarController = ng.controller('CalendarController',
                 return model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) || model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession);
             };
 
-            $scope.openSession = (sessionId: number) => {
-                if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
-                    $scope.goTo('/session/update/' + sessionId);
+            $scope.isSessionOwner = (session: Session): boolean =>
+                session && session.teacher && session.teacher.id === model.me.userId;
+
+            $scope.openSession = (session: Session) => {
+                if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession) && $scope.isSessionOwner(session)) {
+                    $scope.goTo('/session/update/' + session.id);
                 } else {
-                    $scope.goTo('/session/view/' + sessionId);
+                    $scope.goTo('/session/view/' + session.id);
                 }
                 $scope.safeApply();
             };
@@ -441,11 +444,14 @@ export let calendarController = ng.controller('CalendarController',
                 }
             };
 
-            $scope.openHomework = (homeworkId: number) => {
-                if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
-                    $scope.goTo('/homework/update/' + homeworkId);
+            $scope.isHomeworkOwner = (homework: Homework): boolean =>
+                homework && homework.teacher && homework.teacher.id === model.me.userId;
+
+            $scope.openHomework = (homework: Homework) => {
+                if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) && $scope.isHomeworkOwner(homework)) {
+                    $scope.goTo('/homework/update/' + homework.id);
                 } else {
-                    $scope.goTo('/homework/view/' + homeworkId);
+                    $scope.goTo('/homework/view/' + homework.id);
                 }
             };
 

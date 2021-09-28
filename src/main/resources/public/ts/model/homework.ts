@@ -104,7 +104,7 @@ export class Homework {
     }
 
     getSubjectTitle(): string {
-        if (this.subject.id && !this.exceptional_label) {
+        if (this.subject && this.subject.id && !this.exceptional_label) {
             return this.subject.name ? this.subject.name : this.subject.label;
         }
         else {

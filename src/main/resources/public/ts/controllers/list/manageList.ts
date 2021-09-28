@@ -306,15 +306,18 @@ export let manageListCtrl = ng.controller('manageListController',
             homework.setProgress(homework.isDone ? Homework.HOMEWORK_STATE_DONE : Homework.HOMEWORK_STATE_TODO);
         };
 
-        $scope.openHomework = (homeworkId: number): void => {
+        $scope.isHomeworkOwner = (homework: Homework): boolean =>
+            homework && homework.teacher && homework.teacher.id === model.me.userId;
+
+        $scope.openHomework = (homework: Homework): void => {
             window.item = {
                 filters: $scope.filters,
                 display: $scope.display
             };
-            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework)) {
-                $scope.goTo('/homework/update/' + homeworkId);
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageHomework) && $scope.isHomeworkOwner(homework)) {
+                $scope.goTo('/homework/update/' + homework.id);
             } else {
-                $scope.goTo('/homework/view/' + homeworkId);
+                $scope.goTo('/homework/view/' + homework.id);
             }
         };
 
@@ -354,15 +357,18 @@ export let manageListCtrl = ng.controller('manageListController',
             }
         };
 
-        $scope.openSession = (sessionId: number) => {
+        $scope.isSessionOwner = (session: Session): boolean =>
+            session && session.teacher && session.teacher.id === model.me.userId;
+
+        $scope.openSession = (session: Session) => {
             window.item = {
                 filters: $scope.filters,
                 display: $scope.display
             };
-            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession)) {
-                $scope.goTo('/session/update/' + sessionId);
+            if (model.me.hasWorkflow(WORKFLOW_RIGHTS.manageSession) && $scope.isSessionOwner(session)) {
+                $scope.goTo('/session/update/' + session.id);
             } else {
-                $scope.goTo('/session/view/' + sessionId);
+                $scope.goTo('/session/view/' + session.id);
             }
             $scope.safeApply();
         };
