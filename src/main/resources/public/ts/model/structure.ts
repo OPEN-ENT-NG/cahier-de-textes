@@ -1,9 +1,21 @@
 import {Behaviours, model} from 'entcore';
-import {Audiences, Courses, DateUtils, Homeworks, Sessions, Students, Subjects, Teachers} from './index';
+import {
+    Audience,
+    Audiences,
+    Courses,
+    DateUtils,
+    Homeworks,
+    Sessions,
+    Student,
+    Students,
+    Subjects,
+    Teachers
+} from './index';
 import {Eventer} from 'entcore-toolkit';
 import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
-import {Groups} from "./group";
+import {Group, Groups} from "./group";
+import {ArrayUtils} from "../utils/array.utils";
 
 declare let window: any;
 
@@ -64,25 +76,51 @@ export class Structure {
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
         await Promise.all(promises).then(async () => {
-            const promises: Promise<void>[] = [];
             window.audiences = this.audiences;
-            if (model.me.hasWorkflow(Behaviours.applicationsBehaviours.diary.rights.workflow.accessChildData)) {
-                promises.push(this.groups.sync(this.audiences.getIds()));
-                promises.push(this.students.sync());
-            }
-            await Promise.all(promises);
         });
     }
+
+    addStudent(newStudent: Student): void {
+        if (!this.students) this.students = new Students(this);
+
+        let student: Student = this.students.get(newStudent.id);
+        let audience: Audience = this.audiences.getAudienceFromStudent(newStudent);
+        let group: Group = this.groups.getGroupsFromStudent(newStudent);
+
+        const setStudentData = (currentStudent: Student): void => {
+            if (audience) currentStudent.addAudience(audience);
+            if (group) currentStudent.addGroup(group);
+        }
+        if (student) {
+            setStudentData(student);
+            return;
+        }
+        setStudentData(newStudent);
+        this.students.add(newStudent);
+    }
+
+    addGroup(newGroup: Group): void {
+        if (!this.groups) this.groups = new Groups();
+        let group: Group = this.groups.get(newGroup.id_classe);
+        if (group) {
+            group.addGroupIds(newGroup.id_groups);
+            group.addGroupNames(newGroup.name_groups);
+            return;
+        }
+        this.groups.add(newGroup);
+    }
+
 }
 
 export class Structures {
     all: Structure[];
 
     constructor(arr?: Structure[]) {
-        this.all = [];
-        if (arr instanceof Structure) {
-            this.all = arr;
-        }
+        this.all = arr ? arr : [];
+    }
+
+    setStructures(structures: Structure[]): void {
+        this.all = structures;
     }
 
     sync() {
@@ -100,14 +138,26 @@ export class Structures {
         return this.all[0];
     }
 
+    get = (structureId: string): Structure => this.all.find((structure: Structure) => structure.id === structureId);
+
+    getAudiences(): Audience[] {
+        let audiences: Audience[][] = this.all.map((structure: Structure) => structure.audiences.all);
+        return ArrayUtils.propertyDistinct(ArrayUtils.flat(audiences), "id");
+    }
+
+    getStudents(): Student[] {
+        let students: Student[][] = this.all.map((structure: Structure) => structure.students.all);
+        return ArrayUtils.propertyDistinct(ArrayUtils.flat(students), "id");
+    }
 
     /**
      * Returns current structure we are using with window.structure
      * @returns {Structure} structure
      */
     getCurrentStructure(): Structure {
-        if (window.structure) {
-            return this.all.find((structure: Structure) => structure.id === window.structure.id);
-        }
+        if (window.structure) return this.get(window.structure.id);
     }
+
+    filterByStudents = (studentId: string): Structure[] =>
+        this.all.filter((structure: Structure) => structure.students.get(studentId));
 }

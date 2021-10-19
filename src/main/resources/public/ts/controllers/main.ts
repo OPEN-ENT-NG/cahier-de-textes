@@ -1,20 +1,21 @@
-import {Behaviours, idiom as lang, Me, model, moment, ng, template} from 'entcore';
+import {Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {
-    Courses,
+    Courses, Structure,
     Structures,
     Toast, USER_TYPES
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocomplete/autocompleteUtils';
-import {PreferencesUtils} from '../utils/preference/preferences';
-import {StructureService} from '../services';
 import {MobileUtils} from '../utils/mobile';
+import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from "../core/enum/events";
+import {IAngularEvent} from "angular";
+import {UserUtils} from "../utils/user.utils";
 
 declare let window: any;
 
 export let main = ng.controller('MainController',
-    ['$scope', '$rootScope', 'route', '$location', '$timeout', 'StructureService',
-        async function ($scope, $rootScope, route, $location, $timeout, structureService: StructureService) {
+    ['$scope', '$rootScope', 'route', '$location', '$timeout',
+        async function ($scope, $rootScope, route, $location, $timeout) {
             const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
             $scope.notifications = [];
             $scope.display = {
@@ -52,29 +53,42 @@ export let main = ng.controller('MainController',
             };
 
             $scope.initializeStructure = async (): Promise<void> => {
-                // case navigation does not exist
-                if ($scope.isAChildOrAParent) {
-                    let structures = structureService.getUserStructure();
-                    let preferenceStructure = await Me.preference(PreferencesUtils.PREFERENCE_KEYS.CDT_STRUCTURE);
-                    let preferenceStructureId = preferenceStructure ? preferenceStructure['id'] : null;
-                    window.structure = preferenceStructureId ?
-                        structures.find((s) => s.id === preferenceStructureId) : structures[0];
-                }
-
                 $scope.structures = new Structures();
-                await $scope.structures.sync();
-                $scope.structure = $scope.structures.getCurrentStructure();
-                if ($scope.structure) {
-                    await $scope.structure.sync();
-                    $scope.structureInitialized = true;
+                // case navigation does not exist
+                if (UserUtils.amIStudentOrParent()) {
+                    await UserUtils.setWindowStructureFromUser();
+                    $scope.updateStructures(await UserUtils.setParentStructures());
+                    $scope.selectFirstStudent();
                 } else {
-                    // if cannot find own structure because he is based on window.structure.id then we take first
-                    $scope.structure = $scope.structures.first();
-                    await $scope.structure.sync();
-                    $scope.structureInitialized = true;
+                    await $scope.structures.sync();
+                    $scope.structure = $scope.structures.getCurrentStructure();
+                    if ($scope.structure) await $scope.structure.sync();
+                    else {
+                        // if cannot find own structure because he is based on window.structure.id then we take first
+                        $scope.structure = $scope.structures.first();
+                        await $scope.structure.sync();
+                    }
                 }
+                $scope.structureInitialized = true;
                 $scope.safeApply();
             };
+
+            $scope.updateStructures = (structures: Structure[] | Structures) => {
+                if (!$scope.structures) $scope.structures = new Structures();
+                $scope.structures.setStructures(structures instanceof Structures ? structures.all : structures);
+                // !! WARNING: take care to use $scope.$on when you want to use this event result !!
+                $scope.$broadcast(STRUCTURES_EVENTS.UPDATED, $scope.structures);
+            }
+
+            $scope.selectFirstStudent = () => {
+                let students = $scope.structures.getStudents();
+                if (UserUtils.amIStudent() || students.length > 1) {
+                    if (students.length > 1) $scope.params.child = students[0];
+                    $scope.structure = $scope.structures.first();
+                    $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE, $scope.structure);
+                    return;
+                }
+            }
 
             $scope.setLegendLightboxVisible = (state: boolean) => {
                 $scope.legendLightboxIsVisible = state;
@@ -138,7 +152,7 @@ export let main = ng.controller('MainController',
                 if (!$scope.structure) {
                     await $scope.initializeStructure();
                 }
-                if (!$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);
+                if ($scope.structure && !$scope.structure.courses) $scope.structure.courses = new Courses($scope.structure);
                 $scope.pageInitialized = true;
                 $scope.safeApply();
             };
@@ -199,6 +213,14 @@ export let main = ng.controller('MainController',
             $scope.hasRight = (right: string): boolean => {
                 return model.me.hasWorkflow(WORKFLOW_RIGHTS[right]);
             };
+
+            $scope.$on(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, async (event: IAngularEvent, structureId: string) => {
+                if (!$scope.structure || ($scope.structure && $scope.structure.id != structureId)) {
+                    $scope.structure = window.structure = $scope.structures.get(structureId);
+                    if (!UserUtils.amIStudentOrParent()) await $scope.initializeStructure();
+                    $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE);
+                }
+            });
 
             route({
                 main: async () => {

@@ -59,11 +59,10 @@ export const structureService: StructureService = {
         const {structures, structureNames} = model.me;
         const values = [];
         for (let i = 0; i < structures.length; i++) {
-            values.push({id: structures[i], name: structureNames[i]});
+            values.push(new Structure(structures[i], structureNames[i]));
         }
         return values;
-    }
-
+    },
 };
 
 export const StructureService = ng.service('StructureService', (): StructureService => structureService);

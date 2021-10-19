@@ -1,10 +1,12 @@
 import http from "axios";
+import {Student} from "./student";
 
 interface IGroup {
     id_classe: string;
     name_classe: string;
     id_groups: string[];
-    name_groups: string[]
+    name_groups: string[];
+    id_structure: string;
 }
 
 export class Group implements IGroup {
@@ -12,20 +14,15 @@ export class Group implements IGroup {
     name_classe: string;
     id_groups: string[];
     name_groups: string[];
+    id_structure: string;
 
-    /**
-     * Structure constructor. Can take an id and a name in parameter
-     * @param id_classe
-     * @param name_classe
-     * @param id_groups
-     * @param name_groups
-     */
-    constructor(id_classe?: string, name_classe?: string, id_groups?: string[], name_groups?: string[]) {
-        this.id_classe = id_classe && id_classe.trim() != '' ? id_classe : null;
-        this.name_classe = name_classe && name_classe.trim() != '' ? name_classe : null;
-        this.id_groups = id_groups ? id_groups : [];
-        this.name_groups = name_groups ? name_groups : [];
+    addGroupIds(groupIds: string[]): void {
+        if(groupIds) this.id_groups = [...groupIds, ...this.id_groups];
     }
+
+    addGroupNames(groupNames: string[]): void {
+        if(groupNames) this.name_groups = [...groupNames, ...this.id_groups];
+    };
 }
 
 export class Groups {
@@ -35,10 +32,10 @@ export class Groups {
         this.all = arr ? arr : [];
     }
 
-    async sync(audience_ids: String[], student_id?: String): Promise<void> {
+    async sync(audience_ids: String[], student_ids?: String[]): Promise<void> {
         let params: String = '';
         audience_ids.forEach(id => params += `${params.length === 0 ? '?' : '&'}classes=${id}`);
-        if(student_id) params+=`${params.length === 0 ? '?' : '&'}student=${student_id}`;
+        if (student_ids) student_ids.forEach(id => params += `${params.length === 0 ? '?' : '&'}student=${id}`)
 
         let {data} = await http.get(`/viescolaire/group/from/class${params}`);
         this.all = data;
@@ -51,4 +48,13 @@ export class Groups {
     first(): Group {
         return this.all[0];
     }
+
+    get = (groupClassId: string): Group => this.all.find((s: Group) => s.id_classe == groupClassId);
+
+    add(group: Group): void {
+        this.all.push(group);
+    }
+
+    getGroupsFromStudent = (student: Student): Group =>
+        this.all.find((group: Group)  => !!group.id_groups.find((groupId: string) => groupId === student.groupId));
 }

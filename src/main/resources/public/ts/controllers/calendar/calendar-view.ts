@@ -1,22 +1,26 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Subject, Workload} from '../../model';
+import {Course, Homework, PEDAGOGIC_TYPES, Session, Structure, Structures, Subject, Workload} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolder, ProgressionFolders, ProgressionHomework, ProgressionSession} from '../../model/Progression';
-import {StructureService, StructureSlot} from '../../services';
+import {GroupService, StructureService, StructureSlot} from '../../services';
 import {Groups} from '../../model/group';
-import {UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
+import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
 import {PEDAGOGIC_SLOT_PROFILE} from '../../core/enum/pedagogic-slot-profile';
 import {CALENDAR_TOOLTIP_EVENTER} from '../../core/const/calendar-tooltip-eventer';
 import {FORMAT} from '../../core/const/dateFormat';
 import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 import {MobileUtils} from "../../utils/mobile";
+import {IAngularEvent} from "angular";
+import {UserUtils} from "../../utils/user.utils";
+import {StructureUtils} from "../../utils/structure.utils";
 
 declare let window: any;
 
 export let calendarController = ng.controller('CalendarController',
-    ['$scope', '$rootScope', 'route', '$location', 'StructureService',
-        async function ($scope, $rootScope, route, $location, StructureService: StructureService) {
+    ['$scope', '$rootScope', 'route', '$location', 'StructureService', 'GroupService',
+        async function ($scope, $rootScope, route, $location, StructureService: StructureService, groupService: GroupService) {
+            $scope.userUtils = UserUtils;
             $scope.display = {
                 homeworks: true,
                 sessions: true,
@@ -82,6 +86,16 @@ export let calendarController = ng.controller('CalendarController',
                 }
             };
 
+            $scope.changeStudent = (): void => UserUtils.changeStudent($scope, $scope.structure, $scope.params.child);
+
+            $scope.changeStructure = (): void => StructureUtils.emitChangeStructure($scope, $scope.params.structure.id)
+
+            $scope.currentChildStructures = (): Structure[] => {
+                if (UserUtils.amIStudent()) return $scope.structures ? $scope.structures.all || [] : [];
+                return ($scope.params) ? UserUtils.currentChildStructures($scope.params.child, $scope.structures) : [];
+            }
+
+
             const setTimeSlots = async () => {
                 await initTimeSlots();
                 $scope.safeApply();
@@ -137,9 +151,11 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             $scope.syncPedagogicItems = async (firstRun?: boolean) => {
-                $scope.structure.homeworks.all = [];
-                $scope.structure.sessions.all = [];
-                $scope.structure.courses.all = [];
+                if ($scope.structure) {
+                    $scope.structure.homeworks.all = [];
+                    $scope.structure.sessions.all = [];
+                    $scope.structure.courses.all = [];
+                }
                 $scope.progressionFolders.all = [];
                 const teacherSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
                     AutocompleteUtils.getTeachersSelected()[0] : [];
@@ -157,8 +173,7 @@ export let calendarController = ng.controller('CalendarController',
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                     /* student/parents workflow case */
-                    let groups: Groups = new Groups();
-                    await groups.sync([$scope.params.child.audience.id], $scope.params.child.id);
+                    let groups: Groups = new Groups(await groupService.initGroupsFromStudentIds([$scope.params.child.id]));
                     await Promise.all([
                         $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                         $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
@@ -185,7 +200,7 @@ export let calendarController = ng.controller('CalendarController',
                 }
 
                 // On lie les homeworks à leur session
-                $scope.loadPedagogicItems();
+                if ($scope.structure) $scope.loadPedagogicItems();
                 delete ($rootScope.session);
                 delete ($rootScope.homework);
                 $scope.safeApply();
@@ -700,14 +715,16 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             const load = async () => {
-                $scope.isRefreshingCalendar = true;
-                await Promise.all([
-                    $scope.initializeData(),
-                    setTimeSlots()
-                ]);
-                $scope.syncPedagogicItems();
-                AutocompleteUtils.init($scope.structure);
-                $scope.isRefreshingCalendar = false;
+                if ($scope.structure) {
+                    $scope.isRefreshingCalendar = true;
+                    await Promise.all([
+                        $scope.initializeData(),
+                        setTimeSlots()
+                    ]);
+                    $scope.syncPedagogicItems();
+                    AutocompleteUtils.init($scope.structure);
+                    $scope.isRefreshingCalendar = false;
+                }
                 $scope.safeApply();
             };
 
@@ -738,14 +755,21 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.isRefreshingCalendar = true;
                 initCalendar();
                 await setTimeSlots();
-                $scope.syncPedagogicItems();
+                if ($scope.structure) $scope.syncPedagogicItems();
                 $scope.isRefreshingCalendar = false;
                 $scope.safeApply();
             });
 
             $scope.$on('$destroy', () => model.calendar.callbacks['date-change'] = []);
 
-            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
+            $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, (event: IAngularEvent, structure: Structure) => {
+                if (structure) $scope.structure = structure;
+                $scope.params.structure = $scope.structure;
                 load();
             });
+
+            $scope.$on(STRUCTURES_EVENTS.UPDATED, async (event: IAngularEvent, structures: Structures) => {
+                if (structures) $scope.structures = structures;
+            });
+
         }]);
