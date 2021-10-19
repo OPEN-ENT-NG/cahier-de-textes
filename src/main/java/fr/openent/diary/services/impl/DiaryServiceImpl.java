@@ -31,20 +31,44 @@ public class DiaryServiceImpl implements DiaryService {
 
     /**
      * List children info about parent id
+     *
      * @param parentId
      * @param handler
      */
     public void listChildren(final String parentId, final Handler<Either<String, JsonArray>> handler) {
-        StringBuilder sb = new StringBuilder("");
-        sb.append(" MATCH (n:User {id : {id}}) ");
-        sb.append(" WHERE HAS(n.login) ");
-        sb.append(" MATCH n<-[:RELATED]-(child:User) ");
-        sb.append(" MATCH child-[:IN]->(gp:Group) ");
-        sb.append(" MATCH gp-[:DEPENDS]->(c:Class) ");
-        sb.append(" RETURN distinct  child.id as id, child.displayName as displayName, c.id as classId, c.name as className ");
+        StringBuilder baseQuery = new StringBuilder("")
+                .append(" MATCH (n:User {id : {id}})<-[:RELATED]-(child:User) ")
+                .append(" WHERE HAS(n.login) ");
+
+        StringBuilder classMatch = new StringBuilder("")
+                .append(baseQuery)
+                .append(" MATCH child-[:IN]->(gp:Group)-[:DEPENDS]->(c:Class)--(s:Structure) ")
+                .append(" RETURN distinct  child.id as id, child.displayName as displayName, c.id as classId, ")
+                .append(" c.name as className, gp.id as groupId, gp.name as groupName, s.id as structureId ");
+
+        StringBuilder returnQuery =  new StringBuilder("")
+                .append(" RETURN distinct  child.id as id, child.displayName as displayName, null as classId, ")
+                .append(" null as className, gp.id as groupId, gp.name as groupName, s.id as structureId ");
+
+        StringBuilder functionalGroupMatch = new StringBuilder("")
+                .append(" UNION ")
+                .append(baseQuery)
+                .append(" MATCH child-[:IN]-(gp:FunctionalGroup)--(s:Structure) ")
+                .append(returnQuery);
+
+        StringBuilder manualGroupMatch = new StringBuilder("")
+                .append(" UNION ")
+                .append(baseQuery)
+                .append(" MATCH child-[:IN]-(gp:ManualGroup)--(s:Structure) ")
+                .append(returnQuery);
+
+        String query = new StringBuilder("")
+                .append(classMatch)
+                .append(functionalGroupMatch)
+                .append(manualGroupMatch).toString();
 
         JsonObject params = new JsonObject().put("id", parentId);
-        neo.execute(sb.toString(), params, Neo4jResult.validResultHandler(handler));
+        neo.execute(query, params, Neo4jResult.validResultHandler(handler));
     }
 
     @Override

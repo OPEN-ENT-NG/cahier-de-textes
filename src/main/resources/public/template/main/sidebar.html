@@ -53,16 +53,17 @@
                     </i>
                 </h5>
             </div>
-            <div ng-if="display.listViewArea.children" class="padding-md">
+            <div ng-if="display.listViewArea.children"
+                 ng-class="display.listView ? 'padding-md' : 'padding-right-md padding-left-md padding-top-md'">
                 <select data-ng-model="params.child"
                         class="twelve"
-                        data-ng-change="params.group = null;params.user = null;syncPedagogicItems()"
-                        ng-options="child as child.displayName for child in structure.students.all track by child.id">
+                        data-ng-change="changeStudent()"
+                        ng-options="child as child.displayName for child in structures.getStudents() track by child.id">
                     <option value="" disabled>[[translate('student.choose')]]</option>
                 </select>
             </div>
         </div>
-
+        <!-- params.group = null;params.user = null;  -->
         <!-- Filter -->
         <div class="row title-sidebar padding-left-md padding-right-md"
              data-ng-click="collapseMobile('filter')"
@@ -95,6 +96,17 @@
                     </label>
                 </div>
             </label>
+
+            <!-- FILTER STRUCTURE -->
+            <div class="padding-right-md" ng-if="userUtils.amIStudentOrParent()">
+                <select ng-model="params.structure"
+                        ng-show="currentChildStructures().length > 1"
+                        class="twelve"
+                        ng-options="struct as struct.name for struct in currentChildStructures() track by struct.id"
+                        ng-change="changeStructure()">
+                    <option value="" disabled>[[translate('utils.structure.choose.one')]]</option>
+                </select>
+            </div>
 
             <!-- SELECT SUBJECT -->
             <filter-subject

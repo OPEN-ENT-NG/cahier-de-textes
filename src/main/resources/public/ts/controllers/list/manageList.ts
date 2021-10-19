@@ -1,13 +1,15 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Audience, Subject
+    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Audience, Subject, Structure, Structures
 } from '../../model';
-import {UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
+import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
 import {SubjectService} from "../../services";
+import {UserUtils} from "../../utils/user.utils";
+import {StructureUtils} from "../../utils/structure.utils";
 
 declare let window: any;
 
@@ -17,6 +19,7 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
+        $scope.userUtils = UserUtils;
         $scope.display = {
             sessionList: true,
             listView: true,
@@ -67,27 +70,32 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         const init = async (): Promise<void> => {
-            await Promise.all([
-                SubjectService.getTimetableSubjects($scope.structure.id),
-                $scope.subjects.sync($scope.structure.id),
-                $scope.syncPedagogicItems()
-            ]).then(res => {
-                res[0].forEach((timetableSubject: Subject) => {
-                    if (!$scope.subjects.all.find((subject: Subject) => subject.id == timetableSubject.id ||
-                        subject.label == timetableSubject.label || subject.name == timetableSubject.label))
-                        $scope.subjects.all.push(timetableSubject);
+            if ($scope.structure) {
+                await Promise.all([
+                    SubjectService.getTimetableSubjects($scope.structure.id),
+                    $scope.subjects.sync($scope.structure.id),
+                    $scope.syncPedagogicItems()
+                ]).then(res => {
+                    res[0].forEach((timetableSubject: Subject) => {
+                        if (!$scope.subjects.all.find((subject: Subject) => subject.id == timetableSubject.id ||
+                            subject.label == timetableSubject.label || subject.name == timetableSubject.label))
+                            $scope.subjects.all.push(timetableSubject);
+                    });
                 });
-            });
+            }
         };
 
-        $scope.syncPedagogicItems = async (subject): Promise<void> => {
+        $scope.syncPedagogicItems = async (subject?): Promise<void> => {
             if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
                 // incorrect dates
                 return;
             }
-            $scope.structure.homeworks.all = [];
-            $scope.structure.sessions.all = [];
-            $scope.structure.courses.all = [];
+
+            if ($scope.structure) {
+                $scope.structure.homeworks.all = [];
+                $scope.structure.sessions.all = [];
+                $scope.structure.courses.all = [];
+            }
 
             const teacherSelected: any = AutocompleteUtils.getTeachersSelected() !== undefined ?
                 AutocompleteUtils.getTeachersSelected()[0] : [];
@@ -101,7 +109,6 @@ export let manageListCtrl = ng.controller('manageListController',
                 && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id) ||
                     !teacherSelected || !classSelected)) {
                 /* parents workflow case */
-
                 await Promise.all([
                     $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
                     $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
@@ -232,6 +239,16 @@ export let manageListCtrl = ng.controller('manageListController',
             });
             $scope.initDisplay();
         };
+
+        $scope.changeStudent = (): void => UserUtils.changeStudent($scope, $scope.structure, $scope.params.child);
+
+        $scope.changeStructure = (): void => StructureUtils.emitChangeStructure($scope, $scope.params.structure.id)
+
+        $scope.currentChildStructures = (): Structure[] => {
+            if (UserUtils.amIStudent()) return $scope.structures ? $scope.structures.all || [] : [];
+            return ($scope.params) ? UserUtils.currentChildStructures($scope.params.child, $scope.structures) : [];
+        }
+
 
         $scope.initDisplay = (): void => {
             let indexMinChildHomework: number = $scope.pedagogicDays.length;
@@ -476,8 +493,14 @@ export let manageListCtrl = ng.controller('manageListController',
 
         init();
 
-        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, () => {
-            init();
+        $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, async (event: IAngularEvent, structure: Structure) => {
+            if (structure) $scope.structure = structure;
+            $scope.params.structure = $scope.structure;
+            await init();
+        });
+
+        $scope.$on(STRUCTURES_EVENTS.UPDATED, async (event: IAngularEvent, structures: Structures) => {
+            if (structures) $scope.structures = structures;
         });
 
         $scope.$on(UPDATE_SUBJECT_EVENTS.UPDATE, (event: IAngularEvent, data) => {

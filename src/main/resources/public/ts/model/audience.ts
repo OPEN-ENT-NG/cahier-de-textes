@@ -1,5 +1,6 @@
 import { Mix } from 'entcore-toolkit';
 import http, {AxiosResponse} from 'axios';
+import {Student} from "./student";
 
 export interface IAudience {
     id?: string;
@@ -69,5 +70,12 @@ export class Audiences {
     getIds(): String[] {
         return this.all.map(audience => audience.id);
     }
+
+    add(audience: Audience): void {
+        if(!this.all.find((a: Audience) => a.id === audience.id)) this.all.push(audience);
+    }
+
+    getAudienceFromStudent = (student: Student): Audience =>
+        this.all.find((audience: Audience)  => audience.id === student.classId)
 }
 

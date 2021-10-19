@@ -456,6 +456,7 @@ export class Sessions {
 
     async syncSessions(url: string) {
         let {data} = await http.get(url);
+        data = data.filter(s => s.structure_id === this.structure.id);
         this.all = Mix.castArrayAs(Session, Sessions.formatSqlDataToModel(data, this.structure));
         this.all.forEach(i => {
             i.init(this.structure);
