@@ -1,7 +1,7 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Audience, Subject, Structure, Structures
+    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Subject, Structure, Structures
 } from '../../model';
 import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
@@ -9,7 +9,6 @@ import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
 import {SubjectService} from "../../services";
 import {UserUtils} from "../../utils/user.utils";
-import {StructureUtils} from "../../utils/structure.utils";
 
 declare let window: any;
 
@@ -33,24 +32,6 @@ export let manageListCtrl = ng.controller('manageListController',
             }
         };
 
-        $scope.collapseMobile = (areaType: string): void => {
-            if ($scope.isMobile()) {
-                switch (areaType) {
-                    case 'filter': {
-                        $scope.display.listViewArea.filter = !$scope.display.listViewArea.filter;
-                        break;
-                    }
-                    case 'structure': {
-                        $scope.display.listViewArea.structure = !$scope.display.listViewArea.structure;
-                        break;
-                    }
-                    case 'children': {
-                        $scope.display.listViewArea.children = !$scope.display.listViewArea.children;
-                        break;
-                    }
-                }
-            }
-        };
 
         $scope.autocomplete = AutocompleteUtils;
         $scope.subjects = new Subjects();
@@ -240,16 +221,6 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.initDisplay();
         };
 
-        $scope.changeStudent = (): void => UserUtils.changeStudent($scope, $scope.structure, $scope.params.child);
-
-        $scope.changeStructure = (): void => StructureUtils.emitChangeStructure($scope, $scope.params.structure.id)
-
-        $scope.currentChildStructures = (): Structure[] => {
-            if (UserUtils.amIStudent()) return $scope.structures ? $scope.structures.all || [] : [];
-            return ($scope.params) ? UserUtils.currentChildStructures($scope.params.child, $scope.structures) : [];
-        }
-
-
         $scope.initDisplay = (): void => {
             let indexMinChildHomework: number = $scope.pedagogicDays.length;
             let indexMaxChildHomework: number = -1;
@@ -397,11 +368,6 @@ export let manageListCtrl = ng.controller('manageListController',
             $scope.safeApply();
         };
 
-        $scope.changeViewCalendar = function () {
-            $scope.goTo('/view');
-            $scope.display.listView = false;
-        };
-
         $scope.containsOnlyCourses = (pedagogicDay): boolean => {
             let containsOnlyCourseBool: boolean = true;
             pedagogicDay.pedagogicItems.map(p => {
@@ -495,7 +461,6 @@ export let manageListCtrl = ng.controller('manageListController',
 
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, async (event: IAngularEvent, structure: Structure) => {
             if (structure) $scope.structure = structure;
-            $scope.params.structure = $scope.structure;
             await init();
         });
 

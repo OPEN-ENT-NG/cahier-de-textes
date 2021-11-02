@@ -1,0 +1,12 @@
+export enum SIDEBAR_VIEWS {
+    CALENDAR = 'CALENDAR',
+    LIST = 'LIST'
+}
+
+export enum SIDEBAR_AREAS {
+    FILTER = 'FILTER',
+    STRUCTURE = 'STRUCTURE',
+    CHILDREN = 'CHILDREN',
+    LEGEND = 'LEGEND',
+}
+

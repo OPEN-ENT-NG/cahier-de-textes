@@ -5,7 +5,15 @@
     <div ng-include="'/diary/public/template/list/list-view-header.html'"></div>
 
     <!-- content sidebar -->
-    <div class="cell three twelve-mobile sidebar-content" ng-include="'/diary/public/template/main/sidebar.html'"></div>
+    <sidebar-filter list-mode child="params.child"
+                    subjects="subjects"
+                    subject="filters.subject"
+                    structure="structure"
+                    structures="structures"
+                    is-homeworks-filtered="display.homeworks"
+                    is-sessions-filtered="display.sessionList"
+                    class="cell three twelve-mobile sidebar-content">
+    </sidebar-filter>
 
     <!-- content -->
     <div class="cell nine twelve-mobile sidebar-article sidebar-content">

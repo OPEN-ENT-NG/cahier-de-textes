@@ -15,6 +15,10 @@ export class UserUtils {
 
     static isParent = (type: string): boolean => type === "PERSRELELEVE";
 
+    static isTeacher = (type: string): boolean => type === "ENSEIGNANT";
+
+    static isRelative = (type: string): boolean => type === "PERSRELELEVE";
+
     static isStudentOrParent = (type: string): boolean => UserUtils.isStudent(type) || UserUtils.isParent(type);
 
     static amIStudentOrParent = (): boolean => UserUtils.isStudentOrParent(model.me.type);
@@ -22,6 +26,10 @@ export class UserUtils {
     static amIStudent = (): boolean => UserUtils.isStudent(model.me.type);
 
     static amIParent = (): boolean => UserUtils.isParent(model.me.type);
+
+    static amITeacher = (): boolean => UserUtils.isTeacher(model.me.type);
+
+    static amIRelative = (): boolean => UserUtils.isRelative(model.me.type);
 
 
     /* ******** ******
@@ -37,7 +45,7 @@ export class UserUtils {
 
     static changeStudent = ($scope: any, structure: Structure, student: Student): void => {
         if (!structure || student.structureId != structure.id)
-            $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, $scope.params.child.structureId);
+            $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, student.structureId);
     };
 
     static currentChildStructures = (student: Student, structures: Structures): Structure[] =>

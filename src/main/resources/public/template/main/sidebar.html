@@ -99,7 +99,7 @@
 
             <!-- FILTER STRUCTURE -->
             <div class="padding-right-md" ng-if="userUtils.amIStudentOrParent()">
-                <select ng-model="params.structure"
+                <select ng-model="structure"
                         ng-show="currentChildStructures().length > 1"
                         class="twelve"
                         ng-options="struct as struct.name for struct in currentChildStructures() track by struct.id"

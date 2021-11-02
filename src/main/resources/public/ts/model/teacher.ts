@@ -25,8 +25,8 @@ export class Teacher {
 export class Teachers {
     all: Teacher[];
 
-    constructor () {
-        this.all = [];
+    constructor (teachers?: Teacher[]) {
+        this.all = teachers || [];
     }
 
     /**
@@ -42,4 +42,13 @@ export class Teachers {
             throw e;
         }
     }
+
+    public set(teachers: Teacher[]): Teachers {
+        this.all = teachers;
+        return this;
+    }
+
+    getTeachers = (teacherIds: string[]): Teacher[] =>
+        this.all.filter((teacher: Teacher) => teacherIds.indexOf(teacher.id) != -1);
+
 }

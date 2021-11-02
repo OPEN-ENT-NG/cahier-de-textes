@@ -2,6 +2,7 @@ import http from 'axios';
 import { Mix } from 'entcore-toolkit';
 import {Audience, Audiences, Structure} from './index';
 import {Group, Groups} from "./group";
+import {ArrayUtils} from "../utils/array.utils";
 
 export class Student {
     id: string;
@@ -61,7 +62,23 @@ export class Students {
 
     get = (studentId: string): Student => this.all.find((s: Student) => s.id == studentId);
 
-    add(student: Student): void {
+    set = (students: Student[]): Students => {
+        this.all = students;
+        return this;
+    }
+
+    add(student: Student): Students {
         if(!this.all.find((s: Student) => s.id === student.id)) this.all.push(student);
+        return this;
+    }
+
+    getAudiences(): Audience[] {
+        let audiences: Audience[][] = this.all.map((student: Student) => student.audiences.all);
+        return ArrayUtils.propertyDistinct(ArrayUtils.flat(audiences), "id");
+    }
+
+    getGroups(): Group[] {
+        let groups: Group[][] = this.all.map((student: Student) => student.groups.all);
+        return ArrayUtils.propertyDistinct(ArrayUtils.flat(groups), "id_classe");
     }
 }
