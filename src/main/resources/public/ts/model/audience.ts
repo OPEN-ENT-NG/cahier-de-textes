@@ -71,11 +71,21 @@ export class Audiences {
         return this.all.map(audience => audience.id);
     }
 
+    set(audiences: Audience[]): Audiences {
+        this.all = audiences;
+        return this;
+    }
+
     add(audience: Audience): void {
         if(!this.all.find((a: Audience) => a.id === audience.id)) this.all.push(audience);
     }
 
     getAudienceFromStudent = (student: Student): Audience =>
         this.all.find((audience: Audience)  => audience.id === student.classId)
+
+    getAudiences = (audienceNames: string[]): Audience[] =>
+        this.all.filter((audience: Audience) =>
+            audienceNames.indexOf(audience.name) != -1 || audienceNames.indexOf(audience.groupName) != -1
+        )
 }
 

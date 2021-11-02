@@ -2,8 +2,9 @@ import {model, moment} from 'entcore';
 import http, {AxiosResponse} from 'axios';
 import {Mix} from 'entcore-toolkit';
 import {Group, Groups} from "./group";
-import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils, Student} from './index';
+import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
+import {Moment} from "moment";
 
 const colors = ['cyan', 'green', 'orange', 'pink', 'yellow', 'purple', 'grey'];
 
@@ -12,8 +13,11 @@ declare let window: any;
 export class Course {
 
     _id: string;
+    classNames: string[];
+    groupNames: string[];
     audiences: Audiences;
     structure: Structure;
+    teacherIds: string[];
     teachers: Teachers | any;
     subject: Subject;
     subject_id?: string;
@@ -24,12 +28,12 @@ export class Course {
     color: any;
 
     startDate: any;
-    startMoment: any;
+    startMoment: Moment;
     startDisplayDate: string;
     startDisplayTime: string;
     endCourse: any;
     endDate: any;
-    endMoment: any;
+    endMoment: Moment;
     endDisplayDate: string;
     endDisplayTime: string;
 
@@ -44,30 +48,47 @@ export class Course {
         this._id = id;
     }
 
-    static formatSqlDataToModel(data: any, structure: Structure) {
+    static formatSqlDataToModel(data: any, structure?: Structure) {
 
         let audiences = new Audiences();
         let audienceNameArray = data && data.classes && data.classes.concat ? data.classes : [];
         if (data && data.groups) {
             audienceNameArray = audienceNameArray.concat(data.groups);
         }
-        audiences.all = structure.audiences.all.filter(t => audienceNameArray.includes(t.name));
+        audiences.all = structure ? structure.audiences.all.filter(t => audienceNameArray.includes(t.name)) : [];
+
+        let subject: Subject = data.subject;
+        subject.label = subject.name;
+
         return {
             _id: data._id,
             audiences: audiences,
+            classNames: data.classes,
+            groupNames: data.groups,
             dayOfWeek: data.dayOfWeek,
             endDate: data.endDate,
             endCourse: data.endCourse,
             rooms: data.roomLabels,
             exceptionnal: data.exceptionnal,
             startDate: data.startDate,
-            teachers: structure.teachers.all.filter(t => data.teacherIds.includes(t.id)),
-            subject: data.subject,
+            teacherIds: data.teacherIds,
+            teachers: structure ? structure.teachers.all.filter(t => data.teacherIds.includes(t.id)) : new Teachers(),
+            subject: subject,
+            structure: null,
             subject_id: data.subjectId,
             color: data.color ? data.color : colors[Math.floor(Math.random() * colors.length)],
         };
     }
 
+    setTeachers(teachers: Teacher[]): void {
+        this.teachers = new Teachers(teachers);
+    }
+
+    /*
+        WARNING: This init method is used for a second mapping after the Mix.castArray mapping.
+        Param of type Moment are loosing their type when we cast object thanks Mix.castArray.
+        That's why we need this second treatment.
+     */
     init(structure: Structure) {
         this.structure = structure;
         if (this.startDate) {
@@ -108,11 +129,8 @@ export class Courses {
         this.origin = [];
     }
 
-    static formatSqlDataToModel(data: any, structure: Structure) {
-        let dataModel = [];
-        data.forEach(i => dataModel.push(Course.formatSqlDataToModel(i, structure)));
-        return dataModel;
-    }
+    static formatSqlDataToModel = (data: any, structure?: Structure): Course[] =>
+        data.map((c) => Course.formatSqlDataToModel(c, structure))
 
     async syncWithParams(structure: Structure, teachers: (Teacher | string)[] | null, audiences: Audience[] | null,
                          startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
@@ -120,26 +138,25 @@ export class Courses {
         let endDate: string = DateUtils.getFormattedDate(endMoment);
         let filter: string = '';
         if (model.me.type !== USER_TYPES.student && model.me.type !== USER_TYPES.relative) {
-            if (teachers) teachers.forEach((teacher: Teacher | string) => filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`) ;
+            if (teachers) teachers.forEach((teacher: Teacher | string) => filter += `teacherId=${typeof teacher !== 'string' ? teacher.id : teacher}`);
             if (audiences) audiences.forEach((audience: Audience) => filter += `&group=${audience.name ? audience.name : audience.groupName}`);
         } else if (model.me.classes && model.me.classes.length) {
             if (audiences) {
                 audiences.forEach((audience: Audience) => filter += `&group=${audience.name ? audience.name : audience.groupName}`);
                 if (groups) {
                     let selectedGroups: Group[] = groups.all.filter((group: Group) => audiences.map(audience => audience.id).indexOf(group.id_classe) != -1);
-                    if(selectedGroups) selectedGroups.forEach((group: Group) => group.name_groups.forEach((name: String) => filter += `&group=${name}`));
+                    if (selectedGroups) selectedGroups.forEach((group: Group) => group.name_groups.forEach((name: String) => filter += `&group=${name}`));
                 }
-            }
-            else if (window.audiences && window.audiences.all.length > 0) {
+            } else if (window.audiences && window.audiences.all.length > 0) {
                 window.audiences.all.forEach((audience: Audience) =>
                     filter += `&group=${audience.name ? audience.name : audience.groupName}`);
             }
         }
 
-        if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0,-1);
+        if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0, -1);
         let uri: string = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let { data }: AxiosResponse = await http.get(uri);
+        let {data}: AxiosResponse = await http.get(uri);
         data = data.filter((d) => d.teacherIds);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, structure ? structure : this.structure));
         this.all.forEach((i: Course) => {
@@ -158,8 +175,13 @@ export class Courses {
      * @param groups
      * @returns {Promise<void>} Returns a promise.
      */
-    async sync(structure: Structure, teacher: Teacher | string| null, audience: Audience | null,
+    async sync(structure: Structure, teacher: Teacher | string | null, audience: Audience | null,
                startMoment: any, endMoment: any, groups?: Groups): Promise<void> {
         await this.syncWithParams(structure, teacher ? [teacher] : null, audience ? [audience] : null, startMoment, endMoment, groups ? groups : null)
+    }
+
+    public set(courses: Course[]): Courses {
+        this.all = courses;
+        return this;
     }
 }

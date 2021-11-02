@@ -8,3 +8,4 @@ export * from './ViescolaireService';
 export * from './notebook-archive.service';
 export * from './student.service';
 export * from './group.service';
+export * from './course.service';

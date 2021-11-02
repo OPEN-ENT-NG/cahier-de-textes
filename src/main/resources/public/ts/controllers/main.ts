@@ -82,12 +82,12 @@ export let main = ng.controller('MainController',
 
             $scope.selectFirstStudent = () => {
                 let students = $scope.structures.getStudents();
-                if (UserUtils.amIStudent() || students.length > 1) {
-                    if (students.length > 1) $scope.params.child = students[0];
-                    $scope.structure = $scope.structures.first();
-                    $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE, $scope.structure);
-                    return;
+                if (UserUtils.amIStudent()) $scope.structure = $scope.structures.first();
+                else if (students.length > 0) {
+                    $scope.params.child = students[0];
+                    $scope.structure = $scope.structures.filterByStudents($scope.params.child.id)[0];
                 }
+                $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE, $scope.structure);
             }
 
             $scope.setLegendLightboxVisible = (state: boolean) => {

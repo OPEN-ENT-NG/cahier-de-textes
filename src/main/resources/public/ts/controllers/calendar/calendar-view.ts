@@ -1,25 +1,38 @@
-import {_, angular, Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
-import {Course, Homework, PEDAGOGIC_TYPES, Session, Structure, Structures, Subject, Workload} from '../../model';
+import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore';
+import {
+    Course,
+    Homework,
+    PEDAGOGIC_TYPES,
+    Session,
+    Structure,
+    Structures,
+    Subject,
+    Workload
+} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolder, ProgressionFolders, ProgressionHomework, ProgressionSession} from '../../model/Progression';
-import {GroupService, StructureService, StructureSlot} from '../../services';
-import {Groups} from '../../model/group';
+import {
+    CourseService,
+    GroupService,
+    StructureService,
+    StructureSlot
+} from '../../services';
 import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
-import {PEDAGOGIC_SLOT_PROFILE} from '../../core/enum/pedagogic-slot-profile';
 import {CALENDAR_TOOLTIP_EVENTER} from '../../core/const/calendar-tooltip-eventer';
 import {FORMAT} from '../../core/const/dateFormat';
 import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 import {MobileUtils} from "../../utils/mobile";
 import {IAngularEvent} from "angular";
 import {UserUtils} from "../../utils/user.utils";
-import {StructureUtils} from "../../utils/structure.utils";
+import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
 
 declare let window: any;
 
 export let calendarController = ng.controller('CalendarController',
-    ['$scope', '$rootScope', 'route', '$location', 'StructureService', 'GroupService',
-        async function ($scope, $rootScope, route, $location, StructureService: StructureService, groupService: GroupService) {
+    ['$scope', '$rootScope', 'route', '$location', 'StructureService', 'GroupService', 'CourseService',
+        async function ($scope, $rootScope, route, $location, StructureService: StructureService, groupService: GroupService,
+                        courseService: CourseService) {
             $scope.userUtils = UserUtils;
             $scope.display = {
                 homeworks: true,
@@ -56,45 +69,9 @@ export let calendarController = ng.controller('CalendarController',
             };
             model.calendar.setDate(moment());
 
-            $scope.setLegendLightboxVisible = (state: boolean) => {
-                $scope.legendLightboxIsVisible = state;
-                if ($scope.legendLightboxIsVisible) {
-                    template.open('infoBulleTemplate', 'main/toolTip-legendeTemplate');
-                }
-            };
-
             $scope.transformDateToFrenchDate = (date: Date) => {
                 return moment(date).format("dddd D MMMM YYYY");
             };
-
-            $scope.changeViewCalendar = function () {
-                $scope.goTo('/view');
-                $scope.display.listView = false;
-                if ($scope.display.listView) {
-                    $scope.display.sessions = true;
-                    $scope.display.homeworks = true;
-                }
-            };
-
-            $scope.changeViewList = function () {
-                $scope.filters.endDate = moment($scope.filters.startDate).add('2', 'weeks').add('4', 'day');
-                $scope.goTo('/list');
-                $scope.display.listView = true;
-                if ($scope.display.listView) {
-                    $scope.display.sessions = true;
-                    $scope.display.homeworks = true;
-                }
-            };
-
-            $scope.changeStudent = (): void => UserUtils.changeStudent($scope, $scope.structure, $scope.params.child);
-
-            $scope.changeStructure = (): void => StructureUtils.emitChangeStructure($scope, $scope.params.structure.id)
-
-            $scope.currentChildStructures = (): Structure[] => {
-                if (UserUtils.amIStudent()) return $scope.structures ? $scope.structures.all || [] : [];
-                return ($scope.params) ? UserUtils.currentChildStructures($scope.params.child, $scope.structures) : [];
-            }
-
 
             const setTimeSlots = async () => {
                 await initTimeSlots();
@@ -173,12 +150,12 @@ export let calendarController = ng.controller('CalendarController',
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                     /* student/parents workflow case */
-                    let groups: Groups = new Groups(await groupService.initGroupsFromStudentIds([$scope.params.child.id]));
-                    await Promise.all([
+                    let result: any[] = await Promise.all([
+                        courseService.initCoursesFromStudents($scope.structure, [$scope.params.child.id], $scope.filters.startDate, $scope.filters.endDate),
                         $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
                         $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id),
-                        $scope.structure.courses.sync($scope.structure, teacherSelected, $scope.params.child.audience, $scope.filters.startDate, $scope.filters.endDate, groups)
                     ]);
+                    $scope.structure.setCourses(<Course[]>result[0]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher workflow case */
                     let teacherId = (teacherSelected && teacherSelected.id) ? teacherSelected.id : model.me.userId;
@@ -238,7 +215,7 @@ export let calendarController = ng.controller('CalendarController',
                 }
 
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
-                let courses = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
+                let courses: Course[] = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
                 $scope.loadPedagogicDays();
@@ -764,7 +741,6 @@ export let calendarController = ng.controller('CalendarController',
 
             $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, (event: IAngularEvent, structure: Structure) => {
                 if (structure) $scope.structure = structure;
-                $scope.params.structure = $scope.structure;
                 load();
             });
 

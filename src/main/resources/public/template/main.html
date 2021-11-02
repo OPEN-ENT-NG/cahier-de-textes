@@ -77,9 +77,15 @@
 
     <!-- area calendar -->
     <div class="row" id="calendar-area">
-        <div class="cell three twelve-mobile sidebar-content"
-             ng-include="'/diary/public/template/main/sidebar.html'">
-        </div>
+        <sidebar-filter calendar-mode child="params.child"
+                        subjects="subjects"
+                        subject="filters.subject"
+                        structure="structure"
+                        structures="structures"
+                        is-homeworks-filtered="display.homeworks"
+                        is-sessions-filtered="display.sessionList"
+                        class="cell three twelve-mobile sidebar-content">
+        </sidebar-filter>
 
         <div class="cell twelve-mobile main-content" ng-if="!display.listView"
              ng-class="(isAChildOrAParent || isTeacher) ? 'nine' : 'twelve'"

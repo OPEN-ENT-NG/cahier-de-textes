@@ -1,14 +1,14 @@
-import {Behaviours, model} from 'entcore';
+import {model} from 'entcore';
 import {
     Audience,
-    Audiences,
+    Audiences, Course,
     Courses,
     DateUtils,
     Homeworks,
     Sessions,
     Student,
     Students,
-    Subjects,
+    Subjects, Teacher,
     Teachers
 } from './index';
 import {Eventer} from 'entcore-toolkit';
@@ -16,6 +16,7 @@ import {Personnels} from './Personnel';
 import {SessionTypes} from './session';
 import {Group, Groups} from "./group";
 import {ArrayUtils} from "../utils/array.utils";
+import {UserUtils} from "../utils/user.utils";
 
 declare let window: any;
 
@@ -63,16 +64,9 @@ export class Structure {
      * @returns {Promise<any>|Promise}
      */
     async sync() {
-        let hasTeacherStudentWorkflow: boolean = true;
-
-        // boolean that check if relative or children we do not fetch all classes
-        if (DateUtils.isAChildOrAParent(model.me.type)) {
-            hasTeacherStudentWorkflow = false;
-        }
-
         const promises: Promise<void>[] = [];
         promises.push(this.types.sync());
-        promises.push(this.audiences.sync(this.id, hasTeacherStudentWorkflow));
+        promises.push(this.audiences.sync(this.id, !UserUtils.amIStudentOrParent()));
         promises.push(this.teachers.sync(this));
         promises.push(this.personnels.sync(this));
         await Promise.all(promises).then(async () => {
@@ -108,6 +102,18 @@ export class Structure {
             return;
         }
         this.groups.add(newGroup);
+    }
+
+    setCourses(courses: Course[]): void {
+        this.courses = new Courses(this).set(courses);
+        this.courses.all.forEach((course: Course) => {
+            let classNames = course.classNames || [];
+            let groupNames = course.groupNames || [];
+            let teacherIds = course.teacherIds || [];
+            course.audiences.set(this.audiences.getAudiences([...classNames, ...groupNames]));
+            course.teachers.set(this.teachers.getTeachers(teacherIds));
+            course.init(this);
+        });
     }
 
 }

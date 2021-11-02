@@ -1,0 +1,145 @@
+<article class="sidebar remove-padding" workflow="diary.listView">
+
+    <div>
+        <!-- SELECT STRUCTURE -->
+        <select-structure ng-if="vm.userUtils.amIStudentOrParent()" structure="vm.structure"></select-structure>
+
+        <!-- Display mode -->
+        <div ng-if="!vm.mobileUtils.isMobile()" class="row title-sidebar padding-left-md padding-right-md">
+            <h5 class="large cell twelve" workflow="diary.listView">
+                <i18n>sidebar.display_mode</i18n>
+                <!-- Legend -->
+                <i class="large help one cell right-magnet" ng-if="vm.areShownViews[vm.SIDEBAR_VIEWS.CALENDAR]"
+                   tooltip="[[vm.lang.translate('help')]]" ng-click="vm.setLegendVisibility(true)"></i>
+            </h5>
+        </div>
+
+        <!-- Bloc Mode d'affichage -->
+        <section ng-if="!vm.mobileUtils.isMobile()" id="display-section"
+                 class="cell twelve padding-left-md padding-bottom-sm padding-top-sm display-background">
+            <label workflow="diary.listView" class="cell twelve">
+
+                <!-- switch calendar mode -->
+                <span class="six diary-choice-view" data-ng-click="vm.changeView(vm.SIDEBAR_VIEWS.CALENDAR)">
+                    <div ng-include="'/diary/public/img/calendaire.svg'"
+                         class="margin-sm cursorPointer"
+                         ng-class="vm.areShownViews[vm.SIDEBAR_VIEWS.CALENDAR] ? 'selected' : 'opacity-icon'">
+                    </div>
+                    <i18n>calendar</i18n>
+                </span>
+
+                <!-- switch list mode -->
+                <span class="six diary-choice-view" data-ng-click="vm.changeView(vm.SIDEBAR_VIEWS.LIST)">
+                    <div ng-include="'/diary/public/img/liste.svg'"
+                         class="margin-sm cursorPointer"
+                         ng-class="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST] ? 'selected' : 'opacity-icon'"
+                         data-ng-model="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST]">
+                    </div>
+                    <i18n>list</i18n>
+                </span>
+            </label>
+        </section>
+
+        <!-- children content as parent -->
+        <div class="row" ng-if="vm.userUtils.amIRelative()">
+            <div class="row title-sidebar padding-left-md padding-right-md"
+                 data-ng-click="vm.collapseMobile(vm.SIDEBAR_AREAS.CHILDREN)">
+                <h5 class="large cell twelve">
+                    <i18n>children</i18n>
+
+                    <i ng-show="vm.mobileUtils.isMobile()"
+                       ng-class="vm.areShownAreas[vm.SIDEBAR_AREAS.CHILDREN] ? 'up-open' : 'down-open'"
+                       class="right-magnet">
+                    </i>
+                </h5>
+            </div>
+            <div ng-if="vm.areShownAreas[vm.SIDEBAR_AREAS.CHILDREN]"
+                 ng-class="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST] ? 'padding-md' : 'padding-right-md padding-left-md padding-top-md'">
+                <select data-ng-model="vm.child"
+                        class="twelve"
+                        data-ng-change="vm.changeStudent()"
+                        ng-options="child as child.displayName for child in vm.structures.getStudents() track by child.id">
+                    <option value="" disabled>[[vm.lang.translate('student.choose')]]</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="row title-sidebar padding-left-md padding-right-md"
+             data-ng-click="vm.collapseMobile(vm.SIDEBAR_AREAS.FILTER)"
+             ng-if="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST] && vm.userUtils.amIStudentOrParent()">
+            <h5 class="large cell twelve" workflow="diary.listView">
+                <i18n>filters</i18n>
+
+                <i ng-show="vm.mobileUtils.isMobile()"
+                   ng-class="vm.areShownAreas[vm.SIDEBAR_AREAS.FILTER] ? 'up-open' : 'down-open'"
+                   class="right-magnet">
+                </i>
+            </h5>
+        </div>
+        <section ng-if="(vm.userUtils.amIStudentOrParent() || vm.userUtils.amITeacher()) && vm.areShownAreas[vm.SIDEBAR_AREAS.FILTER]"
+                 class="cell twelve padding-left-md margin-bottom-lg padding-bottom-sm padding-top-sm display-background">
+            <label workflow="diary.listView" class="cell twelve margin-bottom-md" ng-if="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST]">
+                <!-- homework -->
+                <div class="six diary-choice-view">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="vm.isHomeworksFiltered"/>
+                        <span><i18n>Homeworks</i18n></span>
+                    </label>
+                </div>
+
+                <!-- session -->
+                <div class="six diary-choice-view">
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="vm.isSessionsFiltered"/>
+                        <span><i18n>sessions</i18n></span>
+                    </label>
+                </div>
+            </label>
+
+            <!-- FILTER STRUCTURE -->
+            <div class="padding-right-md" ng-if="vm.userUtils.amIStudentOrParent()">
+                <select ng-model="vm.structure"
+                        ng-show="vm.currentChildStructures().length > 1"
+                        class="twelve"
+                        ng-options="structure as structure.name for structure in vm.currentChildStructures() track by structure.id"
+                        ng-change="vm.changeStructure()">
+                    <option value="" disabled>[[vm.lang.translate('utils.structure.choose.one')]]</option>
+                </select>
+            </div>
+
+            <!-- SELECT SUBJECT -->
+            <filter-subject
+                    subjects="vm.subjects.all"
+                    current-subject="vm.subject" ng-if="vm.areShownViews[vm.SIDEBAR_VIEWS.LIST]">
+            </filter-subject>
+        </section>
+
+        <!-- Progression -->
+        <div ng-if="vm.userUtils.amITeacher()" ng-show="vm.areShownViews[vm.SIDEBAR_VIEWS.CALENDAR]">
+            <div class="row title-sidebar padding-left-md padding-right-md">
+                <h5 class="large cell twelve">
+                    <i18n>progressions</i18n>
+                </h5>
+            </div>
+            <!-- Bloc Progression -->
+            <section class="progression-container cell twelve padding-md" ng-controller="manageProgessionCtrl">
+                <div class="row">
+                    <input ng-change="filterProgression(search)"
+                           class="progression-search remove-box-shadow cell twelve"
+                           type="text"
+                           ng-model="search"
+                           placeholder="Rechercher">
+                    <div class="row margin-bottom-lg progression-tree"
+                         ng-include="'/diary/public/template/progression/progression-tree.html'">
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</article>
+
+<!-- tooltip legend tips -->
+<lightbox show="vm.areShownAreas[vm.SIDEBAR_AREAS.LEGEND]" on-close="vm.setLegendVisibility(false);">
+    <container template="infoBulleTemplate"></container>
+</lightbox>
