@@ -1,13 +1,13 @@
 import {Behaviours, idiom as lang, model, moment, ng, template} from 'entcore';
 import {
     Courses, Structure,
-    Structures,
+    Structures, Student,
     Toast, USER_TYPES
 } from '../model';
 import {DateUtils} from '../utils/dateUtils';
 import {AutocompleteUtils} from '../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from '../utils/mobile';
-import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from "../core/enum/events";
+import {CHILD_EVENTS, STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from "../core/enum/events";
 import {IAngularEvent} from "angular";
 import {UserUtils} from "../utils/user.utils";
 
@@ -218,7 +218,17 @@ export let main = ng.controller('MainController',
                 if (!$scope.structure || ($scope.structure && $scope.structure.id != structureId)) {
                     $scope.structure = window.structure = $scope.structures.get(structureId);
                     if (!UserUtils.amIStudentOrParent()) await $scope.initializeStructure();
-                    $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE);
+                    $scope.$broadcast(UPDATE_STRUCTURE_EVENTS.UPDATE, $scope.structure);
+                }
+            });
+
+            $scope.$on(CHILD_EVENTS.UPDATE, async (event: IAngularEvent, childId: string) => {
+                if (($scope.param && !$scope.params.child) || ($scope.params.child && $scope.params.child.id != childId)) {
+                    let student: Student = $scope.structures.getStudents().find((student: Student) => student.id === childId);
+                    if (student) {
+                        $scope.params.child = student;
+                        $scope.$broadcast(CHILD_EVENTS.UPDATED, $scope.child);
+                    }
                 }
             });
 

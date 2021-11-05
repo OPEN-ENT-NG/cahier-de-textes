@@ -5,7 +5,7 @@ import {
     PEDAGOGIC_TYPES,
     Session,
     Structure,
-    Structures,
+    Structures, Student,
     Subject,
     Workload
 } from '../../model';
@@ -18,7 +18,7 @@ import {
     StructureService,
     StructureSlot
 } from '../../services';
-import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
+import {CHILD_EVENTS, STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS} from '../../core/enum/events';
 import {CALENDAR_TOOLTIP_EVENTER} from '../../core/const/calendar-tooltip-eventer';
 import {FORMAT} from '../../core/const/dateFormat';
 import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
@@ -83,9 +83,11 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             const initTimeSlots = async () => {
-                const structure_slots: StructureSlot = await StructureService.getSlotProfile(
-                    window.structure ? window.structure.id : $scope.structure.id
-                );
+                let structureId: string = null;
+                if (window.structure) structureId = window.structure.id;
+                else if($scope.structure) structureId = $scope.structure.id;
+                const structure_slots: StructureSlot = structureId ? await StructureService.getSlotProfile(structureId) : null;
+
                 if (structure_slots && structure_slots.slots &&
                     structure_slots.slots.length > 0 && Object.keys(structure_slots).length > 0) {
                     $scope.timeSlot.slots = structure_slots.slots;
@@ -742,6 +744,14 @@ export let calendarController = ng.controller('CalendarController',
             $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, (event: IAngularEvent, structure: Structure) => {
                 if (structure) $scope.structure = structure;
                 load();
+            });
+
+            $scope.$on(CHILD_EVENTS.UPDATED, (event: IAngularEvent, student: Student) => {
+                if (student) $scope.params.child = student;
+                if ($scope.params.child.structureId != $scope.structure.id)
+                    $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, $scope.params.child.structureId)
+                else
+                    load()
             });
 
             $scope.$on(STRUCTURES_EVENTS.UPDATED, async (event: IAngularEvent, structures: Structures) => {

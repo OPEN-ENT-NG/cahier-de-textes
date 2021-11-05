@@ -43,11 +43,6 @@ export class UserUtils {
         });
     };
 
-    static changeStudent = ($scope: any, structure: Structure, student: Student): void => {
-        if (!structure || student.structureId != structure.id)
-            $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, student.structureId);
-    };
-
     static currentChildStructures = (student: Student, structures: Structures): Structure[] =>
         (student && structures) ? structures.filterByStudents(student.id) : [];
 
@@ -81,7 +76,7 @@ export class UserUtils {
 
         let structures: Structures = new Structures(structuresList);
         GroupUtils.addGroupsToStructures(groups, structures);
-        if(UserUtils.amIParent()) UserUtils.addChildrenToStructures(students, structures);
+        if (UserUtils.amIParent()) UserUtils.addChildrenToStructures(students, structures);
         return structures;
     }
 

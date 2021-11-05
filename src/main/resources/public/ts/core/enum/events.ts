@@ -10,3 +10,8 @@ export enum STRUCTURES_EVENTS {
 export enum UPDATE_SUBJECT_EVENTS {
     UPDATE = 'subject:update' // when subject HAVE BEEN updated
 }
+
+export enum CHILD_EVENTS {
+    UPDATE = 'child:update', // when child NEED TO BE updated
+    UPDATED = 'child:updated', // when child HAVE BEEN updated
+}
