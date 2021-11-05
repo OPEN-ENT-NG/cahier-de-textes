@@ -1,9 +1,9 @@
 import {_, Behaviours, model, moment, ng} from 'entcore';
 import {DateUtils} from '../../utils/dateUtils';
 import {
-    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Subject, Structure, Structures
+    Homework, PEDAGOGIC_TYPES, Session, Subjects, Toast, Workload, Course, Subject, Structure, Structures, Student
 } from '../../model';
-import {STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
+import {CHILD_EVENTS, STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
@@ -462,6 +462,14 @@ export let manageListCtrl = ng.controller('manageListController',
         $scope.$on(UPDATE_STRUCTURE_EVENTS.UPDATE, async (event: IAngularEvent, structure: Structure) => {
             if (structure) $scope.structure = structure;
             await init();
+        });
+
+        $scope.$on(CHILD_EVENTS.UPDATED, async (event: IAngularEvent, student: Student) => {
+            if (student) $scope.params.child = student;
+            if ($scope.params.child.structureId != $scope.structure.id)
+                $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, $scope.params.child.structureId)
+            else
+                await init();
         });
 
         $scope.$on(STRUCTURES_EVENTS.UPDATED, async (event: IAngularEvent, structures: Structures) => {

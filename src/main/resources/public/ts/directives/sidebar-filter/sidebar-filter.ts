@@ -4,7 +4,7 @@ import {UserUtils} from "../../utils/user.utils";
 import {MobileUtils} from "../../utils/mobile";
 import {Structure, Structures, Student, Subject, Subjects} from "../../model";
 import {SIDEBAR_AREAS, SIDEBAR_VIEWS} from "../../core/enum/sidebar.enum";
-import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
+import {CHILD_EVENTS, UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
 
 interface IViewModel {
     $onInit(): any;
@@ -131,14 +131,14 @@ export const sidebarFilter = ng.directive('sidebarFilter', ['$location', ($locat
                 if (MobileUtils.isMobile()) vm.areShownAreas[areaType] = !vm.areShownAreas[areaType];
             }
 
-            vm.changeStudent = (): void => UserUtils.changeStudent($scope, vm.structure, vm.child);
-
             vm.currentChildStructures = (): Structure[] => {
                 if (UserUtils.amIStudent()) return vm.structures ? vm.structures.all || [] : [];
                 return (vm.child) ? UserUtils.currentChildStructures(vm.child, vm.structures) : [];
             }
 
-            vm.changeStructure = (): void => $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, vm.structure.id)
+            vm.changeStructure = (): void => $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, vm.structure ? vm.structure.id : null)
+
+            vm.changeStudent = (): void => $scope.$emit(CHILD_EVENTS.UPDATE, vm.child ? vm.child.id : null)
 
             vm.goTo = (path: string): void => {
                 $location.path(path);
