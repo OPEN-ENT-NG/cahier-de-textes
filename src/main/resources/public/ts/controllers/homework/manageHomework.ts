@@ -446,6 +446,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     $scope.syncWorkloadDay(),
                     $scope.subjects.setLinkedTeacherById($scope.structure.id, model.me.userId)
                 ]);
+                $scope.subjects.sort();
                 $scope.homeworkFormIsOpened = true;
                 $scope.safeApply();
                 await $scope.fixEditor();

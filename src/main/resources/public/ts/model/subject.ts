@@ -109,4 +109,9 @@ export class Subjects {
             });
         });
     };
+
+    public sort = (): void => {
+        this.all = this.all.sort((s1: Subject, s2: Subject) => s1.label > s2.label ? 1 : -1);
+    }
+
 }
