@@ -652,6 +652,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.placeholder = lang.translate('homework.attachedToSession') + moment($scope.session.date).format(FORMAT.displayDate);
 
                 await $scope.subjects.setLinkedTeacherById($scope.structure.id, model.me.userId);
+                $scope.subjects.sort();
 
                 if ($scope.subjects.all.length === 1 && !$scope.session.subject) {
                     $scope.session.subject = $scope.subjects.all[0];
