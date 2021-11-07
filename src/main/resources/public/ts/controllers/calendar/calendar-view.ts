@@ -26,6 +26,7 @@ import {MobileUtils} from "../../utils/mobile";
 import {IAngularEvent} from "angular";
 import {UserUtils} from "../../utils/user.utils";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
+import {DAY_OF_WEEK} from "../../core/enum/dayOfWeek.enum";
 
 declare let window: any;
 
@@ -67,7 +68,11 @@ export let calendarController = ng.controller('CalendarController',
                 startDate: moment().startOf('isoWeek').toDate(),
                 endDate: moment().endOf('isoWeek').toDate()
             };
-            model.calendar.setDate(moment());
+            model.calendar.setDate(
+                moment().day() === DAY_OF_WEEK.SUNDAY
+                    ? moment().add(1, 'week').startOf('week')
+                    : moment()
+            );
 
             $scope.transformDateToFrenchDate = (date: Date) => {
                 return moment(date).format("dddd D MMMM YYYY");
