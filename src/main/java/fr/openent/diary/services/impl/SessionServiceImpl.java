@@ -184,8 +184,8 @@ public class SessionServiceImpl extends DBService implements SessionService {
     }
 
     @Override
-    public void getExternalSessions(String startDate, String endDate, String teacherId, String audienceId, String subjectId, Handler<Either<String, JsonArray>> handler) {
-        List<String> listAudienceId = audienceId != null && !audienceId.equals("") ? Arrays.asList(audienceId) : null;
+    public void getExternalSessions(String startDate, String endDate, String teacherId, List<String> audienceIds, String subjectId, Handler<Either<String, JsonArray>> handler) {
+        List<String> listAudienceId = audienceIds != null && !audienceIds.isEmpty() ? audienceIds : null;
         List<String> listTeacherId = teacherId != null && !teacherId.equals("") ? Arrays.asList(teacherId) : null;
         List<String> listSubjectId = subjectId != null ? Arrays.asList(subjectId) : null;
 

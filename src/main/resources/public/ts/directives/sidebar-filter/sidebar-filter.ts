@@ -2,9 +2,11 @@ import {idiom as lang, ng, template} from 'entcore';
 import {ROOTS} from "../../core/const/roots";
 import {UserUtils} from "../../utils/user.utils";
 import {MobileUtils} from "../../utils/mobile";
-import {Structure, Structures, Student, Subject, Subjects} from "../../model";
+import {Audience, Structure, Structures, Student, Subject, Subjects} from "../../model";
 import {SIDEBAR_AREAS, SIDEBAR_VIEWS} from "../../core/enum/sidebar.enum";
 import {CHILD_EVENTS, UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
+import {Group} from '../../model/group';
+import {groupService} from '../../services';
 
 interface IViewModel {
     $onInit(): any;
@@ -23,7 +25,11 @@ interface IViewModel {
 
     changeStructure(): void;
 
+    removeAudience(audience: Audience): void;
+
     goTo(path: string): void;
+
+    onRemoveAudience(): any
 
     userUtils: typeof UserUtils;
 
@@ -51,6 +57,8 @@ interface IViewModel {
 
     child: Student;
 
+    audiences: Audience[];
+
     subjects: Subjects;
 
     subject: Subject;
@@ -65,6 +73,8 @@ export const sidebarFilter = ng.directive('sidebarFilter', ['$location', ($locat
     return {
         scope: {
             child: '=',
+            audiences: '=',
+            onRemoveAudience: '&',
             subjects: '=',
             subject: '=',
             structure: '=',
@@ -97,7 +107,7 @@ export const sidebarFilter = ng.directive('sidebarFilter', ['$location', ($locat
                     CHILDREN: true,
                     LEGEND: false,
                     STRUCTURE: true,
-                    FILTER: true
+                    FILTER: vm.userUtils.amIStudentOrParent() || (vm.userUtils.amITeacher() && vm.areShownViews.LIST)
                 }
             };
         },
@@ -139,6 +149,15 @@ export const sidebarFilter = ng.directive('sidebarFilter', ['$location', ($locat
             vm.changeStructure = (): void => $scope.$emit(UPDATE_STRUCTURE_EVENTS.TO_UPDATE, vm.structure ? vm.structure.id : null)
 
             vm.changeStudent = (): void => $scope.$emit(CHILD_EVENTS.UPDATE, vm.child ? vm.child.id : null)
+
+            vm.removeAudience = async (audience: Audience): Promise<void> => {
+                let groups: Array<Group> = await groupService.initGroupsFromClassNames([audience.id]);
+
+                vm.audiences = (groups.length === 0) ? vm.audiences.filter(
+                    (a: Audience): boolean => a !== audience) : [];
+
+                $scope.$eval(vm.onRemoveAudience)(vm.audiences);
+            };
 
             vm.goTo = (path: string): void => {
                 $location.path(path);

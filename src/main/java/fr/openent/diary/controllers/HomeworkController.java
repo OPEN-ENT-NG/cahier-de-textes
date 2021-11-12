@@ -18,6 +18,8 @@ import org.entcore.common.http.filter.Trace;
 import org.entcore.common.http.response.DefaultResponseHandler;
 import org.entcore.common.user.UserUtils;
 
+import java.util.List;
+
 public class HomeworkController extends ControllerHelper {
 
     private HomeworkService homeworkService;
@@ -66,10 +68,10 @@ public class HomeworkController extends ControllerHelper {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
         String teacherId = request.getParam("teacherId");
-        String audienceId = request.getParam("audienceId");
+        List<String> audienceIds = request.params().getAll("audienceId");
         String subjectId = request.getParam("subjectId");
 
-        homeworkService.getExternalHomeworks(startDate, endDate, teacherId, audienceId, subjectId, DefaultResponseHandler.arrayResponseHandler(request));
+        homeworkService.getExternalHomeworks(startDate, endDate, teacherId, audienceIds, subjectId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Get("/homeworks/child/:startDate/:endDate/:childId/:structureId")

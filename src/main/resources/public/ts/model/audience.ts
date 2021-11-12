@@ -1,6 +1,8 @@
-import { Mix } from 'entcore-toolkit';
+import {Mix} from 'entcore-toolkit';
 import http, {AxiosResponse} from 'axios';
 import {Student} from "./student";
+import {ArrayUtils} from "../utils/array.utils";
+import {Group, Groups} from "./group";
 
 export interface IAudience {
     id?: string;
@@ -77,11 +79,14 @@ export class Audiences {
     }
 
     add(audience: Audience): void {
-        if(!this.all.find((a: Audience) => a.id === audience.id)) this.all.push(audience);
+        if (!this.all.find((a: Audience) => a.id === audience.id)) this.all.push(audience);
     }
 
     getAudienceFromStudent = (student: Student): Audience =>
-        this.all.find((audience: Audience)  => audience.id === student.classId)
+        this.all.find((audience: Audience) => audience.id === student.classId)
+
+    getAudiencesFromGroups = (groups: Groups): Audience[] =>
+        this.all.filter((audience: Audience) => groups.getIds().indexOf(audience.id) != -1);
 
     getAudiences = (audienceNames: string[]): Audience[] =>
         this.all.filter((audience: Audience) =>

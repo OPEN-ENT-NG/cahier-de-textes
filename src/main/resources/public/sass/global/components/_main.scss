@@ -430,6 +430,9 @@ ul.search-input-ul {
   margin: 0;
   font-weight: bold;
   list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 label.checkbox {
