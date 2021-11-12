@@ -50,15 +50,6 @@
                                     data-search="autocomplete.class">
                 </async-autocomplete>
             </div>
-            <div class="cell twelve main-header-result-search"
-                 ng-show="autocomplete.classesSelected[0] && autocomplete.classesSelected[0].displayName !== ''">
-                <ul class="cell twelve search-input-ul">
-                    <li>
-                        [[autocomplete.classesSelected[0].displayName]]
-                        <i class="close" data-ng-click="removeClass(autocomplete.classesSelected[0])"></i>
-                    </li>
-                </ul>
-            </div>
         </div>
 
         <!-- button interact mode -->
@@ -84,11 +75,12 @@
                         structures="structures"
                         is-homeworks-filtered="display.homeworks"
                         is-sessions-filtered="display.sessionList"
+                        audiences="autocomplete.classesSelected"
+                        on-remove-audience="setClasses"
                         class="cell three twelve-mobile sidebar-content">
         </sidebar-filter>
 
-        <div class="cell twelve-mobile main-content" ng-if="!display.listView"
-             ng-class="(isAChildOrAParent || isTeacher) ? 'nine' : 'twelve'"
+        <div class="cell twelve-mobile main-content nine" ng-if="!display.listView"
              ng-include="'/diary/public/template/main/calendar-view.html'">
         </div>
     </div>

@@ -253,13 +253,13 @@ export class Homeworks {
         return dataModel;
     }
 
-    async syncOwnHomeworks(structure: any, startMoment: any, endMoment: any, subjectId?: string, teacherId?: string, audienceId?: string): Promise<void> {
+    async syncOwnHomeworks(structure: any, startMoment: any, endMoment: any, subjectId?: string, teacherId?: string, audienceIds?: string[]): Promise<void> {
         let startDate: string = DateUtils.getFormattedDate(startMoment);
         let endDate: string = DateUtils.getFormattedDate(endMoment);
 
-        let filter: string = subjectId || teacherId || audienceId ? '?' : '';
+        let filter: string = subjectId || teacherId || audienceIds ? '?' : '';
         if (teacherId) filter += `teacherId=${teacherId}&`;
-        if (audienceId) filter += `audienceId=${audienceId}&`;
+        if (audienceIds) filter += audienceIds.map((id: string) => `audienceId=${id}`).join('&') + '&';
         if (subjectId) filter += `subjectId=${subjectId}&`;
 
         let url: string = `/diary/homeworks/own/${startDate}/${endDate}/${this.structure.id}${filter.slice(0, -1)}`;
@@ -267,13 +267,13 @@ export class Homeworks {
         await this.syncHomeworks(url);
     }
 
-    async syncExternalHomeworks(startMoment: any, endMoment: any, teacherId?: string, audienceId?: string, subjectId?: string): Promise<void> {
+    async syncExternalHomeworks(startMoment: any, endMoment: any, teacherId?: string, audienceIds?: string[], subjectId?: string): Promise<void> {
         let startDate: string = DateUtils.getFormattedDate(startMoment);
         let endDate: string = DateUtils.getFormattedDate(endMoment);
 
-        let filter: string = teacherId || audienceId ? '?' : '';
+        let filter: string = teacherId || audienceIds ? '?' : '';
         if (teacherId) filter += `teacherId=${teacherId}&`;
-        if (audienceId) filter += `audienceId=${audienceId}&`;
+        if (audienceIds) filter += audienceIds.map((id: string) => `audienceId=${id}`).join('&') + '&';
         if (subjectId) filter += `subjectId=${subjectId}&`;
 
         let url: string = `/diary/homeworks/external/${startDate}/${endDate}${filter.slice(0, -1)}`;

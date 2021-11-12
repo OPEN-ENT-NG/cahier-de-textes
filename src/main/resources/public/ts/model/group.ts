@@ -1,5 +1,6 @@
 import http from "axios";
 import {Student} from "./student";
+import {ArrayUtils} from "../utils/array.utils";
 
 interface IGroup {
     id_classe: string;
@@ -17,11 +18,11 @@ export class Group implements IGroup {
     id_structure: string;
 
     addGroupIds(groupIds: string[]): void {
-        if(groupIds) this.id_groups = [...groupIds, ...this.id_groups];
+        if (groupIds) this.id_groups = [...groupIds, ...this.id_groups];
     }
 
     addGroupNames(groupNames: string[]): void {
-        if(groupNames) this.name_groups = [...groupNames, ...this.id_groups];
+        if (groupNames) this.name_groups = [...groupNames, ...this.id_groups];
     };
 }
 
@@ -41,6 +42,10 @@ export class Groups {
         this.all = data;
     }
 
+    set = (groups: Group[]): void => {
+        this.all = groups;
+    }
+
     /**
      * Returns first structure occurrence in the class
      * @returns {Group} first group contained in 'all' array
@@ -51,10 +56,19 @@ export class Groups {
 
     get = (groupClassId: string): Group => this.all.find((s: Group) => s.id_classe == groupClassId);
 
+    getIds = (): string[] =>
+        ArrayUtils.flat(this.all.map((group: Group) => {
+            let groupIds: string[] = group.id_groups || [];
+            if (group.id_classe) groupIds.push(group.id_classe);
+            return groupIds;
+        }))
+
     add(group: Group): void {
         this.all.push(group);
     }
 
+    addAll = (groups: Group[]): void => groups.forEach((group: Group) => this.add(group));
+
     getGroupsFromStudent = (student: Student): Group =>
-        this.all.find((group: Group)  => !!group.id_groups.find((groupId: string) => groupId === student.groupId));
+        this.all.find((group: Group) => !!group.id_groups.find((groupId: string) => groupId === student.groupId));
 }

@@ -69,11 +69,11 @@ public class SessionController extends ControllerHelper {
     public void getExternalSessions(final HttpServerRequest request) {
         String startDate = request.getParam("startDate");
         String endDate = request.getParam("endDate");
-        String audienceId = request.getParam("audienceId");
+        List<String> audienceIds = request.params().getAll("audienceId");
         String teacherId = request.getParam("teacherId");
         String subjectId = request.getParam("subjectId");
 
-        sessionService.getExternalSessions(startDate, endDate, teacherId, audienceId, subjectId, DefaultResponseHandler.arrayResponseHandler(request));
+        sessionService.getExternalSessions(startDate, endDate, teacherId, audienceIds, subjectId, DefaultResponseHandler.arrayResponseHandler(request));
     }
 
     @Get("/sessions/child/:startDate/:endDate/:childId")

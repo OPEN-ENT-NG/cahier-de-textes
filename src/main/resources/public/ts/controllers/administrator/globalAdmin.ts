@@ -1,15 +1,16 @@
 import {idiom as lang, model, moment, ng} from 'entcore';
 import * as html2canvas from 'html2canvas';
-import {DateUtils, Homeworks, IVisa, Sessions, Visa, Visas} from "../../model";
+import {Audience, DateUtils, Homeworks, IVisa, Sessions, Visa, Visas} from "../../model";
 import {UPDATE_STRUCTURE_EVENTS} from "../../core/enum/events";
-import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
-import {INotebookService, SearchService} from "../../services";
+import {groupService, INotebookService, SearchItem, SearchService} from "../../services";
 import {UsersSearch} from "../../utils/autocomplete/usersSearch";
 import {INotebook, INotebookRequest, Notebook} from "../../model/Notebook";
 import {FORMAT} from "../../core/const/dateFormat";
 import {NOTEBOOK_TYPE} from "../../core/const/notebook-type";
 import {IVisaService} from "../../services";
 import {IViescolaireService} from "../../services";
+import {Groups} from "../../model/group";
+import {AudiencesSearch} from "../../utils/autocomplete/audiencesSearch";
 
 export let globalAdminCtrl = ng.controller('globalAdminCtrl',
     ['$scope', '$timeout', '$routeParams', '$location', 'SearchService', 'NotebookService', 'VisaService', 'ViescolaireService',
@@ -19,7 +20,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
         /* Init search bar */
         $scope.usersSearch = undefined;
-        $scope.groupsSearch = undefined;
+        $scope.audiencesSearch = undefined;
 
         $scope.isLoading = false;
         $scope.notebooks = new Notebook($scope.structure.id);
@@ -67,7 +68,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
             /* Init search bar */
             $scope.usersSearch = new UsersSearch($scope.structure.id, searchService);
-            $scope.groupsSearch = new GroupsSearch($scope.structure.id, searchService);
+            $scope.audiencesSearch = new AudiencesSearch($scope.structure.id, searchService);
 
             const schoolYears = await viescolaireService.getSchoolYearDates($scope.structure.id);
             $scope.filters.startDate = moment(schoolYears.start_date);
@@ -119,7 +120,9 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
 
             /* get our search bar info */
             $scope.filters.teacherIds = $scope.usersSearch.getSelectedUsers().map(user => user["id"]);
-            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
+            $scope.filters.audienceIds = $scope.audiencesSearch.getSelectedAudiences().filter((audience: Audience) => !!audience.id)
+                .map((audience: Audience) => audience.id);
+
 
             await getNotebooks();
         };
@@ -468,21 +471,24 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         /* Search bar groups section */
-        $scope.searchGroup = async (groupForm: string): Promise<void> => {
-            await $scope.groupsSearch.searchGroups(groupForm);
+        $scope.searchAudience = async (audience: string): Promise<void> => {
+            await $scope.audiencesSearch.searchAudiences(audience);
             $scope.safeApply();
         };
 
-        $scope.selectGroup = (valueInput, groupForm): void => {
-            $scope.groupsSearch.selectGroups(valueInput, groupForm);
-            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
-            $scope.groupsSearch.group = "";
+        $scope.selectAudience = async (valueInput, audienceItem: SearchItem): Promise<void> => {
+            let groups: Groups = new Groups(await groupService.initGroupsFromClassNames([audienceItem.id]));
+            $scope.filters.audienceIds = $scope.audiencesSearch
+                .setSelectedAudiences((groups.all.length > 0) ?
+                    $scope.structure.audiences.getAudiencesFromGroups(groups) : [audienceItem]);
+            $scope.audiencesSearch.resetSearch();
             $scope.updateFilter();
         };
 
-        $scope.removeSelectedGroups = (groupForm): void => {
-            $scope.groupsSearch.removeSelectedGroups(groupForm);
-            $scope.filters.audienceIds = $scope.groupsSearch.getSelectedGroups().map(group => group["id"]);
+        $scope.removeSelectedAudience = async (audience: Audience): Promise<void> => {
+            await $scope.audiencesSearch.removeSelectedAudience(audience);
+            $scope.filters.audienceIds = $scope.audiencesSearch.getSelectedAudiences().filter((audience: Audience) => !audience.id)
+                .map((audience: Audience): string => audience.id);
             $scope.updateFilter();
         };
 

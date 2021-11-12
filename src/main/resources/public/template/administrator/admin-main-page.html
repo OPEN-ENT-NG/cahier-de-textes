@@ -39,12 +39,12 @@
             <div class="flex-col col__6">
                 <div class="search-input">
                     <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="groupsSearch.group"
-                                        data-ng-change="selectGroup"
-                                        data-on-search="searchGroup"
-                                        data-options="groupsSearch.groups"
+                                        data-ng-model="audiencesSearch.searchQuery"
+                                        data-ng-change="selectAudience"
+                                        data-on-search="searchAudience"
+                                        data-options="audiencesSearch.searchItems"
                                         data-placeholder="diary.search.group"
-                                        data-search="groupsSearch.group">
+                                        data-search="audiencesSearch.searchQuery">
                     </async-autocomplete>
                 </div>
             </div>
@@ -54,7 +54,7 @@
     <!-- Result teacher/classes from async autocomplete -->
     <div class="flex-row-cdt row__12 list-search">
         <div class="flex-col col__3 list-search"></div>
-        <div class="flex-col col__9 list-search">
+        <div class="flex-col col__9">
             <div class="flex-col col__6 list-search">
                 <!-- Teacher selected via filter -->
                 <div class="cell twelve administrator-page-list">
@@ -70,8 +70,8 @@
                 <!-- Class selected via filter -->
                 <div class="cell twelve administrator-page-list">
                     <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="group in groupsSearch.selectedGroups" class="administrator-page-list-item">
-                            [[group.toString()]] <i class="close" data-ng-click="removeSelectedGroups(class)"></i>
+                        <li ng-repeat="audience in audiencesSearch.selectedAudiences" class="administrator-page-list-item">
+                            [[audience.toString()]] <i class="close" data-ng-click="removeSelectedAudience(audience)"></i>
                         </li>
                     </ul>
                 </div>

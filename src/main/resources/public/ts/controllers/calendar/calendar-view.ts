@@ -1,5 +1,6 @@
 import {_, angular, Behaviours, idiom as lang, model, moment, ng} from 'entcore';
 import {
+    Audience,
     Course,
     Homework,
     PEDAGOGIC_TYPES,
@@ -14,7 +15,7 @@ import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {ProgressionFolder, ProgressionFolders, ProgressionHomework, ProgressionSession} from '../../model/Progression';
 import {
     CourseService,
-    GroupService,
+    GroupService, SearchItem,
     StructureService,
     StructureSlot
 } from '../../services';
@@ -27,6 +28,7 @@ import {IAngularEvent} from "angular";
 import {UserUtils} from "../../utils/user.utils";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
 import {DAY_OF_WEEK} from "../../core/enum/dayOfWeek.enum";
+import {Groups} from "../../model/group";
 
 declare let window: any;
 
@@ -118,19 +120,20 @@ export let calendarController = ng.controller('CalendarController',
                 await $scope.syncPedagogicItems();
             };
 
-            $scope.selectClass = async (model, item) => {
-                AutocompleteUtils.setClassesSelected([item]);
+            $scope.selectClass = async (model, item: SearchItem) => {
+                let groups: Groups = new Groups(await groupService.initGroupsFromClassNames([item.id]));
+                AutocompleteUtils.setClassesSelected($scope.structure.audiences.getAudiencesFromGroups(groups));
                 AutocompleteUtils.resetSearchFields();
                 await $scope.syncPedagogicItems();
             };
 
+            $scope.setClasses = async (audiences: Audience[]): Promise<void> => {
+                AutocompleteUtils.setClassesSelected(audiences);
+                await $scope.syncPedagogicItems();
+            }
+
             $scope.removeTeacher = async (value) => {
                 AutocompleteUtils.removeTeacherSelected(value);
-                await $scope.syncPedagogicItems();
-            };
-
-            $scope.removeClass = async (value) => {
-                AutocompleteUtils.removeClassSelected(value);
                 await $scope.syncPedagogicItems();
             };
 
@@ -143,17 +146,20 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.progressionFolders.all = [];
                 const teacherSelected = AutocompleteUtils.getTeachersSelected() != undefined ?
                     AutocompleteUtils.getTeachersSelected()[0] : [];
-                const classSelected = AutocompleteUtils.getClassesSelected() != undefined ?
-                    AutocompleteUtils.getClassesSelected()[0] : [];
+                const audiencesSelected: Audience[] = AutocompleteUtils.getClassesSelected() != undefined ?
+                    AutocompleteUtils.getClassesSelected() : [];
+                // const groupIdsSelected = audiencesSelected && (audiencesSelected.)
+                let audienceIds: string[] = audiencesSelected ? audiencesSelected.filter((audience: Audience) => !!audience.id)
+                    .map((audience: Audience) => audience.id) : null;
+
                 /* personal workflow case */
                 if ((model.me.hasWorkflow(WORKFLOW_RIGHTS.diarySearch) && model.me.hasWorkflow(WORKFLOW_RIGHTS.accessExternalData))
-                    && ((teacherSelected && teacherSelected.id) || (classSelected && classSelected.id))) {
+                    && ((teacherSelected && teacherSelected.id) || audiencesSelected)) {
                     let teacherId = teacherSelected && teacherSelected.id ? teacherSelected.id : null;
-                    let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                     await Promise.all([
-                        $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
-                        $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId),
-                        $scope.structure.courses.sync($scope.structure, teacherSelected, classSelected, $scope.filters.startDate, $scope.filters.endDate)
+                        $scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds),
+                        $scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds),
+                        $scope.structure.courses.sync($scope.structure, teacherSelected, audiencesSelected, $scope.filters.startDate, $scope.filters.endDate)
                     ]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id) {
                     /* student/parents workflow case */
@@ -166,16 +172,15 @@ export let calendarController = ng.controller('CalendarController',
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher workflow case */
                     let teacherId = (teacherSelected && teacherSelected.id) ? teacherSelected.id : model.me.userId;
-                    let audienceId = classSelected && classSelected.id ? classSelected.id : null;
                     const promises: Promise<void>[] = [];
                     if (teacherId != model.me.userId) {
-                        promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
-                        promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceId));
+                        promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds));
+                        promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds));
                     } else {
                         promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate));
-                        promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, audienceId));
+                        promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, audienceIds));
                     }
-                    promises.push($scope.structure.courses.sync($scope.structure, teacherId, classSelected, $scope.filters.startDate, $scope.filters.endDate));
+                    promises.push($scope.structure.courses.sync($scope.structure, teacherId, audiencesSelected, $scope.filters.startDate, $scope.filters.endDate));
                     await Promise.all(promises)
                 }
 
