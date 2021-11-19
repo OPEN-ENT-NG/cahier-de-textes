@@ -713,6 +713,10 @@ export let calendarController = ng.controller('CalendarController',
 
             };
 
+            $scope.isShownSidebar = (): boolean =>
+                UserUtils.amIStudentOrParent() || UserUtils.amITeacher() || AutocompleteUtils.getClassesSelected().length > 0;
+
+
             const load = async () => {
                 if ($scope.structure) {
                     $scope.isRefreshingCalendar = true;

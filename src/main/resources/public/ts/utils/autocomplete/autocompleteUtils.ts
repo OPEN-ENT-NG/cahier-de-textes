@@ -78,7 +78,7 @@ export class AutocompleteUtils {
     }
 
     static getClassesSelected(): Array<any> {
-        return this.classesSelected;
+        return this.classesSelected || [];
     }
 
     static setClassesSelected(value): void {

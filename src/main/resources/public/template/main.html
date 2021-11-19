@@ -80,7 +80,9 @@
                         class="cell three twelve-mobile sidebar-content">
         </sidebar-filter>
 
-        <div class="cell twelve-mobile main-content nine" ng-if="!display.listView"
+        <div class="cell twelve-mobile main-content nine"
+             ng-class="isShownSidebar() ? 'nine' : 'twelve'"
+             ng-if="!display.listView"
              ng-include="'/diary/public/template/main/calendar-view.html'">
         </div>
     </div>
