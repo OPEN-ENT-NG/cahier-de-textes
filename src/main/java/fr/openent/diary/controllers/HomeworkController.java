@@ -54,7 +54,7 @@ public class HomeworkController extends ControllerHelper {
             String structureId = request.getParam("structureId");
             String subjectId = request.getParam("subjectId");
             String teacherId = request.getParam("teacherId");
-            String audienceId = request.getParam("audienceId");
+            List<String> audienceId = request.params().getAll("audienceId");
 
             homeworkService.getOwnHomeworks(structureId, startDate, endDate, user, subjectId, teacherId, audienceId, DefaultResponseHandler.arrayResponseHandler(request));
         });

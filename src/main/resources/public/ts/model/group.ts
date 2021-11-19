@@ -61,7 +61,7 @@ export class Groups {
             let groupIds: string[] = group.id_groups || [];
             if (group.id_classe) groupIds.push(group.id_classe);
             return groupIds;
-        }))
+        }));
 
     add(group: Group): void {
         this.all.push(group);

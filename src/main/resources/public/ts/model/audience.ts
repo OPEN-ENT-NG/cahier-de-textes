@@ -86,7 +86,11 @@ export class Audiences {
         this.all.find((audience: Audience) => audience.id === student.classId)
 
     getAudiencesFromGroups = (groups: Groups): Audience[] =>
-        this.all.filter((audience: Audience) => groups.getIds().indexOf(audience.id) != -1);
+        this.all.filter((audience: Audience) => groups.getIds().indexOf(audience.id) != -1)
+            .sort((audienceA: Audience, audienceB: Audience) => {
+                let classIds = groups.all.map((group: Group) => group.id_classe)
+                return classIds.indexOf(audienceA.id) != -1 && classIds.indexOf(audienceB.id) === -1 ? -1 : 1;
+            });
 
     getAudiences = (audienceNames: string[]): Audience[] =>
         this.all.filter((audience: Audience) =>

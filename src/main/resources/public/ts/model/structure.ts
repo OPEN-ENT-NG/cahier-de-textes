@@ -115,7 +115,6 @@ export class Structure {
             course.init(this);
         });
     }
-
 }
 
 export class Structures {

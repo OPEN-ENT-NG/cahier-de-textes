@@ -12,21 +12,21 @@ import {
     Structure,
     Structures,
     Student,
-    Audience
+    Audience, Teacher
 } from '../../model';
 import {CHILD_EVENTS, STRUCTURES_EVENTS, UPDATE_STRUCTURE_EVENTS, UPDATE_SUBJECT_EVENTS} from '../../core/enum/events';
 import {IAngularEvent} from 'angular';
 import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
-import {groupService, SubjectService} from "../../services";
+import {CourseService, groupService, SubjectService} from "../../services";
 import {UserUtils} from "../../utils/user.utils";
 import {Groups} from "../../model/group";
 
 declare let window: any;
 
 export let manageListCtrl = ng.controller('manageListController',
-    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', 'SubjectService', function ($scope, $window, $rootScope, $location, $timeout, $compile,
-                                                                                                     SubjectService: SubjectService) {
+    ['$scope', '$window', '$route', '$location', '$timeout', '$compile', 'SubjectService', 'CourseService',
+        function ($scope, $window, $rootScope, $location, $timeout, $compile, SubjectService: SubjectService, courseService: CourseService) {
         $scope.showcalendar = false;
         const WORKFLOW_RIGHTS = Behaviours.applicationsBehaviours.diary.rights.workflow;
 
@@ -90,8 +90,9 @@ export let manageListCtrl = ng.controller('manageListController',
                 $scope.structure.courses.all = [];
             }
 
-            const teacherSelected: any = AutocompleteUtils.getTeachersSelected() !== undefined ?
-                AutocompleteUtils.getTeachersSelected()[0] : [];
+            const teacherSelected: Teacher = !!AutocompleteUtils.getTeachersSelected() &&
+            AutocompleteUtils.getTeachersSelected().length > 0 ? AutocompleteUtils.getTeachersSelected()[0] : null;
+
             const audiencesSelected: Audience[] = AutocompleteUtils.getClassesSelected() != undefined ?
                 AutocompleteUtils.getClassesSelected() : [];
 
@@ -104,28 +105,38 @@ export let manageListCtrl = ng.controller('manageListController',
             if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessChildData) && $scope.params.child && $scope.params.child.id
                 && ((teacherSelected && teacherSelected.id) || !teacherSelected)) {
                 /* parents workflow case */
-                await Promise.all([
+                let result: any[] = await Promise.all([
+                    courseService.initCoursesFromStudents($scope.structure, [$scope.params.child.id], $scope.filters.startDate, $scope.filters.endDate),
                     $scope.structure.homeworks.syncChildHomeworks($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
                     $scope.structure.sessions.syncChildSessions($scope.filters.startDate, $scope.filters.endDate, $scope.params.child.id, subjectId),
-                    $scope.structure.courses.sync($scope.structure, null, null, $scope.filters.startDate, $scope.filters.endDate)
                 ]);
+                $scope.structure.setCourses(<Course[]>result[0]);
             } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
-                let teacherId: string = teacherSelected && teacherSelected.id ? teacherSelected.id : null;
-
-                const promises: Promise<void>[] = [];
                 /* student/teacher workflow case */
+                let teachers: Teacher[] = null;
+                let teacherId: string = null;
+                if (UserUtils.amITeacher()) {
+                    teachers = (teacherSelected && teacherSelected.id) ? [teacherSelected] : [new Teacher().setFromMe()];
+                    teacherId = teachers[0] ? teachers[0].id : null;
+                }
+
+                const promises: Promise<any>[] = [];
+                promises.push(
+                    UserUtils.amIStudent() ?
+                        courseService.initCoursesFromStudents($scope.structure, [model.me.userId], $scope.filters.startDate, $scope.filters.endDate) :
+                        courseService.initCourses($scope.structure, $scope.filters.startDate, $scope.filters.endDate, teachers, audiencesSelected)
+                );
                 if ((audienceIds && audienceIds.length > 0) || teacherId) {
                     promises.push($scope.structure.homeworks.syncExternalHomeworks($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds, subjectId));
                     promises.push($scope.structure.sessions.syncExternalSessions($scope.filters.startDate, $scope.filters.endDate, teacherId, audienceIds, subjectId));
 
                 } else {
-                    promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId, teacherId ? teacherId : model.me.userId, audienceIds));
+                    promises.push($scope.structure.homeworks.syncOwnHomeworks($scope.structure, $scope.filters.startDate, $scope.filters.endDate, subjectId, teacherId, audienceIds));
                     promises.push($scope.structure.sessions.syncOwnSessions($scope.structure, $scope.filters.startDate, $scope.filters.endDate, audienceIds, subjectId));
                 }
 
-                promises.push($scope.structure.courses.sync($scope.structure, teacherId ? teacherId : model.me.userId, audiencesSelected, $scope.filters.startDate, $scope.filters.endDate));
-
-                await Promise.all(promises);
+                let result: any[] = await Promise.all(promises);
+                $scope.structure.setCourses(<Course[]>result[0]);
             }
 
             // link homeworks to their session
