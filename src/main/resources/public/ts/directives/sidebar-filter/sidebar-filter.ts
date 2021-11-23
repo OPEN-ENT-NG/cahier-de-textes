@@ -151,7 +151,7 @@ export const sidebarFilter = ng.directive('sidebarFilter', ['$location', ($locat
             vm.changeStudent = (): void => $scope.$emit(CHILD_EVENTS.UPDATE, vm.child ? vm.child.id : null)
 
             vm.removeAudience = async (audience: Audience): Promise<void> => {
-                let groups: Array<Group> = await groupService.initGroupsFromClassNames([audience.id]);
+                let groups: Array<Group> = await groupService.initGroupsFromClassIds([audience.id]);
 
                 vm.audiences = (groups.length === 0) ? vm.audiences.filter(
                     (a: Audience): boolean => a !== audience) : [];

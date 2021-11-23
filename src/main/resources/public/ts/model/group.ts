@@ -1,6 +1,8 @@
 import http from "axios";
 import {Student} from "./student";
 import {ArrayUtils} from "../utils/array.utils";
+import {SearchItem} from "../services";
+import {Mix} from "entcore-toolkit";
 
 interface IGroup {
     id_classe: string;
@@ -24,6 +26,11 @@ export class Group implements IGroup {
     addGroupNames(groupNames: string[]): void {
         if (groupNames) this.name_groups = [...groupNames, ...this.id_groups];
     };
+
+    static setFromSearchItem = (item: SearchItem): Group => item ? Mix.castAs(Group, {
+        id_groups: [...(item.groupId ? [item.groupId] : []), ...(item.id ? [item.id] : [])],
+        name_groups: [...(item.groupName ? [item.groupName] : []), ...(item.name ? [item.name] : [])]
+    }) : [];
 }
 
 export class Groups {

@@ -477,7 +477,7 @@ export let globalAdminCtrl = ng.controller('globalAdminCtrl',
         };
 
         $scope.selectAudience = async (valueInput, audienceItem: SearchItem): Promise<void> => {
-            let groups: Groups = new Groups(await groupService.initGroupsFromClassNames([audienceItem.id]));
+            let groups: Groups = new Groups(await groupService.initGroupsFromClassIds([audienceItem.id]));
             $scope.filters.audienceIds = $scope.audiencesSearch
                 .setSelectedAudiences((groups.all.length > 0) ?
                     $scope.structure.audiences.getAudiencesFromGroups(groups) : [audienceItem]);

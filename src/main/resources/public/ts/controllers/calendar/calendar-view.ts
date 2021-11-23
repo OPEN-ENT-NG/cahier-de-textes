@@ -28,7 +28,7 @@ import {IAngularEvent} from "angular";
 import {UserUtils} from "../../utils/user.utils";
 import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
 import {DAY_OF_WEEK} from "../../core/enum/dayOfWeek.enum";
-import {Groups} from "../../model/group";
+import {Group, Groups} from "../../model/group";
 
 declare let window: any;
 
@@ -121,7 +121,8 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             $scope.selectClass = async (model, item: SearchItem) => {
-                let groups: Groups = new Groups(await groupService.initGroupsFromClassNames([item.id]));
+                let groups: Groups = new Groups(await groupService.initGroupsFromClassIds([item.id]));
+                if (!groups || !groups.all || groups.all.length == 0) groups = new Groups([Group.setFromSearchItem(item)]);
                 AutocompleteUtils.setClassesSelected($scope.structure.audiences.getAudiencesFromGroups(groups));
                 AutocompleteUtils.resetSearchFields();
                 await $scope.syncPedagogicItems();
@@ -173,8 +174,15 @@ export let calendarController = ng.controller('CalendarController',
                     $scope.structure.setCourses(<Course[]>result[0]);
                 } else if (model.me.hasWorkflow(WORKFLOW_RIGHTS.accessOwnData)) {
                     /* teacher/student workflow case */
-                    let teachers: Teacher[] = (teacherSelected && teacherSelected.id) ? [teacherSelected] : [new Teacher().setFromMe()];
-                    let teacherId: string = (teachers[0] && !UserUtils.amIStudentOrParent())  ? teachers[0].id : null;
+                    let teachers: Teacher[] = null;
+                    let teacherId: string = null;
+                    if (UserUtils.amITeacher()) {
+                        if ((teacherSelected && teacherSelected.id) || (audienceIds && audienceIds.length > 0))
+                            teachers = (teacherSelected && teacherSelected.id) ? [teacherSelected] : [];
+                        else teachers = [new Teacher().setFromMe()];
+                        teacherId = teachers[0] ? teachers[0].id : null;
+                    }
+
                     const promises: Promise<any>[] = [];
                     promises.push(
                         UserUtils.amIStudent() ?

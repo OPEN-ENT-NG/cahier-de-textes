@@ -33,7 +33,7 @@ export class AudiencesSearch extends AutoCompleteUtils {
     }
 
     public async removeSelectedAudience(audience: Audience): Promise<void> {
-        let groups: Array<Group> = await groupService.initGroupsFromClassNames([audience.id]);
+        let groups: Array<Group> = await groupService.initGroupsFromClassIds([audience.id]);
 
         if (groups.length > 0) {
             this.resetSelectedAudiences();

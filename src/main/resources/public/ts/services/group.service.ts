@@ -6,7 +6,7 @@ import {Mix} from "entcore-toolkit";
 export interface GroupService {
     initGroupsFromStudentIds(studentIds: string[]): Promise<Group[]>;
 
-    initGroupsFromClassNames(classIds: string[]): Promise<Group[]>;
+    initGroupsFromClassIds(classIds: string[]): Promise<Group[]>;
 }
 
 export const groupService: GroupService = {
@@ -21,9 +21,9 @@ export const groupService: GroupService = {
     },
 
 
-    initGroupsFromClassNames: async (classIds: string[]): Promise<Group[]> => {
+    initGroupsFromClassIds: async (classIds: string[]): Promise<Group[]> => {
         try {
-            let groupParams: string = classIds.map((name: string) => `classes=${name}`).join('&');
+            let groupParams: string = classIds.map((id: string) => `classes=${id}`).join('&');
             let {data} = await http.get(`/viescolaire/group/from/class?${groupParams}`);
             return Mix.castArrayAs(Group, data);
         } catch (err) {
