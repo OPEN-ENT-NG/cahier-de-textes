@@ -20,7 +20,7 @@ import {AutocompleteUtils} from '../../utils/autocomplete/autocompleteUtils';
 import {MobileUtils} from "../../utils/mobile";
 import {CourseService, groupService, SubjectService} from "../../services";
 import {UserUtils} from "../../utils/user.utils";
-import {Groups} from "../../model/group";
+import {Group, Groups} from "../../model/group";
 
 declare let window: any;
 
@@ -79,10 +79,8 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.syncPedagogicItems = async (subject?): Promise<void> => {
-            if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) {
-                // incorrect dates
-                return;
-            }
+            // incorrect dates
+            if (moment($scope.filters.startDate).isAfter(moment($scope.filters.endDate))) return;
 
             if ($scope.structure) {
                 $scope.structure.homeworks.all = [];
@@ -466,7 +464,8 @@ export let manageListCtrl = ng.controller('manageListController',
         };
 
         $scope.selectClass = async (model, item) => {
-            let groups: Groups = new Groups(await groupService.initGroupsFromClassNames([item.id]));
+            let groups: Groups = new Groups(await groupService.initGroupsFromClassIds([item.id]));
+            if (!groups || !groups.all || groups.all.length == 0) groups = new Groups([Group.setFromSearchItem(item)]);
             AutocompleteUtils.setClassesSelected($scope.structure.audiences.getAudiencesFromGroups(groups));
             AutocompleteUtils.resetSearchFields();
             await $scope.syncPedagogicItems();
