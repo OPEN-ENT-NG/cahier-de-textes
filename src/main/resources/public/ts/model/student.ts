@@ -4,17 +4,33 @@ import {Audience, Audiences, Structure} from './index';
 import {Group, Groups} from "./group";
 import {ArrayUtils} from "../utils/array.utils";
 
-export class Student {
+interface IStudent {
     id: string;
     displayName: string;
-    audience: any;
-    audiences: Audiences;
+    firstName: string;
+    lastName: string;
+    structureId: string;
+
     groups: Groups;
     groupId: string;
     classId?: string;
-    structureId: string
+    audience: Audience;
+    audiences: Audiences;
+}
 
+export class Student implements IStudent {
+    id: string;
+    displayName: string;
+    firstName: string;
+    lastName: string;
+    structureId: string;
 
+    groups: Groups;
+    groupId: string;
+    classId?: string;
+
+    audience: Audience;
+    audiences: Audiences;
 
     static formatSqlDataToModel(data: any, structure?: Structure){
         return {
@@ -23,10 +39,9 @@ export class Student {
             groupId: data.groupId,
             groups: new Groups(),
             id: data.id,
-            displayName: data.displayName,
+            displayName: data.displayName ? data.displayName : `${data.firstName} ${data.lastName}`,
             structureId: data.structureId,
             classId: data.classId
-            displayName: data.displayName ? data.displayName : `${data.firstName} ${data.lastName}`
         };
     }
 
