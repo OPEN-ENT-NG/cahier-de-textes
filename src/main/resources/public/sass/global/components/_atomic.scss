@@ -69,6 +69,10 @@
   display:inline-block;
 }
 
+.display-block {
+  display:block;
+}
+
 .overflow-y- {
   overflow-y: auto;
 }
@@ -91,6 +95,14 @@
 
 .text-left {
   text-align: left;
+}
+
+.align-self-start {
+  align-self: flex-start;
+}
+
+.align-content-center {
+  align-content: center
 }
 
 // Color
@@ -135,11 +147,11 @@
 }
 
 .text-md {
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .text-lg {
-  font-size: 16px;
+  font-size: 24px;
 }
 
 // Opacity
@@ -326,6 +338,10 @@
 
 .text-align-inherit {
   text-align: initial !important;
+}
+
+.justified-content-start {
+  justify-content: flex-start !important;
 }
 
 .justified-content-end {

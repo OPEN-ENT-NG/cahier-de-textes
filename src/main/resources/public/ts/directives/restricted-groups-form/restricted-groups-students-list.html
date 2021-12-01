@@ -1,38 +1,21 @@
 <!-- board -->
-<div class="flex-table padding-md size-auto">
+<div class="flex-table size-auto">
 
     <!-- List audiences -->
     <div class="flex-body flex-row" ng-show="true">
         <div class="flex-content list-audiences">
-            <!-- Audience item line -->
-            <div class="list-audiences-header flex-row row__8 autocomplete-student">
-                <div class="audience-name flex-col col__2">
-                    [[vm.audience.name]]
-                </div>
-                <div class="flex-col col__10">
-                    <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="vm.autocomplete.student"
-                                        data-ng-change="vm.selectStudent"
-                                        data-on-search="vm.searchStudent"
-                                        data-options="vm.autocomplete.students"
-                                        data-placeholder="diary.search.teacher"
-                                        data-search="vm.autocomplete.student">
-                    </async-autocomplete>
-                </div>
-            </div>
-
             <div class="list-audiences-content">
                 <!-- List students -->
-                <div class="flex-row list-audiences-student student-row-active"
+                <div class="flex-row-cdt row__12 list-audiences-student student-row-active"
                      ng-repeat="student in vm.selectedStudents() track by $index">
                     <!-- student picture -->
-                    <div class="student-photo flex-col col__1">
-                        <img ng-src="/viescolaire/structures/[[structure.id]]/students/[[student.id]]/picture"
+                    <div class="student-photo display-block flex-col col__1">
+                        <img ng-src="/viescolaire/structures/[[vm.structure.id]]/students/[[student.id]]/picture"
                              height="30" width="30"
                              onerror="this.src='/assets/themes/cg77/skins/default/../..//img/illustrations/no-avatar.svg';">
                     </div>
                     <!-- student info -->
-                    <div class="student-displayName ellipsis flex-col col__10">
+                    <div class="student-name flex-col col__10 ellipsis justified-content-start">
                         <span>[[student.displayName]]</span>
                     </div>
                     <!-- remove student -->

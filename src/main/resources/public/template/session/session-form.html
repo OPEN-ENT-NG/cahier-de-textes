@@ -363,23 +363,23 @@
                             <div class="autocomplete-selected"
                                  ng-show="groupsHomeworkSearch.selectedGroups.length > 0">
                                 <div ng-repeat="audience in groupsHomeworkSearch.selectedGroups track by audience.id"
-                                     class="search-input-ul flex-row row__16">
-                                    <div class="flex-col col__7">
+                                     class="search-input-ul flex-row-cdt row__16">
+                                    <div class="flex-col col__6">
                                         <span>[[audience.name]]</span>&nbsp;
                                         <i class="close" ng-click="removeSearchHomeworkAudience(audience)"></i>
                                     </div>
-                                    <restricted-groups-form audience="audience" class="restricted flex-col col__9"></restricted-groups-form>
+                                    <restricted-groups-form audience="audience" class="restricted flex-col col__10"></restricted-groups-form>
                                 </div>
                             </div>
                         </div>
 
 
-                        <div ng-show="form.homework.attachedToSession" class="nine">
+                        <div ng-show="form.homework.attachedToSession" class="flex-row-cdt row__11">
                             <!--SESSION SELECT-->
                             <multi-combo title="[[sessionTitle()]]"
                                          search-placeholder="[[lang.translate('sessions.choose')]]"
                                          id="group-list-teacher"
-                                         class="flex-col col__15 select-list-sessions"
+                                         class="flex-col col__10 select-list-sessions"
                                          combo-model="sessionsToAttachTo"
                                          filtered-model="form.homework.sessions"
                                          search-on="string"
@@ -389,8 +389,8 @@
                         </div>
                     </div>
                     <!-- Type -->
-                    <div class="flex-row-cdt row__16">
-                        <select class="flex-col col__15"
+                    <div class="flex-row-cdt row__11">
+                        <select class="flex-col col__10"
                                 required
                                 ng-model="form.homework.type"
                                 ng-options="homeworkType.label for homeworkType in homeworkTypes.all track by homeworkType.id">

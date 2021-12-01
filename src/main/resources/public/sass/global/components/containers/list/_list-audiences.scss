@@ -31,8 +31,6 @@
     align-items: center;
 
     .student-photo {
-      margin-right: 5px;
-
       img {
         border-radius: 50%;
       }
@@ -43,7 +41,9 @@
     }
 
     .student-remove {
-      text-align: end;
+      .delete:hover {
+        font-weight: bold;
+      }
     }
 
     .flex-col {
@@ -63,21 +63,6 @@
 
     > div {
       display: inline-block;
-    }
-  }
-
-  .student-row {
-
-    &-active {
-      &:hover {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.26);
-        background-color: $diary-grey-clear;
-        font-weight: bold;
-      }
-    }
-
-    &-inactive {
-      background-color: $diary-grey-light !important;
     }
   }
 }

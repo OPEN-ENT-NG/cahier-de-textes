@@ -1,7 +1,7 @@
-import {ng} from 'entcore';
+import {ng, idiom as lang} from 'entcore';
 import {ROOTS} from "../../core/const/roots";
 import {RestrictedGroup} from "../../model/RestrictedGroup";
-import {Audience, Student} from "../../model";
+import {Audience, Structure, Student} from "../../model";
 import {collectiveAbsenceService} from "../../services/AudienceService";
 import {StudentsSearch} from "../../utils/autocomplete/studentsSearch";
 
@@ -12,6 +12,8 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
         $onInit(): any;
 
         $onDestroy(): any;
+
+        isShownSavingOptions(): boolean;
 
         openRestrictedGroupsForm(): void;
 
@@ -25,7 +27,17 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
 
         selectedStudents(): Student[];
 
+        searchStudentPlaceholder(): String;
+
+        save(): void;
+
         roots: typeof ROOTS;
+
+        isToBeSaved: boolean;
+
+        isNewGroup: boolean;
+
+        structure: Structure;
 
         restrictedGroupsLightboxOpened: boolean;
 
@@ -54,6 +66,8 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
             const vm: IViewModel = <IViewModel>this;
 
             vm.$onInit = async () => {
+                vm.roots = ROOTS;
+                vm.structure = window.structure;
                 vm.restrictedGroup = new RestrictedGroup();
                 vm.autocomplete = new StudentsSearch(window.structure.id);
             };
@@ -62,7 +76,10 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
         link: function ($scope) {
             const vm: IViewModel = $scope.vm;
 
-            vm.roots = ROOTS;
+            vm.isShownSavingOptions = (): boolean => !!vm.isToBeSaved && !!vm.restrictedGroup.legacy_id;
+
+            vm.searchStudentPlaceholder = (): String =>
+                `${lang.translate('restricted.group.add.student.placeholder')} ${vm.audience.name}`;
 
             vm.openRestrictedGroupsForm = async (): Promise<void> => {
                 vm.restrictedGroupsLightboxOpened = true;
@@ -75,6 +92,7 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
 
             vm.removeStudent = (studentId: string): void => {
                 vm.restrictedGroup.student_ids = vm.restrictedGroup.student_ids.filter((id: string) => id !== studentId);
+                vm.autocomplete.resetStudents()
             }
 
             vm.searchStudent = (query: string): void => {
@@ -84,7 +102,7 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
 
             vm.selectStudent = (query: string, student: Student): void => {
                 vm.restrictedGroup.student_ids.push(student.id);
-                vm.autocomplete.resetStudents();
+                vm.autocomplete.resetQuery();
             }
 
             vm.selectedStudents = (): Student[] => {
@@ -92,6 +110,10 @@ export const restrictedGroupsForm = ng.directive('restrictedGroupsForm', () => {
                     vm.audience.students
                         .filter((student) => vm.restrictedGroup.student_ids.indexOf(student.id) !== -1) :
                     [];
+            }
+
+            vm.save = (): void => {
+
             }
 
             vm.closeRestrictedGroupsForm = (): void => {

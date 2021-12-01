@@ -1,25 +1,25 @@
 
 export interface IRestrictedGroup {
     id: number;
+    label: string;
     structure_id: string;
-    session_id: number;
+    homework_id: number;
     audience_id: string;
     teacher_id: string;
-    subject_id: string;
     student_ids: string[];
-    label: string;
-    is_valid: boolean;
+    legacy_id: string;
+    deleted_at: string;
 }
 
 export class RestrictedGroup {
     id: number;
+    label: string = '';
     audience_id: string;
-    session_id: number;
-    slug: string;
+    homework_id: number;
+    legacy_id: string;
     structure_id: string;
     student_ids: string[] = [];
     subject_id: string;
     teacher_id: string;
-    is_valid = true;
-    label = '';
+    deleted_at: string;
 }

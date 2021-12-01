@@ -5,7 +5,8 @@
 </button>
 
 <!-- Create Progression from Session -->
-<lightbox show="vm.restrictedGroupsLightboxOpened" class="lightbox create-visa" on-close="vm.closeRestrictedGroupsForm()">
+<lightbox show="vm.restrictedGroupsLightboxOpened" class="lightbox restricted-groups"
+          on-close="vm.closeRestrictedGroupsForm()">
     <!-- Lightbox title -->
     <section class="head">
         <h3>
@@ -15,20 +16,59 @@
         </h3>
     </section>
 
-    <!-- Create warning/folder selector -->
-    <section class="confirm-context">
-        <div class="cell horizontal-spacing twelve margin-top-md">
-            <i18n>restricted.group.create</i18n>
-            <input type="text" ng-model="vm.restrictedGroup.label"/>
-            [[vm.restrictedGroup.label]]
+    <!-- Create warning/folder selector todo edit des-->
+    <section class="restricted-groups-form padding-md">
+        <div class="flex-row-cdt row__13 margin-bottom-md margin-top-md">
+            <div class="flex-col col__3 text-left align-self-center">
+                <i18n>restricted.group.create</i18n>
+                :
+            </div>
+            <div class="flex-col col__4">
+                <input type="text" ng-model="vm.restrictedGroup.label" placeholder="{{vm.audience.name + '-GR1'}}"/>
+            </div>
+            <label class="checkbox flex-col col__6">
+                <input type="checkbox"
+                       ng-model="isToBeSaved">
+                <span></span>
+                <i18n>restricted.group.save.later</i18n>
+            </label>
         </div>
-        <div ng-if="vm.oldRestrictedGroups && vm.oldRestrictedGroups.length > 0" class="cell horizontal-spacing twelve margin-top-md">
+        <div ng-if="vm.oldRestrictedGroups && vm.oldRestrictedGroups.length > 0"
+             class="cell horizontal-spacing twelve margin-top-md">
             <i18n>restricted.group.from.created.group</i18n>
             <select>
                 <option ng-if="false" value="" label=""></option>
             </select>
         </div>
-        <div ng-include="vm.roots.directive + 'restricted-groups-form/restricted-groups-students-list.html'"></div>
+
+        <!-- Audience item line -->
+        <div class="flex-row-cdt row__10 autocomplete-student">
+            <div class="flex-col col__2 text-left align-self-start text-lg">
+                [[vm.audience.name]]
+            </div>
+            <div class="flex-col col__8">
+                <async-autocomplete data-ng-disabled="false"
+                                    data-ng-model="vm.autocomplete.student"
+                                    data-ng-change="vm.selectStudent"
+                                    data-on-search="vm.searchStudent"
+                                    data-options="vm.autocomplete.students"
+                                    data-placeholder="[[vm.searchStudentPlaceholder()]]"
+                                    data-search="vm.autocomplete.student">
+                </async-autocomplete>
+            </div>
+        </div>
+        <div ng-include="vm.roots.directive + 'restricted-groups-form/restricted-groups-students-list.html'" class="margin-bottom-md"></div>
+        <div ng-show="vm.isShownSavingOptions()" class="flex-row-cdt row__11 align-content-center">
+            <div class="flex-col col__3 group-save-option" ng-class="{'selected': !vm.isNewGroup}">
+                <i18n>restricted.group.edit</i18n>
+            </div>
+            <switch ng-model="vm.isNewGroup">
+                <label class="switch"> </label>
+            </switch>
+            <div class="flex-col col__4 group-save-option" ng-class="{'selected': vm.isNewGroup}">
+                <i18n>restricted.group.save.new</i18n>
+            </div>
+        </div>
     </section>
 
 

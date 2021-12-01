@@ -16,7 +16,7 @@
 
   @for $i from 1 through 16 {
     &.row__#{$i} {
-      .flex-col {
+      > .flex-col {
         @for $j from 1 through 16 {
           &.col__#{$j} {
             width: percentage($j / $i);

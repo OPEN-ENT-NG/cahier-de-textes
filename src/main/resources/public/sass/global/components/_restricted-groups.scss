@@ -1,0 +1,32 @@
+/* lightbox */
+.restricted-groups {
+  &-lightbox {
+    .content {
+      width: 900px;
+    }
+  }
+
+  &-form {
+    .group-save-option {
+      color: $diary-grey;
+      &.selected {
+        color: $diary-dark-grey;
+      }
+    }
+
+    switch {
+      display: flex;
+      align-self: center;
+
+      .switch {
+        .tick {
+          background: $diary-blue-light;
+
+          &:before {
+            background: $diary-blue-dark;
+          }
+        }
+      }
+    }
+  }
+}

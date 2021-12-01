@@ -49,6 +49,10 @@ export class StudentsSearch extends AutoCompleteUtils {
         this.selectedStudents = [];
     }
 
+    public resetQuery() {
+        this.student = null;
+    }
+
     public selectStudents(valueInput, studentItem) {
         if (!this.selectedStudents) this.selectedStudents = [];
         if (this.selectedStudents.find(student => student["id"] === studentItem.id) === undefined) {
