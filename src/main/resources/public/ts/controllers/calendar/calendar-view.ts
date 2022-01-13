@@ -252,11 +252,13 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.loadCalendarItems();
             };
 
-            $scope.loadCalendarItems = () => {
-                $scope.dailyHomeworks = $scope.structure.homeworks.all.filter(h => !h.session_id);
+            $scope.loadCalendarItems = (): void => {
+                $scope.dailyHomeworks = $scope.structure.homeworks.all.filter((h: Homework): boolean => !h.session_id ||
+                    ($scope.structure.sessions.all.find((s: Session): boolean => s.id === h.session_id) === undefined
+                        && UserUtils.amIStudentOrParent()));
                 $scope.calendarItems = $scope.pedagogicItems
-                    .filter(i => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK)
-                    .sort(function (a, b) {
+                    .filter((i: Homework): boolean => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK)
+                    .sort((a: any, b: any): number => {
                         return new Date(a.startMoment).getTime() - new Date(b.startMoment).getTime();
                     });
                 $scope.safeApply();
