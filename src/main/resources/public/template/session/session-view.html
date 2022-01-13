@@ -1,11 +1,12 @@
-<div class="session-view">
+<div class="session-view" ng-if="session.isPublished">
     <!-- title -->
     <div class="row margin-bottom-md" ng-if="!session.isInsideDiary">
         <b>[[session.getSubjectTitle()]] &nbsp; [[session.audience.name]] &nbsp; [[session.teacher.displayName]] </b>
     </div>
 
     <!-- description title -->
-    <div class="session-view-description row card padding-md" ng-click="session.opened = !session.opened">
+    <div class="session-view-description row card padding-md"
+         ng-click="session.opened = !session.opened">
         <h2 class="session-view-description-title cdt-title-not-clickable ">
             [[session.title]]
             <i class="right-magnet" ng-if="!session.isInsideDiary" ng-class="session.opened ? 'up-open' : 'down-open'"></i>
