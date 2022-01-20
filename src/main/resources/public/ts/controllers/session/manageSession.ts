@@ -324,8 +324,8 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                 $scope.safeApply();
             };
 
-            $scope.manageHomework = async (homework = null) => {
-                let newHomework = homework ? homework : new Homework($scope.structure);
+            $scope.manageHomework = async (homework: Homework = null): Promise<void> => {
+                let newHomework: Homework = homework ? homework : new Homework($scope.structure);
                 if (!homework) {
                     newHomework.audience = $scope.session.audience;
                     newHomework.subject = $scope.session.subject;
@@ -333,7 +333,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     newHomework.isNewField = true;
                 }
                 newHomework.audiences = [$scope.session.audience];
-                newHomework.isPublished = $scope.session.isPublished ? $scope.session.isPublished : false;
+                if (!newHomework.id) {
+                    newHomework.isPublished = $scope.session.isPublished ? $scope.session.isPublished : false;
+                }
                 $scope.validate = true;
                 $scope.hidePencil = true;
                 $scope.formIsOpened = true;
