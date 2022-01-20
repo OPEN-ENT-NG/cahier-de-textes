@@ -216,7 +216,7 @@ public class SessionServiceImpl extends DBService implements SessionService {
                 " FROM " + Diary.DIARY_SCHEMA + ".homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id " +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".session s ON (homework.session_id = s.id)" +
-                ((onlyPublished) ? " AND s.is_published = true " : " ");
+                ((onlyPublished) ? " AND homework.is_published = true " : " ");
 
         if (startDate != null && endDate != null) {
             query += " AND homework.due_date >= to_date(?,'YYYY-MM-DD')";
@@ -278,7 +278,7 @@ public class SessionServiceImpl extends DBService implements SessionService {
         String agregUsed = table_used.equals(HOMEWORK) ? "h." : "s.";
 
         String query = table_used.equals(HOMEWORK) ? " AND " + agregUsed + "session_id IS NULL " : "";
-        if (published && !notPublished) {
+        if (table_used.equals(HOMEWORK) && published && !notPublished) {
             query += " AND " + agregUsed + "is_published = true ";
         }
 
@@ -297,7 +297,12 @@ public class SessionServiceImpl extends DBService implements SessionService {
 
         query += " AND " + agregUsed + "archive_school_year IS NULL";
         query += " GROUP BY " + agregUsed + "id " + (table_used.equals(HOMEWORK) ? ", type.id" : "");
+        if (table_used.equals(SESSION) && published && !notPublished) {
+            query += " HAVING COUNT(homework_and_type) > 0 OR "+ agregUsed + "is_published = true ";
+        }
         query += " ORDER BY " + agregUsed + (table_used.equals(HOMEWORK) ? "due_date" : "date") + " ASC ";
+
+
         return query.replaceFirst("AND", "WHERE");
     }
 

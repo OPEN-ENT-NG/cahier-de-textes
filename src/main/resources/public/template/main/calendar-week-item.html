@@ -23,7 +23,7 @@
             <div class="flex-col col__4">[[item.audience.name]]</div>
             <i class="flex-col col__1 justified-content-end publish-icon invisible"
                ng-click="publishSession(item,$event)"
-               ng-if="!item.isPublished"
+               ng-if="!item.isPublished && !isAChildOrAParent"
                tooltip="utils.publish"></i>
         </div>
     </div>

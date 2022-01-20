@@ -185,6 +185,13 @@ export class Session {
         this.color = colors[1];
     }
 
+
+    setToUnpublishedWithHomework(): void {
+        this.isPublished = false;
+        this.is_empty = true;
+        this.color = colors[2];
+    }
+
     async save(placeholder?) {
         if (this.id) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat(placeholder));

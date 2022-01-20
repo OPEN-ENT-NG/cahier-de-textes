@@ -223,29 +223,32 @@ export let calendarController = ng.controller('CalendarController',
                 $scope.progressionFolders.all.filter((x) => x.id);
             }
 
-            $scope.loadPedagogicItems = () => {
+            $scope.loadPedagogicItems = (): void => {
                 $scope.pedagogicItems = [];
-                $scope.pedagogicItems = _.map($scope.structure.homeworks.all, function (item) {
+                $scope.structure.notPublishedSessions = [];
+                $scope.pedagogicItems = _.map($scope.structure.homeworks.all, (item) => {
                     if (item instanceof Homework) {
                         item["homeworks"] = [item];
                     }
                     return item;
                 });
                 if (DateUtils.isAChildOrAParent(model.me.type)) {
-                    $scope.structure.sessions.all.map((s, i) => {
+                    $scope.structure.sessions.all.map((s: Session, i: number) => {
                         if (!s.isPublished) {
+                            $scope.structure.notPublishedSessions.push(s);
                             $scope.structure.sessions.all.splice(i, 1);
                         }
                     });
-                    $scope.structure.homeworks.all.map((h, i) => {
+                    $scope.structure.homeworks.all.map((h: Homework, i: number) => {
                         if (!h.isPublished) {
                             $scope.structure.homeworks.all.splice(i, 1);
                         }
-                    })
+                    });
                 }
 
                 $scope.pedagogicItems = $scope.pedagogicItems.concat($scope.structure.sessions.all);
-                let courses: Course[] = $scope.structure.courses.all.filter(c => !($scope.structure.sessions.all.find(s => s.courseId == c._id)));
+                let courses: Array<Course> = $scope.structure.courses.all
+                    .filter((c: Course) => !($scope.structure.sessions.all.find((s: Session) => s.courseId === c._id)));
                 $scope.pedagogicItems = $scope.pedagogicItems.concat(courses);
 
                 $scope.loadPedagogicDays();
@@ -253,9 +256,27 @@ export let calendarController = ng.controller('CalendarController',
             };
 
             $scope.loadCalendarItems = (): void => {
-                $scope.dailyHomeworks = $scope.structure.homeworks.all.filter((h: Homework): boolean => !h.session_id ||
-                    ($scope.structure.sessions.all.find((s: Session): boolean => s.id === h.session_id) === undefined
-                        && UserUtils.amIStudentOrParent()));
+                $scope.dailyHomeworks = $scope.structure.homeworks.all.filter((h: Homework) => !h.session_id);
+
+                if (UserUtils.amIStudentOrParent()) {
+                    for (let h of $scope.structure.homeworks.all) {
+
+                        let matchingSession: Session = $scope.structure.notPublishedSessions
+                            .find((s: Session): boolean => s.id === h.session_id);
+
+                        if (matchingSession !== undefined && $scope.structure.sessions.all
+                            .find((s: Session) => s.id === matchingSession.id) === undefined) {
+                            matchingSession.setToUnpublishedWithHomework();
+                            $scope.structure.sessions.all.push(matchingSession);
+                            $scope.pedagogicItems.push(matchingSession);
+
+                            $scope.pedagogicItems = $scope.pedagogicItems
+                                .filter((item: any): boolean => item.pedagogicType !== PEDAGOGIC_TYPES.TYPE_COURSE
+                                    && !($scope.structure.sessions.all.find((s: Session) => s.courseId === item._id)));
+                        }
+                    }
+                }
+
                 $scope.calendarItems = $scope.pedagogicItems
                     .filter((i: Homework): boolean => i.pedagogicType !== PEDAGOGIC_TYPES.TYPE_HOMEWORK)
                     .sort((a: any, b: any): number => {
