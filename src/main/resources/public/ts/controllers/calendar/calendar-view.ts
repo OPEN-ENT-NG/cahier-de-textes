@@ -271,8 +271,9 @@ export let calendarController = ng.controller('CalendarController',
                             $scope.pedagogicItems.push(matchingSession);
 
                             $scope.pedagogicItems = $scope.pedagogicItems
-                                .filter((item: any): boolean => item.pedagogicType !== PEDAGOGIC_TYPES.TYPE_COURSE
-                                    && !($scope.structure.sessions.all.find((s: Session) => s.courseId === item._id)));
+                                .filter((item: any): boolean => (item.pedagogicType === PEDAGOGIC_TYPES.TYPE_COURSE
+                                    && !($scope.structure.sessions.all.find((s: Session) => s.courseId === item._id)))
+                                    || item.pedagogicType !== PEDAGOGIC_TYPES.TYPE_COURSE);
                         }
                     }
                 }
