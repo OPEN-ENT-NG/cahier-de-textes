@@ -8,7 +8,6 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -17,7 +16,7 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
-import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
+import java.util.Collections;
 
 public class DefautlInitService  extends SqlCrudService implements InitService {
     private static final String STATEMENT = "statement" ;
@@ -44,12 +43,14 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
         JsonArray statements = new fr.wseduc.webutils.collections.JsonArray();
 
         String homeworkTypeQuery = "SELECT DISTINCT structure_id as struct from " + Diary.DIARY_SCHEMA + ".homework_type" +
-                " WHERE structure_id = '" + structure_id + "'";
+                " WHERE structure_id = ?";
+        JsonArray homeworkTypeParams = new JsonArray(Collections.singletonList(structure_id));
         String sessionTypeQuery = "SELECT DISTINCT structure_id as struct from " + Diary.DIARY_SCHEMA + ".session_type" +
-                " WHERE structure_id = '" + structure_id + "'";
+                " WHERE structure_id = ?";
+        JsonArray sessionTypeParams = new JsonArray(Collections.singletonList(structure_id));
 
         Future<JsonArray> HomeworkType = Future.future();
-        sql.raw(homeworkTypeQuery, SqlResult.validResultHandler(event -> {
+        sql.prepared(homeworkTypeQuery, homeworkTypeParams, SqlResult.validResultHandler(event -> {
             JsonArray structuresHomeworkTypeRegistered = new JsonArray();
             for(int i = 0; i < event.right().getValue().size(); i++){
                 structuresHomeworkTypeRegistered.add(event.right().getValue().getJsonObject(i).getString("struct"));
@@ -62,7 +63,7 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
         }));
 
         Future<JsonArray> SessionType = Future.future();
-        sql.raw(sessionTypeQuery, SqlResult.validResultHandler(event -> {
+        sql.prepared(sessionTypeQuery, sessionTypeParams, SqlResult.validResultHandler(event -> {
             JsonArray structuresSessionTypeRegistered = new JsonArray();
             for(int i = 0; i < event.right().getValue().size(); i++){
                 structuresSessionTypeRegistered.add(event.right().getValue().getJsonObject(i).getString("struct"));
