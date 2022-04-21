@@ -26,10 +26,7 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionServiceImpl extends DBService implements SessionService {
@@ -61,17 +58,18 @@ public class SessionServiceImpl extends DBService implements SessionService {
         String query = "SELECT s.*, to_json(type_session) AS type, array_to_json(array_agg(distinct homework_and_type))" +
                 " AS homeworks, (SELECT 1 FROM " + Diary.DIARY_SCHEMA + ".session_visa" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".session on session.id = session_visa.session_id" +
-                " WHERE session.id = " + sessionId + " LIMIT 1) AS one_visa" +
+                " WHERE session.id = ? LIMIT 1) AS one_visa" +
                 " FROM " + Diary.DIARY_SCHEMA + ".session s" +
                 " LEFT JOIN " + Diary.DIARY_SCHEMA + ".session_type AS type_session ON type_session.id = s.type_id" +
                 " LEFT JOIN ( SELECT homework.*, to_json(homework_type) as type FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id )" +
                 " AS homework_and_type ON (s.id = homework_and_type.session_id)" +
-                " WHERE s.id = " + sessionId +
+                " WHERE s.id = ?" +
                 " AND s.archive_school_year IS NULL" +
                 " GROUP BY s.id, type_session";
+        JsonArray params = new JsonArray(Arrays.asList(sessionId, sessionId));
 
-        sql.raw(query, SqlResult.validUniqueResultHandler(result -> {
+        sql.prepared(query, params, SqlResult.validUniqueResultHandler(result -> {
             if (result.isRight()) {
                 JsonObject session = result.right().getValue();
                 List<String> subjectIds = new ArrayList<>();
@@ -100,14 +98,15 @@ public class SessionServiceImpl extends DBService implements SessionService {
     private void getFromSessionHomeworks(Long fromSessionId, JsonObject session, List<String> subjectIds,
                                          List<String> teacherIds, List<String> audienceIds,
                                          Handler<Either<String, JsonObject>> handler) {
-
         String query = " SELECT homework.*, to_json(homework_type) as type" +
                 " FROM " + Diary.DIARY_SCHEMA + ".homework homework" +
                 " INNER JOIN " + Diary.DIARY_SCHEMA + ".homework_type ON homework.type_id = homework_type.id" +
-                " WHERE from_session_id = " + fromSessionId +
-                " AND (session_id != " + fromSessionId + " OR  session_id IS NULL)" +
+                " WHERE from_session_id = ?" +
+                " AND (session_id != ? OR  session_id IS NULL)" +
                 " AND homework.archive_school_year IS NULL";
-        sql.raw(query, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
+        JsonArray params = new JsonArray(Arrays.asList(fromSessionId, fromSessionId));
+
+        sql.prepared(query, params, SqlResult.validResultHandler(fromSessionHomeworksAsync -> {
             if (fromSessionHomeworksAsync.isRight()) {
                 JsonArray fromSessionHomeworks = fromSessionHomeworksAsync.right().getValue();
                 session.put("from_homeworks", fromSessionHomeworks);
@@ -702,31 +701,25 @@ public class SessionServiceImpl extends DBService implements SessionService {
     @Override
     public void createSessionType(JsonObject sessionType, Handler<Either<String, JsonObject>> handler) {
         String maxQuery = "SELECT MAX(rank) as max, nextval('" + Diary.DIARY_SCHEMA + ".session_type_id_seq') as id from " + Diary.DIARY_SCHEMA + ".session_type "
-                + "WHERE structure_id = '" + sessionType.getString("structure_id") + "'";
-        sql.raw(maxQuery, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-            @Override
-            public void handle(Either<String, JsonObject> event) {
-                if (event.isRight()) {
-                    try {
-                        final Number rank = event.right().getValue().getInteger("max");
-                        final Number id = event.right().getValue().getInteger("id");
+                + "WHERE structure_id = ?";
+        JsonArray params = new JsonArray(Collections.singletonList(sessionType.getString("structure_id", "")));
 
-                        JsonArray statements = new JsonArray();
-                        statements.add(getInsertSessionTypeStatement(sessionType, rank.intValue() + 1));
-                        sql.transaction(statements, new Handler<Message<JsonObject>>() {
-                            @Override
-                            public void handle(Message<JsonObject> event) {
-                                handler.handle(SqlQueryUtils.getTransactionHandler(event, id));
-                            }
-                        });
-                    } catch (ClassCastException e) {
-                        LOGGER.error("An error occurred when insert homework_type", e);
-                        handler.handle(new Either.Left<String, JsonObject>("Error creating type"));
-                    }
-                } else {
-                    LOGGER.error("An error occurred when selecting max");
-                    handler.handle(new Either.Left<String, JsonObject>("Error while retrieving data"));
+        sql.prepared(maxQuery, params, SqlResult.validUniqueResultHandler(event -> {
+            if (event.isRight()) {
+                try {
+                    final Number rank = event.right().getValue().getInteger("max");
+                    final Number id = event.right().getValue().getInteger("id");
+
+                    JsonArray statements = new JsonArray();
+                    statements.add(getInsertSessionTypeStatement(sessionType, rank.intValue() + 1));
+                    sql.transaction(statements, event1 -> handler.handle(SqlQueryUtils.getTransactionHandler(event1, id)));
+                } catch (ClassCastException e) {
+                    LOGGER.error("An error occurred when insert homework_type", e);
+                    handler.handle(new Either.Left<>("Error creating type"));
                 }
+            } else {
+                LOGGER.error("An error occurred when selecting max");
+                handler.handle(new Either.Left<>("Error while retrieving data"));
             }
         }));
     }
@@ -761,7 +754,6 @@ public class SessionServiceImpl extends DBService implements SessionService {
 
         String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".session_type st " +
                 "WHERE not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".session s WHERE st.id =  s.type_id)" +
-                "AND not Exists (SELECT 1 from " + Diary.DIARY_SCHEMA + ".progression_session ps WHERE st.id = ps.type_id) " +
                 "AND Exists (SELECT 1 FROM diary.session_type stt WHERE structure_id = ? HAVING COUNT(stt.id) > 1) " +
                 "AND st.id = ? RETURNING id";
         params.add(structure_id);
