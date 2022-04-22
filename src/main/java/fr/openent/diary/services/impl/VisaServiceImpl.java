@@ -20,6 +20,8 @@ import org.entcore.common.user.UserInfos;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -95,9 +97,11 @@ public class VisaServiceImpl implements VisaService {
         StringBuilder query = new StringBuilder();
         query.append(" SELECT *");
         query.append(" FROM " + Diary.DIARY_SCHEMA + ".visa visa");
-        query.append(" WHERE visa.id = ").append(visaId);
+        query.append(" WHERE visa.id = ?");
 
-        Sql.getInstance().raw(query.toString(), SqlResult.validUniqueResultHandler(handler));
+
+        JsonArray params = new JsonArray(Collections.singletonList(visaId));
+        Sql.getInstance().prepared(query.toString(), params, SqlResult.validUniqueResultHandler(handler));
     }
 
     private JsonObject get_VisaSession_Statement(JsonObject visa) {
