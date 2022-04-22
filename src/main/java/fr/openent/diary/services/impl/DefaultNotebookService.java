@@ -22,7 +22,8 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.storage.Storage;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static fr.openent.diary.core.enums.DiaryType.HOMEWORK;
@@ -138,7 +139,7 @@ public class DefaultNotebookService extends DBService implements NotebookService
         });
 
         Sql.getInstance().prepared(queryGetter(false, structure_id, start_at, end_at, teacher_ids, audience_ids,
-                isVisa, visaOrder, isPublished, page, limit, offset, notebookParams), notebookParams,
+                        isVisa, visaOrder, isPublished, page, limit, offset, notebookParams), notebookParams,
                 SqlResult.validResultHandler(FutureHelper.handlerJsonArray(notebookFuture)));
     }
 
@@ -185,7 +186,8 @@ public class DefaultNotebookService extends DBService implements NotebookService
 
         // order by visa
         if ((isVisa != null && isVisa) || (visaOrder != null && !visaOrder.isEmpty())) {
-            query += "ORDER BY visa " + (visaOrder.equals("ASC") ? visaOrder + " NULLS FIRST " : visaOrder + " NULLS LAST ");
+            String visaOrderString = visaOrder.equals("ASC") || visaOrder.equals("DESC") ? visaOrder : "ASC";
+            query += "ORDER BY visa " + (visaOrderString.equals("ASC") ? visaOrderString + " NULLS FIRST " : visaOrderString + " NULLS LAST ");
         }
 
         // paginations cases
