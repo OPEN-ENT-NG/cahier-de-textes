@@ -263,6 +263,9 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             $scope.deleteHomework = async (homework: Homework, index: number, array_concerned?: string): Promise<void> => {
                 if (($scope.session.id === homework.session_id) || (array_concerned && array_concerned == $scope.CONST_HOMEWORKS)) {
                     $scope.localRemoveHomework(index);
+                    //If this condition is true, then when deleting the homework we delete the session in back
+                    if ($scope.homeworks.length == 0 && !$scope.session.isSession())
+                        $scope.session.isDeleted = true;
                 } else {
                     $scope.localRemoveFromHomework(index);
                 }

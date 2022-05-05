@@ -51,6 +51,7 @@ export class Session {
     firstText?: string = '';
     pedagogicType: number = PEDAGOGIC_TYPES.TYPE_SESSION;
     string: string = '';
+    isDeleted: boolean = false;
 
     constructor(structure: Structure, course?: Course, progression?: ProgressionSession) {
         this.structure = structure;
@@ -193,16 +194,14 @@ export class Session {
     }
 
     async save(placeholder?) {
-        if (this.id) {
+        if (this.id && !this.isDeleted) {
             let response = await http.put('/diary/session/' + this.id, this.toSendFormat(placeholder));
             return ToastUtils.setToastMessage(response, 'session.updated', 'session.updated.error');
-
         } else {
             let response = await http.post('/diary/session', this.toSendFormat(placeholder));
             this.id = response.data.id;
 
             return ToastUtils.setToastMessage(response, 'session.created', 'session.created.error');
-
         }
     }
 
@@ -345,6 +344,14 @@ export class Session {
 
         return (moment(otherSessionTime).isSame(moment(currentSessionTime)));
     }
+
+    isSession(): boolean {
+        if (this.color) {
+            // #00ab6f represents session's color and #7E7E7E represents session that does not match timeslot
+            return this.color === colors[0] || this.color === colors[1];
+        }
+        return false;
+    };
 
 }
 
