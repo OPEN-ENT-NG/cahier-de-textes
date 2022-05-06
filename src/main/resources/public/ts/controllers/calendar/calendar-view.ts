@@ -26,7 +26,6 @@ import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 import {MobileUtils} from "../../utils/mobile";
 import {IAngularEvent} from "angular";
 import {UserUtils} from "../../utils/user.utils";
-import {PEDAGOGIC_SLOT_PROFILE} from "../../core/enum/pedagogic-slot-profile";
 import {DAY_OF_WEEK} from "../../core/enum/dayOfWeek.enum";
 import {Group, Groups} from "../../model/group";
 
@@ -59,8 +58,6 @@ export let calendarController = ng.controller('CalendarController',
             $scope.TYPE_HOMEWORK = PEDAGOGIC_TYPES.TYPE_HOMEWORK;
             $scope.TYPE_SESSION = PEDAGOGIC_TYPES.TYPE_SESSION;
             $scope.TYPE_COURSE = PEDAGOGIC_TYPES.TYPE_COURSE;
-
-            const pedagogicSlotProfile: typeof PEDAGOGIC_SLOT_PROFILE = PEDAGOGIC_SLOT_PROFILE;
 
             $scope.timeSlot = {
                 slots: null
