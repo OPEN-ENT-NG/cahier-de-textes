@@ -201,7 +201,9 @@ export class Homework {
 
     init(): void {
         this.type = Mix.castAs(HomeworkType, this.type);
-        this.session = Mix.castAs(Session, this.type);
+        //if the session is not null, the homework must be detached from its previous session.
+        //if the session is null, the homework is not attached to any session, so we do nothing.
+        this.session = this.session ? Mix.castAs(Session, this.type) : this.session;
         this.dueDate = moment(this.dueDate).toDate();
         if (this.session_id && this.session_date) {
             this.startMoment = moment(this.session_date);

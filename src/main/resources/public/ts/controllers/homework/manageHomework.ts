@@ -2,10 +2,11 @@ import {idiom as lang, model, moment, ng} from 'entcore';
 import {Audience, Courses, Session, Sessions, SessionTypes, Subject, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadDay, Course} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
-import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
 import {SearchService} from "../../services";
 import {Moment} from "moment/moment";
+import {safeApply} from "../../utils/safeApply";
+import {FORMAT} from "../../core/const/dateFormat";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', 'SearchService',
@@ -155,23 +156,28 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                                 return false;
                             });
                     }
+                    if (!$scope.homework.session) {
+                        $scope.attachToDate();
+                    } else {
+                        $scope.attachToSession();
+                    }
                     if ($scope.session || courses.length !== 0 || $scope.sessions.all.length !== 0) {
                         $scope.display.sessionSelect = true;
                     } else {
                         $scope.display.sessionSelect = false;
                         $scope.attachToDate();
-
                     }
                     if ($scope.isInsideSessionForm && !$scope.homework.id) {
                         $scope.attachToSession();
                     }
-                    $scope.safeApply();
+                    safeApply($scope);
                 });
             };
 
             $scope.isSessionFuture = (): boolean => {
                 return ($scope.homework.session && $scope.homework.session.date) ?
-                    moment($scope.homework.session.date).isAfter(moment()) : true;
+                    //Compare if the date is in the future or if it is today
+                    moment($scope.homework.session.date).format(FORMAT.formattedDate) >= moment().format(FORMAT.formattedDate) : true;
             }
 
             $scope.attachToSession = (): void => {
@@ -194,7 +200,7 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                 if ($scope.sessionsToAttachTo) {
                     if ($scope.sessionsToAttachTo.length == 1 && ($scope.homework.opened || !$scope.homework.session)) {
                         $scope.homework.session = $scope.sessionsToAttachTo[0];
-                    } else if ($scope.sessionsToAttachTo.length > 1 && ($scope.homework.opened || !$scope.homework.session
+                    } else if ($scope.sessionsToAttachTo.length > 1 && !$scope.homework.session && ($scope.homework.opened
                         || $scope.homework.session && $scope.homework.session.id && $scope.homework.session.id !== $scope.session.id && $scope.homework.opened)) {
                         $scope.homework.session = $scope.sessionsToAttachTo[1];
                     } else if ($scope.homework.opened && !$scope.sessionsToAttachTo.length) {
@@ -286,14 +292,16 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     // Creating session from course before saving the homework
                     // first condition checks if homework is not attachedToDate (will obviously be attached to session)
                     // we set our dueDate with the session we attached to
-                    if (!$scope.homework.attachedToDate && !$scope.homework.session.id && $scope.homework.session.courseId) {
+                    if (!$scope.homework.attachedToDate) {
                         $scope.homework.dueDate = $scope.homework.session.date;
-                        if (!$scope.homework.session.type || !$scope.homework.session.type.id) {
-                            $scope.homework.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
-                        }
-                        let sessionSaveResponse = await $scope.homework.session.save();
-                        if (sessionSaveResponse.succeed) {
-                            $scope.homework.session.id = sessionSaveResponse.data.id;
+                        if (!$scope.homework.session.id && $scope.homework.session.courseId) {
+                            if (!$scope.homework.session.type || !$scope.homework.session.type.id) {
+                                $scope.homework.session.type = $scope.sessionTypes.all.find(ht => ht.rank > 0);
+                            }
+                            let sessionSaveResponse = await $scope.homework.session.save();
+                            if (sessionSaveResponse.succeed) {
+                                $scope.homework.session.id = sessionSaveResponse.data.id;
+                            }
                         }
                     }
 

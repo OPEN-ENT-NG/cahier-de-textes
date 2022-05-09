@@ -96,7 +96,7 @@
                         <date-picker class="date-picker-sm margin-bottom-7"  ng-if="homework.attachedToDate"
                                      ng-model="homework.dueDate"  ng-change="syncWorkloadDay()">
                         </date-picker>
-                        <select ng-if="homework.attachedToSession && (isSessionFuture() || !homework.id)" ng-model="homework.session" ng-click="syncWorkloadDay()"
+                        <select ng-if="homework.attachedToSession && ((homework.session && isSessionFuture()) || !homework.id)" ng-model="homework.session" ng-click="syncWorkloadDay()"
                                 ng-options="session as (session.getSessionString()) for session in sessionsToAttachTo">
                         </select>
                         <span ng-if="homework.attachedToSession && !isSessionFuture() && homework.id">
