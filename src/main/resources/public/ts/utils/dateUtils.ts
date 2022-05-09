@@ -81,21 +81,9 @@ export class DateUtils {
         return xhtml;
     }
 
-    static safeApply(that) {
-        return new Promise((resolve, reject) => {
-            let phase = (that.$root !== null) ? that.$root.$$phase : undefined;
-            if (phase === '$apply' || phase === '$digest') {
-                if (resolve && (typeof (resolve) === 'function')) resolve();
-            } else {
-                if (resolve && (typeof (resolve) === 'function')) that.$apply(resolve);
-                else that.$apply();
-            }
-        });
-    }
-
     static convertHtmlToPlainText(html) {
         let htmlWithSpaces = html.replace(/<\/div>/g, ' </div>');
-        return htmlWithSpaces ? String(htmlWithSpaces).replace(/<[^>]+>/gm, '') : '';
+        return htmlWithSpaces ? String(htmlWithSpaces).replace(/<(?!(\/)*img)[^>]+>/gm, '') : '';
     }
 
     static isAChildOrAParent(type) {
