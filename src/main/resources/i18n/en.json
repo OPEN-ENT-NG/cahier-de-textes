@@ -60,6 +60,7 @@
   "home": "Home",
   "homework": "homework",
   "homework.attachedToSession": "Session from ",
+  "homework.attachedToSession": "Due for the ",
   "homework.consult": "View homework",
   "homework.create": "Create homework",
   "homework.created": "Homework created",

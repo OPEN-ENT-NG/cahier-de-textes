@@ -2,10 +2,11 @@ import {idiom as lang, model, moment, ng} from 'entcore';
 import {Audience, Courses, Session, Sessions, SessionTypes, Subject, Subjects, Toast} from '../../model';
 import {Homework, HomeworkTypes, WorkloadDay, Course} from '../../model';
 import {DateUtils} from '../../utils/dateUtils';
-import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from "../../utils/autocomplete/groupsSearch";
 import {SearchService} from "../../services";
 import {Moment} from "moment/moment";
+import {safeApply} from "../../utils/safeApply";
+import {FORMAT} from "../../core/const/dateFormat";
 
 export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
     ['$scope', '$rootScope', '$routeParams', '$location', '$attrs', 'SearchService',
@@ -165,18 +166,18 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                     } else {
                         $scope.display.sessionSelect = false;
                         $scope.attachToDate();
-
                     }
                     if ($scope.isInsideSessionForm && !$scope.homework.id) {
                         $scope.attachToSession();
                     }
-                    $scope.safeApply();
+                    safeApply($scope);
                 });
             };
 
             $scope.isSessionFuture = (): boolean => {
                 return ($scope.homework.session && $scope.homework.session.date) ?
-                    moment($scope.homework.session.date).isAfter(moment()) : true;
+                    //Compare if the date is in the future or if it is today
+                    moment($scope.homework.session.date).format(FORMAT.formattedDate) >= moment().format(FORMAT.formattedDate) : true;
             }
 
             $scope.attachToSession = (): void => {
@@ -388,6 +389,11 @@ export let manageHomeworkCtrl = ng.controller('manageHomeworkCtrl',
                         } else {
                             $scope.attachToDate();
                         }
+                    }
+                    if (!$scope.homework.id || ($scope.homework && $scope.homework.workloadDay &&
+                        $scope.homework.workloadDay.dueDate &&
+                        moment($scope.homework.workloadDay.dueDate).format(FORMAT.formattedDate) >= moment().format(FORMAT.formattedDate))) {
+                        $scope.homework.editable = true;
                     }
                 }
 
