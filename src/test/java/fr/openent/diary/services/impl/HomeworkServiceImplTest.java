@@ -261,11 +261,11 @@ public class HomeworkServiceImplTest {
     public void testUpdateHomework(TestContext ctx) {
         Async async = ctx.async();
 
-        String expectedQuery = "UPDATE diary.homework SET subject_id = ?, exceptional_label = ?, structure_id = ?, " +
-                "audience_id = ?, estimatedTime = ?, color = ?, description = ?, type_id = ?,  modified = NOW() , is_published = ?, " +
-                "session_id = ?, due_date = ?,publish_date = NOW ()   WHERE id = ?;";
+        String expectedQuery = "UPDATE diary.homework SET subject_id = ?, exceptional_label = ?, structure_id = ?, audience_id" +
+                " = ?, estimatedTime = ?, color = ?, description = ?, type_id = ?, session_id = ?,  modified = NOW() ," +
+                " is_published = ?, due_date = ?,publish_date = NOW ()   WHERE id = ?;";
         JsonArray expectedParams = new JsonArray(Arrays.asList(
-                "subject_id", "exceptional_label", "structure_id", "audience_id", 1, "color", "description", 3, true, 4, "due_date", 1
+                "subject_id","exceptional_label","structure_id","audience_id",1,"color","description",3,4,true,"due_date",1
         ));
 
         vertx.eventBus().consumer("fr.openent.diary", message -> {
@@ -281,6 +281,34 @@ public class HomeworkServiceImplTest {
         JsonObject homework = new JsonObject("{\"is_published\": true, \"subject_id\": \"subject_id\", \"exceptional_label\":" +
                 " \"exceptional_label\", \"structure_id\": \"structure_id\", \"audience_id\": \"audience_id\", \"estimatedTime\": 1," +
                 " \"color\": \"color\", \"description\": \"description\", \"from_session_id\": 5, \"session_id\": 4, \"due_date\":" +
+                " \"due_date\", \"type_id\": 3}");
+        this.homeworkServiceImpl.updateHomework(1, true, homework, null);
+    }
+
+    @Test
+    public void testUpdateHomeworkWithNullSessionId(TestContext ctx) {
+        Async async = ctx.async();
+
+        String expectedQuery = "UPDATE diary.homework SET subject_id = ?, exceptional_label = ?, structure_id = ?, audience_id" +
+                " = ?, estimatedTime = ?, color = ?, description = ?, type_id = ?, session_id = ?,  modified = NOW() ," +
+                " is_published = ?, due_date = ?,publish_date = NOW ()   WHERE id = ?;";
+        JsonArray expectedParams = new JsonArray(Arrays.asList(
+                "subject_id","exceptional_label","structure_id","audience_id",1,"color","description",3,null,true,"due_date",1
+        ));
+
+        vertx.eventBus().consumer("fr.openent.diary", message -> {
+            JsonObject body = (JsonObject) message.body();
+            ctx.assertEquals("prepared", body.getString("action"));
+            ctx.assertEquals(expectedQuery, body.getString("statement"));
+            ctx.assertEquals(expectedParams.toString(), body.getJsonArray("values").toString());
+            async.complete();
+        });
+
+        UserInfos user = new UserInfos();
+        user.setUserId("userId");
+        JsonObject homework = new JsonObject("{\"is_published\": true, \"subject_id\": \"subject_id\", \"exceptional_label\":" +
+                " \"exceptional_label\", \"structure_id\": \"structure_id\", \"audience_id\": \"audience_id\", \"estimatedTime\": 1," +
+                " \"color\": \"color\", \"description\": \"description\", \"from_session_id\": 5, \"session_id\": null, \"due_date\":" +
                 " \"due_date\", \"type_id\": 3}");
         this.homeworkServiceImpl.updateHomework(1, true, homework, null);
     }
