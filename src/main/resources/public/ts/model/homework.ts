@@ -77,7 +77,8 @@ export class Homework {
             description: DateUtils.htmlToXhtml(this.description),
             color: this.color,
             is_published: this.isPublished,
-            workload: this.workload
+            workload: this.workload,
+            detachFromSession: (!this.session || !this.session.id)
         };
     }
 

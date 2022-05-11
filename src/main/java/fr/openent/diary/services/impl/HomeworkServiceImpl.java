@@ -440,7 +440,7 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Diary.DIARY_SCHEMA + ".homework " +
                 "SET subject_id = ?, exceptional_label = ?, structure_id = ?, audience_id = ?, estimatedTime = ?," +
-                " color = ?, description = ?, type_id = ?, session_id = ?,  modified = NOW() " ;
+                " color = ?, description = ?, type_id = ?, modified = NOW() " ;
 
         values.add(homework.getString("subject_id"));
         if (homework.getString("exceptional_label") != null) {
@@ -454,8 +454,11 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
         values.add(homework.getString("color"));
         values.add(homework.getString("description"));
         values.add(homework.getInteger("type_id"));
-        //If session_id is null in the json, we explicitly authorize to update session_id to null
-        values.add(homework.getInteger("session_id"));
+
+        if(homework.getInteger("session_id") != null || Boolean.TRUE.equals(homework.getBoolean("detachFromSession"))) {
+            query += ", session_id = ?";
+            values.add(homework.getInteger("session_id"));
+        }
 
         if(homework.getBoolean("is_published") != null) {
             query += ", is_published = ?";
