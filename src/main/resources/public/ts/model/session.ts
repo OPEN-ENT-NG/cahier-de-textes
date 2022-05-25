@@ -414,16 +414,16 @@ export class Sessions {
     }
 
     async syncExternalSessions(startMoment: any, endMoment: any, teacherId?: string, audienceIds?: string[], subjectId?: string): Promise<void> {
-        let startDate = DateUtils.getFormattedDate(startMoment);
-        let endDate = DateUtils.getFormattedDate(endMoment);
+        let startDate: string = DateUtils.getFormattedDate(startMoment);
+        let endDate: string = DateUtils.getFormattedDate(endMoment);
 
-        let filter = teacherId || audienceIds ? '?' : '';
-        if (teacherId) filter += `teacherId=${teacherId}&`;
-        if (audienceIds) filter += audienceIds.map((id: string) => `audienceId=${id}`).join('&') + '&';
-        if (subjectId) filter += `&subjectId=${subjectId}`;
-        let url = `/diary/sessions/external/${startDate}/${endDate}${filter.slice(0, -1)}`;
+        const params: URLSearchParams = new URLSearchParams();
 
-        await this.syncSessions(url);
+        if (audienceIds) audienceIds.forEach((id: string) => params.append("audienceId", id));
+        if (teacherId) params.append("teacherId", teacherId);
+        if (subjectId) params.append("subjectId", subjectId);
+
+        await this.syncSessions(`/diary/sessions/external/${startDate}/${endDate}?` + params.toString());
     }
 
     async syncChildSessions(startMoment: any, endMoment: any, childId?: string, subjectId?: string): Promise<void> {
