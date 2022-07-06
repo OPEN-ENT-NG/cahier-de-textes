@@ -1,12 +1,15 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.core.constants.Field;
 import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.services.SearchService;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -79,13 +82,17 @@ public class DefaultSearchService implements SearchService {
                 .put("fields", new JsonArray(fields))
                 .put("structureId", structure_id);
 
-        eb.send("viescolaire", action, event -> {
-            if (event.failed() || event.result() == null || "error".equals(((JsonObject) event.result().body()).getString("status"))) {
-                String message = "[Presences@DefaultSearchService::searchGroupsEventBus] Failed to search for groups" + event.cause();
+        eb.request("viescolaire", action, event -> {
+            if (event.failed()) {
+                String message = String.format("[Presences@DefaultSearchService::searchGroupsEventBus] Failed to search for groups %s", event.cause().getMessage());
+                LOGGER.error(message);
+                handler.handle(new Either.Left<>(event.cause().getMessage()));
+            } else if (Field.ERROR.equals(((JsonObject) event.result().body()).getString(Field.STATUS))) {
+                String message = String.format("[Presences@DefaultSearchService::searchGroupsEventBus] Failed to search for groups %s" + ((JsonObject) event.result().body()).getString(Field.MESSAGE));
                 LOGGER.error(message);
                 handler.handle(new Either.Left<>(event.cause().getMessage()));
             } else {
-                handler.handle(new Either.Right<>(((JsonObject) event.result().body()).getJsonArray("results")));
+                handler.handle(new Either.Right<>(((JsonObject) event.result().body()).getJsonArray(Field.RESULTS)));
             }
         });
     }
