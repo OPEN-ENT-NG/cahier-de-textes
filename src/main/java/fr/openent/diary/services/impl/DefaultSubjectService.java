@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.core.constants.Field;
 import fr.openent.diary.helper.SubjectHelper;
 import fr.openent.diary.models.Subject;
 import fr.openent.diary.services.SubjectService;
@@ -56,14 +57,17 @@ public class DefaultSubjectService implements SubjectService {
     }
 
     private void retrieveSubjectsEb(JsonObject action, Handler<AsyncResult<List<Subject>>> handler) {
-        eb.send("viescolaire", action, event -> {
-            JsonObject body = (JsonObject) event.result().body();
-            if (event.failed() || "error".equals(body.getString("status"))) {
-                String err = "[Diary@DefaultSubjectService::getSubjects] Failed to retrieve subjects";
-                LOGGER.error(err + " " + (event.failed() ? event.cause().getMessage() : body.getString("message", "")));
+        eb.request("viescolaire", action, event -> {
+            if (event.failed()) {
+                String err = String.format("[Diary@DefaultSubjectService::getSubjects] Failed to retrieve subjects %s", event.cause().getMessage());
+                LOGGER.error(err);
+                handler.handle(Future.failedFuture(err));
+            } else if (Field.ERROR.equals(((JsonObject) event.result().body()).getString(Field.STATUS))) {
+                String err = String.format("[Diary@DefaultSubjectService::getSubjects] Failed to retrieve subjects %s", ((JsonObject) event.result().body()).getString(Field.MESSAGE, ""));
+                LOGGER.error(err);
                 handler.handle(Future.failedFuture(err));
             } else {
-                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(body.getJsonArray("results", new JsonArray()))));
+                handler.handle(Future.succeededFuture(SubjectHelper.toSubjectList(((JsonObject) event.result().body()).getJsonArray(Field.RESULTS, new JsonArray()))));
             }
         });
     }

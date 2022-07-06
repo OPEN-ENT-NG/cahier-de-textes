@@ -1,5 +1,6 @@
 package fr.openent.diary.services.impl;
 
+import fr.openent.diary.core.constants.Field;
 import fr.openent.diary.helper.AudienceHelper;
 import fr.openent.diary.models.Audience;
 import fr.openent.diary.services.GroupService;
@@ -28,14 +29,17 @@ public class DefaultGroupService implements GroupService {
                 .put("action", "classe.getClassesInfo")
                 .put("idClasses", groupsId);
 
-        eb.send("viescolaire", action, event -> {
-            JsonObject body = (JsonObject) event.result().body();
-            if (event.failed() || "error".equals(body.getString("status"))) {
-                String err = "[Diary@DefaultGroupService::getGroups] Failed to retrieve groups";
+        eb.request("viescolaire", action, event -> {
+            if (event.failed()) {
+                String err = String.format("[Diary@DefaultGroupService::getGroups] Failed to retrieve groups %s", event.cause().getMessage());
+                LOGGER.error(err);
+                handler.handle(Future.failedFuture(err));
+            } else if (Field.ERROR.equals(((JsonObject) event.result().body()).getString(Field.STATUS))) {
+                String err = String.format("[Diary@DefaultGroupService::getGroups] Failed to retrieve groups %s", ((JsonObject) event.result().body()).getString(Field.MESSAGE, ""));
                 LOGGER.error(err);
                 handler.handle(Future.failedFuture(err));
             } else {
-                handler.handle(Future.succeededFuture(AudienceHelper.toAudienceList(body.getJsonArray("results"))));
+                handler.handle(Future.succeededFuture(AudienceHelper.toAudienceList(((JsonObject) event.result().body()).getJsonArray(Field.RESULTS))));
             }
         });
     }
