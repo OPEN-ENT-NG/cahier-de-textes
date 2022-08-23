@@ -11,6 +11,8 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 import org.entcore.common.user.UserInfos;
 
+import java.util.Collections;
+
 
 public class InspectorServiceImpl implements InspectorService {
     private final Neo4j neo = Neo4j.getInstance();
@@ -44,8 +46,9 @@ public class InspectorServiceImpl implements InspectorService {
 
     @Override
     public void deleteInspector(String inspectorId, Handler<Either<String, JsonArray>> handler) {
-        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".inspector_habilitation WHERE inspector_id = " + inspectorId;
-        Sql.getInstance().raw(query, SqlResult.validResultHandler(handler));
+        String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".inspector_habilitation WHERE inspector_id = ?";
+        JsonArray params = new JsonArray(Collections.singletonList(inspectorId));
+        Sql.getInstance().prepared(query, params, SqlResult.validResultHandler(handler));
     }
 
 

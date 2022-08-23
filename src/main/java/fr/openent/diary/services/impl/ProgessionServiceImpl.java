@@ -16,6 +16,8 @@ import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.user.UserInfos;
 
+import java.util.Collections;
+
 public class ProgessionServiceImpl extends SqlCrudService implements ProgressionService {
     private static final String STATEMENT = "statement";
     private static final String VALUES = "values";
@@ -428,8 +430,9 @@ public class ProgessionServiceImpl extends SqlCrudService implements Progression
 
         String getIdQuery = "SELECT id, subject_id, color, structure_id, teacher_id, date, " +
                 "is_published, audience_id, type_id " +
-                "FROM " + Diary.DIARY_SCHEMA + ".session s WHERE s.id = " + idSession + " AND s.archive_school_year IS NULL";
-        sql.raw(getIdQuery, SqlResult.validUniqueResultHandler(event -> {
+                "FROM " + Diary.DIARY_SCHEMA + ".session s WHERE s.id = ? AND s.archive_school_year IS NULL";
+        JsonArray params = new JsonArray(Collections.singletonList(idSession));
+        sql.prepared(getIdQuery, params, SqlResult.validUniqueResultHandler(event -> {
             if (event.isRight()) {
                 try {
                     final Number id = event.right().getValue().getInteger("id");
