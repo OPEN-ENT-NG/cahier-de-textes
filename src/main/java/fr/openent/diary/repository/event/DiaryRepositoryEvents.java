@@ -31,6 +31,6 @@ public class DiaryRepositoryEvents implements RepositoryEvents {
 
     @Override
     public void transition(JsonObject structure) {
-        Diary.launchNotebookArchiveWorker(eb, new JsonObject().put("structure", structure));
+//        Diary.launchNotebookArchiveWorker(eb, new JsonObject().put("structure", structure));
     }
 }
