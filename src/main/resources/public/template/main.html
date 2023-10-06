@@ -1,89 +1,126 @@
-<div class="row" ng-class="{'remove-margin-left': isAChildOrAParent}" ng-controller="CalendarController">
-    <!--  search bar -->
-    <div class="main-header" ng-class="{'padding-bottom-lg': !isCounselorUser()}">
-        <!-- Title -->
-        <h1 class="cell title-area-complete padding-right-xlg">
-            <!-- module image -->
-            <img ng-if="!isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
+<div
+  class="row"
+  ng-class="{'remove-margin-left': isAChildOrAParent}"
+  ng-controller="CalendarController"
+>
+  <!--  search bar -->
+  <div class="main-header" ng-class="{'padding-bottom-lg': !isCounselorUser()}">
+    <!-- Title -->
+    <h1 class="cell title-area-complete padding-right-xlg">
+      <!-- module image -->
+      <img
+        ng-if="!isCounselorUser()"
+        ng-src="/diary/public/img/diary.png"
+        alt=""
+      />
 
-            <!-- module title name -->
-            <i18n>diary.title</i18n>
+      <!-- module title name -->
+      <i18n>diary.title</i18n>
 
-            <!-- name structure -->
-            <span ng-if="!isCounselorUser()" class="structure-title main ellipsis-multiline-two">
-                [[structure.name]]
-            </span>
-        </h1>
+      <!-- name structure -->
+      <span
+        ng-if="!isCounselorUser()"
+        class="structure-title main ellipsis-multiline-two"
+      >
+        [[structure.name]]
+      </span>
+    </h1>
 
-        <!-- teacher search bar -->
-        <div workflow="diary.diarySearch" class="cell padding-left-xlg margin-right-lg" ng-class="isCounselorUser() ? 'four' : 'three'">
-            <div class="cell twelve search-input">
-                <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="autocomplete.teacher"
-                                    data-ng-change="selectTeacher"
-                                    data-options="autocomplete.teacherOptions"
-                                    data-on-search="filterTeacherOptions"
-                                    data-placeholder="diary.search.teacher"
-                                    data-search="autocomplete.teacher">
-                </async-autocomplete>
-            </div>
-            <div class="cell twelve main-header-result-search"
-                 ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''">
-                <ul class="cell twelve search-input-ul">
-                    <li>
-                        [[autocomplete.teachersSelected[0].displayName]]
-                        <i class="close" data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"></i>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Classes/groups search bar -->
-        <div workflow="diary.diarySearch" class="cell padding-left-xlg" ng-class="isCounselorUser() ? 'four' : 'three'">
-            <div class="cell twelve search-input">
-                <async-autocomplete data-ng-disabled="false"
-                                    data-ng-model="autocomplete.class"
-                                    data-ng-change="selectClass"
-                                    data-options="autocomplete.classOptions"
-                                    data-on-search="filterClassOptions"
-                                    data-placeholder="diary.search.group"
-                                    data-search="autocomplete.class">
-                </async-autocomplete>
-            </div>
-        </div>
-
-        <!-- button interact mode -->
-        <div workflow="diary.manageHomework" class="right-magnet title-buttons">
-            <button workflow="diary.manageHomework" class="padding-md calendar-button title-button"
-                    ng-click="goTo('/homework/create/')">
-                <i18n>homework.create</i18n>
-            </button>
-            <button workflow="diary.manageSession" class="padding-md margin-left-md calendar-button title-button"
-                    ng-click="goTo('/session/create/')">
-                <i18n>session.create</i18n>
-            </button>
-        </div>
+    <!-- teacher search bar -->
+    <div
+      workflow="diary.diarySearch"
+      class="cell padding-left-xlg margin-right-lg"
+      ng-class="isCounselorUser() ? 'four' : 'three'"
+    >
+      <div class="cell twelve search-input">
+        <async-autocomplete
+          data-ng-disabled="false"
+          data-ng-model="autocomplete.teacher"
+          data-ng-change="selectTeacher"
+          data-options="autocomplete.teacherOptions"
+          data-on-search="filterTeacherOptions"
+          data-placeholder="diary.search.teacher"
+          data-search="autocomplete.teacher"
+        >
+        </async-autocomplete>
+      </div>
+      <div
+        class="cell twelve main-header-result-search"
+        ng-show="autocomplete.teachersSelected[0] && autocomplete.teachersSelected[0].displayName !== ''"
+      >
+        <ul class="cell twelve search-input-ul">
+          <li>
+            [[autocomplete.teachersSelected[0].displayName]]
+            <i
+              class="close"
+              data-ng-click="removeTeacher(autocomplete.teachersSelected[0])"
+            ></i>
+          </li>
+        </ul>
+      </div>
     </div>
 
-
-    <!-- area calendar -->
-    <div class="row" id="calendar-area">
-        <sidebar-filter calendar-mode child="params.child"
-                        subjects="subjects"
-                        subject="filters.subject"
-                        structure="structure"
-                        structures="structures"
-                        is-homeworks-filtered="display.homeworks"
-                        is-sessions-filtered="display.sessionList"
-                        audiences="autocomplete.classesSelected"
-                        on-remove-audience="setClasses"
-                        class="cell three twelve-mobile sidebar-content">
-        </sidebar-filter>
-
-        <div class="cell twelve-mobile main-content nine"
-             ng-class="isShownSidebar() ? 'nine' : 'twelve'"
-             ng-if="!display.listView"
-             ng-include="'/diary/public/template/main/calendar-view.html'">
-        </div>
+    <!-- Classes/groups search bar -->
+    <div
+      workflow="diary.diarySearch"
+      class="cell padding-left-xlg"
+      ng-class="isCounselorUser() ? 'four' : 'three'"
+    >
+      <div class="cell twelve search-input">
+        <async-autocomplete
+          data-ng-disabled="false"
+          data-ng-model="autocomplete.class"
+          data-ng-change="selectClass"
+          data-options="autocomplete.classOptions"
+          data-on-search="filterClassOptions"
+          data-placeholder="diary.search.group"
+          data-search="autocomplete.class"
+        >
+        </async-autocomplete>
+      </div>
     </div>
+
+    <!-- button interact mode -->
+    <div workflow="diary.manageHomework" class="right-magnet title-buttons">
+      <button
+        workflow="diary.manageHomework"
+        class="padding-md calendar-button title-button"
+        ng-click="goTo('/homework/create/')"
+      >
+        <i18n>homework.create</i18n>
+      </button>
+      <button
+        workflow="diary.manageSession"
+        class="padding-md margin-left-md calendar-button title-button"
+        ng-click="goTo('/session/create/')"
+      >
+        <i18n>session.create</i18n>
+      </button>
+    </div>
+  </div>
+
+  <!-- area calendar -->
+  <div class="row" id="calendar-area">
+    <sidebar-filter
+      calendar-mode
+      child="params.child"
+      subjects="subjects"
+      subject="filters.subject"
+      structure="structure"
+      structures="structures"
+      is-homeworks-filtered="display.homeworks"
+      is-sessions-filtered="display.sessionList"
+      audiences="autocomplete.classesSelected"
+      on-remove-audience="setClasses"
+      class="cell three twelve-mobile sidebar-content"
+    >
+    </sidebar-filter>
+
+    <div
+      class="cell twelve-mobile main-content nine"
+      ng-class="isShownSidebar() ? 'nine' : 'twelve'"
+      ng-if="!display.listView"
+      ng-include="'/diary/public/template/main/calendar-view.html'"
+    ></div>
+  </div>
 </div>

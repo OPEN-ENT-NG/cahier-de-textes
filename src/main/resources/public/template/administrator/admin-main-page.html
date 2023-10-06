@@ -1,129 +1,160 @@
 <div class="global-administrator-page" ng-controller="globalAdminCtrl">
-    <!-- HEADER SECTION -->
-    <div class="flex-row-cdt global-administrator-page-header row__12">
-        <div class="flex-col col__3">
-            <app-title class="zero-mobile">
-                <div ng-class="isCounselorUser() ?  'title-area-complete' : 'title-area-simple'">
-                    <img ng-if="isCounselorUser()" ng-src="/diary/public/img/uni-cahierdetexte.png" alt=""/>
-                    <h1 class="application-title">
-                        <!-- module title name -->
-                        <i18n>diary.title</i18n>
+  <!-- HEADER SECTION -->
+  <div class="flex-row-cdt global-administrator-page-header row__12">
+    <div class="flex-col col__3">
+      <app-title class="zero-mobile">
+        <div
+          ng-class="isCounselorUser() ?  'title-area-complete' : 'title-area-simple'"
+        >
+          <img
+            ng-if="isCounselorUser()"
+            ng-src="/diary/public/img/diary.png"
+            alt=""
+          />
+          <h1 class="application-title">
+            <!-- module title name -->
+            <i18n>diary.title</i18n>
 
-                        <!-- name structure -->
-                        <span ng-if="isCounselorUser()" class="structure-title admin-main ellipsis-multiline-two">
-                            [[structure.name]]
-                        </span>
-                    </h1>
-
-                </div>
-            </app-title>
+            <!-- name structure -->
+            <span
+              ng-if="isCounselorUser()"
+              class="structure-title admin-main ellipsis-multiline-two"
+            >
+              [[structure.name]]
+            </span>
+          </h1>
         </div>
-        <!-- Filter Zone (Teacher and Class) -->
-        <div workflow="diary.diarySearch" class="flex-col col__9">
-            <!-- Teacher search bar -->
-            <div class="flex-col col__6">
-                <div class="search-input">
-                    <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="usersSearch.user"
-                                        data-ng-change="selectUser"
-                                        data-on-search="searchUser"
-                                        data-options="usersSearch.users"
-                                        data-placeholder="diary.search.teacher"
-                                        data-search="usersSearch.user">
-                    </async-autocomplete>
-                </div>
-            </div>
-            <div class="flex-col col__1"></div>
-
-            <!-- audience search bar -->
-            <div class="flex-col col__6">
-                <div class="search-input">
-                    <async-autocomplete data-ng-disabled="false"
-                                        data-ng-model="audiencesSearch.searchQuery"
-                                        data-ng-change="selectAudience"
-                                        data-on-search="searchAudience"
-                                        data-options="audiencesSearch.searchItems"
-                                        data-placeholder="diary.search.group"
-                                        data-search="audiencesSearch.searchQuery">
-                    </async-autocomplete>
-                </div>
-            </div>
-        </div>
+      </app-title>
     </div>
-
-    <!-- Result teacher/classes from async autocomplete -->
-    <div class="flex-row-cdt row__12 list-search">
-        <div class="flex-col col__3 list-search"></div>
-        <div class="flex-col col__9">
-            <div class="flex-col col__6 list-search">
-                <!-- Teacher selected via filter -->
-                <div class="cell twelve administrator-page-list">
-                    <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="user in usersSearch.selectedUsers track by user.id" class="administrator-page-list-item">
-                            [[user.displayName]] <i class="close" data-ng-click="removeSelectedUsers(teacher)"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="flex-col col__1 list-search"></div>
-            <div class="flex-col col__6 list-search">
-                <!-- Class selected via filter -->
-                <div class="cell twelve administrator-page-list">
-                    <ul class="cell twelve search-input-ul">
-                        <li ng-repeat="audience in audiencesSearch.selectedAudiences" class="administrator-page-list-item">
-                            [[audience.toString()]] <i class="close" data-ng-click="removeSelectedAudience(audience)"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Filter Zone (Teacher and Class) -->
+    <div workflow="diary.diarySearch" class="flex-col col__9">
+      <!-- Teacher search bar -->
+      <div class="flex-col col__6">
+        <div class="search-input">
+          <async-autocomplete
+            data-ng-disabled="false"
+            data-ng-model="usersSearch.user"
+            data-ng-change="selectUser"
+            data-on-search="searchUser"
+            data-options="usersSearch.users"
+            data-placeholder="diary.search.teacher"
+            data-search="usersSearch.user"
+          >
+          </async-autocomplete>
         </div>
+      </div>
+      <div class="flex-col col__1"></div>
+
+      <!-- audience search bar -->
+      <div class="flex-col col__6">
+        <div class="search-input">
+          <async-autocomplete
+            data-ng-disabled="false"
+            data-ng-model="audiencesSearch.searchQuery"
+            data-ng-change="selectAudience"
+            data-on-search="searchAudience"
+            data-options="audiencesSearch.searchItems"
+            data-placeholder="diary.search.group"
+            data-search="audiencesSearch.searchQuery"
+          >
+          </async-autocomplete>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- CONTENT -->
-    <div workflow="diary.adminAccess">
-        <!-- HEADER CONTENT -->
-        <div ng-include="'/diary/public/template/administrator/admin-sidebar.html'"></div>
-
-        <!-- Loader calendrier -->
-        <loader data-ng-show="isLoading" min-height="'250px'"></loader>
-
-        <!-- TABLE CONTENT -->
-        <div class="visa-diary"
-             data-ng-show="!isLoading"
-             ng-include="'/diary/public/template/administrator/diary-lister.html'">
+  <!-- Result teacher/classes from async autocomplete -->
+  <div class="flex-row-cdt row__12 list-search">
+    <div class="flex-col col__3 list-search"></div>
+    <div class="flex-col col__9">
+      <div class="flex-col col__6 list-search">
+        <!-- Teacher selected via filter -->
+        <div class="cell twelve administrator-page-list">
+          <ul class="cell twelve search-input-ul">
+            <li
+              ng-repeat="user in usersSearch.selectedUsers track by user.id"
+              class="administrator-page-list-item"
+            >
+              [[user.displayName]]
+              <i class="close" data-ng-click="removeSelectedUsers(teacher)"></i>
+            </li>
+          </ul>
         </div>
+      </div>
+      <div class="flex-col col__1 list-search"></div>
+      <div class="flex-col col__6 list-search">
+        <!-- Class selected via filter -->
+        <div class="cell twelve administrator-page-list">
+          <ul class="cell twelve search-input-ul">
+            <li
+              ng-repeat="audience in audiencesSearch.selectedAudiences"
+              class="administrator-page-list-item"
+            >
+              [[audience.toString()]]
+              <i
+                class="close"
+                data-ng-click="removeSelectedAudience(audience)"
+              ></i>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- CONTENT -->
+  <div workflow="diary.adminAccess">
+    <!-- HEADER CONTENT -->
+    <div
+      ng-include="'/diary/public/template/administrator/admin-sidebar.html'"
+    ></div>
 
-        <!-- SNACKBAR/TOAST -->
-        <section class="toggle-buttons hide" data-ng-class="{ 'display': showOptionToaster }">
-            <div class="toggle">
-                <div class="row">
+    <!-- Loader calendrier -->
+    <loader data-ng-show="isLoading" min-height="'250px'"></loader>
 
-                    <!-- to visa -->
-                    <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
-                        <i18n>visa.manage.viser</i18n>
-                    </button>
+    <!-- TABLE CONTENT -->
+    <div
+      class="visa-diary"
+      data-ng-show="!isLoading"
+      ng-include="'/diary/public/template/administrator/diary-lister.html'"
+    ></div>
 
-                    <!-- download pdf file -->
-                    <button ng-class="{'loading': printPdf.loading}"
-                            ng-click="printPdf()">
-                        <span class="loader"></span>
-                        <i18n>visa.manage.diaryToPrintPDF</i18n>
-                    </button>
+    <!-- SNACKBAR/TOAST -->
+    <section
+      class="toggle-buttons hide"
+      data-ng-class="{ 'display': showOptionToaster }"
+    >
+      <div class="toggle">
+        <div class="row">
+          <!-- to visa -->
+          <button workflow="diary.manageVisa" ng-click="wantCreateVisa()">
+            <i18n>visa.manage.viser</i18n>
+          </button>
 
-                    <!-- consult visas file -->
-                    <button workflow="diary.readVisa"
-                            ng-show="getSelectedNotebooks().length !== 0 && getSelectedNotebooks().length === 1
+          <!-- download pdf file -->
+          <button
+            ng-class="{'loading': printPdf.loading}"
+            ng-click="printPdf()"
+          >
+            <span class="loader"></span>
+            <i18n>visa.manage.diaryToPrintPDF</i18n>
+          </button>
+
+          <!-- consult visas file -->
+          <button
+            workflow="diary.readVisa"
+            ng-show="getSelectedNotebooks().length !== 0 && getSelectedNotebooks().length === 1
                             && getVisasFromSelectedNotebooks().length !== 0"
-                            ng-click="consultVisasFromNotebook()">
-                        <i18n>sessions.admin.icon.dwlPdf</i18n>
-                    </button>
+            ng-click="consultVisasFromNotebook()"
+          >
+            <i18n>sessions.admin.icon.dwlPdf</i18n>
+          </button>
 
-<!--                    <button disabled ng-if="userType == 'ENSEIGNANT'">-->
-<!--                        <i18n>sessions.admin.share</i18n>-->
-<!--                    </button>-->
-                </div>
-            </div>
-        </section>
-    </div>
+          <!--                    <button disabled ng-if="userType == 'ENSEIGNANT'">-->
+          <!--                        <i18n>sessions.admin.share</i18n>-->
+          <!--                    </button>-->
+        </div>
+      </div>
+    </section>
+  </div>
 </div>
