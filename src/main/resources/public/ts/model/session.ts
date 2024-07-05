@@ -66,6 +66,12 @@ export class Session {
     }
 
     static formatSqlDataToModel(data: any, structure: Structure) {
+        // FIX #WB2-1756: 
+        // Date from database is returned with time set to "00h00m00s".
+        // By default momentJS will parse and display in local time, so if user is in UTC negative then the date day will be the day before.
+        // Using the utc() function from momentJS will keep the day as the one saved in the database.
+        const formatedDate = moment(data.date).utc().format(FORMAT.formattedDate);
+
         return {
             audience: data.audience,
             teacher: data.teacher,
@@ -78,7 +84,7 @@ export class Session {
             room: data.room,
             color: data.color,
             isPublished: data.is_published,
-            date: DateUtils.getFormattedDate(data.date),
+            date: formatedDate,
             startTime: data.start_time,
             endTime: data.end_time,
             description: data.description,
