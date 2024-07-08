@@ -114,6 +114,12 @@ export class Homework {
     }
 
     static formatSqlDataToModel(data: any): any {
+        // FIX #WB2-1756: 
+        // Date from database is returned with time set to "00h00m00s".
+        // By default momentJS will parse and display in local time, so if user is in UTC negative then the date day will be the day before.
+        // Using the utc() function from momentJS will keep the day as the one saved in the database.
+        const formatedDate = moment.utc(data.due_date, FORMAT.formattedDate).format(FORMAT.formattedDate);
+
         return {
             audience: data.audience,
             teacher: data.teacher,
@@ -129,7 +135,7 @@ export class Homework {
             title: data.title,
             color: data.color,
             estimatedTime: data.estimatedtime,
-            dueDate: DateUtils.getFormattedDate(data.due_date),
+            dueDate: formatedDate,
             description: data.description,
             isPublished: data.is_published,
             workload: data.workload,
