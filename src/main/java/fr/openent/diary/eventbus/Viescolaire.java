@@ -31,7 +31,7 @@ public class Viescolaire {
                 .put("structureId", structureId)
                 .put("action", "periode.getSchoolYearPeriod");
 
-        eb.send(address, action, MessageResponseHandler.messageJsonObjectHandler(FutureHelper.handlerJsonObject(handler)));
+        eb.request(address, action, MessageResponseHandler.messageJsonObjectHandler(FutureHelper.handlerJsonObject(handler)));
     }
 
 

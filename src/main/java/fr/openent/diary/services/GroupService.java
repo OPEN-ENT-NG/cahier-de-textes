@@ -4,6 +4,7 @@ import fr.openent.diary.models.Audience;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface GroupService {
      */
     void getGroups(JsonArray groups, Handler<AsyncResult<List<Audience>>> handler);
 
-    void getGroups(JsonArray groups, Future<List<Audience>> future);
+    void getGroups(JsonArray groups, Promise<List<Audience>> promise);
 }

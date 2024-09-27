@@ -134,7 +134,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                         .put("content", bytes)
                         .put("baseUrl", baseUrl);
 
-                eb.send(node + "entcore.pdf.generator", actionObject, reply -> {
+                eb.request(node + "entcore.pdf.generator", actionObject, reply -> {
                     if (reply.failed()) {
                         String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate pdf.";
                         log.error(message + " " + reply.cause().getMessage());
@@ -273,9 +273,23 @@ public class ExportPDFServiceImpl implements ExportPDFService {
             handler.handle(new Either.Left<>("Bad request"));
             return;
         }
+        final String boundary = UUID.randomUUID().toString();
+
+        RequestOptions requestOptions = new RequestOptions()
+                .setAbsoluteURI(url.toString())
+                .setMethod(HttpMethod.POST)
+                .setFollowRedirects(true)
+                .putHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary)
+                .putHeader("Authorization", authHeader)
+                .putHeader(HttpHeaders.ACCEPT, "*/*");
+
         HttpClient httpClient = createHttpClient(this.vertx);
-        HttpClientRequest httpClientRequest =
-                httpClient.postAbs(url.toString(), response -> {
+        httpClient.request(requestOptions)
+                .compose(request -> {
+                    request.setChunked(true);
+                    return request.send(multipartBody(file, token, boundary));
+                })
+                .onSuccess(response -> {
                     if (response.statusCode() == 200) {
                         final Buffer buff = Buffer.buffer();
                         response.handler(buff::appendBuffer);
@@ -286,33 +300,24 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                             }
                         });
                     } else {
-                        log.error("fail to post node-pdf-generator" + response.statusMessage());
+                        log.error("[Common@ExportPDFServiceImpl::webServiceNodePdfGeneratorPost::postAbs] " +
+                                "fail to post node-pdf-generator" + response.statusMessage());
                         response.bodyHandler(event -> {
-                            log.error("Returning body after POST CALL : " + nodePdfGeneratorUrl
-                                    + ", Returning body : " + event.toString(StandardCharsets.UTF_8));
+                            log.error("[Common@ExportPDFServiceImpl::webServiceNodePdfGeneratorPost::postAbsResponseBodyHandler] " +
+                                    "Returning body after POST CALL : " + nodePdfGeneratorUrl + ", Returning body : " + event.toString("UTF-8"));
                             if (!responseIsSent.getAndSet(true)) {
                                 httpClient.close();
                             }
                         });
                     }
+                })
+                .onFailure(event -> {
+                    log.error(event.getMessage(), event);
+                    if (!responseIsSent.getAndSet(true)) {
+                        handler.handle(new Either.Left<>(event.getMessage()));
+                        httpClient.close();
+                    }
                 });
-
-        httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-            @Override
-            public void handle(Throwable event) {
-                log.error(event.getMessage(), event);
-                if (!responseIsSent.getAndSet(true)) {
-                    handle(event);
-                    httpClient.close();
-                }
-            }
-        }).setFollowRedirects(true);
-        final String boundary = UUID.randomUUID().toString();
-        httpClientRequest.setChunked(true)
-                .putHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data; boundary=" + boundary)
-                .putHeader("Authorization", authHeader)
-                .putHeader(HttpHeaders.ACCEPT, "*/*")
-                .end(multipartBody(file, token, boundary));
 
     }
 

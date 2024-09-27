@@ -11,6 +11,7 @@ import fr.openent.diary.services.impl.DefaultNotebookService;
 import fr.openent.diary.utils.DateUtils;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -73,7 +74,7 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
             Future<JsonObject> removeNotebooksArchiveFuture = removingNotebookArchiveProcess(structureId, removeArchivePeriod);
             Future<JsonObject> removeNotebooksFuture = removingNotebooksProcess(structureId, removeNotebookDate);
 
-            FutureHelper.join(Arrays.asList(removeNotebooksArchiveFuture, removeNotebooksFuture)).setHandler(result -> {
+            Future.join(Arrays.asList(removeNotebooksArchiveFuture, removeNotebooksFuture)).onComplete(result -> {
                 if (result.failed()) {
                     log.error("[Diary@NotebookArchiveWorker::processNotebookArchive] An error occurred while removing archives data",
                             result.cause().getMessage());
@@ -90,7 +91,7 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
     }
 
     private Future<JsonObject> removingNotebookArchiveProcess(String structureId, String removeArchivePeriod) {
-        Future<JsonObject> future = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
         log.info(ANSI_CYAN + ARCHIVE_FLAG + " Get old notebook archives to delete them" + ANSI_RESET);
         archiveService.getNotebookArchives(structureId, removeArchivePeriod, null, null,
                 null, null, null)
@@ -98,23 +99,23 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
                     log.info(ANSI_CYAN + ARCHIVE_FLAG + " Start to delete old notebook archives" + ANSI_RESET);
                     return archiveService.delete(NotebookArchiveHelper.notebookArchives(notebooksArchive));
                 })
-                .setHandler(result -> {
-                    future.handle(result);
+                .onComplete(result -> {
+                    promise.handle(result);
                     log.info(ANSI_CYAN + ARCHIVE_FLAG + " Deleting old notebook archives end" + ANSI_RESET);
                 });
 
-        return future;
+        return promise.future();
     }
 
     private Future<JsonObject> removingNotebooksProcess(String structureId, String removeDate) {
-        Future<JsonObject> future = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
         log.info(ANSI_CYAN + ARCHIVE_FLAG + " Start to delete old notebooks" + ANSI_RESET);
         archiveService.deleteOldNotebooksAndVisas(structureId, removeDate, result -> {
-            future.handle(result);
+            promise.handle(result);
             log.info(ANSI_CYAN + ARCHIVE_FLAG + " Deleting old notebooks end" + ANSI_RESET);
         });
 
-        return future;
+        return promise.future();
     }
 
     private void archivingProcess(String structureId, String structureName, String archiveDate) {

@@ -6,6 +6,7 @@ import fr.openent.diary.services.UserService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -35,12 +36,12 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public void getTeachers(JsonArray teachers, Future<List<User>> future) {
+    public void getTeachers(JsonArray teachers, Promise<List<User>> promise) {
         getTeachers(teachers, event -> {
             if (event.failed()) {
-                future.fail(event.cause());
+                promise.fail(event.cause());
             } else {
-                future.complete(event.result());
+                promise.complete(event.result());
             }
         });
     }

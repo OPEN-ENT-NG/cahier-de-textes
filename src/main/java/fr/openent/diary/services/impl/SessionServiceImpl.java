@@ -11,10 +11,7 @@ import fr.openent.diary.services.*;
 import fr.openent.diary.utils.DateUtils;
 import fr.openent.diary.utils.SqlQueryUtils;
 import fr.wseduc.webutils.Either;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
@@ -119,24 +116,24 @@ public class SessionServiceImpl extends DBService implements SessionService {
                     JsonObject homework = fromSessionHomeworks.getJsonObject(i);
                     setAudienceSubjectTeacherData(subjectIds, teacherIds, audienceIds, homework);
                 }
-                Future<List<Subject>> subjectsFuture = Future.future();
-                Future<List<User>> teachersFuture = Future.future();
-                Future<List<Audience>> audiencesFuture = Future.future();
+                Promise<List<Subject>> subjectsPromise = Promise.promise();
+                Promise<List<User>> teachersPromise = Promise.promise();
+                Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(asyncResult -> {
                     if (asyncResult.failed()) {
                         String message = "[Diary@SessionServiceImpl::getSessions] Failed to get sessions. ";
                         LOGGER.error(message + " " + asyncResult.cause());
                         handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
                     } else {
                         // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
-                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                        Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                        Map<String, User> teacherMap = teachersFuture.result()
+                        Map<String, User> teacherMap = teachersPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                        Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -160,9 +157,9 @@ public class SessionServiceImpl extends DBService implements SessionService {
                         handler.handle(new Either.Right<>(session));
                     }
                 });
-                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
             } else {
                 LOGGER.error("[Diary@SessionServiceImpl::getFromSessionHomeworks] " +
                         "An error occurred when fetching child homeworks", fromSessionHomeworksAsync.left().getValue());
@@ -390,24 +387,24 @@ public class SessionServiceImpl extends DBService implements SessionService {
                     cleanSession(arraySession.getJsonObject(i), subjectIds, teacherIds, audienceIds);
                     setAudienceSubjectTeacherData(subjectIds, teacherIds, audienceIds, arraySession.getJsonObject(i));
                 }
-                Future<List<Subject>> subjectsFuture = Future.future();
-                Future<List<User>> teachersFuture = Future.future();
-                Future<List<Audience>> audiencesFuture = Future.future();
+                Promise<List<Subject>> subjectsPromise = Promise.promise();
+                Promise<List<User>> teachersPromise = Promise.promise();
+                Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(asyncResult -> {
                     if (asyncResult.failed()) {
                         String message = "[Diary@SessionServiceImpl::getSessions] Failed to get sessions. ";
                         LOGGER.error(message + " " + asyncResult.cause());
                         handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
                     } else {
                         // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
-                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                        Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                        Map<String, User> teacherMap = teachersFuture.result()
+                        Map<String, User> teacherMap = teachersPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                        Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -428,9 +425,9 @@ public class SessionServiceImpl extends DBService implements SessionService {
                         handler.handle(new Either.Right<>(arraySession));
                     }
                 });
-                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
@@ -441,28 +438,28 @@ public class SessionServiceImpl extends DBService implements SessionService {
                                                  List<String> listSubjectId, boolean published, boolean notPublished, boolean vised, boolean notVised,
                                                  Handler<Either<String, JsonArray>> handler) {
 
-        Future<JsonArray> sessionsFuture = Future.future();
-        Future<JsonArray> homeworksFuture = Future.future();
+        Promise<JsonArray> sessionsPromise = Promise.promise();
+        Promise<JsonArray> homeworksPromise = Promise.promise();
 
         getSessions(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
                 listSubjectId, published, notPublished, vised, notVised, true, sessionResult -> {
                     if (sessionResult.isLeft()) {
-                        sessionsFuture.fail(sessionResult.left().getValue());
+                        sessionsPromise.fail(sessionResult.left().getValue());
                         return;
                     }
-                    sessionsFuture.complete(sessionResult.right().getValue());
+                    sessionsPromise.complete(sessionResult.right().getValue());
                 });
 
         getSelectIndependantHomeworks(structureID, startDate, endDate, ownerId, listAudienceId, listTeacherId,
                 listSubjectId, published, notPublished, vised, notVised, true, homeworkResult -> {
                     if (homeworkResult.failed()) {
-                        homeworksFuture.fail(homeworkResult.cause().getMessage());
+                        homeworksPromise.fail(homeworkResult.cause().getMessage());
                         return;
                     }
-                    homeworksFuture.complete(homeworkResult.result());
+                    homeworksPromise.complete(homeworkResult.result());
                 });
 
-        FutureHelper.all(Arrays.asList(sessionsFuture, homeworksFuture)).setHandler(event -> {
+        Future.all(Arrays.asList(sessionsPromise.future(), homeworksPromise.future())).onComplete(event -> {
             if (event.failed()) {
                 String message = "[Diary@SessionServiceImpl::getSessionsAndHomeworksWithVisas] Failed to " +
                         "fetch used homeworks. " + event.cause().toString();
@@ -470,8 +467,8 @@ public class SessionServiceImpl extends DBService implements SessionService {
                 handler.handle(new Either.Left<>(message));
                 return;
             }
-            JsonArray result = sessionsFuture.result();
-            result.addAll(homeworksFuture.result());
+            JsonArray result = sessionsPromise.future().result();
+            result.addAll(homeworksPromise.future().result());
             handler.handle(new Either.Right<>(result));
         });
     }

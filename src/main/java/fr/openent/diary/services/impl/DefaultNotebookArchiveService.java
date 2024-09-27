@@ -8,10 +8,7 @@ import fr.openent.diary.services.NotebookArchiveService;
 import fr.openent.diary.helper.FileHelper;
 import fr.openent.diary.utils.DateUtils;
 import fr.wseduc.webutils.*;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -46,22 +43,22 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
     @Override
     public void get(String structureId, String schoolYear, List<String> teacherNames, List<String> audienceLabels,
                     Integer page, String limit, String offset, Handler<AsyncResult<JsonObject>> handler) {
-        Future<JsonArray> listResultsFuture = Future.future();
-        Future<Long> countResultsFuture = Future.future();
+        Promise<JsonArray> listResultsPromise = Promise.promise();
+        Promise<Long> countResultsPromise = Promise.promise();
 
-        getNotebookArchives(structureId, schoolYear, teacherNames, audienceLabels, page, limit, offset, listResultsFuture);
-        countRequest(structureId, schoolYear, teacherNames, audienceLabels, countResultsFuture);
+        getNotebookArchives(structureId, schoolYear, teacherNames, audienceLabels, page, limit, offset, listResultsPromise);
+        countRequest(structureId, schoolYear, teacherNames, audienceLabels, countResultsPromise);
 
-        CompositeFuture.all(listResultsFuture, countResultsFuture).setHandler(eventResult -> {
+        Future.all(listResultsPromise.future(), countResultsPromise.future()).onComplete(eventResult -> {
             if (eventResult.failed()) {
                 handler.handle(Future.failedFuture(eventResult.cause().getMessage()));
                 return;
             }
 
             JsonObject result = new JsonObject()
-                    .put("all", listResultsFuture.result())
-                    .put("page_count", countResultsFuture.result() <= Diary.PAGE_SIZE ?
-                            0 : (long) Math.ceil(countResultsFuture.result() / (double) Diary.PAGE_SIZE));
+                    .put("all", listResultsPromise.future().result())
+                    .put("page_count", countResultsPromise.future().result() <= Diary.PAGE_SIZE ?
+                            0 : (long) Math.ceil(countResultsPromise.future().result() / (double) Diary.PAGE_SIZE));
 
             if (page != null) {
                 result.put("page", page);
@@ -81,35 +78,35 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
     @Override
     public void getNotebookArchives(String structureId, String schoolYear, List<String> teacherNames,
                                     List<String> audienceLabels, Integer page,
-                                    String limit, String offset, Future<JsonArray> future) {
+                                    String limit, String offset, Promise<JsonArray> promise) {
         JsonArray params = new JsonArray();
         sql.prepared(queryGetter(false, structureId, schoolYear, teacherNames, audienceLabels,
                 page, limit, offset, params), params,
-                SqlResult.validResultHandler(FutureHelper.handlerJsonArray(future)));
+                SqlResult.validResultHandler(FutureHelper.handlerEitherPromise(promise)));
     }
 
     @Override
     public Future<JsonArray> getNotebookArchives(String structureId, String schoolYear, List<String> teacherNames,
                                                  List<String> audienceLabels, Integer page,
                                                  String limit, String offset) {
-        Future<JsonArray> future = Future.future();
-        getNotebookArchives(structureId, schoolYear, teacherNames, audienceLabels, page, limit, offset, future);
-        return future;
+        Promise<JsonArray> promise = Promise.promise();
+        getNotebookArchives(structureId, schoolYear, teacherNames, audienceLabels, page, limit, offset, promise);
+        return promise.future();
     }
 
     private void countRequest(String structureId, String schoolYear, List<String> teacherNames,
-                              List<String> audienceLabels, Future<Long> future) {
+                              List<String> audienceLabels, Promise<Long> promise) {
         JsonArray params = new JsonArray();
         sql.prepared(queryGetter(true, structureId, schoolYear, teacherNames,
                 audienceLabels, null, null, null, params), params, SqlResult.validUniqueResultHandler(event -> {
             if (event.isLeft()) {
                 String message = "[Diary@DefaultNotebookArchiveService::countRequest] Failed to count notebook archives.";
                 log.error(message + " " + event.left().getValue());
-                future.fail(message);
+                promise.fail(message);
                 return;
             }
             Long count = event.right().getValue().getLong("count", 0L);
-            future.complete(count);
+            promise.complete(count);
         }));
     }
 
@@ -173,43 +170,43 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
 
     @Override
     public Future<JsonObject> delete(List<NotebookArchive> archives) {
-        Future<JsonObject> future = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
         if (archives == null || archives.isEmpty()) {
-            future.complete(new JsonObject().put("success", "ok"));
-            return future;
+            promise.complete(new JsonObject().put("success", "ok"));
+            return promise.future();
         }
 
         List<Long> archiveIdsToDelete = new ArrayList<>();
         List<Future<Void>> pdfRemoveFutures = removePdfs(archives, archiveIdsToDelete);
 
-        FutureHelper.join(pdfRemoveFutures).setHandler(result -> {
-            deleteArchives(archiveIdsToDelete, future);
+        Future.join(pdfRemoveFutures).onComplete(result -> {
+            deleteArchives(archiveIdsToDelete, promise);
         });
 
-        return future;
+        return promise.future();
     }
 
     private List<Future<Void>> removePdfs(List<NotebookArchive> archives, List<Long> archiveIds) {
         List<Future<Void>> pdfRemoveFutures = new ArrayList<>();
 
         for (NotebookArchive archive : archives) {
-            Future<Void> pdfRemoveFuture = Future.future();
-            pdfRemoveFutures.add(pdfRemoveFuture);
+            Promise<Void> pdfRemovePromise = Promise.promise();
+            pdfRemoveFutures.add(pdfRemovePromise.future());
             FileHelper.exist(storage, archive.getFileId(), existResult -> {
                 if (existResult.result() != null && existResult.result().equals(Boolean.FALSE)) {
                     archiveIds.add(archive.getId());
-                    pdfRemoveFuture.complete();
+                    pdfRemovePromise.complete();
                     return;
                 }
 
                 FileHelper.removeFile(storage, archive.getFileId(), result -> {
                     if (result.failed()) {
-                        pdfRemoveFuture.fail(result.cause().getMessage());
+                        pdfRemovePromise.fail(result.cause().getMessage());
                         return;
                     }
 
                     archiveIds.add(archive.getId());
-                    pdfRemoveFuture.complete();
+                    pdfRemovePromise.complete();
                 });
             });
         }
@@ -232,7 +229,7 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
 
         deleteOldVisas(structureId, date)
                 .compose(res -> deleteOldSessionsAndHomeworks(structureId, date))
-                .setHandler(result -> {
+                .onComplete(result -> {
                     if (result.failed()) {
                         log.error(result.cause());
                         handler.handle(Future.failedFuture(result.cause().getMessage()));
@@ -243,7 +240,7 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
     }
 
     private Future<Void> deleteOldVisas(String structureId, String date) {
-        Future<Void> future = Future.future();
+        Promise<Void> promise = Promise.promise();
 
         String query = "DELETE FROM " + Diary.DIARY_SCHEMA + ".visa v WHERE v.structure_id = ? AND v.created <= ?";
         JsonArray params = new JsonArray()
@@ -254,16 +251,16 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
             if (result.isLeft()) {
                 String message = "[Diary@DefaultNotebookArchiveService::deleteOldVisas] Failed to delete old visas.";
                 log.error(message, result.left().getValue());
-                future.fail(message);
+                promise.fail(message);
             } else {
-                future.complete();
+                promise.complete();
             }
         }));
-        return future;
+        return promise.future();
     }
 
     private Future<Void> deleteOldSessionsAndHomeworks(String structureId, String date) {
-        Future<Void> future = Future.future();
+        Promise<Void> promise = Promise.promise();
 
         JsonArray statements = new JsonArray();
         statements.add(getDeleteOldHomeworksStatement(structureId, date));
@@ -274,12 +271,12 @@ public class DefaultNotebookArchiveService extends DBService implements Notebook
                 String message = "[Diary@DefaultNotebookArchiveService::deleteOldSessionsAndHomeworks] Failed to delete " +
                         "old homeworks and sessions.";
                 log.error(message, result.left().getValue());
-                future.fail(message);
+                promise.fail(message);
             } else {
-                future.complete();
+                promise.complete();
             }
         }));
-        return future;
+        return promise.future();
     }
 
     private JsonObject getDeleteOldSessionsStatement(String structureId, String date) {

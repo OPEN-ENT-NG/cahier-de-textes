@@ -204,8 +204,8 @@ public class NotebookArchiveController extends BaseController {
                                 .putHeader("Content-Transfer-Encoding", "binary")
                                 .sendFile(zip.result());
 
-                        Future<Void> deleteZipFuture = Future.future();
-                        this.exportZIPService.deleteZIP(zipFile, deleteZipFuture);
+                        Promise<Void> deleteZipPromise = Promise.promise();
+                        this.exportZIPService.deleteZIP(zipFile, deleteZipPromise);
                     });
                 }
             }

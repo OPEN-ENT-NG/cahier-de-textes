@@ -3,10 +3,7 @@ package fr.openent.diary.services.impl;
 import fr.openent.diary.models.ZIPFile;
 import fr.openent.diary.services.ExportZIPService;
 import fr.openent.diary.helper.FileHelper;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -44,7 +41,7 @@ public class ExportZIPServiceImpl implements ExportZIPService {
     public void getZIP(List<String> fileIds, JsonObject fileNames, ZIPFile zipFile, Handler<AsyncResult<String>> handler) {
         generateTempFolder(fileIds, fileNames, zipFile)
                 .compose(res -> createZIPFromTempFolder(zipFile))
-                .setHandler(result -> {
+                .onComplete(result -> {
                     if (result.failed()) {
                         log.error(result.cause());
                         handler.handle(Future.failedFuture(result.cause().getMessage()));
@@ -62,16 +59,16 @@ public class ExportZIPServiceImpl implements ExportZIPService {
      * @return                  temporary folder path
      */
     private Future<JsonObject> generateTempFolder(List<String> fileIds, JsonObject fileNames, ZIPFile zipFile) {
-        Future<JsonObject> future = Future.future();
+        Promise<JsonObject> promise = Promise.promise();
         storage.writeToFileSystem(fileIds.toArray(new String[0]), zipFile.getDirPath(), fileNames, res -> {
             if ("ok".equals(res.getString("status"))) {
-                future.complete(res);
+                promise.complete(res);
             } else {
-                future.fail(res.getString("error"));
+                promise.fail(res.getString("error"));
             }
         });
 
-        return future;
+        return promise.future();
     }
 
     /**
@@ -80,18 +77,18 @@ public class ExportZIPServiceImpl implements ExportZIPService {
      * @return              Zip file location path
      */
     private Future<String> createZIPFromTempFolder(ZIPFile zipFile) {
-        Future<String> future = Future.future();
+        Promise<String> promise = Promise.promise();
 
         Zip.getInstance().zipFolder(zipFile.getDirPath(), zipFile.getZipPath(), true, Deflater.NO_COMPRESSION, res2 -> {
             if ("ok".equals(res2.body().getString("status"))) {
-                future.complete(res2.body().getString("destZip"));
+                promise.complete(res2.body().getString("destZip"));
             } else {
                 String message = "[Diary@ExportZipServiceImpl::createZIPFromTempFolder] Failed to compress temporary folder to ZIP.";
-                future.fail(message);
+                promise.fail(message);
             }
         });
 
-        return future;
+        return promise.future();
     }
 
     /**

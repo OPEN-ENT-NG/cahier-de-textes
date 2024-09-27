@@ -12,6 +12,7 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
@@ -162,23 +163,23 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                 audienceIds.add(homework.getString("audience_id"));
 
 
-                Future<List<Subject>> subjectsFuture = Future.future();
-                Future<List<User>> teachersFuture = Future.future();
-                Future<List<Audience>> audiencesFuture = Future.future();
+                Promise<List<Subject>> subjectsPromise = Promise.promise();
+                Promise<List<User>> teachersPromise = Promise.promise();
+                Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(asyncResult -> {
                     if (asyncResult.failed()) {
                         String message = "[Diary@HomeworkServiceImpl::proceedHomework] Failed to get homework. ";
                         LOGGER.error(message + " " + asyncResult.cause());
                         handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
                     } else {
-                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                        Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                        Map<String, User> teacherMap = teachersFuture.result()
+                        Map<String, User> teacherMap = teachersPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                        Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -198,9 +199,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                         handler.handle(new Either.Right<>(homework));
                     }
                 });
-                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }
@@ -228,24 +229,24 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                         audienceIds.add(arrayHomework.getJsonObject(i).getString("audience_id"));
                     }
                 }
-                Future<List<Subject>> subjectsFuture = Future.future();
-                Future<List<User>> teachersFuture = Future.future();
-                Future<List<Audience>> audiencesFuture = Future.future();
+                Promise<List<Subject>> subjectsPromise = Promise.promise();
+                Promise<List<User>> teachersPromise = Promise.promise();
+                Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(asyncResult -> {
+                Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(asyncResult -> {
                     if (asyncResult.failed()) {
                         String message = "[Diary@HomeworkServiceImpl::proceedHomeworks] Failed to get homeworks. ";
                         LOGGER.error(message + " " + asyncResult.cause());
                         handler.handle(new Either.Left<>(asyncResult.cause().getMessage()));
                     } else {
                         // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
-                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                        Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                        Map<String, User> teacherMap = teachersFuture.result()
+                        Map<String, User> teacherMap = teachersPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                        Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -258,9 +259,9 @@ public class HomeworkServiceImpl extends SqlCrudService implements HomeworkServi
                         handler.handle(new Either.Right<>(arrayHomework));
                     }
                 });
-                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
             } else {
                 handler.handle(new Either.Left<>(result.left().getValue()));
             }

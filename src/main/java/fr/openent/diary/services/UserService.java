@@ -4,6 +4,7 @@ import fr.openent.diary.models.Person.User;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 
 import java.util.List;
@@ -18,5 +19,5 @@ public interface UserService {
      */
     void getTeachers(JsonArray teachers, Handler<AsyncResult<List<User>>> handler);
 
-    void getTeachers(JsonArray teachers, Future<List<User>> future);
+    void getTeachers(JsonArray teachers, Promise<List<User>> promise);
 }

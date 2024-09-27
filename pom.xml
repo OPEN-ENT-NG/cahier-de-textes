@@ -31,12 +31,11 @@
         </repository>
     </repositories>
     <properties>
-        <vertxVersion>3.9.5</vertxVersion>
         <toolsVersion>2.0.0-final</toolsVersion>
         <junitVersion>4.10</junitVersion>
         <powerMockVersion>2.0.2</powerMockVersion>
         <mockitoVersion>[2.0,3.0)</mockitoVersion>
-        <entCoreVersion>5.3-SNAPSHOT</entCoreVersion>
+        <entCoreVersion>5.0-b2school-SNAPSHOT</entCoreVersion>
         <gatlingHighchartsVersion>2.2.2</gatlingHighchartsVersion>
     </properties>
     <dependencies>
