@@ -5,6 +5,7 @@ import fr.wseduc.webutils.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -29,7 +30,7 @@ public interface NotebookArchiveService {
 
     void getNotebookArchives(String structureId, String schoolYear, List<String> teacherNames,
                              List<String> audienceLabels, Integer page,
-                             String limit, String offset, Future<JsonArray> future);
+                             String limit, String offset, Promise<JsonArray> promise);
 
     Future<JsonArray> getNotebookArchives(String structureId, String schoolYear, List<String> teacherNames,
                              List<String> audienceLabels, Integer page,

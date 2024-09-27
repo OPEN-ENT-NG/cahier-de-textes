@@ -7,6 +7,7 @@ import fr.openent.diary.services.SessionService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -43,15 +44,15 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                     if (sessions.getJsonObject(j).containsKey("id") &&
                             sessions.getJsonObject(j).getInteger("id") != null) {
                         // insert only homework based on session_id (id) and session's subject_id + audience_id + due_date
-                        Future<JsonObject> homeworkSessionFuture = Future.future();
-                        allSessionsFuture.add(homeworkSessionFuture);
-                        homeworkSessionFuture.complete(sessions.getJsonObject(j).put("homework", homework));
+                        Promise<JsonObject> homeworkSessionPromise = Promise.promise();
+                        allSessionsFuture.add(homeworkSessionPromise.future());
+                        homeworkSessionPromise.complete(sessions.getJsonObject(j).put("homework", homework));
                     } else {
                         // insert session returning id and insert homework using that id and
                         // session's subject_id + audience_id + due_date
-                        Future<JsonObject> sessionFuture = Future.future();
-                        allSessionsFuture.add(sessionFuture);
-                        this.createSession(homework, sessions.getJsonObject(j), user, sessionFuture);
+                        Promise<JsonObject> sessionPromise = Promise.promise();
+                        allSessionsFuture.add(sessionPromise.future());
+                        this.createSession(homework, sessions.getJsonObject(j), user, sessionPromise);
                     }
                 }
             } else {
@@ -61,17 +62,17 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                 //Handle potential undefined audience_ids
                 if(audience_ids != null) {
                     for (int j = 0; j < audience_ids.size(); j++) {
-                        Future<JsonObject> homeworkFuture = Future.future();
-                        homeworkFutures.add(homeworkFuture);
+                        Promise<JsonObject> homeworkPromise = Promise.promise();
+                        homeworkFutures.add(homeworkPromise.future());
                         homework.put("audience_id", audience_ids.getString(j));
-                        this.createHomework(homework, user, homeworkFuture);
+                        this.createHomework(homework, user, homeworkPromise);
                     }
                 }
             }
         }
 
         // All sessions whose each is created or fetched (having their current homework)
-        FutureHelper.all(allSessionsFuture).setHandler(event -> {
+        Future.all(allSessionsFuture).onComplete(event -> {
             if (event.failed()) {
                 String message = "[diary@DefaultSessionsHomeworkService::createSession] " +
                         "Failed to create session(s) ";
@@ -81,13 +82,13 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                 for (int j = 0; j < event.result().size(); j++) {
                     if (!((JsonObject) event.result().resultAt(j)).isEmpty()) {
                         JsonObject homeworkSession = event.result().resultAt(j);
-                        Future<JsonObject> homeworkFuture = Future.future();
-                        homeworkFutures.add(homeworkFuture);
-                        this.createHomework(formatHomeworkObjectWithSession(homeworkSession), user, homeworkFuture);
+                        Promise<JsonObject> homeworkPromise = Promise.promise();
+                        homeworkFutures.add(homeworkPromise.future());
+                        this.createHomework(formatHomeworkObjectWithSession(homeworkSession), user, homeworkPromise);
                     }
                 }
                 // All homework is created
-                FutureHelper.all(homeworkFutures).setHandler(finalEvent -> {
+                Future.all(homeworkFutures).onComplete(finalEvent -> {
                     if (finalEvent.failed()) {
                         String message = "[diary@DefaultSessionsHomeworkService::createSession] " +
                                 "Failed to create homework in session(s) ";
@@ -112,10 +113,10 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                 .put("exceptional_label", homeworkSession.getString("exceptional_label", null));
     }
 
-    private void createSession(JsonObject homework, JsonObject session, UserInfos user, Future<JsonObject> future) {
+    private void createSession(JsonObject homework, JsonObject session, UserInfos user, Promise<JsonObject> promise) {
         this.sessionService.createSession(session, user, event -> {
             if (event.isRight()) {
-                future.complete(session
+                promise.complete(session
                         .put("id", event.right().getValue().getInteger("id"))
                         .put("homework", homework)
                 );
@@ -123,20 +124,20 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
                 String message = "[diary@DefaultSessionsHomeworkService::createSession::createSession] " +
                         "Failed to create session future(s) ";
                 LOGGER.error(message + event.left().getValue());
-                future.fail(event.left().getValue());
+                promise.fail(event.left().getValue());
             }
         });
     }
 
-    private void createHomework(JsonObject homework, UserInfos user, Future<JsonObject> future) {
+    private void createHomework(JsonObject homework, UserInfos user, Promise<JsonObject> promise) {
         this.homeworkService.createHomework(homework, user, event -> {
             if (event.isRight()) {
-                future.complete();
+                promise.complete();
             } else {
                 String message = "[diary@DefaultSessionsHomeworkService::createSession::createSession] " +
                         "Failed to create session future(s) ";
                 LOGGER.error(message + event.left().getValue());
-                future.fail(event.left().getValue());
+                promise.fail(event.left().getValue());
             }
         });
     }
@@ -149,13 +150,13 @@ public class DefaultSessionsHomeworkService implements SessionHomeworkService {
         for (int i = 0; i < homeworks.size(); i++) {
             // update homeworks statements based on session_id
             JsonObject homework = homeworks.getJsonObject(i);
-            Future<JsonObject> homeworkFuture = Future.future();
-            homeworkFutures.add(homeworkFuture);
+            Promise<JsonObject> homeworkPromise = Promise.promise();
+            homeworkFutures.add(homeworkPromise.future());
             this.homeworkService.updateHomework(homework.getInteger("id"), false, homework,
-                    FutureHelper.handlerJsonObject(homeworkFuture));
+                    FutureHelper.handlerEitherPromise(homeworkPromise));
         }
 
-        FutureHelper.all(homeworkFutures).setHandler(event -> {
+        Future.all(homeworkFutures).onComplete(event -> {
             if (event.failed()) {
                 String message = "[diary@DefaultSessionsHomeworkService::update] " +
                         "Failed to update homework(s) ";
