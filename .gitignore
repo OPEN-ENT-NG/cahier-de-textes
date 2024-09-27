@@ -32,3 +32,8 @@ src/main/resources/public/sass/global/develop/output.scss.map
 /gradlew
 /gradlew.bat
 /out/
+.env
+target
+*/target
+.flattened-pom.xml
+*/.flattened-pom.xml
