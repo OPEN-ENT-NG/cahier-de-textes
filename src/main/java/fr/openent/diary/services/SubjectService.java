@@ -4,6 +4,7 @@ import fr.openent.diary.models.Subject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -19,9 +20,9 @@ public interface SubjectService {
      */
     void getSubjects(JsonArray subjectsId, Handler<AsyncResult<List<Subject>>> handler);
 
-    void getSubjects(JsonArray subjectsId, Future<List<Subject>> handler);
+    void getSubjects(JsonArray subjectsId, Promise<List<Subject>> promise);
 
-    void getSubjects(String subjectsId, Future<List<Subject>> future);
+    void getSubjects(String structureId, Promise<List<Subject>> promise);
 
     void getSubjects(String structureId, Handler<AsyncResult<List<Subject>>> handler);
 

@@ -102,7 +102,7 @@ public class SearchController extends ControllerHelper {
     }
 
     private void callCDTEventBus(JsonObject action, HttpServerRequest request) {
-        eb.send("viescolaire", action, handlerToAsyncHandler(event -> {
+        eb.request("viescolaire", action, handlerToAsyncHandler(event -> {
             JsonObject body = event.body();
             if (!"ok".equals(body.getString("status"))) {
                 log.error("[CDT@SearchController::callCDTEventBus] An error has occured while using viescolaire eb");

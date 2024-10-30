@@ -8,6 +8,7 @@ import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -33,19 +34,19 @@ public class DefaultSubjectService implements SubjectService {
     }
 
     @Override
-    public void getSubjects(JsonArray subjectsId, Future<List<Subject>> future) {
+    public void getSubjects(JsonArray subjectsId, Promise<List<Subject>> promise) {
         getSubjects(subjectsId, event -> {
             if (event.failed()) {
-                future.fail(event.cause());
+                promise.fail(event.cause());
             } else {
-                future.complete(event.result());
+                promise.complete(event.result());
             }
         });
     }
 
     @Override
-    public void getSubjects(String structureId, Future<List<Subject>> future) {
-        getSubjects(structureId, future::handle);
+    public void getSubjects(String structureId, Promise<List<Subject>> promise) {
+        getSubjects(structureId, promise::handle);
     }
 
     public void getSubjects(String structureId, Handler<AsyncResult<List<Subject>>> handler) {

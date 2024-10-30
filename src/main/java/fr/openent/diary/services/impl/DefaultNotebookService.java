@@ -49,23 +49,23 @@ public class DefaultNotebookService extends DBService implements NotebookService
     public void get(String structure_id, String start_at, String end_at, List<String> teacher_id, List<String> audience_id,
                     Boolean isVisa, String visaOrder, Boolean isPublished, Integer page, String limit, String offset,
                     Handler<Either<String, JsonObject>> handler) {
-        Future<JsonArray> listResultsFuture = Future.future();
-        Future<Long> countResultsFuture = Future.future();
+        Promise<JsonArray> listResultsPromise = Promise.promise();
+        Promise<Long> countResultsPromise = Promise.promise();
 
         getNotebooks(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished,
-                page, limit, offset, listResultsFuture);
-        countRequest(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished, countResultsFuture);
+                page, limit, offset, listResultsPromise);
+        countRequest(structure_id, start_at, end_at, teacher_id, audience_id, isVisa, visaOrder, isPublished, countResultsPromise);
 
-        CompositeFuture.all(listResultsFuture, countResultsFuture).setHandler(eventResult -> {
+        Future.all(listResultsPromise.future(), countResultsPromise.future()).onComplete(eventResult -> {
             if (eventResult.failed()) {
                 handler.handle(new Either.Left<>(eventResult.cause().getMessage()));
                 return;
             }
 
             JsonObject result = new JsonObject()
-                    .put("all", listResultsFuture.result())
-                    .put("page_count", countResultsFuture.result() <= Diary.PAGE_SIZE ?
-                            0 : (long) Math.ceil(countResultsFuture.result() / (double) Diary.PAGE_SIZE));
+                    .put("all", listResultsPromise.future().result())
+                    .put("page_count", countResultsPromise.future().result() <= Diary.PAGE_SIZE ?
+                            0 : (long) Math.ceil(countResultsPromise.future().result() / (double) Diary.PAGE_SIZE));
 
             if (page != null) {
                 result.put("page", page);
@@ -85,41 +85,41 @@ public class DefaultNotebookService extends DBService implements NotebookService
     @Override
     public void getNotebooks(String structure_id, String start_at, String end_at, List<String> teacher_ids,
                              List<String> audience_ids, Boolean isVisa, String visaOrder, Boolean isPublished, Integer page,
-                             String limit, String offset, Future<JsonArray> future) {
+                             String limit, String offset, Promise<JsonArray> promise) {
         JsonArray notebookParams = new JsonArray();
-        Future<JsonArray> notebookFuture = Future.future();
+        Promise<JsonArray> notebookPromise = Promise.promise();
 
-        notebookFuture.setHandler(event -> {
+        notebookPromise.future().onComplete(event -> {
             if (event.failed()) {
                 String message = "[Diary@DefaultNotebookService::getNotebooksRequest] Failed to retrieve notebooks. ";
                 log.error(message + event.cause());
-                future.fail(message);
+                promise.fail(message);
             } else {
-                List<Notebook> notebookList = NotebookHelper.toNotebookList(notebookFuture.result());
+                List<Notebook> notebookList = NotebookHelper.toNotebookList(notebookPromise.future().result());
 
                 List<String> subjectIds = notebookList.stream().map(n -> n.getSubject().getId()).collect(Collectors.toList());
                 List<String> teacherIds = notebookList.stream().map(n -> n.getTeacher().getId()).collect(Collectors.toList());
                 List<String> audienceIds = notebookList.stream().map(n -> n.getAudience().getId()).collect(Collectors.toList());
 
-                Future<List<Subject>> subjectsFuture = Future.future();
-                Future<List<User>> teachersFuture = Future.future();
-                Future<List<Audience>> audiencesFuture = Future.future();
+                Promise<List<Subject>> subjectsPromise = Promise.promise();
+                Promise<List<User>> teachersPromise = Promise.promise();
+                Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(result -> {
+                Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(result -> {
 
                     if (result.failed()) {
                         String message = "[Diary@DefaultNotebookService::getNotebooksRequest] Failed to get main line of Notebooks. ";
                         log.error(message + " " + result.cause());
-                        future.fail(message);
+                        promise.fail(message);
                     } else {
                         // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
-                        Map<String, Subject> subjectMap = subjectsFuture.result()
+                        Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                        Map<String, User> teacherMap = teachersFuture.result()
+                        Map<String, User> teacherMap = teachersPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                        Map<String, Audience> audienceMap = audiencesFuture.result()
+                        Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                 .stream()
                                 .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -128,42 +128,42 @@ public class DefaultNotebookService extends DBService implements NotebookService
                             notebook.setTeacher(teacherMap.getOrDefault(notebook.getTeacher().getId(), new User(notebook.getTeacher().getId())));
                             notebook.setAudience(audienceMap.getOrDefault(notebook.getAudience().getId(), new Audience(notebook.getAudience().getId())));
                         }
-                        future.complete(NotebookHelper.toJsonArray(notebookList));
+                        promise.complete(NotebookHelper.toJsonArray(notebookList));
                     }
                 });
 
-                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
             }
         });
 
         Sql.getInstance().prepared(queryGetter(false, structure_id, start_at, end_at, teacher_ids, audience_ids,
                         isVisa, visaOrder, isPublished, page, limit, offset, notebookParams), notebookParams,
-                SqlResult.validResultHandler(FutureHelper.handlerJsonArray(notebookFuture)));
+                SqlResult.validResultHandler(FutureHelper.handlerEitherPromise(notebookPromise)));
     }
 
     public Future<JsonArray> getNotebooks(String structureId, String starAt, String enAt, List<String> teacherIds,
                                           List<String> audienceIds, Boolean isVisa, String visaOrder, Boolean isPublished, Integer page,
                                           String limit, String offset) {
-        Future<JsonArray> future = Future.future();
+        Promise<JsonArray> promise = Promise.promise();
         getNotebooks(structureId, starAt, enAt, teacherIds, audienceIds, isVisa, visaOrder, isPublished, page,
-                limit, offset, future);
-        return future;
+                limit, offset, promise);
+        return promise.future();
     }
 
     private void countRequest(String structure_id, String start_at, String end_at, List<String> teacher_id,
-                              List<String> audience_id, Boolean isVisa, String visaOrder, Boolean isPublished, Future<Long> future) {
+                              List<String> audience_id, Boolean isVisa, String visaOrder, Boolean isPublished, Promise<Long> promise) {
         JsonArray params = new JsonArray();
         Sql.getInstance().prepared(queryGetter(true, structure_id, start_at, end_at, teacher_id,
                 audience_id, isVisa, visaOrder, isPublished, null, null, null, params), params, SqlResult.validUniqueResultHandler(event -> {
             if (event.isLeft()) {
                 String message = "[Diary@DefaultNotebookService::countRequest] Failed to count notebooks.";
                 log.error(message + " " + event.left().getValue());
-                future.fail(message);
+                promise.fail(message);
             } else {
                 Long count = event.right().getValue().getLong("count", 0L);
-                future.complete(count);
+                promise.complete(count);
             }
         }));
     }
@@ -339,26 +339,26 @@ public class DefaultNotebookService extends DBService implements NotebookService
         return promise.future();
     }
 
-    private void archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook, Future<JsonObject> future) {
+    private void archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook, Promise<JsonObject> promise) {
         NotebookArchive archive = new NotebookArchive(notebook);
         archive.setStructureId(structureId);
         archive.setStructureLabel(structureName);
         archive.setArchiveSchoolYear(archivePeriod);
 
-        Future<List<Notebook>> notebookContentFuture = Future.future();
-        getNotebookHomeworksSessions(structureId, date, notebook, notebookContentFuture)
+        Promise<List<Notebook>> notebookContentPromise = Promise.promise();
+        getNotebookHomeworksSessions(structureId, date, notebook, notebookContentPromise)
                 .compose(notebookContent -> generatePdf(structureName, archivePeriod, notebook, archive, notebookContent))
-                .compose(pdf -> saveArchive(archive, notebookContentFuture.result(), archivePeriod))
-                .setHandler(result -> {
+                .compose(pdf -> saveArchive(archive, notebookContentPromise.future().result(), archivePeriod))
+                .onComplete(result -> {
                     if (result.succeeded()) {
-                        future.complete(new JsonObject().put("success", "ok"));
+                        promise.complete(new JsonObject().put("success", "ok"));
                         return;
                     }
                     String message = "[Diary@DefaultNotebookService::archiveNotebook] Failed to archive notebook " +
                             "[subject::teacher::audience]-" + notebook.getNotebookId() + " : " + result.cause().getMessage();
                     log.error(message, result.cause().getMessage());
                     if (archive.getFileId() == null) {
-                        future.fail(result.cause().getMessage());
+                        promise.fail(result.cause().getMessage());
                         return;
                     }
 
@@ -366,20 +366,20 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         if (removeResult.failed()) {
                             String error = "[Diary@DefaultNotebookService::archiveNotebook] Failed to remove archive file from id: " +
                                     archive.getFileId();
-                            future.fail(error);
+                            promise.fail(error);
                             return;
                         }
 
-                        future.fail(message);
+                        promise.fail(message);
                     });
                 });
     }
 
     private Future<JsonObject> archiveNotebook(String structureId, String structureName, String date, String archivePeriod, Notebook notebook) {
-        Future<JsonObject> archiveNotebookFuture = Future.future();
+        Promise<JsonObject> archiveNotebookPromise = Promise.promise();
         Promise<JsonObject> promise = Promise.promise();
-        archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveNotebookFuture);
-        archiveNotebookFuture.setHandler(ar -> {
+        archiveNotebook(structureId, structureName, date, archivePeriod, notebook, archiveNotebookPromise);
+        archiveNotebookPromise.future().onComplete(ar -> {
             if (ar.failed()) {
                 promise.fail(ar.cause().getMessage());
             } else {
@@ -390,24 +390,24 @@ public class DefaultNotebookService extends DBService implements NotebookService
     }
 
     private Future<List<Notebook>> getNotebookHomeworksSessions(String structureId, String date,
-                                                                Notebook notebook, Future<List<Notebook>> future) {
+                                                                Notebook notebook, Promise<List<Notebook>> promise) {
         getNotebookHomeworksSessions(structureId, null, date, notebook.getSubject().getId(),
                 notebook.getTeacher().getId(), notebook.getAudience().getId(), null, null, notebookSessionsResult -> {
                     if (notebookSessionsResult.isLeft()) {
-                        future.handle(Future.failedFuture(notebookSessionsResult.left().getValue()));
+                        promise.handle(Future.failedFuture(notebookSessionsResult.left().getValue()));
                         return;
                     }
 
                     List<Notebook> notebookSessions = NotebookHelper.toNotebookList(notebookSessionsResult.right().getValue());
-                    future.handle(Future.succeededFuture(notebookSessions));
+                    promise.handle(Future.succeededFuture(notebookSessions));
                 });
 
-        return future;
+        return promise.future();
     }
 
     private Future<Void> generatePdf(String structureName, String archivePeriod, Notebook notebook,
                                      NotebookArchive archive, List<Notebook> notebookSessions) {
-        Future<Void> future = Future.future();
+        Promise<Void> promise = Promise.promise();
         // trick to remove extra xmlns, remove invalid xml character unicode and unclosed
         // html tag (xhtml won't support single closed tag)
         for (Notebook notebookSession : notebookSessions) {
@@ -420,20 +420,20 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         String message = "[Diary@DefaultNotebookService::generateArchivePDF] Failed to save Pdf: " +
                                 pdfResult.left().getValue();
                         log.error(message);
-                        future.fail(pdfResult.left().getValue());
+                        promise.fail(pdfResult.left().getValue());
                         return;
                     }
                     JsonObject file = pdfResult.right().getValue();
                     archive.setFileId(file.getString("_id"));
-                    future.complete();
+                    promise.complete();
                 }))
                 .onFailure(err -> {
                     String message = "[Diary@DefaultNotebookService::archiveNotebooks] Failed to generate PDF: " +
                             err.getMessage();
                     log.error(message, err.getMessage());
-                    future.fail(err.getMessage());
+                    promise.fail(err.getMessage());
                 });
-        return future;
+        return promise.future();
     }
 
     private void cleanHTMLDescriptionContent(Notebook notebookSession) {
@@ -454,15 +454,15 @@ public class DefaultNotebookService extends DBService implements NotebookService
     }
 
     private Future<Void> saveArchive(NotebookArchive archive, List<Notebook> notebookSessions, String archivePeriod) {
-        Future<Void> future = Future.future();
+        Promise<Void> promise = Promise.promise();
 
         JsonArray statements = new JsonArray()
                 .add(createArchiveStatement(archive))
                 .addAll(updateNotebooksStatements(notebookSessions, archivePeriod));
 
-        sql.transaction(statements, result -> SqlQueryUtils.getTransactionHandler(result, future));
+        sql.transaction(statements, result -> SqlQueryUtils.getTransactionHandler(result, promise));
 
-        return future;
+        return promise.future();
     }
 
     private JsonObject createArchiveStatement(NotebookArchive archive) {
@@ -552,11 +552,11 @@ public class DefaultNotebookService extends DBService implements NotebookService
                         List<String> teacherIds = notebookList.stream().map(n -> n.getTeacher().getId()).collect(Collectors.toList());
                         List<String> audienceIds = notebookList.stream().map(n -> n.getAudience().getId()).collect(Collectors.toList());
 
-                        Future<List<Subject>> subjectsFuture = Future.future();
-                        Future<List<User>> teachersFuture = Future.future();
-                        Future<List<Audience>> audiencesFuture = Future.future();
+                        Promise<List<Subject>> subjectsPromise = Promise.promise();
+                        Promise<List<User>> teachersPromise = Promise.promise();
+                        Promise<List<Audience>> audiencesPromise = Promise.promise();
 
-                        CompositeFuture.all(subjectsFuture, teachersFuture, audiencesFuture).setHandler(result -> {
+                        Future.all(subjectsPromise.future(), teachersPromise.future(), audiencesPromise.future()).onComplete(result -> {
 
                             if (result.failed()) {
                                 String message = "[Diary@DefaultNotebookService::getNotebookHomeworksSessions] Failed to get notebooksSessions. ";
@@ -564,13 +564,13 @@ public class DefaultNotebookService extends DBService implements NotebookService
                                 handler.handle(new Either.Left<>(message));
                             } else {
                                 // for some reason, we still manage to find some "duplicate" data so we use mergeFunction (see collectors.toMap)
-                                Map<String, Subject> subjectMap = subjectsFuture.result()
+                                Map<String, Subject> subjectMap = subjectsPromise.future().result()
                                         .stream()
                                         .collect(Collectors.toMap(Subject::getId, Subject::clone, (subject1, subject2) -> subject1));
-                                Map<String, User> teacherMap = teachersFuture.result()
+                                Map<String, User> teacherMap = teachersPromise.future().result()
                                         .stream()
                                         .collect(Collectors.toMap(User::getId, User::clone, (teacher1, teacher2) -> teacher1));
-                                Map<String, Audience> audienceMap = audiencesFuture.result()
+                                Map<String, Audience> audienceMap = audiencesPromise.future().result()
                                         .stream()
                                         .collect(Collectors.toMap(Audience::getId, Audience::clone, (audience1, audience2) -> audience1));
 
@@ -582,23 +582,23 @@ public class DefaultNotebookService extends DBService implements NotebookService
                                 handler.handle(new Either.Right<>(NotebookHelper.toJsonArray(notebookList)));
                             }
                         });
-                        this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsFuture);
-                        this.userService.getTeachers(new JsonArray(teacherIds), teachersFuture);
-                        this.groupService.getGroups(new JsonArray(audienceIds), audiencesFuture);
+                        this.subjectService.getSubjects(new JsonArray(subjectIds), subjectsPromise);
+                        this.userService.getTeachers(new JsonArray(teacherIds), teachersPromise);
+                        this.groupService.getGroups(new JsonArray(audienceIds), audiencesPromise);
                     }
                 });
     }
 
     private void fetchNotebookHomeworksSessions(String structure_id, String start_at, String end_at, String subject_id, String teacher_id,
                                                 String audience_id, Boolean isVisa, Boolean isPublished, Handler<AsyncResult<List<Notebook>>> handler) {
-        Future<List<Notebook>> notebookHomeworksSessionsFuture = Future.future();
-        Future<List<DiaryTypeModel>> diaryTypeFuture = Future.future();
+        Promise<List<Notebook>> notebookHomeworksSessionsPromise = Promise.promise();
+        Promise<List<DiaryTypeModel>> diaryTypePromise = Promise.promise();
 
         getNotebookHomeworksSessionsRequest(structure_id, start_at, end_at, subject_id, teacher_id, audience_id,
-                isVisa, isPublished, notebookHomeworksSessionsFuture);
-        fetchDiaryType(structure_id, diaryTypeFuture);
+                isVisa, isPublished, notebookHomeworksSessionsPromise);
+        fetchDiaryType(structure_id, diaryTypePromise);
 
-        CompositeFuture.all(notebookHomeworksSessionsFuture, diaryTypeFuture).setHandler(result -> {
+        Future.all(notebookHomeworksSessionsPromise.future(), diaryTypePromise.future()).onComplete(result -> {
             if (result.failed()) {
                 String message = "[Diary@DefaultNotebookService::fetchNotebookHomeworksSessions] Failed to fetch " +
                         "content notebook homeworks and sessions and their corresponding type ";
@@ -606,8 +606,8 @@ public class DefaultNotebookService extends DBService implements NotebookService
                 handler.handle(Future.failedFuture(message));
             } else {
 
-                List<Notebook> notebookList = notebookHomeworksSessionsFuture.result();
-                List<DiaryTypeModel> diaryTypeModelList = diaryTypeFuture.result();
+                List<Notebook> notebookList = notebookHomeworksSessionsPromise.future().result();
+                List<DiaryTypeModel> diaryTypeModelList = diaryTypePromise.future().result();
 
                 notebookList.stream()
                         .filter(notebook -> notebook.getType() != null && notebook.getDiaryType() != null &&
@@ -689,13 +689,13 @@ public class DefaultNotebookService extends DBService implements NotebookService
 
     private void getNotebookHomeworksSessionsRequest(String structure_id, String start_at, String end_at, String subject_id,
                                                      String teacher_id, String audience_id, Boolean isVisa, Boolean isPublished,
-                                                     Future<List<Notebook>> future) {
+                                                     Promise<List<Notebook>> promise) {
         getNotebookHomeworksSessionsRequest(structure_id, start_at, end_at, subject_id, teacher_id, audience_id,
                 isVisa, isPublished, event -> {
                     if (event.failed()) {
-                        future.fail(event.cause());
+                        promise.fail(event.cause());
                     } else {
-                        future.complete(event.result());
+                        promise.complete(event.result());
                     }
                 });
     }
@@ -799,12 +799,12 @@ public class DefaultNotebookService extends DBService implements NotebookService
         }));
     }
 
-    private void fetchDiaryType(String structureId, Future<List<DiaryTypeModel>> future) {
+    private void fetchDiaryType(String structureId, Promise<List<DiaryTypeModel>> promise) {
         fetchDiaryType(structureId, event -> {
             if (event.failed()) {
-                future.fail(event.cause());
+                promise.fail(event.cause());
             } else {
-                future.complete(event.result());
+                promise.complete(event.result());
             }
         });
     }

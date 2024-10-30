@@ -28,7 +28,7 @@ public class NotebookRead implements ResourcesProvider {
                 new SessionRead().canAccessSession(request, userInfos),
                 new HomeworkRead().canAccessHomework(request, userInfos)
         );
-        FutureHelper.all(futureList)
+        Future.all(futureList)
                 .onSuccess(res -> promise.complete(futureList.stream().allMatch(Future::result)))
                 .onFailure(promise::fail);
         return promise.future();

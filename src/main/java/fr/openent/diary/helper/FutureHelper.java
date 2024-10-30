@@ -1,11 +1,7 @@
 package fr.openent.diary.helper;
 
 import fr.wseduc.webutils.Either;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.impl.CompositeFutureImpl;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -20,16 +16,7 @@ public class FutureHelper {
     private FutureHelper() {
     }
 
-    public static Handler<Either<String, JsonArray>> handlerJsonArray(Future<JsonArray> future) {
-        return event -> {
-            if (event.isRight()) {
-                future.complete(event.right().getValue());
-            } else {
-                LOGGER.error(event.left().getValue());
-                future.fail(event.left().getValue());
-            }
-        };
-    }
+
 
     public static Handler<Either<String, JsonArray>> handlerJsonArray(Handler<AsyncResult<JsonArray>> handler) {
         return event -> {
@@ -38,17 +25,6 @@ public class FutureHelper {
             } else {
                 LOGGER.error(event.left().getValue());
                 handler.handle(Future.failedFuture(event.left().getValue()));
-            }
-        };
-    }
-
-    public static Handler<Either<String, JsonObject>> handlerJsonObject(Future<JsonObject> future) {
-        return event -> {
-            if (event.isRight()) {
-                future.complete(event.right().getValue());
-            } else {
-                LOGGER.error(event.left().getValue());
-                future.fail(event.left().getValue());
             }
         };
     }
@@ -64,15 +40,17 @@ public class FutureHelper {
         };
     }
 
-    public static <T> CompositeFuture all(List<Future<T>> futures) {
-        return CompositeFutureImpl.all(futures.toArray(new Future[futures.size()]));
+    public static <L,R> Handler<Either<L,R>> handlerEitherPromise(Promise<R> promise){
+        return event -> {
+            if (event.isRight()) {
+                promise.complete(event.right().getValue());
+            } else {
+                String message = String.format("[Diary@%s::handlerEitherPromise]: %s",
+                        FutureHelper.class.getSimpleName(), event.left().getValue());
+                LOGGER.error(message);
+                promise.fail(event.left().getValue().toString());
+            }
+        };
     }
 
-    public static <T> CompositeFuture join(List<Future<T>> futures) {
-        return CompositeFutureImpl.join(futures.toArray(new Future[futures.size()]));
-    }
-
-    public static <T> CompositeFuture any(List<Future<T>> futures) {
-        return CompositeFutureImpl.any(futures.toArray(new Future[0]));
-    }
 }

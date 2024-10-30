@@ -7,6 +7,7 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -49,38 +50,38 @@ public class DefautlInitService  extends SqlCrudService implements InitService {
                 " WHERE structure_id = ?";
         JsonArray sessionTypeParams = new JsonArray(Collections.singletonList(structure_id));
 
-        Future<JsonArray> HomeworkType = Future.future();
+        Promise<JsonArray> HomeworkTypePromise = Promise.promise();
         sql.prepared(homeworkTypeQuery, homeworkTypeParams, SqlResult.validResultHandler(event -> {
             JsonArray structuresHomeworkTypeRegistered = new JsonArray();
             for(int i = 0; i < event.right().getValue().size(); i++){
                 structuresHomeworkTypeRegistered.add(event.right().getValue().getJsonObject(i).getString("struct"));
             }
             if (event.isRight()) {
-                HomeworkType.complete(structuresHomeworkTypeRegistered);
+                HomeworkTypePromise.complete(structuresHomeworkTypeRegistered);
             } else {
-                HomeworkType.fail("Error while initialising HomeworkType");
+                HomeworkTypePromise.fail("Error while initialising HomeworkType");
             }
         }));
 
-        Future<JsonArray> SessionType = Future.future();
+        Promise<JsonArray> SessionTypePromise = Promise.promise();
         sql.prepared(sessionTypeQuery, sessionTypeParams, SqlResult.validResultHandler(event -> {
             JsonArray structuresSessionTypeRegistered = new JsonArray();
             for(int i = 0; i < event.right().getValue().size(); i++){
                 structuresSessionTypeRegistered.add(event.right().getValue().getJsonObject(i).getString("struct"));
             }
             if (event.isRight()) {
-                SessionType.complete(structuresSessionTypeRegistered);
+                SessionTypePromise.complete(structuresSessionTypeRegistered);
             } else {
-                SessionType.fail("Error while initialising SessionType");
+                SessionTypePromise.fail("Error while initialising SessionType");
             }
         }));
 
-        CompositeFuture.all(HomeworkType, SessionType).setHandler( event -> {
+        Future.all(HomeworkTypePromise.future(), SessionTypePromise.future()).onComplete( event -> {
             if (event.succeeded()) {
-                if (!HomeworkType.result().contains(structure_id)) {
+                if (!HomeworkTypePromise.future().result().contains(structure_id)) {
                     statements.add(initHomeworkType(structure_id));
                 }
-                if (!SessionType.result().contains(structure_id)) {
+                if (!SessionTypePromise.future().result().contains(structure_id)) {
                     statements.add(initSessionType(structure_id));
                 }
                 statements.add(initSettingsStatement(structure_id));

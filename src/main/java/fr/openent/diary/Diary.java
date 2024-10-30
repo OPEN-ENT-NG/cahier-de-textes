@@ -10,6 +10,7 @@ import fr.openent.diary.services.impl.*;
 import fr.openent.diary.worker.NotebookArchiveWorker;
 import fr.wseduc.mongodb.MongoDb;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Promise;
 import io.vertx.core.eventbus.*;
 import io.vertx.core.json.*;
 import org.entcore.common.events.EventStore;
@@ -32,10 +33,10 @@ public class Diary extends BaseServer {
     public static int PAGE_SIZE = 20;
 
 	@Override
-	public void start() throws Exception {
+	public void start(Promise<Void> startPromise) throws Exception {
         DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
 
-        super.start();
+        super.start(startPromise);
         final EventBus eb = getEventBus(vertx);
         Storage storage = new StorageFactory(vertx, config).getStorage();
 
@@ -78,10 +79,12 @@ public class Diary extends BaseServer {
 
         // Worker
         vertx.deployVerticle(NotebookArchiveWorker.class, new DeploymentOptions().setConfig(config).setWorker(true));
+        startPromise.tryComplete();
+        startPromise.tryFail("[Diary@Diary::start] Failed to start module Diary.");
     }
 
     public static void launchNotebookArchiveWorker(EventBus eb, JsonObject params) {
-	    eb.send(NotebookArchiveWorker.class.getName(), params,
+	    eb.request(NotebookArchiveWorker.class.getName(), params,
                 new DeliveryOptions().setSendTimeout(1000 * 1000L), handlerToAsyncHandler(eventExport -> {
                         if(!eventExport.body().getString("status").equals("ok")) {
                             launchNotebookArchiveWorker(eb, params);
