@@ -9,7 +9,7 @@
     </parent>
     <groupId>fr.openent</groupId>
     <artifactId>diary</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0.4</version>
     <scm>
         <connection>scm:git:https://github.com/OPEN-ENT-NG/cahier-de-textes.git</connection>
         <developerConnection>scm:git:https://github.com/OPEN-ENT-NG/cahier-de-textes.git</developerConnection>
@@ -35,7 +35,7 @@
         <junitVersion>4.10</junitVersion>
         <powerMockVersion>2.0.2</powerMockVersion>
         <mockitoVersion>[2.0,3.0)</mockitoVersion>
-        <entCoreVersion>6.6-SNAPSHOT</entCoreVersion>
+        <entCoreVersion>6.6.2</entCoreVersion>
         <gatlingHighchartsVersion>2.2.2</gatlingHighchartsVersion>
     </properties>
     <dependencies>
