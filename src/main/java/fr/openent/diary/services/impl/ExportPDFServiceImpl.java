@@ -4,6 +4,7 @@ import fr.openent.diary.helper.NodePdfHelper;
 import fr.openent.diary.helper.RendersHelper;
 import fr.openent.diary.services.ExportPDFService;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.collections.SharedDataHelper;
 import fr.wseduc.webutils.data.FileResolver;
 import fr.wseduc.webutils.http.Renders;
 import io.vertx.core.*;
@@ -127,30 +128,32 @@ public class ExportPDFServiceImpl implements ExportPDFService {
                 byte[] bytes;
                 bytes = buffer.toString().getBytes(StandardCharsets.UTF_8);
 
-                String node = (String) vertx.sharedData().getLocalMap("server").get("node");
-                if (node == null) node = "";
+                SharedDataHelper.getInstance().get("server", "node")
+                        .onSuccess(node -> {
+                            if (node == null) node = "";
+                            actionObject
+                                    .put("content", bytes)
+                                    .put("baseUrl", baseUrl);
 
-                actionObject
-                        .put("content", bytes)
-                        .put("baseUrl", baseUrl);
-
-                eb.request(node + "entcore.pdf.generator", actionObject, reply -> {
-                    if (reply.failed()) {
-                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate pdf.";
-                        log.error(message + " " + reply.cause().getMessage());
-                        handler.handle(Future.failedFuture(message));
-                        return;
-                    }
-                    JsonObject pdfResponse = (JsonObject) reply.result().body();
-                    if (!"ok".equals(pdfResponse.getString("status"))) {
-                        String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate PDF from pdf bus: " +
-                                pdfResponse.getString("message", "");
-                        log.error(message);
-                        handler.handle(Future.failedFuture(pdfResponse.getString("message", "")));
-                        return;
-                    }
-                    handler.handle(Future.succeededFuture(Buffer.buffer(pdfResponse.getBinary("content"))));
-                });
+                            eb.request(node + "entcore.pdf.generator", actionObject, reply -> {
+                                if (reply.failed()) {
+                                    String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate pdf.";
+                                    log.error(message + " " + reply.cause().getMessage());
+                                    handler.handle(Future.failedFuture(message));
+                                    return;
+                                }
+                                JsonObject pdfResponse = (JsonObject) reply.result().body();
+                                if (!"ok".equals(pdfResponse.getString("status"))) {
+                                    String message = "[Diary@ExportPDFServiceImpl::generatePDF] Failed to generate PDF from pdf bus: " +
+                                            pdfResponse.getString("message", "");
+                                    log.error(message);
+                                    handler.handle(Future.failedFuture(pdfResponse.getString("message", "")));
+                                    return;
+                                }
+                                handler.handle(Future.succeededFuture(Buffer.buffer(pdfResponse.getBinary("content"))));
+                            });
+                        })
+                        .onFailure(th -> log.error("[Diary@ExportPDFServiceImpl::generatePDF] Failed to get server node: " + th.getMessage()));
             });
         });
     }
@@ -256,7 +259,7 @@ public class ExportPDFServiceImpl implements ExportPDFService {
 
     public String createToken(UserInfos user) throws Exception {
         String clientId =  config.getJsonObject("pdf-generator", new JsonObject()).getString("pdf-connector-id", null);
-        final String token = UserUtils.createJWTToken(vertx, user, clientId, null);
+        final String token = UserUtils.createJWTToken(vertx, user, clientId, null, pdfFactory.getPdfGenerator().createToken(user));
         if (isEmpty(token)) {
             throw new PdfException("invalid.token");
         }

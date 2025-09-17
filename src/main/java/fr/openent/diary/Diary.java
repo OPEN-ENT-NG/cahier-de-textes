@@ -9,10 +9,14 @@ import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.impl.*;
 import fr.openent.diary.worker.NotebookArchiveWorker;
 import fr.wseduc.mongodb.MongoDb;
+import fr.wseduc.webutils.collections.SharedDataHelper;
+import io.netty.util.concurrent.SucceededFuture;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.*;
 import io.vertx.core.json.*;
+import org.apache.commons.lang3.tuple.Pair;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
@@ -21,6 +25,8 @@ import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
+
+import java.util.Map;
 
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
@@ -34,11 +40,19 @@ public class Diary extends BaseServer {
 
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
+        final Promise<Void> promise = Promise.promise();
+        super.start(promise);
+        promise.future()
+                .compose(init -> StorageFactory.build(vertx, config))
+                .compose(storageFactory -> initDiary(storageFactory))
+                .onComplete(startPromise);
+    }
+
+    private Future<Void> initDiary(StorageFactory storageFactory) {
         DB.getInstance().init(Neo4j.getInstance(), Sql.getInstance(), MongoDb.getInstance());
 
-        super.start(startPromise);
         final EventBus eb = getEventBus(vertx);
-        Storage storage = new StorageFactory(vertx, config).getStorage();
+        Storage storage = storageFactory.getStorage();
 
         TimelineHelper timeline = new TimelineHelper(vertx, eb, config);
         final DiaryService diaryService = new DiaryServiceImpl();
@@ -79,8 +93,7 @@ public class Diary extends BaseServer {
 
         // Worker
         vertx.deployVerticle(NotebookArchiveWorker.class, new DeploymentOptions().setConfig(config).setWorker(true));
-        startPromise.tryComplete();
-        startPromise.tryFail("[Diary@Diary::start] Failed to start module Diary.");
+        return Future.succeededFuture();
     }
 
     public static void launchNotebookArchiveWorker(EventBus eb, JsonObject params) {

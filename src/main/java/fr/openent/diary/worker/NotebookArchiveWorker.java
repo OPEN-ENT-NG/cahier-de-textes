@@ -39,12 +39,19 @@ public class NotebookArchiveWorker extends BusModBase implements Handler<Message
     private NotebookArchiveService archiveService;
 
     @Override
-    public void start() {
+    public void start(Promise<Void> startPromise) {
         super.start();
-        Storage storage = new StorageFactory(vertx, config).getStorage();
+        StorageFactory.build(vertx, config)
+                .compose(storageFactory -> initNoteBookArchiveWorker(storageFactory))
+                .onComplete(startPromise);
+    }
+
+    private Future<Void> initNoteBookArchiveWorker(StorageFactory storageFactory) {
+        Storage storage = storageFactory.getStorage();
         this.notebookService = new DefaultNotebookService(eb, vertx, storage, config);
         this.archiveService = new DefaultNotebookArchiveService(eb, storage);
         eb.consumer(this.getClass().getName(), this);
+        return Future.succeededFuture();
     }
 
     @Override
