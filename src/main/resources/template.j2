@@ -1,0 +1,31 @@
+{
+  "name": "fr.openent~diary",
+  "config": {
+    "main" : "fr.openent.diary.Diary",
+    "port" : 8054,
+    "app-name" : "Diary",
+    "app-address" : "/diary",
+    "app-icon" : "cahier-textes-large",
+    "host": "https://{{ host }}",
+    "ssl" : true,
+    {% if overrideTheme %} "override-theme": {{ override2d }}, {% endif %}
+    "auto-redeploy": false,
+    "userbook-host": "https://{{ host }}",
+    "integration-mode": "{{ integration_mode|default('HTTP') }}",
+    "app-registry.port" : 8012,
+    "mode" : "prod",
+    "sql": true,
+    "dependencies" : {
+        "fr.openent.viescolaire": "1.0.0"
+    },
+    "exports" : {
+      "template-path" : "public/template/pdf/"
+    },
+    "pdf-generator" : {
+     "pdf-connector-id": "exportpdf",
+     "auth" : "{{ nodePdfToken }}",
+     "url": "{{ nodePdfUrl }}generate/pdf"
+    },
+    "entcore.port" : 8009
+  }
+}
