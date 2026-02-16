@@ -1,6 +1,7 @@
 package fr.openent.diary.security.workflow;
 
 import fr.openent.diary.Diary;
+import fr.openent.diary.db.DB;
 import fr.openent.diary.db.DBService;
 import fr.openent.diary.helper.FutureHelper;
 import fr.openent.diary.security.WorkflowUtils;
@@ -59,6 +60,9 @@ public class SessionManage extends DBService implements ResourcesProvider {
         String query = " SELECT teacher_id" +
                 " FROM " + Diary.DIARY_SCHEMA + ".session" +
                 " WHERE id = ? ";
+        if (sql == null) {
+            this.sql = DB.getInstance().sql();
+        }
         sql.prepared(query, new JsonArray(Collections.singletonList(sessionId)),
                 SqlResult.validUniqueResultHandler(FutureHelper.handlerJsonObject(promise)));
         return promise.future();
