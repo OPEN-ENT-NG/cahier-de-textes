@@ -1,6 +1,6 @@
 {
   "name": "diary",
-  "version": "4.1.4",
+  "version": "4.1.4-dev.0",
   "description": "Diary tool for ENT Core.",
   "main": "gulpfile.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "test": "npm run coverage"
   },
   "dependencies": {
-    "entcore": "4.8.14",
+    "entcore": "dev",
     "awesome-typescript-loader": "3.2.1",
     "axios": "0.16.2",
     "core-js": "2.4.1",
