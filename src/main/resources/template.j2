@@ -2,6 +2,11 @@
   "name": "fr.openent~diary",
   "config": {
     "main" : "fr.openent.diary.Diary",
+    "probes": [
+      "org.entcore.common.http.health.Neo4jProbe",
+      "org.entcore.common.http.health.MongoProbe",
+      "org.entcore.common.http.health.PostgresProbe"
+    ],
     "port" : 8054,
     "app-name" : "Diary",
     "app-address" : "/diary",
