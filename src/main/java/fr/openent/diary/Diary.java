@@ -9,14 +9,11 @@ import fr.openent.diary.services.DiaryService;
 import fr.openent.diary.services.impl.*;
 import fr.openent.diary.worker.NotebookArchiveWorker;
 import fr.wseduc.mongodb.MongoDb;
-import fr.wseduc.webutils.collections.SharedDataHelper;
-import io.netty.util.concurrent.SucceededFuture;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.eventbus.*;
 import io.vertx.core.json.*;
-import org.apache.commons.lang3.tuple.Pair;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
@@ -25,8 +22,6 @@ import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
-
-import java.util.Map;
 
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
