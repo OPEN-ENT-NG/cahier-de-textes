@@ -20,7 +20,7 @@ pipeline {
       }
       stage('Build image') {
         steps {
-          sh './edifice image --archs=linux/amd64 --force --rebuild=false'
+          sh './edifice image --rebuild=false'
         }
       }
     }
