@@ -1,6 +1,6 @@
 {
   "name": "diary",
-  "version": "4.1.6-dev.0",
+  "version": "4.1.6-dev.1",
   "description": "Diary tool for ENT Core.",
   "main": "gulpfile.js",
   "scripts": {
