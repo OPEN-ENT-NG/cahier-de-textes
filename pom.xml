@@ -8,7 +8,7 @@
   </parent>
   <groupId>fr.openent</groupId>
   <artifactId>diary</artifactId>
-  <version>4.1-SNAPSHOT</version>
+  <version>4.2.0</version>
   <scm>
     <connection>scm:git:https://github.com/OPEN-ENT-NG/cahier-de-textes.git</connection>
     <developerConnection>scm:git:https://github.com/OPEN-ENT-NG/cahier-de-textes.git</developerConnection>
@@ -34,13 +34,13 @@
     <junitVersion>4.10</junitVersion>
     <powerMockVersion>2.0.2</powerMockVersion>
     <mockitoVersion>2.28.2</mockitoVersion>
-    <entCoreVersion>6.14-SNAPSHOT</entCoreVersion>
+    <entCoreVersion>6.15.0</entCoreVersion>
     <gatlingHighchartsVersion>2.2.2</gatlingHighchartsVersion>
-    <modPostgresVersion>2.1-SNAPSHOT</modPostgresVersion>
-    <modJsonSchemaValidatorVersion>2.1-SNAPSHOT</modJsonSchemaValidatorVersion>
-    <entCoreLibsVersion>6.14-SNAPSHOT</entCoreLibsVersion>
-    <modMongoVersion>4.1-SNAPSHOT</modMongoVersion>
-    <modPdfGeneratorVersion>2.1-SNAPSHOT</modPdfGeneratorVersion>
+    <modPostgresVersion>2.2.0</modPostgresVersion>
+    <modJsonSchemaValidatorVersion>2.2.0</modJsonSchemaValidatorVersion>
+    <entCoreLibsVersion>6.15.0</entCoreLibsVersion>
+    <modMongoVersion>4.2.0</modMongoVersion>
+    <modPdfGeneratorVersion>2.2.0</modPdfGeneratorVersion>
   </properties>
   <dependencies>
     <dependency>
