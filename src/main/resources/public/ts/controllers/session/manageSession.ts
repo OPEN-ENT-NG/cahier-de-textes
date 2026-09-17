@@ -13,7 +13,7 @@ import {SearchService, SubjectService} from '../../services';
 import {Moment} from 'moment';
 import {FORMAT} from '../../core/const/dateFormat';
 import {GroupsSearch} from '../../utils/autocomplete/groupsSearch';
-import {AxiosResponse} from 'axios';
+import { HttpResponse } from 'entcore-toolkit';
 import {EXCEPTIONAL} from '../../core/const/exceptional-subject';
 
 export let manageSessionCtrl = ng.controller('manageSessionCtrl',
@@ -197,7 +197,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
             const createSessionsHomework = async (): Promise<boolean> => {
                 let sessionsHomework: ISessionHomeworkBody = {homeworks: $scope.homeworks.filter(h => !h.id)};
                 if (sessionsHomework.homeworks.length) {
-                    let response: AxiosResponse = await sessionHomeworkService.create(sessionsHomework);
+                    let response: HttpResponse = await sessionHomeworkService.create(sessionsHomework);
                     if (response.status === 200 || response.status === 201) {
                         return true;
                     } else {
@@ -217,7 +217,7 @@ export let manageSessionCtrl = ng.controller('manageSessionCtrl',
                     homeworks: $scope.homeworks.filter(h => h.id).concat($scope.from_homeworks.filter(h => h.id))
                 };
                 if (sessionsHomework.homeworks.length) {
-                    let response: AxiosResponse = await sessionHomeworkService.update(sessionsHomework);
+                    let response: HttpResponse = await sessionHomeworkService.update(sessionsHomework);
                     if (response.status === 200 || response.status === 201) {
                         return true;
                     } else {

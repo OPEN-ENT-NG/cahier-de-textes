@@ -3,18 +3,21 @@ jest.mock('entcore', () => ({
     ng: {service: jest.fn()}
 }));
 
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+jest.mock('entcore-toolkit', () => Object.assign({}, (jest as any).requireActual('entcore-toolkit'), {
+    http: {get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), postFile: jest.fn(), putFile: jest.fn()}
+}));
+
+import {http} from 'entcore-toolkit';
+import {mockHttpResponse} from '../../test-utils/httpMock';
 import {notebookArchiveService} from '../../services';
 import DoneCallback = jest.DoneCallback;
 import {NotebookArchiveParams, NotebookArchiveResponse} from "../../model";
 
 describe('notebookArchiveService', () => {
     it('should call service first',  (done: DoneCallback) => {
-        const mock = new MockAdapter(axios);
         const data = { response: true };
         const structureId: string =  'structureId';
-        mock.onGet(`/diary/structures/${structureId}/notebooks/archives`).reply(200, data);
+        (http.get as jest.Mock).mockResolvedValueOnce(mockHttpResponse(data, {url: `/diary/structures/${structureId}/notebooks/archives`}));
         const params: NotebookArchiveParams = {schoolYear: null};
         notebookArchiveService.getNotebookArchives(structureId, params).then((response: NotebookArchiveResponse) => {
             expect(response).toEqual(data);

@@ -3,17 +3,20 @@ jest.mock('entcore', () => ({
     ng: {service: jest.fn()}
 }));
 
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+jest.mock('entcore-toolkit', () => Object.assign({}, (jest as any).requireActual('entcore-toolkit'), {
+    http: {get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), postFile: jest.fn(), putFile: jest.fn()}
+}));
+
+import {http} from 'entcore-toolkit';
+import {mockHttpResponse} from '../../test-utils/httpMock';
 import {notebookService} from "../NotebookService";
 import {INotebookRequest, INotebookResponse} from "../../model/Notebook";
 import DoneCallback = jest.DoneCallback;
 
 describe('notebookService',  () => {
     it('should call service first', (done: DoneCallback) => {
-        const mock = new MockAdapter(axios);
         const data = { response: true };
-        mock.onGet(`/diary/notebooks?structure_id=`).reply(200, data);
+        (http.get as jest.Mock).mockResolvedValueOnce(mockHttpResponse(data, {url: `/diary/notebooks?structure_id=`}));
         const notebookRequest: INotebookRequest = {};
         notebookService.getNotebooks(notebookRequest).then((response: INotebookResponse) => {
             expect(response).toEqual(data);

@@ -1,5 +1,5 @@
 import {ng} from 'entcore'
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {IVisa} from "../model";
 
 export interface IVisaService {
@@ -21,7 +21,7 @@ export const visaService: IVisaService = {
                 homeworkParams += `&homework_id=${id}`;
             });
         }
-        const {data}: AxiosResponse = await http.get(`/diary/visas${structureUrl}${sessionParams}${homeworkParams}`);
+        const {data}: HttpResponse = await http.get(`/diary/visas${structureUrl}${sessionParams}${homeworkParams}`);
         return data;
     }
 };

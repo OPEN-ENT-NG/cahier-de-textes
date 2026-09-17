@@ -1,5 +1,5 @@
 import {_, moment, notify} from 'entcore';
-import http from 'axios';
+import { http } from 'entcore-toolkit';
 import {Mix} from 'entcore-toolkit';
 import {Course, Structure, Subject, Teacher, DateUtils, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';
@@ -217,12 +217,12 @@ export class Session {
     }
 
     async publish() {
-        let response = await http.post('/diary/session/publish/' + this.id);
+        let response = await http.post('/diary/session/publish/' + this.id, {});
         return ToastUtils.setToastMessage(response, 'session.published', 'session.published.error');
     }
 
     async unpublish() {
-        let response = await http.post('/diary/session/unpublish/' + this.id);
+        let response = await http.post('/diary/session/unpublish/' + this.id, {});
         return ToastUtils.setToastMessage(response, 'session.unpublished', 'session.unpublished.error');
     }
 

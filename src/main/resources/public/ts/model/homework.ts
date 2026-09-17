@@ -1,5 +1,5 @@
 import {idiom as lang, model, moment, notify} from 'entcore';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Mix} from 'entcore-toolkit';
 import {Structure, Teacher, DateUtils, ToastUtils, Visas} from './index';
 import {Subject} from './subject';
@@ -155,40 +155,40 @@ export class Homework {
     async setProgress(stateId: number): Promise<void> {
 
         let state: string = stateId === Homework.HOMEWORK_STATE_DONE ? 'done' : 'todo';
-        let response: AxiosResponse = await http.post(`/diary/homework/progress/${this.id}/${state}`);
+        let response: HttpResponse = await http.post(`/diary/homework/progress/${this.id}/${state}`, {});
 
         return ToastUtils.setToastMessage(response, 'homework.setProgress', 'homework.setProgress.error');
     }
 
     async create(): Promise<void> {
-        let response: AxiosResponse = await http.post('/diary/homework', this.toSendFormat());
+        let response: HttpResponse = await http.post('/diary/homework', this.toSendFormat());
         return ToastUtils.setToastMessage(response, 'homework.created', 'homework.created.error');
     }
 
     async update(): Promise<void> {
-        let response: AxiosResponse = await http.put(`/diary/homework/${this.id}/${this.publishedChanged} `, this.toSendFormat());
+        let response: HttpResponse = await http.put(`/diary/homework/${this.id}/${this.publishedChanged} `, this.toSendFormat());
         return ToastUtils.setToastMessage(response, 'homework.updated', 'homework.updated.error');
     }
 
     async delete(): Promise<void> {
-        let response: AxiosResponse = await http.delete('/diary/homework/' + this.id);
+        let response: HttpResponse = await http.delete('/diary/homework/' + this.id);
         return ToastUtils.setToastMessage(response, 'homework.deleted', 'homework.deleted.error');
     }
 
     async publish(): Promise<void> {
-        let response: AxiosResponse = await http.post('/diary/homework/publish/' + this.id);
+        let response: HttpResponse = await http.post('/diary/homework/publish/' + this.id, {});
         return ToastUtils.setToastMessage(response, 'homework.published', 'homework.published.error');
     }
 
 
     async unpublish(): Promise<void> {
-        let response: AxiosResponse = await http.post('/diary/homework/unpublish/' + this.id);
+        let response: HttpResponse = await http.post('/diary/homework/unpublish/' + this.id, {});
         return ToastUtils.setToastMessage(response, 'homework.unpublished', 'homework.unpublished.error');
     }
 
     async sync(): Promise<void> {
         if (model.me.type === USER_TYPES.teacher || model.me.type === USER_TYPES.personnel) {
-            let {data}: AxiosResponse = await http.get('/diary/homework/' + this.id);
+            let {data}: HttpResponse = await http.get('/diary/homework/' + this.id);
             Mix.extend(this, Homework.formatSqlDataToModel(data));
         } else {
             let studentId: string;
@@ -198,7 +198,7 @@ export class Homework {
             } else {
                 studentId = 'stop';
             }
-            let {data}: AxiosResponse = await http.get('/diary/homework/' + this.id + '/' + studentId);
+            let {data}: HttpResponse = await http.get('/diary/homework/' + this.id + '/' + studentId);
             Mix.extend(this, Homework.formatSqlDataToModel(data));
         }
 
@@ -303,7 +303,7 @@ export class Homeworks {
     }
 
     async syncHomeworks(url: string): Promise<void> {
-        let {data}: AxiosResponse = await http.get(url);
+        let {data}: HttpResponse = await http.get(url);
         this.all = Mix.castArrayAs(Homework, Homeworks.formatSqlDataToModel(data));
         this.all.forEach(i => {
             i.init();
@@ -339,19 +339,19 @@ export class HomeworkType {
     }
 
     async create(): Promise<void> {
-        let response: AxiosResponse = await http.post(`/diary/homework-type`, this.toJson());
+        let response: HttpResponse = await http.post(`/diary/homework-type`, this.toJson());
         return ToastUtils.setToastMessage(response, 'cdt.homework.type.create', 'cdt.homework.type.create.error');
     }
 
     async update(): Promise<void> {
-        let response: AxiosResponse = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
+        let response: HttpResponse = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
         return ToastUtils.setToastMessage(response, 'cdt.homework.type.update', 'cdt.homework.type.update.error');
     }
 
     async delete(): Promise<void> {
-        let {data}: AxiosResponse = await http.delete(`/diary/homework-type/${this.id}/${this.structure_id}`);
+        let {data}: HttpResponse = await http.delete(`/diary/homework-type/${this.id}/${this.structure_id}`);
         if (data.id !== undefined) {
-            let response: AxiosResponse = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
+            let response: HttpResponse = await http.put(`/diary/homework-type/${this.id}`, this.toJson());
             return ToastUtils.setToastMessage(response, 'cdt.homework.type.delete', 'cdt.homework.type.delete.error');
         } else {
             notify.error('cdt.homework.type.delete.impossible');
@@ -370,7 +370,7 @@ export class HomeworkTypes {
     }
 
     async sync(): Promise<void> {
-        let {data}: AxiosResponse = await http.get(`/diary/homework-types/${this.structure_id}`);
+        let {data}: HttpResponse = await http.get(`/diary/homework-types/${this.structure_id}`);
         this.all = Mix.castArrayAs(HomeworkType, data);
         this.id = data.id;
         this.label = data.label;
@@ -442,7 +442,7 @@ export class WorkloadDay {
     }
 
     async sync(date: any): Promise<void> {
-        let {data}: AxiosResponse = await http.get(`/diary/workload/${this.structure.id}/${this.audience.id}/${DateUtils.getFormattedDate(date)}/${this.isPublished}`);
+        let {data}: HttpResponse = await http.get(`/diary/workload/${this.structure.id}/${this.audience.id}/${DateUtils.getFormattedDate(date)}/${this.isPublished}`);
         this.all = Mix.castArrayAs(Workload, WorkloadDay.formatSqlDataToModel(data));
         this.all.forEach(w => w.init());
     }

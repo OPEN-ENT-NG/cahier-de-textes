@@ -1,6 +1,6 @@
 import {Toast, ToastUtils} from "../model";
 import {homeworkType} from "./homeworkType";
-import http from "axios";
+import { http } from 'entcore-toolkit';
 import {structureService} from "../services";
 
 declare let window: any;

@@ -1,5 +1,5 @@
 import {Mix} from 'entcore-toolkit';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Student} from "./student";
 import {ArrayUtils} from "../utils/array.utils";
 import {Group, Groups} from "./group";
@@ -50,7 +50,7 @@ export class Audiences {
         try {
             let structureParam: string = `?idEtablissement=${structureId}`;
             let optionalEdtParams: string = `&isEdt=true${canFetchAllClasses ? '&isTeacherEdt=true' : ''}`;
-            let audiences: AxiosResponse = await http.get(`/viescolaire/classes${structureParam}${optionalEdtParams}`);
+            let audiences: HttpResponse = await http.get(`/viescolaire/classes${structureParam}${optionalEdtParams}`);
             this.all = Mix.castArrayAs(Audience, audiences.data);
             this.all.sort((g: Audience, gg: Audience) => {
                 if (g.type_group < gg.type_group)

@@ -1,7 +1,7 @@
 import {ng, model, idiom as lang, toasts} from 'entcore';
 import {ProgressionFolder, ProgressionFolders, ProgressionSession} from "../../model/Progression";
 import {Homework, Session} from "../../model";
-import {AxiosResponse} from "axios";
+import { HttpResponse } from 'entcore-toolkit';
 import {ROOTS} from "../../core/const/roots";
 
 export const sessionToProgressionForm = ng.directive('sessionToProgressionForm', function () {

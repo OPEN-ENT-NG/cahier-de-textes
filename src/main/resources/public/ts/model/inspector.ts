@@ -1,5 +1,5 @@
 import { model, moment, _, notify } from 'entcore';
-import http from 'axios';
+import { http } from 'entcore-toolkit';
 import { Mix } from 'entcore-toolkit';
 import {Structure, ToastUtils} from './index';
 import {Personnel} from './Personnel';

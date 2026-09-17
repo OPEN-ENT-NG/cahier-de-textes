@@ -1,5 +1,5 @@
 ///<reference path="session.ts"/>
-import http from 'axios';
+import { http } from 'entcore-toolkit';
 import {Eventer, Mix, Selectable, Selection} from 'entcore-toolkit';
 import {Homework, Session, ToastUtils} from './index';
 import {PEDAGOGIC_TYPES} from '../core/const/pedagogicTypes';

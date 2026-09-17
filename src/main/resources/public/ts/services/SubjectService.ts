@@ -1,5 +1,5 @@
 import {ng} from 'entcore';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Subject} from '../model';
 
 export interface SubjectService {
@@ -26,7 +26,7 @@ export const subjectService: SubjectService = {
 
     getExceptionalLabels: async (structureId): Promise<string[]> => {
         try {
-            const {data}: AxiosResponse = await http.get(`/diary/subjects/exceptional/${structureId}`);
+            const {data}: HttpResponse = await http.get(`/diary/subjects/exceptional/${structureId}`);
             return data.values;
         } catch (e) {
             throw e;
@@ -35,7 +35,7 @@ export const subjectService: SubjectService = {
 
     getTimetableSubjects: async (structureId: string): Promise<Subject[]> => {
         try {
-            const {data}: AxiosResponse = await http.get(`/diary/timetableSubjects/${structureId}`)
+            const {data}: HttpResponse = await http.get(`/diary/timetableSubjects/${structureId}`)
             return data.map((subject) => new Subject(subject.id, subject.name))
         } catch (e) {
             throw e;

@@ -1,6 +1,6 @@
 import {ng} from 'entcore'
 import {ISchoolYearPeriod} from "../model";
-import http from "axios";
+import { http } from 'entcore-toolkit';
 
 export interface IViescolaireService {
     getSchoolYearDates(structureId): Promise<ISchoolYearPeriod>;

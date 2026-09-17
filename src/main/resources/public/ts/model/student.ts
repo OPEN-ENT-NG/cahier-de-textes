@@ -1,4 +1,4 @@
-import http from 'axios';
+import { http } from 'entcore-toolkit';
 import { Mix } from 'entcore-toolkit';
 import {Audience, Audiences, Structure} from './index';
 import {Group, Groups} from "./group";

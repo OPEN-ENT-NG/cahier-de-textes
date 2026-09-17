@@ -1,5 +1,5 @@
 import {ng} from 'entcore';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {NotebookArchiveParams, NotebookArchiveResponse, NotebookArchiveSearchResponse} from '../model';
 
 
@@ -38,7 +38,7 @@ export const notebookArchiveService: INotebookArchiveService = {
         urlParams += (params.page !== undefined && params.page !== null)  ? `&page=${params.page}` : '';
 
         return http.get(`/diary/structures/${structureId}/notebooks/archives${urlParams}`)
-            .then((res: AxiosResponse) => {
+            .then((res: HttpResponse) => {
                 return res.data;
             });
     },
@@ -49,7 +49,7 @@ export const notebookArchiveService: INotebookArchiveService = {
      */
     getArchiveYears: async (structureId: string): Promise<Array<string>> => {
         return http.get(`/diary/structures/${structureId}/notebooks/archives/periods`)
-            .then((res: AxiosResponse) => {
+            .then((res: HttpResponse) => {
                 return res.data.archiveSchoolYears;
             });
     },

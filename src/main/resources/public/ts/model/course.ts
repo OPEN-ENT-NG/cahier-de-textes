@@ -1,5 +1,5 @@
 import {model, moment} from 'entcore';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Mix} from 'entcore-toolkit';
 import {Group, Groups} from "./group";
 import {Audience, Audiences, Structure, Subject, Teacher, Teachers, USER_TYPES, DateUtils} from './index';
@@ -156,7 +156,7 @@ export class Courses {
         if (filter.substr(filter.length - 1) === "?") filter = filter.slice(0, -1);
         let uri: string = `/viescolaire/common/courses/${structure.id}/${firstDate}/${endDate}?${filter}`;
 
-        let {data}: AxiosResponse = await http.get(uri);
+        let {data}: HttpResponse = await http.get(uri);
         data = data.filter((d) => d.teacherIds);
         this.all = Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data, structure ? structure : this.structure));
         this.all.forEach((i: Course) => {
