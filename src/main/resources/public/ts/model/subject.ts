@@ -1,5 +1,5 @@
 import {notify, idiom as lang} from 'entcore';
-import http from 'axios';
+import { http } from 'entcore-toolkit';
 import {subjectService} from '../services';
 import {EXCEPTIONAL} from '../core/const/exceptional-subject';
 

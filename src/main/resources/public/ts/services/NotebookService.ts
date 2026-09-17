@@ -1,5 +1,5 @@
 import {ng} from 'entcore'
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {INotebook, INotebookRequest, INotebookResponse} from "../model/Notebook";
 
 /**
@@ -41,7 +41,7 @@ export const notebookService: INotebookService = {
         const structureUrl: string = `?structure_id=${notebookRequest.structure_id}`;
         const dateUrl: string = `&start_at=${notebookRequest.start_at}&end_at=${notebookRequest.end_at}`;
         const urlParams: string = `${visa}${visaOrder}${isPublished}${teacherParams}${audienceParams}${page}`;
-        const {data}: AxiosResponse = await http.get(`/diary/notebooks${structureUrl}${dateUrl}${urlParams}`);
+        const {data}: HttpResponse = await http.get(`/diary/notebooks${structureUrl}${dateUrl}${urlParams}`);
         return data;
     },
 
@@ -57,7 +57,7 @@ export const notebookService: INotebookService = {
         const isPublished: string = (notebookRequest.published !== undefined && notebookRequest.published !== null)
             ? `&is_published=${notebookRequest.published}` : '';
         const urlParams: string = `${teacher}${subject}${audience}${visa}${isPublished}`;
-        const {data}: AxiosResponse = await http.get(`/diary/notebooks/sessions/homeworks${structureUrl}${dateUrl}${urlParams}`);
+        const {data}: HttpResponse = await http.get(`/diary/notebooks/sessions/homeworks${structureUrl}${dateUrl}${urlParams}`);
         return data;
     }
 };

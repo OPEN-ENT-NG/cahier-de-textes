@@ -7,7 +7,7 @@ import {
     ProgressionSessions
 } from '../../model/Progression';
 import {ScheduleItem} from "../../model/scheduleItem";
-import {AxiosResponse} from "axios";
+import { HttpResponse } from 'entcore-toolkit';
 
 declare let window: any;
 
@@ -261,7 +261,7 @@ export let manageProgressionCtrl = ng.controller('manageProgessionCtrl',
                 let progressionSession: ProgressionSession = new ProgressionSession(item.data,
                     !!item.data.homeworks && item.data.homeworks.length > 0 ? item.data.homeworks : null);
                 progressionSession.folder_id = folder.id;
-                let response: AxiosResponse = await progressionSession.save();
+                let response: HttpResponse = await progressionSession.save();
                 if (response.status === 200 || response.status === 201) {
                     toasts.confirm(lang.translate("progression.session.create"));
                     await $scope.initProgressions();
