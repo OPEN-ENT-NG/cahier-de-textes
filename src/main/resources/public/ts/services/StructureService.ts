@@ -1,5 +1,5 @@
 import {model, ng} from 'entcore'
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Structure} from "../model";
 
 export interface StructureSlot {
@@ -17,7 +17,7 @@ export interface TimeSlot {
 }
 
 export interface StructureService {
-    initStructure(structure_id: string): Promise<AxiosResponse>;
+    initStructure(structure_id: string): Promise<HttpResponse>;
 
     getSlotProfile(structureId: string): Promise<StructureSlot>;
 
@@ -27,7 +27,7 @@ export interface StructureService {
 }
 
 export const structureService: StructureService = {
-    initStructure: async (structure_id: string): Promise<AxiosResponse> => {
+    initStructure: async (structure_id: string): Promise<HttpResponse> => {
         return http.get(`/diary/init/structures/${structure_id}`);
     },
 

@@ -1,4 +1,4 @@
-import http from "axios";
+import { http } from 'entcore-toolkit';
 import {Student} from "./student";
 import {ArrayUtils} from "../utils/array.utils";
 import {SearchItem} from "../services";

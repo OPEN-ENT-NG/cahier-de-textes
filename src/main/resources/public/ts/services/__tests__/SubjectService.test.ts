@@ -3,8 +3,12 @@ jest.mock('entcore', () => ({
     ng: {service: jest.fn()}
 }));
 
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+jest.mock('entcore-toolkit', () => Object.assign({}, (jest as any).requireActual('entcore-toolkit'), {
+    http: {get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), postFile: jest.fn(), putFile: jest.fn()}
+}));
+
+import {http} from 'entcore-toolkit';
+import {mockHttpResponse} from '../../test-utils/httpMock';
 import {subjectService} from "../SubjectService";
 import DoneCallback = jest.DoneCallback;
 import {Subject} from "../../model";
@@ -12,9 +16,8 @@ import {Subject} from "../../model";
 describe('subjectService',  () => {
     it('should call getTimetableSubjects service first', (done: DoneCallback) => {
         const structureId: string = '111';
-        const mock = new MockAdapter(axios);
         const data = { response: true };
-        mock.onGet(`/diary/timetableSubjects/${structureId}`).reply(200, data);
+        (http.get as jest.Mock).mockResolvedValueOnce(mockHttpResponse(data, {url: `/diary/timetableSubjects/${structureId}`}));
         subjectService.getTimetableSubjects(structureId).then((response: Subject[]) => {
             console.log(response);
             expect(response).toEqual(data);

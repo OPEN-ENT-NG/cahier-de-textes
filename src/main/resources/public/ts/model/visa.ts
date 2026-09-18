@@ -1,4 +1,4 @@
-import http, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import { http, HttpRequestConfig, HttpResponse } from 'entcore-toolkit';
 import {Structure, Teacher, DateUtils, Homework, ToastUtils, User} from './index';
 import {idiom as lang, model, moment} from 'entcore';
 import {INotebook} from './Notebook';
@@ -179,7 +179,7 @@ export class Visas {
         if (visasList && visasList.length) {
             let promiseArray = [];
             for (let i = 0, imax = visasList.length; i < imax; i++) {
-                let config: AxiosRequestConfig = {
+                let config: HttpRequestConfig = {
                     responseType: 'arraybuffer',
                     headers: {
                         'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export class Visas {
                 };
                 promiseArray.push((http.post(`/diary/visas/topdf`, {visas: visasList[i]}, config)));
             }
-            Promise.all(promiseArray).then((reponses: AxiosResponse[]) => {
+            Promise.all(promiseArray).then((reponses: HttpResponse[]) => {
                 for (let response of reponses) {
                     console.log(response)
                     let filename = DateUtils.getFileNameByContentDisposition(response.headers['content-disposition']);

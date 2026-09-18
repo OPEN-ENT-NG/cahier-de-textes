@@ -1,5 +1,5 @@
 import {ng} from 'entcore'
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {Mix} from "entcore-toolkit";
 import {
     Audience,
@@ -41,7 +41,7 @@ export const courseService: CourseService = {
         filter += addFilter(groupsParams, filter);
 
         try {
-            let {data}: AxiosResponse =
+            let {data}: HttpResponse =
                 await http.get(`/viescolaire/common/courses/${structure.id}/${startAt}/${endAt}?${filter}`)
             return Mix.castArrayAs(Course, Courses.formatSqlDataToModel(data));
         } catch (err) {

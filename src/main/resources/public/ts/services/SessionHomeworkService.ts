@@ -1,10 +1,10 @@
 import {model, ng, idiom as lang} from 'entcore';
-import http, {AxiosResponse} from 'axios';
+import { http, HttpResponse } from 'entcore-toolkit';
 import {DateUtils, Homework, ISessionHomeworkBody, ISessionHomeworkService} from '../model';
 import {EXCEPTIONAL} from '../core/const/exceptional-subject';
 
 export const sessionHomeworkService: ISessionHomeworkService = {
-    create: async (sessionHomework: ISessionHomeworkBody): Promise<AxiosResponse> => {
+    create: async (sessionHomework: ISessionHomeworkBody): Promise<HttpResponse> => {
         const formatPostHomeworks = (homeworks: Array<Homework>) => {
             return homeworks.map(h => {
                 let res = basicFormatHomework(h);
@@ -41,7 +41,7 @@ export const sessionHomeworkService: ISessionHomeworkService = {
         return http.post(`/diary/sessions/homework`, {homeworks: formatPostHomeworks(sessionHomework.homeworks)});
     },
 
-    update: async (sessionHomework: ISessionHomeworkBody): Promise<AxiosResponse> => {
+    update: async (sessionHomework: ISessionHomeworkBody): Promise<HttpResponse> => {
         const formatPutHomeworks = (homeworks: Array<Homework>) => {
             return homeworks.map(h => basicFormatHomework(h));
         };
